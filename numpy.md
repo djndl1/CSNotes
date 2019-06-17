@@ -191,7 +191,7 @@ array([ 1,  2,  5,  5, 76,  3])
 array([ 1,  2,  5,  5, 76,  3])
 ```
 
-- `ndarray.sort(axis=-1, kind='quicksort', order=None)`; `numpy.sort(a, axis=-1, kind='quicksort', order=None)`; Return a sorted copy of an array. 
+- `ndarray.sort(axis=-1, kind='quicksort', order=None)`; `numpy.sort(a, ax/is=-1, kind='quicksort', order=None)`; Return a sorted copy of an array. 
 
 - `ndarray.sort(axis=-1, kind='quicksort', order=None)`; `numpy.argsort(a, axis=-1, kind='quicksort', order=None)`; 
 
@@ -243,3 +243,163 @@ array([[1, 1, 1, 2, 2, 2],
 Arithmetic and comparison operations on ndarrays are defined as element-wise operations, and generally yield ndarray objects as results.
 
 Each of the arithmetic operations (`+`, `-`, `*`, `/`, `//`, `%`, `divmod()`, `**` or `pow()`, `<<`, `>>`, `&`, `^`, `|`, `~`) and the comparisons (`==`, `<`, `>`, `<=`, `>=`, `!=`) is equivalent to the corresponding universal function (or ufunc for short) in NumPy.
+
+The matrix product can be performed using the @ operator (in python >=3.5) or the dot function or method.
+
+## Array Broadcasting
+
+Broadcasting describes how numpy treats arrays with different shapes during arithmetic operations.
+
+When operating on two arrays, NumPy compares their shapes element-wise. It starts with the trailing dimensions, and works its way forward. 
+
+Two dimensions are compatible when 
+
+- they are equal
+
+or 
+
+- one of them is $1$
+
+The size of the resulting array is the maximum size along each dimension of the input arrays.
+
+```python
+x = np.arange(4)
+xx = x.reshape(4,1)
+y = np.ones(5)
+```
+
+Result
+
+```python
+array([[0],
+       [1],
+       [2],
+       [3]])
+       
+array([1., 1., 1., 1., 1.]) 
+
+array([[1., 1., 1., 1., 1.],
+       [2., 2., 2., 2., 2.],
+       [3., 3., 3., 3., 3.],
+       [4., 4., 4., 4., 4.]])
+```
+
+### `class numpy.broadcast`: an object mimicing broadcasting
+
+```python
+>>> x = np.array([[1], [2], [3]])
+>>> y = np.array([4, 5, 6])
+>>> b = np.broadcast(x, y)
+>>> b.shape
+(3, 3)
+```
+
+### `numpy.broadcast_to(array, shape, subok=False)`: broadcast an array to a new shape
+
+```python
+>>> x = np.array([1, 2, 3])
+>>> np.broadcast_to(x, (3, 3))
+array([[1, 2, 3],
+       [1, 2, 3],
+       [1, 2, 3]])
+```
+
+### `numpy.broadcast_arrays(*args, **kwargs)`: Broadcast any number of arrays against each other.
+
+```python
+>>> x = np.array([[1,2,3]])
+>>> y = np.array([[4],[5]])
+>>> np.broadcast_arrays(x, y)
+[array([[1, 2, 3],
+       [1, 2, 3]]), array([[4, 4, 4],
+       [5, 5, 5]])]
+```
+
+## Array Creation
+
+Often, the elements of an array are originally unknown, but its size is known. Hence, NumPy offers several functions to create arrays with initial placeholder content. These minimize the necessity of growing arrays, an expensive operation.
+
+`numpy.zeros()`; `numpy.ones()`; `numpy.empty()`; `numpy.arange()`; `numpy.linspace()`; `numpy.eye()`; `numpy.identity()`; `numpy.fill()`; `numpy.rec()`; `numpy.char()`; 
+
+## Indexing
+
+It must be noted that the returned array is not a copy of the original, but points to the same values in memory as does the original array. 
+
+### Index arrays
+
+NumPy arrays may be indexed with other arrays (or any other sequence- like object that can be converted to an array, such as lists, with the exception of tuples)
+
+```python
+>>> y = np.arange(35).reshape(5,7)
+>>> y[np.array([0,2,4])]
+array([[ 0,  1,  2,  3,  4,  5,  6],
+       [14, 15, 16, 17, 18, 19, 20],
+       [28, 29, 30, 31, 32, 33, 34]])
+>>> y[np.array([0,2,4]), np.array([0,1,2])]
+array([ 0, 15, 30])
+```
+
+Boolean arrays must be of the same shape as the initial dimensions of the array being indexed. In the most straightforward case, the boolean array has the same shape. Unlike in the case of integer index arrays, in the boolean case, the result is a 1-D array containing all the elements in the indexed array corresponding to all the true elements in the boolean array
+
+```python
+>>> b = y>20
+>>> y[b]
+array([21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34])
+```
+
+Index arrays may be combined with slices.
+
+### Structural indexing tools
+
+To facilitate easy matching of array shapes with expressions and in assignments, the np.newaxis object can be used within array indices to add new dimensions with a size of 1. 
+
+```python
+>>> x = np.arange(5)
+>>> x[:,np.newaxis] + x[np.newaxis,:]
+array([[0, 1, 2, 3, 4],
+       [1, 2, 3, 4, 5],
+       [2, 3, 4, 5, 6],
+       [3, 4, 5, 6, 7],
+       [4, 5, 6, 7, 8]])
+```
+
+One can select a subset of an array to assign to using a single index, slices, and index and mask arrays.
+
+```python
+>>> x = np.arange(10)
+>>> x[2:7] = 1
+>>> x[2:7] = np.arange(5)
+```
+
+## Data types
+
+There are 5 basic numerical types representing booleans (bool), integers (int), unsigned integers (uint) floating point (float) and complex.
+
+Data-types can be used as functions to convert python numbers to array scalars (see the array scalar section for an explanation), python sequences of numbers to arrays of that type. To convert the type of an array, use the `.astype()` method (preferred) or the type itself as a function.
+
+A data type object describes describes how the bytes in the fixed-size block of memory corresponding to an array item should be interpreted.
+
+Structured data types are formed by creating a data type whose fields contain other data types. Each field has a name by which it can be accessed. 
+
+```python
+>>> dt = np.dtype([('name', np.unicode_, 16), ('grades', np.float64, (2,))])
+>>> dt['name']
+dtype('|U16')
+>>> dt['grades']
+dtype(('float64',(2,)))
+```
+
+Each built-in data-type has a character code (the updated Numeric typecodes), that uniquely identifies it.
+
+### Structured Datatypes
+
+Structured datatypes are designed to be able to mimic ‘structs’ in the C language, and share a similar memory layout. A structured datatype can be thought of as a sequence of bytes of a certain length (the structure’s itemsize) which is interpreted as a collection of fields. Each field has a name, a datatype, and a byte offset within the structure. 
+
+TODO
+
+## Structured arrays
+
+Structured arrays are ndarrays whose datatype is a composition of simpler datatypes organized as a sequence of named fields.
+
+TODO
+
