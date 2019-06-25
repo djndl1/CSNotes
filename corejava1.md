@@ -34,8 +34,30 @@ Declaring multiple variables in a single line is not recommended.
 var vacationDays = 12
 var greeting = "Hello"
 ```
-
 Use `final` to denote a constant, and `static final` to set up a class constant so that it's available to multiple methods inside a single class.
+
+## Arithmetic Operators
+
+Integer division by 0 raises an exception, whereas floating-point division by 0 yields an infinite or NaN result.
+
+The `Math` class contains an assortment of mathematical functions.
+
+`++` is not recommended inside expressions.
+
+## Strings
+
+Conceptually, Java strings are sequences of Unicode characters.
+
+`.substring()`: extract a substring
+
+- The `String` class gives no methods that let change a character in an existing string.
+
+- `.equals()` tests whether two strings are equal.
+
+`""` is an empty string while a String variable can hold a special value `null`.
+
+`.length()`, `.charAt()` operate by code units. `.codePointCount()`, `codePointAt()` by code points.
+
 
 
 
