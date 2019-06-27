@@ -46,9 +46,12 @@ Regex patterns are compiled into a series of bytecodes which are then executed b
 
 Both patterns and strings to be searched can be Unicode strings (`str`) as well as 8-bit strings (`bytes`). However, Unicode strings and 8-bit strings cannot be mixed: that is, you cannot match a Unicode string with a byte pattern or vice-versa; similarly, when asking for a substitution, the replacement string must be of the same type as both the pattern and the search string.
 
-`\` is used to indicate special forms, literal backslash have to be written `\\`.
+`\` is used to indicate special forms, literal backslash have to be written `\\`. Since a literal backslash must be expressed as `\\` in RE, the string representation of RE `\\` then is expressed as `\\\\` or `r'\\'`.
 
 Python's raw string notation is used for regular expression patterns.
 
 The matching engine goes as far as it can at first, cand if no match is found it will then prograssively back up and retry the rest of the RE again and again.
 
+# Module content
+
+- `re.compile(pattern, falgs=0)`: compile (RE is not part of python) a regular expression pattern into a regex object used for matching.
