@@ -18,6 +18,7 @@ A `String` represents a string in the UTF-16 format in which supplementary chara
 
 - `boolean startsWith()`, `boolean endsWith()`
 
+
 - `int indexOf()`: returns the start of the argument; `int lastIndexOf(String str)`: returns the start of last substring equal to the strings
 
 - `length()`; `CodePointCount()`
@@ -40,3 +41,15 @@ A `String` represents a string in the UTF-16 format in which supplementary chara
 - `repeat()`
 
 # Class StringBuilder
+
+A mutable sequence of characters, API compatible with `StringBuffer` without guarantee of synchronization. Every string builder has a capacity.If the internal buffer overflows, it is automatically made larger.
+
+- `append()`, `insert()`: accepts boolean, char, char array, numbers, various `CharSequence` objects.
+
+- `appendCodePoint()`, `codePointAt()`, `codePointBefore()`...
+
+# Class `StringBuffer`
+
+a thread-safe, mutable sequence of characters. String buffers are safe for use by multiple threads. The methods are synchronized where necessary so that all the operations on any particular instance behave as if they occur in some serial order that is consistent with the order of the method calls mde by each of the individual threads involved.
+
+
