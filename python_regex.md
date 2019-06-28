@@ -6,9 +6,15 @@
 
 - `.` (dot): matches any character except a newline unless `DOTALL` flag is present
 
-- `^`(caret): the start of the string
+- `^`(caret): the start of the line
 
-- `$`: the end of the string.
+- `$`: the end of the line.
+
+- `\A`: the start of the string
+
+- `\b`: word boundary, zero match.
+
+- `\B`: non-word boundary
 
 - `*`: 0 or more repetitions of the preceding Regex. ! this is not wildcard `*`.
 
@@ -24,9 +30,20 @@
 
 - `|`: OR-match 
 
-- `(...)`: match whatever regx is inside the parentheses.
 
-...
+## Grouping 
+
+- `(...)`: Grouping whatever regex is inside the parentheses. groups can be nested.
+
+- `\1`: backreference a former matched group
+
+- `(?:whatever regex here)`: non-capturing group, not interested in retrieving the group's content. Particularly useful when added to an existing pattern without having to care about group numbering.
+
+- `(?<name>whatever regex here)`: named groups, associating a group with a name.
+
+- `(?P=name)`: match the so-named group
+
+## Special characters
 
 Some of the special sequences beginning with `\` represent predefined sets of charactersthat are often useful.
 
@@ -53,5 +70,7 @@ Python's raw string notation is used for regular expression patterns.
 The matching engine goes as far as it can at first, cand if no match is found it will then prograssively back up and retry the rest of the RE again and again.
 
 # Module content
+
+
 
 - `re.compile(pattern, falgs=0)`: compile (RE is not part of python) a regular expression pattern into a regex object used for matching.
