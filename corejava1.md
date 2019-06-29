@@ -71,4 +71,41 @@ label:
 // jumps here when the break statement executes
 ```
 
+## Array
 
+`type[] var` declaration is preferred. Allelements are initialized after creating an array. It is esssentially the same as a pointer to an array allocated on the heap. In Java, the `[]` operator is predefined to perform _bounds checking_.
+
+Java has a foreach loop
+
+```java
+for (variable : collection) statement 
+```
+
+`java.util.Arrays` provides many methods to manipulate arrays. static `.Copyof` copy all values of one array into a new array, one of whose common uses is to increase the size of an array.
+
+```java
+luckynumbers = Arrays.copyOf(luckyNumbers, 2 * luckyNumbers.length)
+```
+
+In the `main` method of a Java program, the name of the program is not stored in the `args` array.
+
+
+# Objects and Classes
+
+A class is the template or blueprint from which objects are made. Encapsulation (information hiding) is a key concept in working with objects. Formally, encapsulation is simply combining data and behavior in one package and hiding the implementation details from users of object. The bits of data in an object are called its instance fields, and the procedures that operate on the data are called its methods. A specific object that is an instance of a class will have specific values of its instance fields. The set of those values is the current state of the object. Whenever you invoke a method on an object, its state may change.
+
+Objects have three key characteristics:
+
+1. behavior: defined by the methods that is callable
+
+2. state: information about what it currently looks like
+
+3. identity
+
+## Relationships between Classes
+
+- Dependece ("uses-a")
+
+- Aggregation ("has-a")
+
+- Inheritance ("is-a")
