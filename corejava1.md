@@ -4,7 +4,7 @@ Java is a whole platform, with a huge library, containign lots of reusable code,
 
 The syntax for java is a cleaned-up version of C++ syntax. Java is object-oriented, distributed (having an extensive library for coping with TCP/IP protocols so that accessing remote objects is as easy as accessing a local file system), robust (has a pointer model that eliminates the possiblity of overwriting memory and corrpting data); though not as expected, java security model is still good. Since Java generates bytecode, it is architecture-neutral and its specification has no implementation-dependent aspects. Java's JIT compiler now provides high performance. Java was the first mainstream language to support concurrent programming. 
 
-# Chap.3 Fundamental Programming of Java
+# Fundamental Programming of Java
 
 The `main` method does not return an exit code to the operating system. To terminate the program with a different exit code, use the `System.exit` method.
 
@@ -109,3 +109,4 @@ Objects have three key characteristics:
 - Aggregation ("has-a")
 
 - Inheritance ("is-a")
+
