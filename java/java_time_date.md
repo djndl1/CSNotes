@@ -1,6 +1,25 @@
 # Background knowledge
 
-UTC is based on atom clock and UT based on astronomical observations. Since the earth does not rotate uniformly, a leap second is introduced to keep UTC and UT close within 0.9 second.
+The `History` section of [this Wikipedia article](https://en.wikipedia.org/wiki/Leap_second) has some brief introduction to time measurement. [This article](https://en.wikipedia.org/wiki/Standard_time) introduced why standard time is needed, of which, the [GMT](https://en.wikipedia.org/wiki/Greenwich_Mean_Time) is a important case.
+
+Modern civil time is generally standard time in a time zone at a fixed offset from UTC or from GMT, possibly adjusted by daylight saving time during part of the year. Traditionally, civil time was mean solar time reckoned from midnight.
+
+## International Atomic Time
+
+A high-precision coordinate time standard based on the notional passage of proper time of Earth's geoid. The basis for UTC.
+
+## Universal Time
+ 
+Universal Time is a time standard based on Earth's rotation, a modern continuation of Greenwich Mean Time (GMT), the mean solar time on the Prime Meridian at Greenwich, England. There are several versions of Universal Time, of which the most commonly used are Coordinated Universal Time (UTC) and UT1. All these versions of UT except for UTC, are based on Earth's rotation relative to distant celestial objects, with a sclaing factor and other adjustments to make them closer to solar time. UTC is based on International Atomic Time, with leap seconds added to keep within 0.9 second of UT1. 
+
+A leap second is a one-second adjustment that is occasionally applied to civil time to keep UTC close the mean solar time at 0 Meridian, to accomomodate irregularities and slowdown in the Earth's rotation. Because the Earth's rotation speed varies in response to climatic geological events, UTC leap seconds are spaced and unpredictable. Not all clocks implement leap seconds in the same manner as UTC. Leap seconds in Unix time are commonly implemented by repeating the last second of the day. Network Time Protocol freezes time during the leap second. Other experimental schemes smear time in the vicinity of a leap second.
+
+## Main Versions
+
+UT1: the principal form of UT, computed from observations of distant quasars.
+
+UTC: an atomic timescale that approximates UT1.
+
 
 ## ISO 8601
 

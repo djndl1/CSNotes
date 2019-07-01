@@ -165,4 +165,3 @@ $$
 
 where the function should take two coefficent $a$ and $b$ and returns $ax+b$.
 
-
