@@ -1,7 +1,112 @@
+## Basics
+
+`quote` = `'`: do nothing
+
+`null` reutrn true of the empty list.
+
+`not` returns true if its argument is false
+
+Lisp makes no distinction between a program, a procedure and a function.
+
+```lisp
+(defun our-member (obj lst)
+    (if (null lst)
+        nil
+        (if (eql obj (car lst))
+            lst
+            (our-member obj (cdr lst)))))
+```
+
+The most general output function in Common Lisp is `format`. The standard function for input is `read`, which a complete parser, does not just read characters and return a string.
+
+`let` introduces mew local variables.
+
+```lisp
+(defun ask-number ()
+    (format t "Please enter a number.")
+    (let ((val (read)))
+        (if (numberp val)
+            val
+            (ask-number))))
+
+(ask-number)
+```
+
+`defparameter` creates a global variable, which is often surrounded by `**`.
+`defconstant` defines global constants.
+`boundp` checks if a name is bound to a global variable or constant.
+
+The most general assignment operator is `setf`.
+
+One of the most important advantages of functional programming is that it allows _interactive testing_.
+
+The `do` macro is the fundamental iteration operator.
+
+```lisp
+(defun show-squares (start end)
+  (do ((i start (+ i 1)))
+      ((> i end) 'done)
+    (format t "~A ~A~%" i (* i i))))
+
+(show-squares 1 5)
+```
+
+The above iteration has a recursive version
+
+```lisp
+(defun show-squares-recursive (i end)
+  (if (> i end)
+      'done
+      (progn
+        (format t "~A ~A~%" i (* i i))
+        (show-squares (+ i 1) end))))
+
+(show-squares-recursive 1 5)
+```
+
+To iterate through the elements of a list, use `dolist`:
+
+```lisp
+(defun our-length (lst)
+  (let ((len 0))
+    (dolist (obj lst)
+      (setf len (+ len 1))) ;such an assignment is not unacceptable
+    len))
+
+(our-length '(1 2 3 4 5))
+```
+
+A recursive version
+
+```lisp
+(defun our-length-recursive (lst)
+  (if (null lst)
+      0
+      (+ 1 (our-length-recursive (cdr lst)))))
+
+(our-length-recursive '(1 2 3 4 5 6))
+```
+
+`function` returns a function object given the name of the function. Just as `'` is an abbreviation for `(quote ...)`, `#'` is for `(function ...)`.
+
+`apply` takes a function and its arguments, and returns the result of the function with the arguments applied.
+
+`funcall` does the same thing without having to package the arguments into a list.
+
+lambda expression: 
+
+```lisp
+(lambda (x y)
+    (+ x y))
+```
+
+In common lisp, values or objects have types, not variables. This approach is called _manifest typing_. An object always has more than one type. The builtin Common lisp types form a hierarchy of subtypes and supertypes.
+
+
 
 ## Arrays and vectors
 
-A literal array is dentoed by `#na` where `n` is the number of dimensions in the array.
+A literal array is dentoed by `#na` where `n` is the number of dimensions in the array. 
 
 `make-array` makes an array
 
@@ -23,7 +128,7 @@ One-dimensional array is a vector, also built by calling `vector`
 
 `svref` (simple vector)is faster than `aref` when accessing a vector.
 
-## an example of binary search
+### an example of binary search
 
 ```lisp
 (defun finder (obj vec start end)
@@ -164,4 +269,46 @@ $$
 $$
 
 where the function should take two coefficent $a$ and $b$ and returns $ax+b$.
+
+## Structures
+
+Similarly to C struct.
+
+```lisp
+(defstruct point
+    x
+    y)
+```
+
+It also implicitly defines the functions `make-point`, `point-p`, `copy-point`, `point-x` and `point-y`.
+
+`typep` can also be used to determine the type of an object.
+
+```lisp
+(typep p 'point)
+```
+
+We can also specify default values for structure fields by enclosign the field name and a default expression in a list in the original definition.
+
+```lisp
+(defstruct polemic
+    (type (progn
+            (format t "What kind of polemic was it? ")
+            (read)))
+    (effect nil))
+```
+
+We can also control things like the way a structure is displayed and the prefix used in the names of the access functions it creates.
+
+```lisp
+(defstruct (point (:conc-name p)
+                  (:print-function print-point))
+    (x 0)
+    (y 0))
+    
+(defun print-point (p stream depth)
+    (format stream "#<~A,~A>" (px p) (py p)))
+```
+
+The `:conc-name` argument specifies what should be concatenated to the front of the field names to make access functions for them. The `print-function` is the name of the function that should be used to print a point when it has to be displayed.
 
