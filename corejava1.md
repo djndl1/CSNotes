@@ -33,7 +33,9 @@ Declaring multiple variables in a single line is not recommended.
 ```java
 var vacationDays = 12
 var greeting = "Hello"
+var harry = new Employee("Harry Hacker", 50000, 1989, 19, 1); // instead of using `Employee`
 ```
+
 Use `final` to denote a constant, and `static final` to set up a class constant so that it's available to multiple methods inside a single class.
 
 ## Arithmetic Operators
@@ -110,3 +112,26 @@ Objects have three key characteristics:
 
 - Inheritance ("is-a")
 
+## Working with `null` references
+
+When defining a class, it is a good idea to be clear about which fields can be `null`.
+
+```java
+if (n == null)
+    name = "unknown";
+else
+    name = n;
+```
+
+```java
+name = Objects.requireNonNullElse(n, "unknown");
+```
+
+or 
+
+```java
+Objects.requireNonNull(n, "The name cannot be null");
+name = n;
+```
+
+If an exception occurs, make the exception report the description of the problem or pinpoints the location of the problem.
