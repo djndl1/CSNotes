@@ -102,7 +102,30 @@ lambda expression:
 
 In common lisp, values or objects have types, not variables. This approach is called _manifest typing_. An object always has more than one type. The builtin Common lisp types form a hierarchy of subtypes and supertypes.
 
+## Lists
 
+Lisp has outgrown "LISt Processor". Common Lisp is a general-purpose programming language with a wide variety of data structures.
+
+a `cons` is a pair of pointers; the first one is the `car` and the second is the `cdr`. Conses provide a convenient representation for pairs of any type. The two havels of a cons can point to any kind of object, including conses. The `cdr` of a list is either another cons or `nil`. Lists are not a distinct kind of object, but conses linked together. Every that is not a cons is an atom. Note that `nil` is both an atom and a list. Each time `cons` is called, Lisp allocates a new piece of memory with room.
+
+## Equality
+
+`eq` tests if two arguments are the same identical object. 
+
+`eql` = `eq` + testing if two numbers or two characters are of the same value. `eql` tells whether two objects are conceptually the same, while `eq` tells whether two objects are implementationally identical. Thus `eql` is the default comparison predicate. 
+
+`equal` tests if two objects are structurally similar (isomorphic) objects. A rough rule of thumb is that two objects are `equal` iff their printed representations are the same.
+
+`=` is used to compare mathematical values.
+
+```lisp
+(= 5 5.0) ==> true
+(eql) 5 5.0) ==> false
+```
+
+## Pointers, garbage collection
+
+Every value is conceptually a pointer. When a value is assigned to a variable or store it in a data structure, what gets stored is actually a pointer to the value. When the contents of the data structure or the value of the variable is asked for, Lisp returns what it points to. For efficiency, Lisp sometimes use an immediate representation instead of a pointer.
 
 ## Arrays and vectors
 
