@@ -135,3 +135,18 @@ name = n;
 ```
 
 If an exception occurs, make the exception report the description of the problem or pinpoints the location of the problem.
+
+Be careful not to let the accessor return a reference to a private mutable field. If a reference to a mutable object must be returned, clone it first.
+
+```java
+class Employee {
+    ...
+    public Date getHireDay() {
+        return (Date) hierDay.clone();
+    }
+}
+```
+
+Access priviledges are class-based. A method can access the private data of all objects of its class.
+
+The `final` keywords merely means the object reference will never again refer to a difference object, but the object can be mutated.

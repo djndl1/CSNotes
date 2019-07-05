@@ -403,3 +403,18 @@ Structured arrays are ndarrays whose datatype is a composition of simpler dataty
 
 TODO
 
+# Numpy IO
+
+## Numpy binary files
+
+`numpy.save`, `numpy.load`, `numpy.savez`, `numpy.savez_compressed` saves/loads arrays to/from binary files.
+
+## Numpy text files
+
+`numpy.savetxt` saves an array to a text file with a customizable header and format. `numpy.loadtxt` is a fast reader for simply formatted files.
+
+## base-n representations
+
+`numpy.binary_repr`, `numpy.base_repr`
+
+
