@@ -52,3 +52,7 @@ class Fib:
         return fib
 ```
 
+`iter(object [,sentinel])` returns an iterator object. If `sentine` is absent, `object` must support the iteration protocol or the sequence protocol. If `sentinel` is givne, the `object` must be callable.
+
+See [Iterators on PEP](https://www.python.org/dev/peps/pep-0234/) and 
+https://www.python.org/dev/peps/pep-0255/
