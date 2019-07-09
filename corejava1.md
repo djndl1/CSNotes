@@ -145,8 +145,35 @@ class Employee {
         return (Date) hierDay.clone();
     }
 }
+
 ```
 
 Access priviledges are class-based. A method can access the private data of all objects of its class.
 
 The `final` keywords merely means the object reference will never again refer to a difference object, but the object can be mutated.
+
+Static variables are quite rare, static constants are more common. Static methods don't have a `this` parameter. However, a static method can access a static field. Static factory methods can vary the type of the constructed object. Every class can have a `main` method, a handy trick for unit testing of classes.
+
+## Object construction
+
+Numbers defaults to 0, `boolean` to `false`, and object references to `null`.
+
+If no constructors are written, a no-argument constructor is provided which sets all the instance fields to default values. Some programmers prefix `a` to every parameters of a method to distinguish from field name. Constructor dispatch is possible thorugh `this` keyword.
+
+```java
+public Employee {
+    this("Employee #" + nextId, s);
+    nextId++;
+}
+```
+Besides explicitly initializing fields, it is possible to use __initializtion block__ to initalize variables. This mechanism is never necessary and is not common.
+
+`finalize` method is now deprecated since when the method will be called is undetermined. `Cleaner` class registers an action that is carried out when an object is no longer reacheable. `Runtime.addShutdownHook` adds a "shutdown hook".
+
+## Packages
+
+The main reason for using packages is to guarantee the uniqueness of class names. To absolutely guarantee a unique package name, use an Internet domain name written in reverse.
+
+A class can use all classes from its own package and all _public_ classes from other packages. `import static` permits the importing of static methods and fields, not just class. A source file without `package` is locates in the unnamed package. The compiler does not check the directory structure when it compiles source files.
+
+A JAR file contains multiple class files and subdirectories in a compressed format, saving space and improving performance.
