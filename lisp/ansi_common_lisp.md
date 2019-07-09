@@ -114,10 +114,56 @@ a `cons` is a pair of pointers; the first one is the `car` and the second is the
 
 ```lisp
 (defun our-copy-list (lst)
-  if (atom lst)
+  (if (atom lst)
   lst
-  (cons (car lst) (our-copy-list (cdr lst))))
+  (cons (car lst) (our-copy-list (cdr lst)))))
 ```
+
+Conses can be considered as binary trees. CL has several built-in functions for use with trees. `copy-tree` takes a tree and returns a copy of it.
+
+```lisp
+(defun our-copy-tree (tr)
+  (if (atom tr)
+      tr
+      (cons (our-copy-tree (car tr))
+            (our-copy-tree (cdr tr)))))
+```
+
+`subst` traverses a tree
+
+```lisp
+(defun our-subst (new old tree)
+  (if (eql tree old)
+      new
+      (if (atom tree)
+          tree
+          (cons (our-subst new old (car tree))
+                (our-subst new old (cdr tree))))))
+```
+
+Lists are a good way to represent small sets. `member`, `member-if`, `adjoin`, `intersection`, `union`, `set-difference`
+
+```lisp
+(defun our-member-if (fn lst)
+  (and (consp lst)
+       (if (funcall fn (car lst))
+           lst
+           (our-member-if fn (cdr lst)))))
+```
+
+Another way to think of a list is as a series of objects in a particular order. In CL, sequences include both lists and vectors. `length`
+
+To copy part of a sequence, we use `subseq`. `reverse` returns a sequence with the same elements as its argument but in reverse order.
+
+`sort` takes a sequence and a comparison function of two arguments. For efficiency reasons, `sort` is allowed to modify the sequence given to it as an argument.
+
+```lisp
+(defun nthmost (n lst)
+  (nth (- n 1)
+       (sort (copy-list lst) #'>)))
+```
+
+`some`, `every`
 
 ## a run-length compression example
 
@@ -193,6 +239,7 @@ a `cons` is a pair of pointers; the first one is the `car` and the second is the
 
 ```list
 (maplist #'(lambda (x) x) '(a b c))
+
 ```
 
 ## Pointers, garbage collection
