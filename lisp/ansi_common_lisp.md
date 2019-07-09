@@ -8,6 +8,8 @@
 
 Lisp makes no distinction between a program, a procedure and a function.
 
+Use `load` to load a lisp program.
+
 ```lisp
 (defun our-member (obj lst)
     (if (null lst)
@@ -102,7 +104,101 @@ lambda expression:
 
 In common lisp, values or objects have types, not variables. This approach is called _manifest typing_. An object always has more than one type. The builtin Common lisp types form a hierarchy of subtypes and supertypes.
 
+## Lists
 
+Lisp has outgrown "LISt Processor". Common Lisp is a general-purpose programming language with a wide variety of data structures.
+
+a `cons` is a pair of pointers; the first one is the `car` and the second is the `cdr`. Conses provide a convenient representation for pairs of any type. The two havels of a cons can point to any kind of object, including conses. The `cdr` of a list is either another cons or `nil`. Lists are not a distinct kind of object, but conses linked together. Every that is not a cons is an atom. Note that `nil` is both an atom and a list. Each time `cons` is called, Lisp allocates a new piece of memory with room.
+
+`list` builds a list; `copy-list` copies a list; `append` returns the concatenation of any number of lists.
+
+```lisp
+(defun our-copy-list (lst)
+  if (atom lst)
+  lst
+  (cons (car lst) (our-copy-list (cdr lst))))
+```
+
+## a run-length compression example
+
+```lisp
+(defun n-elts (elt n)
+  (if (> n 1)
+      (list n elt)
+      elt))
+
+(defun compr (elt n lst)
+  (if (null lst)
+      (list (n-elts elt n))
+      (let ((next (car lst))) ;lst is the part yet to examine
+        (if (eql next elt)
+            (compr elt (+ n 1) (cdr lst))
+            (cons (n-elts elt n)
+                  (compr next 1 (cdr lst)))))))
+
+(defun compress (x)
+  (if (consp x)
+      (compr (car x) 1 (cdr x))
+      x))
+
+;;; unfold a (elt n) pair
+(defun list-of (n elt)
+  (if (zerop n)
+      nil
+      (cons elt (list-of (- n 1) elt))))
+
+(defun uncompress (lst)
+  (if (null lst)
+      nil
+      (let ((elt (car lst))
+            (rest (uncompress (cdr lst))))
+        (if (consp elt)
+            (append (apply #'list-of elt)
+                    rest)
+            (cons elt rest)))))
+
+(setf runned (compress '(1 1 1 0 1 0 0 0 0 1)))
+(uncompress runned)
+```
+
+### accessing a list
+
+`nth`, `nthcdr`, `last` (zero indexed); `first` to `tenth` (one-indexed)
+
+
+## Equality
+
+`eq` tests if two arguments are the same identical object. 
+
+`eql` = `eq` + testing if two numbers or two characters are of the same value. `eql` tells whether two objects are conceptually the same, while `eq` tells whether two objects are implementationally identical. Thus `eql` is the default comparison predicate. 
+
+`equal` tests if two objects are structurally similar (isomorphic) objects. A rough rule of thumb is that two objects are `equal` iff their printed representations are the same.
+
+`=` is used to compare mathematical values.
+
+```lisp
+(= 5 5.0) ==> true
+(eql) 5 5.0) ==> false
+```
+
+## Mapping functions
+
+`mapcar` returns the result of applying the function to elements taken from each list until some list runs out.
+
+```list
+(mapcar #'list '(a b c) '(1 2 3 4))
+```
+
+`maplist` calls the function on successive cdrs of the lists
+
+```list
+(maplist #'(lambda (x) x) '(a b c))
+```
+
+## Pointers, garbage collection
+
+
+Every value is conceptually a pointer. When a value is assigned to a variable or store it in a data structure, what gets stored is actually a pointer to the value. When the contents of the data structure or the value of the variable is asked for, Lisp returns what it points to. For efficiency, Lisp sometimes use an immediate representation instead of a pointer.
 
 ## Arrays and vectors
 
