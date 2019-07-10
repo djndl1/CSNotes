@@ -177,3 +177,15 @@ The main reason for using packages is to guarantee the uniqueness of class names
 A class can use all classes from its own package and all _public_ classes from other packages. `import static` permits the importing of static methods and fields, not just class. A source file without `package` is locates in the unnamed package. The compiler does not check the directory structure when it compiles source files.
 
 A JAR file contains multiple class files and subdirectories in a compressed format, saving space and improving performance.
+
+## Inheritance
+
+Factoring out common functionality by moving it to a superclass is routine in OOP. 
+
+A subclass cannot access the private fields of a superclass directly. To access them, use `super.getWhateverYouNeed`. `super` is not a reference to an object but a special keyword that directs the compiler to invoke the superclass method.
+
+Call `super()` to construct the superclass in the constructors of the subclass. Otherwise, the no-argument constructor of the superclass is invoked.
+
+`this` and `super` access a class method/fields or constructors.
+
+In Java, dynamic binding is the default behavior.
