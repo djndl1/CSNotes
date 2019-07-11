@@ -189,3 +189,21 @@ Call `super()` to construct the superclass in the constructors of the subclass. 
 `this` and `super` access a class method/fields or constructors.
 
 In Java, dynamic binding is the default behavior.
+
+Attempting to store an `Employee` reference in a `manager` array causes an `ArrayStoreException`.
+
+When calling a method, the compiler first determines the type of the implicit parameter, finds all available methods for that class, then resolves overloading. If the method is _statically bound_, i.e. modified by `private`, `static`, `final` or a constructor, then the method is found. Otherwise the type determined is searched first then its superclass to find the method. The actual search is done through a table lookup instead of searching upwards.
+
+Classes that cannot be extended are called _final_ classes and the `final` modifier in the definition of the class indicates this.
+
+```java
+public final class Executive extends Manager {
+    ...
+}
+```
+
+`final` also modifies a specific method in a class. 
+
+The is only one good reason to make a method or class `final`: to make sure its semantics cannot be changed in a subclass.
+
+The JIT compiler does a better job at optimization and inlining a method instead of having programmers figure out whether to `final` a method to avoid the overhead of dynamic binding.
