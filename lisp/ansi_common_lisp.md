@@ -141,6 +141,7 @@ Conses can be considered as binary trees. CL has several built-in functions for 
                 (our-subst new old (cdr tree))))))
 ```
 
+
 Lists are a good way to represent small sets. `member`, `member-if`, `adjoin`, `intersection`, `union`, `set-difference`
 
 ```lisp
@@ -207,6 +208,8 @@ To copy part of a sequence, we use `subseq`. `reverse` returns a sequence with t
 (uncompress runned)
 ```
 
+The representation of lists as conses makes it natural to use them as pushdown stacks. Two macros `push` and `pop` are available. `pushnew` is a variant of `push` that uses `adjoin` instead of `cons`.
+
 ### accessing a list
 
 `nth`, `nthcdr`, `last` (zero indexed); `first` to `tenth` (one-indexed)
@@ -246,6 +249,8 @@ To copy part of a sequence, we use `subseq`. `reverse` returns a sequence with t
 
 
 Every value is conceptually a pointer. When a value is assigned to a variable or store it in a data structure, what gets stored is actually a pointer to the value. When the contents of the data structure or the value of the variable is asked for, Lisp returns what it points to. For efficiency, Lisp sometimes use an immediate representation instead of a pointer.
+
+_Automatic memory management_ is one of Lisp's most valuable features. The Lisp system maintains a segment of memory, _heap_. The function `cons` returns a newly allocated cons. Allocating memory from the heap is sometimes generically known as _consing_. Memory that is no longer needed is called _garbage_, and the scavenging operation is called _garbage collectiion_ or __GC__. Allocating storage and scavenging memory to reclaim it can be expensive compared to the routine operations of a program. It is easy to write programs that cons excessively.
 
 ## Arrays and vectors
 
