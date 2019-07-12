@@ -152,6 +152,16 @@ Lists are a good way to represent small sets. `member`, `member-if`, `adjoin`, `
            (our-member-if fn (cdr lst)))))
 ```
 
+```lisp
+(defun new-union (x y)
+  (let ((new-lst x))
+    (if (null y)
+        new-lst
+        (if (member (car y) x)
+             (new-union new-lst (cdr y))
+             (new-union (append new-lst (list (car y))) (cdr y))))))
+```
+
 Another way to think of a list is as a series of objects in a particular order. In CL, sequences include both lists and vectors. `length`
 
 To copy part of a sequence, we use `subseq`. `reverse` returns a sequence with the same elements as its argument but in reverse order.
@@ -245,10 +255,34 @@ The representation of lists as conses makes it natural to use them as pushdown s
 
 ```
 
+## Dotted lists
+
+A proper list is either `nil` or a cons whose `cdr` is a proper list. dot notation implies a nonproper list (dotted list). In dot notation, the car and cdr of each cons are shown separated by a period.
+
+```lisp
+(defun proper-list? (x)
+  (or (null x)
+      (and (consp x)
+           (proper-list? (cdr x)))))
+```
+
+## Assoc-lists
+
+A list of conses are called an assoc-list or alist. Such a list could represent a set of translations.
+
+`assoc` retrieves the pair associated with a given key:
+
+```lisp
+(setf trans '((+ . "add") (- . "substract")))
+(assoc '+ trans)
+```
+
+
 ## Pointers, garbage collection
 
 
-Every value is conceptually a pointer. When a value is assigned to a variable or store it in a data structure, what gets stored is actually a pointer to the value. When the contents of the data structure or the value of the variable is asked for, Lisp returns what it points to. For efficiency, Lisp sometimes use an immediate representation instead of a pointer.
+Every value is conceptually a pointer. When a value is assigned to a variable or store it in a data structure, what gets stored is actua
+lly a pointer to the value. When the contents of the data structure or the value of the variable is asked for, Lisp returns what it points to. For efficiency, Lisp sometimes use an immediate representation instead of a pointer.
 
 _Automatic memory management_ is one of Lisp's most valuable features. The Lisp system maintains a segment of memory, _heap_. The function `cons` returns a newly allocated cons. Allocating memory from the heap is sometimes generically known as _consing_. Memory that is no longer needed is called _garbage_, and the scavenging operation is called _garbage collectiion_ or __GC__. Allocating storage and scavenging memory to reclaim it can be expensive compared to the routine operations of a program. It is easy to write programs that cons excessively.
 
