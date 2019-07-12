@@ -148,6 +148,7 @@ Lists are a good way to represent small sets. `member`, `member-if`, `adjoin`, `
 (defun our-member-if (fn lst)
   (and (consp lst)
        (if (funcall fn (car lst))
+       
            lst
            (our-member-if fn (cdr lst)))))
 ```
@@ -277,6 +278,29 @@ A list of conses are called an assoc-list or alist. Such a list could represent 
 (assoc '+ trans)
 ```
 
+```lisp
+;;; simply iterate the list and count every element sequentially
+(defun occurrences-iterative (lst)
+  (let ((occurs '()))
+    (dolist (elm lst)
+      (let ((elm-pair (assoc elm occurs)))
+      (if (null elm-pair)
+          (setf occurs (append occurs (list (cons elm 1))))
+          (rplacd elm-pair (+ (cdr elm-pair) 1))))
+    occurs))
+    
+;;; count (car lst) and (cdr lst) separately
+(defun occurrences-recursive (lst)
+  (let ((elm (car lst)))
+    (if (null elm)
+        nil
+        (let* ((sub-occurs (occurrences-recursive (cdr lst)))
+               (elm-pair (assoc elm sub-occurs)))
+          (if (null elm-pair)
+              (append sub-occurs (list (cons elm 1)))
+              (progn (rplacd elm-pair (+ (cdr elm-pair) 1))
+                     sub-occurs))))))
+```
 
 ## Pointers, garbage collection
 
