@@ -197,6 +197,7 @@ When calling a method, the compiler first determines the type of the implicit pa
 Classes that cannot be extended are called _final_ classes and the `final` modifier in the definition of the class indicates this.
 
 ```java
+
 public final class Executive extends Manager {
     ...
 }
@@ -207,3 +208,11 @@ public final class Executive extends Manager {
 The is only one good reason to make a method or class `final`: to make sure its semantics cannot be changed in a subclass.
 
 The JIT compiler does a better job at optimization and inlining a method instead of having programmers figure out whether to `final` a method to avoid the overhead of dynamic binding.
+
+There is only one reason to make a cast - to use an object in its full capacity after its actual type has been temporarily forgotten. It is only possible to cast within an inheritance hierarchy. To ensure a correct cast, use `instanceof` operator before casting (Note that `null` simply returns `false`). However, it may be a design flaw that you need a downcast. In general, it is best to minimize the use of casts and the `instanceof` operator.
+
+## Abstract classes
+
+A class with one or more `abstract` methods must itself be declared abstract. Abstract classes can have concrete methods. Common fields and methods whether abstract or not, should always be moved to the superclass. A class can be declared as `abstract` though it has no abstract methods.
+
+In C++, an abstract method is called _pure virtual function_ with a training `= 0`. In C++, there is no special keyword to denote abstract classes.
