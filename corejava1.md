@@ -216,3 +216,47 @@ There is only one reason to make a cast - to use an object in its full capacity 
 A class with one or more `abstract` methods must itself be declared abstract. Abstract classes can have concrete methods. Common fields and methods whether abstract or not, should always be moved to the superclass. A class can be declared as `abstract` though it has no abstract methods.
 
 In C++, an abstract method is called _pure virtual function_ with a training `= 0`. In C++, there is no special keyword to denote abstract classes.
+
+## Access control
+
+Any feature declared `private` won't be accessible in other classes: a subclass cannot access the private fields of its superclass. A protected field is accessible by any class in the same package. But a subclass from a different package can only access the protected field of itself, not of any of its superclass.
+
+## `Object`: the cosmic superclass
+
+The `Object` class is the ultimate ancestor of every class in Java. A variable of type `Object` is only useful as a generic holder for arbitrary values. Only the values of _primitive types_ are not objects. All array types are class types.
+
+### `.equals(Object otherObject)`
+
+`.equals()` tests whether one object is considered equal to another. The default, if not overriden, tests whether two objects are the same one. To guard against the possibility that objects may be `null`, use the `Objects.equals()` method.
+
+The Java Language specification requires that the `equals()` method be _reflexive_, _symmetric_, _transitive_, _consistent_ (always returning the same truth value given the same arguments), `x.equals(null)` returns `false`. The symmetry part is kind of subtle, depending on the semantics required.
+
+#### Implementation
+
+1. explicit parameter is named `otherObject`;
+
+2. Test whether `this` happens to be identical to `otherObject`
+
+3. Test whether `otherObject` is `null`
+
+4. Compare the classes of `this` and `otherObject`. If the same semantics holds for all subclasses, use an `istanceof` test, otherwise use `getClass()`;
+
+5. Cast `objectType` to a variable of the calling object's class and compare by the semantics required.
+
+### `.hashCode()` method
+
+Every object has a default hash code derived from the object's memory address. The defintions of `equals` and `hashCode` must be compatible.
+
+### `.toString()` method
+
+The `Object` class defines the `toString` method to print the class name and the hash code of the object. Most `toString` methods have the following format
+
+```java
+getClass().getName + "[field1=" + field1 + ",field2=" + field2 + ... + "]"
+```
+
+The string concatenation operator `+` implicitly calls `toString` methods. 
+
+`"" + x` is a more general way to call `.toString()`. Howevery, arrays does not call its own `toString` instead, they call `object`'s. To correctly print multidimensional arrays, use `Array.deepToString`.
+
+The `toString` method is a great tool for logging. It is strongly recommended that `toString` be added.
