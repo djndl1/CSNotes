@@ -260,3 +260,56 @@ The string concatenation operator `+` implicitly calls `toString` methods.
 `"" + x` is a more general way to call `.toString()`. Howevery, arrays does not call its own `toString` instead, they call `object`'s. To correctly print multidimensional arrays, use `Array.deepToString`.
 
 The `toString` method is a great tool for logging. It is strongly recommended that `toString` be added.
+
+## Object Wrappers and Autoboxing
+
+All primitive types have class counterparts: `integer`, `Long`, `Float`, `Double`, `Short`, `Byte`, `Character` and `Boolean`, inheriting `Number`. Primitive wrappers are all immutable and `final`. It is used when a primitive cannot be used in a generic collection class. Wrapping and unboxing take place automatically between primitive types and wrappers, done by the compiler. Wrappers also have some static related methods.
+
+## Methods with varargs
+
+It is possible to provide methods that can be called with a variable number of parameters.
+
+```java
+public static double max(double... values) {
+    double largest = Double.NEGATIVE_INFINITY;
+    
+    for (double v : values) if (v > largest) largest = v;
+    return largest;
+}
+```
+
+## Enumeration Classes
+
+Constructors, methods and fields can be added to an enumerated type:
+
+```java
+public enum Size {
+    SMALL("S"), MEDIUM("M"), LARGE("L"), EXTRA_LARGE("XL");
+    
+    private String abbreviation;
+    
+    private Size(String abbreviation) { this.abbreviation = abbreviation; }
+    public String getAbbreviation() { return abbreviation; }
+}
+```
+
+The constructor of an enumeration is always private. All enumerated types are subclasses of the class `Enum`.
+
+- `valueOf()` - `toString()`
+
+- `.ordinal()`: yields the position of an enumerated constant in the `enum` declaration, counting from zero.
+
+- `.compareTo()`: compare the position enum constants.
+
+## Design Hints for Inheritance
+
+1. Place common operations and fields in the superclass.
+
+2. Do not use `protected` fields if possible. `protected` methods can be useful to indicate methods that are not ready for general use and should be redefined in subclasses.
+
+3. Do not use inheritance unless all inherited methods make sense.
+
+4. Use polymorphism, not type information.
+
+5. Do not overuse reflection. It is not usually appropriate in applications.
+
