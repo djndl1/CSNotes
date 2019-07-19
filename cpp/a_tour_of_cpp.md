@@ -183,3 +183,97 @@ It is also possible to handle classes where access is through member functions.
 complex<double> z = {1, 2};
 auto [re, im] = z + 2;
 ```
+
+
+# Classes
+
+The central language feature of C++ is the class. A class in a use-defined type provided to represent a concept in the code of a program.
+
+## Types
+
+Three important kinds of classes:
+
+- concrete classes
+
+- abstract classes
+
+- classes in class hierarchies
+
+An astounding number of useful classes turn out to be of one of these kinds.
+
+### Concrete Types
+
+The basic idea of _concrete classes_ is that they behave just like built-in types. The defining characteristic of a concrete type is that its representation is part of its definition. This allows implementations to be optimally efficient in time and space. It allows us to place objects of concrete types on the stack, in statistically allocated memory and in other objects. To increase flexibility, a concrete type can keep major parts of its representation on the free store and access them through the part stored in the class object itself.
+
+The constructor/destructor combination is the basis of many elegant techniques. It is the basis for most C++ general resource management techniques. The _handle-to-data model_  is very commonly used to manage data that can vary in size during the lifetime of an object.
+
+The standard library uses `unsigned` integers for sizes and subscripts. A 
+
+
+### Abstract Types
+
+ An _abstract type_ is a type that completely insulates a user form implementation details. Since we don't know anything about the representation of an abstract type, not even its size, we must allocate objects on the free store and access them through references or pointers.
+ 
+ ```c++
+ class Container {
+public:
+    virtual double& operator[](int) = 0;
+    virtual int size() const = 0;
+    virtual ~Container() {}
+};
+
+Container c; // error
+Container* p = new Vector_container(10); // container is an interface.
+ ```
+
+A function may take an object of `container` class.
+
+```c++
+void use(Container& c)
+{
+     const int sz = c.size();
+
+     for (int i=0; i!=sz; ++i)
+           cout << c[i] << '\n';
+}
+```
+
+The class `container` provides the interface to a variety of other classes, called a _polymorphic type_.
+
+Two implementations of `container` can be
+
+```c++
+class Vector_container : public Container {   // Vector_container implements Container
+public:
+     Vector_container(int s) : v(s) { }   // Vector of s elements
+     ~Vector_container() {}
+
+     double& operator[](int i) override { return v[i]; }
+     int size() const override { return v.size(); }
+private:
+     Vector v;
+};
+
+class List_container : public Container {     // List_container implements Container
+public:
+     List_container() { }      // empty List
+     List_container(initializer_list<double> il) : ld{il} { }
+     ~List_container() {}
+     double& operator[](int i) override;
+     int size() const override { return ld.size(); }
+private:
+     std::list<double> ld;     // (standard-library) list of doubles
+};
+
+double& List_container::operator[](int i)
+{
+     for (auto& x : ld) {
+           if (i==0)
+                 return x;
+           −−i;
+     }
+     throw out_of_range{"List container"};
+}
+```
+
+Note the keyword `override`. It is optional, but using it allows the compiler to catch mistakes, such as misspelling of function names or slight differences between the type of a `virtual` function and its intended overrider. The explicit use of override is particularly useful in larger class hiearchies where it can otherwise be hard to know what is supposed to override what.
