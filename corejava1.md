@@ -1,8 +1,8 @@
 # Java intro
 
-Java is a whole platform, with a huge library, containign lots of reusable code, a high-quality executation envrionment that provides services such as security, portability across operating systems, and automatic garbage collection.
+Java is a whole platform, with a huge library, containing lots of reusable code, a high-quality executation envrionment that provides services such as security, portability across operating systems, and automatic garbage collection.
 
-The syntax for java is a cleaned-up version of C++ syntax. Java is object-oriented, distributed (having an extensive library for coping with TCP/IP protocols so that accessing remote objects is as easy as accessing a local file system), robust (has a pointer model that eliminates the possiblity of overwriting memory and corrpting data); though not as expected, java security model is still good. Since Java generates bytecode, it is architecture-neutral and its specification has no implementation-dependent aspects. Java's JIT compiler now provides high performance. Java was the first mainstream language to support concurrent programming. 
+The syntax for java is a cleaned-up version of C++ syntax. Java is object-oriented, distributed (having an extensive library for coping with TCP/IP protocols so that accessing remote objects is as easy as accessing a local file system), robust (has a pointer model that eliminates the possiblity of overwriting memory and corrpting data); though not as great as expected, java security model is still good. Since Java generates bytecode, it is architecture-neutral and its specification has no implementation-dependent aspects. Java's JIT compiler now provides high performance. Java was the first mainstream language to support concurrent programming. 
 
 # Fundamental Programming of Java
 
@@ -75,7 +75,7 @@ label:
 
 ## Array
 
-`type[] var` declaration is preferred. Allelements are initialized after creating an array. It is esssentially the same as a pointer to an array allocated on the heap. In Java, the `[]` operator is predefined to perform _bounds checking_.
+`type[] var` declaration is preferred. All elements are initialized after creating an array. It is esssentially the same as a pointer to an array allocated on the heap. In Java, the `[]` operator is predefined to perform _bounds checking_.
 
 Java has a foreach loop
 
@@ -158,7 +158,7 @@ Static variables are quite rare, static constants are more common. Static method
 
 Numbers defaults to 0, `boolean` to `false`, and object references to `null`.
 
-If no constructors are written, a no-argument constructor is provided which sets all the instance fields to default values. Some programmers prefix `a` to every parameters of a method to distinguish from field name. Constructor dispatch is possible thorugh `this` keyword.
+If no constructors are written, a no-argument constructor is provided which sets all the instance fields to default values. Some programmers prefix `a` to every parameters of a method to distinguish from field name. Constructor dispatch is possible through `this` keyword.
 
 ```java
 public Employee {
@@ -182,7 +182,7 @@ A JAR file contains multiple class files and subdirectories in a compressed form
 
 Factoring out common functionality by moving it to a superclass is routine in OOP. 
 
-A subclass cannot access the private fields of a superclass directly. To access them, use `super.getWhateverYouNeed`. `super` is not a reference to an object but a special keyword that directs the compiler to invoke the superclass method.
+A subclass cannot access the private fields of a superclass directly. To access them, use `super.getWhateverYouNeed()`. `super` is not a reference to an object but a special keyword that directs the compiler to invoke the superclass method.
 
 Call `super()` to construct the superclass in the constructors of the subclass. Otherwise, the no-argument constructor of the superclass is invoked.
 
@@ -297,6 +297,7 @@ The constructor of an enumeration is always private. All enumerated types are su
 
 - `valueOf()` - `toString()`
 
+
 - `.ordinal()`: yields the position of an enumerated constant in the `enum` declaration, counting from zero.
 
 - `.compareTo()`: compare the position enum constants.
@@ -313,3 +314,40 @@ The constructor of an enumeration is always private. All enumerated types are su
 
 5. Do not overuse reflection. It is not usually appropriate in applications.
 
+# Interfaces
+
+Interfaces are a way of describing what classes should do. It is a set of requirements for the classes that want to conform to the interface. without specifying how they should do it. A class can implement one or more interfaces. Objects of these implementing classes can be used whenever conformance to the interface is required. Typically, the supplier of some service requires that a class conform to a particular interface so that it may perform the service.
+
+While each class can have only one superclass, classes can implement multiple interfaces. This gives the maximum amount of flexibilty in defining a class's behavior. Multiple inheritance makes the language very complex. Few C++ programmers use multiple inheritance.
+
+```java
+public interface Comparable<T> {
+    int compareTo(T other);
+}
+
+class Employee implements Comparable<Employee> {
+    public int compareTo(Employee otherObject) {
+        return Double.compare(salary, otherObject.salary); // to avoid floating-point overflow instead of using >
+    }
+}
+```
+
+All methods of an interface are automatically `public` (`private` methods are only used as helpers); `static` methods are allowed ; all fields are always `public static final`. The interface itself may be modified by `public` or no acess specifier. Interfaces can provide constants. Interfaces cannot have instance fields. It is possible to supply simple methods in interfaces but they cannot refer to instance fields. Supplying instance fields and methods that operate on them is the job of the classes that implement the interface.
+
+You may not create an object of a certain `interface`, but it is possible to declare such a variable.
+
+```java
+Comparable<Employee> x = new Employee();
+```
+
+It is possible to extend interfaces to allow for multiple chains of interfaces that go from a greater degree of generality to a greater degree of specialization.
+
+```java
+public interface Moveable {
+    void move(doube x, double y);
+}
+
+public interface Powered extends Moveable {
+    double milesPerGallon();
+}
+```
