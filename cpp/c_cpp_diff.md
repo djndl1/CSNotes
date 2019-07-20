@@ -110,3 +110,32 @@ int [[nodiscard]] importantInt()
 
 importantInt(); // warning issued
 ```
+
+# `const` keyword
+
+In C++, variables declared `const` can be used to specify the size of an array.
+
+# global namespace and scope resolution operator `::`
+
+```c++
+#include <cstdio>
+
+double counter = 50;
+
+int main()
+{
+    for (int counter = 1; counter != 10; counter++) {
+        printf("%d\n", ::counter / counter); //global `counter` divided by local `counter`
+    }
+}
+```
+
+# Stream objects `cin`, `cout`, `cerr`
+
+Some advantages of using streams are:
+
+- Using insertion and extraction operators is _type-safe_. Old style functions may be given wrong format specifier. With streams there are no format strings.
+
+- Insertion and extraction may be extended, alloiwng objects of classes to be inserted into or extracted form streams.
+
+- Streams are independent of the media they operate on.
