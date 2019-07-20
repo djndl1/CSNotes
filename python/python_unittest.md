@@ -14,6 +14,60 @@ The `unittest` unit testing framework supports test automation, sharing of setup
 
 # Principles and Caveats
 
-A test case should be able to run completely by itself without any human input. Unit test is about automation, determine by itself whether the function it is testing has passed or failed, without a human interpreting the results, and run in isolation, separate from any other test cases. It is better to place test code in separate modules.
+A test case should be able to run completely by itself without any human input. Unit test is about automation, determine by itself whether the function it is testing has passed or failed, without a human interpreting the results. The testing code of a TestCase instance should be entirely self contained, such that it can be run either in isolation or in arbitrary combination with any number of other test cases. It is better to place test code in separate modules.
 
 Test code should be modified much less frequently than the code it tests. 
+
+Write a test that fails then code until it passes.
+
+- Write test cases beforethe code
+
+- Write tests that test good inputs and check for proper results
+
+- Write tests that test bad input and check for proper failure
+
+- Write and update test cases to reflect new requirements
+
+# Writing tests
+
+The basic building blocks of unit testing are test cases, single scenerios that must be set up and checked for correctness. Every test case class should inherit `unittest.TestCase`. Every test is a method of the class, whose name starts with `test`.
+
+The crux of each test is a call to `assertEqual()` to check for an expected result; `assertTrue()` or `assertFalse()` to verify a condition; or `assertRaises()` to verify that a specific exception gets raised. These methods are used instead of the assert statement so the test runner can accumulate all test results and produce a report.
+
+The setUp() and tearDown() methods allow you to define instructions that will be executed before and after each test method. If the setUp() method raises an exception while the test is running, the framework will consider the test to have suffered an error, and the test method will not be executed. If setUp() succeeded, tearDown() will be run whether the test method succeeded or not.
+
+```python
+import unittest
+
+class WidgetTestCase(unittest.TestCase):
+    def setUp(self):
+        self.widget = Widget('The widget')
+
+    def test_default_widget_size(self):
+        self.assertEqual(self.widget.size(), (50,50),
+                         'incorrect default size')
+
+    def test_widget_resize(self):
+        self.widget.resize(100,150)
+        self.assertEqual(self.widget.size(), (100,150),
+                         'wrong size after resize')
+                         
+    def tearDown(self):
+        self.widget.dispose()
+```
+
+should you want to customize the building of your test suite
+
+
+```python
+def suite():
+    suite = unittest.TestSuite()
+    suite.addTest(WidgetTestCase('test_default_widget_size'))
+    suite.addTest(WidgetTestCase('test_widget_resize'))
+    return suite
+
+if __name__ == '__main__':
+    runner = unittest.TextTestRunner()
+    runner.run(suite())
+```
+
