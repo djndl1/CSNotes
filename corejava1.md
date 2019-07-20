@@ -330,6 +330,7 @@ class Employee implements Comparable<Employee> {
         return Double.compare(salary, otherObject.salary); // to avoid floating-point overflow instead of using >
     }
 }
+
 ```
 
 All methods of an interface are automatically `public` (`private` methods are only used as helpers); `static` methods are allowed ; all fields are always `public static final`. The interface itself may be modified by `public` or no acess specifier. Interfaces can provide constants. Interfaces cannot have instance fields. It is possible to supply simple methods in interfaces but they cannot refer to instance fields. Supplying instance fields and methods that operate on them is the job of the classes that implement the interface.
@@ -349,5 +350,54 @@ public interface Moveable {
 
 public interface Powered extends Moveable {
     double milesPerGallon();
+}
+```
+
+A default implementation can be supplied for any interface method, tagged with `default`.
+
+```java
+public interface Iterator<E> {
+    boolean hasNext();
+    E next();
+    default void remove() {
+        throw new UnsupportedOperationException("remove");
+    }
+}
+```
+
+An important use for default methods is _inteface evolution_: a default method is added to the interface, while the class implementing the interface is written before the method is added. 
+
+A subclass may have a inherited method or a default method of an interface with the same name as that of another method of another interface. Concrete methods of a superclass takes priority. Interfaces clash so that the conclicting method must be overriden.
+
+Interfaces can be used in _callback pattern_. Consider a `timer` class in `javax.swing` that calls a method on an object repeatedly between a certain amount of time. The object must implements `ActionListener` interface.
+
+```java
+public interface ActionListener {
+    void actionPerformed(ActionEvent event);
+}
+
+import java.awt.*;
+import java.awt.event.*;
+import java.time.*;
+import javax.swing.*;
+
+public class TimerTest {
+  public static void main(String[] args) {
+    var listener = new TimerPrinter();
+
+    var timer = new Timer(1000, listener);
+    timer.start();
+
+    JOptionPane.showMessageDialog(null, "Quit program?");
+    System.exit(0);
+  }
+}
+
+
+class TimerPrinter implements ActionListener {
+    public void actionPerformed(ActionEvent event) {
+        System.out.println("At the tone, the time is " + Instant.ofEpochMilli(event.getWhen()));
+        Toolkit.getDefaultToolkit().beep();
+    }
 }
 ```
