@@ -187,7 +187,7 @@ auto [re, im] = z + 2;
 
 # Classes
 
-The central language feature of C++ is the class. A class in a use-defined type provided to represent a concept in the code of a program.
+The central language feature of C++ is the class. A class in a user-defined type provided to represent a concept in the code of a program.
 
 ## Types
 
@@ -206,8 +206,6 @@ An astounding number of useful classes turn out to be of one of these kinds.
 The basic idea of _concrete classes_ is that they behave just like built-in types. The defining characteristic of a concrete type is that its representation is part of its definition. This allows implementations to be optimally efficient in time and space. It allows us to place objects of concrete types on the stack, in statistically allocated memory and in other objects. To increase flexibility, a concrete type can keep major parts of its representation on the free store and access them through the part stored in the class object itself.
 
 The constructor/destructor combination is the basis of many elegant techniques. It is the basis for most C++ general resource management techniques. The _handle-to-data model_  is very commonly used to manage data that can vary in size during the lifetime of an object.
-
-The standard library uses `unsigned` integers for sizes and subscripts. A 
 
 
 ### Abstract Types
@@ -276,4 +274,109 @@ double& List_container::operator[](int i)
 }
 ```
 
+
 Note the keyword `override`. It is optional, but using it allows the compiler to catch mistakes, such as misspelling of function names or slight differences between the type of a `virtual` function and its intended overrider. The explicit use of override is particularly useful in larger class hiearchies where it can otherwise be hard to know what is supposed to override what.
+
+### Class Hierarchy
+
+A class hierarchy offers two kinds of benefits: 
+
+- Interface inheritance: The base class acts as an interface for the derived class. Such classes are often abstract classes.
+
+- Implmentation inheritance: a base class provides functions or data that simplifies the implementation of derived class.
+
+Classes in class hierarchies tend to be accessed through pointers or references and allocated on the free store.
+
+```c++
+enum class Kind { circle, triangle, smiley };
+
+Shape* read_shape(istream& is)   // read shape descriptions from input stream is
+{
+     // ... read shape header from is and find its Kind k ...
+
+     switch (k) {
+     case Kind::circle:
+          // read circle data {Point,int} into p and r
+          return new Circle{p,r};
+     case Kind::triangle:
+          // read triangle data {Point,Point,Point} into p1, p2, and p3
+          return new Triangle{p1,p2,p3};
+     case Kind::smiley:
+          // read smiley data {Point,int,Shape,Shape,Shape} into p, r, e1, e2, and m
+          return ps;
+     }
+}
+
+void user()
+{
+     std::vector<Shape*>v;
+     while (cin)
+          v.push_back(read_shape(cin));
+     draw_all(v);                // call draw() for each element
+     rotate_all(v,45);           // call rotate(45) for each element
+     for (auto p : v)            // remember to delete elements
+           delete p;
+}
+```
+
+The manipulator of objects of `shape` has no idea of which kind of shapes it manipulates. It is crucial that all these subclasses override the virtual destructor so the manipulator may call it for every subclass. Otherwise, it does not know how to find the real destructor of an object without full type information of the objects.
+
+Occasionally type information is lost and must be recovered. This typically happens when we pass an object to some system that accepts an interface specified by a base class.
+
+```c++
+Shape* ps {read_shape(cin)};
+
+if (Smiley* p = dynamic_cast<Smiley*>(ps)) { // ... does ps point to a Smiley? ...
+     // ... a Smiley; use it
+}
+else {
+     // ... not a Smiley, try something else ...
+}
+```
+
+Pointers may fail to be deleted and then resource leak happens.
+
+```c++
+class Smiley : public Circle {  // use the circle as the base for a face
+public:
+     Smiley(Point p, int rad) : Circle{p,r}, mouth{nullptr} { }
+
+     ~Smiley()
+     {
+          delete mouth;
+          for (auto p : eyes)
+                delete p;
+     }
+
+     void move(Point to) override;
+
+     void draw() const override;
+     void rotate(int) override;
+
+     void add_eye(Shape* s)
+     {
+          eyes.push_back(s);
+     }
+     void set_mouth(Shape* s);
+     virtual void wink(int i);     // wink eye number i
+
+     // ...
+
+private:
+     vector<Shape*> eyes;          // usually two eyes
+     Shape* mouth;
+};
+```
+
+One simple solution is to use `std::unique_ptr`. 
+
+```C++
+class Smiley : public Circle {
+     // ...
+private:
+     vector<unique_ptr<Shape>> eyes; // usually two eyes
+     unique_ptr<Shape> mouth;
+};
+```
+
+This way, we no longer need a desctructor for `Smiley` since the destructor of `unique_ptr` takes responsiblity. The code using `unique_ptr` will be as efficient as code using raw pointers.
