@@ -401,3 +401,125 @@ class TimerPrinter implements ActionListener {
     }
 }
 ```
+
+# Lambda Expression
+
+## Syntax
+
+A lambda expression has three ingredients: 
+
+1. a block of code
+
+2. parameters
+
+3. values for the free variables, that is, the variables that are not parameters and not defined inside the code. The _captured_ free variables reference values that don't change. Any captured variable in a lambda expression must be effectively final. 
+ 
+A block of code together with the values of the free variables is a _closure_. The body of a lambda expression has the same scope as a nested block. The same rules for name conflicts and shadowing apply. The `this` keyword refers to the `this` parameter of the method that contains the lambda.
+
+
+```java
+(String first, String second) -> first.length() - second.length()
+```
+
+```java
+(String first, String second) -> {
+    if ((first.length()) < second.length()) return -1;
+    else if (first.length() > second.length()) return 1;
+    else return 0;
+}
+```
+
+```java
+() -> { for (int i = 100; i >= 0; i--) System.out.println(i); }
+```
+
+If the parameter types of a lambda expression can be inferred, then they can be omitted.
+
+```java
+Comparator<String> comp = (first, second) -> first.length() = second.length();
+```
+The result tuype of a lambda expression is never specified. It is always inferred from context.
+
+it is illegal for a lambda expression to return a value in some branches but not in others.
+
+```java
+(int x) -> { if (x >= 0) return 1; }
+```
+
+When functional inteface like `ActionListener` with a single `abstract` method is expected, a lambda expression can be supplied. Note that it is possible for an interface to redeclare methods from the `Object` class such as `toString` or `clone` and these declarations do not make the methods abstract. This conversion to interfaces is what makes lambda expressions so compelling. The syntax is short and simple. However, it is almost the only thing that you can do with a lambda expression in Java. You can't even assign a lambda expression to a variable of type `Object`. That is, there is no function object in Java. You have to make lambda expression convert to an object of a functional interface.
+
+The Java API defines a number of very generic functional interfaces in `java.util.function`.
+
+```java
+BiFunction<String, String, Integer> comp = (first, second) -> fisrt.length() - second.length();
+```
+
+Unfortuately, this `comp` implementing `BiFunction` not `Comparator`, thus not acceptable for `sort` method.
+
+A particularly useful interface in the `java.util.function` package is `Predicate`.
+
+```java
+public interface Predicate<T> {
+    boolean test(T, t);
+    // more
+}
+```
+
+
+```java
+list.removeIf(e -> e == null);
+```
+
+Another is `Supplier<T>`. A supplier yields a value of type `T` when called. Suppliers are for _lazy evaluation_.
+
+```java
+public interface Supplier<T> {
+    T get();
+}
+```
+
+```java
+Localdate hireDay = Objects.requireNonNullElse(day, new LocalDate(1970, 1, 1));
+```
+
+is not optimal. Instead,
+
+```java
+Localdate hireDay = Objects.requireNonNullElseGet(day, () -> new LocalDate(1970, 1, 1));
+```
+
+This method allows creation of the message to be deferred until after the null check is made. However, creating a supplier also cost performance.
+
+## Method reference
+
+It is possible, instead of converting a lambda expression into an object of a functional interface, to pass a named method.
+
+```java
+var timer = new Timer(1000, System.out::println);
+```
+
+```java
+Arrays.sort(strings. String::compareToIgnoreCase);
+```
+
+There are three variants of syntax for this.
+
+- `object::instanceMethod`: = `(args) -> object.instanceMethod(args)`;
+
+- `Class::instanceMethod`: = `(first, remainders) -> first.instanceMethod(remainders)`;
+
+- `Class::staticMethod`: = `(args) -> Class::staticMethod(args)`.
+
+The `this` and `super` keywords are also legal to use in method references.
+
+Note that a lambda expression can only be rewritten as a method reference if the body of the lambda expression calls a single method and doesn't do anything else.
+
+It is also possible to pass constructor references, whose method name is `::new`.
+
+```java
+Stream<Person> stream = names.stream().map(Person::new);
+```
+
+```java
+Person[] people = stream.toArray(Person[]::new);
+```
