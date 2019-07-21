@@ -48,7 +48,8 @@ The `do` macro is the fundamental iteration operator.
 (defun show-squares (start end)
   (do ((i start (+ i 1)))
       ((> i end) 'done)
-    (format t "~A ~A~%" i (* i i))))
+
+(format t "~A ~A~%" i (* i i))))
 
 (show-squares 1 5)
 ```
@@ -302,6 +303,42 @@ A list of conses are called an assoc-list or alist. Such a list could represent 
                      sub-occurs))))))
 ```
 
+### Shortest Path in a Graph
+
+Given a directed graph, the neighbor of a certain node is obtained as above:
+
+```lisp
+(setf net '((a b f) (b c d) (c) (d c) (f d)))
+(cdr (assoc 'b net))
+```
+
+A breadth-first search implementation
+
+```lisp
+;;; generate a list of paths that extend `path' via `node'in `net'
+(defun new-paths (path node net)
+    (mapcar #'(lambda (n)
+        (cons n path))
+    (cdr (assoc node net))))
+    
+;;; breadth first search to `end' in `net'
+  ;;; `queue' is a list of reversed candidate paths that might lead to `end', longer paths will be appended to the back
+  (defun bfs (end queue net)
+    (if (null queue)
+        nil     ; not found
+        (let ((path (car queue)))
+          (let ((node (car path)))
+            (if (eql node end) ; current node is the end
+                (reverse path)
+                (bfs end
+                     (append (cdr queue)  ; (car queue) is already searched and nothing has been found
+                             (new-paths path node net))
+                     net))))))
+                     
+(defun shortest-path (start end net)
+    (bfs end (list (list start)) net))
+```
+
 ## Pointers, garbage collection
 
 
@@ -320,13 +357,21 @@ A literal array is dentoed by `#na` where `n` is the number of dimensions in the
 (setf arr (make-array '(2 3) :initial-element nil)) ; make a 2-by-3 array with nil values
 ```
 
+A literal array is denoted by 
+
+```lisp
+#2a((b nil nil) (nil nil nil))
+```
+
+where `2` is the number of dimensions in the array.
+
 `aref` returns an reference to an element of an array.
 
 ```lisp
 (setf (aref arr 0 0 ))
 ```
 
-One-dimensional array is a vector, also built by calling `vector`
+One-dimensional array is a vector, also built by calling `vector`, literally denoted by `#(a b c)`.
 
 ```lisp
 (vector "a" 'b 3)
@@ -338,7 +383,6 @@ One-dimensional array is a vector, also built by calling `vector`
 
 ```lisp
 (defun finder (obj vec start end)
-  (format t "~A~%" (subseq vec start (+ end 1)))
   (let ((range (- end start)))
     (if (zerop range)
         ;; if there's only one element in the vector
@@ -368,7 +412,7 @@ Strings are vectors of characters, so both sequence functions and array functios
 
 `char<`, `char<=`, `char=`, `char>=`, `char>` and `char/=` (different) compare characters.
 
-`char` is faster than `aref` when working on strings.
+`char` access the element of string specified by index and is faster than `aref` when working on strings.
 
 ### How to replace chars in strings
 
@@ -391,7 +435,7 @@ Common lisp provides a large number of functions for comparing and manipulating 
 (format nil "~A or ~A" "truth" "dare")
 ```
 
-Use concatenate to join several strings.
+Use `concatenate` to join several strings.
 
 ## Sequence
 
@@ -476,6 +520,70 @@ $$
 
 where the function should take two coefficent $a$ and $b$ and returns $ax+b$.
 
+```lisp
+(defun polynomial-compute (lst x)
+    (reduce #'(lambda (a b) (+ (* a x) b)) lst))
+```
+
+A token parser
+
+```lisp
+(defun tokens (str test start)
+  "a token parser"
+    (let ((p1 (position-if test str :start start)))
+      (if p1
+          (let ((p2 (position-if #'(lambda (c)
+                                     (not (funcall test c)))
+                                 str :start p1))) ;; the end of a token
+            (cons (subseq str p1 p2)
+                  (if p2
+                      (tokens str test p2)
+                      nil)))
+          nil))) ;; not even a single char satisfying the test
+
+(defun constituent (c)
+  "test if a char is anything but newline and space"
+    (and (graphic-char-p c)
+         (not (char= c #\ ))))
+```
+
+And then a date parser
+
+```lisp
+(defun parse-date (str)
+  "doc"
+  (let ((toks (tokens str #'constituent 0)))
+    (list (parse-integer (first toks))
+          (parse-month (second toks))
+          (parse-integer (third toks)))))
+
+  (defconstant +month-names+
+    #("jan" "feb" "mar" "apr" "may" "jun"
+      "jul" "aug" "sep" "oct" "nov" "dec"))
+
+  (defun parse-month (str)
+    (let ((p (position str +month-names+
+                       :test #'string-equal)))
+      (if p
+          (+ p 1)
+          nil)))
+
+  (parse-date "16 Aug 1980")
+```
+
+An integer parser
+
+```lisp
+  (defun read-integer (str)
+    (if (every #'digit-char-p str)
+        (let ((accum 0))
+          (dotimes (pos (length str))
+            (setf accum (+ (* accum 10)
+                           (digit-char-p (char str pos)))))
+          accum)
+        nil))
+
+```
 ## Structures
 
 Similarly to C struct.
@@ -512,6 +620,8 @@ We can also control things like the way a structure is displayed and the prefix 
     (x 0)
     (y 0))
     
+(setf p (make-point :x 0 :y 0))
+
 (defun print-point (p stream depth)
     (format stream "#<~A,~A>" (px p) (py p)))
 ```
