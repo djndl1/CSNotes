@@ -412,7 +412,8 @@ A lambda expression has three ingredients:
 
 2. parameters
 
-3. values for the free variables, that is, the variables that are not parameters and not defined inside the code. The _captured_ free variables reference values that don't change. Any captured variable in a lambda expression must be effectively final. 
+3. values for the free variables, that is, the variables that are not parameters and not defined inside the code. The _captured_ free variables reference valu
+es that don't change. Any captured variable in a lambda expression must be effectively final. 
  
 A block of code together with the values of the free variables is a _closure_. The body of a lambda expression has the same scope as a nested block. The same rules for name conflicts and shadowing apply. The `this` keyword refers to the `this` parameter of the method that contains the lambda.
 
@@ -436,7 +437,7 @@ A block of code together with the values of the free variables is a _closure_. T
 If the parameter types of a lambda expression can be inferred, then they can be omitted.
 
 ```java
-Comparator<String> comp = (first, second) -> first.length() = second.length();
+Comparator<String> comp = (first, second) -> first.length() == second.length();
 ```
 The result tuype of a lambda expression is never specified. It is always inferred from context.
 
@@ -523,3 +524,67 @@ Stream<Person> stream = names.stream().map(Person::new);
 ```java
 Person[] people = stream.toArray(Person[]::new);
 ```
+## Processing Lambda Expressions
+
+the point of using lambdas is _deferred execution_. There are many reasons for executing code later, such as:
+
+- running the code in a separate thread
+
+- running the code multiple times
+
+- running the code at the right point in an algorithm
+
+- running the code when something happens
+
+- running the code only when necessary
+
+```java
+public static void repeat(int n, Runnable action) {
+        for (int i = 0; i < n; i++) action.run();
+    )
+```
+
+There are specializations for primitive types `int`, `long` and `double`. It is more efficient to use these specializations than the  generic interfaces.
+
+```java
+public static void repeat(int n, IntConsumer action) {
+    for (int i = 0; i < n; i++) action.accept(i);
+}
+```
+
+`@FunctionalInterface` annotation should be added when defining an interface with a single abstact method.
+
+
+# Inner Classes
+
+Reasons:
+
+1. Inner classes can be hidden from other classes in the same package.
+
+2. Inner class methods can access the data from the scope in which they are defined, including the data that would otherwise be private.
+
+Inner classes used to be very important for concisely implementing callbacks, which now has been almost replaced by lambda expressions.
+
+In Java, unlike in C++, an object that comes form an inner class has an implicit reference to the outer class object that instantiated it, through which it gains access to the total state of the outer object. The `TimePrinter` has no `beep` field yet it refers to one, which is the field of the `TalkingClock`. An inner class gets to access both its own data and those of the outer object creating it. It eliminates the need to provide unnecessary public methods.
+
+```java
+public class TalkingClock
+{
+   private int interval;
+   private boolean beep;
+   public TalkingClock(int interval, boolean beep) { . . . }
+   public void start() { . . . }
+   public class TimePrinter implements ActionListener
+      // an inner class
+   {
+       public void actionPerformed(ActionEvent event)
+   {
+      System.out.println("At the tone, the time is "
+         + Instant.ofEpochMilli(event.getWhen()));
+      if (beep) Toolkit.getDefaultToolkit().beep();
+   }
+   }
+}
+```
+
+The compiler modifies all inner clas constructors, adding a parameter for the outer class reference.
