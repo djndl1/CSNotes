@@ -1,4 +1,4 @@
-## Basics
+# Basics
 
 `quote` = `'`: do nothing
 
@@ -105,7 +105,7 @@ lambda expression:
 
 In common lisp, values or objects have types, not variables. This approach is called _manifest typing_. An object always has more than one type. The builtin Common lisp types form a hierarchy of subtypes and supertypes.
 
-## Lists
+# Lists
 
 Lisp has outgrown "LISt Processor". Common Lisp is a general-purpose programming language with a wide variety of data structures.
 
@@ -222,7 +222,7 @@ To copy part of a sequence, we use `subseq`. `reverse` returns a sequence with t
 
 The representation of lists as conses makes it natural to use them as pushdown stacks. Two macros `push` and `pop` are available. `pushnew` is a variant of `push` that uses `adjoin` instead of `cons`.
 
-### accessing a list
+## accessing a list
 
 `nth`, `nthcdr`, `last` (zero indexed); `first` to `tenth` (one-indexed)
 
@@ -347,7 +347,7 @@ lly a pointer to the value. When the contents of the data structure or the value
 
 _Automatic memory management_ is one of Lisp's most valuable features. The Lisp system maintains a segment of memory, _heap_. The function `cons` returns a newly allocated cons. Allocating memory from the heap is sometimes generically known as _consing_. Memory that is no longer needed is called _garbage_, and the scavenging operation is called _garbage collectiion_ or __GC__. Allocating storage and scavenging memory to reclaim it can be expensive compared to the routine operations of a program. It is easy to write programs that cons excessively.
 
-## Arrays and vectors
+# Arrays and vectors
 
 A literal array is dentoed by `#na` where `n` is the number of dimensions in the array. 
 
@@ -627,4 +627,57 @@ We can also control things like the way a structure is displayed and the prefix 
 ```
 
 The `:conc-name` argument specifies what should be concatenated to the front of the field names to make access functions for them. The `print-function` is the name of the function that should be used to print a point when it has to be displayed.
+
+## A binary search tree example
+
+A BST is a binary tree in which, for some ordering function `<`, the left child of each elemetn is `<` the element andthe element is `<` its right child. 
+
+The fundamental data structure is the `node` which has three fields, one for the object stored at the node, and one each for the left and right children of the node. 
+
+```lisp
+(defstruct (node (:print-function
+                    (lambda (n out d)
+                      (format out "#<~A>" (node-elt n)))))
+    elt (l nil) (r nil))
+```
+
+```lisp
+  (defun bst-min (bst)
+    (and bst
+         (or (bst-min (node-l bst)) bst)))
+
+  (defun bst-max (bst)
+    (and bst
+         (or (bst-max (node-r bst)) bst)))
+```
+A BST is either `nil` or a node whose left and right fields are BSTs.
+
+```lisp
+(defun bst-insert (obj bst <)
+    (if (null bst)
+        (make-node :elt obj)
+        (let ((elt (node-elt bst)))
+          (if (eql obj elt)
+              bst
+              (if (funcall < obj elt)
+                  (make-node
+                   :elt elt
+                   :l (bst-insert obj (node-l bst) <)
+                   :r (node-r bst))
+                  (make-node
+                   :elt elt
+                   :l (node-l bst)
+                   :r (bst-insert obj (node-r bst) <)))))))
+
+  (defun bst-find (obj bst <)
+    (if (null bst)
+        nil
+        (let ((elt (node-elt bst)))
+          (if (eql obj elt)
+              bst
+              (if (funcall < obj elt)
+                  (bst-find obj (node-l bst) <)
+                  (bst-find obj (node-r bst) <))))))
+
+```
 
