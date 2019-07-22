@@ -553,3 +553,38 @@ public static void repeat(int n, IntConsumer action) {
 ```
 
 `@FunctionalInterface` annotation should be added when defining an interface with a single abstact method.
+
+
+# Inner Classes
+
+Reasons:
+
+1. Inner classes can be hidden from other classes in the same package.
+
+2. Inner class methods can access the data from the scope in which they are defined, including the data that would otherwise be private.
+
+Inner classes used to be very important for concisely implementing callbacks, which now has been almost replaced by lambda expressions.
+
+In Java, unlike in C++, an object that comes form an inner class has an implicit reference to the outer class object that instantiated it, through which it gains access to the total state of the outer object. The `TimePrinter` has no `beep` field yet it refers to one, which is the field of the `TalkingClock`. An inner class gets to access both its own data and those of the outer object creating it. It eliminates the need to provide unnecessary public methods.
+
+```java
+public class TalkingClock
+{
+   private int interval;
+   private boolean beep;
+   public TalkingClock(int interval, boolean beep) { . . . }
+   public void start() { . . . }
+   public class TimePrinter implements ActionListener
+      // an inner class
+   {
+       public void actionPerformed(ActionEvent event)
+   {
+      System.out.println("At the tone, the time is "
+         + Instant.ofEpochMilli(event.getWhen()));
+      if (beep) Toolkit.getDefaultToolkit().beep();
+   }
+   }
+}
+```
+
+The compiler modifies all inner clas constructors, adding a parameter for the outer class reference.
