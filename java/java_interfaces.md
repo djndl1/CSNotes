@@ -20,6 +20,14 @@ String[] friends = {"Peter", "Paul" , "mary"};
 Arrays.sort(friends, new LengthComparator());
 ```
 
+The `Comparator` interface has a number of convenient static methods for creating comparators. These methods are intended to be used with lambda expressions or method references.
+
+E.g. `.comparing`
+
+```java
+Arrays.sort(people, Comparator.comparing(Person::getLastName).thenComparing(Person::getFirstName));
+```
+
 # The `Cloneable` interface (C++ copy assignment, copy constructor )
 
 The `Cloneable` interface indicates that a class has provided a safe `clone()` method. The default `clone` of the `Object` class copies only every fields of an object and is `protected`. The default cloning operation is _shallow_: it does not copy objects that are referenced inside other objects. If the object inside is _immutable_, shallow cloning is enough.
