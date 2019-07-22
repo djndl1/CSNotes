@@ -60,7 +60,7 @@ This distinction allows the implementation of _move semantics_ and _perfect forw
 
 - gvalue: _generalized value_, anything that may receive a value, either a lvalue or an xvalue.
 
-- prvalue: pure rvalue, a literal value or an immutable object.
+- prvalue: pure rvalue, a literal value except for string literal or an immutable object.
 
  An expression's value is an xvalue if it is:
  
@@ -68,7 +68,7 @@ This distinction allows the implementation of _move semantics_ and _perfect forw
 
 - an object that is cast to an rvalue reference.
 
-- an expression accessing a non-static class data member whose object is an xvalue or a pointer-to-member expression in which the left-hand side operand is an xvalue and the right-hand side operand is a pointer to a data member. ???
+- an expression accessing a non-static class data member whose object is an xvalue or a pointer-to-member (`a.*mp`) expression in which the left-hand side operand is an xvalue and the right-hand side operand is a pointer to a data member. ???
 
 Named rvalue reference are treated as lvalues and anonymous rvalue references to objects are treated as xvalues. Rvalue references to functions are treated as lvalues whether anonymous or not. 
 
@@ -95,3 +95,22 @@ demo + demo
 
 are xvalues. However, `rref` is an lvalue.
 
+# More on value category
+
+Each C++ expression (an operator with its operands, a literal, a variable name, etc.) is characterized by two independent properties, type and _value category_. Each expression belongs to exactly one of the three primary value categories: _prvalue_, _xvalue_, _lvalue_.
+
+- _glvalue_: an expression whose evaluation determines the identity of an object, bit-field, or function.
+
+- _xvalue_: a glvalue that denotes an object or bit-field whose resources can be reused
+
+- _lvalue_: a glvalue that is not an xvalue.
+
+- _prvalue_: an expression whose evaluation either computes the value of the operand of an operator or initializes an object or a bit-field.
+
+- _rvalue_: a prvalue or an xvalue.
+
+# More on references
+
+https://blog.petrzemek.net/2016/09/17/universal-vs-forwarding-references-in-cpp/
+
+https://isocpp.org/files/papers/N4164.pdf
