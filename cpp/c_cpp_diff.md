@@ -8,15 +8,32 @@ The return type is `int`, not `void`. `return` statement may be omitted, and `ma
 
 A prototype must be known for each funciton before it is called and the call must match the prototype. `return` must explicitly return `int` in `main`. An empty parameter list indicates the total absence of parameter, i.e. as with `void`.
 
-# default arguments
+# Strongly types enumerations
 
-Default arguments must be known at compile-time (instead of finding these arguments in the implementation at run-time). Therefore, the default arguments must be mentioned at the function's declaration.
+The old style `enum` has their values not restricted to the enum type name itself, but to the scope where the enumeration is defined. Two enumerations having the same scope cannot have identical names.
+
+`enum class` solves such problems. The value type used by `enum class` can be specified instead of `int` only.
+
+```c++
+enum class CharEnum : unsigned char {
+    NOT_OK,
+    OK
+}
+```
+
+`...` operator is allowed to show a sequence of symbols of a `enum class`.
 
 # `NULL` pointer, `0` pointer and `nullptr`
 
 In C++, all zero values are coded as 0.
 
 `NULL` should be avoided. `0` pointer may lead to trouble with function overloading since it's actually `int`. Use `nullptr` instead.
+
+
+# default arguments
+
+default arguments must be known at compile-time (instead of finding these arguments in the implementation at run-time). Therefore, the default arguments must be mentioned at the function's declaration.
+
 
 # `#define __cplusplus`
 
@@ -61,7 +78,7 @@ If considered appropriate, _nested block_ can be used to localize auxiliary vari
 
 In C++, local variables can be defined and initialized within `if-else`, `switch`, `while` statements.
 
-# `typedef`
+# `typedef` and `using`
 
 The keyword `typedef` is not required anymore when defining `union`, `struct` or `enum` defintions.
 
@@ -71,6 +88,16 @@ struct someStruct {
 }
 
 someStruct whatVar;
+```
+The scope of typedefs is restricted to compilation units. Therefore, typedefs are usually embedded in
+header files which are then included by multiple source files in which the typedefs should be used.
+
+In practice, `typedef` and `using` can be used interchangeably.
+
+```c++
+typedef unsigned long long int FUN(double, int);
+using FUN = unsigned long long int (double, int);
+using FUN = auto (double, int) -> unsigned long long int;
 ```
 
 # Evaluation order of operands
@@ -105,6 +132,10 @@ switch (selector) {
 
 - `[[nodiscard]]`: specified when declaring a function, class or enumeration. This attribute requires that the return value of a function may be ignored only when explicitly cast to void.
 
+- `[[noreturn]]`: used in functions like `std::terminate`, `std::abort`.
+
+- `[[deprecated]]`/`[[deprecated("reason")]]`: 
+
 ```c++
 int [[nodiscard]] importantInt()
 
@@ -136,6 +167,155 @@ Some advantages of using streams are:
 
 - Using insertion and extraction operators is _type-safe_. Old style functions may be given wrong format specifier. With streams there are no format strings.
 
-- Insertion and extraction may be extended, alloiwng objects of classes to be inserted into or extracted form streams.
+- Insertion and extraction may be extended, allowing objects of classes to be inserted into or extracted form streams.
 
 - Streams are independent of the media they operate on.
+
+# References
+
+- When a function explicitly must change the values of its arguments, a pointer parameter is preferred. These pointer parameters should preferably be the function’s initial parameters. This is called return by argument. If the modification of the argument is a trivial side-effect, references can be used.
+
+
+
+# Initializer lists
+
+C++ extends the concept of initializer list by introducing the type `initializer_list<Type>` where `Type` is reolaced by the type name of the values used in the initializer list.
+
+Initializer lists are recursive, so they can be used with multidimensional arrays, structs and clases.
+
+```c++
+void values2(std::initializer_list<std::initializer_list<int>> iniValues)
+{}
+values2({{1, 2}, {2, 3}, {3, 5}, {4, 7}, {5, 11}, {6, 13}});
+```
+
+# Designated initialization
+
+As C++ requires that destruction of data members occurs in the opposite order as their construction it is required that, when using designated initialization, members are initialized in the order in which they are declared in their class or struct. A union can be initialized using designated initialization.
+
+In C++, it is not allowed to reorder the initialization of members in a designated initialization list.
+
+# Initializer for bit fields
+
+(C++2a) Bit fields is allowed them to be initialized by default by using initialization expressions in their definitions.
+
+```c++
+struct FirstIP4word
+{
+uint32_t version: 4 = 1; // version now 1, by default
+uint32_t header: 4 = 10; // TCP header length now 10, by default
+uint32_t tos: 8;
+uint32_t length: 16;
+};
+```
+
+# Type inference using `auto`
+
+The keyword `auto` can be used to simplify type definitions of variables and return types of functions if
+the compiler is able to determine the proper types of such variables or functions. It is no longer used as a storage class specifier.
+
+Plain types and pointer types are used as-is when declared `auto`. A reference's basic type (without the reference, omitting `const` and `volatile`)  is used. If a reference is required, use `auto&` or `auto&&`. Likewise, `const` and/or pointer specifications can be used in combination with the `auto` keyword.
+
+The declaration of such a function `int (*intArrPtr())[10];` is rather complex. Using `auto`, it becomes
+
+```c++
+auto intArrPtr() -> int (*)[10];
+```
+
+which is called a _late-specified return type_.
+
+(C++14) Late return type specifications are no longer required for functions returning auto, simply
+
+```c++
+auto autoReturnFunction();
+```
+
+in which case, all return values must have an identical type. Funtions merely returning `auto` cannot be used before the compiler has seen their definitions. So they cannot be used after mere declarations. When such functions are implemented as recursive function, at least one return statement must have been seen before the recursive call.
+
+```c++
+auto fibonacci(size_t n) 
+{
+    if (n <=1 )
+        return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+```
+
+# Structured binding declarations (C++17)
+
+Usually, when functions need to return mutliple values, a return-by-argument construction is often used. When multiple vlaues should be returned from a function, a struct can be used.
+
+```c++
+struct Return {
+    int first;
+    double second;
+};
+
+Return fun() 
+{
+    return { 1, 12.5};
+}
+
+Return& fun2()
+{
+    static Return ret{4, 5};
+    return ret;
+}
+```
+
+The struct definition can completely be omitted if fun returns a pair or tuple. Instead of referring to the elements of the returned struct, pair or tuple structured binding declarations can also be used.
+
+```c++
+auto [one, two] = fun();
+auto&& [rone, rtwo] = fun();
+auto& [lone, ltwo] = fun2();
+```
+
+There doesn't have to be a function call!
+
+```c++
+auto const &[lone, ltwo] = Return{4, 5};
+auto &&[lone, ltwo] = Return{4, 5};
+
+for (auto &[year, amount, interest] : structArray)
+    cout << "Year " << year << ": amount = " << amount << '\n';
+```
+
+The object doesn't even have to make its data member publicly available (TODO).
+
+# Range-based for-loops
+
+- Plain arrays
+
+- Initializer lists;
+
+- standard containers
+
+- any other type offering `begin()` and `end()` functions returning iterators.
+
+(C++20) range-based for-loop can have a init-statement.
+
+# (C++17) `if`, `switch` with init-statement
+
+Before using the condition clauses an initialization clause may be used to define additional variables (plural, as it may contain a comma-separated list of variables, similar to the syntax that’s available for for-statements).
+
+
+# Raw String literals
+
+Raw string literals start with an `R`, followed by a double quote, optionally followed by a label (which is an arbitrary sequence of characters not equal to `(`, followed by `(`. The raw string ends at the closing parenthesis ), followed by the label (if specified when starting the raw string literal), which is in turn followed by a double quote.
+
+```c++
+R"label(whatever raw string you want)label"
+```
+
+```c++
+char const *noPrompt =
+R"(
+    if (d_debug__)
+        s_out__ << '\n';
+)";
+```
+
+# Binary constants (C++14)
+
+Binary integral constants can be defined using the prefixes `0b` or `oB`.
