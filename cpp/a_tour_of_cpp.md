@@ -380,11 +380,12 @@ private:
 
 This way, we no longer need a desctructor for `Smiley` since the destructor of `unique_ptr` takes responsiblity. The code using `unique_ptr` will be as efficient as code using raw pointers.
 
+
 ## Essential operations
 
-Some operations such as initialization, assignment, cioy and move, are **fundamental** in the sense that language rules make assumptions about them.
+Some operations such as initialization, assignment, copy and move, are **fundamental** in the sense that language rules make assumptions about them.
 
-Constructors, destructors, and copy and move operations for a type are not logically separate. We must define them as amtched set or suffer logical or performance problems.
+Constructors, destructors, and copy and move operations for a type are not logically separate. We must define them as matched set or suffer logical or performance problems.
 
 ```c++
 class X {
@@ -481,3 +482,57 @@ Vector f()
 ```
 
 The compiler is obliged (by the C++ standard) to eliminate most copies associated with initialization, so move constructors are not invoked as often as you might imagine. This copy elision eliminates even the very minor overhead of a move. On the other hand, it is typically not possible to implicitly eliminate copy or move operations from assignments, so move assignments can be critical for performance.
+
+### Resource Management
+
+A resource is anything that has to be acquired and released after use. E.g. memory, lock, sockets, file handles and thread handles. Leak must be avoided in any long-running system, but excessive resource retention can be almost as bad as  aleak. RAII is the resource management scheme usually used by C++, integrated with error handling. Resources can be moved from scope to scope using move semantics or smart pointers, and shared ownership can be represented by shared pointers.
+
+Use resource handles like `vector`, `thread` or smart pointers to achieve resource safety, eliminating `new` and `delete`. Garbage collection is fundamentally a global memory management scheme. As systems are getting more distributed, locality is more important than ever.
+
+## Conventional Operations
+
+Some operations have conventional meaings when defined for a type, often assumed by programmers and libraries.
+
+## Container Operations
+
+
+
+### Comparisons
+
+Define `==` and `!=` together, define `<` and `<=`, `>` and `>=` together. Note `a>b` can be implemented as `b<a`. 
+
+`.size()`, `.begin()`, `end()`.
+
+### User-Defined Literals
+
+Literals of a user-defined type is provided by defining the meaning of a suitable suffix to a literal, _lite
+ral operators_, in the form ``(constexpr) target_type operator""literal_suffix(literal_type arg)`.
+
+`"surprise"` is a `const char[] while `"surprise"s` is a `std::string`. `123s` is `second`s, `12.7i` is `imaginary`.
+
+```c++
+constexpr complex<double> operator""i(long double arg) 
+{
+    return {0, arg};
+}
+```
+
+### `swap()`
+
+Many algorithms, most notably `sort()`, use a `swap()` function that exchanges the values of two objects. Such algorithms generally assume that `swap()` is very fast and doesn’t throw an exception. 
+
+The standard library `std::swap()` is implemented as three move operations.
+
+### `hash<>`
+
+To use a type `X` as a key in `map`s, `hash<X>` must be defined.
+
+# Template and Generic Programming
+
+A template is a classs or a function that we parameterize with a set of types or values. We use template to represent ideas that are best understood as something general from which we can generate specific types andfunctions by specifying argumetns. `template<typename T>` is the C++ version of $\forall T$.
+
+Templates are a compile-time mechanism, so their use incurs no run-time overhead compared to hand-crafted code. A template plus a set of template arguments is called an _instantiation_ or a _specialization_.
+
+## (C++20) Constrained Template Arguments
+
+
