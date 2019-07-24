@@ -544,7 +544,7 @@ public static void repeat(int n, Runnable action) {
     )
 ```
 
-There are specializations for primitive types `int`, `long` and `double`. It is more efficient to use these specializations than the  generic interfaces.
+There are specializations of generic functional interfaces for primitive types `int`, `long` and `double`. It is more efficient to use these specializations than the  generic interfaces.
 
 ```java
 public static void repeat(int n, IntConsumer action) {
@@ -567,6 +567,7 @@ Inner classes used to be very important for concisely implementing callbacks, wh
 
 In Java, unlike in C++, an object that comes form an inner class has an implicit reference to the outer class object that instantiated it, through which it gains access to the total state of the outer object. The `TimePrinter` has no `beep` field yet it refers to one, which is the field of the `TalkingClock`. An inner class gets to access both its own data and those of the outer object creating it. It eliminates the need to provide unnecessary public methods.
 
+
 ```java
 public class TalkingClock
 {
@@ -574,17 +575,69 @@ public class TalkingClock
    private boolean beep;
    public TalkingClock(int interval, boolean beep) { . . . }
    public void start() { . . . }
-   public class TimePrinter implements ActionListener
-      // an inner class
+   public class TimePrinter implements ActionListener // an inner class
    {
        public void actionPerformed(ActionEvent event)
-   {
-      System.out.println("At the tone, the time is "
-         + Instant.ofEpochMilli(event.getWhen()));
-      if (beep) Toolkit.getDefaultToolkit().beep();
-   }
+       {
+            System.out.println("At the tone, the time is "
+                + Instant.ofEpochMilli(event.getWhen()));
+            if (beep) Toolkit.getDefaultToolkit().beep();
+       }
    }
 }
 ```
 
-The compiler modifies all inner clas constructors, adding a parameter for the outer class reference.
+The compiler modifies all inner clas constructors, adding a parameter for the outer class reference. The explicit outer class reference is `OuterClass.this`. The `beep` above can be rewritten as `TalkingClock.this.beep`. The inner object constructor can be `outerObject.new InnerClass(args)`. It is also possible to set the outer reference to another object by eplicitly naming it.
+
+```java
+var jabberer = new TalkingClock(1000, true);
+TalkingClock.TimePrinter listener = jabberer.new TimePrinter();
+```
+
+An inner class is referred to as `OuterClass.InnerClass` when it occurs outside the scope of the outer class.
+
+Inner classes are a phenomenon of the compiler, not the virtual machine. Inner classes are translated into regular class files with $ (dollar signs) delimiting outer and inner class names, and the virtual machine does not have any special knowledge about them.
+
+The generated class files of inner classes and outer classes have compiler generated references to outer classes and accessors, which causes security issues.
+
+## Local Inner Classes: clases locally in a single method
+
+Local classes are never declared with an access specifier (that is, public or private). Their scope is always restricted to the block in which they are declared. Local classes have one great advantage: They are completely hidden from the outside world. Local classes can access effectively final local variables, that is, they never change once assigned. Those variables have `fian` fields inside the compiled local inner class.
+
+## Anonymous Inner Classes
+
+In general, the syntax is 
+
+```java
+new SuperType(construction parameters)   // SuperType may be an interface or a class
+   {
+     // inner class methods and data
+   }
+```
+
+```java
+public void start(int interval, boolean beep)
+{
+   var listener = new ActionListener() 
+      {
+         public void actionPerformed(ActionEvent event)
+         {
+            System.out.println("At the tone, the time is "
+               + Instant.ofEpochMilli(event.getWhen()));
+            if (beep) Toolkit.getDefaultToolkit().beep();
+         }
+      };
+   var timer = new Timer(interval, listener);
+   timer.start();
+}
+```
+
+An anonymous inner class cannot have constructors because the name of a constructor must be the same as the name of a class, and the class has no name. Instead, the construction parameters are given to the superclass constructor. In particular, whenever an inner class implements an interface, it cannot have any construction parameters. Even though an anonymous class cannot have constructors, you can provide an object initialization block.
+
+```java
+invite(new ArrayList<String>() {{ add("Harry"); add("Tony"); }});
+```
+
+For many years, Java programmers routinely used anonymous inner classes for event listeners and other callbacks. Nowadays, you are better off using a lambda expression.
+
+
