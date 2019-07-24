@@ -506,9 +506,9 @@ Define `==` and `!=` together, define `<` and `<=`, `>` and `>=` together. Note 
 ### User-Defined Literals
 
 Literals of a user-defined type is provided by defining the meaning of a suitable suffix to a literal, _lite
-ral operators_, in the form ``(constexpr) target_type operator""literal_suffix(literal_type arg)`.
+ral operators_, in the form `(constexpr) target_type operator""literal_suffix(literal_type arg)`.
 
-`"surprise"` is a `const char[] while `"surprise"s` is a `std::string`. `123s` is `second`s, `12.7i` is `imaginary`.
+`"surprise"` is a `const char[]` while `"surprise"s` is a `std::string`. `123s` is `second`s, `12.7i` is `imaginary`.
 
 ```c++
 constexpr complex<double> operator""i(long double arg) 
@@ -535,4 +535,167 @@ Templates are a compile-time mechanism, so their use incurs no run-time overhead
 
 ## (C++20) Constrained Template Arguments
 
+`template <Element T>` prefix is C++ version of mathematical "for all T such that Element(T)", where `Element`, called a _concept_, is a predicate that checks whether `T` has all the properties required.
 
+## Value Template Arguments
+
+```c++
+template<typename T, size_t N>
+class buffer {
+  using value_type = T;
+
+public:
+  constexpr size_t size() const { return N; }
+
+private:
+  T buf[N];
+```
+
+```c++
+buffer<char, 1024> glob;
+```
+
+## (C++17) template parameter deduction from constructors arguments.
+
+```c++
+pair p = {1, 5.2}; // pair<int, double>
+vector v1 {1, 2, 3};
+vector v2 = v1;
+```
+
+This is not a panacea
+
+```c++
+Vector<string> vs1 {"Hello", "World"};  // Vector<string>
+Vector vs {"Hello", "World"};           // deduces to Vector<const char*> (Surprise?)
+Vector vs2 {"Hello"s, "World"s};        // deduces to Vector<string>
+Vector vs3 {"Hello"s, "World"};         // error: the initializer list is not homogenous
+```
+
+A deduction guide can be added after declaration.
+
+```c++
+template<typename T>
+class Vector2 {
+public:
+    template<typename Iter>
+     Vector2(Iter,Iter) −> Vector2<typename Iter::value_type>;
+}
+```
+
+The effects of deduction guides are often subtle, so it is best to design class templates so that deduction guides are not needed.
+
+## Parameterized Operations
+
+### Function Templates
+
+```c++
+template<typename Sequence, typename Value>
+Value sum(const Sequence& s, Value v)
+{
+     for (auto x : s)
+           v+=x;
+     return v;
+}
+```
+
+```c++
+void user(Vector<int>& vi, list<double>& ld, vector<complex<double>>& vc)
+{
+     int x = sum(vi,0);                     // the sum of a vector of ints (add ints)
+     double d = sum(vi,0.0);                // the sum of a vector of ints (add doubles)
+     double dd = sum(ld,0.0);               // the sum of a list of doubles
+     auto z = sum(vc,complex{0.0,0.0});     // the sum of a vector of complex<double>s
+}
+```
+
+A function template can be a member function, but not a virtual member.
+
+### Function Objects (functor)
+
+```c++
+template<typename T>
+class Less_than {
+     const T val;   // value to compare against
+public:
+     Less_than(const T& v) :val{v} { }
+     bool operator()(const T& x) const { return x<val; } // call operator
+};
+```
+
+```c++
+template<typename C, typename P>
+     // requires Sequence<C> && Callable<P,Value_type<P>>
+int count(const C& c, P pred)
+{
+     int cnt = 0;
+     for (const auto& x : c)
+           if (pred(x))
+                 ++cnt;
+     return cnt;
+}
+```
+
+### Lambda Expressions
+
+`[capture whatever local names you what](parameters args...){ function body}`
+
+- `[&]`: capture all local names used by reference
+
+- `[=]`: capture all local names used by value
+
+- `[ ]`: capture nothing
+
+```c++
+template<typename C, typename Oper>
+void for_all(C& c, Oper op)       // assume that C is a container of pointers
+     // requires Sequence<C> && Callable<Oper,Value_type<C>> (see §7.2.1)
+{
+     for (auto& x : c)
+           op(x);       // pass op() a reference to each element pointed to
+}
+```
+
+```c++
+     vector<unique_ptr<Shape>> v;
+     while (cin)
+          v.push_back(read_shape(cin));
+     for_all(v,[](unique_ptr<Shape>& ps){ ps−>draw(); });        // draw_all()
+     for_all(v,[](unique_ptr<Shape>& ps){ ps−>rotate(45); });    // rotate_all(45)
+```
+
+A lambda can be generic.
+
+```c++
+template<class S>
+void rotate_and_draw(vector<S>& v, int r)
+{
+     for_all(v,[](auto& s){ s−>rotate(r); s−>draw(); });
+}
+
+void user4()
+{
+     vector<unique_ptr<Shape>> v1;
+     vector<Shape*> v2;
+     // ...
+     rotate_and_draw(v1,45);
+     rotate_and_draw(v2,90);
+}
+```
+
+Using a lambda, we can turn any statement into an expression.
+
+```c++
+// int n, Init_mode m, vector<int>& arg, and iterators p and q are defined somewhere
+
+vector<int> v = [&] {
+     switch (m) {
+     case zero:
+          return vector<int>(n);       // n elements initialized to 0
+     case seq:
+          return vector<int>{p,q};     // copy from sequence [p:q)
+     case cpy:
+          return arg;
+     }
+};
+```
