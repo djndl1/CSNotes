@@ -319,3 +319,32 @@ R"(
 # Binary constants (C++14)
 
 Binary integral constants can be defined using the prefixes `0b` or `oB`.
+
+# New language-defined data types
+
+There is a subtle issue to be aware of when converting applications developed for 32-bit architectures to 64-bit architectures. When converting, only `long` types and pointer types change in size from 32 bits to 64 bits. `int` remains at 32 bits.
+
+`L` as a prfix is used to indicate a character string whose elements are `wchar_t`. `p` specifies the power in hexadecimal floating point numbers, the exponential part is interpreted as a power of 2.
+
+```c++
+0x10p2 // 16 * 2^2 = 64
+```
+
+If a function should inform its caller about the success or failure of its task, let the function return a bool value. If the function should return success or various types of errors, let the function return enum values, documenting the situation by its various symbolic constants.
+
+## Unicode encoding
+
+C++ supports 8, 16 and 32 bit Unicode encoded strings. Two new data types are introduced: `char16_t`, `char32_t` representing UTF-16 and UTF-32 respectively. A `char` type value fits in a UTF-8 unicode value.
+
+```c++
+char
+ utf_8[] = u8"This is UTF-8 encoded.";
+char16_t utf16[] = u"This is UTF-16 encoded.";
+char32_t utf32[] = U"This is UTF-32 encoded.";
+
+char
+ utf_8[] = u8"\u2018";
+char16_t utf16[] = u"\u2018";
+char32_t utf32[] = U"\u2018";
+
+```
