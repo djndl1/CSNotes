@@ -33,3 +33,29 @@ Comments cannot be nested.
 ## Schemas and validation
 
 Validity of an XML document means that it contains a reference to a Document Type Definition and that its elements and attributes are declared in that DTD and follow the grammatical rules for them that the DTD specifies. A newer schema language, described by the W3C as the successor of DTDs, is XML Schema, often referred to by the initialism for XML Schema instances, XSD (XML Schema Definition). XSDs are far more powerful than DTDs in describing XML languages.
+
+## `xml.etree.ElementTree`
+
+The `xml.etree.ElementTree` module implements a simple and efficient API for parsing and creating XML data.
+
+# `ElementTree`
+
+This class represents an entire element hierarchy, and adds some extra support for serialization to and from standard XML.
+
+### `Element`
+
+Represents a single node in this tree.
+
+## The Document Object Model API (DOM)
+
+The Document Object Model, or “DOM,” is a cross-language API from the World Wide Web Consortium (W3C) for accessing and modifying XML documents. The DOM is a standard tree representation for XML data.
+
+A DOM implementation presents an XML document as a tree structure, or allows client code to build such a structure from scratch. It then gives access to the structure through a set of objects which provided well-known interfaces.
+
+The DOM is extremely useful for random-access applications. Some applications are simply impossible in an event driven model with no access to a tree.
+
+See [DOM Level 2 Core Specification](https://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/Overview.html#contents)
+
+### `xml.dom`
+
+
