@@ -228,3 +228,7 @@
 - [ ] https://machinelearningmastery.com/difference-test-validation-datasets/
 - [ ] https://developer.ibm.com/articles/an-introduction-to-uml/
 - [ ] https://en.wikipedia.org/wiki/Unified_Modeling_Language
+
+2019-07-25
+
+- [ ] https://stackoverflow.com/questions/20187587/what-is-the-difference-between-dynamic-dispatch-and-late-binding-in-c
