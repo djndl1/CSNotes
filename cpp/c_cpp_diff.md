@@ -202,10 +202,10 @@ In C++, it is not allowed to reorder the initialization of members in a designat
 ```c++
 struct FirstIP4word
 {
-uint32_t version: 4 = 1; // version now 1, by default
-uint32_t header: 4 = 10; // TCP header length now 10, by default
-uint32_t tos: 8;
-uint32_t length: 16;
+    uint32_t version: 4 = 1; // version now 1, by default
+    uint32_t header: 4 = 10; // TCP header length now 10, by default
+    uint32_t tos: 8;
+    uint32_t length: 16; 
 };
 ```
 
@@ -337,14 +337,52 @@ If a function should inform its caller about the success or failure of its task,
 C++ supports 8, 16 and 32 bit Unicode encoded strings. Two new data types are introduced: `char16_t`, `char32_t` representing UTF-16 and UTF-32 respectively. A `char` type value fits in a UTF-8 unicode value.
 
 ```c++
-char
- utf_8[] = u8"This is UTF-8 encoded.";
+char utf_8[] = u8"This is UTF-8 encoded.";
 char16_t utf16[] = u"This is UTF-16 encoded.";
 char32_t utf32[] = U"This is UTF-32 encoded.";
 
-char
- utf_8[] = u8"\u2018";
+char utf_8[] = u8"\u2018";
 char16_t utf16[] = u"\u2018";
 char32_t utf32[] = U"\u2018";
 
+```
+
+
+# Casts
+
+C++ prorams should merely use the new style C++ casts as they offer the compiler facilities to verify the sensibility of the cast.
+
+## `static_cast`
+
+The `static_cast<type>(expression)` is used to convert ‘conceptually comparable or related types’ to each other.
+
+```c++
+sqrt(static_cast<double>(x) / y);
+cout << static_cast<int>(Enum::VALUE);
+tolower(static_cast<unsigned char>(ch));
+```
+
+The `static_cast` is used in the context of class inheritance to convert a pointer to a derived class to a pointer to its base class. Also, use `static_cast` to convert `void *` to an intended destination pointer.
+
+## `const_cast`
+
+A const_cast<type>(expression) expression is used to undo the const attribute of a (pointer) type.
+
+The need for a const_cast may occur in combination with functions from the standard C library which traditionally weren’t always as const-aware as they should.
+
+## `dynamic_cast`
+
+Different from the static_cast, whose actions are completely determined compile-time, the `dynamic_cast`’s actions are determined run-time to convert a pointer to an object of some class.
+
+## `reinterpret_cast`
+
+`reinterpret_cast` should only be used when it is known that the information as defined in fact is or can be interpreted as something completely different. Think of the reinterpret_cast as a cast offering a poor-man’s union: the same memory location may be interpreted in completely different ways. Avoid this unless necessary.
+
+
+```c++
+reinterpret_cast<pointer type>(pointer expression)
+```
+
+```c++
+cout.write(reinterpret_cast<char const *>(&value), sizeof(double)); // value is a double variable
 ```

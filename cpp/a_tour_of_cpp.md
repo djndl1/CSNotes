@@ -529,7 +529,7 @@ To use a type `X` as a key in `map`s, `hash<X>` must be defined.
 
 # Template and Generic Programming
 
-A template is a classs or a function that we parameterize with a set of types or values. We use template to represent ideas that are best understood as something general from which we can generate specific types andfunctions by specifying argumetns. `template<typename T>` is the C++ version of $\forall T$.
+A template is a classs or a function that we parameterize with a set of types or values. We use template to represent ideas that are best understood as something general from which we can generate specific types and functions by specifying argumetns. `template<typename T>` is the C++ version of $\forall T$.
 
 Templates are a compile-time mechanism, so their use incurs no run-time overhead compared to hand-crafted code. A template plus a set of template arguments is called an _instantiation_ or a _specialization_.
 
@@ -657,11 +657,11 @@ void for_all(C& c, Oper op)       // assume that C is a container of pointers
 ```
 
 ```c++
-     vector<unique_ptr<Shape>> v;
-     while (cin)
-          v.push_back(read_shape(cin));
-     for_all(v,[](unique_ptr<Shape>& ps){ ps−>draw(); });        // draw_all()
-     for_all(v,[](unique_ptr<Shape>& ps){ ps−>rotate(45); });    // rotate_all(45)
+vector<unique_ptr<Shape>> v;
+while (cin)
+     v.push_back(read_shape(cin));
+for_all(v,[](unique_ptr<Shape>& ps){ ps−>draw(); });        // draw_all()
+for_all(v,[](unique_ptr<Shape>& ps){ ps−>rotate(45); });    // rotate_all(45)
 ```
 
 A lambda can be generic.
@@ -699,3 +699,53 @@ vector<int> v = [&] {
      }
 };
 ```
+
+## Template Mechanisms
+
+### Variable Templates: values dependent on a type
+
+We can use arbitrary expressions of suitable type as initializers.
+
+```c++
+template <class T>
+     constexpr T viscosity = 0.4;
+
+template <class T>
+     constexpr space_vector<T> external_acceleration = { T{}, T{−9.8}, T{} };
+
+auto vis2 = 2*viscosity<double>;
+auto acc = external_acceleration<float>;
+```
+
+### Type aliasing
+
+The aliasing mechanism can be used to define a new template by binding some or all template arguments.
+
+```c++
+template<typename Key, typename Value>
+class Map {
+     // ...
+};
+
+template<typename Value>
+using String_map = Map<string,Value>;
+
+String_map<int> m;     // m is a Map<string,int>
+```
+
+### (C++17) Compile-time `if`
+
+```c++
+template<typename T>
+void update(T& target)
+{
+     // ...
+     if constexpr(is_pod<T>::value) //is_pod is a type trait
+          simple_and_fast(target); // for "plain old data"
+     else
+          slow_and_safe(target);
+     // ...
+}
+```
+
+Only the selected branc hof an `if constexpr` is instantiated.
