@@ -94,7 +94,7 @@ In the `main` method of a Java program, the name of the program is not stored in
 
 # Objects and Classes
 
-A class is the template or blueprint from which objects are made. Encapsulation (information hiding) is a key concept in working with objects. Formally, encapsulation is simply combining data and behavior in one package and hiding the implementation details from users of object. The bits of data in an object are called its instance fields, and the procedures that operate on the data are called its methods. A specific object that is an instance of a class will have specific values of its instance fields. The set of those values is the current state of the object. Whenever you invoke a method on an object, its state may change.
+A class is the template or blueprint from which objects are made. Encapsulation (information hiding) is a key concept in working with objects. Formally, encapsulation is simply combining data and behavior in one package and hiding the implementation details from users of object. The bits of data in an object are called its _instance fields_, and the procedures that operate on the data are called its _methods_. A specific object that is an instance of a class will have specific values of its instance fields. The set of those values is the current state of the object. Whenever you invoke a method on an object, its state may change.
 
 Objects have three key characteristics:
 
@@ -106,13 +106,13 @@ Objects have three key characteristics:
 
 ## Relationships between Classes
 
-- Dependece ("uses-a")
+- Dependence ("uses-a")
 
 - Aggregation ("has-a")
 
 - Inheritance ("is-a")
 
-## Working with `null` references
+## Some issues when defining a class
 
 When defining a class, it is a good idea to be clear about which fields can be `null`.
 
@@ -166,7 +166,7 @@ public Employee {
     nextId++;
 }
 ```
-Besides explicitly initializing fields, it is possible to use __initializtion block__ to initalize variables. This mechanism is never necessary and is not common.
+Besides explicitly initializing fields, it is possible to use __initialization block__ to initalize variables. This mechanism is never necessary and is not common.
 
 `finalize` method is now deprecated since when the method will be called is undetermined. `Cleaner` class registers an action that is carried out when an object is no longer reacheable. `Runtime.addShutdownHook` adds a "shutdown hook".
 
@@ -217,7 +217,7 @@ A class with one or more `abstract` methods must itself be declared abstract. Ab
 
 In C++, an abstract method is called _pure virtual function_ with a training `= 0`. In C++, there is no special keyword to denote abstract classes.
 
-## Access control
+## Access control (TODO: may be expanded)
 
 Any feature declared `private` won't be accessible in other classes: a subclass cannot access the private fields of its superclass. A protected field is accessible by any class in the same package. But a subclass from a different package can only access the protected field of itself, not of any of its superclass.
 
@@ -313,6 +313,33 @@ The constructor of an enumeration is always private. All enumerated types are su
 4. Use polymorphism, not type information.
 
 5. Do not overuse reflection. It is not usually appropriate in applications.
+
+## Reflection (Not for application development)
+
+The _reflection library_ has a very rich and elaborate toolset to write programs that manipulate Java code dynamically. Using reflection, Java can support user interface builders, object-relational mappers, and many other development tools that dynamically inquire about the capabilities of classes.
+
+A program that can analyze the capabilities of classes is called _reflective_ It can analyze the capabilities of classes, inspect objects at runtime, implement generic array manipulation code and take advantage of `Method` objects that work like function pointers in C++.
+
+### The `Class` class
+
+The Java runtime system always maintains what is called runtime type identification on all objects. This information keeps track of the class to which each object belongs.
+
+```java
+System.out.println(e.getClass().getName() + " " + e.getName());
+```
+
+`T.class` is the matching class object of type `T`. Note that `T` doesn't have to be a class. The `Class` class is actually a generic class. `Employee.class` is of type `Class<Employee>`. The virtual machine manages a unique `Class` object for each type.
+
+```java
+var className = "java.util.Random"; // or any other name of a class with 
+                                    // a no-arg constructor
+Class cl = Class.forName(className);
+Object obj = cl.getConstructor().newInstance();
+```
+
+This constructs a new instance of type `cl`;
+
+TODO
 
 # Interfaces
 
@@ -598,11 +625,11 @@ An inner class is referred to as `OuterClass.InnerClass` when it occurs outside 
 
 Inner classes are a phenomenon of the compiler, not the virtual machine. Inner classes are translated into regular class files with $ (dollar signs) delimiting outer and inner class names, and the virtual machine does not have any special knowledge about them.
 
-The generated class files of inner classes and outer classes have compiler generated references to outer classes and accessors, which causes security issues.
+The generated class files of inner classes  have compiler-generated references to outer classes and that of outer classes have accessors, which causes security issues.
 
 ## Local Inner Classes: clases locally in a single method
 
-Local classes are never declared with an access specifier (that is, public or private). Their scope is always restricted to the block in which they are declared. Local classes have one great advantage: They are completely hidden from the outside world. Local classes can access effectively final local variables, that is, they never change once assigned. Those variables have `fian` fields inside the compiled local inner class.
+Local classes are never declared with an access specifier (that is, public or private). Their scope is always restricted to the block in which they are declared. Local classes have one great advantage: They are completely hidden from the outside world. Local classes can access effectively final local variables, that is, they never change once assigned. Those variables have `final` fields inside the compiled local inner class.
 
 ## Anonymous Inner Classes
 
@@ -638,6 +665,30 @@ An anonymous inner class cannot have constructors because the name of a construc
 invite(new ArrayList<String>() {{ add("Harry"); add("Tony"); }});
 ```
 
+
 For many years, Java programmers routinely used anonymous inner classes for event listeners and other callbacks. Nowadays, you are better off using a lambda expression.
 
+## Static Inner Classes
 
+If the referece of the outer class is not needed by the inner class, simply placed inside there, the inner class can be declared `static`.
+
+```java
+class ArrayAlg {
+    public static class Pair {
+        // ...
+    }
+
+    public static Pair minmax(double[] d) {
+        //...
+        return new Pair(min, max);
+    }
+}
+
+ArrayAlg.Pair p = ArrayAlg.minmax();
+```
+
+## Proxies (advanced wizardry uncommon in applications)
+
+Proxies are used to create at runtime new classes that implement a given set of interfaces. Proxies are only necessary when you don't yet know at compile time which interfaces to implement. 
+
+TODO
