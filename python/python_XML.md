@@ -38,13 +38,22 @@ Validity of an XML document means that it contains a reference to a Document Typ
 
 The `xml.etree.ElementTree` module implements a simple and efficient API for parsing and creating XML data.
 
+This module has limited support for XPath expressions as a query language.
+
 # `ElementTree`
 
 This class represents an entire element hierarchy, and adds some extra support for serialization to and from standard XML.
 
+`ElementTree.tostring()` can be used to serialize XML.
+
 ### `Element`
 
 Represents a single node in this tree.
+
+
+## `lxml` - a third party library
+
+100% compatible with `ElementTree`, with full XPath 1.0. For large XML documents, `lxml` is significantly faster than the built-in `ElementTree` library.
 
 ## The Document Object Model API (DOM)
 
