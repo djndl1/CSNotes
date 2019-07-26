@@ -4,9 +4,9 @@ she-bang is actually a two-byte magic number, see `man magic`.
 
 # Basics
 
-`;;`: terminator in a case option
+- `;;`: terminator in a case option
 
-`,`: comma operator links together a series of arithymetic operations. All are evaluted, but only the last one is returned.
+- `,`: comma operator links together a series of arithmetic operations. All are evaluted, but only the last one is returned.
 
 ```shell
 let "t2 = ((a = 9, 15 / 3))"
@@ -103,3 +103,66 @@ command >&2 # redirects stdout of command to stderr
 scriptnam >> filename # appends the output of scripname to filename
 [i]<> filename # opens filename for reading and writing and assigns file descriptor i to it. If filename does not exist, it is created.
 ```
+
+- `<` `>` ascii comparison
+
+```bash
+if [[ "$veg1" < "$veg2" ]]
+then
+    ...
+else
+    ...
+fi
+```
+
+- `<<`: redirectionin a here document
+
+- `<<<`: redirection in a here string
+
+- `|`: A pipe runs as a child process, and therefore cannot alter script variables. If one of the commands in the pipe aborts, this prematurely terminates execution of the pipe, called a _broken pipe_, sending a `SIGPIPE` signal.
+
+- `>|`: force redirection.
+
+- `-`: redirection from/to stdin or stdout, not a bash builtin. Where a filename is expected, `-` redirects output to stdout or accepts input from stdin.
+
+```bash
+ $ file -
+#!/usr/bin/env python
+/dev/stdin: Python script, ASCII text executable
+```
+
+- `~+`: current working directory, `$PWD`
+
+- `~-`: previous working directory, `$OLDPWD`, ???
+
+## Control characters
+
+`Ctl-G`: bell.
+
+`Ctl-H`: rubout, destructive backspace
+
+`Ctl-J`: line feed
+
+`Ctl-K`: vertical tab. Within a script, vertical tab goes straight down.
+
+`Ctl-I`: horizontal tab
+
+`Ctl-U`: kill backwards to the beginning or the whole line
+
+`Ctl-M`: carriage return
+
+`Ctl-L`: formfeed
+
+`Ctl-O`: issue a newline
+
+`Ctl-R`: backwards search for text in history buffer
+
+`Ctl-S`: suspend
+
+`Ctl-Q`: resume
+
+`Ctl-V`: inserts control characters
+
+`Ctl-T`: swap the current char with the previous one
+
+`Ctl-W`: kill a word backwards
