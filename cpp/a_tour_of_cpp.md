@@ -533,9 +533,24 @@ A template is a classs or a function that we parameterize with a set of types or
 
 Templates are a compile-time mechanism, so their use incurs no run-time overhead compared to hand-crafted code. A template plus a set of template arguments is called an _instantiation_ or a _specialization_.
 
-## (C++20) Constrained Template Arguments
+Templates provide a powerful mechanism for compile-time computation and type manipulation that can lead to compact and efficient code.
 
-`template <Element T>` prefix is C++ version of mathematical "for all T such that Element(T)", where `Element`, called a _concept_, is a predicate that checks whether `T` has all the properties required.
+The first and most common use of templates is to support generic programming, that is, programming focused on the design, implementation and use of general algorithms. Templates provide compile-time parametric polymorphism.
+
+Good abstractions are carefully grown from concrete examples. It is not a good idea to try to “abstract” by trying to prepare for every conceivable need and technique; in that direction lies inelegance and code bloat. Instead, start with one – and preferably more – concrete examples from real use and try to eliminate inessential details. 
+
+
+## (C++20) Constrained Template Arguments, concepts
+
+`template <Element T>` prefix is C++ version of mathematical "for all T such that Element(T)", where `Element`, called a _concept_, is a predicate that checks whether `T` has all the properties required. A concept is about semantics.
+
+```c++
+template<Sequence Seq, Number Num>
+    requires Arithmetic<Value_type<Seq>,Num>
+Num sum(Seq s, Num n);
+```
+
+TODO (not yet fully supported by GCC)
 
 ## Value Template Arguments
 
@@ -749,3 +764,83 @@ void update(T& target)
 ```
 
 Only the selected branc hof an `if constexpr` is instantiated.
+
+### Variadic Templates
+
+A template can be defined to accept an arbitrary number of arguments of arbitrary types. Traditionally, implementing a variadic template has been to separate the first argument from the rest and then recursively call the variadic template for the tail of the argument.
+
+```c++
+void print()
+{
+     // what we do for no arguments: nothing
+}
+
+template<typename T, typename ... Tail>
+void print(T head, Tail... tail)
+{
+     // what we do for each argument, e.g.,
+     cout << head << ' ';
+     print(tail...);
+}
+```
+
+`typename ...` indicates that `Tail` is a sequence of types and `Tail...` indicates that `tail` is a sequence of values of types in `Tail`. A parameter declared with a `...` is called a _parameter pack_. Here `Tail` is a parameter pack.
+
+The recursive implementation can be surprisingly expensive in compile time.
+
+### (C++17) Fold Expressions
+
+To simplify the implementation of simple variadic templates, C++17 offers a limited form of iteration over elements of a parameter pack. A fold does not have to perform numeric computations.
+
+```c++
+// a right-fold example
+template<Number... T>
+int sum(T... v)
+{
+  return (v + ... + 0);     // add all elements of v starting with 0
+}
+```
+
+```c++
+// a left-fold example
+template<typename ... T>
+int sum2(T... v)
+{
+  return (0 + ... + v); // add all elements of v to 0
+}
+
+```
+
+No need for recursive variadic templates now:
+
+```c++
+template<typename ...T>
+void print(T&&... args)
+{
+  (std::cout << ... << args) << '\n';  // print all arguments
+}
+```
+
+Convert a sequence of values of different types into a vector.
+
+```c++
+template<typename Res, typename... Ts>
+vector<Res> to_vector(Ts&&... ts)
+{
+     vector<Res> res;
+     (res.push_back(ts) ...);   // no initial value needed ???
+     return res;
+}
+
+aut x = to_vector<double>(1, 2.0, 3, 'a');
+```
+
+### Forwarding Arguments
+
+TODO
+
+## Template Compilation Model
+
+The arguments for a template are checked against its concepts. Errors found here will be reported and the programmer has to fix the problems. Arguments for unconstrained template arguments, is postponed until code is generated for the template and a set of template arguments: “at template instantiation time.”
+
+An unfortunate side effect of instantiation-time (late) type checking is that a type error can be found uncomfortably late and can result in spectacularly bad error messages because the compiler found the problem only after combining information from several places in the program. The instantiation-time type checking provided for templates checks the use of arguments in the template definition. This provides a compile-time variant of what is often called duck typing. What is done at compile time using templates mostly does not involve objects, only values.
