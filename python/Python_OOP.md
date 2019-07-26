@@ -21,3 +21,11 @@ Objects are an abstraction of a real concept. Abstraction means dealing with the
 - Inheritance: Programmers often use inheritance to share code between two kinds of objects that are only distantly related, with no is a relationship in sight. 
 
 In Python, duck typing is more used as polymorphism, which doesn't care if a class inherits another or not.
+
+# Objects in Python
+
+PEP8 recommends that classes be named using CamelCase notation.
+
+The one difference between methods and normal functions is that all methods have one required argument `self`, a reference to the objet that the method is being invoked on.
+
+Python has a constructor (`__new__()`) and an initializer (`__init__()`).
