@@ -79,8 +79,7 @@ label:
 
 Java has a foreach loop
 
-```java
-for (variable : collection) statement 
+```javafor (variable : collection) statement 
 ```
 
 `java.util.Arrays` provides many methods to manipulate arrays. static `.Copyof` copy all values of one array into a new array, one of whose common uses is to increase the size of an array.
@@ -692,3 +691,98 @@ ArrayAlg.Pair p = ArrayAlg.minmax();
 Proxies are used to create at runtime new classes that implement a given set of interfaces. Proxies are only necessary when you don't yet know at compile time which interfaces to implement. 
 
 TODO
+
+# Exceptions: dealing with errors at runtime
+
+## Dealing with errors
+
+If an operation cannot be completed because of an error, the program ought to 
+
+- return to a safe state and enable the user to execute other commands
+
+or 
+
+- allow the user to save all work and terminate the program gracefully.
+
+The mission of exception handling is to transfer control from where the error occurred to an error handler that can deal with the situation. Errors might be 
+
+- User input errors: typos, syntax errors;
+
+- device errors: hardware not following orders or unavailable;
+
+- physical limitations: full disks, out of memory;
+
+- code errors
+
+The traditional reaction to an error in a method is to return a special error code that the calling method analyzes. Unfortunately, it is not always possible to return an error code. Java allows every method an alternative exit path if it is unable to complete its task in the normal way. An object that encapsulates the error information is thrown. The exception-handling mechanism begins its search for an exception handler that can deal with this particular error condition.
+
+An exception object is always an instance of a class derived from `Throwable`. The `Error` branch of `Throwable` describes internal errors and resource exhaustion situations inside the Java runtime system, where nothing can be done. The `Exception` branch  further splits into `RuntimeException` (a programming error) and `IOException`.
+
+"If it is a `RuntimeException`, it was your fault!" Any exception derived from `Error` or `RuntimeException` is an _unchecked exception_. The compiler checks that an exception handler is provided for all checked exceptions.
+
+In C++, `runtime_error` is equivalent to those exceptions in Java that are not of type `RuntimeException` while `logic_error` is the equivalent of Java's `RuntimeException` and also denotes logical errors in the program.
+
+In Java, a method tells the compiler what can go wrong. A method must declare all the checked exceptions that it might throw. If your method fails to faithfully declare all checked exceptions, the compiler will issue an error message.
+
+```java
+public FileInputStream(String name) throws FileNotFoundException // a constructor of FileInputStream
+```
+
+Unchecked exceptions are either beyond your control (`Error`) or result from conditions that you should not have allowed in the first place (`RuntimeException`).
+
+If you override a method from a superclass, the checked exceptions that the subclass method declares cannot be more general than those of the superclass method.
+
+```java
+String gripe = "Content-length: " + len + ", Received: " + n;
+throw new EOFException(gripe);
+```
+
+
+
+
+
+
+
+# Generic Programming (Not for application development but for library coding)
+
+Generic programming means writing code that can be reused for objects of many different types. Before generic classes were added to Java, generic programming was achieved with inheritance. The ArrayList class simply maintained an array of Object references. Casts are everywhere and there is no error checking. Under the hood, Java generics are nothing more implicit casting, using type erasure (erased to `Object`, which is why in Java a primitive type cannot be used in generics). Type information is not retained at runtime, so it cannot do generic specialization. It's nothing like C++ templates.
+
+(Java 9) It is possible to use diamonds with anonymous subclasses
+
+```java
+ArrayList<String> passwords = new ArrayList<>() // diamond OK in Java 9
+   {
+      public String get(int n) { return super.get(n).replaceAll(".", "*"); }
+   };
+```
+
+It is common practice to use uppercase letters for type variables, and to keep them short. The Java library uses the variable E for the element type of a collection, K and V for key and value types of a table, and T (and the neighboring letters U and S, if necessary) for “any type at all.”
+
+Besides generic classes, it is also possible to define generic methods.
+
+```java
+class ArrayAlg
+{
+   public static <T> T getMiddle(T... a)
+   {
+      return a[a.length / 2];
+   }
+}
+```
+
+In almost all cases, type inference for generic methods works smoothly.
+
+In Java, it is possible to restrict type variable, like how concepts in C++2a. Note the `extends` keyword, where the one after `extends` may be an interface or a class.
+
+```java
+public static <T extends Comparable> T min(T[] a)
+{
+      if (a == null || a.length == 0) return null;
+      T smallest = a[0];
+      for (int i = 1; i < a.length; i++)
+         if (smallest.compareTo(a[i]) > 0) smallest = a[i];
+      return smallest;
+}
+```
+
+`T` is guaranteed to have a `compareTo` method. Multiple bounding types are connected using `&`.
