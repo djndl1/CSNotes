@@ -737,10 +737,160 @@ String gripe = "Content-length: " + len + ", Received: " + n;
 throw new EOFException(gripe);
 ```
 
+### Catching Exceptions
 
+To catch an exception, set up a `try/catch` block
 
+```java
+try {
+ code
+} catch (ExceptionType e) {
+    handler for this type
+} catch (ExceptionType2 e) { // if you wanna catch multiple exceptions
+    handler for the second type 
+} catch (ExceptionType3 | ExceptionType4 e) // you can also hadnle multiple exceptios together, `e` is implicitly final here
+```
+If any code inside `try` block throws an exception of the class specified in the catch clause, The program skips the remainder of the code in the try block and executes the handler code inside the catch clause. If any of the code in a method throws an exception of a type other than the one named in the catch clause, this method exits immediately.
 
+If we decide that no exception handling should be done, the method should declare the kind of exception it might throw and let the caller handle it. When you propagate an exception, you must add a throws specifier to alert the caller that an exception may be thrown.
 
+If you are writing a method that overrides a superclass method which throws no exceptions, then you must catch each checked exception in your method’s code
+
+As a general rule, you should catch those exceptions that you know how to handle and propagate those that you do not know how to handle.
+
+### Rethrow an exception
+
+You can throw an exception in a catch clause. Typically, you do this when you want to change the exception type.
+
+```java
+try
+{
+   access the database
+}
+catch (SQLException original)
+{
+   var e = new ServletException("database error");
+   e.initCause(original);
+   throw e;
+}
+```
+
+When the exception is caught, the original exception can be retrieved:
+
+```java
+Throwable original = caughtException.getCause();
+```
+
+```java
+try
+{
+   access the database
+}
+catch (Exception e)
+{
+   logger.log(level, message, e);
+   throw e;
+}
+```
+
+### Cleanup
+
+#### the `finally` clause
+
+The code in the finally clause executes whether or not an exception was caught.
+
+```java
+InputStream in = . . .;
+try
+{
+   try
+   {
+      code that might throw exceptions
+   }
+   finally
+   {
+      in.close();
+   }
+}
+catch (IOException e)
+{
+   show error message
+}
+```
+
+Errors in the finally clause are reported. 
+
+The body of the finally clause is intended for cleaning up resources. Don’t put statements that change the control flow (return, throw, break, continue) inside a finally clause.
+
+### The `try`-with-resources statement
+
+provided the resource belongs to a class that implements the `AutoCloseable` interface:
+
+```java
+void close() throws Exception
+```
+
+use `try`-with-resources statement:
+
+```java
+try (var in = new Scanner(
+      new FileInputStream("/usr/share/dict/words"), StandardCharsets.UTF_8))
+{
+   while (in.hasNext())
+      System.out.println(in.next());
+}
+```
+
+```java
+try (var in = new Scanner(
+      new FileInputStream("/usr/share/dict/words"), StandardCharsets.UTF_8);
+      var out = new PrintWriter("out.txt", StandardCharsets.UTF_8))
+{
+   while (in.hasNext())
+      out.println(in.next().toUpperCase());
+}
+```
+
+(Java 9)  you can provide previously declared effectively final variables in the try header:
+
+```java
+public static void printAll(String[] lines, PrintWriter out)
+{
+   try (out) { // effectively final variable
+      for (String line : lines)
+         out.println(line);
+   } // out.close() called here
+}
+```
+
+If `close` method also throws an exception, the original exception is rethrown and any exceptions thrown by `close()` are considered suppressed. They are automatically caught and added to the original exception with the `addSuppressed` method.
+
+Use the try-with-resources statement whenever you need to close a resource.
+
+### Stack Trace Elements
+
+A _stack trace_ is a listing of all pending method calls at a particular point in the execution of a program. 
+
+The `Throwable` has a `printStackTrace` method. The `StackWalker` class yields a stream of `StackWalker.StackFrame` instances.
+
+```java
+StackWalker walker = StackWalker.getInstance();
+walker.forEach(frame -> analyze frame)
+```
+
+## Tips for Using Exceptions
+
+- Exception handling is not supposed to replace a simple test.
+
+- Do not micromanage exceptions. `try`-block should not be used at a micro-level, i.e. statement-level.
+
+- Make good use of the exception hierarchy. Don’t just throw a RuntimeException. Find an appropriate subclass or create your own. Don’t just catch Throwable. It makes your code hard to read and maintain. Respect the difference between checked and unchecked exceptions. Do not hesitate to turn an exception into another exception that is more appropriate.
+
+- Do not squelch exceptions.
+
+- When you detect an error, “tough love” works better than indulgence. Do not hesitate to throw an exception.
+
+- Propagating exceptions is not a sign of shame.  Often, it is actually better to propagate the exception instead of catching it.
 
 
 # Generic Programming (Not for application development but for library coding)
@@ -761,6 +911,7 @@ It is common practice to use uppercase letters for type variables, and to keep t
 Besides generic classes, it is also possible to define generic methods.
 
 ```java
+
 class ArrayAlg
 {
    public static <T> T getMiddle(T... a)
@@ -786,3 +937,4 @@ public static <T extends Comparable> T min(T[] a)
 ```
 
 `T` is guaranteed to have a `compareTo` method. Multiple bounding types are connected using `&`.
+
