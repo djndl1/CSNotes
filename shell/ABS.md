@@ -166,3 +166,45 @@ fi
 `Ctl-T`: swap the current char with the previous one
 
 `Ctl-W`: kill a word backwards
+
+# Variables and Parameters
+
+
+
+`$VAR` is a simplified form of `${VAR}`. Undeclared/uninitialized variable has a null value. Quoted strings exists as a whole.
+
+```bash
+a=15+5     # a 15+5
+let b=20+1 # b 21
+read a     # implicitly set a
+
+var= # null value
+unset var  # unset it
+```
+
+A null-valued variable is not the same as unsetting it.
+
+Bash variables are untyped. Bash does not segregate its variables by type. Essentially, Bash variables are character strings. Depending on context, Bash permits arithmetic operations and comparsions on variables. The determining factor is whether the value of a variable contains only digits.
+
+```bash
+a=2345
+let "a += 5" # a is now 2350
+b=${a/23/BB} # However, it's still a string and can be substituted.
+declare -i b # declaring it an integer doesn't help
+let "b += 1" # b is now 1, the integer value of a string is 0
+
+e='' # null value is integer 0
+```
+
+- `local var`: variable visible only within a code block or function
+
+- `Environmental var`: variables that affect the behavior or the shell or user interface
+
+- `$0`, `$1`, `$2`, ..., `${10}`, `$*`/`$@`: positional parameters with the final two denoting all the positional parameters and the first denoting the script's name; `$#`: the number of positional parameters, with `$0` not included.
+
+The last argument is obtained using indirect reference:
+
+```bash
+args=$#
+lastarg=${!args}
+```
