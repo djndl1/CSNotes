@@ -895,7 +895,7 @@ walker.forEach(frame -> analyze frame)
 
 # Generic Programming (Not for application development but for library coding)
 
-Generic programming means writing code that can be reused for objects of many different types. Before generic classes were added to Java, generic programming was achieved with inheritance. The ArrayList class simply maintained an array of Object references. Casts are everywhere and there is no error checking. Under the hood, Java generics are nothing more implicit casting, using type erasure (erased to `Object`, which is why in Java a primitive type cannot be used in generics). Type information is not retained at runtime, so it cannot do generic specialization. It's nothing like C++ templates.
+Generic programming means writing code that can be reused for objects of many different types. Before generic classes were added to Java, generic programming was achieved with inheritance. The ArrayList class simply maintained an array of Object references. Casts are everywhere and there is no error checking. Under the hood, Java generics are nothing more implicit casting, using type erasure (erased to `Object` or the first type they are bound to, which is why in Java a primitive type cannot be used in generics). Type information is not retained at runtime, so it cannot do generic specialization. It's nothing like C++ templates.
 
 (Java 9) It is possible to use diamonds with anonymous subclasses
 
@@ -906,7 +906,7 @@ ArrayList<String> passwords = new ArrayList<>() // diamond OK in Java 9
    };
 ```
 
-It is common practice to use uppercase letters for type variables, and to keep them short. The Java library uses the variable E for the element type of a collection, K and V for key and value types of a table, and T (and the neighboring letters U and S, if necessary) for “any type at all.”
+It is common practice to use uppercase letters for type variables, and to keep them short. The Java library uses the variable E for the element type of a collection, K and V for key and value types of a table, and T (and the neighboring letters U and S, if necessary) for "any type at all."
 
 Besides generic classes, it is also possible to define generic methods.
 
@@ -937,4 +937,54 @@ public static <T extends Comparable> T min(T[] a)
 ```
 
 `T` is guaranteed to have a `compareTo` method. Multiple bounding types are connected using `&`.
+
+## Type Erasure
+
+The virtual machine does not have objects of generic types—all objects belong to ordinary classes. Whenever you define a generic type, a corresponding raw type is automatically provided. The name of the raw type is simply the name of the generic type, with the type parameters removed. The type variables are erased and replaced by their bounding types (or Object for variables without bounds).
+
+When you program a call to a generic method, the compiler inserts casts when the return type has been erased. Casts are also inserted when you access a generic field.
+
+
+When you override a method of a generic class, a new bridge method, which has the same signature and return type as the overriden one, is synthesized and it's this method then do some type cast and call the overriding method. Bridge methods are synthesized to preserve polymorphism.
+
+## Restrictions and Limitations
+
+- type parameters cannot be instantiated with primitive types;
+
+- Runtime type inquiry only works with raw types;
+
+```java
+if (a instantceof Pair<String>) // Error and isn't of much help
+```
+
+- You cannot create arrays of parameterized types
+
+- Varargs warning. You may use `@SafeVarargs` with constructors and methods that are `static`, `fianl` or `private` to suppress the warning.
+
+- You cannot instantiate type variables.
+
+```java
+public Pair() { first = new T(); second = new T(); } // illegal
+```
+
+The best workaround since Java 8 is to make the caller provide a constructor expression.
+
+```java
+public static <T> Pair<T> makePair(Supplier<T> constr)
+{
+   return new Pair<>(constr.get(), constr.get());
+}
+```
+
+```java
+Pair<String> p = Pair.makePair(String::new);
+```
+
+A more traditional workaround is to construct generic objects through reflection, by calling the `Constructor.newInstance` method.
+
+- You cannot construct a generic array
+
+```java
+T[] mm = new T[2]; //Error
+```
 
