@@ -681,3 +681,76 @@ A BST is either `nil` or a node whose left and right fields are BSTs.
 
 ```
 
+#### `cond`: a broad `switch-case` without `break`
+
+Returns the value of the form whose test-form evaluates to true.
+
+```lisp
+ (defun select-options ()
+   (cond ((= a 1) (setq a 2))
+         ((= a 2) (setq a 3))
+         ((and (= a 3) (floor a 2)))
+         (t (floor a 3)))) =>  SELECT-OPTIONS
+```
+
+```lisp
+ (setq a 1) =>  1
+ (select-options) =>  2
+ a =>  2
+ (select-options) =>  3
+ a =>  3
+ (select-options) =>  1
+ (setq a 5) =>  5
+ (select-options) =>  1, 2
+```
+
+#### remove an element from the BST
+
+```lisp
+(defun rperc (bst)
+    (make-node :elt (node-elt (node-r bst))
+               :l (node-l bst)
+               :r (percolate (node-r bst))))
+
+  (defun lperc (bst)
+    (make-node :elt (node-elt (node-l bst))
+               :l (percolate (node-l bst))
+               :r (node-r bst)))
+
+  (defun percolate (bst)
+    (cond ((null (node-l bst))
+           (if (null (node-r bst))
+               nil                          ; has none
+               (rperc bst)))                ; has a right subtree only
+          ((null (node-r bst)) (lperc bst)) ; has a left subtree only 
+          (t (if (zerop (random 2))         ; has both, random at 0 or 1
+                 (lperc bst)
+                 (rperc bst)))))
+
+  (defun bst-remove (obj bst <)
+    (if (null bst)
+        nil
+        (let ((elt (node-elt bst)))
+          (if (eql obj elt)
+              (percolate bst)
+              (if (funcall < obj elt)
+                  (make-node
+                   :elt elt
+                   :l (bst-remove obj (node-l bst) <)
+                   :r (node-r bst))
+                  (make-node
+                   :elt elt
+                   :l (node-l bst)
+                   :r (bst-remove obj (node-r bst) < )))))))
+
+```
+
+An inorder traverse function
+
+```lisp
+ (defun bst-inorder-traverse (fn bst)
+    (when bst
+      (bst-inorder-traverse fn (node-l bst))
+      (funcall fn (node-elt bst))
+      (bst-inorder-traverse fn (node-r bst))))
+```
