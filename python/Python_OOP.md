@@ -29,3 +29,25 @@ PEP8 recommends that classes be named using CamelCase notation.
 The one difference between methods and normal functions is that all methods have one required argument `self`, a reference to the objet that the method is being invoked on.
 
 Python has a constructor (`__new__()`) and an initializer (`__init__()`).
+
+Besides not cluttering up our namespace, `import`  instead of `from aaa import *` at the beginning of the file is more clear on what is available.
+
+A module is just a file. A __package__ is a collection of modules in a folder, where `__init__.py` is placed. The name of the package is the name of the folder. Absolute imports specify the complete path to the module, function, or path, which will work from any module. Relative imports are basically a way of saying find class, function, or module as it is positioned relative to the current module. Suppose we have the following package hierarchy:
+
+```bash
+parent_directory/
+    main.py
+    ecommerce/
+        __init__.py
+        database.py
+        products.py
+        payments/
+            __init__.py
+            square.py
+            stripe.py
+```
+
+```python
+from .database import Database   # products.py imports database.py
+from ..database import Dataqbase # from the payments folder
+```
