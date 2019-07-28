@@ -892,6 +892,66 @@ walker.forEach(frame -> analyze frame)
 
 - Propagating exceptions is not a sign of shame.  Often, it is actually better to propagate the exception instead of catching it.
 
+# Assertions
+
+Assertions are a commonly used idiom of defensive programming. The assertion mechanism allows you to put in checks during testing and to have them automatically removed in the production code.
+
+```java
+assert condition
+assert condition : expression // expression is passed to the constructor of the `AssertionError` object and tuned into a meesage string
+```
+
+Both statements evaluate the condition and throw an AssertionError if it is false. 
+
+To enable assertions, running the program with `-enableassertions` or `-ea`. Note that you do not have to recompile your program to enable or disable assertions. Enabling or disabling assertions is a function of the class loader.
+
+You can even turn on assertions in specific classes or in entire packages.
+
+```shell
+java -ea:MyClass -ea:com.mycompany.mylib MyApp
+```
+
+You can also disable assertions in certain classes and packages with the `-disableassertions` or `-da` option:
+
+Use the `-enablesystemassertions`/`-esa` switch to enable assertions in system classes.
+
+It is also possible to programmatically control the assertion status of class loaders
+
+Assertion failures are intended to be fatal, unrecoverable errors. Assertion checks are turned on only during development and testing. Assertions can be used as a tool for documentation.
+
+# Logging
+
+The logging API is designed to conveniently log program behavior.
+
+- It is easy to suppress all log records or just those below a certain level, and just as easy to turn them back on.
+
+- Suppressed logs are very cheap.
+
+- Log records can directed to different handlers.
+
+- Both loggers and handlers can filter records.
+
+- Log records can be formatted in different ways
+
+- Applications can use multiple loggers
+
+- The logging configuration is controlled by a configuration file.
+
+Third-party alternatives: Log4J2, Logback, SLF4J, Commons Logging.
+
+A logger that is not referenced by any variable can be garbage-collected. To prevent this, save a reference to the logger with a static variable, as in the example above.
+
+Logger names are hierarchical. Logger parents and children share certain properties.
+
+- SEVERE
+- WARNING
+- INFO, default
+- CONFIG
+- FINE
+- FINER
+- FINEST
+
+use `Level.ALL` to turn on logging for all levels or `Level.OFF` to turn all logging off.
 
 # Generic Programming (Not for application development but for library coding)
 
