@@ -136,3 +136,99 @@ namespace std { // make a hash function for Record
     };
 }
 ```
+
+# Algorithms
+
+A data structure is not very useful on its own. We need operations for basic access such as adding and removing elements. The standard library provides the most common algorithms for containers in addition to providing the most common container types.
+
+In the context of the C++ standard library, an algorithm is a function template operating on sequences of elements.
+
+
+## Iterators
+
+Iterators are used to separate algorithms and containers. An algorithm operates on its data through iterators and knows nothing about the container in which the elements are stored. Conversely, a container knows nothing about the algorithms operating on its elements; all it does is to supply iterators upon request (e.g., begin() and end()). This model of separation between data storage and algorithm delivers very general and flexible software.
+
+
+For a container, a few iterators referring to useful elements can be obtained.
+
+```cpp
+template<typename C, typename V>
+vector<typename C::iterator> find_all(C& c, V v)
+{
+     vector<typename C::iterator> res;          // typename, otherwise, ::iterator may be some constant
+     for (auto p = s.begin(); p!=s.end(); ++p)
+           if (*p==c)
+                 res.push_back(p);
+     return res;
+}
+
+void test()
+{
+     string m {"Mary had a little lamb"};
+     for (auto p : find_all(m,'a'))
+           if (*p!='a')
+                 cerr << "a bug!\n";
+}
+```
+
+A `vector` iterator might be a pointer or a pointer to the `vector` plus an index. A `list` iterator might be a pointer to a link node. What is common for all iterators is their semantics and the naming of their operations. In fact, any object that obeys a few simple rules like these is an iterator – Iterator is a concept.
+
+The notion of iterators can be usefully applied to input and output.
+
+```cpp
+ostream_iterator<string> oo {cout};    // write strings to cout
+*oo = "Hello, ";    // meaning cout<<"Hello, "
+++oo;
+*oo = "world!\n";   // meaning cout<<"world!\n"
+```
+
+Typically, `istream_iterators` and `ostream_iterators` are not used directly. Instead, they are provided as arguments to algorithms.
+
+```c++
+int main()
+{
+     string from, to;
+     cin >> from >> to;             // get source and target file names
+
+     ifstream is {from};            // input stream for file "from"
+     ofstream os {to};              // output stream for file "to"
+
+     set<string> b {istream_iterator<string>{is},istream_iterator<string>{}};     // read input
+     copy(b.begin(),b.end(),ostream_iterator<string>{os,"\n"});                   // copy to output
+
+     return !is.eof() || !os;           // return error state
+}
+```
+
+
+## Predicates
+
+```cpp
+struct Greater_than {
+     int val;
+     Greater_than(int v) : val{v} { }
+     bool operator()(const pair<string,int>& r) const { return r.second>val; }
+};
+```
+
+```cpp
+void f(map<string,int>& m)
+{
+     auto p = find_if(m.begin(),m.end(),Greater_than{42});
+     // ...
+}
+```
+
+Or we can use a lambda
+
+```cpp
+auto p = find_if(m.begin(), m.end(), [](const pair<string,int>& r) { return r.second>42; });
+```
+
+## (C++20) Concepts 
+
+TODO
+
+## Parallel Algorithms
+
+TODO (not yet fully available)
