@@ -65,3 +65,32 @@ Operations on streams may fail for various reasons. Whenever an operation fails,
 - `ios::failbit`: an operation by the `streambuf` object has failed, in which case, further such operations no longer work.
 
 - `ios::goodbit`: if none of the three above 
+
+streams may be be used in expressions expecting logical values, where `not fail()` is actually interpreted.
+
+```cpp
+if (cin)
+```
+
+Formatting is controlled by flags, defined by the `ios` class. These flags may be manipulated in two ways: using specialized member functions or using manipulators, which are directly inserted into or extracted from streams. There is no special reason for using either method; usually both methods are possible.
+
+`std::endl` should be avoided unless flushing the stream is explicitly intended.
+
+
+# Output
+
+`ostream` offers the basic output facilities; `ofstream` allows to write files; `ostringstream` allows to write information to memory. 
+
+## `ostream`
+
+`cout`, `clog`, `cerr` objects are all ostream objects. predefined with predefined `streambuf` objects. `ostream` support both formatted and binary output. `<<` is formatted output.
+
+`.put(char c)`, `.write(char const *buffer, int length)` may be used to write binary files. The bytes written by `write` are written to the `ostream` in an order depending on the endianness of t he underlying hardware.
+
+
+It is impossible to open an `ofstream` using a file descriptor.
+
+# Input
+
+similar to output
+
