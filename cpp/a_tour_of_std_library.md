@@ -232,3 +232,140 @@ TODO
 ## Parallel Algorithms
 
 TODO (not yet fully available)
+
+# Utilities
+
+## Resource Management
+
+Besides RAII, the standard library provides two "smart pointers", `unique_ptr` and `shared_ptr`, to deal with objects allocated on the free store.
+
+The most basic use of smart pointers is to prevent memory leaks caused by careless programming.
+
+A `unique_ptr` is a handle to an individual object (or an array) in much the same way that a vector is a handle to a sequence of objects
+
+```cpp
+void f(int i, int j)    // X* vs. unique_ptr<X>
+{
+     X* p = new X;                // allocate a new X
+     unique_ptr<X> sp {new X};    // allocate a new X and give its pointer to unique_ptr
+     // ...
+
+     if (i<99) throw Z{};         // may throw an exception
+     if (j<77) return;            // may return "early"
+     // ... use p and sp ..
+     delete p;                    // destroy *p
+}
+```
+
+A `unique_ptr` doesn't directly take away the ownership of a raw pointer
+
+```cpp
+int main(int argc, char *argv[])
+{
+  string* p = new string("Can you see me?");
+
+  cout << "raw pointer has this: " << *p << "\n";
+
+  unique_ptr<string> sp{p};
+
+  cout << "After there is a unique_ptr: p = " << p << " *p =  " << *p << endl;
+
+  cout << "unique_ptr has: sp=" << sp.get() << " *sp = " << *sp << endl;
+
+  unique_ptr<string> sp2{move(sp)}; // no way to copy-construct a unique_ptr from a unique_ptr because of unique ownership
+
+  cout << "Let's see if the ownership is transferred: " << " sp= " << sp.get() << " sp2=" << sp2.get() << " p=" << p << endl;
+  return 0;
+}
+```
+
+```bash
+raw pointer has this: Can you see me?
+After there is a unique_ptr: p = 0xb9ae70 *p =  Can you see me?
+unique_ptr has: sp=0xb9ae70 *sp = Can you see me?
+Let's see if the ownership is transferred:  sp= 0 sp2=0xb9ae70 p=0xb9ae70
+```
+
+
+Here, `sp` ensures the object is released. `unique_ptr` is a very lightweight mechanism with no space or time overhead compared to correct use of a built-in pointer. Its further uses include passing free-store allocated objects in and out of functions:
+
+```cpp
+unique_ptr<X> make_X(int i)
+     // make an X and immediately give it to a unique_ptr
+{
+     // ... check i, etc. ...
+     return unique_ptr<X>{new X{i}};
+}
+```
+
+The `shared_ptr` for an object share ownership of an object, which will be destroyed only when the last of its `shared_ptr`s is destroyed. `shared_ptr` provides a form of garbage collection that respects the destructor-based resource management of the memory-managed objects. This is neither cost free nor exorbitantly expensive, but it does make the lifetime of the shared object hard to predict. Use `shared_ptr` only if you actually need shared ownership.
+
+The standard library provides functions for constructing an object and returning an approoriate smart pointer, `make_shared()` and `make_unique()`. Using make_shared() is not just more convenient than separately making an object using new and then passing it to a shared_ptr, it is also notably more efficient because it does not need a separate allocation for the use count that is essential in the implementation of a shared_ptr.
+
+Still, pointer semantics are not always recommended. We use pointer when
+
+- we share an object, we need pointers (or references) to refer to the shared object;
+
+- we refer to a polymorphic object in classical object-oriented code
+
+- A shared polymorphic object typically requires `shared_ptr`s.
+
+## `move()` and `forward()`
+
+`std::move()` doesn't do anything more than casting its argument to an rvalue reference.
+
+```cpp
+template<typename _Tp>
+constexpr typename std::remove_reference<_Tp>::type&&
+move(_Tp&& __t) noexcept
+{ 
+    return static_cast<typename std::remove_reference<_Tp>::type&&>(__t); 
+}
+```
+
+It can be used to implement `std::swap`:
+
+```cpp
+#define _GLIBCXX_MOVE(__val) std::move(__val)
+
+template<typename _Tp>
+     inline
+     typename enable_if<__and_<__not_<__is_tuple_like<_Tp>>,
+                               is_move_constructible<_Tp>,
+                               is_move_assignable<_Tp>>::value>::type
+     swap(_Tp& __a, _Tp& __b)
+     noexcept(__and_<is_nothrow_move_constructible<_Tp>,
+                     is_nothrow_move_assignable<_Tp>>::value)
+     {
+       __glibcxx_function_requires(_SGIAssignableConcept<_Tp>)
+ 
+       _Tp __tmp = _GLIBCXX_MOVE(__a);
+       __a = _GLIBCXX_MOVE(__b);
+       __b = _GLIBCXX_MOVE(__tmp);
+     }
+```
+
+The state of a moved-from object is in general unspecified, but all standard-library types leave a moved-from object in a state where it can be destroyed and assigned to. It would be unwise not to follow that lead.
+
+`std::forward()` differs from the simpler `std::move()` by correctly handling subtleties to do with lvalue and rvalue.
+
+```cpp
+template<typename _Tp>
+constexpr _Tp&&
+forward(typename std::remove_reference<_Tp>::type& __t) noexcept
+{ return static_cast<_Tp&&>(__t); }
+    
+template<typename _Tp>
+constexpr _Tp&&
+forward(typename std::remove_reference<_Tp>::type&& __t) noexcept
+{
+    static_assert(!std::is_lvalue_reference<_Tp>::value, "template argument"
+    " substituting _Tp is an lvalue reference type");
+    return static_cast<_Tp&&>(__t);
+}
+```
+
+
+##(C++20) `std::span` 
+
+TODO
