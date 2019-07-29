@@ -94,3 +94,40 @@ It is impossible to open an `ofstream` using a file descriptor.
 
 similar to output
 
+# Redirecting streams
+
+Information written to one stream is actually written to another stream. Redirection is commonly implemented ast the operating system level. An implementation using `streambuf` would be like
+
+```cpp
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main(int argc, char *argv[])
+{
+    ofstream errlog;
+    streambuf *cerr_buffer = nullptr;
+    
+    if (argc == 2) {
+        errlog.open(argv[1]);
+        cerr_buffer = cerr.rdbuf(errlog.rdbuf());   // it is important that the original buffer be saved
+    } else {
+        cerr << "Missing log names\n";
+        return 1;
+    }
+    cerr << "Several messages to stderr, msg 1\n";
+    cerr << "Several messages to stderr, msg 2\n";
+    
+    cout << "Now inspect the contents of " <<
+        argv[1] << "... [Enter] ";
+    cin.get();
+    cerr << "Several messages to stderr, msg 3\n";
+    cerr.rdbuf(cerr_buffer);
+    cerr << "Done\n";
+}
+```
+
+# Reading and Writing
+
+TODO
