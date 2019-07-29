@@ -208,3 +208,25 @@ The last argument is obtained using indirect reference:
 args=$#
 lastarg=${!args}
 ```
+
+The `shift` command reassigns the positional parameters, in effect shifting them to the left one notch. A numerical parameter indicates how many positions to shift.
+
+```bash
+$1 <-- $2, $2 <-- $3, $3 <-- $4, ...
+```
+
+# Quoting
+
+Quoting has the effect of protecting special character in teh tring from reinterpretation or expansion by the shell or shell script.
+
+When referencing a variable, it is generally advisable to enclose its name in double quotes, which prevents reinterpretation of all special charactes within the quoted string, except `$`, ```(backquote) and `\`(escape). Use double quotes to prevent word splitting.
+
+`\b` is not the backspace on the keyboard, more like the left arrow.
+
+`$'abc'` is string expansion
+
+```bash
+$ echo $'afd\nbcd'
+afd
+bcd
+```
