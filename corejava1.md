@@ -948,6 +948,7 @@ Logger names are hierarchical. Logger parents and children share certain propert
 - INFO, default
 - CONFIG
 - FINE
+
 - FINER
 - FINEST
 
@@ -955,7 +956,7 @@ use `Level.ALL` to turn on logging for all levels or `Level.OFF` to turn all log
 
 # Generic Programming (Not for application development but for library coding)
 
-Generic programming means writing code that can be reused for objects of many different types. Before generic classes were added to Java, generic programming was achieved with inheritance. The ArrayList class simply maintained an array of Object references. Casts are everywhere and there is no error checking. Under the hood, Java generics are nothing more implicit casting, using type erasure (erased to `Object` or the first type they are bound to, which is why in Java a primitive type cannot be used in generics). Type information is not retained at runtime, so it cannot do generic specialization. It's nothing like C++ templates.
+Generic programming means writing code that can be reused for objects of many different types. Before generic classes were added to Java, generic programming was achieved with polymorphism. The ArrayList class simply maintained an array of Object references. Casts are everywhere and there is no error checking. Under the hood, Java generics are nothing more implicit casting, using type erasure (erased to `Object` or the first type they are bound to, which is why in Java a primitive type cannot be used in generics). Type information is not retained at runtime, so it cannot do generic specialization. It's nothing like C++ templates.
 
 (Java 9) It is possible to use diamonds with anonymous subclasses
 
@@ -1000,7 +1001,7 @@ public static <T extends Comparable> T min(T[] a)
 
 ## Type Erasure
 
-The virtual machine does not have objects of generic types—all objects belong to ordinary classes. Whenever you define a generic type, a corresponding raw type is automatically provided. The name of the raw type is simply the name of the generic type, with the type parameters removed. The type variables are erased and replaced by their bounding types (or Object for variables without bounds).
+The virtual machine does not have objects of generic types—all objects belong to ordinary classes. Whenever you define a generic type, a corresponding raw type is automatically provided. The name of the raw type is simply the name of the generic type, with the type parameters removed. The type variables are erased and replaced by their bounding types (or `Object` for variables without bounds).
 
 When you program a call to a generic method, the compiler inserts casts when the return type has been erased. Casts are also inserted when you access a generic field.
 
@@ -1048,3 +1049,52 @@ A more traditional workaround is to construct generic objects through reflection
 T[] mm = new T[2]; //Error
 ```
 
+- type variables are not valid in static contexts of generic classes because there can only be one such method.
+
+- You cannot throw or catch instances of a generic class. It is not even legal for a generic class to extend Throwable.
+
+Generic classes can extend or implement other generic classes.
+
+## Wildcard Types
+
+Since `Pair<Manager>` and `Pair<Employee>` are two unrelated classes, a method accepting `Pair<Employee>` cannot accept `Pair<Manager>`. To solve this problem, we can use wildcard types. In a wildcard type, a type parameter is allowed to vary:
+
+```java
+public static void printBuddies(Pair<? extends Employee> p)
+{
+   Employee first = p.getFirst();
+   Employee second = p.getSecond();
+   System.out.println(first.getName() + " and " + second.getName() + " are buddies.");
+}
+```
+
+Wildcard allows for supertype bound:
+
+```java
+public static void minmaxBonus(Manager[] a, Pair<? super Manager> result)
+{
+   if (a.length == 0) return;
+   Manager min = a[0];
+   Manager max = a[0];
+   for (int i = 1; i < a.length; i++)
+   {
+      if (min.getBonus() > a[i].getBonus()) min = a[i];
+      if (max.getBonus() < a[i].getBonus()) max = a[i];
+   }
+   result.setFirst(min);
+   result.setSecond(max);
+}
+```
+
+?????????
+
+
+Intuitively speaking, wildcards with supertype bounds let you write to a generic object, while wildcards with subtype bounds let you read from a generic object.
+
+????? TODO
+
+## Reflection and Generics
+
+The `Class` class is generic. The type parameter is useful because it allows the methods of `Class<T>` to be more specific about their return types.
+
+TODO
