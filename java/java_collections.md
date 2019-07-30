@@ -150,26 +150,60 @@ for (int i = 0; i < list.size(); i++)
 
 
 
+
+
+
+
+##  Sets
+
+
+
+- `TreeSet`: A sorted set, currently implemented as a red-black tree, which requires a `Comparator` on its elements.
+
+- `EnumSet`: A efficient set implementation of enumerated type values, internally implemented as a sequence of bits. A bit is turned on if the corresponding value is present in the set.
+
+- `LinkedHashSet`: A set that remembers the order in which elements were inserted.  As entries are inserted into the table, they are joined in a doubly linked list.
+
+### Hash Sets
+
+In Java, hash tables are implemented as arrays of linked lists (called _buckets_). As of Java 8, the buckets change from linked lists into balanced binary trees when they get full. To find the place of an object in the table, compute its hash code and reduce it modulo the total number of buckets. The resulting number is the index of the bucket that holds the element. The standard library uses bucket counts that are powers of 2 (any value supplied is automatically rounded), with a default of 16.
+
+If the hash table gets too full, it needs to be rehashed. A table with more buckets is created, all elements are inserted into the new table and the original table is discarded. The _load factor_ (default 75% and rehashed to twice the original size) determines when a hash table is rehashed.
+
+- `HashSet`: An unordered collection that rejects duplicates. It is implemented as a set based on a hash table. The hash set iterator visits all buckets in turn.
+
+##  Queues
+
+A priority queue retrieves elements in sorted order after they were inserted in arbitrary order. The priority queue does not sort all its elements. It's implemented as a _heap_, which is a self-organizing binary tree in which the smallest element gravitates to the root. 
+
+A typical use for a priority queue is job scheduling.
+
+- `PriorityQueue`: A collection that allows efficient removal of the smallest element, which must be of a class that implements the `Comparable` interface. The iteration over a `PriorityQueue` does not visit the elements in sorted order.
+
 - `ArrayDeque`: A double-ended queue that is implemented as a circular array
 
-- `HashSet`: An unordered collection that rejects duplicates
+## Map
 
-- `TreeSet`: A sorted set
-
-- `EnumSet`: A set of enumerated type values
-
-- `LinkedHashSet`: A set that remembers the order in which elements were inserted
-
-- `PriorityQueue`: A collection that allows efficient removal of the smallest element
+The Java library supplies two general-purpose implementations for maps: `HashMap` and `TreeMap`.
 
 - `HashMap`: A data structure that stores key/value associations
 
 - `TreeMap`: A map in which the keys are sorted
 
-- `EnumMap`: A map in which the keys belong to an enumerated type
+The collection class library has several map classes for specialized needs.
 
-- `LinkedHashMap`: A map that remembers the order in which entries were added
+- `WeakHashMap`: A map whose unused entries can be reclaimed by the GC. It uses _weak references_(???) to hold keys.
 
-- `WeakHashMap`: A map with values that can be reclaimed by the garbage collector if they are not used elsewhere
+- `EnumMap`: A map in which the keys belong to an enumerated type, internally implemented as an array of values. 
 
-- `IdentityHashMap`: A map with keys that are compared by `==`, not `equals`
+- `LinkedHashMap`: A map that remembers the order in which entries were added. As entries are inserted into the table, they are joined in a doubly linked list. A `LinkedHashMap` can also use the so-called _access order_. Every time `get` or `put` is called, the affected entry is moved to the end of the linked list (the hash map order is not affected). Access order is useful for implementing a least-recently-used discipline for a cache.
+
+- `IdentityHashMap`: A map with keys that are compared by `==` and the hash values of its elements are computed using `System.identityHashCode`, through which a hash code is computed from the object's memory address). Different key objects are considered distinct even if they have equal contents.
+
+The collections framework does not consider a map itself as a collection. However, views of the map implements the `Collection` interface or one of its subinterfaces, the set of keys, the collection of values, and the set of key/value pairs.
+
+```java
+Set<K> keySet() // an object that implements the `Set` interface
+Collection<V> values()
+Set<Map, Entry<K, V>> entrySet()
+```
