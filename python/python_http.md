@@ -60,6 +60,9 @@ The way the user agent handles the response depends primarily on the code, and s
 
 More practical information at https://code.tutsplus.com/tutorials/http-the-protocol-every-web-developer-must-know-part-1--net-31177
 
+
+
+
 # `http.client` module
 
 TODO
@@ -70,6 +73,26 @@ TODO
 
 # `httplib2`
 
-`httplib2` supports caching, last-modified-checking (check the date to see if a cached resource should be resent), etag hashing (use hash value to determine if the file on the server has changed), compression, redirections.
+`httplib2` is a comprehensive HTTP client library.
+
+`httplib2` supports caching, last-modified-checking (check the date to see if a cached resource should be resent), etag hashing (use hash value to determine if the file on the server has changed), compression (both deflate and gzip), redirects (automatically follows 3XX redirects on GETs).
+
+`httplib2` doesn't automatically decode the content. It is up to the client to determine  which encoding the content is using, depending on the `Content-Type` header, the content itself and a fallback scheme.
+
+You'll have to specify `no-cache` in `cache-control` field to bypass all the cache locally or on intermediate proxies.
+
+`httplib2` automatically decompressed the body of the response and place it in the content.
+
+## class `httplib2.Http`
+
+The class that represents a client HTTP interface.
+
+## class `httplib2.FileCache`
+
+`FileCache` implements a Cache as a directory of files.
+
+## class `httplib2.Response`
+
+`Response` is a subclass of dict and instances of this class are returned from calls to `Http.request`.
 
 # `requests`
