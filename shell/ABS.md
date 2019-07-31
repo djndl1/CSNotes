@@ -223,10 +223,32 @@ When referencing a variable, it is generally advisable to enclose its name in do
 
 `\b` is not the backspace on the keyboard, more like the left arrow.
 
-`$'abc'` is string expansion
+`$'abc'` is string expansion.
 
 ```bash
 $ echo $'afd\nbcd'
 afd
 bcd
+```
+
+```bash
+    case "$key" in
+        $'x\1b\x5b\x32\x7e')
+            echo Insert Key
+            ;;
+
+        d)
+            date
+            ;;
+        q)
+            echo Time to quit...
+            echo
+            exit 0
+    esac
+```
+
+```bash
+echo "foo\
+bar"
+#foobar
 ```

@@ -366,6 +366,36 @@ forward(typename std::remove_reference<_Tp>::type&& __t) noexcept
 ```
 
 
-##(C++20) `std::span` 
+## (C++20) `std::span` 
+
+TODO
+
+## Specialized Containers
+
+- built-in containers
+
+- `array<T,N>`: a fixed-size continuously allocated sequence of N elements of type T. 
+
+An `array` can be allocated with its elements on the stack, in an object, or in static storage. The elements are allocated in the scope where the `array` is defined. An array is best understood as a built-in array with its size firmly attached, without implicit, potentially surprising conversions to pointer types, and with a few convenience functions provided. There is no overhead (time or space) involved in using an array compared to using a built-in array. An array does not follow the “handle to elements” model of STL containers. 
+
+An `array` can be explicitly passed a C-style function that expects a pointer.
+
+Occasionally, there is a significant performance advantage to be had by directly accessing elements allocated on the stack rather than allocating elements on the free store. On the other hand, the stack is a limited resource (especially on some embedded systems), and stack overflow is nasty. 
+
+An `array` knows its size, so it is easy to use with standard-library algorithms, and it can be copied using `=`. And it saves the programmer from implicit conversion to pointers like the old built-in array and thus avoid disasters of wrong offsets of wrong type information.
+
+- `bitset<N>`: a fixed-size sequence of N bits
+
+- `pair<T,U>`: two elements of types T and U
+
+- `tuple<T...>`: a sequence of an arbitrary number of elements of arbitrary heteoregenous types, contiguously allocated
+
+- `basic_string<C>`: a sequence of characters of type `C`
+
+- `valarray<T>`: an array of numeric values of type `T`; provides numeric operations.
+
+
+
+## (C++17) Alternatives
 
 TODO
