@@ -178,7 +178,8 @@ A priority queue retrieves elements in sorted order after they were inserted in 
 
 A typical use for a priority queue is job scheduling.
 
-- `PriorityQueue`: A collection that allows efficient removal of the smallest element, which must be of a class that implements the `Comparable` interface. The iteration over a `PriorityQueue` does not visit the elements in sorted order.
+- `PriorityQueue`: A collection that allows efficient removal of the smallest element, which must be of a class that implements the `Comparable` interface. The iteration over a `PriorityQueue` does not visit the elements
+in sorted order.
 
 - `ArrayDeque`: A double-ended queue that is implemented as a circular array
 
@@ -207,3 +208,99 @@ Set<K> keySet() // an object that implements the `Set` interface
 Collection<V> values()
 Set<Map, Entry<K, V>> entrySet()
 ```
+
+# Views and Wrappers
+
+A collection that manipulates the elements of another container.
+
+(Java 9) introduces static methods yielding a set of list with given lements and a map with given key/value pairs.
+
+```java
+List<String> names = List.of("Peter", "Paul", "Mary");
+Set<Integer> numbers = Set.of(2, 3, 5);
+Map<String, Integer> scores = Map.of("Peter", 2, "Paul", 3, "Mary", 5);
+
+Map<String, Integer> scores = ofEntries(
+   entry("Peter", 2),
+   entry("Paul", 3),
+   entry("Mary", 5));
+```
+
+`Map.Entry` is used a poor man's pair, since Java doesn't provide a `Pair` class.
+
+These collections are unmodifiable.
+
+`Collections.nCopies()` returns an immutable object that implements the `List` interface and gives the illusion of having `n`, each of which appears as `anObject`. However, the object is stored only once, not `n` times.
+
+It is possible to form a subrange view for a number of collection.
+
+```java
+List<Employee> group2 = staff.subList(10, 20); // [10 20)
+```
+
+```java
+SortedSet<E> subSet(E from, E to)
+SortedSet<E> headSet(E to)
+SortedSet<E> tailSet(E from)
+
+SortedMap<K, V> subMap(K from, K to) // [from, to)]
+SortedMap<K, V> headMap(K to)
+SortedMap<K, V> tailMap(K from)
+
+NavigableSet<E> subSet(E from, boolean fromInclusive, E to, boolean toInclusive)
+NavigableSet<E> headSet(E to, boolean toInclusive)
+NavigableSet<E> tailSet(E from, boolean fromInclusive)
+```
+
+The `Collections` class has methods that produce _unmodifiable views_ of collections. These views add a runtime check to an existing collection. If an attempt to modify the collection is detected, an exception is thrown and the collection remains untouched.
+
+```java
+Collections.unmodifiableCollection
+Collections.unmodifiableList
+Collections.unmodifiableSet
+Collections.unmodifiableSortedSet
+Collections.unmodifiableNavigableSet
+Collections.unmodifiableMap
+Collections.unmodifiableSortedMap
+Collections.unmodifiableNavigableMap
+```
+
+Instead of implementing therad-safe collection clases, the library designers used the view mechanism to make regular collections thread safe.
+
+```java
+var map = Collections.synchronizedMap(new HashMap<String, Employee>());
+```
+
+The methods such as `get` and `put` are synchronized.
+
+
+# Algorithms
+
+The Java library may not be so rich in algorithms as the C++ STL, but it does contain the basics: sorting, binary search, and some utility algorithms.
+
+##  Sorting and Shuffling
+
+```java
+Collections.sort()
+List.sort()
+```
+
+The Java `.sort` simply dumps all elements into an array, sorts the array, and then copies the sorted sequence back into the list. It doesn't switch equal elements.
+
+Oppositely, `shuffle()` permutes the order of the elements in a list.
+
+## Binary Search
+
+```java
+Collections.binarySearch()
+```
+
+Binary search requires random access. The `binarySearch` reverts to a linear search if it is given a linked list.
+
+- `Collections.min`; `Collections.max`;
+
+- `Collections.copy`; `Collections.fill`; `Collections.addAll`; `Collections.replaceAll`; `Collections.swap`;
+
+- `Collections.replaceAll`; `Collections.removeIf`
+
+- `.removeAll`; `.retainAll`
