@@ -60,7 +60,11 @@ The way the user agent handles the response depends primarily on the code, and s
 
 More practical information at https://code.tutsplus.com/tutorials/http-the-protocol-every-web-developer-must-know-part-1--net-31177
 
+https://www.mnot.net/cache_docs/
 
+
+
+`Cache-Control` and `Expires` are called _freshness indicators_. `Last-Modified` and `Etag` headers are _validators_. IF the local cache is no longer fresh, a client can send the validators with the next request to see if the data has actually changed.
 
 
 # `http.client` module
