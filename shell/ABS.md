@@ -167,7 +167,7 @@ fi
 
 `Ctl-W`: kill a word backwards
 
-# Variables and Parameters
+## Variables and Parameters
 
 
 
@@ -215,7 +215,7 @@ The `shift` command reassigns the positional parameters, in effect shifting them
 $1 <-- $2, $2 <-- $3, $3 <-- $4, ...
 ```
 
-# Quoting
+## Quoting
 
 Quoting has the effect of protecting special character in teh tring from reinterpretation or expansion by the shell or shell script.
 
@@ -251,4 +251,76 @@ bcd
 echo "foo\
 bar"
 #foobar
+```
+
+## Exit
+
+An `exit` with no parameter, the exit status of the script is the exit status of the last command executed in the script.
+
+`$?` reads the exit status of the last command executed. A `$?` following the executation of a pip gives the exit status of the last command executed.
+
+## Tests
+
+An `if/then` construct tests whether the exit status of a list of commands of is 0.
+
+`[` (a command)  is a synonym for `test`. `[[...]]` is the _extended test command_ where `[[` is a keyword.
+
+`((...))` and `let...` constructs return an exit status according to whether the arithmetic expressions they evaluate expand to a nonzero value. If the last ARG evaluates to 0, let returns 1;  returns 0 otherwise.
+
+The exit status of an arithmetic expression is not an error value.
+
+An `if ` can test any command, not just conditions enclosed within brackets.
+
+```bash
+if cmp a b &> /dev/null
+then 
+if cmp a b &> /dev/null
+then
+    echo "Files a and b are identical"
+else
+    echo "Files a and b differ"
+fi
+```
+
+```bash
+if echo "$word" | grep -q "$letter_sequence"
+then
+    echo "$letter_sequence found in $word"
+else
+    echo "$letter_sequence not found in $word"
+fi
+```
+
+Note the differnce between `0` `1` `-1`  and `[ 0 ]`, `[ 1 ]`, `[ -1 ]`. The latter three all evaluate to true. 
+
+When `if` and `then` are on the same line in a conditional test, a semicolon must terminate the `if` statement. Both `if` and `then` are keywords, which themselves begin statements. `[` doesn't necessarily requires `]`, however, newer versions of Bash requires it. There are builtin `[`, `/usr/bin/test` and `/usr/bin/[`. They are all the same.
+
+`[[]]` construct is the more versatile Bash version of `[]`. Using the `[[ ... ]]` test construct, rather than `[ ... ]` can prevent many logic errors in scripts. For example, the `&&`, `||`, `<`, and `>` operators work within a `[[ ]]` test, despite giving an error within a `[ ]` construct. Arithmetic evaluation of octal / hexadecimal constants takes place automatically within a `[[ ... ]]` construct.
+
+```bash
+if [[ 15 -eq 0x0f ]] // [] error
+then
+    echo "Equal"
+else
+    echo "NotEqual"
+fi
+# Equal
+```
+
+A condition within test brackets may stand alone without an `if`, when used in combination with a list construct.
+
+```bash 
+[[ 15 -eq 0xfd ]] && echo "Equal" # Equal
+```
+
+
+Arithmatic expansion has the property of returning an exit status 0 when evaluating to nonzero, which is exactly what `if` needs.
+
+```bash
+if (( "5 > 2" ))
+then
+    echo "5>2"
+else
+    echo "5<=2"
+fi
 ```
