@@ -16,3 +16,64 @@ Most Swing component classes start with a "J" while many classes without "J" as 
 The Swing classes are placed in the `javax.swing` package, where `javax` indicates a Java _extension_ package, not a core package, although it is now present in every Java implementation since version 1.2. By default, a frame has a size of $0 \times 0$ pixels.
 
 All Swing components must be configured from the event dispatch thread, the thread of control that passes events such as mouse clicks and keystrokes to the user interface components. Simply constructing a frame does not automatically display it. Frames start their life invisible. That gives the programmer the chance to add components into the frame before showing it for the first time. To show the frame, the main method calls the `setVisible` method of the frame. After scheduling the initialization statements, the main method exits. Note that exiting main does not terminate the program—just the main thread. The event dispatch thread keeps the program alive until it is terminated, either by closing the frame or by calling the System.exit method. Components have properties that can be manipulated through a pair of getter and setter
+
+# Display Information in a Component
+
+Frames are designed to be containers for components, such as a menu bar and other use interface elements. Any componenets added to a frame are automatically placed into the content pane.
+
+`JComponent` is the base calss for all Swing components except top-level containers.
+
+```java
+class MyComponent extends JComponent
+{
+   public void paintComponent(Graphics g)
+   {
+      code for drawing
+   }
+   
+   public Dimension getPreferredSize()
+   { 
+      return new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT); 
+   }
+}
+```
+
+where `Graphics` remembers a collection of settings for drawing images and text. Each time a window needs to be redrawn, no matter what the reason, the event handler notifies the component. This causes the paintComponent methods of all components to be executed automatically.
+
+Override the getPreferredSize method and return an object of the Dimension class with the preferred width and height.
+
+Methods such as `paintComponent` automatically receive an object of the `Graphics2D` class. The Java 2D library provides a set of shape classes and supplies two versions of each shape class, one with `float` coordiantes and the other with `double` coordinates, both of which are static inner class packaged into an abstract class:
+
+```java
+Rectangle2D.Float
+Rectangle2D.Double
+```
+
+Simply use the `Double` shape classes to avoid dealing with `float` values altogether. Only use the `Double` version to save memory
+
+```
++----------+                    +----------+
+|  Point2D |                    |          |
++-----|----+                    |   Shape  |
+      ^                +- - - ->+          |
+      |                |        +------|---+
+      |                                ^
++-----|----+           |               |
+|x  Point x|       +---|-----+   +-----|-------+
++----------+       |  Line2D |   | Rectangular |
+                   +---------+   |    Shape    |
+                                 +------^------+
+                                        |
+                                        |
+                             +----------|-----------+
+                             |                      |
+                      +------|------+      +--------|-------+
+                      |  Ellipse2D  |      |  Rectangular2D |
+                      +-------------+      +------|---------+
+                                                  ^
+                                                  |
+                                           +------|-----+
+                                           |xRectangle x|
+                                           +------------+
+
+```
