@@ -382,13 +382,18 @@ An `array` can be explicitly passed a C-style function that expects a pointer.
 
 Occasionally, there is a significant performance advantage to be had by directly accessing elements allocated on the stack rather than allocating elements on the free store. On the other hand, the stack is a limited resource (especially on some embedded systems), and stack overflow is nasty. 
 
-An `array` knows its size, so it is easy to use with standard-library algorithms, and it can be copied using `=`. And it saves the programmer from implicit conversion to pointers like the old built-in array and thus avoid disasters of wrong offsets of wrong type information.
+An `array` knows its size, so it is easy to use with standard-library algorithms, and it can be copied using `=`. And it saves the programmer from implicit conversion to pointers like the old built-in array and thus avoid disasters of wrong offsets caused by wrong type information.
 
-- `bitset<N>`: a fixed-size sequence of N bits
+- `bitset<N>`: a fixed-size sequence of N bits. For sets of bits that don't fit into a `long long int`, using a `bitset` is much more convenient than using integers directly.
+
+```cpp
+bitset<9> bs1 {"110001111"};
+bitset<9> bs2 {0b1'1000'1111};
+```
 
 - `pair<T,U>`: two elements of types T and U
 
-- `tuple<T...>`: a sequence of an arbitrary number of elements of arbitrary heteoregenous types, contiguously allocated
+- `tuple<T...>`: a sequence of an arbitrary number of elements of arbitrary heteoregenous types, contiguously allocated. Accessing members of a tuple by their index is general, ugly, and somewhat error-prone. Fortunately, an element of a tuple with a unique type in that tuple can be “named” by its type.
 
 - `basic_string<C>`: a sequence of characters of type `C`
 
@@ -399,3 +404,54 @@ An `array` knows its size, so it is easy to use with standard-library algorithms
 ## (C++17) Alternatives
 
 TODO
+
+## Allocators
+
+By default, standard-library containers allocate space using new. Operators new and delete provide a general free store (also called dynamic memory or heap) that can hold objects of arbitrary size and user-controlled lifetime.
+
+The standard-library containers offer the opportunity to install allocators with specific semantics where needed. This has been used to address a wide variety of concerns related to performance (e.g., pool allocators), security (allocators that clean-up memory as part of deletion), per-thread allocation, and non-uniform memory architectures (allocating in specific memories with pointer types to match).
+
+TODO
+
+## Time
+
+`<chrono>` provides facilities for dealing with time.
+
+```cpp
+auto t0 = high_resolution_clock::now();
+do_work();
+auto t1 = high_resolution_clock::now();
+cout << duration_cast<milliseconds>(t1−t0).count() << "msec\n";
+```
+
+## Function Adaption
+
+Use lambda expressions
+
+```cpp
+void draw_all(vector<Shape*>& v)
+{
+     for_each(v.begin(),v.end(),[](Shape* p) { p−>draw(); });
+}
+```
+
+Use `std::mem_fn`, which produces a function object that can be called as a nonmember function.
+
+```cpp
+void draw_all(vector<Shape*>& v)
+{
+     for_each(v.begin(),v.end(),mem_fn(&Shape::draw));
+}
+```
+
+Use `std::function`, a type that can hold any object that can be invoked using `()`. `function`s are useful for callbacks, for passing operations as arguments, for passing function objects, etc. it may introduce some run-time overhead compared to direct calls, and a function, being an object, does not participate in overloading. If you need to overload function objects (including lambdas), consider `overloaded`.
+
+```cpp
+int f1(double);
+function<int(double)> fct1 {f1};                // initialize to f1
+
+int f2(string);
+function fct2 {f2};                             // fct2's type is function<int(string)>
+
+function fct3 = [](Shape* p) { p−>draw(); };    // fct3's type is function<void(Shape*)>
+```
