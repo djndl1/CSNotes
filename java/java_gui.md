@@ -75,5 +75,22 @@ Simply use the `Double` shape classes to avoid dealing with `float` values altog
                                            +------|-----+
                                            |xRectangle x|
                                            +------------+
-
 ```
+
+The `setPaint()` method of the Graphics2D class lets you select a color that is used for all subsequent drawing operations on the graphics context. `.fill()` fill the interior of closed shapes. A custom color can be created by creating a `Color` object. To set the background color use the `setBackground()` of the `Component` class. There is also a `setForeground()` method.
+
+`GraphicsEnvironment.getAvailableFontFamilyNames()` finds out which fonts are available on a particular computer. The AWT defines five logical font names:
+
+- `SansSerif`
+
+- `Serif`
+
+- `Monospaced`
+
+-  `Dialog`
+
+- `DialogInput`
+
+which are always mapped to some fonts that actually exist on the client machine.
+
+To use a font, create a `Font` object. Use the `deriveFont()` method to get a font of the desired size.
