@@ -185,3 +185,124 @@ Virtual functions should never be defined inline and always out-of-line.
 ### (C++17) inline variable
 
 The same rules for inline functions are applied to inline variables. `inline` is applicable to variables only with static storage duration (`static` or namespace scope variables). `inline` variables eliminate the main obstacle to packaging C++ code as header-only libraries.
+
+## Local Classes: classes inside functions
+
+It is entirely possible to define a local classes, inside a function. Local classes can be very useful in advanced applications involving inheritance or templates.
+
+- Local classes cannot define static data members. It is possible to define nested functions in C++.
+
+- Local classes cannot directly access the non-static varaible of their surrounding context. Local classes may directly access global data and static variables defined by their surrounding context.
+
+- Local class objects can be defined inside the function body, but they cannot leave the function as objects of their own type, i.e. not as parameter or return types of its surrounding function.
+
+- A local class may be derived from an existing a class allowing the surrounding function to return a dynamically allocated locally constructed class object, pointer or reference via a base class poointer or reference.
+
+## the keyword `mutable`
+
+In contrast to `const`, C++ also allows the declaration of data members which may be modified, even by const member function or the object itself is `const`.
+
+Mutable sould be used for those data members that may be modified without logically changing the object, which might still be considered a constant object, that is, the externally visible state of the class.
+
+```cpp
+mutable char *d_data;
+
+char const *string::c_str() const 
+{
+    d_data[d_length] = 0; // doesn't really matter to the string 
+    return d_data.
+}
+```
+
+The keyword `mutable` should be sparingly used. Data modified by const member function should never logically modify the object.
+
+```cpp
+class ThreadsafeCounter {
+  mutable std::mutex m; // The "M&M rule": mutable and mutex go together
+  int data = 0;
+ public:
+  int get() const {
+    std::lock_guard<std::mutex> lk(m);
+    return data;
+  }
+  void inc() {
+    std::lock_guard<std::mutex> lk(m);
+    ++data;
+  }
+};
+```
+
+# Header File Organization
+
+Source files contain the code of member functions of classes. There are two approaches
+
+- All required header files for a member function are included in each individual source file. (Compiler-economy but inconvenient for programmers.)
+
+- All required header files (for all member functions of a class) are include in a header file that is included by each of the source files defining class members. (may contain unnecesary headers )
+
+To prevent (circular dependency)[https://stackoverflow.com/questions/625799/resolve-build-errors-due-to-circular-dependency-amongst-classes], use forward class reference before the class interface and include the needed header after using.
+
+```cpp
+#ifndef STRING_H_
+#define STRING_H_
+class File; // forward reference
+class String
+{
+public:
+    void getLine(File &file);
+};
+#include <project/file.h>  // to know about a File
+#endif
+```
+
+```cpp
+#ifndef FILE_H_
+#define FILE_H_
+class String; // forward reference
+class File
+{
+public:
+    void gets(String &string);
+};
+#include
+<project/string.h> // to know about a String
+#endif
+```
+
+The above doesn't work with composition (the compiler cannot determine the size of both classes), nor with in-class inline member functions. In such cases, the header files of the classes of the composed objects must have been read before the class interface itself.
+
+- Header files defining a class interface should declare what can be declared before defining the class interface itsefl, that is, base class of the current class, class types of composed data members, inline member functions, which must be known by the compiler before the current class starts. Class types of return values and function parameters do not need their headers before that.
+
+- Program sources in which the class is used only need to include this header file.
+
+- Other additional headers and the class header file can be included in a separate internal header file(`.ih`) in the same directory as the source files of the class.
+
+```cpp
+// file.h
+#ifndef FILE_H_
+#define FILE_H_
+#include <fstream> // for composed 'ifstream'
+class Buffer;      // forward reference
+
+class File // class interface
+{
+    std::ifstream d_instream;
+public:
+    void gets(Buffer &buffer);
+};
+#endif
+```
+
+```cpp
+// file.ih
+#include <myheaders/file.h> // make the class File known
+#include <string> // used by members of the class
+#include <sys/stat.h> // File.
+#include <buffer.h> // make Buffer known to File
+```
+
+No `using` directive should be specified in header files if they are to be used as general header files declaring classes or other entities from a library. As a rule of thumb, header files intended for general use should not contain using declarations. This rule does not hold true for header files which are only included by the sources of a class.
+
+## (C++20) Modules 
+
+TODO
