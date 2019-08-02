@@ -407,7 +407,7 @@ TODO
 
 ## Allocators
 
-By default, standard-library containers allocate space using new. Operators new and delete provide a general free store (also called dynamic memory or heap) that can hold objects of arbitrary size and user-controlled lifetime.
+By default, standard-library containers allocate space using `new`. Operators `new` and `delete` provide a general free store (also called dynamic memory or heap) that can hold objects of arbitrary size and user-controlled lifetime.
 
 The standard-library containers offer the opportunity to install allocators with specific semantics where needed. This has been used to address a wide variety of concerns related to performance (e.g., pool allocators), security (allocators that clean-up memory as part of deletion), per-thread allocation, and non-uniform memory architectures (allocating in specific memories with pointer types to match).
 
@@ -435,7 +435,7 @@ void draw_all(vector<Shape*>& v)
 }
 ```
 
-Use `std::mem_fn`, which produces a function object that can be called as a nonmember function.
+Use `std::mem_fn`, which produces a function object that can be called as a nonmember function. `std::mem_fn` generates wrapper objects for pointers to members, which can store, copy, and invoke a pointer to member. Both references and pointers (including smart pointers) to an object can be used when invoking a `std::mem_fn`.
 
 ```cpp
 void draw_all(vector<Shape*>& v)
@@ -455,3 +455,46 @@ function fct2 {f2};                             // fct2's type is function<int(s
 
 function fct3 = [](Shape* p) { p−>draw(); };    // fct3's type is function<void(Shape*)>
 ```
+
+## Type functions
+
+A type function is a function that is evaluated at compile time given a type as its argument or returning a type. The standard library provides a variety of type functions to help library implementers (and programmers in general) to write code that takes advantage of aspects of the language, the standard library, and code in general.
+
+Such type functions are part of C++’s mechanisms for compile-time computation that allow tighter type checking and better performance than would otherwise have been possible. Use of such features is often called metaprogramming or (when templates are involved) template metaprogramming.
+
+TODO
+
+
+In `<type_traits>`, the standard library offers simple type functions, called _type predicates_ that answers a fundamental question about types. They are most useful when we write templates.
+
+Obvious ways of using type predicates includes conditions for `static_assert`s, compile-time `if`s, and `enable_if`s. The standard-library `enable_if` is a widely used mechanism for conditonally introducing definitions. The syntax of enable_if is odd, awkward to use, and will in many cases be rendered redundant by concepts. It relies on a subtle language feature called SFINAE (“Substitution Failure Is Not An Error”).
+
+# Numerics
+
+TODO
+
+
+# Concurrency
+
+Concurrency is widely used to improve throughput or to improve responsiveness. The standard library supoort for concurrency is primarily aimed at supporting system-level concurrency rather than directly providing sophisticated higher-level concurrency models. The features are built directly upon what operating systems offer and do not incur performance penalties compared with those.
+
+A computation that can potentially be executed concurrently with other computation is a _task_. A thread is the system-level representation of a task in a program.
+
+```cpp
+void f();                 // function
+
+struct F {                // function object
+     void operator()();   // F's call operator (§6.3.2)
+};
+
+void user()
+{
+     thread t1 {f};       // f() executes in separate thread
+     thread t2 {F()};     // F()() executes in separate thread
+
+     t1.join();           // wait for t1 to terminate
+     t2.join();           // wait for t2 to terminate
+}
+```
+
+Inter-thread communication is typically controlled by locks or other mechanisms to prevent data reaces (uncontrolled concurrent access to a variable).
