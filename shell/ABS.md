@@ -322,5 +322,78 @@ then
     echo "5>2"
 else
     echo "5<=2"
+    
 fi
 ```
+
+### Important file test operators
+
+- `-e`/`-a`: file exists
+
+- `-f`: regular files
+
+- `-s`: not zero size
+
+- `-d`: directory file
+
+- `-b`: block file
+
+- `-c`: character file
+
+- `-p`: pipe file
+
+```bash
+echo "Input" | [[ -p /dev/fd/0 ]] && echo PIPE || echo STDIN
+PIPE
+```
+
+- `-h`, `-L`: symbolic link
+
+- `-S`: socket
+
+- `-t`: file (descriptor) is associated with a terminal device
+
+- `-r`;`-w`;`-x`: read/write/execute permission
+
+- `-g`: set-group-id, a file within such a directory belongs to the group that owns the directory, not necessarily th the group of the user who created the file. This may be useful for a directory shared by a workgroup.
+
+- `-u`: set-user-id, a binary owned by root with this flag runs with root priviledges, even when an ordinary user invokes it.
+
+- `-k`: sticky bit, if set on a file, it's kept in cache memory; if set on a directory, it restricts write permission. This restricts altering or deleting specific files in such a directory to the owner of those files.
+
+- `-O`: are you the owner?
+
+- `-G`: your group?
+
+### integer comparison
+
+- `-eq`; `-ne`; `-gt`; `-ge`; `-lt`; `-le`;
+
+- `<`; `<=`; `>`; `>=` only within `[[ ]]`
+
+### String comparison
+
+- `=`; `==`; `==` behaves diffferently within a double-bracket test than within single brackets
+
+```bash
+[[ $a == z* ]] # True if $a starts with an "z" (pattern matching).
+[[ $a == "z*" ]] # True if $a is equal to z* (literal matching).
+[ $a == z* ]  # File globbing and word splitting take place.
+[ "$a" == "z*" ] # True if $a is equal to z* (literal matching).
+```
+
+- `!=`; `<`; `>`; the latter two needs an escape in `[ ]`
+
+- `-z`: null string
+
+- `-n`: not null string, always quote a tested string; the `[...]` test alone detects whether the string is null
+
+### compound comparison
+
+- `exp1 -a exp2`: logical and, or `[[ condition1 && condition2 ]]` (short-circuit)
+
+- `exp1 -o exp2`: logical or, or `[[ conditional1 || condition2 ]]` (short-circuit)
+
+Condition tests using the `if/then` may be nested.
+
+
