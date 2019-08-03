@@ -116,7 +116,60 @@ class MyListener implements ActionListener
       // reaction to button click goes here
       . . .
    }
+   
 }
 ```
 
 Each of the AWT listener interfaces that have more than one method comes with a companion adapter class that implements all the methods in the interface but does nothing with them. You extend the adapter class to specify the desired reactions to some, but not all, of the event types in the interface.
+
+the `Action` interface, which extends `ActionListener`  is an object that encapsulates a description of the command (as a text string and an optional icon) and parameters that are necessary to carry out the command (such as the requested color).
+
+```java
+void actionPerformed(ActionEvent event)
+// enable or disable the action
+void setEnabled(boolean b)
+boolean isEnabled()
+// store and retrieve arbirary name/value pairs
+void putValue(String key, Object value)
+Object getValue(String key)
+// do something if the listener changes
+void addPropertyChangeListener(PropertyChangeListener listener)
+void removePropertyChangeListener(PropertyChangeListener listener)
+```
+
+There is a class `AbstractAction` that implements all methods except for actionPerformed.
+
+```java
+public class ColorAction extends AbstractAction
+{
+   public ColorAction(String name, Icon icon, Color c)
+   {
+      putValue(Action.NAME, name);
+      putValue(Action.SMALL_ICON, icon);
+      putValue("color", c);
+      putValue(Action.SHORT_DESCRIPTION, "Set panel color to " + name.toLowerCase());
+   }
+   public void actionPerformed(ActionEvent event)
+   {
+      Color c = (Color) getValue("color");
+      buttonPanel.setBackground(c);
+   }
+}
+```
+
+A `KeyStroke` object is the source of a key stroke event. There are three input maps:
+
+- `WHEN_FOCUSED`: this component has keyboard focus;
+
+- `WHEN_ANCESTOR_OF_FOCUSED_COMPONENT`: this component contains the component that has keyboard focus;
+
+- `WHEN_IN_FOCUSED_WINDOW`: this component is contained in the same window as the component has keyboard focus;
+
+Each component has three input maps and one action map.
+
+```java
+InputMap imap = panel.getInputMap(JComponent.WHEN_FOCUSED);
+imap.put(KeyStroke.getKeyStroke("ctrl Y"), "panel.yellow");
+ActionMap amap = panel.getActionMap();
+amap.put("panel.yellow", yellowAction);
+```
