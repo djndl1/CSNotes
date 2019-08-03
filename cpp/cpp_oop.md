@@ -240,7 +240,7 @@ Source files contain the code of member functions of classes. There are two appr
 
 - All required header files (for all member functions of a class) are include in a header file that is included by each of the source files defining class members. (may contain unnecesary headers )
 
-To prevent (circular dependency)[https://stackoverflow.com/questions/625799/resolve-build-errors-due-to-circular-dependency-amongst-classes], use forward class reference before the class interface and include the needed header after using.
+To prevent [circular dependency](https://stackoverflow.com/questions/625799/resolve-build-errors-due-to-circular-dependency-amongst-classes), use forward class reference before the class interface and include the needed header after using.
 
 ```cpp
 #ifndef STRING_H_
@@ -306,3 +306,110 @@ No `using` directive should be specified in header files if they are to be used 
 ## (C++20) Modules 
 
 TODO
+
+# `static` 
+
+Common to all objects of a class.
+
+## `static` data
+
+`static` data is created and initialized only once. They are created as soon as the program starts. `static` data are not initialized by constructors. At most they are modified. It can be defined and initialized in a source file. In the class interface, they are only declared.
+
+```cpp
+#include "myheaders.h"
+
+char Directory::s_path[200] = "/usr/local";
+```
+
+```cpp
+// an interface connecting to a display device
+class Graphics
+{
+    static int s_nobjects;
+
+    public:
+        Graphics();
+        ~Graphics();
+private:
+        void setgraphicsmode();
+        void settextmode();
+}
+
+int Graphics::s_nobjects = 0;
+Graphics::Graphics()
+{
+    if (!s_nobjects++)
+        setgraphicsmode(); // set the device to graphic mode when the first graphic interface is initialized
+}
+Graphics::~Graphics()
+{
+    if (!--s_nobjects)
+        settextmode();
+}
+```
+
+s`tatic const` data members should be initialized like any other static data member: in source files defining these data members (better always so). In-class initialization may be possible (although not strictly required for compilers) of built-in primitive data types. In-class initialization of integer constatn values is possible using enums.
+
+```cpp
+class X {
+public:
+    enum { s_x = 34 };
+    enum: size_t { s_maxWidth = 100 };
+}
+```
+
+### Generalized constant expressions (`constexpr`)
+
+Generalized `const` expressions can be used as an alternative to C macro function.
+
+`constexpr` can only be applied to definitions. Variables defined with the `constexpr` modifier have constant values. Moreover, it can be applied to functions. A `constexpr` specifier used in an object declaration or non-static member function (until C++14) implies `const`.
+
+#### `constexpr` functions
+
+A constant expression functions has the following characteristics:
+
+- it returns a `constexpr` modified value and consists of only a single return statement.
+
+- it is implicitly declared `inline`.
+
+Such functions are also called _na med constant expression with parameters_. If they are called with compile-time evaluated arguments then the returned value is considered a `const` value as well. It's an encapsulation of expressions. If the arguments cannot be evaluated at compile time, the return values are no longer considered constant expressions and the function behaves like any other function.
+
+In situations where `static const` member data must be accessed, a `constexpr` function can be used as an accessor.
+
+```cpp
+class Data
+{
+    static size_t const s_size = 7;
+public:
+    static size_t constexpr size();
+    size_t constexpr mSize();
+};
+
+size_t constexpr Data::size()
+{
+    return s_size;
+}
+
+size_t constexpr Data::mSize()
+{
+    return size();
+}
+
+double data[ Data::size() ];
+short data2[ Data().mSize() ];
+```
+
+C++14 has relaxed requirements for `constexpr` functions. TODO
+
+#### `constexpr` data
+
+Constant expression class-type objects must be initialized with constant expression arguments; the constructor that is actually used must itself have been declared with the `constexpr` modifier, whose member initializers only use constant expressions and whose body is empty.
+
+An object constructed with a constant-expression constructor is called a _user-defined literal_. Destructors
+and copy constructors of user-defined literals must be trivial.
+
+### `static` member functions
+
+`static` member functions can access all static members of their class, but also the members of objects of their class if they are informed about the existence of these objects. A `static` member function is completely comparable to a global function, not associated with any class. The C++ standard does not prescribe the same calling conventions for static member functions as for classless global functions. In practice, the calling conventions are identical, meaning that the address of a static member function could be used as an argument of functions having parameters that are pointers to global functions. It is suggested to create global classless wrapper functions around static member functions that must be used as callback functions for other functions.
+
+However, traditional situations in which call back functions are used in C are tackled in C++ using template algorithms
