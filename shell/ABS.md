@@ -396,4 +396,8 @@ PIPE
 
 Condition tests using the `if/then` may be nested.
 
+## Operators
 
+- `=`: all purpose assignment operator, which works for both arithmetic and string assignment
+
+- `+`; `-`; `*`; `/`; `**` (exponentiation); `+=`; `-=`; `*=`; `/=`; `%=`;
