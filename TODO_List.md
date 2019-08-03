@@ -232,3 +232,9 @@
 2019-07-25
 
 - [ ] https://stackoverflow.com/questions/20187587/what-is-the-difference-between-dynamic-dispatch-and-late-binding-in-c
+
+- [ ] https://www.thegeekstuff.com/2013/11/linux-process-and-threads/
+
+- [ ] http://www.catb.org/esr/structure-packing/
+- [ ] https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
+
