@@ -1,4 +1,4 @@
-# IO core tools for working with streams
+# IO Module - core tools for working with streams
 
 The `io` module provides Python's main facilities for dealing with various types of I/O. Three abstract generic types are avaialbe
 
@@ -96,6 +96,9 @@ A buffered text stream over a `BufferedIOBase` binary stream. There's a `reconfi
 
 An in-memory stream for text I/O.
 
+
+
+
 # Built-in `open` function
 Python has a built-in function `open`. It accepts a path to a file or an integer file descritpor of the file. It basically has the same modes as the C standard library function `fopen` and the default mode is `r`/`rt`. The `encoding` argument defaults to the platform unless specified and is only used in text mode.
 
@@ -104,3 +107,25 @@ Python distinguishes binary mode, which returns `bytes` objects without any deco
 The default buffer policy deterimines the buffer size using a heuristic to find the underlying device's block size and falling back on `io.DEFAULT_BUFFER_SIZE`, typically 4096 or 8192 bytes. For interactive text files, it uses line buffering. `0` means buffer off. `1` means line buffering. Any other positive integer means a fixed size chunk buffer.
 
 `errors` argument is an optional string that specifies how encoding and decoding errors are to be handled, only in text mode. `newline` determines how to deal with newline characters when reading and writing. The default accepts all three newlines as a newline character when reading and writes the system default line separator. `closefd` specifies whether to close the file descriptor when the file is closed. The default  `opener` is similar to `os.open`.
+
+# gzip - support for gzip files
+
+The data compression is provided by the `zlib` module. 
+
+The `gzip module` provides the `GzipFile` class as well as the `open()`, `compress()` and `decompress()`.
+
+## `gzip.open()` function
+
+Open a gzip-compressed file in binary or text mode, returning a file object. 
+
+## class `gzip.GzipFile`
+
+Simulates most of the methods of `io.BufferedIOBase` interface with the exception of the `truncate()` method. The file is always opened in binary mode. To open a compressed file in text mode, use `open()`.
+
+Calling a GzipFile object’s close() method does not close fileobj, since you might wish to append more material after the compressed data.
+
+# Standard input, standard output, standard error
+
+`sys.stdin`, `sys.stdout` and `sys.stderr` are file objects and regular text files.
+
+`stdout` and `stderr` are variables and can be assigned a new value.
