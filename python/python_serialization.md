@@ -32,3 +32,7 @@ TODO
 This module contains various constants relating to the intimate details of the pickle module, some lengthy comments about the implementation, and a few useful functions for analyzing pickled data.
 
 `python -m pickletools` will disassemble the contents of one or more pickle files.
+
+# Module `json`
+
+ If cross-language compatibility is required, one option is `json`. `json` exposes an API familiar to users of the standard library `marshal` and `pickle` modules.
