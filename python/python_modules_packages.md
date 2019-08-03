@@ -1,4 +1,4 @@
-# The import system
+# The import system mechanism
 
 The `import` statement combines two operations; it searches for the named module, then it binds the results of that search to a name in the local scope. The built-in `__import__()` function searches the path and return the module to perform the name binding. Other mechanisms for invoking the import system (such as `importlib.import_module()`) may choose to bypass `__import__()` and use their own solutions to implement import semantics.
 
@@ -16,6 +16,8 @@ Out[10]:
  <six._SixMetaPathImporter at 0x7f96fce4aa90>]
 ```
 
+TODO
+
 # Modules
 
 Python has a way to put definitons in a file and use them in a script or in an interactive instance of the interpreter. Such a file is called a module.
@@ -28,9 +30,15 @@ Each module has its own private symbol table, which is used as the global symbol
 
 A module executed as a script can be used to provide a convenient user interface or for testing purpose.
 
-
-
 `dir()` finds out which names a module defines. To reload a module, use `importlib.reload()`
+
+The import machinery fills in some attributes on each module during loading, based on the module's spec, before the loader executes the module.
+
+- `__name__`: fully-qualified name of the module
+
+- `__package__`: empty for top-level module, or the parent package's name for submodules.
+
+
 
 # Packages
 
