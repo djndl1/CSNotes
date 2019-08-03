@@ -37,3 +37,15 @@
 - `len(seq)`: `seq.__len__()`
 
 - `x in seq`: `seq.__contains__(x)`
+
+# Numbers
+
+- `x + y`: `x.__add__(y)`
+
+- `x - y`: `x.__sub__(y)`
+
+- `x * y`: `x.__mul__(y)`
+
+...
+
+TODO
