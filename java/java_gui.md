@@ -94,3 +94,29 @@ The `setPaint()` method of the Graphics2D class lets you select a color that is 
 which are always mapped to some fonts that actually exist on the client machine.
 
 To use a font, create a `Font` object. Use the `deriveFont()` method to get a font of the desired size.
+
+# Event Handling
+
+In AWT, _event sources_ (such as buttons or scrollbars) have methods that allow to register _event listeners_ (that implements a listener interface), objects that carry out the desired response to the event. When an event listener is notified about an event, information about the event is encapsulated in an event object. In Java, all event objects ultimately derive from the class `java.util.EventObject`. The event source sends out event objects to all registered listeners, which take respective actions to the event.
+
+```java
+ActionListener listener = . . .;
+var button = new JButton("OK");
+button.addActionListener(listener);
+```
+
+where `listener` inplements
+
+```java
+class MyListener implements ActionListener
+{
+   . . .
+   public void actionPerformed(ActionEvent event)
+   {
+      // reaction to button click goes here
+      . . .
+   }
+}
+```
+
+Each of the AWT listener interfaces that have more than one method comes with a companion adapter class that implements all the methods in the interface but does nothing with them. You extend the adapter class to specify the desired reactions to some, but not all, of the event types in the interface.
