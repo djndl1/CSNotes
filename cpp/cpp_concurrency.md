@@ -52,3 +52,54 @@ std::thread safeLocal()
 ```
 
 The class `std::thread` does not provide a copy constructor.
+
+- `void detach()`: The thread for which `detach` is called continues to run. The parent thread calling `detach` continues immediately beyond the `detach` call. The `object` as in `object.detach()` no longer represents a thread of execution. As the `main` thread exits, the still running detached threads also stop. A detached thread may bery well continue to run after the function that launched it has finished.
+
+```cpp
+void fun(size_t count, char const* text)
+{
+    for (; count--; ) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::cout << count << ": " << text << std::endl;
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    std::thread first{fun, 5, "hello world"};
+    first.detach();
+
+    std::thread second(fun, 5, "a second thread");
+    second.detach();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    std::cout << "leaving from the main thread" << std::endl;
+    return 0;
+}
+```
+
+```bash
+djn@djn-Aspire-E5-575G:~/FOSS/playground $ ./a.out
+44: : a second threadhello world
+
+33: hello world: a second thread
+
+22: hello world: a second thread
+```
+
+```cpp
+void add(int const& p1, int const &p2)
+{
+    this_thread::sleep_for(milliseconds(200));
+    cerr << p1 << " + " << p2 << " = " << (p1 + p2) << '\n';
+}
+
+void run()
+{
+    int v1 = 10;
+    int v2 = 10;
+
+    thread{add, ref(v1), ref(v2)}.detach();
+}
+// output:32765 + 924796728 = 924829493
+```
