@@ -173,3 +173,110 @@ imap.put(KeyStroke.getKeyStroke("ctrl Y"), "panel.yellow");
 ActionMap amap = panel.getActionMap();
 amap.put("panel.yellow", yellowAction);
 ```
+
+When the user clicks a mouse button, three listener methods are called: `mousePad` when the mouse is first pressed, `mouseReleased` when the mouse is released and `mouseClicked`. The `getX` and `getY` methods on `MouseEvent` gives the coordinates of the mouse pointer when the mouse was clicked. The `getClickCount` distinguishes between single, double and triple clicks. 
+
+```java
+public void mousePressed(MouseEvent event)
+{
+   current = find(event.getPoint());
+   if (current == null) // not inside a square
+      add(event.getPoint());
+}
+public void mouseClicked(MouseEvent event)
+{
+   current = find(event.getPoint());
+   if (current != null && event.getClickCount() >= 2)
+      remove(current);
+}
+```
+
+
+There are separate `MouseListener` and `MouseMotionListener` dealing with mouse motion instead of mouse clicks. The cursor can be changed.
+
+```java
+public void mouseMoved(MouseEvent event)
+{
+   if (find(event.getPoint()) == null)
+      setCursor(Cursor.getDefaultCursor());
+   else
+      setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+}
+```
+
+The inheritance of the AWT events
+
+```bash
+                             +--------+
+                             | Event  |
+                             | Object |
+                             +----|---+
+                                  ^
+                                  |
+                                  |
+                             +---------+
+                             |AWT Event|
+                             +---|-----+
+                                 ^
+                                 |
+                                 |
+    +-----------|----------------|------------+
+    |           |                |            |
++---|---+  +----|-----+  +-------|--+   +-----|---+
+| Action|  |Adjustment|  |Component |   |  Item   |
+| Event |  |  Event   |  |  Event   |   |  Event  |
++-------+  +----------+  +-----^----+   +---------+
+                               |
+                 +-------------|----------|-----------+
+                 |             |          |           |
+                 |             |          |           |
+            +----|----+   +----|---+  +---|---+  +----|---+
+            |  Focus  |   |  Input |  | Paint |  | Window |
+            |  Event  |   |  Event |  | Event |  |  Event |
+            +---------+   +----|---+  +-------+  +--------+
+                               ^
+                         +-----|-----+
+                         |           |
+                     +---|---+   +---|---+
+                     |  Key  |   | Mouse |
+                     | Event |   | Event |
+                     +-------+   +----^--+
+                                      |
+                                      |
+                                      |
+                                 +----|-----+
+                                 |MouseWheel|
+                                 |  Event   |
+                                 +----------+
+
+```
+
+The event objects encapsulate information about the event that the event source communicates to its listeners. The AWT makes a useful distinction between low-level and semantic events. Low-level events are those events that make semantic events possible (dragging the mouse vs. scrolling the scrollbar). 
+
+Common used event classes in `java.awt.event`
+
+- `ActionEvent` (for a button click, a menu selection, selecting a list item, or Enter typed in a text field)
+
+- `AdjustmentEvent` (the user adjusted a scrollbar)
+
+- `ItemEvent` (the user made a selection from a set of checkbox or list items)
+ 
+Five low-level event classes are commonly used:
+
+- `KeyEvent` (a key was pressed or released)
+
+- `MouseEvent` (the mouse button was pressed, released, moved, or dragged)
+
+- `MouseWheelEvent` (the mouse wheel was rotated)
+
+- `FocusEvent` (a component got focus or lost focus)
+
+- `WindowEvent` (the window state changed)
+
+# Preferences API
+
+TODO
+
+# Swing
+
+TODO
