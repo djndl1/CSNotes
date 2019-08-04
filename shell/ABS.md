@@ -401,3 +401,42 @@ Condition tests using the `if/then` may be nested.
 - `=`: all purpose assignment operator, which works for both arithmetic and string assignment
 
 - `+`; `-`; `*`; `/`; `**` (exponentiation); `+=`; `-=`; `*=`; `/=`; `%=`;
+
+```bash
+let "n = $n + 1"
+: $((n = $n + 1))
+(( n = n + 1))
+n=$(($n+1))
+: $[ n = $n + 1]
+n=$[$n+1]
+
+let "n++"
+: $((n++))
+: $[n++]
+((n++))
+```
+
+Bash integers are now 64-bit long. Bash does not understand floating point arithmetic. It treats numbers containing a decimal point as strings.
+
+- bitwise operator: `<<`; `<<=`; `>>`; `>>=`; `&`; `&=`; `|`; `|=`; `~`; `^`; `^=`;
+
+- logical operator: `!`; `&&`; `||`
+
+```bash
+if [ $condition1 ] && [ condition2 ]
+if [ $condition1 -a $condition1 ]
+if [[ $condition1 && $condition1 ]]
+# same for || 
+```
+
+The comma operator chains together two or more arithmetic operations and returns the last one.
+
+```bash
+let "dec=32" # base 10
+let "oct=032" # base 8, 26
+let "hex=0x32" # base 16, 50
+
+# BASE#NUMBER, where BASE is between 2 and 64, 10 digits + 52 characters (lower and upper) + @ + _
+let "bin= 2#10100110111" # base 2
+let "b32 = 32#77" # base 32
+```
