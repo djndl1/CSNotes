@@ -348,7 +348,7 @@ Graphics::~Graphics()
 }
 ```
 
-s`tatic const` data members should be initialized like any other static data member: in source files defining these data members (better always so). In-class initialization may be possible (although not strictly required for compilers) of built-in primitive data types. In-class initialization of integer constatn values is possible using enums.
+`static const` data members should be initialized like any other static data member: in source files defining these data members (better always so). In-class initialization may be possible (although not strictly required for compilers) of built-in primitive data types. In-class initialization of integer constatn values is possible using enums.
 
 ```cpp
 class X {
@@ -410,6 +410,80 @@ and copy constructors of user-defined literals must be trivial.
 
 ### `static` member functions
 
-`static` member functions can access all static members of their class, but also the members of objects of their class if they are informed about the existence of these objects. A `static` member function is completely comparable to a global function, not associated with any class. The C++ standard does not prescribe the same calling conventions for static member functions as for classless global functions. In practice, the calling conventions are identical, meaning that the address of a static member function could be used as an argument of functions having parameters that are pointers to global functions. It is suggested to create global classless wrapper functions around static member functions that must be used as callback functions for other functions.
+`static` member functions can access all static members of their class, but also the members of objects of thpeir class if they are informed about the existence of these objects. A `static` member function is completely comparable to a global function, not associated with any class. The C++ standard does not prescribe the same calling conventions for static member functions as for classless global functions. In practice, the calling conventions are identical, meaning that the address of a static member function could be used as an argument of functions having parameters that are pointers to global functions. It is suggested to create global classless wrapper functions around static member functions that must be used as callback functions for other functions.
 
 However, traditional situations in which call back functions are used in C are tackled in C++ using template algorithms
+
+
+# Classes and Memory Allocation
+
+## `new` and `delete`
+
+`new` is type safe. It knows about the type of allocated entity it may and will call the constructor of an allocated class type object. When confronted with failing memory allocation, `new`'s behavior is configurable ghrough the use of a `new_handler`.
+
+All `malloc` and `str...` in C should be deprecated in favor of `string`, `new` and `delete`.
+
+`new` uses a type as its operand, which guarantees the correct amount of memory being allocated. `delete` can safely operate on a `NULL` pointer (It's not that `delete` guarantees this, it's `free` that does this).
+
+```cpp
+//from libstdc++
+_GLIBCXX_WEAK_DEFINITION void
+operator delete(void* ptr) _GLIBCXX_USE_NOEXCEPT
+{
+  std::free(ptr);
+}
+```
+
+```c
+// from musl libc
+void free(void *p)
+{
+	if (!p) return;
+
+    //...
+}
+```
+
+About two different `new`, see 
+
+- [How is the C++ new operator implemented](https://stackoverflow.com/questions/9595758/how-is-the-c-new-operator-implemented)
+
+- [operator new and new expression](https://stackoverflow.com/questions/1885849/difference-between-new-operator-and-operator-new)
+
+POD types without constructors are guaranteed to initialized to zero unless adding the brackets `()`. If the struct has a default data member initializer, `()` initializes the POD data to that. Objects of arrays are initialized using their constructors (with the default constructors only).
+
+It's totally legal and safe to create `new int[0]` (and `malloc(0)`, both of which returns nonzero pointers under glibc and musl).
+
+When calling `delete`, the class's destructor is called and the memory pointed at by the pointer is returned to the common pool.
+
+```cpp
+string **sp = new string *p[5];
+for (size_t idx = 0; idx != 5; ++idx)
+    sp[idx] = new string;
+delete[] sp; //memory leak
+```
+
+Static and local arrays cannot be resized. Resizing is only possible for dynamically allocated arrays.
+
+```cpp
+string *enlarge(string *old, size_t oldsize size_t newsize)
+{
+    string *tmp = new string[newsize];
+    for (size_t idx = 0; idx != oldsize; ++idx) {
+        tmp[idx] = old[idx];
+    }
+
+    delete[] old;
+    return tmp;
+}
+```
+
+## Managing raw memory
+
+Raw memory is made available by `operator new(sizeInBytes)` and also by `operator new[](sizeInBytes)`. They have no concept of data types the size of the intended data type must be specified. The counterparts are `operator delete()` and `operator delete[]()`.
+
+## the placement `new` operator
+
+Placement `new` is declared in `<memory>` header. Placement `new` is passed an existing block of memory into which `new` initializes an object or value (placing the object in a certain place in memory). 
+
+TODO
