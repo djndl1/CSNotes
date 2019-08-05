@@ -1,0 +1,1 @@
+- Default `Object.equals()` is the same as `==`;
