@@ -440,3 +440,5 @@ let "hex=0x32" # base 16, 50
 let "bin= 2#10100110111" # base 2
 let "b32 = 32#77" # base 32
 ```
+
+- C-style `++`, `--` also work. Ternary operator `condition ? a : b` also works.
