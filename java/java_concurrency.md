@@ -105,3 +105,21 @@ Thread priorities are highly system-dependent. When the virtual machine relies o
 Thread priorities may have been useful in early versions of Java that didn’t use operating systems threads. You should not use them nowadays.
 
 
+# Synchronization
+
+The problem is that access to shared data is not atomic, it can be interrupted in the middle.
+
+## Lock Objects
+
+`ReentrantLock`: It is critically important that the unlock operation is enclosed in a finally clause. If the code in the critical section throws an exception, the lock must be unlocked. Otherwise, the other threads will be blocked forever. 
+
+```java
+myLock.lock();
+try {
+// critical section
+} finally {
+myLock.unlock();
+}
+```
+
+The lock is called reentrant because a thread can repeatedly acquire a lock that it already owns. The thread has to call unlock for every call to lock in order to relinquish the lock. Because of this feature, code protected by a lock can call another method that uses the same locks. See the [motivation behind it](https://en.wikipedia.org/wiki/Reentrant_mutex).
