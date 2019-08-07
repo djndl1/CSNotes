@@ -498,3 +498,4 @@ void user()
 ```
 
 Inter-thread communication is typically controlled by locks or other mechanisms to prevent data reaces (uncontrolled concurrent access to a variable).
+

@@ -215,6 +215,50 @@ The `shift` command reassigns the positional parameters, in effect shifting them
 $1 <-- $2, $2 <-- $3, $3 <-- $4, ...
 ```
 
+### Internal Variables
+
+- `BASHPID`: Process ID of the current instance of Bash, not the same as `$$` (which returns the PID of the parent shell).
+
+- `BASH_VERSINFO`: a 6-element array containing version information about Bash.
+
+- `BASH_VERSION`: Bash version string 
+
+- `EUID`: effective user ID, whatever identity the current user has assumed. not the same as `UID`.
+
+- `FUNCNAME`: the current function name
+
+- `GROUPS`: an array groups current user belong to
+
+- `HOSTNAME`
+
+- `HOSTTYPE`: identifies the system hardware
+
+- `MACHTYPE`: machine type 
+
+- `OSTYPE`: OS type
+
+- `IFS`: internal field separator, determines how Bash recognizes fields, or word boundaries. Defaults to whitespace (space, tab and newline).
+
+```bash
+ djn  debian  ~  echo "$IFS"  | cat -vte
+ ^I$ # single space, horizontal tab, newline
+$
+```
+
+- `LINENO`: current line number, chiefly for debugging purposes.
+
+- `OLDPWD`, `PWD`.
+
+- `PPID`: parent PID
+
+- `PS1`; `PS2`; `PS3`; `PS4`
+
+- `SHELLOPTS`: enabled shell options
+
+- `SECONDS`: the number of seconds the script has been running
+
+
+
 ## Quoting
 
 Quoting has the effect of protecting special character in teh tring from reinterpretation or expansion by the shell or shell script.
@@ -440,3 +484,5 @@ let "hex=0x32" # base 16, 50
 let "bin= 2#10100110111" # base 2
 let "b32 = 32#77" # base 32
 ```
+
+- C-style `++`, `--` also work. Ternary operator `condition ? a : b` also works.

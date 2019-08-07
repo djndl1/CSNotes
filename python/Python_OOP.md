@@ -51,3 +51,24 @@ parent_directory/
 from .database import Database   # products.py imports database.py
 from ..database import Dataqbase # from the payments folder
 ```
+
+Private attributes are prefixed by `__` (on which name mangling will be performed), internal attributes with `_` (still accessible).
+
+```python
+a.__plain_string
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-4-5f2b11c3fe5b> in <module>()
+----> 1 a.__plain_string
+
+AttributeError: 'SecretString' object has no attribute '__plain_string'
+```
+
+However, it's actually still there
+
+```python
+In [6]: a._SecretString__plain_string
+Out[6]: 'abc'
+```
+
+Most Python programmers will not touch a single underscore variable without a compelling reason either. Therefore, there are very few good reasons to use a name-mangled variable in Python
