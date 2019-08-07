@@ -26,7 +26,8 @@ class Reverse:
     def __next__(self):
         if self.index == 0:
             raise StopIteration
-        self.index = self.index - 1
+
+self.index = self.index - 1
         return self.data[self.index]
 ```
 
@@ -56,3 +57,50 @@ class Fib:
 
 See [Iterators on PEP](https://www.python.org/dev/peps/pep-0234/) and 
 https://www.python.org/dev/peps/pep-0255/
+
+## important functions about iterators
+
+`zip`: make an iterator taht aggregates elements from each of the iterables.
+
+```python
+>>> list(zip(range(0, 3), range(10, 13)))
+[(0, 10), (1, 11), (2, 12)]
+```
+
+# Generator function and generator iterators
+
+Generators are a simple and powerful tool for creating iterators. They are written like regular functions but use the `yield` statement whenever they want to return data. 
+
+```python
+    def reverse(data):
+        for index in range(len(data)-1, -1, -1):
+            yield data[index]
+```
+
+Generators provide a convenient way to implement the iterator protocol. If a container object's `__iter__()` method is implemented as a generator, it will automatically return an iterator object supplying the `__iter__()` and `__next__()` methods.
+
+`
+Some simple generators can be coded succinctly as expressions using a syntax similar to list comprehensions but with parentheses instead of square brackets. Generator expressions are more compact but less versatile than full generator definitions and tend to be more memory friendly than equivalent list comprehensions.
+
+```python
+sum(i*i for i in range(10))
+```
+
+# `itertools`: functions creating iterators for efficient looping
+
+This module implements a number of iterator building blocks inspired by. It standardizes a core set of fast, memory effcient tools that are useful by themselves or in combination.
+
+## Combinatoric iterators
+
+`product()`: Cartesian product
+
+`combination()`; `permutations()`
+
+## others
+
+`groupby()`: groups an iterable by a function and works only when already sorted by the function.
+
+`chain()`: returns an iterator that chains input iterables together.
+
+`zip_longest()`: similar to `zip`, but stops at the longest sequence, inserting `None` if necessary.
+
