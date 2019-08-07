@@ -26,7 +26,7 @@ Sequences support some common operations.
 
 - `x (not) in seq`: tests if `x` is in `seq`.
 
-- `s + t`: concatenation
+- `s + t`: concatenation. Concatenating immutable sequences always results in a new object.
 
 - `s * n`/`n * s`: they are not copied but referenced `n` times.
 
@@ -44,10 +44,28 @@ Out[32]: [1, 23, 2, 4, 5, 'a', 1, 23, 2, 4, 5, 'a', 1, 23, 2, 4, 5, 'a']
 [[3], [3], [3]]
 ```
 
-- slicing
+- slicing `seq[i:j:k]`: empty if `i >= j`; if `i` or `j` > `len(s)`, use `len(s)`.  When `k` is negative, `i` and `j` are reduced to `len(s) - 1` if they are greater than `len(s)`.
 
 - `len(s)`; `min(s)`; `max(s)`
 
 - `s.index(x[, i[, j]])`: inex of the first occurrence of x in s at or after index `i` and before index `j`.
 
 - `s.count(x)`: total number of occurrences of `x` in `s`
+
+## Immutable and Mutable Sequence Types
+
+Immutables support `hash()` so that they can be used as `dict` keys.
+
+Mutables accepts the following operations:
+
+- `del s[i:j]`: `s[i:j] = 0`
+
+- slicing assignment `s[i:j] = t`
+
+- `s.append()`; `s.copy()`;  `s.insert()`; 
+
+- `s.pop()`; `s.remove()`; `s.clear()` (`del s[:]`);
+
+- `s.reverse()`
+
+- `s.extend(t)`; `s += t`; `s * n`;
