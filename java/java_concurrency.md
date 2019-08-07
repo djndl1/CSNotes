@@ -123,3 +123,97 @@ myLock.unlock();
 ```
 
 The lock is called reentrant because a thread can repeatedly acquire a lock that it already owns. The thread has to call unlock for every call to lock in order to relinquish the lock. Because of this feature, code protected by a lock can call another method that uses the same locks. See the [motivation behind it](https://en.wikipedia.org/wiki/Reentrant_mutex).
+
+## Condition Object/Variables
+
+Often, a thread enters a critical section only to discover that it can’t proceed until a condition is fulfilled. Use a condition object to manage threads that have acquired a lock but cannot do useful work.
+
+```java
+// inferior solution
+
+public void transfer(int from, int to, int amount) {
+   bankLock.lock();
+   try {
+      while (accounts[from] < amount) {
+         // unlock and wait
+         . . .
+      }
+      // transfer funds
+      . . .
+   }
+   finally {
+      bankLock.unlock();
+p   } 
+```
+
+ A lock object can have one or more associated condition. There is an essential difference between a thread that is waiting to acquire a lock and a thread that has called await. Once a thread calls the await method, it enters a wait set for that condition. The thread is not made runnable when the lock is available. Instead, it stays deactivated until another thread has called the `signalAll` method on the same condition. When a thread calls `await`, it has no way of reactivating itself.
+
+`signal()` notifies one thread, which can be danger since this thread's condition has not been satisfied, the whole system deadlocks. 
+
+```java
+   public void transfer(int from, int to, double amount) throws InterruptedException
+   {
+      bankLock.lock();
+      try {
+           while (accounts[from] < amount)
+              sufficientFunds.await();
+           System.out.print(Thread.currentThread());
+           accounts[from] -= amount;
+           System.out.printf(" %10.2f from %d to %d", amount, from, to);
+           accounts[to] += amount;
+           System.out.printf(" Total Balance: %10.2f%n", getTotalBalance());
+           sufficientFunds.signalAll();
+        }
+        finally {
+           bankLock.unlock();
+        }
+     }
+```
+
+Every object in Java has an intrinsic lock. If a method is declared with the `synchronized` keyword, the object’s lock protects the entire method. That is, to call the method, a thread must acquire the intrinsic object lock. The instrinsic lock has a single associated condition.
+
+```java
+class Bank
+{
+   private double[] accounts;
+   public synchronized void transfer(int from, int to, int amount) 
+         throws InterruptedException {
+      while (accounts[from] < amount)
+         wait(); // wait on intrinsic object lock's single condition
+      accounts[from] -= amount;
+      accounts[to] += amount;
+      notifyAll(); // notify all threads waiting on the condition
+   }
+   public synchronized double getTotalBalance() { . . . }
+}
+```
+
+It is also legal to declare static methods as synchronized. If such a method is called, it acquires the intrinsic lock of the associated class object. This locks the class object.
+
+Do not use lock, conditions or `synchronized` if possible. There are other mechanism in `java.util.concurrent`. Use `synchronized` first if sufficient. Use Lock/Condition for additional power.
+
+Another way to use the intrinsic lock is to use the synchronized block.
+
+```java
+synchronized (obj) {
+// critical section
+}
+```
+
+It's possible to use an ad-hoc lock
+
+```java
+public class Bank
+{
+   private double[] accounts;
+   private var lock = new Object();
+   . . .
+   public void transfer(int from, int to, int amount) {
+      synchronized (lock) // an ad-hoc lock {
+         accounts[from] -= amount;
+         accounts[to] += amount;
+      }
+      System.out.println(. . .);
+   }
+}
+```
