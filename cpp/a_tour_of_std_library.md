@@ -497,5 +497,81 @@ void user()
 }
 ```
 
-Inter-thread communication is typically controlled by locks or other mechanisms to prevent data reaces (uncontrolled concurrent access to a variable).
+Inter-thread communication is typically controlled by locks or other mechanisms to prevent data races (uncontrolled concurrent access to a variable).
+
+Besides passing an argument directly when constructing a thread, use a functor and pass the argument through its constructor is another method.
+
+There isn't more innovation than C does when returning values from a thread.
+
+```cpp
+void f(const vector<double>& v, double* res);    // take input from v; place result in *res
+
+class F {
+public:
+     F(const vector<double>& vv, double* p) :v{vv}, res{p} { }
+     void operator()();          // place result in *res
+private:
+     const vector<double>& v;    // source of input
+     double* res;                // target for output
+};
+
+double g(const vector<double>&); // use return value
+
+void user(vector<double>& vec1, vector<double> vec2, vector<double> vec3)
+{
+     double res1;
+     double res2;
+     double res3;
+
+     thread t1 {f,cref(vec1),&res1};        // f(vec1,&res1) executes in a separate thread
+     thread t2 {F{vec2,&res2}};             // F{vec2,&res2}() executes in a separate thread
+     thread t3 {[&](){res3 = g(vec3);}};    // capture local variables by reference
+
+     t1.join();
+     t2.join();
+     t3.join();
+
+     cout << res1 << ' ' << res2 << ' ' << res3 << '\n';
+}
+```
+
+## Synchronization
+
+Use of resource handles, such as `scoped_lock` and `unique_lock`, is simpler and far safer than explicitly locking and unlocking mutexes.
+
+```cpp
+mutex m; // controlling mutex
+int sh;  // shared data
+
+void f()
+{
+     scoped_lock lck {m};        // acquire mutex
+     sh += 7;                    // manipulate shared data
+} 
+```
+
+The correspondence between the shared data and a mutex is conventional: the programmer simply has to know which mutex is supposed to correspond to which data.
+
+It is not uncommon to need to simultaneously access several resources to perform some action. This can lead to deadlock. The `scoped_lock` helps by enabling us to acquire several locks simultaneously.
+
+ One of the most common ways of sharing data is among many readers and a single writer. This “reader-writer lock” idiom is supported be `share_mutex`. A reader will acquire the mutex “shared” so that other readers can still gain access, whereas a writer will demand exclusive access.
+ 
+ ```cpp
+ shared_mutex mx;          // a mutex that can be shared
+
+void reader()
+{
+     shared_lock lck {mx};       // willing to share access with other readers
+     // ... read ...
+}
+
+void writer()
+{
+     unique_lock lck {mx};       // needs exclusive (unique) access
+     // ... write ...
+}
+ ```
+
+Locking and unlocking are relatively expensive operations. Modern machines are very good at copying data. Don’t choose shared data for communication because of “efficiency” without thought and preferably not without measurement.
+
 
