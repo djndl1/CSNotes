@@ -123,3 +123,122 @@ myLock.unlock();
 ```
 
 The lock is called reentrant because a thread can repeatedly acquire a lock that it already owns. The thread has to call unlock for every call to lock in order to relinquish the lock. Because of this feature, code protected by a lock can call another method that uses the same locks. See the [motivation behind it](https://en.wikipedia.org/wiki/Reentrant_mutex).
+
+## Condition Object/Variables
+
+Often, a thread enters a critical section only to discover that it can’t proceed until a condition is fulfilled. Use a condition object to manage threads that have acquired a lock but cannot do useful work.
+
+```java
+// inferior solution
+
+public void transfer(int from, int to, int amount) {
+   bankLock.lock();
+   try {
+      while (accounts[from] < amount) {
+         // unlock and wait
+         . . .
+      }
+      // transfer funds
+      . . .
+   }
+   finally {
+      bankLock.unlock();
+p   } 
+```
+
+ A lock object can have one or more associated condition. There is an essential difference between a thread that is waiting to acquire a lock and a thread that has called await. Once a thread calls the await method, it enters a wait set for that condition. The thread is not made runnable when the lock is available. Instead, it stays deactivated until another thread has called the `signalAll` method on the same condition. When a thread calls `await`, it has no way of reactivating itself.
+
+`signal()` notifies one thread, which can be danger since this thread's condition has not been satisfied, the whole system deadlocks. 
+
+```java
+   public void transfer(int from, int to, double amount) throws InterruptedException
+   {
+      bankLock.lock();
+      try {
+           while (accounts[from] < amount)
+              sufficientFunds.await();
+           System.out.print(Thread.currentThread());
+           accounts[from] -= amount;
+           System.out.printf(" %10.2f from %d to %d", amount, from, to);
+           accounts[to] += amount;
+           System.out.printf(" Total Balance: %10.2f%n", getTotalBalance());
+           sufficientFunds.signalAll();
+        }
+        finally {
+           bankLock.unlock();
+        }
+     }
+```
+
+Every object in Java has an intrinsic lock. If a method is declared with the `synchronized` keyword, the object’s lock protects the entire method. That is, to call the method, a thread must acquire the intrinsic object lock. The instrinsic lock has a single associated condition.
+
+```java
+class Bank
+{
+   private double[] accounts;
+   public synchronized void transfer(int from, int to, int amount) 
+         throws InterruptedException {
+      while (accounts[from] < amount)
+         wait(); // wait on intrinsic object lock's single condition
+      accounts[from] -= amount;
+      accounts[to] += amount;
+      notifyAll(); // notify all threads waiting on the condition
+   }
+   public synchronized double getTotalBalance() { . . . }
+}
+```
+
+It is also legal to declare static methods as synchronized. If such a method is called, it acquires the intrinsic lock of the associated class object. This locks the class object.
+
+Do not use lock, conditions or `synchronized` if possible. There are other mechanism in `java.util.concurrent`. Use `synchronized` first if sufficient. Use Lock/Condition for additional power.
+
+Another way to use the intrinsic lock is to use the synchronized block.
+
+```java
+synchronized (obj) {
+// critical section
+}
+```
+
+It's possible to use an ad-hoc lock
+
+```java
+public class Bank
+{
+   private double[] accounts;
+   private var lock = new Object();
+   . . .
+   public void transfer(int from, int to, int amount) {
+      synchronized (lock) // an ad-hoc lock {
+         accounts[from] -= amount;
+         accounts[to] += amount;
+      }
+      System.out.println(. . .);
+   }
+}
+```
+
+## The Monitor Concept
+
+A monitor, with all its fields being private, has an associated lock, which locks all methods in the class, and can have any number of associated conditions. The Java designer loosely adapted the monitor concept. Every object in Java has an intrinsic lock and an intrinsic condition. If a method is declared with the synchronized keyword, it acts like a monitor method. The condition variable is accessed by calling `wait`/`notifyAll`/`notify`.
+
+
+## `volatile`
+
+Computers with multiple processors can temporarily hold memory values in registers or local memory caches. As a consequence, threads running in different processors may see different values for the same memory location! Compilers can reorder instructions for maximum throughput. Compilers won’t choose an ordering that changes the meaning of the code, but they make the assumption that memory values are only changed when there are explicit instructions in the code. However, a memory value can be changed by another thread. 
+
+_Compilers are required to respect locks by flushing local caches as necessary and not inappropriately reordering instructions_. The `volatile` keyword offers a lock-free mechanism for synchronizing access to an instance field.
+
+```java
+private volatile boolean done;
+public boolean isDone() { return done; }
+public void setDone() { done = true; }
+```
+
+The compiler will insert the appropriate code to ensure that a change to the done variable in one thread is visible from any other thread that reads the variable. It does not provide any atomicity. You can declare shared variables as volatile provided you perform no operations other than assignment.
+
+```java
+final var accounts = new HashMap<String, Double>();
+```
+
+Other threads get to see the accounts variable after the constructor has finished. Without using `final`, there would be no guarantee that other threads would see the updated value of accounts—they might all see null, not the constructed `HashMap`.
