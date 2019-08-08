@@ -64,9 +64,13 @@ Also a field separator, as in `$PATH` or in  `/etc/passwd`.
 
 - `$?`: exit status
 
-- `$$`: process ID variable.
+- `$$`: process ID variable of the script itself
 
 - `$!`: PID of last job running in background
+
+```bash
+eval 'kill -9 $!' &> /dev/null
+```
 
 - `()`: command group; a listing of commands within parentheses starts a subshell.
 
@@ -99,11 +103,11 @@ a1b a2b a3b
 - `> &> >& >> < <>`: redirection;
 
 ```bash
-scriptname > filename # redirects the output of `scriptname` to `filename`
-command &> filename # redirects both stdout and stderr of command to filename
+scriptname >filename # redirects the output of `scriptname` to `filename`
+command &>filename # redirects both stdout and stderr of command to filename
 command >&2 # redirects stdout of command to stderr
-scriptnam >> filename # appends the output of scripname to filename
-[i]<> filename # opens filename for reading and writing and assigns file descriptor i to it. If filename does not exist, it is created.
+scriptnam >>filename # appends the output of scripname to filename
+[i]<>filename # opens filename for reading and writing and assigns file descriptor i to it. If filename does not exist, it is created.
 ```
 
 - `<` `>` ascii comparison
@@ -276,6 +280,44 @@ fadfa
 ```
 
 - `TMOUT`: Time out value. Logout after that.
+
+### Typing variables
+
+The `declare`/`typeset` permits modifying the properties of variables, a very weak form of typing.
+
+- `-r`: readonly, `declare -r var1` = `readonly var1`;
+
+```bash
+ djn  debian  ~/FOSS/playground  declare -r a=5
+
+ djn  debian  ~/FOSS/playground  a=3
+-bash: a: readonly variable
+```
+
+- `-i`: integer, trying to assign a string to it will end up getting a `0`.
+
+- `-a`: array
+
+- `-f`: function
+
+- `-x`: export, available for exporting outside the environment of the script itself ; `-x var=$val`
+
+Also, `declare` restricts a variable's scope. If no name is given, `declare` displays the attributes and values of all variables.
+
+### Random integer `$RANDOM`
+
+`$RANDOM` is an internal Bash function that returns a pseudorandom itneger in the range 0 - 32767
+
+Mod a range to limit its upper bound.
+
+```bash
+# generate a binary truth value
+BINARY=2
+number=$RANDOM
+let "number %= $BINARY"
+```
+
+More usage :TODO
 
 ## Quoting
 
