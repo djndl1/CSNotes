@@ -66,6 +66,8 @@ Also a field separator, as in `$PATH` or in  `/etc/passwd`.
 
 - `$$`: process ID variable.
 
+- `$!`: PID of last job running in background
+
 - `()`: command group; a listing of commands within parentheses starts a subshell.
 
 ```bash
@@ -200,7 +202,7 @@ e='' # null value is integer 0
 
 - `Environmental var`: variables that affect the behavior or the shell or user interface
 
-- `$0`, `$1`, `$2`, ..., `${10}`, `$*`/`$@`: positional parameters with the final two denoting all the positional parameters and the first denoting the script's name; `$#`: the number of positional parameters, with `$0` not included.
+- `$0`, `$1`, `$2`, ..., `${10}`, `$*`(a whole string), `$@` (each parameter is a quoted string): positional parameters with the final two denoting all the positional parameters and the first denoting the script's name; `$#`: the number of positional parameters, with `$0` not included.
 
 The last argument is obtained using indirect reference:
 
@@ -224,6 +226,8 @@ $1 <-- $2, $2 <-- $3, $3 <-- $4, ...
 - `BASH_VERSION`: Bash version string 
 
 - `EUID`: effective user ID, whatever identity the current user has assumed. not the same as `UID`.
+
+- `UID`: current user's real id, even if temporarily assumed another identity through `su`.
 
 - `FUNCNAME`: the current function name
 
@@ -257,7 +261,21 @@ $
 
 - `SECONDS`: the number of seconds the script has been running
 
+```bash
+rm .[A-Za-z0-9]*  # delete dotfiles
+rm -f .[^.]* ..?* # remove filenames beginning with multiple dots
+```
 
+- `REPLY`: the default value when a variable is not supplied to `read`.
+
+```bash
+ djn  debian  ~  read
+fadfa
+ djn  debian  ~  echo $REPLY
+fadfa
+```
+
+- `TMOUT`: Time out value. Logout after that.
 
 ## Quoting
 

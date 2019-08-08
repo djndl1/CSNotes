@@ -238,3 +238,6 @@
 - [ ] http://www.catb.org/esr/structure-packing/
 - [ ] https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 
+- [ ] https://code.tutsplus.com/articles/introduction-to-parallel-and-concurrent-programming-in-python--cms-28612
+- [ ] https://hackernoon.com/understanding-the-underscore-of-python-309d1a029edc
+
