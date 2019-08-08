@@ -4,7 +4,7 @@
 
 Most file I/O on a UNIX system can be performed using only five functions: `open`, `read`, `write`, `lseek`, `close`. Each `read` and `write` are unbuffered.
 
-To the kernel, all open files of a process are referred to by file descriptors, a nonnegative integer. By convention, file descriptor `0` is the standard input of a process, `1` the standard input, `2` the standard error. It is not a feature of the UNIX kernel. They should be replaced by the symbolic constants `STDIN_FILENO`, `STDOUT_FILENO` and `STDERR_FILENO`. File descriptors range from 0 through `"OPEN_MAX-1` (On Linux 5.1 the value is 1024).
+To the kernel, all open files of a process are referred to by file descriptors, a nonnegative integer. By convention, file descriptor `0` is the standard input of a process, `1` the standard input, `2` the standard error. It is not a feature of the UNIX kernel. They should be replaced by the symbolic constants `STDIN_FILENO`, `STDOUT_FILENO` and `STDERR_FILENO`. File descriptors range from 0 through `"OPEN_MAX-1` (On Linux 5.1 the value is 1024). 
 
 A file is opened or created by calling either the `open` function or the `openat` function. The file descriptor returned by `open` and `openat` is guaranteed to be the lowest-numbered unused descriptor. `openat` gives threads a way to use relative pathnames to open files in directories other than the CWD and it provides a way to avoid time-of-check-to-time-of-use errors. `O_CREAT` flag creates the file if it doesn't exist.
 
@@ -19,3 +19,60 @@ off_t currpos = lseek(fd, 0, SEEK_CUR); // nonseekable files return -1 and set `
 ```
 
 The standard input is seekable. For regular files, the offset must be non-negative. The file's offset can be greater than the file's current size, in which case the next `write` will extend the file, creating a hole in the file and is allowed. The hole are read back as 0. The hole may or may not have storage on disk (doesn't allocate disk. `ls -lh` and `du` gives different file sizes). On Linux 5.1 64-bit, `off_t` is by default 64-bit long.
+
+Data is read from an open file with the `read` funciton. The number o bytes actually read might be less than the amount requested. Data is writen to an open file with `write` funciton. A common cause for a write error is either filling up a disk or exceeding the file size limit for a given process.
+
+## I/O efficiency
+
+Most file systems support some kind of read-ahead to improve performance. When sequential reads are detected, the system tries to read in more data than an application requests, assuming that the application will read it shortly.
+
+Beware when trying to measure the performance of programs that read and write files. The operating system will try to cache the file incore (in main memory), so if you measure the performance of the program repeatedly, the successive timings will likely be better than the first. 
+
+## File Sharing
+
+The UNIX system supports the sharing of open files among different processes.
+
+Thre kernel uses three data structures to represent an openfile.
+
+- Every process has an entry in the process table, within which is a table of open file descriptors.
+
+- The kernel maintains a file table for all open files, containing the file status flags (read/write/append...), offset, and a pointer to the v-node table entry for the file.
+
+- Each open file has a _v-node_  strcture that contains information about the type of file and pointers to functions that operate on the file. For most files,the v-node also contains the i-node for the file. This information is read from disk when the file is opened. (Linux has a generic filesystem-independent 
+i-node insetead of a v-node).
+
+```bash
+process table entry                             +-----------+
++----|-----+                               +--->-v-node info|
+| fd |     |       file table entry        |    |  v-data+----+
+| 0  |   +-------+  +--------------------+ |    +-----------+ |
++----------+     |  |file status flags   | |                  |
+| fd |     |     +-->current file offset | |                  |
+| 1  |   +----+     | v-node pointer+------+    +-----------+ |
++----------+  |     +--------------------+      |i-node info| |
+|    |     |  |                                 |file size  <-+
+|    |     |  |                                 |           |
+|    |     |  |                                 |i_^node    |
+|    |     |  |     +--------------------+      +-----------+
+|    |     |  |     | file status flags  |
+|    |     |  +-----> current file offset|
+|    |     |  +     | v-node pointer+------+     +----------+
++----|-----+        +--------------------+ |     +v-node info
+                                           +---->+   v-data+-----+
+                                                 +----------+    |
+                                                                 |
+                                                +-----------+    |
+                                                |i-node info|    |
+                                                |file size  <----<
+                                                |           |
+                                                | i_^node   |
+                                                +-----------+
+
+```
+
+Each process that opens the same file gets its own file table entry. Every process has its own file table entry with its own current file offset. The offset changes as the process write. When the offset goes beyond the file size, the i-node entry is set to the current file offset. 
+
+It is possible for more than one file desciptor entry to point to the same file table entry.
+
+To summarize, a file table entry (maintained by the kernel) is associated with a file descriptor of a certain process. The v-nodes are shared, maintained by the kernel.
+
