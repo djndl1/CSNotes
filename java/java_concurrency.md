@@ -217,3 +217,28 @@ public class Bank
    }
 }
 ```
+
+## The Monitor Concept
+
+A monitor, with all its fields being private, has an associated lock, which locks all methods in the class, and can have any number of associated conditions. The Java designer loosely adapted the monitor concept. Every object in Java has an intrinsic lock and an intrinsic condition. If a method is declared with the synchronized keyword, it acts like a monitor method. The condition variable is accessed by calling `wait`/`notifyAll`/`notify`.
+
+
+## `volatile`
+
+Computers with multiple processors can temporarily hold memory values in registers or local memory caches. As a consequence, threads running in different processors may see different values for the same memory location! Compilers can reorder instructions for maximum throughput. Compilers won’t choose an ordering that changes the meaning of the code, but they make the assumption that memory values are only changed when there are explicit instructions in the code. However, a memory value can be changed by another thread. 
+
+_Compilers are required to respect locks by flushing local caches as necessary and not inappropriately reordering instructions_. The `volatile` keyword offers a lock-free mechanism for synchronizing access to an instance field.
+
+```java
+private volatile boolean done;
+public boolean isDone() { return done; }
+public void setDone() { done = true; }
+```
+
+The compiler will insert the appropriate code to ensure that a change to the done variable in one thread is visible from any other thread that reads the variable. It does not provide any atomicity. You can declare shared variables as volatile provided you perform no operations other than assignment.
+
+```java
+final var accounts = new HashMap<String, Double>();
+```
+
+Other threads get to see the accounts variable after the constructor has finished. Without using `final`, there would be no guarantee that other threads would see the updated value of accounts—they might all see null, not the constructed `HashMap`.
