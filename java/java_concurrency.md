@@ -285,3 +285,7 @@ String dateStamp = dateFormat.get().format(new Date());
 ```
 
 The first time you call get in a given thread, the lambda in the constructor is called. From then on, the get method returns the instance belonging to the current thread.
+
+# Thread-Safe Collections
+
+You can protect a shared data structure by supplying a lock, but it is usually easier to choose a thread-safe implementation instead.
