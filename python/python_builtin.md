@@ -69,3 +69,24 @@ Mutables accepts the following operations:
 - `s.reverse()`
 
 - `s.extend(t)`; `s += t`; `s * n`;
+
+### class `list([iterable])`
+
+Lists are mutable sequences, typically used to store collections of homogeneous items. 
+
+- `.sort()`: using `<` comparisons
+
+### class `tuple([iterable])`
+
+Tuples are immutable sequences, typically used to store collections of heterogeneous data. It is actually the comma not the parentheses that makes a tuple.
+
+### `class range()`
+
+an immutable sequences of numbers. The advantage of the range type over a regular list or tuple is that a range object will always take the same (small) amount of memory, no matter the size of the range it represents (as it only stores the start, stop and step values, calculating individual items and subranges as needed).
+
+
+## Text Sequence Type -`str`
+
+Strings are immutable sequences of Unicode code points. There is also no mutable string type, but `str.join()` or `io.StringIO` can be used to efficiently construct strings from multiple fragments.
+
+If neither encoding nor errors is given, `str(object)` returns `object.__str__()`, which is the “informal” or nicely printable string representation of object. If `object` has no `__str__()`, it returns `repr(object)`.
