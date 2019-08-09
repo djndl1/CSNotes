@@ -319,6 +319,38 @@ let "number %= $BINARY"
 
 More usage :TODO
 
+### Manipulating Strings
+
+Bash supports a number of number manipulation operations, though inconsistent and overlapping. Some are a subset of parameter substitution and others fall under the functionality of the UNIX `expr` command.
+
+- `${#string}`; `expr length $string`; `expr "$string" : '.*'` (returns the number of chars matched): get string length
+
+- `expr match "$string" '$substring'`; `expr "$string" : '$substring'`: length of matching sbustring at beginning of string
+
+- `expr index $string $substring`: position of the first char of  `substring` in `string` that matches.
+
+- `${string:position}`; `{string:position:length}`; : string extraction. The position and length arguments can be parameterized and the position can be parenthesized negative (from the right end). Also, it can be used to extract positional parameters.
+
+```bash
+echo $(*:2) # the second and following
+echo $(@:2) # same as above
+echo $(*:2:3) # #2 #3 #4 three positional parameters
+```
+
+- `expr substr $string $position $length`; 
+
+- `expr match "$string" '\($substring\)'`; `expr match "$string" '\($substring\)'`: extract from the beggining of `string`
+
+- `expr match "$string" '.*\($substring\)'`; `expr "$string" : '.*\($substring\)'`: extract from the end of `string`
+
+- `{string#substring}`: deletes shrotest match of `substring` from front of `string`; `${string##substring}`: deletes longest match of `substring` from front of `string`.
+
+- `{string%substring}`: deletes shrotest match of `substring` from back of `string`; `${string%%substring}`: deletes longest match of `substring` from back of `string`.
+
+- `${string/substring/replacement}`: replace the first match; `${string//substring/replacement}`: replace all matches; `${string/#substring/replacement}`: match from front and replace; `${string/%substring/replacement}`: match from back and replace.
+
+A Bash script may invoke the string manipulation facilities of `awk` as an alternative to using its built-in operations.
+
 ## Quoting
 
 Quoting has the effect of protecting special character in teh tring from reinterpretation or expansion by the shell or shell script.
