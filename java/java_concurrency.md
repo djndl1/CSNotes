@@ -223,7 +223,7 @@ public class Bank
 A monitor, with all its fields being private, has an associated lock, which locks all methods in the class, and can have any number of associated conditions. The Java designer loosely adapted the monitor concept. Every object in Java has an intrinsic lock and an intrinsic condition. If a method is declared with the synchronized keyword, it acts like a monitor method. The condition variable is accessed by calling `wait`/`notifyAll`/`notify`.
 
 
-## `volatile`
+## `volatile` and `final`
 
 Computers with multiple processors can temporarily hold memory values in registers or local memory caches. As a consequence, threads running in different processors may see different values for the same memory location! Compilers can reorder instructions for maximum throughput. Compilers won’t choose an ordering that changes the meaning of the code, but they make the assumption that memory values are only changed when there are explicit instructions in the code. However, a memory value can be changed by another thread. 
 
@@ -242,3 +242,46 @@ final var accounts = new HashMap<String, Double>();
 ```
 
 Other threads get to see the accounts variable after the constructor has finished. Without using `final`, there would be no guarantee that other threads would see the updated value of accounts—they might all see null, not the constructed `HashMap`.
+
+## Atomics
+
+There are a number of classes in the `java.util.concurrent.atomic` package that use efficient machine-level instructions to guarantee atomicity of other operations without using locks. There are methods for atomically setting, adding, and subtracting values, but if you want to make a more complex update, you have to use the `compareAndSet` method.
+
+```java
+largest.updateAndGet(x -> Math.max(x, observed));
+```
+
+When multiple threads update a common sum that is used only for later use not for synchronization, use `LongAdder` to avoid high contention. Multiple threads can update different summands, and new summands are automatically provided when the number of threads increases.
+
+```java
+var adder = new LongAdder();
+for (. . .) 
+   pool.submit(() -> {
+      while (. . .) {
+
+         . . .
+         if (. . .) adder.increment(); 
+      }
+   });
+. . . 
+long total = adder.sum();
+```
+
+The `LongAccumulator` generalizes this idea to an arbitrary accumulation operation. In the constructor, you provide the operation, as well as its neutral element. When accumulate is called with value v, then one of them is atomically updated as `ai = ai op v`, where `op` is the accumulation operation written in infix form.
+
+## Deadlock
+
+Unsatisfied conditions blocks all threads and the program eventually hang. Unfortunately, there is nothing in the Java programming language to avoid or break these deadlocks. You must design your program to ensure that a deadlock situation cannot occur.
+
+## Thread-Local Variables
+
+Sometimes it is possible to avoid sharing by giving each thread its own instance, using the `ThreadLocal` helper class.
+
+```local
+public static final ThreadLocal<SimpleDateFormat> dateFormat
+   = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+
+String dateStamp = dateFormat.get().format(new Date());
+```
+
+The first time you call get in a given thread, the lambda in the constructor is called. From then on, the get method returns the instance belonging to the current thread.
