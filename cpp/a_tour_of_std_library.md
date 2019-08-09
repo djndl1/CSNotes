@@ -628,6 +628,7 @@ void g(future<X>& fx)       // a task: get the result from fx
      catch (...) {         // oops: someone couldn't compute v
           // ... handle error ...
      }
+
 }
 ```
 
