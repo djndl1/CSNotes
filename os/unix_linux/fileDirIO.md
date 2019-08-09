@@ -1,7 +1,7 @@
 # I/O
 
 ## Five basic IO functions
-
+p
 Most file I/O on a UNIX system can be performed using only five functions: `open`, `read`, `write`, `lseek`, `close`. Each `read` and `write` are unbuffered.
 
 To the kernel, all open files of a process are referred to by file descriptors, a nonnegative integer. By convention, file descriptor `0` is the standard input of a process, `1` the standard input, `2` the standard error. It is not a feature of the UNIX kernel. They should be replaced by the symbolic constants `STDIN_FILENO`, `STDOUT_FILENO` and `STDERR_FILENO`. File descriptors range from 0 through `"OPEN_MAX-1` (On Linux 5.1 the value is 1024). 
@@ -63,16 +63,36 @@ process table entry                             +-----------+
                                                                  |
                                                 +-----------+    |
                                                 |i-node info|    |
-                                                |file size  <----<
+                                                |file size  <----< 
                                                 |           |
                                                 | i_^node   |
                                                 +-----------+
-
 ```
 
 Each process that opens the same file gets its own file table entry. Every process has its own file table entry with its own current file offset. The offset changes as the process write. When the offset goes beyond the file size, the i-node entry is set to the current file offset. 
 
-It is possible for more than one file desciptor entry to point to the same file table entry.
+It is possible for more than one file desciptor entry to point to the same file table entry. `dup()` and `dup2()` duplicate an existing file descriptor. These duplicated file descriptors share the same file table entry. Another way to duplicate file descriptor is with the `fcntl` function. Opening or creating `/dev/fd/n` is identical to duplicate the corresponding file descriptor. The main use of `/dev/fd/n` is from the shell to allow programs that use pathname arguments to handle standard input and standard output in the same manner as other pathnames.
+
+```bash
+filter file2 | cat file1 /dev/fd/0 file3 | lpr # sometimes a better choice for `-` and pipeline
+```
 
 To summarize, a file table entry (maintained by the kernel) is associated with a file descriptor of a certain process. The v-nodes are shared, maintained by the kernel.
 
+## Atomic Operation
+
+Atomicity here means for IO, the syscall either succeeds or does nothing at all.
+
+The positioning to the current end of file and the write should be an atomic operation with regard to other processes. The UNIX system provides an atomic way to do this if we set the `O_APPEND` when a file is opened. The SUS includes two functions that allow applications to seek and perform I/O atomically: `pread` and `pwrite`.
+
+The `pread()` and `pwrite()` system calls  are  especially  useful  in  multi-threaded  applications.  They allow multiple threads to perform I/O on the same file descriptor without being affected by changes to the file  offset by other threads.
+
+## Cache, delayer write
+
+Traditional implementations of the UNIX System have a buffer cache or page cache in the kernel through which most disk I/O passes. When writing data to a file, the data is normally copied by the kernel into one of its buffers and queued for writing to disk at some later time. 
+
+The `sync`, `fsync` and `fdatasync` are provided to ensure consistency of the file system on disk with the contents of the buffer cache. The function `sync` is normally called periodically (usually every 30 seconds) from a system daemon, often called `update`.
+
+## `ioctl` function
+
+The `ioctl` function has always been the catchall for I/O operations. The system provides generic `ioctl` commands for different classes of devices.
