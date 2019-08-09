@@ -148,7 +148,7 @@ p   }
 
  A lock object can have one or more associated condition. There is an essential difference between a thread that is waiting to acquire a lock and a thread that has called await. Once a thread calls the await method, it enters a wait set for that condition. The thread is not made runnable when the lock is available. Instead, it stays deactivated until another thread has called the `signalAll` method on the same condition. When a thread calls `await`, it has no way of reactivating itself.
 
-`signal()` notifies one thread, which can be danger since this thread's condition has not been satisfied, the whole system deadlocks. 
+`signal()` notifies one thread, which can be dangerous since if this thread's condition has not been satisfied, the whole system deadlocks. 
 
 ```java
    public void transfer(int from, int to, double amount) throws InterruptedException

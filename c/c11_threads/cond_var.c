@@ -29,7 +29,8 @@ int MainTask(void *app)
         struct timespec dura = {.tv_nsec = 100000000};
         App_t *papp = app;
         mtx_lock(&(papp->m_mutex));
-        cnd_wait(&(papp->m_condVar), &(papp->m_mutex));
+        while (!papp->m_bDataLoaded)
+            cnd_wait(&(papp->m_condVar), &(papp->m_mutex));
 
         mtx_unlock(&(papp->m_mutex));
 
