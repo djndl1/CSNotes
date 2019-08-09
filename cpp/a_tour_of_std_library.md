@@ -574,4 +574,85 @@ void writer()
 
 Locking and unlocking are relatively expensive operations. Modern machines are very good at copying data. Don’t choose shared data for communication because of “efficiency” without thought and preferably not without measurement.
 
+The basic support for communicating using external events is provided by condition_variables found in `<condition_variable>`.
 
+```cpp
+// a producer-consumer problem
+class Message {    // object to be communicated
+     // ...
+};
+
+queue<Message> mqueue;         // the queue of messages
+condition_variable mcond;      // the variable communicating events
+mutex mmutex;                  // for synchronizing access to mcond
+
+void consumer()
+{
+     while(true) {
+          unique_lock lck {mmutex};          // acquire mmutex
+          mcond.wait(lck,[] { return !mqueue.empty(); });    // release lck and wait;
+                                                             // re-acquire lck upon wakeup
+                                                             // don't wake up unless mqueue is non-empty
+          auto m = mqueue.front();           // get the message
+          mqueue.pop();
+          lck.unlock();                      // release lck
+          // ... process m ...
+     }
+}
+
+void producer()
+{
+     while(true) {
+          Message m;
+          // ... fill the message ...
+          scoped_lock lck {mmutex};      // protect operations
+          mqueue.push(m);
+          mcond.notify_one();            // notify
+     }                                   // release lock (at end of scope)
+}
+
+```
+
+The standard library provides a few facilities to allow programmers to operate at the conceptual level of tasks rather than directly at the lower level of threads and locks:
+
+- `future` and `promise` for returning a value from a task spawned on a separate thread. To deal with an exception transmitted through a future, the caller of get() must be prepared to catch it somewhere.
+
+```cpp
+void g(future<X>& fx)       // a task: get the result from fx
+{
+     // ...
+     try{
+          X v = fx.get();  // if necessary, wait for the value to get computed
+          // ... use v ...
+     }
+     catch (...) {         // oops: someone couldn't compute v
+          // ... handle error ...
+     }
+}
+```
+
+- `packaged_task` to help launch tasks and connect up the mechanisms for returning a result. It is provided to simplify setting up tasks connected with `future`s and `promise`s to be run on `thread`s. A `packaged_task` provides wrapper code to put the return value or exception from the task into a `promise`. It is a wrapper around a callable object with its `future` and `promise`.
+
+- `async()` for launching of a task in a manner very similar to calling a function. It serves well for a wide range of needs. Basically, async() separates the “call part” of a function call from the “get the result part” and separates both from the actual execution of the task.
+
+```cpp
+double comp4(vector<double>& v)
+     // spawn many tasks if v is large enough
+{
+     if (v.size()<10000)      // is it worth using concurrency?
+           return accum(v.begin(),v.end(),0.0);
+
+     auto v0 = &v[0];
+     auto sz = v.size();
+
+     auto f0 = async(accum,v0,v0+sz/4,0.0);          // first quarter
+     auto f1 = async(accum,v0+sz/4,v0+sz/2,0.0);     // second quarter
+     auto f2 = async(accum,v0+sz/2,v0+sz*3/4,0.0);   // third quarter
+     auto f3 = async(accum,v0+sz*3/4,v0+sz,0.0);     // fourth quarter
+
+     return f0.get()+f1.get()+f2.get()+f3.get(); // collect and combine the results
+}
+```
+
+
+With `async()` you don’t even know how many threads will be used because that’s up to `async()` to decide based on what it knows about the system resources available at the time of a call. Don’t even think of using `async()` for tasks that share resources needing locking.
