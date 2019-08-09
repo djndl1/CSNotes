@@ -578,3 +578,18 @@ let "b32 = 32#77" # base 32
 ```
 
 - C-style `++`, `--` also work. Ternary operator `condition ? a : b` also works.
+
+# Loops and Branches
+
+## Loops 
+
+`for arg in [list]`: the basic looping construct.
+
+```bash
+for arg in [list] # may contain wild cards, entire list enclosed in quotes creates a single variable
+do
+    commands...
+done
+```
+
+Omitting the `in [list]` part causes the loop to operate on `$@`.
