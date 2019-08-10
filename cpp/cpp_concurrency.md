@@ -103,3 +103,106 @@ void run()
 }
 // output:32765 + 924796728 = 924829493
 ```
+
+- `id get_id()` returns the thread's unique ID if running, otherwise returns `thread::id()`. 
+
+```cpp
+// libcxx simply returns the underlying thread identifier and cast it to `thread::id`
+class _LIBCPP_TYPE_VIS thread
+{
+    __libcpp_thread_t __t_;
+
+    thread(const thread&);
+    thread& operator=(const thread&);
+public:
+    typedef __thread_id id;
+    typedef __libcpp_thread_t native_handle_type;
+    //...
+    id get_id() const _NOEXCEPT {return __libcpp_thread_get_id(&__t_);}
+};
+
+__libcpp_thread_id __libcpp_thread_get_id(const __libcpp_thread_t *__t)
+{
+  return *__t;
+}
+// more interestingly, `__thread_id` is just a wrapper around `__libcpp_thread_t` and has only this one data member.
+```
+
+- `bool joinable()`: returns `get_id() != id()`
+
+```cpp
+// in libcxx, id() defaults to 0, after detaching, __t_ is set to zero
+bool joinable() const _NOEXCEPT {return !__libcpp_thread_isnull(&__t_);}
+
+bool __libcpp_thread_isnull(const __libcpp_thread_t *__t) {
+  return *__t == 0;
+}
+```
+
+Exceptions thrown from the thread are local to the executed thread. Either they are caught on spot or are passed to the starting thread.
+
+When a `thread` object is destroyed while its thread function is still running, `terminate` is called, aborting the program's end. 
+
+```cpp
+thread::~thread()
+{
+    if (!__libcpp_thread_isnull(&__t_)) 
+    // That's why the starting thread either joins or detaches the spawned thread, both of which set `__t_` to zero..
+        terminate();
+}
+```
+
+The `thread_local` keyword provides an intermediate data level that is uniquely available to different threads. Global variables declared as `thread_local` are global within each individual thread. `thread_local` is implicitly `static` otherwise it makes no sense to declare a local `thread_local`.
+
+To avoid the following code:
+
+```cpp
+void parent() 
+{
+    thread child{childAction};
+    try {
+        doSomeWork(); // may throw exceptions
+        child.join();
+    } catch (...) {
+        child.join();
+        throw;
+    }
+}
+```
+
+we may consider using RAII, that is, automatically join the thread when going out of scope
+
+```cpp
+class JoinGuard {
+    std::thread d_thread;
+
+public:
+    JoinGuard(std::thread &&threadObj) : d_thread(std::move(threadObj))
+        {}
+
+    ~JoinGuard()
+        {
+            if (d_thread.joinable())
+                d_thread.join();
+        }
+};
+```
+
+```cpp
+void parent()
+{
+    JoinGuard{std::thread{childAction}};
+    doSomeWork();
+}
+
+int main(int argc, char *argv[])
+{
+    try {
+            parent();
+  // may throw exception, but JoinGuard ensures the spawned thread is always joined
+    } catch (...) {
+        // ..
+    }
+    return 0;
+}
+```
