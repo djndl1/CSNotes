@@ -93,6 +93,22 @@ Traditional implementations of the UNIX System have a buffer cache or page cache
 
 The `sync`, `fsync` and `fdatasync` are provided to ensure consistency of the file system on disk with the contents of the buffer cache. The function `sync` is normally called periodically (usually every 30 seconds) from a system daemon, often called `update`.
 
+## `fcntl` function
+
+The `fcntl` function can change the properties of a file that is already open. 
+- Duplicate an existing descriptor
+
+- Get/set file descriptor flags
+
+- Get/set file status flags
+
+- Get/set asynchronous I/O ownership
+
+- Get/set record locks
+
+
+
 ## `ioctl` function
 
 The `ioctl` function has always been the catchall for I/O operations. The system provides generic `ioctl` commands for different classes of devices.
+
