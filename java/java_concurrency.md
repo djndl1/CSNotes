@@ -289,3 +289,18 @@ The first time you call get in a given thread, the lambda in the constructor is 
 # Thread-Safe Collections
 
 You can protect a shared data structure by supplying a lock, but it is usually easier to choose a thread-safe implementation instead.
+
+## Blocking Queues
+
+Many threading problems can be formulated elegantly and safely by using one or more queues. Producer threads insert items into the queue, and consumer threads retrieve them. Instead of having every thread transfer data, insert transfer object into a queue and let one thread handlle the transfers, no synchronization needed.
+
+A blocking queue causes a thread to block when you try to add an element when the queue is currently full or to remove an element when the queue is empty. Blocking queues are a useful tool for coordinating the work of multiple threads. Worker threads can periodically deposit intermediate results into a blocking queue. Other worker threads remove the intermediate results and modify them further. The queue automatically balances the workload.
+
+Use `put` and `take` when using the queue as a thread management tool.
+
+The `java.util.concurrent` package supplies several variations of blocking queues. By default, the `LinkedBlockingQueue` has no upper bound on its capacity, but a maximum capacity can be optionally specified. The `LinkedBlockingDeque` is a double-ended version. The `ArrayBlockingQueue` is constructed with a given capacity and an optional parameter to require fairness. The `PriorityBlockingQueue` is a priority queue, not a first-in/first-out queue. Elements are removed in order of their priority. A DelayQueue contains objects that implement the `Delayed` interface. Elements can only be removed from a DelayQueue if their delay has elapsed. Java 7 adds a `TransferQueue` interface that allows a producer thread to wait until a consumer is ready to take on an item.
+
+
+## Efficient Maps, Sets and Queues
+
+The java.util.concurrent package supplies efficient implementations for maps, sorted sets, and queues: `ConcurrentHashMap`, `ConcurrentSkipListMap`, `ConcurrentSkipListSet`, and `ConcurrentLinkedQueue`.
