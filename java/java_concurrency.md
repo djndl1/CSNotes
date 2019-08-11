@@ -303,4 +303,61 @@ The `java.util.concurrent` package supplies several variations of blocking queue
 
 ## Efficient Maps, Sets and Queues
 
-The java.util.concurrent package supplies efficient implementations for maps, sorted sets, and queues: `ConcurrentHashMap`, `ConcurrentSkipListMap`, `ConcurrentSkipListSet`, and `ConcurrentLinkedQueue`.
+The java.util.concurrent package supplies efficient implementations for maps, sorted sets, and queues: `ConcurrentHashMap`, `ConcurrentSkipListMap`, `ConcurrentSkipListSet`, and `ConcurrentLinkedQueue`. These collections return _weakly consistent iterators_, meaning that these iterators may not reflect all modifications that are made after they were constructed. The concurrent hash map can efficiently support a large number of readers and a fixed number of writers.
+
+To atomically update an entry of a map, use `compute` method:
+
+```java
+map.compute(word, (k, v) -> v == null ? 1 : v + 1);
+```
+
+Also, there are `computeIfPresent` and `computeIfAbsent`.
+
+```java
+map.computeIfAbsent(word, k -> new LongAdder()).increment(); // lazy evaluation
+```
+
+The `.merge()` has a parameter for the initial value if not present in the map. Otherwise the function passed is called, combining the existing value and the initial value.
+
+```java
+map.merge(word, 1L, Long::sum);
+```
+
+# Tasks and Thread Pools
+
+Constructing a new thread is somewhat expensive because it involves interaction with the operating system. If your program creates a large number of short-lived threads, you should not map each task to a separate thread, but use a _thread pool_ instead. A thread pool contains a number of threads that are ready to run. You give a `Runnable` to the pool, and one of the threads calls the run method. When the run method exits, the thread doesn’t die but stays around to serve the next request.
+
+## `Callable`s and `Future`s
+
+A `Runnable` encapsulates a task that runs asynchronously. A `Callable` is similar to a `Runnable` but returns a value.
+
+```java
+public interface Callable<V>
+{
+   V call() throws Exception;
+}
+```
+
+A `Future` holds the result of an asynchronous computation. A computation is started and the `Future` is given. The owner of the `Future` object can obtain the result when it is ready.
+
+```java
+V get()                             // blocks until the computation is finished
+V get(long timeout, TimeUnit unit)  // blocks until the computation is finished or throws a TimeoutExecutation if timed out before the computation finished.
+void cancel(boolean mayInterrupt)   // 
+boolean isCancelled()
+boolean isDone()
+```
+
+If the running thrad is interrupted, both `get`s throw an `InterruptedException`. Also, it is possible to `cancel` the computation. Canceling a task involves two steps. The underlying thread must be located and interrupted. And the task implementation (in the call method) must sense the interruption and abandon its work. If a `Future` object does not know on which thread the task is executed, or if the task does not monitor the interrupted status of the thread on which it executes, cancellation will have no effect.
+
+One way to execute a `Callable` is to use a `FutureTask`, which implements both the `Future` and `Runnable` interfaces:
+
+```java
+Callable<Integer> task = . . .;
+var futureTask = new FutureTask<Integer>(task);
+var t = new Thread(futureTask); // it's a Runnable
+t.start();
+. . .
+Integer result = task.get(); // it's a Future
+// somewhat like a std::packaged_task in C++ except that Future is not explictly got.
+```
