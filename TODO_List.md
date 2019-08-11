@@ -241,3 +241,5 @@
 - [ ] https://code.tutsplus.com/articles/introduction-to-parallel-and-concurrent-programming-in-python--cms-28612
 - [ ] https://hackernoon.com/understanding-the-underscore-of-python-309d1a029edc
 
+- [ ] https://github.com/mtrebi/thread-pool
+- [ ] http://tutorials.jenkov.com/java-concurrency/thread-pools.html
