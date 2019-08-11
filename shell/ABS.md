@@ -343,17 +343,55 @@ echo $(*:2:3) # #2 #3 #4 three positional parameters
 
 - `expr match "$string" '.*\($substring\)'`; `expr "$string" : '.*\($substring\)'`: extract from the end of `string`
 
-- `{string#substring}`: deletes shrotest match of `substring` from front of `string`; `${string##substring}`: deletes longest match of `substring` from front of `string`.
+- `{string#substring}`: deletes shortest match of `substring` from front of `string`; `${string##substring}`: deletes longest match of `substring` from front of `string`.
 
-- `{string%substring}`: deletes shrotest match of `substring` from back of `string`; `${string%%substring}`: deletes longest match of `substring` from back of `string`.
+- `{string%substring}`: deletes shortest match of `substring` from back of `string`; `${string%%substring}`: deletes longest match of `substring` from back of `string`.
 
 - `${string/substring/replacement}`: replace the first match; `${string//substring/replacement}`: replace all matches; `${string/#substring/replacement}`: match from front and replace; `${string/%substring/replacement}`: match from back and replace.
 
 A Bash script may invoke the string manipulation facilities of `awk` as an alternative to using its built-in operations.
 
+## Parameter Substitution
+
+- `${parameter}`: may be used to concatenating variables with strings
+
+```bash
+echo ${USER}-${HOSTNAME}
+//djn-debian
+```
+
+- `${parameter-default}`, `${parameter:-default}` (`:` make a difference only when `parameter` has been declared but is null): if `parameter` not set (`:` adds null), _return_ `default`.
+
+```bash
+$ echo ${abd-$USER}
+djn
+$ echo ${HOME-$USER}
+/home/djn
+
+ djn  debian  ~  abd=
+
+ djn  debian  ~  echo ${abd-$USER}
+
+
+ djn  debian  ~  echo ${abd:-$USER}
+djn
+```
+
+The default parameter construct finds use in providing missing comman-line arguments in scripts.
+
+- `${parameter=default}`: if parameter not set, set it to default; `${parameter:=default}`: if parameter not set or null, _set it to default.
+
+- `${parameter+alt_value}`: if parameter set, use `alt_value`, else use null string; `${parameter:+alt-value}`: if parameter set and not null, use `alt-value`, else use null string.
+
+- `${parameter?err_msg}`: if parameter set, use it, else print `err_msg` and abort the script with exit status of 1.; `${parameter:?err_msg}`: if parameter set and not null, above.
+
+- `${#array[*]}`/ `${#array[#]}`: the number of elements in the array.
+
+- `${!varprefix*}`, `${!varprefix@}`: matches names of all previously declared variables beginning with `varprefix`.
+
 ## Quoting
 
-Quoting has the effect of protecting special character in teh tring from reinterpretation or expansion by the shell or shell script.
+Quoting has the effect of protecting special character in the string from reinterpretation or expansion by the shell or shell script.
 
 When referencing a variable, it is generally advisable to enclose its name in double quotes, which prevents reinterpretation of all special charactes within the quoted string, except `$`, ```(backquote) and `\`(escape). Use double quotes to prevent word splitting.
 
