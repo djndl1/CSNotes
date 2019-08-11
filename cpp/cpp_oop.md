@@ -450,7 +450,7 @@ About two different `new`, see
 
 - [operator new and new expression](https://stackoverflow.com/questions/1885849/difference-between-new-operator-and-operator-new)
 
-POD types without constructors are guaranteed to initialized to zero unless adding the brackets `()`. If the struct has a default data member initializer, `()` initializes the POD data to that. Objects of arrays are initialized using their constructors (with the default constructors only).
+POD types without constructors are not guaranteed to initialized to zero unless adding the brackets `()`. If the struct has a default data member initializer, `()` initializes the POD data to that. Objects of arrays are initialized using their constructors (with the default constructors only).
 
 It's totally legal and safe to create `new int[0]` (and `malloc(0)`, both of which returns nonzero pointers under glibc and musl).
 
@@ -486,4 +486,27 @@ Raw memory is made available by `operator new(sizeInBytes)` and also by `operato
 
 Placement `new` is declared in `<memory>` header. Placement `new` is passed an existing block of memory into which `new` initializes an object or value (placing the object in a certain place in memory). 
 
+```cpp
+type *new(void *memory) type{arguments};
+```
+
 TODO
+
+## The Destructor
+The destructors of dynamically allocated objects are not automatically activated and when a program is interrupted by an `exit` call, destructors of locally defined objects by functions are not called, only globally initialized objects are called (which is a good reason why C++ should avoid `exit()`).
+
+A destructor's main task is to ensure that memory allocated by an object is properly returned when the object ceases to exist.
+
+Destructors are only called for fully constructed objects (at least one of its constructors normally completes). Destructors are called:
+
+- destructors of static or global objects are called when the program itself terminates;
+
+- when a dynamically allocated object or arrayis `delete`d;
+
+- when explicitly called;
+
+- destructors of local non-static objects are called automatically when th execution flow leaves the _block in which they are defined_; the destructors of objects defined in the outer block of a function are called just before the function terminates.
+
+One of the advantage of the operators `new` and `delete` over functions like `malloc` and `free` is that they call the corresponding object constructors and destructors. However, the pointer returned by `new` and `new type[]` is indistinguishable. `delete`ing an array of objects allocated by `new type[]` only destroys the first one. Conversely, `delete[]` an object allocated by `new` may cause the program to crash.
+
+The C++ run-time system ensures that when memory allocation fails an error function is activated. By default it throws a `bad_alloc` exception, terminating the program, thus no need to check the return value of `new`. The handler can be defined by users using `set_new_handler()`.
