@@ -1,7 +1,8 @@
+
 # I/O
 
 ## Five basic IO functions
-p
+
 Most file I/O on a UNIX system can be performed using only five functions: `open`, `read`, `write`, `lseek`, `close`. Each `read` and `write` are unbuffered.
 
 To the kernel, all open files of a process are referred to by file descriptors, a nonnegative integer. By convention, file descriptor `0` is the standard input of a process, `1` the standard input, `2` the standard error. It is not a feature of the UNIX kernel. They should be replaced by the symbolic constants `STDIN_FILENO`, `STDOUT_FILENO` and `STDERR_FILENO`. File descriptors range from 0 through `"OPEN_MAX-1` (On Linux 5.1 the value is 1024). 
@@ -95,6 +96,8 @@ The `sync`, `fsync` and `fdatasync` are provided to ensure consistency of the fi
 
 ## `fcntl` function
 
+
+
 The `fcntl` function can change the properties of a file that is already open. 
 - Duplicate an existing descriptor
 
@@ -112,3 +115,102 @@ The `fcntl` function can change the properties of a file that is already open.
 
 The `ioctl` function has always been the catchall for I/O operations. The system provides generic `ioctl` commands for different classes of devices.
 
+# Files and Directories
+
+Given a pathname, the `stat` function returns a structure of information about the named file. The `fstat` function obtains information about the file that is already opened on the descriptor `fd`. The `lstat` function can `stat`s symbolic links. The `fstatat` funciton provides a way to return the file statistics for a pathname relative to an open directory represented by the `fd` argument.
+
+```c
+struct stat {
+    dev_t     st_dev;         /* ID of device containing file */
+    ino_t     st_ino;         /* Inode number */
+    mode_t    st_mode;        /* File type and mode */
+    nlink_t   st_nlink;       /* Number of hard links */
+
+    uid_t     st_uid;         /* User ID of owner */
+    gid_t     st_gid;         /* Group ID of owner */
+
+    dev_t     st_rdev;        /* Device ID (if special file) */
+    
+    off_t     st_size;        /* Total size, in bytes */
+    blksize_t st_blksize;     /* Block size for filesystem I/O */
+    blkcnt_t  st_blocks;      /* Number of 512B blocks allocated */
+
+    struct timespec st_atim;  /* Time of last access */
+    struct timespec st_mtim;  /* Time of last modification */
+    struct timespec st_ctim;  /* Time of last status change */
+};
+```
+
+```c
+struct timespec {
+    time_t          tv_sec;     // elaped time in whole seconds
+    long            tv_nsec;    // the rest of the elapsed time in nanoseconds
+};
+```
+
+## File types
+
+```c
+    mode_t    st_mode;        /* File type and mode */
+```
+
+A file on a UNIX system can be a
+
+- regular file, with no distinction of text or data type. Any interpretation is left to the application.
+
+- directory file: a file that contains the names of other files and pointers to information on these files. Only the kernel can write directly to a directory file.
+
+- block special file: a type of file providing buffered I/O access in fixed-size units to devices such as disk drives.
+
+- character special file: a type of file providing unbuffered I/O access in _variable-sized_ units to devices.
+
+- FIFO/named pipe: a type of file used for communication between processes
+
+- Socket: a type fo file for network communication between processes, also for non-network communication between processes on a single host.
+
+- Symbolic link
+
+All devices on a system are either block special files or character special files.
+
+The type of a file can be determined using macros.
+
+```c
+S_ISREG()
+S_ISDIR()
+S_ISCHR()
+S_ISBLK()
+S_ISFIFO()
+S_ISLNK()
+S_ISSOCK()
+```
+
+## Permissions, Ownership and Groups
+
+```c
+   uid_t     st_uid;         /* User ID of owner */
+   gid_t     st_gid;         /* Group ID of owner */
+```
+
+Every process has six or more IDs associated with it
+
+- real user ID; real group ID
+
+- effective user ID; effective group ID; supplementary group IDs
+
+- saved set-user-ID; saved set-group-ID
+
+TODO
+
+## File Size and Trucation
+
+```c
+    off_t     st_size;        /* Total size, in bytes */
+    blksize_t st_blksize;     /* Block size for filesystem I/O */
+    blkcnt_t  st_blocks;      /* Number of (typically 512B) blocks allocated */
+```
+
+This field is meaningful only for regular files, directories and symbolic links. A regular file of size 0 is allowed. The file size of a symbol link is the nubmer of bytes in the filename it points to.
+
+`truncate()` and `ftruncate()` truncate an existing file to a specified size (may increase the size).
+
+## File Systems
