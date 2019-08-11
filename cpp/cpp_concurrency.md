@@ -206,3 +206,34 @@ int main(int argc, char *argv[])
     return 0;
 }
 ```
+
+# Synchronization
+
+Objects of mutex classes are used to protect shared data. The members of mutex classes perform atomic actions: no context switch occurs while they are active. Although mutexes can directly be used in programs, this rarely happened. It is more common to embed mutex handling in locking classes that make sure that the mutex is automatically unlocked again when the mutex lock is no longer needed.
+
+Classes `std::timed_mutex` and `std::timed_recurisve_mutex` are available for delayed lock release.
+
+The destructor of class `mutex` does not unlock a mutex. A `system_error` is thrown when relocking a non-recursive mutex or unlocking a lock not owned by the thread. `try_lock()` tries to obtain ownership of the mutex and returns `false` if failed. Timed mutexes can also try to obtain ownership of the mutex within the specified time interval and can keep the mutex until a specified time point has passed.
+
+When using a singleton concurrently, multiple instances may be constructed by different threads at the same time. Mutexes may be used but it's expensive. Another method is to use `std::call_once`.
+
+```cpp
+class Singleton {
+    static std::once_flag s_once;
+    static Singleton *s_singleton;
+    ...
+
+    public:
+    static Singleton *instance()
+        {
+            std::call_once(s_once, []{s_singleton = new Singleton;});
+            return s_singleton;
+            
+        }
+};
+```
+
+A `constexpr`, if statisfying the requirements for constant initialization, is guaranteed to be initialized before any code is run as part of the static initialization. A static variable defined within a compound statement are initialized the first time the function is called at the point in the code where the static variable is defined. This feature causes a thread to wait automatically if another thread is still initializing the static data (by C++ standard).
+
+(C++17) The class `shared_mutex` provides a non-recursive mutex with shared ownership semantics. Multiple threads can simultaneously hold a shared lock ownership of a `shared_mutex` type of object. But no thread can hold a shared lock while another thread holds an exclusive lock on the same `shared_mutex` object and vice versa.
+
