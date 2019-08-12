@@ -621,6 +621,7 @@ let "b32 = 32#77" # base 32
 
 ## Loops 
 
+### `for`-loop
 `for arg in [list]`: the basic looping construct.
 
 ```bash
@@ -631,3 +632,185 @@ done
 ```
 
 Omitting the `in [list]` part causes the loop to operate on `$@`.
+
+`seq` is a useful range command when using with `for`-loop, or use `{m..n}`
+
+```bash
+for a in {1..10}
+for a in `seq 10`
+```
+
+It is possible to use C-like `for`-loop:
+
+```bash
+for ((a=1; a <= LIMIT ; a++))
+do
+    echo -n "$a"
+done
+```
+
+`do` and `done` can even be replaced by curly brackets in certain contexts
+
+```bash
+for ((n=1; n<=10; n++))
+{
+    echo -n "$n "
+}
+```
+
+### `while`-loop
+
+```bash
+while [ condition ]
+do
+    commands
+done
+```
+
+A `while`-loop may have multiple conditions. Only the final condition determines when the loop  terminates.
+
+```bash
+var1=unset
+previous=$var1
+while echo "previous-variable = $previous"
+      echo
+      previous=$var1
+      [ "$var1" != end ]
+do
+echo "Input variable #1 (end to exit) "
+    read var1
+    echo "variable #1 = $var1"
+done
+```
+
+A `while`-loop may employ C-style syntax  by using the double-parentheses construct.
+
+```bash
+((a = 1))
+while ((a <= LIMIT))
+do
+    echo -n "$a "
+    ((a+=1))
+done
+```
+
+Inside its test brackets, a `while`-loop can call a function
+
+```bash
+t=0
+condition ()
+{
+    ((t++))
+    if [ $t -lt 5 ]
+    then
+        return 0 # true
+    else
+        return 1 # false
+    fi
+}
+while condition
+do
+    echo "Still going: t = $t"
+done
+```
+
+`while` has similar behavior of condition test to `if`
+
+```bash
+while read line
+do
+    ...
+done
+```
+
+### `until`-loop
+
+```bash
+until[ condition is true ]
+do 
+    commands
+done
+```
+
+An `until`-loop permits C-like test constructs
+
+```bash
+until [ "$var" = "end" ]
+do
+    read var
+    echo "var = $var"
+done
+
+until (( var > LIMIT ))
+do
+    echo -n "$var "
+    ((var++))
+done
+```
+
+Bash `for`-loop is more loosely structured and more flexible than its equivalent in other languages. Therefore, feel free to use whatever type of loop gets the job done in the simplest way.
+
+## Loop Control
+
+`break` and `continue` loop control commands correspond exactly to their counterparts in other programming languages. `break` may optionally take a parameter to break out of N levels of loop. A `continue N` terminates all remaining iterations at its loop and continues with the next iteration at the loop N levels above (however, it's tricky to use in any meaningful context, better to avoid).
+
+```bash
+for outer in I II III IV V
+do
+    echo; echo -n "Group $outer"
+    for inner in `seq 10`
+    do
+        if [[ "$inner" -eq 7 && "$outer" = "III" ]]
+        then
+            continue 2
+        fi
+        
+        echo -n "$inner " # 7 8 9 10 will not echo on "Group III."
+    done
+done
+```
+
+## Testing and Braching
+
+```bash
+case "$var" in
+    "$condition1")
+    commands...
+    ;;
+    
+    "$condition2")
+    commands...
+    ;;
+esac
+```
+
+```bash
+case "$Kerpress" in 
+    [[:lower:]] ) echo "lowercase"
+    [[:upper:]] ) echo "uppercase"
+    [0-9] ) echo "Digit"
+    * ) echo "Punctuation, whitespace, or other"
+esac
+```
+
+A use of `case` involves testing for command line parameters.
+
+```bash
+while [ $# -gt 0 ]
+do
+    case "$1" in
+        -d|--debug)
+                DEBUG=1
+                ;;
+        -c|--conf)
+                CONFFILE="$2"
+                shift
+                if [ ! -f $CONFFILE ]; then
+                    echo "Error: Supplied file doesn't exist!"
+                    echo 2
+                file
+                ;;
+    esac
+    shift
+done
+```
