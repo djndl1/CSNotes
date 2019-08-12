@@ -34,3 +34,73 @@ One thread can request that another in the same process be canceled by calling  
 ```
 
 A thread's underlying storage can be reclaimed immediately on termination if the thead has been detached without the need for another thread to join with the terminated thread.
+
+# Thread Synchronization
+
+When mutliple threads of control share the same memory, we need to make sure that each thread sees a consistent view of its data. To solve the problem, the threads have to use a lock that will allow only one thread to access the variable at a time. If the modification is atomic, then there isn't a race. If our data always appears to be _sequentially consistent_, then no synchronization is needed.  In modern computer systems, memory accesses take multiple bus cycles, and multiprocessors generally interleave bus cycles among multiple processors, so we aren’t guaranteed that our data is sequentially consistent.
+
+## Mutexes
+
+We can protect our data and ensure access by only one thread at a time by using the pthreads mutual-exclusion interfaces. A _mutex_ is basically a lock that we set before accessing a shared resources and release (unlock) when we're done. While it is set, any other thread that tries to set it will block until we release it. 
+
+The mutual-exclusion mechanism works only if we design our threads to follow the same data-aceess rules. If we allow one thread to access a shared resource without first acquiring a lock, t hen inconsistencies can occur even though the rest of our threads do acquire the lock before attempting to access the shared resource.
+
+A mutex variable is represented by the `pthread_mutex_t` dat type. Initialize a mutex by
+
+- setting it to `PTHREAD_MUTEX_INITIALIZER` if it is statisically allocated;
+
+- calling `pthread_mutex_init`.
+
+`pthread_mutex_destroy()` is neede before freeing the memory if a mutex is dynamically allocated.
+
+`pthread_mutex_lock` locks a mutex. `pthread_mutex_unlock` unlocks a mutex. If a thread cannot afford to block, it can use `pthread_mutex_tryblock` to lock the mutex conditionally.
+
+```c
+#include <pthread.h>
+#include <stdlib.h>
+
+// a dynamically allocated object
+struct foo {
+        int f_count;            // reference count to ensure that memory is not freed before all threads are done using it.
+        pthread_mutex_t f_lock; // protect in multithreading
+        int f_id;
+        // more stuff can go here
+};
+
+struct foo *foo_alloc(int id)
+{
+        struct foo *fp;
+
+        if ((fp = malloc(sizeof(struct foo))) != NULL) {
+                fp->f_count = 1; 
+                fp->f_id = id;
+                if (pthread_mutex_init(&fp->f_lock, NULL) != 0) {
+                        free(fp);
+                        return (NULL);
+                }
+        }
+        return fp;
+}
+
+void foo_hold(struct foo *fp)
+{
+        pthread_mutex_lock(&fp->f_lock);
+        fp->f_count++;
+        pthread_mutex_unlock(&fp->f_lock);
+}
+
+void foo_rele(struct foo *fp)
+{
+        pthread_mutex_lock(&fp->f_lock);
+        // release the reference count when a thread is done
+        if (--fp->f_count == 0) {
+                // no need to keep the object when no thread is using it.
+                pthread_mutex_unlock(&fp->f_lock);
+                pthread_mutex_destroy(&fp->f_lock);
+                free(fp);
+        } else {
+                pthread_mutex_unlock(&fp->f_lock);
+        }
+}
+```
+
