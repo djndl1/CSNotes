@@ -323,6 +323,36 @@ The `.merge()` has a parameter for the initial value if not present in the map. 
 map.merge(word, 1L, Long::sum);
 ```
 
+The Java API provides bulk operations on concurrent hash maps that can safely execute even while other threads operate on the map. The bulk operations traverse the map and operate on the elements they find as they go along. 
+
+- `search`
+
+- `reduce`: combines all keys and/or value, using a provided accumulation function
+
+- `forEach`: applies a function to all keys and/or values
+
+It is possible to specify a parallelism threshold so that the bulk operation is parallelized when the map contains more elements than the threshold.
+
+```java
+String result = map.search(threshold, (k, v) -> v > 1000 ? k : null);
+map.forEach(threshold, (k, v) -> k + " -> " + v, System.out::println);
+Long sum = map.reduceValues(threshold, Long::sum);
+
+Integer maxlength = map.reduceKeys(threshold,
+   String::length, // transformer
+   Integer::max); // accumulator
+```
+
+There is no `ConcurrentHashSet` class, The static `newKeySet` method yields a `Set<K>` that is actually a wrapper around a `ConcurrentHashMap<K, Boolean>`. (All map values are `Boolean.TRUE`).
+
+```java
+Set<String> words = ConcurrentHashMap.<String>newKeySet();
+```
+
+The `CopyOnWriteArrayList` and `CopyOnWriteArraySet` are thread-safe collections in which all mutators make a copy of the underlying array so that iterators have consistent view that it can access without any synchronization expense.
+
+The `Arrays` class has a number of parallelized operations. The static `Arrays.parallelSort` method can sort an array of primitive values or objects. The `parallelSetAll` method fills an array with values that are computed from a function. `parallelPrefix` method replaces each array element with the accumulation of the prefix for a given associative operation.
+
 # Tasks and Thread Pools
 
 Constructing a new thread is somewhat expensive because it involves interaction with the operating system. If your program creates a large number of short-lived threads, you should not map each task to a separate thread, but use a _thread pool_ instead. A thread pool contains a number of threads that are ready to run. You give a `Runnable` to the pool, and one of the threads calls the run method. When the run method exits, the thread doesn’t die but stays around to serve the next request.
@@ -361,3 +391,7 @@ t.start();
 Integer result = task.get(); // it's a Future
 // somewhat like a std::packaged_task in C++ except that Future is not explictly got.
 ```
+
+## Executors
+
+The `Executors` class has a number of static factory methods for constructing thread pools.
