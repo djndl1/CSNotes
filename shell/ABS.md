@@ -772,6 +772,8 @@ done
 
 ## Testing and Braching
 
+### `case`
+
 ```bash
 case "$var" in
     "$condition1")
@@ -814,3 +816,17 @@ do
     shift
 done
 ```
+
+### `select`
+
+`select` prompts the user to enter one of the choices presented in the variable list.
+
+```bash
+select var [ in list ]
+do
+    commands
+    break
+done
+```
+
+If `in list` is ommited, then `select` uses the list of command line arguments passed to the script or the function containing the `select` construct.
