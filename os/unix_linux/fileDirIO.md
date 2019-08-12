@@ -197,9 +197,33 @@ Every process has six or more IDs associated with it
 
 - effective user ID; effective group ID; supplementary group IDs
 
-- saved set-user-ID; saved set-group-ID
+- saved set-user-ID; saved set-group-ID: contain copies of the effective user ID and the effective group ID, respectively when a program is executed.
 
-TODO
+the set-user-ID bit and the set-group-ID bit causes the effective user/group ID to be the user/group ID of the owner. These two bits are in `st_mode` and can be tested against the constants `S_ISUID` and `S_ISGID`.
+
+The `st_mode` value also encodes the access permission bits of the file. There are a few rules about permissions besides the obvious ones.
+
+- To access a file under a directory, the user must have execute permission to the directory and directories above. The execute permission bit for a directory is often called the _search_ bit.
+
+- we must have write permission for a file to specify the `O_TRUNCATE` flag.
+
+- To create a new file in a directory, write permission and execute permission for the directory are required.
+
+- to delete an existing file in a directory, write permission and execute permission for the directory are required but read permission or write permission for the file itself are unnecessary.
+
+```bash
+ djn  debian  ~/FOSS/playground/perm  lh
+Permissions Size User Date Modified Name
+.---------     5 djn  13 Aug  0:30  a.txt
+
+ djn  debian  ~/FOSS/playground/perm  rm a.txt 
+rm: remove write-protected regular file 'a.txt'? y
+
+```
+
+The file access tests that the kernel performs each time a process opens, creates, or deletes a file depend on the owner of the file (`st_uid` and `st_gid`), the effective IDs of the process and the supplementary gorup ID of the process (if the effective group ID of the process or one of the supplementary group IDs of the process equals the group ID of the file, access is allowed if the appropriate group access permission bit is set). The test order is superuser ID, effective user ID, group IDs and other access permission. If the process owns the file, access is granted or denied only based on the user access permissions.
+
+The user ID of a new file is set to the effective user ID of the process. The group ID of a new file can be the effective group ID of the process or the group ID of the directory in which the file is being created depending on the implementation. On Linux, this is determined by whether the set-group-ID bit is set. If it's set, then the permission is copied from the directory (the subdirectory will be set-group-ID automatically), otherwise it's set to the effective group ID of the process.
 
 ## File Size and Trucation
 
