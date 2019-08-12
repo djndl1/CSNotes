@@ -510,3 +510,32 @@ Destructors are only called for fully constructed objects (at least one of its c
 One of the advantage of the operators `new` and `delete` over functions like `malloc` and `free` is that they call the corresponding object constructors and destructors. However, the pointer returned by `new` and `new type[]` is indistinguishable. `delete`ing an array of objects allocated by `new type[]` only destroys the first one. Conversely, `delete[]` an object allocated by `new` may cause the program to crash.
 
 The C++ run-time system ensures that when memory allocation fails an error function is activated. By default it throws a `bad_alloc` exception, terminating the program, thus no need to check the return value of `new`. The handler can be defined by users using `set_new_handler()`.
+
+## The assignment operator
+
+In C++, struct and clas type objects can be directly assigned new values in the same way as in C. The default action of such an assignment for non-class type data members is a straight byte-by-byte copy from one data member to another.
+
+Operator overloading should be used in situations whre an operator has a defiend action but this default action has undesired side effects in a given context. It should be commonly applied and no surprise is introduced when it's redefined.
+
+Operator overloaded can be used explicitly and must be used explictly when you want to call the overloaded operator from a pointer to an object.
+
+```cpp
+Person *tmp = new Person
+```
+
+### `this` pointer
+
+A member function of a given class is always called in combination with an object of its class. There
+is always an implicit ‘substrate’ for the function to act on. C++ defines a keyword, `this`, to reach this
+substrate. The `this` pointer is implicitly declared by every member function. 
+
+A overloaded assignment operator should return `*this`. 
+
+Overloaded operators may themseles be overloaded. 
+
+```cpp
+// in std::string
+operator=(std::string const &rhs);
+operator=(char const *rhs);
+...
+```
