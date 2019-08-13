@@ -395,3 +395,66 @@ Integer result = task.get(); // it's a Future
 ## Executors
 
 The `Executors` class has a number of static factory methods for constructing thread pools.
+
+- `newCachedThreadPool`: new threads are created as needed; idle threads are kept for 60 seconds;
+
+- `newFixedThreadPool`: The pool contains a fixed set of threads; idle threads are kept indefinitely;
+
+- `newWorkStealingPool`: A pool suitable for “fork-join” tasks in which complex tasks are broken up into simpler tasks and idle threads “steal” simpler tasks;
+
+- `newSingleThreadExecutor`: A “pool” with a single thread that executes the submitted tasks sequentially;
+
+- `newScheduledThreadPool`: A fixed-thread pool for scheduled execution;
+
+- `newSingleThreadScheduledExecutor`: A single-thread “pool” for scheduled execution.
+
+Submit a Runnable or Callable to an ExecutorService with one of the following methods:
+
+```bash
+Future<T> submit(Callable<T> task)
+Future<?> submit(Runnable task)
+Future<T> submit(Runnable task, T result)
+```
+
+`shutdown` initiates the shutdown sequence for the pool. An executor that is shut down accepts no new tasks. When all tasks are finished, the threads in the pool die. If `shutdownNow` is called, the pool then cancels all tasks that have not yet begun.
+
+The `ScheduledExecutorService` interface has methods for scheduled or repeated execution of tasks. It is a generalization of `java.util.Timer` that allows for thread pooling.
+
+An executor can be used to control a group of related tasks. `invokeAny` method submits all objects in a collection of `Callable` objects and returns the result of a completed task. `invokeALl` executes the given tasks, returning a list of `Future`s holding their status and results when all complete.
+
+```java
+List<Callable<T>> tasks = . . .;
+List<Future<T>> results = executor.invokeAll(tasks);
+for (Future<T> result : results)
+   processFurther(result.get()); // blocks until the result of the first task is available
+```
+
+A better way is to use `ExecutorCompletionService` manages a blocking queue of `Future` objects, containing the results of the submitted tasks as they become available.
+
+```java
+var service = new ExecutorCompletionService<T>(executor);
+for (Callable<T> task : tasks) service.submit(task);
+for (int i = 0; i < tasks.size(); i++)
+   processFurther(service.take().get()); // take the Future once the result is available
+```
+
+
+## Asynchronous Computations
+
+## Processes
+
+`Process` class executes a command (which cannot be a shell built-in) in a separate operating system process and intereacts with its own standard input, output and error streams. `ProcessBuild` class configures a `Process` object. 
+
+```java
+var builder = new ProcessBuilder("gcc", "myapp.c");
+```
+
+`.directory()` changes the `directory` method. `getOutputStream()`, `getInputStream()` and `getErrorStream()` returns stdout, stdin and stderr by default. `.redirectIO` is possible.
+
+To modify the environment variables of the process, get the `environment` from the builder and put or remove entries. 
+
+(Java 9) offers a `startPipeline` (shell `|`), which accepts a list of process builders and chains them together.
+
+`start` fires up a process and `waitFor` waits for the process to finish and returns its exit value.
+
+`ProcessHandle` gets more information about a process that the program started. It can get its process ID, its parent process, its children, and descendants.
