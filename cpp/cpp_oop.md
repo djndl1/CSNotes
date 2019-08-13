@@ -513,7 +513,7 @@ The C++ run-time system ensures that when memory allocation fails an error funct
 
 ## The assignment operator
 
-In C++, struct and clas type objects can be directly assigned new values in the same way as in C. The default action of such an assignment for non-class type data members is a straight byte-by-byte copy from one data member to another.
+In C++, struct and class type objects can be directly assigned new values in the same way as in C. The default action of such an assignment for non-class type data members is a straight byte-by-byte copy from one data member to another.
 
 Operator overloading should be used in situations whre an operator has a defiend action but this default action has undesired side effects in a given context. It should be commonly applied and no surprise is introduced when it's redefined.
 
@@ -539,3 +539,57 @@ operator=(std::string const &rhs);
 operator=(char const *rhs);
 ...
 ```
+
+### Copy Constructor
+
+Besides explicit copy construction, copy constructors are called when pass by value or return by value.
+
+```cpp
+String copy(Strings const &store)
+{
+    return store; // a temporary `Strings`' object is constructed.
+}
+```
+
+More at [return value and constructors](https://stackoverflow.com/questions/13430831/should-i-return-an-rvalue-reference-by-stdmoveing) and copy elision
+ [Should I return by rvalue reference](https://stackoverflow.com/questions/29332516/return-rvalue-reference-vs-return-by-value-in-function-return-type)
+ [Member function ref-qualifier](https://stackoverflow.com/questions/8610571/what-is-rvalue-reference-for-this)
+
+### Swapping
+
+The copy assigment may be implemented generically as
+
+```cpp
+void Strings::swap(Strings &other)
+{
+    swap(d_string, other.d_string);
+    swap(d_size, other.d_size);
+}
+
+Strings &operator=(Strings const &other)
+{
+    Strings tmp{other};
+    swap(tmp);
+    return *this;
+}
+```
+
+Many classes offer `swap` members allowing to swap two of their objects. STL offers variaous functions related to swapping and a generic `std::swap`.
+
+When implementing a `swap` member function, it is not always a good idea to swap every data member of a class, like when in a linked list or a data member referring/pointing to another data member in the same object. Simple swapping operations must be avoided when data members point or refer to data that is involved in the swapping.
+
+Sometimes, a `swap` implementation using `memcpy` can be fast (this is barbarous!):
+
+```cpp
+#include <cstring>
+void Class::swap(Class &other)
+{
+    char buffer[sizeof(Class)];
+    memcpy(buffer, &other, sizeof(Class));
+    memcpy(reinterpret_cast<char *>(&other), this, sizeof(Class));
+    memcpy(reinterpret_cast<char *>(this), buffer, sizeof(Class));
+}
+```
+
+### Moving
+
