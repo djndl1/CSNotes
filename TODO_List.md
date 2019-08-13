@@ -245,3 +245,7 @@
 - [ ] http://tutorials.jenkov.com/java-concurrency/thread-pools.html
 
 - [ ] [why L1 L2 regularization did not improve my accuracy](https://ai.stackexchange.com/questions/8607/why-l1-l2-regularization-technique-did-not-improve-my-accuracy))
+
+- [ ] [keras Conv2D](https://www.pyimagesearch.com/2018/12/31/keras-conv2d-and-convolutional-layers/)
+- [ ] [ConvLayer Anatomy](https://medium.com/@apiltamang/a-gentle-dive-into-the-anatomy-of-a-convolution-layer-6f1024339aca)
+- [ ] Copy Elision
