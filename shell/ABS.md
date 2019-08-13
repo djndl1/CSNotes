@@ -830,3 +830,46 @@ done
 ```
 
 If `in list` is ommited, then `select` uses the list of command line arguments passed to the script or the function containing the `select` construct.
+
+# Command Substitution
+
+Command substitution reassigns the output of a command or even multiple commands; it literally plugs the command output into another context.
+
+```bash
+`command` # classic form
+$(command) # alternative form
+```
+
+Command substitution invokes a subshell. Command substitution may result in word splitting. You may quote it. However, this may causes trailing newlines. Using `echo` to output an unquoted variable set with command substitution removes trailing newlines characters from the output of the reassigned commands.
+
+```bash
+echo `ls -lh`
+echo "`ls -lh`"
+```
+
+Command substitution permits setting a variable to the contents of a file using either redirections or the `cat` command. However, this is not recommended.
+
+```bash
+variable1=`<file1`
+variable2=`cat file2`
+```
+
+Command substitution permits setting a variable to the output of a loop.
+
+```bash
+a="`for i in $(seq 10); do echo $((i++)); done`"
+echo $a
+1 2 3 4 5 6 7 8 9 10
+```
+
+The `$(...)` form permits nesting.
+
+# Arithmetic Expansion
+
+```bash
+z=`expr $z + 3` # not recommended
+z=$(($z+3))
+z=$((z+3))
+let z=z+3
+let "z += 3"
+```
