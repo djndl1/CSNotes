@@ -873,3 +873,27 @@ z=$((z+3))
 let z=z+3
 let "z += 3"
 ```
+
+# Commands
+
+Mastering the commands is an indispensable prelude to writing effective shell scripts.
+
+## Internal Commands and Builtins
+
+A builtin execute faster than external commands that usually require forking off a separate process. A builtin may be a synonym to a system command of the same name, but Bash reimplements it internally like `echo`. 
+
+- `echo`: normally, each `echo` command prints a terminal newlne, `-n` suppresses this. `echo `command` ` deletes any linefeeds that the output of command generates.
+
+- `printf`: fromatted print, limited variant of the C language `printf()`. Formatting error messages is a useful application of `printf`.
+
+- `read`: reads the value of a variable from `stdin`. The `-a` option gets array variables. Without associated variables, the input is assigned to `$REPLY`. `\` in the input suppresses a newline, `-r` causes `\` to be treated literally.
+
+More usage TODO
+
+- `cd`
+
+- `pwd`
+
+- `pushd`, `popd`, `dirs`: a mechanism for bookmarking working directories. `$DIRSTACK` variable related. Scripts that require various changes to the current working directory without hard-coding the directory name changes can make good use of the mechanism.
+
+
