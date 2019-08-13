@@ -37,3 +37,53 @@ The logging shell field can be set to `/dev/null`/`/bin/false`/`/bin/true` so th
 
 The `finger` command (need manual installation on Debian) supports additional information in the comment field, each of which separated by a comma: the user's name, office location, office phone number and home phone number. The `vipw` command allow administators to edit the password file.
 
+`getpwnam`, `getpwuid` allow us to look up an entry given a user's login name or a numerical user ID. `getpwent`, `setpwent`, `getpwent` go through the entire password file.
+
+## Shadow Passwords
+
+The encrypted password is copy of the user's password that has been put through a one-way encryption algorithm. Given an encrypted password, we can't apply an algorithm that inverts it and returns the plaintext password. A common experiment is for someone to obtain a copy of the password file and try guessing the passwords. To make it more difficult to obtain the encrypted passwords, systems now store the encrypted password in the _shadow password file_.
+
+```c
+struct spwd {
+    char *sp_namp;     /* Login name */
+    char *sp_pwdp;     /* Encrypted password */
+    long  sp_lstchg;   /* Date of last change (measured in days
+                        since 1970-01-01 00:00:00 +0000 (UTC)) */
+    long  sp_min;      /* Min # of days between changes */
+    long  sp_max;      /* Max # of days between changes */
+    long  sp_warn;     /* # of days before password expires
+                            to warn user to change it */
+    long  sp_inact;    /* # of days after password expires
+    until account is disabled */
+    long  sp_expire;   /* Date when account expires
+                        (measured in days since
+                        1970-01-01 00:00:00 +0000 (UTC)) */
+    unsigned long sp_flag;  /* Reserved */
+};
+```
+
+The shadow password file should not be readable by the world.
+
+A separate set of functions like `getspnam` are available to access the shadow password file.
+
+### Group File `/etc/group`
+
+The group database contains the fields 
+
+```c
+struct group {
+    char   *gr_name;        /* group name */
+    char   *gr_passwd;      /* group password */
+    gid_t   gr_gid;         /* group ID */
+    char  **gr_mem;         /* NULL-terminated array of pointers
+                                to names of group members */
+};
+```
+
+There is also a set of functions available to access the structure and these fields: `getgrgid`, `getgrnam`, `getgrent`, `setgrent`, `endgrent`.
+
+### Supplementary Group IDs
+
+4.2BSD introduces the concept of supplementary group IDs. It is a feature required by POSIX.1. The advantage of using supplementary group IDs is that changing groups is no longer necessary.
+
+`getgroups`, `setgroups` and `initgroups` are provided to fetch and set the supplementary group IDs.
