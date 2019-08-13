@@ -30,7 +30,8 @@ One thread can request that another in the same process be canceled by calling  
    If EXECUTE is non-zero, the handler function is called. */
 #  define pthread_cleanup_pop(execute) \
     __clframe.__setdoit (execute);					      \
-  } while (0)
+ 
+ } while (0)
 ```
 
 A thread's underlying storage can be reclaimed immediately on termination if the thead has been detached without the need for another thread to join with the terminated thread.
@@ -99,6 +100,104 @@ void foo_rele(struct foo *fp)
                 pthread_mutex_destroy(&fp->f_lock);
                 free(fp);
         } else {
+                pthread_mutex_unlock(&fp->f_lock);
+        }
+}
+```
+
+## Deadlock avoidance
+
+Deadlocks may occur if a thrad tries to lock the same mutex twice or two threads holding one of two mutexes respectively and try to acquire the other. Lock ordering may prevent deadlock. If it is impossible to arrange a lock ordering, use `pthread_trylock` to acquire another lock, release the already-held lock if failed.
+
+```c
+#include <pthread.h>
+#include <stdlib.h>
+
+#define NHASH 29
+#defin HASH(id) (((unsigned long)id)%NHASH)
+
+struct foo *fh[NHASH]; // a hash table keeping foos
+
+pthread_mutex_t hashlock = PTHREAD_MUTEX_INITIALIZER;
+
+struct foo {
+        int               f_count;
+        pthread_mutex_t   f_lock;
+        int               f_id;
+        struct foo       *f_next;
+        /* more stuff go here */
+};
+
+struct foo *foo_alloc(int id)
+{
+        struct foo *fp;
+        int        idx;
+
+        if ((fp = malloc(sizeof(struct foo))) != NULL) {
+                fp->f_count = 1;
+                fp->f_id = id;
+                if (pthread_mutex_init(&fp->f_lock, NULL) != 0) {
+                        free(fp);
+                        return NULL;
+                }
+                idx = HASH(id);
+                pthread_mutex_lock(&hashlock);
+                fp->f_next = fh[idx]; // put fp at the beginning of the bucket
+                fh[idx] = fp;
+                pthread_mutex_lock(&fp->f_lock);
+                pthread_mutex_unlock(&hashlock);
+                // continue intialization
+                pthread_mutex_unlock(&fp->f_lock);
+        }
+        return fp;
+}
+
+void foo_hold(struct foo *fp)
+{
+        pthread_mutex_lock(&fp->f_lock);
+        fp->f_count++;
+        pthread_mutex_unlock(&fp->f_lock);
+}
+
+struct foo* foo_find(int id)
+{
+        struct foo *fp;
+
+        pthread_mutex_lock(&hashlock);
+        for (fp = fh[HASH(id)]; fp != NULL; fp = fp->next) {
+                if (fp->f_id == id) {
+                        foo_hold(fp);
+                        break;
+                }
+        }
+        pthread_mutex_unlock(&hashlock);
+        return fp;
+}
+
+void foo_rele(struct foo *fp)
+{
+        struct foo *tfp;
+        int         idx;
+
+        pthread_mutex_lock(&hashlock);
+        if (--fp->f_count == 0) { // last release
+                idx = HASH(fp->f_id);
+                tfp = fh[idx];
+                if (tfp == fp) {
+                        fh[idx] = fp->f_next;
+                } else {
+                        while (tfp->f_next != fp)
+                                tfp = tfp->f_next;
+                        tfp->f_next = fp->f_next;
+                }
+                pthread_mutex_unlock(&hashlock);
+                pthread_mutex_destroy(&fp->f_lock); 
+                // we are not accessing any members of fp
+                // hashlock cannot prevent anyone from holding fp and modify it directly without accessing the hash table
+                // it's gonna be destroyed anyway
+                free(fp);
+        } else {
+                fp->f_count--;
                 pthread_mutex_unlock(&fp->f_lock);
         }
 }
