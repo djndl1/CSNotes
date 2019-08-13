@@ -438,6 +438,40 @@ for (int i = 0; i < tasks.size(); i++)
    processFurther(service.take().get()); // take the Future once the result is available
 ```
 
+### The Fork-Join Framework
+
+The fork-join framework is designed to support computationally intensive tasks such as image or video processing. Suppose a problem like
+
+```java
+if (problemSize < threshold) 
+   solve problem directly
+else {
+   break problem into subproblems
+   recursively solve each subproblem
+   combine the results
+}
+```
+
+```java
+class Counter extends RecursiveTask<Integer> {
+   . . .
+   protected Integer compute() {
+      if (to - from < THRESHOLD)
+      {
+         solve problem directly
+      }
+      else {
+         int mid = (from + to) / 2;
+         var first = new Counter(values, from, mid, filter);
+         var second = new Counter(values, mid, to, filter);
+         invokeAll(first, second);
+         return first.join() + second.join();
+      }
+   }
+}
+```
+
+Read more at [Work Stealing](https://en.wikipedia.org/wiki/Work_stealing)
 
 ## Asynchronous Computations
 
