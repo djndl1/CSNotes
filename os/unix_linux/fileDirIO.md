@@ -225,6 +225,17 @@ The file access tests that the kernel performs each time a process opens, create
 
 The user ID of a new file is set to the effective user ID of the process. The group ID of a new file can be the effective group ID of the process or the group ID of the directory in which the file is being created depending on the implementation. On Linux, this is determined by whether the set-group-ID bit is set. If it's set, then the permission is copied from the directory (the subdirectory will be set-group-ID automatically), otherwise it's set to the effective group ID of the process.
 
+The `access` and `faccessat` functions base their tests on the real user and group IDs instead of effective user ID. If `AT_EACCESS` flag is set, the access checks are made using the effective user and group IDs of the calling process instead of the real user and group IDs.
+
+The `umask` sets the file mode creation mask for the process and returns the previous value. The file mode creation mask is used whenever the process creates a new file or a new directory. It disables the corresponding mode bits that it is set to. If anyone can read a file, the `umask` needs to be set to 0.
+
+The `chmod`, `fchmod`, `fchmodat` functions allow to change the file access permissions for an existing file.
+
+Sticky (sticking to the swap area) bit (formally called saved-text) was initially used to indicate a executable file should be cached. If the sticky bit is set for a directory, a file in the directory can be removed or renamed only if the user has write permissions for the directory and owns the file or owns the directory or is the superuser. e.g. `/var/tmp`, `/tmp` so that any one can create, read, write a file there but no one except the superuser can delete files owned by other users (the directories belong to root).
+
+The `chown` functions allow us to change a file's user ID and group ID.
+
+
 ## File Size and Trucation
 
 ```c
