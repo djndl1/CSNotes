@@ -475,6 +475,68 @@ Read more at [Work Stealing](https://en.wikipedia.org/wiki/Work_stealing)
 
 ## Asynchronous Computations
 
+### Computable Futures
+
+A callback can be registered at `ComputableFuture` and it will be automatically called once the result is available to process without blocking.
+
+```java
+public CompletableFuture<String> readPage(URL url) {
+   return CompletableFuture.supplyAsync(() -> {
+         try {
+            return new String(url.openStream().readAllBytes(), "UTF-8");
+         }
+         catch (IOException e) {
+            throw new UncheckedIOException(e);
+         }
+      }, executor);
+}
+```
+
+A `CompletableFuture` can complete in two ways: either with a result, or with an uncaught exception. In order to handle both cases, use the `whenComplete` method.
+
+```java
+f.whenComplete((s, t) -> {
+   if (t == null) { Process the result s; }
+   else { Process the Throwable t; }
+});
+```
+
+The `CompletableFuture` is called completable because you can manually set a completion value. (In other concurrency libraries, such an object is called a promise.)
+
+```java
+var f = new CompletableFuture<Integer>();
+executor.execute(() ->
+   {
+      int n = workHard(arg);
+      f.complete(n);
+   });
+executor.execute(() ->
+   {
+      int n = workSmart(arg);
+      f.complete(n);
+   });
+
+Throwable t = . . .;
+f.completeExceptionally(t);
+```
+
+
+
+the computation of a `CompletableFuture` is not interrupted when you invoke its `cancel` method. Canceling simply sets the `Future` object to be completed exceptionally, with a `CancellationException`. In general, this makes sense since a `CompletableFuture` may not have a single thread that is responsible for its completion.
+
+Nonblocking calls are implemented through callbacks. The programmer registers a callback for the action that should occur after a task completes. Of course, if the next action is also asynchronous, the next action after that is in a different callback. The CompletableFuture class provides a mechanism for composing asynchronous tasks into a processing pipeline.
+
+```java
+CompletableFuture<String> contents = readPage(url);
+CompletableFuture<List<URL>> imageURLs = contents.thenApply(this::getLinks);
+```
+
+TODO
+
+
+
+
+
 ## Processes
 
 `Process` class executes a command (which cannot be a shell built-in) in a separate operating system process and intereacts with its own standard input, output and error streams. `ProcessBuild` class configures a `Process` object. 
@@ -492,3 +554,4 @@ To modify the environment variables of the process, get the `environment` from t
 `start` fires up a process and `waitFor` waits for the process to finish and returns its exit value.
 
 `ProcessHandle` gets more information about a process that the program started. It can get its process ID, its parent process, its children, and descendants.
+
