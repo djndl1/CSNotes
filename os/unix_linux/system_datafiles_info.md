@@ -66,7 +66,7 @@ The shadow password file should not be readable by the world.
 
 A separate set of functions like `getspnam` are available to access the shadow password file.
 
-### Group File `/etc/group`
+## Group File `/etc/group`
 
 The group database contains the fields 
 
@@ -82,8 +82,50 @@ struct group {
 
 There is also a set of functions available to access the structure and these fields: `getgrgid`, `getgrnam`, `getgrent`, `setgrent`, `endgrent`.
 
-### Supplementary Group IDs
+## Supplementary Group IDs
 
 4.2BSD introduces the concept of supplementary group IDs. It is a feature required by POSIX.1. The advantage of using supplementary group IDs is that changing groups is no longer necessary.
 
 `getgroups`, `setgroups` and `initgroups` are provided to fetch and set the supplementary group IDs.
+
+# Other Data Files
+
+- `/etc/services`: data  file for the services provided by the various network servers
+
+- `/etc/protocols`: protocols
+
+- `/etc/networks`: networks
+
+- `/etc/hosts`
+
+At least three functions are provided for each of these data files: `get...``, `set...`, `end...`.
+
+# Login Accounting
+
+- `utmp` keeps track of all the users currently logged in;
+
+- `wtmp`: keeps track of all logins and logouts.
+
+On login, one of these structures was filled in and written to the `utmp` file by the login program, and the same structure was appended to the `wtmp` file. On logout, the entry in the `utmp` file was erased—filled with null bytes—by the init process, and a new entry was appended to the `wtmp` file. This logout entry in the `wtmp` file had the `ut_name` field zeroed out. 
+
+The `who` program prints the contents of `utmp`. `last` command read through the `wtmp` file and prints selected entries.
+
+# System Identification
+
+`uname` returns information on the current host and operating system.
+
+```c
+struct utsname {
+    char sysname[];    /* Operating system name (e.g., "Linux") */
+    char nodename[];   /* Name within "some implementation-defined
+                        network" */
+    char release[];    /* Operating system release (e.g., "2.6.28") */
+    char version[];    /* Operating system version */
+    char machine[];    /* Hardware identifier */
+#ifdef _GNU_SOURCE
+    char domainname[]; /* NIS or YP domain name */
+#endif
+};
+```
+
+The hostname of the current host is obtained by `gethostname()`, usually the name of the host on a TCP/IP network.
