@@ -574,6 +574,16 @@ Strings &operator=(Strings const &other)
 }
 ```
 
+Or more concisely using move-assignment.
+
+```cpp
+Class &operator=(Class const &other)
+{
+    Class tmp{ other };
+    return *this = std::move(tmp);
+}
+```
+
 Many classes offer `swap` members allowing to swap two of their objects. STL offers variaous functions related to swapping and a generic `std::swap`.
 
 When implementing a `swap` member function, it is not always a good idea to swap every data member of a class, like when in a linked list or a data member referring/pointing to another data member in the same object. Simple swapping operations must be avoided when data members point or refer to data that is involved in the swapping.
@@ -591,5 +601,155 @@ void Class::swap(Class &other)
 }
 ```
 
-### Moving
+### Move Semantics
 
+Moving information is based on the concept of anonymous data and in general by functions returning their results by value instead of returning references or pointers. Anonymous values are always short-lived.
+
+Classes supporting move operations like move assignment and move constructors are called _move-aware_.
+
+A rvalue reference only binds to an anonymous temporary value.  The compiler is required to call functions offering movable parameters whenever possible. Once a temporary value has a name, it is no longer an anonymous temporary value and within such functions the compiler no longer calls functions expecting anonymous temporary values when the parameters are used as arguments.
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Class {
+public:
+    Class() {}
+
+    void fun(Class const &other)
+        {
+            cout << "fun: Class const &\n";
+            gun(other);
+        }
+
+    void fun(Class &other)
+        {
+            cout << "fun: Class &\n";
+            gun(other);
+        }
+
+    void fun(Class &&other)
+        {
+            cout << "fun: Class &&\n";
+            gun(other);
+        }
+
+    void gun(Class const &other)
+        {
+            cout << "gun: class const &\n";
+        }
+
+    void gun(Class &other)
+        {
+            cout << "gun: class &\n";
+        }
+
+    void gun(Class &&other)
+        {
+            cout << "gun: class &&\n";
+        }
+};
+
+int main()
+{
+    Class c1;
+
+    c1.fun(c1);
+    c1.fun(Class{});
+    Class const c0;
+    c1.fun(c0);
+}
+```
+
+```bash
+ djn  debian  ~/FOSS/playground  ./a.out 
+fun: Class &
+gun: class &
+fun: Class &&
+gun: class &
+fun: Class const &
+gun: class const &
+```
+
+Generally it is pointless to define a function having an rvalue reference return type. It may causes a dangling reference.
+
+```cpp
+std::string &&doubleString(std::string &&tmp)
+{
+    tmp += tmp;
+    return std::move(tmp);
+}
+
+std::cout << doubleString(std::string("hello "));
+```
+
+### The move constructor
+
+Move constructors of classes using dynamic memory allocation are allowed to assign the values of pointer data members to their own pointer data members without requiring them to make a copy of the source’s data.  Next, the temporary’s pointer value is set to zero to prevent its destructor from destroying data now owned by the just constructed object. The move constructor has grabbed or stolen the data from the temporary object.
+
+The class benefits from move operations when one or more of the composed data members themselves support move operations. Move operations cannot be implemented if the class type of a composed data member does not support moving or copying. Currently, `stream` classes fall into this category.
+
+```cpp
+Person::Person(Person &&tmp) : d_name( std::move(tmp.d_name) ), d_address( std::move(tmp.d_address) )
+{}
+```
+
+Having available a rvalue does not mean that we're referring to an anonymous object, so `std::move` is required.
+
+When a class using composition not only contains class type data members but also other types of data
+(pointers, references, primitive data types), then these other data types can be initialized as usual.
+Primitive data type members can simply be copied; references and pointers can be initialized as usual (just copy-initialized).
+
+### Move-assignment
+
+In addition to the overloaded assignment operator a move assignment operator may be implemented for classes supporting move operations. In this case, if the class supports swapping the implementation is surprisingly simple.
+
+```cpp
+Class &operator=(Class &&tmp)
+{
+    swap(tmp);
+    return *this;
+}
+```
+
+If swapping is not supported then the assignment can be performed for each of the data members in turn, using `std::move`.
+
+```cpp
+Person &operator=(Person &&tmp)
+{
+    d_name = std::move(tmp.d_name);
+    d_address = std::move(tmp.d_address);
+    return *this;
+}
+```
+
+### Moving and the destructor
+ 
+When moving pointer values from a temporary source to a destination the move constructor should make sure that the temporary’s pointer value is set to zero, to prevent doubly freeing memory. Primitive types should also be set to zero since they might be used in destructors.
+
+read [why set primitive type to zero move semantics](https://stackoverflow.com/questions/33470156/why-set-primitive-type-value-to-zero-in-the-end-of-move-constructor-function)
+
+### Default move constructors and assignment operators
+
+- If the copy constructor or the copy assignment operator is declared, then the default move constructor and move assignment operator are suppressed;
+
+- If the move constructor or the move assignment operator is declared then the copy constructor and the copy assignment operator are implicitly declared as deleted, and can therefore not be used anymore;
+
+- If either the move constructor or the move assignment operator is declared, then (in addition to suppressing the copy operations) the default implementation of the other move-member is also suppressed;
+
+- In all other cases the default copy and move constructors and the default copy and assignment operators are provided.
+
+If default implementations of copy or move constructors or assignment operators are suppressed, add them back and append `= default`.
+
+### Moving: design
+
+For classes offering value sematics (able to initialize/be assigned to objects of their classes).
+
+- Classes using pointers to dynamically allocated memory, owned by the class’s objects must be provided with a copy constructor, an overloaded copy assignment operator and a destructor;
+
+- Classes using pointers to dynamically allocated memory, owned by the class’s objects, should be provided with a move constructor and a move assignment operator;
+
+-  The copy- and move constructors must always be implemented independently from each other.
+
+Whenever a member of a class receives a const & to an object of its own class and creates a copy of that object to perform its actual actions on, then that function’s implementation can be implemented by an overloaded function expecting an rvalue reference. e.g. implementing a copy assginment in terms of move assignment.
