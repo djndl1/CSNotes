@@ -896,4 +896,52 @@ More usage TODO
 
 - `pushd`, `popd`, `dirs`: a mechanism for bookmarking working directories. `$DIRSTACK` variable related. Scripts that require various changes to the current working directory without hard-coding the directory name changes can make good use of the mechanism.
 
+- `let`: carries out arithmetic operations, it functions as a less complex version of `expr`.
 
+- `eval arg1 [arg2] ... [argN]`:  combines the argument in an expression or list of expressions and evaluates them. Any variables within the expression are expanded. The eval utility shall construct a command by concatenating arguments  together, separating each with a <space> character.
+
+- `set`: changes the value of internal script variables/options. One use is to toggle option flags which help determine the behavior of the script. Another application is to reset the positional parameters. Invoking `set` without arguments or options lists all the environment variables and other variables that have been initialized. 
+
+```bash
+set `uname -a` # sets the positional parameter to the output of the command `uname -a`
+set -- $var    # sets the contents of var to positional parameters
+set --         # unsets all positional parameters
+```
+
+- `unset`: deletes a shell variable, setting it to null. This command does not affect positional parameters.
+
+- `export`: makes available variables to all child processes of the running script or shell.
+
+- `getopts`: parses command-line arguments passed to the script. It uses two implicit variables `$OPTIND` and `$OPTARG`.
+
+```bash
+while getopts ":abcde:fg" Option
+do
+    case $Option in
+        a)
+            echo "Option a $OPTARG"
+           ;;
+        b)
+            echo "Option b"
+            ;;
+        c)
+            echo "Option c"
+            ;;
+        d)
+            echo "Option d"
+            ;;
+        e)
+            echo "Option e $OPTARG"
+            ;;
+        f)
+            echo "Option f"
+            ;;
+        g)
+            echo "Option g"
+            ;;
+        *)
+            echo "Strange args"
+            ;;
+    esac
+done
+```
