@@ -33,4 +33,20 @@ The Android runtime core libraries are Java-based and provide the primary APIs f
 
 More at [Android Architecture](https://source.android.com/devices/architecture)
 
-Android apps are built as combination of components that can be invoked individually. Android allows for different resources to be provided for different devices.
+. Android allows for different resources to be provided for different devices.
+
+# View System
+
+
+
+# Activities
+
+Activities serve as the entry point for a user's interaction with an app, and are also central to how a user navigates within an app (as with the Back button) or between apps (as with the Recents button). The Android system initiates code in an Activity instance by invoking specific callback methods that correspond to specific stages of its lifecycle. Android apps are built as combination of components that can be invoked individually. When one app invokes another, the calling app invokes an activity in the other app, rather than the app as an atomic whole.
+
+An activity provides the window in which the app draws its UI. Generally, one activity implements one screen in an app. Typically, one activity in an app is specified as the main activity, which is the first screen to appear when the user launches the app. Each activity can then start another activity in order to perform different actions. Although activities work together to form a cohesive user experience in an app, each activity is only loosely bound to the other activities; there are usually minimal dependencies among the activities in an app.
+
+# APIs
+
+## Support Library
+
+With the release of Android 9.0 (API level 28) there is a new version of the support library called `AndroidX` which is part of Jetpack. The AndroidX library contains the existing support library and also includes the latest Jetpack components. 
