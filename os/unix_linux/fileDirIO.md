@@ -13,7 +13,7 @@ A new file can also be created by calling the `creat` function. It's equivalent 
 
 A open file is closed by calling the `close` function. Closing a file also releases any record locks that the process may have on the file. When a process terminates, all of its open files are closed automatically by the kernel.
 
-Every open file has an associated ‘‘current file offset,’’ normally a non-negative integer that measures the number of bytes from the beginning of the file. Read and write operations normally start at the current file offset and cause the offset to be incremented by the number of bytes read or written. By default, this offset is initialized to 0 when a file is opened, unless the `O_APPEND` option is specified. A open file's offset can be set explicitly by calling `lseek`. We can seek zero bytes from the current position to determine the current offset, or to determine if a file si capable of seeking.
+Every open file has an associated ‘‘current file offset,’’ normally a non-negative integer that measures the number of bytes from the beginning of the file. Read and write operations normally start at the current file offset and cause the offset to be incremented by the number of bytes read or written. By default, this offset is initialized to 0 when a file is opened, unless the `O_APPEND` option is specified. A open file's offset can be set explicitly by calling `lseek`. We can seek zero bytes from the current position to determine the current offset, or to determine if a file is capable of seeking.
 
 ```c
 off_t currpos = lseek(fd, 0, SEEK_CUR); // nonseekable files return -1 and set `errno` to ESPIPE
@@ -70,7 +70,7 @@ process table entry                             +-----------+
                                                 +-----------+
 ```
 
-Each process that opens the same file gets its own file table entry. Every process has its own file table entry with its own current file offset. The offset changes as the process write. When the offset goes beyond the file size, the i-node entry is set to the current file offset. 
+Each process that opens the same file gets its own file table entry (which indicates the status of a file opening). Every process has its own file table entry with its own current file offset. The offset changes as the process write. When the offset goes beyond the file size, the i-node entry is set to the current file offset. 
 
 It is possible for more than one file desciptor entry to point to the same file table entry. `dup()` and `dup2()` duplicate an existing file descriptor. These duplicated file descriptors share the same file table entry. Another way to duplicate file descriptor is with the `fcntl` function. Opening or creating `/dev/fd/n` is identical to duplicate the corresponding file descriptor. The main use of `/dev/fd/n` is from the shell to allow programs that use pathname arguments to handle standard input and standard output in the same manner as other pathnames.
 
@@ -88,15 +88,13 @@ The positioning to the current end of file and the write should be an atomic ope
 
 The `pread()` and `pwrite()` system calls  are  especially  useful  in  multi-threaded  applications.  They allow multiple threads to perform I/O on the same file descriptor without being affected by changes to the file  offset by other threads.
 
-## Cache, delayer write
+## Cache, delayed write
 
 Traditional implementations of the UNIX System have a buffer cache or page cache in the kernel through which most disk I/O passes. When writing data to a file, the data is normally copied by the kernel into one of its buffers and queued for writing to disk at some later time. 
 
 The `sync`, `fsync` and `fdatasync` are provided to ensure consistency of the file system on disk with the contents of the buffer cache. The function `sync` is normally called periodically (usually every 30 seconds) from a system daemon, often called `update`.
 
 ## `fcntl` function
-
-
 
 The `fcntl` function can change the properties of a file that is already open. 
 - Duplicate an existing descriptor
@@ -249,3 +247,33 @@ This field is meaningful only for regular files, directories and symbolic links.
 `truncate()` and `ftruncate()` truncate an existing file to a specified size (may increase the size).
 
 ## File Systems
+
+A disk is divided into one or more partitions, each of which contains a file system.
+
+```bash
+          file    system
+  +------|-------|---------------------------------------|-------------------------------------|-----|------------------------------------------+
+  |      |       |                                       |                                     |     |                                          |
+  |      |       |                                       |                                     |     |                                          |
+  |      |       | cylinder group 0                      |        cylinder group 1             | ... |           cylinder group 2               |
+  |      |       |                                       |                                     |     |                                          |
+  |      |       |                                       |                                     |     |                                          |
+  |   +  |    +  |                                       |                                     |     |                                          |
+  +------|-------|---------------------------------------|-------------------------------------|-----|------------------------------------------+
+      |       |
+      |       |                                                                 cylinder group
+      |       +--> super block            +--------|--------|--------|--------|---------------------|-----------------------------------------+
+      v                                   |        |        |        |        |                     |                                         |
+                                          | super  |        |        |        |                     |                                         |
+boot block                                | block  |   cg   | i-node | block  |                     |                                         |
+                                          |  copy  |  info  |  map   | bitmap |       i-nodes       |               data blocks               |
+                                          |        |        |        |        |                     |                                         |
+                                          |        |        |        |        |                     |                                         |
+                                          +--------|--------|--------|--------|---------------------|-----------------------------------------+
+```
+
+Every i-node has link count that contains the number of directory entries that point to it. Only when the link count goes to 0 can the file be deleted (unlinking).
+
+The i-node contains all the information about the file. Most of the information in the `stat` structure is obtaiend from the i-node. Only two items of interest are stored in the directory entry: the filename and the i-node number.
+
+Any leaf directory has a link count of 2, the directory itself contains one and its parent directory contains the other.
