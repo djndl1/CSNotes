@@ -237,3 +237,40 @@ A `constexpr`, if statisfying the requirements for constant initialization, is g
 
 (C++17) The class `shared_mutex` provides a non-recursive mutex with shared ownership semantics. Multiple threads can simultaneously hold a shared lock ownership of a `shared_mutex` type of object. But no thread can hold a shared lock while another thread holds an exclusive lock on the same `shared_mutex` object and vice versa.
 
+## Lock and Lock Handling
+
+Locks are used to simplify the use of mutexes. To simplify locking and unlocking, a few mutex wrappers are available:
+
+- `std::lock_guard`: basic unlock_guarantee, a basic wrapper. This wrapper can accept a mutex that the thread has already acquired.
+
+```cpp
+template <class _Mutex>
+class _LIBCPP_TEMPLATE_VIS _LIBCPP_THREAD_SAFETY_ANNOTATION(scoped_lockable)
+lock_guard
+{
+public:
+    typedef _Mutex mutex_type;
+
+private:
+    mutex_type& __m_;
+public:
+
+    _LIBCPP_NODISCARD_EXT _LIBCPP_INLINE_VISIBILITY
+    explicit lock_guard(mutex_type& __m) _LIBCPP_THREAD_SAFETY_ANNOTATION(acquire_capability(__m))
+        : __m_(__m) {__m_.lock();}
+
+    _LIBCPP_NODISCARD_EXT _LIBCPP_INLINE_VISIBILITY
+    lock_guard(mutex_type& __m, adopt_lock_t) _LIBCPP_THREAD_SAFETY_ANNOTATION(requires_capability(__m))
+        : __m_(__m) {}
+    _LIBCPP_INLINE_VISIBILITY
+    ~lock_guard() _LIBCPP_THREAD_SAFETY_ANNOTATION(release_capability()) {__m_.unlock();}
+
+private:
+    lock_guard(lock_guard const&) _LIBCPP_EQUAL_DELETE;
+    lock_guard& operator=(lock_guard const&) _LIBCPP_EQUAL_DELETE;
+};
+```
+
+- `std::unique_lock`: a more expensive interface, allowing explicit unlocking and locking of the mutex they control. a general-purpose mutex ownership wrapper allowing deferred locking, time-constrained attempts at locking, recursive locking, transfer of lock ownership, and use with condition variables. It can be constructed without locking the mutex and can `release` the mutex and no longer "own"s it (can no longer manipulate it, break the association with the mutex) without unlocking the mutex.
+
+- `std::shared_lock`: a general-purpose shared mutex ownership wrapper allowing deferred locking, timed locking and transfer of lock ownership.
