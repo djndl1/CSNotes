@@ -313,3 +313,58 @@ struct job *job_find(struct queue *qp, pthread_t id)
 ```
 
 The SUS provides functions to lock reader-writer locks with a timeout to give applications a way to avoid blocking indefinitely while trying to acquire a reader-writer lock: `pthread_rwlock_timedrdlock`, `pthread_rwlock_timedwrlock`.
+
+### Conditional Variables 
+
+When used with mutexes, condition variables allow threads to wait in a race-free way for arbitrary conditions to occur. The condition itself is protected by a mutex. A thread must first lock the mutex to change the condition state. Other threads will not notice the change until they acquire the mutex.
+
+A condition variable `pthread_cont_t` can initialized by `pthread_cond_t`. A statistically allocated `pthread_cond_t` is initialized by `PTHREAD_COND_INITIALIZER`. We use `pthread_cond_destroy` to deinitialize a condition variable before freeing its underlying memory. We use `pthread_cond_wait` to wait for a condition to be true, A timed variant is provided to return an error code if the condition hasn't been satisfied in the specified amount of time. The wait operation atomically unlocks the mutex and waits for the signal. There are two functions to notify that a condition has been satisfied: `pthread_cond_signal` and `pthread_cond_broadcast`.
+
+
+```c
+#include <pthread.h>
+
+struct msg {
+        struct msg *m_next;
+        /* more stuff go here */
+};
+
+struct msg *workq;
+
+pthread_cond_t qready = PTHREAD_COND_INITIALIZER;
+
+pthread_mutex_t qlock = PTHREAD_MUTEX_INITIALIZER;
+
+void process_msg(void)
+{
+        struct msg *mp;
+
+        for (;;) {
+                pthread_mutex_lock(&qlock);
+                while (workq == NULL)
+                        pthread_cond_wait(&qready, &qlock);
+                mp = workq;
+                workq = mp->m_next;
+                pthread_mutex_unlock(&qlock);
+        }
+}
+
+void enqueue_msg(struct msg *mp)
+{
+        pthread_mutex_lock(&qlock);
+        mp->m_next = workq;
+        workq = mp;
+        pthread_mutex_unlock(&qlock);
+        pthread_cond_signal(&qready); 
+        /* there is a while loop checking the condition so it's okay
+        to signal after we release the lock. a thread wakes up and find
+        the condition has been changed by some other thread that is not 
+        waiting and go back waiting */
+}
+```
+
+Condition variables are a inter-thread synchronization mechanism, not the predicate condition itself. The boolean condition must be examined. In general, whenever a condition wait returns, the thread has to re-evaluate the predicate associated with the condition wait to determine whether it can safely proceed, should wait again, or should declare a timeout. A return from the wait does not imply that the associated predicate is either true or false. It is thus recommended that a condition wait be enclosed in the equivalent of a "while loop" that checks the predicate. Condition variables are for signaling.
+
+The `pthread_cond_broadcast()` or `pthread_cond_signal()` functions may be called by a thread whether or not it currently owns the mutex that threads calling `pthread_cond_wait()` or `pthread_cond_timedwait()` have associated with the condition variable during their waits. If predictable scheduling behavior is required, then that mutex shall be locked by the thread calling `pthread_cond_broadcast()` or` pthread_cond_signal()`. Read Section 3.3.3 of "Programming With POSIX Threads". The `pthread_cond_wait` blocks on the mutex after signalling if the mutex is not available.
+
+https://stackoverflow.com/questions/14924469/does-pthread-cond-waitcond-t-mutex-unlock-and-then-lock-the-mutex
