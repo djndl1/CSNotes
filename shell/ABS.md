@@ -945,3 +945,57 @@ do
     esac
 done
 ```
+
+- `source`: sourcing a file imports code into the script. If the sourced file is itself an executable script, then it will run, then return control to the script that called it. A sourced executable script may use a `return` for this purpose.
+
+- `exit`: unconditionally terminates a script. It is good practice to end all but the simplest script with an `exit 0`.
+
+- `exec`: replaces the current process with a specified command. The shell does not fork and the command `exec`ed replaces the shell. It forces an exit from the script when the `exec`ed command terminates.
+
+- `shopt`: changes shell options on the fly. It often appears in the Bash startup files.
+
+- `caller`: echoes to `stdout` information about the caller of that function
+
+- `true`/`false`: returns a successful(zero)/unsuccessful exit status but does nothing else.
+
+- `type`: can be useful for testing whether a certain command exists.
+
+- `hash`: records the path name of specified commands in the shell hash table so the shell or script will not need to search the `$PATH` on subsequent calles to those commands.
+
+- `bind`: displays or modifies `readline` key bindings.
+
+- `help`
+
+### Job Control
+
+https://unix.stackexchange.com/questions/3886/difference-between-nohup-disown-and
+
+http://linuxcommand.org/lc3_lts0100.php
+
+- `jobs`: listing the jobs running in the background, giving the job number.
+
+- `disown`: remove jobs from the shell's table of active jobs
+
+read [Difference Between nohup disown](https://unix.stackexchange.com/questions/3886/difference-between-nohup-disown-and)
+
+- `fg`: switches a job running in the background into the foreground; `bg`: restarts a suspended job and runs it in the background.
+
+- `wait`: suspend script executation unitl all jobs in background have terminated or until the job number or process ID specified as an option terminates.  `wait` may be used to prevent a script from exiting before a background job finishes.'
+
+- `suspend`: similar effect to `Ctrl-Z`, it suspends the shell.
+
+- `logout`
+
+- `times`: give statistics on the system time elapsed when executing commands. Not common to profile and benchmark shell scripts.
+
+- `kill`
+
+- `killall`: an external command
+
+- `command`: diasbles aliases and functions for the command immediately following it.
+
+- `builtin command`: invoke a built-in command
+
+- `enable`: enables or disables a shell builtin command
+
+- `autoload`: a function withan `autoload` declaration will load from an external file at its first invocation. This saves system resources. Not a part of the core Bash installation.
