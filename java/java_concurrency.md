@@ -531,11 +531,31 @@ CompletableFuture<String> contents = readPage(url);
 CompletableFuture<List<URL>> imageURLs = contents.thenApply(this::getLinks);
 ```
 
+There are many variants of methods for composing completable futures: `thenApply`, `thenAccepts`, ...
+
 TODO
 
+### Long-Running Tasks in User Interface Callbacks
 
+User interfaces such as Swing, JavaFX, or Android are not thread-safe. You cannot manipulate user interface elements from multiple threads, or they risk becoming corrupted. Each user interface library provides some mechanism to schedule a Runnable for execution on the UI thread. It is tedious to implement user feedback in a worker thread, so each user interface library provides some kind of helper class for managing the details. After each work unit, update the UI to show prograss. After the work is finised, make a final stage to the UI.
 
-
+```java
+@Override public StringBuilder doInBackground() throws IOException, InterruptedException {
+   int lineNumber = 0;
+   var in = new Scanner(new FileInputStream(file), StandardCharsets.UTF_8);
+   while (in.hasNextLine()) {
+      String line = in.nextLine();
+      lineNumber++;
+      text.append(line).append("\n");
+      var data = new ProgressData();
+      data.number = lineNumber;
+      data.line = line;
+      publish(data);
+      Thread.sleep(1); // to test cancellation; no need to do this in your programs
+   }
+   return text;
+}
+```
 
 ## Processes
 
