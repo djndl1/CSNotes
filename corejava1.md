@@ -948,11 +948,12 @@ Logger names are hierarchical. Logger parents and children share certain propert
 - INFO, default
 - CONFIG
 - FINE
-
 - FINER
 - FINEST
 
 use `Level.ALL` to turn on logging for all levels or `Level.OFF` to turn all logging off.
+
+
 
 # Generic Programming (Not for application development but for library coding)
 
@@ -1076,6 +1077,7 @@ public static void minmaxBonus(Manager[] a, Pair<? super Manager> result)
    if (a.length == 0) return;
    Manager min = a[0];
    Manager max = a[0];
+   
    for (int i = 1; i < a.length; i++)
    {
       if (min.getBonus() > a[i].getBonus()) min = a[i];
