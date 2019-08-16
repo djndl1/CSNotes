@@ -368,3 +368,127 @@ Condition variables are a inter-thread synchronization mechanism, not the predic
 The `pthread_cond_broadcast()` or `pthread_cond_signal()` functions may be called by a thread whether or not it currently owns the mutex that threads calling `pthread_cond_wait()` or `pthread_cond_timedwait()` have associated with the condition variable during their waits. If predictable scheduling behavior is required, then that mutex shall be locked by the thread calling `pthread_cond_broadcast()` or` pthread_cond_signal()`. Read Section 3.3.3 of "Programming With POSIX Threads". The `pthread_cond_wait` blocks on the mutex after signalling if the mutex is not available.
 
 https://stackoverflow.com/questions/14924469/does-pthread-cond-waitcond-t-mutex-unlock-and-then-lock-the-mutex
+
+
+## Spin Locks
+
+The process is blocked by busy-waiting (spinning) until the lock can be acquired. A spin lock could be used in situations where locks are held for short periods of times and threads don't want to incur the cost of being descheduled. Spin locks are often used as low-level primitive to implement other types of locks. Although efficient, they can lead to wasting CPU resources. Spin locks are useful when used in a nonpreemptive kernel, tehy block interrupts. Spin locks are not as useful unless in a real-time scheduling class that doesn't allow preemption. Many mutex implementations are so efficient that the performance of applications using mutex locks is equivalent to their performance if they had used spin locks. Spin locks are useful in limited circumstances.
+
+The interfaces for spin locks are similar to those for mutexes, making it relatively easy to replace one with the other.
+
+- `pthread_spin_init`; `pthread_spin_destroy`;
+
+- `pthread_spin_lock`; `pthread_spin_trylock`; `pthread_spin_unlock`;
+
+We need to be careful not to call any functions that might sleep while holding the spin lock. If we do, then we’ll waste CPU resources by extending the time other threads will spin if they try to acquire it.
+
+## Barriers
+
+Barriers are a synchronization mechanism that can be coordinate multiple threads working in parallel. A barrier allows each thread to wait until all cooperating threads have reached the same point and then continue executing from there. They allow arbitrary number of threads to wait until all of the threads have completed processing but the threads don't have to exit.
+
+- `pthread_barrier_init`; `pthread_barrier_destroy`;
+
+When we initialize a barrier, we use the count argument to specify the number of threads that must reach the barrier before all of the threads will be allowed to continue.
+
+`pthread_barrier_wait` indicates that a thread is done with its work and is ready to wait for all the other threads to catch up. The thread calling `pthread_barrier_wait` is put to sleep if the count is not satisfied.  If the thread is the last one to call `pthread_barrier_wait`, thereby satisfying the barrier count, all of the threads are awakened.
+
+ When   the  required  number  of  threads  have  called  `pthread_barrier_wait()` specifying the barrier, the constant  PTHREAD_BARRIER_SE- RIAL_THREAD  shall  be  returned  to  one unspecified thread and zero shall be returned to each of the remaining threads.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <limits.h>
+#include <sys/time.h>
+
+#define NTHR 2              // number of threads, better set to `nproc`
+#define NUMNUM 8000000L     // number of numbers to sort
+#define TNUM (NUMNUM/NTHR)  // number to sort per thread
+
+long nums[NUMNUM];
+long snums[NUMNUM];
+
+pthread_barrier_t b;
+
+int complong(const void *p_lhs, const void *p_rhs)
+{
+        long l1 = *(long*)p_lhs;
+        long l2 = *(long*)p_rhs;
+
+        if (l1 == l2)
+                return 0;
+        else if (l1 < l2)
+                return -1;
+        else
+                return 1;
+}
+
+void *thr_fn(void *arg)
+{
+        long idx = (long)arg;
+
+        qsort(&nums[idx], TNUM, sizeof(long), complong);
+        pthread_barrier_wait(&b);
+
+        return ((void*)0);
+}
+
+void merge()
+{
+        long idx[NTHR];
+        long i, minidx, sidx, num;
+
+        for (i = 0; i < NTHR; i++)
+                idx[i] = i * TNUM;
+        for (sidx = 0; sidx < NUMNUM; sidx++) {
+                num = LONG_MAX;
+                for (i = 0; i < NTHR; i++) {
+                        if ((idx[i] < (i+1)*TNUM) && (nums[idx[i]] < num)) {
+                                num = nums[idx[i]];
+                                minidx = i;
+                        }
+                }
+                snums[sidx] = nums[idx[minidx]];
+                idx[minidx]++;
+        }
+}
+
+int main(int argc, char *argv[])
+{
+        unsigned long i;
+        struct timeval start, end;
+        long long startusec, endusec;
+        double elapsed;
+        int err;
+        pthread_t tid;
+
+        // generate NUMNUM random long integers
+        srandom(1);
+        for (i = 0; i < NUMNUM; i++)
+                nums[i] = random();
+
+        gettimeofday(&start, NULL);
+        pthread_barrier_init(&b, NULL, NTHR + 1); // the main thread included
+        for (i = 0; i < NTHR; i++) {
+                err = pthread_create(&tid, NULL, thr_fn, (void*)(i * TNUM));
+                if (err != 0) {
+                        fprintf(stderr, "cannot create thread\n!");
+                        exit(1);
+                }
+        }
+        pthread_barrier_wait(&b);
+        merge();
+        gettimeofday(&end, NULL);
+
+        // print the sorted list
+        startusec = start.tv_sec * 1000000 + start.tv_usec;
+        endusec = end.tv_sec * 1000000 +  end.tv_usec;
+        elapsed = (double) (endusec - startusec) / 1000000.0;
+        printf("sort took %.4f seconds\n", elapsed);
+        //  for (i = 0; i < NUMNUM; i++)
+        //      printf("%ld\n", snums[i]);
+
+        return 0;
+}
+
+```
