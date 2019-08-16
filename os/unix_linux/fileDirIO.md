@@ -277,3 +277,9 @@ Every i-node has link count that contains the number of directory entries that p
 The i-node contains all the information about the file. Most of the information in the `stat` structure is obtaiend from the i-node. Only two items of interest are stored in the directory entry: the filename and the i-node number.
 
 Any leaf directory has a link count of 2, the directory itself contains one and its parent directory contains the other.
+
+`link` and `linkat` create a new directory entry that references the existing file. The creation of the new directory and the increment of the link count must be an atomic operation. `unlink` and `unlinkat` remove the directory entry and decrement the link count of the file referenced by the entry. Only when the link count reaches 0 can the contents of the file be deleted. As long as some process has the file open, its contents will not be deleted. When a file is closed, the kernel first checks the count of the number of processes that have the file open and deletes it if the count reaches zero. This property of unlink is often used by a program to ensure that a temporary file it creates won’t be left around in case the program crashes. The process creates a file using either open or creat and then immediately calls unlink. The file is not deleted, however, because it is still open. Only when the process either closes the file or terminates, which causes the kernel to close all its open files, is the file deleted.
+
+ISO C `remove` is identical to `unlink` (file) or `rmdir` (directory).
+
+`rename` (ISO C) and `renameat` rename a file or a directory. If newname already exists, we need permissions as if we were deleting it.
