@@ -279,3 +279,35 @@ private:
 ## Deadlocks
 
 If multiple mutexes must be used, always obtain the locks in the same order. C++ defines the generic `std::lock` and `std::try_lock` functions that can be used to help prevent deadlocks rather than do it manually.
+
+## Conditional Variables (Event Handling)
+
+Condition variables allow programs to synchronize threads using the states of data, rather than simply locking the access to data. If using mutexes only, the above consumer-producer scenario would lack information about the states of data, that is, consumers don't know if they should acquire the mutex and so they are busy acquiring and releasing the mutex just to check if the the data is available. With condition variables, mutexes are only used for controlling access to the data. In addition, condition variables allow threads to release ownership of mutexes until a certain value has been obtained, until a preset amount of time has been passed, or until a preset point in time has been reached.
+
+The prototypical setup of threads using condition variables:
+
+1. consumer:
+
+- lock the mutex
+
+- while the required condition has not yet been attained (i.e., is false): release the mutex and wait until being notified
+
+- once the mutex's lock has been reacquired, and the required condition has been attained: process the data
+
+- release the mutex's lock
+
+2. producer:
+
+- lock the mutex
+
+- while the required condition has not yet been attained, do something to attain the required condition
+
+- notify waiting threads
+
+- release the mutex's lock.
+
+The consumer will miss the producer's notification if it hasn't yet entered its waiting state. So waiting (consumer) threads should start before notifying (producer) threads.
+
+`std::condition_variable`s are used in combination with `unique_lock<mutex>`, which might be more efficient than the more general `std::condition_variable_any` that may be used with any lock type.
+
+In addition to the condition variables, `std::notify_all_at_thread_exit` notifies all threads blocking on the condition variable. Waiting threads must verify the thread that is waiter for has indeed exited by first obtaining the lock and verify if the condition they are waiting for has been satisfied.
