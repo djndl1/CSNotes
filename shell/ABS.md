@@ -999,3 +999,31 @@ read [Difference Between nohup disown](https://unix.stackexchange.com/questions/
 - `enable`: enables or disables a shell builtin command
 
 - `autoload`: a function withan `autoload` declaration will load from an external file at its first invocation. This saves system resources. Not a part of the core Bash installation.
+
+## External Filters, Programs and Commands
+
+- `ls`: `-R`, recursive; `-S`: sort by size; `-t`: sort by modification time; `-v`: sort by numerical version number embedded in the filenames; `-b`: show escape characters; `-i`: show file inodes.
+
+- `cat`/`tac`: `tac` lists a file backwards from its end. `cat -n`: prepend a line number to every line in the output. `cat` is commonly used to concatenate files. In a pipe, it may be more efficient to redirect the `stdin` to a file rather than to `cat` the file.
+
+- `rev`: reverse every line of a file.
+
+- `cp`: `-a`: archive flag for copying an entire directory tree; `-u`: update flag which prevents overwriting identically-named newer files. `-r`/`-R`: recursive flags
+
+- `mv`: `-f`: do not prompt before overwriting.
+
+- `mkdir -p`: automatically creates any necessary parent directories.
+
+- `chattr`/`lsattr`: change/list file attributes
+
+- `find`: `-exec` carries out command on each file that find matches.
+
+```bash
+find . -maxdepth 1 -name '*.md' -exec lsattr {} \;
+find "$DIR" -type f -atime +5 -exec rm {} \;
+find /etc -exec grep '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*' {} \;
+```
+
+More usage TODO
+
+- `xargs`: a filter for feeding arguments to a command and also a tool for assembling the commands themselves.
