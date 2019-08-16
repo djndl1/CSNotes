@@ -249,3 +249,7 @@
 - [ ] [keras Conv2D](https://www.pyimagesearch.com/2018/12/31/keras-conv2d-and-convolutional-layers/)
 - [ ] [ConvLayer Anatomy](https://medium.com/@apiltamang/a-gentle-dive-into-the-anatomy-of-a-convolution-layer-6f1024339aca)
 - [ ] Copy Elision
+
+- [ ] https://developer.ibm.com/articles/au-aix-symbol-visibility/
+
+- [ ] https://gcc.gnu.org/wiki/Visibility
