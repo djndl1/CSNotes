@@ -1,8 +1,8 @@
 # Concept
 
-All threads within a single process have access to the same process components, such as file descriptors and memory. We can simplify code that deals with asynchronous events by assigning a separate thread to handle each event type. The overall throughput may be improved and interactive programs can realize improved response time by using multiple threads to separpate to the portions of the program that deal with user input and output from the other parts of the program.
+All threads within a single process have access to the same process components, such as file descriptors and memory. We can simplify code that deals with asynchronous events by assigning a separate thread to handle each event type. The overall throughput may be improved and interactive programs can realize improved response time by using multiple threads to separate the portions of the program that deal with user input and output from the other parts of the program.
 
-A thread consists of the information necessary to represent an execution context within a process, including a thread ID, a set of registers values, a stack, a scheduling priority and policy, a signal mask, an `errno` variable and thread-specific ddata. Everything with a process is sharable among the threads in a process, including the text of executable program, the program's global and heap memory, the stacks, and the file descriptors.
+A thread consists of the information necessary to represent an execution context within a process, including a thread ID, a set of registers values, a stack, a scheduling priority and policy, a signal mask, an `errno` variable and thread-specific data. Everything with a process is sharable among the threads in a process, including the text of executable program, the program's global and heap memory, the stacks, and the file descriptors.
 
 # Thread Identification
 
@@ -10,16 +10,16 @@ A thread ID is represented by the `pthread_t` data type, which may not be an int
 
 # Thread Creation
 
-When a program runs, it starts out as a single process with a single thread of control until it creates  more threads of control by `pthread_create()`. If more than one argument to the function is needed, store them in a struct and pass the pointer. pthread functions usually return an error code when they fail. They don't set `errno` like other POSIX functions. The new thread cannot safely use the `thread_t` that handles it because the spawning thread may not have returned from `pthread_create()` thus the `thread_t` may not usable.
+When a program runs, it starts out as a single process with a single thread of control until it creates  more threads of control by `pthread_create()`. If more than one argument to the function is needed, store them in a struct and pass the pointer. pthread functions usually return an error code when they fail. They don't set `errno` like other POSIX functions. The new thread cannot safely use a global `thread_t` that identifies this thread because the spawning thread may not have returned from `pthread_create()` thus the `thread_t` may not usable.
 
 # Thread Termination
 
-If any thread within a process calls `exit`, `_Exit` or `_exit`, the entire process terminates. A signal sent to a thread will terminate the entire process. To terminate a thread, a thread can simply return, be canceled by another thread or call `pthread_exit`. `pthread_join` gets the returned value from `pthread_exit` or the simple `return`ed value or the `PTHREAD_CANCEL`.
+If any thread within a process calls `exit`, `_Exit` or `_exit`, the entire process terminates. A signal sent to a thread will terminate the entire process. To terminate a thread, a thread can simply _return_, _be canceled_ by another thread or call `pthread_exit`. `pthread_join` gets the returned value from `pthread_exit` or the simple `return`ed value or the `PTHREAD_CANCEL`.
 
 
 The typeless pointer passed to `pthread_create` and `pthread_exit` can be used to pass more than a single value through a `struct`.
 
-One thread can request that another in the same process be canceled by calling  `pthread_cancel`. The default behavior is that the thread requested to exit `pthread_exit`s with `PTHREAD_CANCELED`. A thread can ignore or otherwise control how it is canceled. A thread can arrange for functions to be called when it exits, known as _thread cleanup handlers_, recorded in stack. The `pthread_cleanup push` schedules the cleanup function when the thread `pthread_exit`, responds to a cancellation request or makes a call to `pthread_cleanup_pop` with nonzero execute argument. A zero argument to `pthread_cleanup_push` merely remove a handler. A simple `return` does not trigger cleanup handlers. Returning between `pthread_cleanup_push` and `pthread_cleanup_pop` is undefined behavior (on linux they are implemented as paired macros that expand to text containing `{` and `}`). The only portable way to return in between is to call `pthread_exit`.
+One thread can request that another in the same process be canceled by calling  `pthread_cancel`. The default behavior is that the thread requested to exit `pthread_exit`s with `PTHREAD_CANCELED`. A thread can ignore or otherwise control how it is canceled. A thread can arrange for functions to be called when it exits, known as _thread cleanup handlers_, recorded in stack. The `pthread_cleanup_push` schedules the cleanup function when the thread `pthread_exit`, responds to a cancellation request or makes a call to `pthread_cleanup_pop` with nonzero execute argument. A zero argument to `pthread_cleanup_push` merely remove a handler. A simple `return` does not trigger cleanup handlers. Returning between `pthread_cleanup_push` and `pthread_cleanup_pop` is undefined behavior (on linux they are implemented as paired macros that expand to text containing `{` and `}`). The only portable way to return in between is to call `pthread_exit`.
 
 ```c
 #  define pthread_cleanup_push(routine, arg) \
@@ -44,7 +44,7 @@ When mutliple threads of control share the same memory, we need to make sure tha
 
 We can protect our data and ensure access by only one thread at a time by using the pthreads mutual-exclusion interfaces. A _mutex_ is basically a lock that we set before accessing a shared resources and release (unlock) when we're done. While it is set, any other thread that tries to set it will block until we release it. 
 
-The mutual-exclusion mechanism works only if we design our threads to follow the same data-aceess rules. If we allow one thread to access a shared resource without first acquiring a lock, t hen inconsistencies can occur even though the rest of our threads do acquire the lock before attempting to access the shared resource.
+The mutual-exclusion mechanism works only if we design our threads to follow the same data-aceess rules. If we allow one thread to access a shared resource without first acquiring a lock, then inconsistencies can occur even though the rest of our threads do acquire the lock before attempting to access the shared resource.
 
 A mutex variable is represented by the `pthread_mutex_t` dat type. Initialize a mutex by
 
@@ -79,7 +79,8 @@ struct foo *foo_alloc(int id)
                         free(fp);
                         return (NULL);
                 }
-        }
+        } else
+                return NULL;
         return fp;
 }
 
@@ -107,7 +108,7 @@ void foo_rele(struct foo *fp)
 
 ## Deadlock avoidance
 
-Deadlocks may occur if a thrad tries to lock the same mutex twice or two threads holding one of two mutexes respectively and try to acquire the other. Lock ordering may prevent deadlock. If it is impossible to arrange a lock ordering, use `pthread_trylock` to acquire another lock, release the already-held lock if failed.
+Deadlocks may occur if a thread tries to lock the same mutex twice or two threads holding one of two mutexes respectively and try to acquire the other. Lock ordering may prevent deadlock. If it is impossible to arrange a lock ordering, use `pthread_trylock` to acquire another lock, release the already-held lock if failed.
 
 ```c
 #include <pthread.h>
@@ -145,10 +146,11 @@ struct foo *foo_alloc(int id)
                 fp->f_next = fh[idx]; // put fp at the beginning of the bucket
                 fh[idx] = fp;
                 pthread_mutex_lock(&fp->f_lock);
-                pthread_mutex_unlock(&hashlock);
                 // continue intialization
+                pthread_mutex_unlock(&hashlock);
                 pthread_mutex_unlock(&fp->f_lock);
-        }
+        } else
+                return NULL;
         return fp;
 }
 
@@ -183,7 +185,7 @@ void foo_rele(struct foo *fp)
         if (--fp->f_count == 0) { // last release
                 idx = HASH(fp->f_id);
                 tfp = fh[idx];
-                if (tfp == fp) {
+                if (tfp == fp) {            // if at the head of the bucket
                         fh[idx] = fp->f_next;
                 } else {
                         while (tfp->f_next != fp)
@@ -194,7 +196,7 @@ void foo_rele(struct foo *fp)
                 pthread_mutex_destroy(&fp->f_lock); 
                 // we are not accessing any members of fp
                 // hashlock cannot prevent anyone from holding fp and modify it directly without accessing the hash table
-                // it's gonna be destroyed anyway
+                // it's not in the hash table and it's gonna be destroyed anyway.
                 free(fp);
         } else {
                 fp->f_count--;
@@ -202,8 +204,6 @@ void foo_rele(struct foo *fp)
         }
 }
 ```
-
-## Timed lock
 
 `pthread_mutex_timedlock` returns the error code `ETIMEOUT` when it failed to lock the mutex after tiemout value is reached. It can be used to avoid blocking indefinitely.
 
@@ -433,23 +433,25 @@ void *thr_fn(void *arg)
         return ((void*)0);
 }
 
+// one of the smallest eight elements of the eight sorted array is the smallest
 void merge()
 {
         long idx[NTHR];
         long i, minidx, sidx, num;
 
         for (i = 0; i < NTHR; i++)
-                idx[i] = i * TNUM;
+                idx[i] = i * TNUM; // keep the smallest eight
         for (sidx = 0; sidx < NUMNUM; sidx++) {
                 num = LONG_MAX;
-                for (i = 0; i < NTHR; i++) {
+                f
+                or (i = 0; i < NTHR; i++) {
                         if ((idx[i] < (i+1)*TNUM) && (nums[idx[i]] < num)) {
                                 num = nums[idx[i]];
                                 minidx = i;
                         }
                 }
                 snums[sidx] = nums[idx[minidx]];
-                idx[minidx]++;
+                idx[minidx]++;    // update the index of the smallest in corresponding array
         }
 }
 
@@ -492,3 +494,31 @@ int main(int argc, char *argv[])
 }
 
 ```
+
+# Thread Limits
+
+The SUS defines several limits associated with the operation of threads, which are queried using `sysconf`:
+
+`PTHREAD_DESTRUCTOR_INTERATIONS`; `PTHREAD_KEYS_MAX`; `PTHREAD_STACK_MIN`; `PTHREAD_THREADS_MAX`.
+
+# Thread Attributes
+
+The pthread interface allows us to fine-tune the behavior of threads and synchronization objects by setting various attributes associated with each object. Each object is associated with its own type of attribute object. The attribute object is opaque to applications. A pair of functions exist to set the attributes to their default values and destroy the attribute object. Each attribute has a pair of functions to get/set the value of the attribute.
+
+We use `pthread_attr_init` to initialize `pthread_attr_t` structure to the default values. `pthread_attr_destroy` set the attribute object with invalid values and free the resource if any.
+
+- `detachstate`: detached thread attribute. `pthread_attr-setdetachstate` set the `detachstate` attribute to one of two legal values: `PTHREAD_CREATE_DETACHED` to start the thread in the detached state or `PTHREAD_CREATE_JOINABLE` to start the thread normally. `pthread_attr_getdetachstate` obtain the current `detachstate` attribute.
+
+- `stackaddr`: lowest address of the thread stack. With threads, the same amount of virtual address space must be shared by all the thread stacks. If virtual address space runs out, `malloc` and `mmap` can allocate space for an alternative stack and `pthread_set_stack` change the stack location of the created threads. For most applications, this is not necessary and should be avoided.
+
+- `stacksize`: minimum size in bytes of thread stack. An application can also get and set the `stacksize` thread attribute using the `pthread_attr_getstacksize` and `pthread_attr_setstacksize`.
+
+- `guardsize`: guard buffer size in bytes at end of thread stack. It controls the size of the memory extent after the end of the thread's stack to protect against stack overflow. A commonly used value is the system page size. If the thread's stack pointer overflows into the guard area, the application will receive an error, possibly with a signal.
+
+Two thread attributes not included in the `pthread_attr_t` structure are the _cancellability state_ (`PTHREAD_CANCEL_ENABLE` or `PTHREAD_CANCEL_DISABLE`) and the `cancelability type`, which affect the behavior of a thread in response to a call to `pthread_cancel`.
+
+A call to `pthread_cancel` doesn’t wait for a thread to terminate. In the default case, a thread will continue to execute after a cancellation request is made until the thread reaches a cancellation point. A cancellation point is a place where the thread checks whether it has been canceled, and if so, acts on the request. POSIX.1 guarantees that cancellation points will occur when a thread calls certain functions. A custom cancellation point can be set by calling `pthread_testcancel`.
+
+A thread starts with a default cancelability state of `PTHREAD_CANCEL_ENABLE`. When the state is set to `PTHREAD_CANCEL_DISABLE`, a call to `pthread_cancel` will not kill the thread. Instead, the cancellation request remains pending for the thread. When the state is enabled again, the thread will act on any pending cancellation requests at the next cancellation point.
+
+The default cancellation type we have been describing is known as _deferred cancellation_. However, `pthread_setcanceltype` can set it to `PTHREAD_CANCEL_ASYNCHRONOUS` type. With asynchronous cancedllation, a thread can be cancelled at any time, rather than when hitting a cancedllation point.
