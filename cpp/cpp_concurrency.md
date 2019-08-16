@@ -273,4 +273,9 @@ private:
 
 - `std::unique_lock`: a more expensive interface, allowing explicit unlocking and locking of the mutex they control. a general-purpose mutex ownership wrapper allowing deferred locking, time-constrained attempts at locking, recursive locking, transfer of lock ownership, and use with condition variables. It can be constructed without locking the mutex and can `release` the mutex and no longer "own"s it (can no longer manipulate it, break the association with the mutex) without unlocking the mutex.
 
-- `std::shared_lock`: a general-purpose shared mutex ownership wrapper allowing deferred locking, timed locking and transfer of lock ownership.
+- `std::shared_lock`: a general-purpose shared mutex ownership wrapper allowing deferred locking, timed locking and transfer of lock ownership. Used with `shared_mutex` and `shared_timedmutex`
+
+
+## Deadlocks
+
+If multiple mutexes must be used, always obtain the locks in the same order. C++ defines the generic `std::lock` and `std::try_lock` functions that can be used to help prevent deadlocks rather than do it manually.
