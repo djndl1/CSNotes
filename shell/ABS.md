@@ -1026,4 +1026,70 @@ find /etc -exec grep '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*' {} 
 
 More usage TODO
 
-- `xargs`: a filter for feeding arguments to a command and also a tool for assembling the commands themselves.
+- `xargs`: a filter for feeding arguments to a command and also a tool for assembling the commands themselves. It reads items from the stdin, delimited by blanks or newlines and executes the command with any initial arguments followed by items read from stdin by `xargs`.
+
+```bash
+ls | xargs -p gzip # gzips every file in pwd
+```
+
+The `-P` option to `xargs` permits running processes in parallel. A curly bracket servers as a placeholder for replacement text.
+
+```bash
+ls | xargs -i echo {} # two echoes instead of one
+ls | xargs -i wc -l {}
+```
+
+### Date/Time
+
+- `date`: date and time
+
+- `zdump`: echoes the time in a specified time zone
+
+```bash
+zdump UTC-8
+zdump EST
+```
+
+- `time`: output verbose timing statistics for executing a command
+
+- `touch`: update access/modification time, also creates a file if none
+
+tip: use `touch` to stop `cp -u` overwriting a file.
+
+- `at`/`batch`: batch job
+
+- `cal`: calendar
+
+- `sleep`
+
+- `usleep`: micro sleep in microseconds
+
+- `hwclock`, `clock`: accesses or adjusts the machine's hardware clock.
+
+### Text  Processing 
+
+TODO
+
+### File and Archiving
+
+TODO
+
+### Communication 
+
+TODO
+
+### Terminal Control
+
+TODO
+
+### Math
+
+TODO
+
+### Miscellaneous
+
+TODO
+
+## System and Administrative Commands
+
+
