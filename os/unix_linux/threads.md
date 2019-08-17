@@ -372,7 +372,7 @@ https://stackoverflow.com/questions/14924469/does-pthread-cond-waitcond-t-mutex-
 
 ## Spin Locks
 
-The process is blocked by busy-waiting (spinning) until the lock can be acquired. A spin lock could be used in situations where locks are held for short periods of times and threads don't want to incur the cost of being descheduled. Spin locks are often used as low-level primitive to implement other types of locks. Although efficient, they can lead to wasting CPU resources. Spin locks are useful when used in a nonpreemptive kernel, tehy block interrupts. Spin locks are not as useful unless in a real-time scheduling class that doesn't allow preemption. Many mutex implementations are so efficient that the performance of applications using mutex locks is equivalent to their performance if they had used spin locks. Spin locks are useful in limited circumstances.
+The process is blocked by busy-waiting (spinning) until the lock can be acquired. A spin lock could be used in situations where locks are held for short periods of times and threads don't want to incur the cost of being descheduled. Spin locks are often used as low-level primitive to implement other types of locks. Although efficient, they can lead to wasting CPU resources. Spin locks are useful when used in a nonpreemptive kernel, they block interrupts. Spin locks are not as useful unless in a real-time scheduling class that doesn't allow preemption. Many mutex implementations are so efficient that the performance of applications using mutex locks is equivalent to their performance if they had used spin locks. Spin locks are useful in limited circumstances.
 
 The interfaces for spin locks are similar to those for mutexes, making it relatively easy to replace one with the other.
 
@@ -392,7 +392,7 @@ When we initialize a barrier, we use the count argument to specify the number of
 
 `pthread_barrier_wait` indicates that a thread is done with its work and is ready to wait for all the other threads to catch up. The thread calling `pthread_barrier_wait` is put to sleep if the count is not satisfied.  If the thread is the last one to call `pthread_barrier_wait`, thereby satisfying the barrier count, all of the threads are awakened.
 
- When   the  required  number  of  threads  have  called  `pthread_barrier_wait()` specifying the barrier, the constant  PTHREAD_BARRIER_SE- RIAL_THREAD  shall  be  returned  to  one unspecified thread and zero shall be returned to each of the remaining threads.
+ When   the  required  number  of  threads  have  called  `pthread_barrier_wait()` specifying the barrier, the constant  `PTHREAD_BARRIER_SERIAL_THREAD`  shall  be  returned  to  one unspecified thread and zero shall be returned to each of the remaining threads.
 
 ```c
 #include <stdio.h>
@@ -443,8 +443,7 @@ void merge()
                 idx[i] = i * TNUM; // keep the smallest eight
         for (sidx = 0; sidx < NUMNUM; sidx++) {
                 num = LONG_MAX;
-                f
-                or (i = 0; i < NTHR; i++) {
+                for (i = 0; i < NTHR; i++) {
                         if ((idx[i] < (i+1)*TNUM) && (nums[idx[i]] < num)) {
                                 num = nums[idx[i]];
                                 minidx = i;
@@ -522,3 +521,52 @@ A call to `pthread_cancel` doesn’t wait for a thread to terminate. In the defa
 A thread starts with a default cancelability state of `PTHREAD_CANCEL_ENABLE`. When the state is set to `PTHREAD_CANCEL_DISABLE`, a call to `pthread_cancel` will not kill the thread. Instead, the cancellation request remains pending for the thread. When the state is enabled again, the thread will act on any pending cancellation requests at the next cancellation point.
 
 The default cancellation type we have been describing is known as _deferred cancellation_. However, `pthread_setcanceltype` can set it to `PTHREAD_CANCEL_ASYNCHRONOUS` type. With asynchronous cancedllation, a thread can be cancelled at any time, rather than when hitting a cancedllation point.
+
+# Synchronization Attributes
+
+## Mutex Attributes
+
+`phtread_mutexattr_t` accepts the default attributes by using `PTHREAD_MUTEX_INITIALIZER` or by calling `pthread_mutex_init` with a null pointer for the argument for the mutex attribute.
+
+There are three attributes of interest
+
+- _process-shared_ attribute: the default is `PTHREAD_PROCESS_PRIVATE`. Access to shared data by multiple processes usually requires synchronization, just as does access to shared data by multiple threads. If the process-shared mutex attribute is set to _PTHREAD_PROCESS_SHARED_, a mutex allocated from a memory extent shared between multiple processes may be used for synchronization by those processes. The process-shared mutex attribute allows the pthread library to provide more efficient mutex implementations when the attribute is set to PTHREAD_PROCESS_PRIVATE, which is the default case with multithreaded applications.
+
+- _robust attribute_: It is meant to address the problem of mutex state recovery when a process terminates while holding a mutex. The default is `PTHREAD_MUTEX_STALLED`, which means that no special action is taken when a process terminates while holding a mutex. The other value is `PTHREAD_MUTEX_ROBUST`. This value will cause a thread blocked in a call to pthread_mutex_lock to acquire the lock when another process holding the lock terminates without first unlocking it. The next owner should call pthread_mutex_consistent(3) on the acquired mutex to make it consistent again before using it any further.
+
+- _type_ attribute: 
+
+1. `PTHREAD_MUTEX_NORMAL`: A standard mutex type that doesn’t do any special error checking or deadlock detection.
+
+2. `PTHREAD_MUTEX_ERRORCHECK `: provides error checking.
+
+3. `PTHREAD_MUTEX_RECURSIVE`: A mutex type that allows the same thread to lock it multiple times without first unlocking it. A recursive mutex maintains a lock count and isn’t released until it is unlocked the same number of times it is locked.
+
+4. `PTHREAD_MUTEX_DEFAULT`: A mutex type providing default characteristics and behavior. Implementations are free to map it to one of the other mutex types.
+
+| Mutex Type               | Relock without unlock | Unlock when unlocked | Unlock when not owned |
+| :---:                    | :---:                 | :---:                | :---:                 |
+| `PTHREAD_MUTEX_NORMAL`    | deadlock              | undefined            | undefined             |
+| `PTHREAD_MUTEX_ERRORCHECK` | returns error         | returns error        | returns error         |
+| `PTHREAD_MUTEX_RECURSIVE` | allowed               | returns error        | returns error         |
+
+
+It is not a good idea to use a recursive mutex with a condvar.
+
+Recursive use TODO
+
+## Reader-Writer Lock Attributes
+
+Reader-writer locks have attributes similar to mutexes. The only attribute supported for reader-writer lock is the _process-shared_ attribute, identical to the mutex process-shared attribute. Implementations arefree to define additional nonstandard ones.
+
+## Condition Variable Attributes
+
+The SUS defines two attributes for condition variables:
+
+- process-shared: It controls whether condition variables can be used by threads within a single process only or from within multiple processes. 
+
+- clock: The clock attribute controls which clock is used when evaluating the timeout argument of the `pthread_cond_timedwait` function.
+
+## Barrier Attributes
+
+The only barrier attribute currently defined is the _process-shared_ attribute, which controls whether a barrier can be used by threads from multiple processes or only from within the process that initialized the barrier.
