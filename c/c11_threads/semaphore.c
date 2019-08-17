@@ -5,7 +5,7 @@
 #include <time.h>
 
 typedef struct semaphore {
-        size_t    d_available;
+        volatile int    d_available;
         cnd_t     d_cnd;
         mtx_t     d_mtx;
 
@@ -36,20 +36,22 @@ void smph_destroy(smph_t *sm)
 void smph_wait(smph_t *sm)
 {
         mtx_lock(&sm->d_mtx);
-        while (sm->d_available == 0)
-                cnd_wait(&sm->d_cnd, &sm->d_mtx);
-
         sm->d_available--;
-        printf("Semaphore %lu resource consumed, remaining %lu\n", sm->id, sm->d_available);
+        while (sm->d_available < 0)
+                cnd_wait(&sm->d_cnd, &sm->d_mtx);
+        printf("Semaphore %zu count %d\n", sm->id, sm->d_available);
         mtx_unlock(&sm->d_mtx);
 }
 
 void smph_notify_all(smph_t *sm)
 {
         mtx_lock(&sm->d_mtx);
-        while (sm->d_available++ == 0)
-                cnd_broadcast(&sm->d_cnd);
-        printf("Semaphore %lu resource increased, now %lu\n", sm->id, sm->d_available);
+        while (sm->d_available < 0) {
+                sm->d_available++;
+                if (sm->d_available == 0)
+                        cnd_broadcast(&sm->d_cnd);
+        }
+        printf("Semaphore %zu count %d\n", sm->id, sm->d_available);
         mtx_unlock(&sm->d_mtx);
 }
 
@@ -57,21 +59,25 @@ void smph_notify_all(smph_t *sm)
 
 
 typedef struct sems {
-        smph_t filled;
-        smph_t available;
+        smph_t empty_count;
+        smph_t full_count;
+        mtx_t pool_mtx;
+        size_t items;
 } sems_t;
 
-struct timespec consuming_dura = { 5, 0 };
-struct timespec producing_dura = { 4, 0 };
+struct timespec consuming_dura = { 1, 0 };
+struct timespec producing_dura = { 2, 0 };
 
 int consumer(void *arg)
 {
         sems_t *sms = arg;
         while (true) {
-                printf("Consuming\n");
-                smph_wait(&sms->filled);  // waiting for resource available
+                smph_wait(&sms->full_count);  // P
+                mtx_lock(&sms->pool_mtx);
+                printf("Consuming, %zu remaining in the pool\n", sms->items);
                 thrd_sleep(&consuming_dura, NULL);
-                smph_notify_all(&sms->available); // notify producer if there is no resource
+                mtx_unlock(&sms->pool_mtx);
+                smph_notify_all(&sms->empty_count); // V
         }
 }
 
@@ -80,19 +86,25 @@ int producer(void *arg)
         sems_t *sms = arg;
 
         while (true) {
-                smph_wait(&sms->available);   // waiting for an empty place to place resource
-                printf("Producing\n");
+                smph_wait(&sms->empty_count);   // P
+                mtx_lock(&sms->pool_mtx);
+                sms->items++;
+                printf("Producing, %zu now in the pool\n", sms->items);
                 thrd_sleep(&producing_dura, NULL);
-                smph_notify_all(&sms->filled);  // notify consumers there is a resource available
+                mtx_unlock(&sms->pool_mtx);
+                smph_notify_all(&sms->full_count);  // V
         }
 }
 
+
 int main(int argc, char *argv[])
 {
-        smph_t filled, available;
-        smph_init(&filled, 0, 1);
-        smph_init(&available, 5, 2);
-        sems_t sms = { filled, available };
+        smph_t empty, full;
+        smph_init(&full, 0, 1);
+        smph_init(&empty, 5, 2);
+        mtx_t pool_t;
+        mtx_init(&pool_t, mtx_plain);
+        sems_t sms = { empty, full, pool_t, 0};
 
         thrd_t consume_thrd1, consume_thrd2, produce_thrd;
         thrd_create(&consume_thrd2, consumer, &sms);
