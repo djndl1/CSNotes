@@ -577,7 +577,7 @@ Multiple threads of control can potentially call the same function at the same t
 
 Many functions are not thread-safe, because they return data stored in a static memory buffer. They are made thread-safe by changing their interfaces to require that the caller provide its own buffer.
 
-A function that is safe to be reentered from an asynchronous signal handler.
+A function that is safe to be reentered from an asynchronous signal handler is async-signal safe.
 
 POSIX.1 provides a way to manage `FILE` objects in a thread-safe way. `flockfile` and `ftrylockfile` obtain a recursive lock associated with a given `FILE` object. To avoid locking and unlocking overhead, character-at-a-time I/O functions have unlocked versions: `getchar_unlocked`, `getc_unlocked`, `putchar_unlocked` and `putc_unlocked`, used with `flockfile` functions.
 
@@ -631,9 +631,9 @@ int getenv_r(const char *name, char *buf, int buflen)
 }
 ```
 
-Protecting the global `environ` and providing a custom buffer ensures thread-safety. The recursive mutex gives async-signal safety. 
+Protecting the global `environ` and providing a custom buffer ensures thread-safety. The recursive mutex gives async-signal safety (however, pthread functions are not guaranteed to be async-signal safe).
 
-More at (Difference between thread-safety and async-signal safety)[https://stackoverflow.com/questions/9837343/difference-between-thread-safe-and-async-signal-safe].
+More at [Difference between thread-safety and async-signal safety](https://stackoverflow.com/questions/9837343/difference-between-thread-safe-and-async-signal-safe).
 
 
 # Thread-Specific Data
@@ -700,3 +700,5 @@ char *getenv_m(const char *name)
         return NULL;
 }
 ```
+
+This is not async-signal safe even if we make the mutex recursive.
