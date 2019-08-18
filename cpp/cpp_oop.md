@@ -601,7 +601,7 @@ void Class::swap(Class &other)
 }
 ```
 
-### Move Semantics
+## Move Semantics
 
 Moving information is based on the concept of anonymous data and in general by functions returning their results by value instead of returning references or pointers. Anonymous values are always short-lived.
 
@@ -752,4 +752,95 @@ For classes offering value sematics (able to initialize/be assigned to objects o
 
 -  The copy- and move constructors must always be implemented independently from each other.
 
-Whenever a member of a class receives a const & to an object of its own class and creates a copy of that object to perform its actual actions on, then that function’s implementation can be implemented by an overloaded function expecting an rvalue reference. e.g. implementing a copy assginment in terms of move assignment.
+Whenever a member of a class receives a `const&` to an object of its own class and creates a copy of that object to perform its actual actions on, then that function’s implementation can be implemented by an overloaded function expecting an rvalue reference. e.g. implementing a copy assginment in terms of move assignment.
+
+## Copy Elision and Return Value Optimization
+
+### How a member function is selected
+
+For a named argument:
+
+|       | ono-const | const |
+| :---: | :---:     | :---: |
+|       | (T&)       |       |
+|       | (T const &) | (T const &) |
+
+For an anonymous argument
+
+|   | non-const | const |
+|---|-----------|-------|
+|   | (T&&)     | )     |
+|   | (T const &) | (T const &) |
+
+A function with value parameters and another overloaded function with reference parameters cause the compiler to report an ambiguity error. All arguments can be used with a function specifying a `T const &` parameter. For anonymous arguments, a similar catchall is available having a higher priority: `T const &&`. A function like this cannot modify the parameter but copy it. This kind of function should be replaced by functions that have `T const &` when accepting anonymous objects.`
+
+The compiler can choose to avoid making copies (copy elision/return value optimization). All modern compilers apply copy elision.
+
+- if a copy or move constructor exists, try copy elision.
+
+- if a move constructor exists, move
+
+- if a copy constructor exists, copy
+
+- report an error
+
+```cpp
+#include <utility>
+#include <iostream>
+#include <vector>
+ 
+struct Noisy {
+    Noisy() { std::cout << "constructed\n"; }
+    Noisy(const Noisy&) { std::cout << "copy-constructed\n"; }
+    Noisy(Noisy&&) { std::cout << "move-constructed\n"; }
+    ~Noisy() { std::cout << "destructed\n"; }
+};
+ 
+std::vector<Noisy> f() {
+    std::vector<Noisy> v = std::vector<Noisy>(3); // copy elision when initializing v
+                                                  // from a temporary (until C++17)
+                                                  // from a prvalue (since C++17)
+    return v; // NRVO from v to the result object (not guaranteed, even in C++17)
+}             // if optimization is disabled, the move constructor is called
+ 
+void g(std::vector<Noisy> arg) {
+    std::cout << "arg.size() = " << arg.size() << '\n';
+}
+ 
+int main() {
+    std::vector<Noisy> v = f(); // copy elision in initialization of v
+                                // from the temporary returned by f() (until C++17)
+                                // from the prvalue f() (since C++17)
+    g(f());                     // copy elision in initialization of the parameter of g()
+                                // from the temporary returned by f() (until C++17)
+                                // from the prvalue f() (since C++17)
+}
+```
+
+```bash
+constructed
+constructed
+constructed
+constructed
+constructed
+constructed
+arg.size() = 3
+destructed
+destructed
+destructed
+destructed
+destructed
+destructed
+```
+
+## Unrestricted Unions
+
+unrestricted unions allow addition of data fields of types for which non-trivial constructors were defined. Such data fields commonly are of class types.
+
+TODO
+
+## Aggregate Data Types
+
+Structs are still used in C++, mainly to store and pass around aggregates of different data types. A commonly used term for these structs is aggregate (in some languages known as plain old data (pod)). Aggregates are commonly used in C++ programs to merely combine data in dedicated (struct) types. Some members (constructors, destructors, overloaded assignment operator) may implicitly be defined.
+
+Aggregates should not have user provided special member functions, virtual members. Aggregates should inherit only publicly and the base classes aren't not virtual. Its non-static members have public access rights.
