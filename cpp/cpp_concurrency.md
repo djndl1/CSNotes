@@ -311,3 +311,44 @@ The consumer will miss the producer's notification if it hasn't yet entered its 
 `std::condition_variable`s are used in combination with `unique_lock<mutex>`, which might be more efficient than the more general `std::condition_variable_any` that may be used with any lock type.
 
 In addition to the condition variables, `std::notify_all_at_thread_exit` notifies all threads blocking on the condition variable. Waiting threads must verify the thread that is waiter for has indeed exited by first obtaining the lock and verify if the condition they are waiting for has been satisfied.
+
+`condition_variable`'s destructor requires that no thread is blocked by the thread destroying the `condition_variable`. All threads waiting on a `condition_variable` must be notified before a `condition_variable` object's lifetime ends.
+
+The functionality that is offered by `condition_variable_any` is identical to the functionality offered by the class `condition_variable`, albeit that the lock type is not predefined. The requirements of these lock-types are identical to those of the stl-provided `unique-lock` and user-defined lock-type implementation should provide at least the interface and semantics that is also provided by `unique_lock`.
+
+## Atomic Actions
+
+Atomic data types are available for all basic types and also for trivial user defined types, which are all scalar types, arrays of elements of a trivial type, and classes whose constructors, copy constructors, and destructors all have default implementations and their non-static data members are themselves of trivial types.
+
+The class template `std::atomiic<T>` is available for all built-in types, including pointer types. `std::atomic<Trivial>` also defines an atomic variant of a trivial type.
+
+Atomic types cannot be assigned to each other directly, but can be assgined to or initialized using non-atomic types.
+
+```cpp
+atomic<int> a1 = 5;
+atomic<int> a2{static_cast<int>(a1)};
+```
+
+`std::memory_order` TODO
+
+There are some standard available member functions for `std::atomic<T>`:
+
+First read [CAS](https://en.wikipedia.org/wiki/Compare-and-swap), [cmpxchg](http://heather.cs.ucdavis.edu/~matloff/50/PLN/lock.pdf)
+
+- `bool compare_exchange_strong()`
+
+- `bool compare_exchange_weak()`
+
+- `T exchange(T newValue)`
+
+- `bool is_lock_free()`: if operations on the current object can be performed lock-free
+
+- `void store(T newValue)`: same as assignment
+
+- `T load() const`
+
+Integral atomic types `Integral` also offers:
+
+- `fetch_add`; `fetch_sub`; `fetch_and`; `fetch_!=``; `fetch_^|`, increments, decrements, assignments.
+
+`std::atomic_compare_exchange_strong`; `std::atomic_compare_exchange_weak`; `std::atomic_exchange`; `std::atomic_init` (unfortunately it's not atomic); `std::atomic_is_lock_free`; `std::atomic_load` are available for all atomic types.
