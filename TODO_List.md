@@ -255,3 +255,4 @@
 - [ ] https://gcc.gnu.org/wiki/Visibility
 
 - [ ] https://sites.cs.ucsb.edu/~rich/class/cs170/notes/Semaphores/
+- [ ] https://en.wikibooks.org/wiki/Operating_System_Design/Processes/Semaphores
