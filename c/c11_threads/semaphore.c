@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <threads.h>
 #include <stdint.h>
 #include <time.h>
@@ -36,22 +37,22 @@ void smph_destroy(smph_t *sm)
 void smph_wait(smph_t *sm)
 {
         mtx_lock(&sm->d_mtx);
-        sm->d_available--;
-        while (sm->d_available < 0)
+        
+        while (sm->d_available == 0)
                 cnd_wait(&sm->d_cnd, &sm->d_mtx);
+        sm->d_available--;
         printf("Semaphore %zu count %d\n", sm->id, sm->d_available);
+        fflush(stdout);
         mtx_unlock(&sm->d_mtx);
 }
 
 void smph_notify_all(smph_t *sm)
 {
         mtx_lock(&sm->d_mtx);
-        while (sm->d_available < 0) {
-                sm->d_available++;
-                if (sm->d_available == 0)
-                        cnd_broadcast(&sm->d_cnd);
-        }
-        printf("Semaphore %zu count %d\n", sm->id, sm->d_available);
+        if (sm->d_available++ == 0)
+            cnd_broadcast(&sm->d_cnd);
+        printf("Semaphore %zu count %d\n\n", sm->id, sm->d_available);
+        fflush(stdout);
         mtx_unlock(&sm->d_mtx);
 }
 
@@ -65,20 +66,25 @@ typedef struct sems {
         size_t items;
 } sems_t;
 
-struct timespec consuming_dura = { 1, 0 };
-struct timespec producing_dura = { 2, 0 };
+struct timespec consuming_dura = { 0, 0 };
+struct timespec producing_dura = { 0, 0 };
 
 int consumer(void *arg)
 {
         sems_t *sms = arg;
         while (true) {
+                consuming_dura.tv_nsec = rand();
                 smph_wait(&sms->full_count);  // P
                 mtx_lock(&sms->pool_mtx);
-                printf("Consuming, %zu remaining in the pool\n", sms->items);
+                sms->items--;
+                printf("Consumed, %zu items remaining\n", sms->items);
+                fflush(stdout);
                 thrd_sleep(&consuming_dura, NULL);
                 mtx_unlock(&sms->pool_mtx);
                 smph_notify_all(&sms->empty_count); // V
         }
+
+        return 0;
 }
 
 int producer(void *arg)
@@ -86,14 +92,18 @@ int producer(void *arg)
         sems_t *sms = arg;
 
         while (true) {
+                producing_dura.tv_nsec = rand();
                 smph_wait(&sms->empty_count);   // P
                 mtx_lock(&sms->pool_mtx);
                 sms->items++;
-                printf("Producing, %zu now in the pool\n", sms->items);
-                thrd_sleep(&producing_dura, NULL);
+                printf("Produced, %zu items now in the pool\n", sms->items);
+                fflush(stdout);
                 mtx_unlock(&sms->pool_mtx);
                 smph_notify_all(&sms->full_count);  // V
+                thrd_sleep(&producing_dura, NULL);
         }
+
+        return 0;
 }
 
 
@@ -105,8 +115,10 @@ int main(int argc, char *argv[])
         mtx_t pool_t;
         mtx_init(&pool_t, mtx_plain);
         sems_t sms = { empty, full, pool_t, 0};
+        srand(time(0));
 
         thrd_t consume_thrd1, consume_thrd2, produce_thrd;
+
         thrd_create(&consume_thrd2, consumer, &sms);
         thrd_create(&consume_thrd1, consumer, &sms);
         thrd_create(&produce_thrd, producer, &sms);
