@@ -253,3 +253,5 @@
 - [ ] https://developer.ibm.com/articles/au-aix-symbol-visibility/
 
 - [ ] https://gcc.gnu.org/wiki/Visibility
+
+- [ ] https://sites.cs.ucsb.edu/~rich/class/cs170/notes/Semaphores/
