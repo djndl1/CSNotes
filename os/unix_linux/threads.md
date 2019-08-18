@@ -570,3 +570,133 @@ The SUS defines two attributes for condition variables:
 ## Barrier Attributes
 
 The only barrier attribute currently defined is the _process-shared_ attribute, which controls whether a barrier can be used by threads from multiple processes or only from within the process that initialized the barrier.
+
+# Reentrancy
+
+Multiple threads of control can potentially call the same function at the same time. If a function can be safely called by multiple threads at the same time, then they are _thread safe_. Implementations provide alternative thread-safe versions of some of POSIX.1 functions that aren't thread-safe, with `_r` appended at the end of the name, signifying reentrancy.
+
+Many functions are not thread-safe, because they return data stored in a static memory buffer. They are made thread-safe by changing their interfaces to require that the caller provide its own buffer.
+
+A function that is safe to be reentered from an asynchronous signal handler.
+
+POSIX.1 provides a way to manage `FILE` objects in a thread-safe way. `flockfile` and `ftrylockfile` obtain a recursive lock associated with a given `FILE` object. To avoid locking and unlocking overhead, character-at-a-time I/O functions have unlocked versions: `getchar_unlocked`, `getc_unlocked`, `putchar_unlocked` and `putc_unlocked`, used with `flockfile` functions.
+
+```c
+// a reentrant getenv implementation
+
+#include <string.h>
+#include <errno.h>
+#include <pthread.h>
+#include <stdlib.h>
+
+extern char **environ;
+
+pthread_mutex_t env_mutex;
+
+static pthread_once_t init_done = PTHREAD_ONCE_INIT;
+
+static void thread_init(void)
+{
+        pthread_mutexattr_t attr;
+
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutex_init(&env_mutex, &attr);
+        pthread_mutexattr_destroy(&attr);
+}
+
+int getenv_r(const char *name, char *buf, int buflen)
+{
+        int i, len, olen;
+
+        pthread_once(&init_done, thread_init);
+        len = strlen(name);
+        pthread_mutex_lock(&env_mutex);
+        for (i = 0; environ[i] != NULL; i++) {
+                if ((strncmp(name, environ[i], len) == 0) &&
+                    (environ[i][len] == '=')) {
+                        olen = strlen(&environ[i][len+1]);
+                        if (olen > buflen) {
+                                pthread_mutex_unlock(&env_mutex);
+                                return ENOSPC;
+                        }
+                        strcpy(buf, environ[i][len+1]);
+                        pthread_mutex_unlock(&env_mutex);
+                        return 0;
+                }
+        }
+
+        pthread_mutex_unlock(&env_mutex);
+        return ENOENT;
+}
+```
+
+Protecting the global `environ` and providing a custom buffer ensures thread-safety. The recursive mutex gives async-signal safety. 
+
+More at (Difference between thread-safety and async-signal safety)[https://stackoverflow.com/questions/9837343/difference-between-thread-safe-and-async-signal-safe].
+
+
+# Thread-Specific Data
+
+Thread-specific/thread-private data is a mechanism for storing and finding data associated with a particular thread. One reason for thread-private data is to provide a mechanism for adapting process-based interfaces to a multithreaded environment. To make it possible for threads to use these same system calls and library routines, `errno` is redefined as thread-private data.
+
+Other than using registers, there is no way for one thread to prevent another from accessing its data. This is true even for thread-specific data. Even though the underlying implementation doesn’t prevent access, the functions provided to manage thread-specific data promote data separation among threads by making it more difficult for threads to gain access to thread-specific data from other threads.
+
+A `key` is used to gain access to the thread-specific data. This is created by `pthread_key_create()`. The same key can be used by all threads in the process, but each thread will associate a different thread-specific data address with the key. Threads typically use malloc to allocate memory for their thread-specific data. The destructor function usually frees the memory that was allocated. The destructors will be called when the thread exit normally (`exit`, `_exit` and `_Exit` do not count).
+
+It is possible for the destructor to call another function that creates new thread-specific data and associate it with the key. After all destructors are called, the system will check whether any non-null thread-specific values were associated with the keys and, if so, call the destructors again.
+
+`pthread_key_delete` breaks the association of a key with the thread-specific data values for all threads (which does not invoke the destructor function). To avoid race condition when initializing a key, use `pthread_once()`. Once a key is created, we can associate thread-specific data with the key by calling `pthread_setspecific` and obtain the address of the thread-specific data with `pthread_getspecific`.
+
+```c
+// Another reentrant `getenv` using thread-specific data
+#include <string.h>
+#include <limits.h>
+#include <pthread.h>
+#include <stdlib.h>
+
+#define MAXSTRINGSZ 4096
+
+extern char **environ;
+
+pthread_mutex_t env_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+static pthread_key_t key;
+
+static pthread_once_t init_done = PTHREAD_ONCE_INIT;
+
+static void thread_init(void)
+{
+        pthread_key_create(&key, free);
+}
+
+char *getenv_m(const char *name)
+{
+        int i, len;
+        char *envbuf;
+
+        pthread_once(&init_done, thread_init);
+        pthread_mutex_lock(&env_mutex);
+        envbuf = (char *)pthread_getspecific(key);
+        if (envbuf == NULL) {
+                envbuf = malloc(MAXSTRINGSZ);
+                if (envbuf == NULL) {
+                        pthread_mutex_unlock(&env_mutex);
+                        return NULL;
+                }
+                pthread_setspecific(key, envbuf);
+        }
+
+        len = strlen(name);
+        for (i = 0; environ[i] != NULL ; ++i) {
+                if ((strncmp(name, &environ[i], len) == 0) &&
+                    (environ[i][len] == '=')) {
+                        strncpy(envbuf, &environ[i][len+1], MAXSTRINGSZ-1);
+                        pthread_mutex_unlock(&env_mutex);
+                        return envbuf;
+                }
+        }
+        pthread_mutex_unlock(&env_mutex);
+        return NULL;
+}
+```
