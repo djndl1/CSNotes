@@ -36,7 +36,8 @@ for j = 2 to A.length
     key = A[j] // insert A[j] into the sorted sequence A[1...j-1].
     i = j - 1
     while i > 0 and A[i] > key
-        A[i+1] = A[i]
+        A[i+1
+        ] = A[i]
         i = i - 1
     A[i+i] = key
 ```
@@ -49,3 +50,33 @@ To show the algorithm is correct, we require that for such a loop, the propertie
 
 - Termination: When the loop terminates, the invariant gives us a useful property that helps show that the algorithm is correct. (a point where mathematical induction should stop)
 
+
+```cpp
+// The boost implementation
+
+template < class Iter_t, typename Compare = compare_iter < Iter_t > >
+static void insert_sort (Iter_t first, Iter_t last,
+                         Compare comp = Compare())
+{
+    //--------------------------------------------------------------------
+    //                   DEFINITIONS
+    //--------------------------------------------------------------------
+    typedef value_iter< Iter_t > value_t;
+
+    if ((last - first) < 2) return;
+
+    for (Iter_t it_examine = first + 1; it_examine != last; ++it_examine)
+    {
+        value_t Aux = std::move (*it_examine);
+        Iter_t it_insertion = it_examine;
+
+        while (it_insertion != first and comp (Aux, *(it_insertion - 1)))
+        {
+            *it_insertion = std::move (*(it_insertion - 1));
+            --it_insertion;
+        };
+        *it_insertion = std::move (Aux);
+    };
+};
+
+```
