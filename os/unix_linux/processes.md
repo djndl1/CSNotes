@@ -97,8 +97,8 @@ we can affect the environment of only the current process and any child processe
                                         +---------------------------+
                                         |                           |
                                         |    uninitialized data     |
-                                        |          (bss)            |
-                                        |                           |
+                                        |    (bss,block stared      |   
+                                        |      by symbols)          |
                                         |                           |
                                         +---------------------------+
                                         |                           |
@@ -112,3 +112,84 @@ we can affect the environment of only the current process and any child processe
                                         |                           |
                                    low  +---------------------------+
 ```
+
+Usually, the text segment is sahrable so that only a single copy needs to be in memory for frequently executed programs and is often read-only. The only portions of the program that need to be saved in the program file are the text segment and the initialized data. `size` command reports information of all above.
+
+ISO C specifies three functions for memory allocation:
+
+- `malloc`
+
+- `calloc`: allocates space for a specified number of objects of a specified size. All space initialized to zero bits.
+
+- `realloc`: increases or decreases the size of a previously allocated area.
+
+The pointer returned is guaranteed to be suitably aligned so that it can be used for any data object. `free` causes the space to be deallocated. Most versions of `malloc` and `free` never decrease their memory size. They are usually reserved for a later allocation and not returned immediately to the kernel. Most implementations allocate more space than requested and use the additional space for record keeping. As a consequence, writing past the end or before the start of an allocated area could overwrite this record-keeping information in another block. These error would be hard to find out.
+
+# `setjmp`, `longjmp` 
+
+Useful for handling error conditions that occur in a deeply nested function call. On systems that don't have built-in hardware support for stacks, a C implementation might use a linked list for its stack frmes. To avoid multiple returns in a nested funcall situation, use `setjmp` and `longjmp`.
+
+`setjmp` is called from where to return to. Normally the `env` variable is a global variable so to be referenced from another function. `longjmp` causes the stack to be unwound back, throwing away stack frames. However, where the control jumps back to, automatic and register variables may not be there as before the `setjmp` call.
+
+```c
+#include <stdio.h>
+#include <setjmp.h>
+
+static void f1(int, int, int, int);
+static void f2(void);
+
+static jmp_buf jmpbuffer;
+static int globval;
+
+int main(int argc, char *argv[])
+{
+        int             autoval;
+        register int    regival;
+        volatile int    volaval;
+        static int      statval;
+
+        globval = 1; autoval = 2; regival = 3; volaval = 4; statval = 5;
+
+        if (setjmp(jmpbuffer) != 0) {
+                printf("after longjmp:\n");
+                printf("globval = %d, autoval = %d, regival = %d, volaval = %d, statval = %d\n",
+                       globval, autoval, regival, volaval, statval);
+                return (0);
+        }
+
+        globval = 95; autoval = 96; regival = 97; volaval = 98; statval = 99;
+
+        f1(autoval, regival, volaval, statval);
+        return 0;
+}
+
+static void f1(int i, int j, int k, int l)
+{
+        printf("in f1(:\n)");
+        printf("globval = %d, autoval = %d, regival = %d,"
+               "volaval = %d, statval = %d\n", globval, i, j, k, l);
+        f2();
+}
+
+static void f2(void)
+{
+        longjmp(jmpbuffer, 1);
+}
+
+```
+
+```bash
+# without optimization
+in f1(:
+)globval = 95, autoval = 96, regival = 97,volaval = 98, statval = 99
+after longjmp:
+globval = 95, autoval = 96, regival = 3, volaval = 98, statval = 99
+
+# with optimization
+in f1(:
+)globval = 95, autoval = 96, regival = 97,volaval = 98, statval = 99
+after longjmp:
+globval = 95, autoval = 2, regival = 3, volaval = 98, statval = 99
+```
+
+For global, static and volatile variables, their values after `longjmp` are the last values that they assumed.
