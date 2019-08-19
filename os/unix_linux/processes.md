@@ -193,3 +193,7 @@ globval = 95, autoval = 2, regival = 3, volaval = 98, statval = 99
 ```
 
 For global, static and volatile variables, their values after `longjmp` are the last values that they assumed.
+
+# `getrlimit`, `setrlimit`
+
+Every process has a set of resource limits, some of which can be queried and changed by `getrlimit` and `setrlimit` functions. A process can change its soft limit to a value less than or equal to its hard limit. A process can lower its hard limit to value greater than or equal to its soft limit. Only a superuser process can raise a hard limit. The resources limits affect the calling process and are inherited by any of its children.
