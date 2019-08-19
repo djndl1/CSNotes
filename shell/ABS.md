@@ -1068,7 +1068,49 @@ tip: use `touch` to stop `cp -u` overwriting a file.
 
 ### Text  Processing 
 
-TODO
+- `sort`: sorts a file stream in lines, either a file name or stdin.
+
+- `tsort`: topological sort
+
+- `uniq`: removes duplicates
+
+```bash
+cat list-1 list-2 list-3 | sort | uniq
+```
+
+- `expand`/`unexpand`: converts tabs to spaces/spaces to tabs
+
+- `cut`: extracts fileds from files
+
+```bash
+cut /etc/passwd -d':' -f1 # extracts all user names
+awk -F'[:]' '{ print $1 }' /etc/passwd
+```
+
+- `paste`: merges together different files into a single multi-column file.
+
+- `join`: allows merging two files in a meaningful fashion, which creates a simple version of a relational database.
+
+- `head`/`tail`: list the beginning/end of a file to `stdout`. The default is 10 lines.
+
+```bash
+head -c2 /etc/profile.d/proxy.sh = '#!'
+tail -f # follow
+```
+
+- `grep`: a multi-purpose file search tool that uses regex.
+
+Regex
+
+A regex contains one or more of 
+
+- a character set: characters retaining their literal meaning
+
+- anchor: designates the position in the line of text that regex is to match: `^`, `$`
+
+- modifiers: expands or narrows the range of text that the regex is to match: `*`, `()`, `\`
+
+`-i`: case-insensitive; `-w`: matches only whole words; `-l`: lists only the files in which matches were found not the matching lines; `-r`: recursively searches the cwd; `-n`: lists the matching lines with line numbers; `-v`: filters out matches; `-c`: a numerical count of matches; 
 
 ### File and Archiving
 

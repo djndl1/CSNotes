@@ -135,7 +135,7 @@ struct stat {
 
     struct timespec st_atim;  /* Time of last access */
     struct timespec st_mtim;  /* Time of last modification */
-    struct timespec st_ctim;  /* Time of last status change */
+    struct timespec st_ctim;  /* Time of last i-node status change */
 };
 ```
 
@@ -283,3 +283,20 @@ Any leaf directory has a link count of 2, the directory itself contains one and 
 ISO C `remove` is identical to `unlink` (file) or `rmdir` (directory).
 
 `rename` (ISO C) and `renameat` rename a file or a directory. If newname already exists, we need permissions as if we were deleting it.
+
+Only the superuser can create a hard link to a directory and hard links normally require that the link and the file reside in the same file system while there are non file system limitations on a symbolic link and what it points to. TODO security issues with symbolic link
+
+A symbolic link is created with either the `symlink` or `symlinkat` function. `readlink` and `readlinkat` open the link itself and read the name in the link.
+
+## File Times
+
+
+```c
+   struct timespec st_atim;  /* Time of last access of file data */
+   struct timespec st_mtim;  /* Time of last modification of file data*/
+   struct timespec st_ctim;  /* Time of last i-node status change */
+```
+
+The system does not maintain the last-access time for an i-node. Adding, deleting, or modifying can affect the three times associated with that directory.
+
+`utimensat`, `futimens`, `utimes` change file timestamps with nanosecond precision. We are unable to specify a value for the changed-status time, `st_ctim` the time the i-node was last changed.
