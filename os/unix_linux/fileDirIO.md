@@ -300,3 +300,22 @@ A symbolic link is created with either the `symlink` or `symlinkat` function. `r
 The system does not maintain the last-access time for an i-node. Adding, deleting, or modifying can affect the three times associated with that directory.
 
 `utimensat`, `futimens`, `utimes` change file timestamps with nanosecond precision. We are unable to specify a value for the changed-status time, `st_ctim` the time the i-node was last changed.
+
+## Directories
+
+Directories are created with `mkdir`, `mkdirat` and deleted with `rmdir` (empty directories). Note that a directory usually needs an execute bit.
+
+Directories can be read by anyone who has access permission to read the directory, through `opendir`, `fdopendir`, `readdir`, `rewinddir`, `closedir`, `telldir`, `seekdir`. But only the kernel can write to a directory to preserve file sanity.
+
+example TODO
+
+`chdir`, `fchdir`, `getcwd` deal with the current file directory. The current working directory is an attribute of a process (that's why `cd` is built in the shell).
+
+## Device Special Files
+
+```c
+dev_t     st_rdev;        /* Device ID (if special file) */
+dev_t     st_dev;         /* ID of device containing file */
+```
+
+Every file system is known by its major (device driver and peripheral board to communicate with) and minor (the specific subdeivce) device numbers, access by `major()`/`minor()`. Each file system on the same disk drive would usually have the same major number but a different number.
