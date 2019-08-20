@@ -1112,7 +1112,62 @@ A regex contains one or more of
 
 `-i`: case-insensitive; `-w`: matches only whole words; `-l`: lists only the files in which matches were found not the matching lines; `-r`: recursively searches the cwd; `-n`: lists the matching lines with line numbers; `-v`: filters out matches; `-c`: a numerical count of matches; 
 
+To grep all lines in a file that contain both `pattern1` and `pattern2`, one method is to pipe the result of `grep pattern1` to `grep pattern2`.
+
+- `look`: does a lookup on a dictionary, default in `/usr/dict/words`.
+
+- `wc`: word count; `-w`: word count; `-l`: line count; `-c`: byte count; `-m`: character count; `-L`: the length of the longest line.
+
+- `tr`: character translation filter; `-d` deletes a range of characters; `--squeeze-repeats`/`-s`: deletes all but the fist instance of a string of consecutive characters, useful for remove excess whitespaces.; `-c`: inverts the character set to match.
+
+```bash
+tr '[[:lower:]]' '[[:upper:]]' # convert all lowercase letter to uppercase
+```
+
+- `fold`: wraps lines of input to a specified width
+
+- `fmt`: simple file formatter
+
+- `column`: column formatter
+
+- `iconv`: a utility for converting files to a different encoding.
+
+- `recode`: a fancier version of `iconv` (not a standard utility).
+
 ### File and Archiving
+
+- `tar`: `-c`/`-x`/`--delete`/`-r`/`-A`: create/extract/delete/append/append; `-t`/`-u`: list/update
+
+- `shar`: shell archiving utility.
+
+- `cpio`: copy input and output, rarely used
+
+- `gzip`/`bzip2`/`lzma`/`xz`
+
+- `file`: identifying file types
+
+- `whereis`: similar to `which` but also gives manpages.
+
+- `whatis`: looks up command in the `whatis` database.
+
+- `locate`/`slocate`
+
+- `getfacl, setfacl`: retrieve/set the file access control list
+
+- `strings`: find printable strings in a binary or data file
+
+- `basename`/`dirname`
+
+- `split`/`csplit`: splitting a file into smaller chunks
+
+- `sum`/`cksum`/`md5sum`/`sha1sum`
+
+```bash
+md5sum hello_grid.py | tr 3 1 | md5sum -c 
+md5sum hello_grid.py | md5sum -c
+```
+
+##### diffutils
 
 TODO
 
