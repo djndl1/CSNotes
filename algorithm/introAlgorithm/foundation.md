@@ -65,6 +65,7 @@ static void insert_sort (Iter_t first, Iter_t last,
 
     if ((last - first) < 2) return;
 
+
     for (Iter_t it_examine = first + 1; it_examine != last; ++it_examine)
     {
         value_t Aux = std::move (*it_examine);
@@ -78,5 +79,110 @@ static void insert_sort (Iter_t first, Iter_t last,
         *it_insertion = std::move (Aux);
     };
 };
-
 ```
+
+## Analyzing Algorithms
+
+Analyzing an algorithm has come to mean predicting the resources that the algorithm requires.
+
+The worst-case running time of an algorithm gives us an upper bound on the running time for any input. For some algorithms, the worst case occurs fairly often (search a record in a database only to find no results). The average case is often roughly as bad as the worst case.
+
+## Designing Algorithms
+
+### Divide and Conquer
+
+The divide-and-conquer paradigm involves three steps at each level of the recursion:
+
+1. Divide the problem into a number of subproblems that are smaller instances of the same problem
+
+2. Conquer the subproblems by solving them recursively. If the subproblem sizes are small enough, just solve them in a straightforward manner
+
+3. Combine the solutions to the subproblems into the solution for the original problem
+
+###### Merge Sort: an example
+
+```c
+MERGE(A,p,q,r): // A is the an array; A[p..q] and A[q+1..r] are in sorted order
+n_1 = q - p + 1
+n_2 = r - q
+let L[1..n_1 + 1] and R[1..n_2 + 1] be new arrays
+for i = 1 to n_1
+    L[i] = A[p+i-1]
+for j = 1 to n_2
+   R[j] = A[q+j]
+L[n_1+1] = inf
+R[n_2+1] = inf
+
+i = 1
+j = 1
+for k = p to r
+    if L[i] <= R[j]
+        A[k] = L[i]
+        i = i + 1
+    else
+        A[k] = R[j]
+        j = j + 1
+```
+
+`MERGE` procedure runs in $\Theta (n)$ time.
+
+```c
+MERGE-SORT(A,p,r)
+if p < r
+    q = floor((p + r) / 2)
+    MERGE-SORT(A,p,q)
+    MERGE-SORT(A,q+1,r)
+    MERGE(A,p,q,r)
+```
+
+The running time of a recurrence can be described as 
+
+$$
+T\left(n\right)=\begin{cases}
+\Theta\left(1\right) & \text{if }n\leq c,\\
+aT\left(n/b\right)+D\left(n\right)+C\left(n\right) & \text{otherwise}
+\end{cases}
+$$
+
+where $D(n)$ is the time to divide the problem and $C(n)$ to combine the solutions, $a$ is the number of subproblems, each with size $1/b$.
+
+In case of merge sort:
+
+$$
+T\left(n\right)=\begin{cases}
+c & \text{if }n=1,\\
+2T\left(n/2\right)+cn & \text{if }n>1
+\end{cases}
+$$
+
+The result is $\Theta(n\log_2 n)$.
+
+```cpp
+// implementation from libcxx
+template <class _Compare, class _InputIterator1, class _InputIterator2, class _OutputIterator>
+_OutputIterator
+__merge(_InputIterator1 __first1, _InputIterator1 __last1,
+        _InputIterator2 __first2, _InputIterator2 __last2, _OutputIterator __result, _Compare __comp)
+{
+    for (; __first1 != __last1; ++__result)
+    {
+        if (__first2 == __last2)
+            return _VSTD::copy(__first1, __last1, __result);
+        if (__comp(*__first2, *__first1))
+        {
+            *__result = *__first2;
+            ++__first2;
+        }
+        else
+        {
+            *__result = *__first1;
+            ++__first1;
+        }
+    }
+    return _VSTD::copy(__first2, __last2, __result);
+}
+```
+
+# Growth of Functions
+
+TODO
