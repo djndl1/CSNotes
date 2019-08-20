@@ -158,7 +158,7 @@ $$
 The result is $\Theta(n\log_2 n)$.
 
 ```cpp
-// implementation from libcxx
+// implementation from libcxx, this does not create new arrays, the __result cannot be overlapped with sources. 
 template <class _Compare, class _InputIterator1, class _InputIterator2, class _OutputIterator>
 _OutputIterator
 __merge(_InputIterator1 __first1, _InputIterator1 __last1,
