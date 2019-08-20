@@ -1167,6 +1167,14 @@ md5sum hello_grid.py | tr 3 1 | md5sum -c
 md5sum hello_grid.py | md5sum -c
 ```
 
+- `openssl`: using the various cryptography functions of OpenSSL's crypto library from the shell.
+
+- `shred`: securely erase a file by overwriting it multiple times with random bit patterns before deleting it.
+
+- `mktemp`: create a temporary file
+
+- `dos2unix`: newline conversion
+
 ##### diffutils
 
 TODO
