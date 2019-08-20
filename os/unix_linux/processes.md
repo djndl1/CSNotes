@@ -62,6 +62,18 @@ A process can register at least 32 functions that are automatically called by `e
 
 More at https://stackoverflow.com/questions/25434850/where-does-the-returned-value-for-main-function-go
 
+The three forms of abnormal terminations:
+
+1. Calling `abort()`: generates the `SIGABRT` signal
+
+2. When the process receives certain signals.
+
+3. The last thread responds to a cancellation request.
+
+The parent process can obtain the termination status from either the `wait` or `waitpid`function. The exit status is converted into a termination status by the kernel when `_exit` is finally called. The kernel keeps a small amount of information for every terminating process, so that the information is available when the parent of the terminating process calls `wait` and `waitpid`.  performing a wait allows the system to  release  the  resources  associated with the child; if a wait is not performed, then the terminated child remains in  a  "zombie" state. A child that has terminates but is not waited for by its parent becomes a _zombie_. 
+
+Whenever a parent process terminates, all the children will be adopted by PID 1. These children won't become zombies since PID 1  waits to fetch the termination status.
+
 # Environment 
 
 Each program is also passed an environment list. The address of the array of pointers is contained in the global variable `environ`:
@@ -194,6 +206,77 @@ globval = 95, autoval = 2, regival = 3, volaval = 98, statval = 99
 
 For global, static and volatile variables, their values after `longjmp` are the last values that they assumed.
 
+
 # `getrlimit`, `setrlimit`
 
 Every process has a set of resource limits, some of which can be queried and changed by `getrlimit` and `setrlimit` functions. A process can change its soft limit to a value less than or equal to its hard limit. A process can lower its hard limit to value greater than or equal to its soft limit. Only a superuser process can raise a hard limit. The resources limits affect the calling process and are inherited by any of its children.
+
+# Process Control
+
+## Process Identification
+
+Every process has a unique process ID, a non-negative integer. Most UNIX systems implement algorithms to delay reuse, , so that newly created processes are assigned IDs different from those used by processes that terminated recently.
+
+Process ID 0 is usually the scheduler process and is often known as the _swapper_ ((how it is)[https://superuser.com/questions/377572/what-is-the-main-purpose-of-the-swapper-process-in-unix]). Process ID is usually the `init` process and is invoked by the kernel at the end of the bootstrap procedure. It reads the system-dependent initialization files and brings the system to a certain state. It is a normal user process, not a system process within the kernel.
+
+`getpid()`, `getppid()`, `getuid()`, `geteuid()`, `getgid()`, `getegid()` return identifiers for every process.
+
+## Create New Processes
+
+An existing process can create a new one by calling the `fork` function. It is called once but returns twice. Both the child and the parent continue executing with the instruction that follows the call to `fork`. The child gets a copy of the parent's data space, heap and stack. Modern implementations employs copy-on-write instead of copying immediately. Linux provides a `clone` syscall for creating a child process.
+
+In general, it is uncertain whether the child starts executing before or after the parent. The order depends on the scheduling algorithm used by the kernel.
+
+One characteristic of `fork` is that all file descriptors that are open in the parent are duplicated in the child. The parent and the child share the same file offset. The child inherits from the parent:
+
+- Real user ID, real group ID, effective user ID and effective group ID; The set-user-ID and set-group-ID flags
+
+- Supplementary group IDs
+
+- Process group ID
+
+- Session ID
+
+- Controlling terminal
+
+- Current working directory
+
+- root directory
+
+- file mode create mask
+
+- signal mask and dispositions
+
+- The close-on-exec flag
+
+- Environment
+
+- Attached shared memory segments
+
+- memory mappings
+
+- resource limits
+
+However, the set of pending signals (for the child it's zero), file locks set by the parents are not inherited by the child.
+
+The `vfork` has different semantics than `fork`. It creates a process without copying the address space of the parent into the child. the child simply calls `exec` right after the the `vfork`. The child runs in the address space of the parent until it calls either `exec` or `exit`. `vfork` guarantees that the child runs first until the child calls `exec` or `exit`. 
+
+When a process terminates, the kernel sends `SIGCHLD` to notify its parent, who can choose to ignore the signal or handle it.
+
+A process that calls a `wait`/`waitpid` function can block if all of its children are still running, return immediately with the termination of a child if a child has terminated and is waiting for its termination status to be fetched, or return immediately with an error if it doesn't have any child process.
+
+The termination status obtained by `wait`/`waitpid` can be determined by `WIFEXITED`, `WIFSIGNALED`, `WIFSTOPPED`, `WIFCONTINUED`.
+
+`waitpid` has an `options` argument to let us control the operation of `waitpid` instead of simply blocking and waiting for a child process to terminate.
+
+`waitid` is an even more flexible version of `waitpid` and returns more detained information about the child process. `wait3` and `wait4` provide a summary of the resources used by the terminated process and all its child.
+
+If a process wants to wait for its parent to terminate
+
+```c
+// poling
+while (getppid() != 1)
+    sleep(1);
+```
+
+which is wasting CPU time.
