@@ -99,3 +99,33 @@ Internet          |               IP           ICMP                          | a
 |               |
 +---------------+
 ```
+
+# Cases Analysis
+
+## ARPANET
+
+- distributed, digital packet-switching
+
+- subnets and hosts; subnet-host protocol, subnet-subnet protocol.
+
+- TCP/IP to handle heterogeneous networks
+
+- BSD sockets
+
+## NSFNET
+
+- Connected through fuzzballs
+
+- Used TCP/IP from the beginning
+
+- Connected to ARPANET
+
+## Internet
+
+Users access the Internet through DSL, dialup, FTTH or mobile network to ISPs' POPs (point of presence). ISPs have their backbones, long distance transmission lines that interconnect routers at POPs in the different cities that the ISPs serve. ISPs connect their networks to exchange traffic at IXPs (Internet eXchnage Points).
+
+ISPs who publicly compete with one another for customers often privately cooperate to do peering. Tier 1 ISPs don't pay transit. Companies locate their data centers at ISP POPs so that they have short fast connections.
+
+## 3G Mobile Phone Networks
+
+The scarity of spectrum leads to the cellular network design, under which within a cell, users are assigned channels that do not interfere with each other.

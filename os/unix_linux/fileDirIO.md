@@ -319,3 +319,21 @@ dev_t     st_dev;         /* ID of device containing file */
 ```
 
 Every file system is known by its major (device driver and peripheral board to communicate with) and minor (the specific subdeivce) device numbers, access by `major()`/`minor()`. Each file system on the same disk drive would usually have the same major number but a different number.
+
+# Standard I/O
+
+The standard I/O library handles details such as buffer allocation and performing I/O in optimal-sized chunks. The standard I/O centers on streams. 
+
+A stream is associated with a file. Standard I/O file streams can be used with both single-byte and multibyte character sets. A stream's _orientation_ determines whether the character that are read and written are single byte or multibyte. Initially, a created stream has no orientation. The `fwide` function sets a stream's orientation. A stream is represented by a `FILE` object.
+
+## Buffering
+
+Three types of buffering are provided:
+
+- Fully buffered: Files on disk are normally fully buffered by the standard I/O library, usually through `malloc`. _Flush_ describes the writing of a standard I/O buffer. 
+
+- Line buffered: performs I/O when a newline character is encountered on input or output. A terminal is usually line buffered. A line might be longer than the buffer and thus I/O might take place before writing a newline. whenever input is requested through the standard I/O library from either an unbuffered stream or a line-buffered stream (that requires data to be requested from the kernel), all line-buffered output streams are flushed.
+
+- Unbuffered: `stderr` so that error messages can be displayed as quickly as possible.
+
+On most implementations, `stderr` is always unbuffered. All other streams are line buffered if they refer to a terminal device, otherwise they are fully buffered. `setbuf` and `setvbuf` can change the buffering of a certain stream. In general, we should let the system choose the buffer size and automatically allocate the buffer.
