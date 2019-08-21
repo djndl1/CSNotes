@@ -280,3 +280,57 @@ while (getppid() != 1)
 ```
 
 which is wasting CPU time.
+
+## `exec`
+
+The PID is not replaced. `exec` merely replaces the current processes, its text, data, heap and stack segments with a brand-new program from disk.
+
+```c
+// l: list of arguments
+// v: vector (array) of arguments
+// p: use the PATH variable
+// e: accept environment
+
+       int execl(const char *pathname, const char *arg, ...
+                       /* (char  *) NULL */);
+       int execlp(const char *file, const char *arg, ...
+                       /* (char  *) NULL */);
+       int execle(const char *pathname, const char *arg, ...
+                       /*, (char *) NULL, char * const envp[] */);
+       int execv(const char *pathname, char *const argv[]);
+       int execvp(const char *file, char *const argv[]);
+       int execve(const char *pathname, char *const argv[],
+                  char *const envp[]);
+       int execvpe(const char *file, char *const argv[],
+                       char *const envp[]);
+       int fexecve(int fd, char *const argv[], char *const envp[]);
+```
+
+POSIX.1 specifically requires that open directory streams be closed across an `exec`. the effective IDs can change, depending on the status of the set-user-ID and the set-group-ID bits for the program file that is executed. 
+
+In many UNIX system implementations, only one of these seven functions, `execve`, is a system call within the kernel. The other six are just library functions that eventually invoke this system call. 
+
+The  exec()  functions return only if an error has occurred. It has been replaced by another program.
+
+## Changing User IDs and Group IDs
+
+```c
+       int setuid(uid_t uid);
+       int setgid(gid_t gid);
+```
+
+TODO
+
+## Interpreter File
+
+```bash
+#!pathname [optional argument]
+```
+
+The recognition of these files is done within the kernel as part of processing the `exec` syscall. The pathname of the interpreter file is passed to the interpreter.
+
+TODO
+
+## `system` function
+
+it is convenient to execute a command string from within a program. `system` is implemented by calling `fork`, `exec` and `waitpid`.
