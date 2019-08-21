@@ -60,7 +60,7 @@ static void insert_sort (Iter_t first, Iter_t last,
 {
     //--------------------------------------------------------------------
     //                   DEFINITIONS
-    //--------------------------------------------------------------------
+o    //--------------------------------------------------------------------
     typedef value_iter< Iter_t > value_t;
 
     if ((last - first) < 2) return;
@@ -86,6 +86,34 @@ static void insert_sort (Iter_t first, Iter_t last,
 Analyzing an algorithm has come to mean predicting the resources that the algorithm requires.
 
 The worst-case running time of an algorithm gives us an upper bound on the running time for any input. For some algorithms, the worst case occurs fairly often (search a record in a database only to find no results). The average case is often roughly as bad as the worst case.
+
+#### selection sort
+
+```c
+SELECTION-SORT(A):
+for i = 1 to n-1:
+    k = find_smallest(A,i,n)
+    swap(A[k], A[i])
+```
+
+```cpp
+// home-made implmentation
+template <typename Iterator, typename Compare>
+void
+selection_sort(Iterator first, Iterator last, Compare comp)
+{
+    if (first == last)
+        return ;
+
+    Iterator min;
+    for (auto i = first; i != last; i++) {
+        min = std::min_element(i, last, comp);
+        std::swap(*i, *min);
+    }
+    return;
+}
+```
+
 
 ## Designing Algorithms
 
@@ -183,6 +211,15 @@ __merge(_InputIterator1 __first1, _InputIterator1 __last1,
 }
 ```
 
+
 # Growth of Functions
+
+TODO
+
+# Divide-and-Conquer
+
+TODO
+
+# Probablilistic Analysis and Randomized Algorithms
 
 TODO
