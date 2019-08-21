@@ -129,3 +129,21 @@ ISPs who publicly compete with one another for customers often privately coopera
 ## 3G Mobile Phone Networks
 
 The scarity of spectrum leads to the cellular network design, under which within a cell, users are assigned channels that do not interfere with each other.
+
+TODO
+
+## 802.11
+
+- Unlicensed bands such as ISM
+
+- Infrastructure/Ad hoc
+
+TODO
+
+## RFID and Sensor Networks
+
+TODO
+
+# Standard 
+
+TODO
