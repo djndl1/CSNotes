@@ -1181,15 +1181,115 @@ TODO
 
 ### Communication 
 
-TODO
+- `host`: searches for information about an internet host by name or IP, using DNS
+
+```bash
+ djn  debian  ../Documents/CSNotes  host www.tencent.com
+www.tencent.com is an alias for upfile.wj.qq.com.cloud.tc.qq.com.
+upfile.wj.qq.com.cloud.tc.qq.com is an alias for ssd.tcdn.qq.com.
+ssd.tcdn.qq.com has address 110.185.115.204
+ssd.tcdn.qq.com has address 118.112.11.101
+ssd.tcdn.qq.com has address 118.112.22.184
+```
+
+- `ipcalc`
+
+```bash
+ djn  debian  ../Documents/CSNotes  ipcalc 192.168.1.1
+Address:   192.168.1.1          11000000.10101000.00000001. 00000001
+Netmask:   255.255.255.0 = 24   11111111.11111111.11111111. 00000000
+Wildcard:  0.0.0.255            00000000.00000000.00000000. 11111111
+=>
+Network:   192.168.1.0/24       11000000.10101000.00000001. 00000000
+HostMin:   192.168.1.1          11000000.10101000.00000001. 00000001
+HostMax:   192.168.1.254        11000000.10101000.00000001. 11111110
+Broadcast: 192.168.1.255        11000000.10101000.00000001. 11111111
+Hosts/Net: 254                   Class C, Private Internet
+```
+
+- `nslookup`: name server lookup
+
+```bash
+ djn  debian  ../Documents/CSNotes  host www.tencent.com
+www.tencent.com is an alias for upfile.wj.qq.com.cloud.tc.qq.com.
+upfile.wj.qq.com.cloud.tc.qq.com is an alias for ssd.tcdn.qq.com.
+ssd.tcdn.qq.com has address 110.185.115.204
+ssd.tcdn.qq.com has address 118.112.11.101
+ssd.tcdn.qq.com has address 118.112.22.184
+```
+
+- `dig`: Domain Information Groper
+
+```bash
+ djn  debian  ../Documents/CSNotes  dig www.tencent.com
+
+; <<>> DiG 9.11.5-P4-5.1-Debian <<>> www.tencent.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 47503
+;; flags: qr rd ra; QUERY: 1, ANSWER: 5, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;www.tencent.com.               IN      A
+
+;; ANSWER SECTION:
+www.tencent.com.        29      IN      CNAME   upfile.wj.qq.com.cloud.tc.qq.com.
+upfile.wj.qq.com.cloud.tc.qq.com. 61 IN CNAME   ssd.tcdn.qq.com.
+ssd.tcdn.qq.com.        119     IN      A       110.185.115.204
+ssd.tcdn.qq.com.        119     IN      A       118.112.11.101
+ssd.tcdn.qq.com.        119     IN      A       118.112.22.184
+
+;; Query time: 3 msec
+;; SERVER: 61.139.2.69#53(61.139.2.69)
+;; WHEN: Wed Aug 21 23:27:53 CST 2019
+;; MSG SIZE  rcvd: 147
+
+```
+
+- `traceroute`: trace the route taken by packets sent to a remote host.
+
+- `ping`: broadcast an `ICMP ECHO_REQUEST` packet to another machine, either on a local or remote network.
+
+- `whois`: perform a DNS lookup
+
+- `finger`: retrieve information about users on a network
+
+- `chfn`: change information disclosed by the `finger` command
+
+- `ftp`: client side implementation of the ftp protocol
+
+- `lynx`: can be used to retrieve a file from a web or ftp site noninteractively
+
+ `write`: send messages to another user
+
+- `mail`: send or read e-mails
+
+
 
 ### Terminal Control
 
-TODO
+- `tput`: ???
+
+- `infocmp`: prints out extensive information about the current terminal
+
+- `reset`: reset terminal parameters and clear text screen
+
+
 
 ### Math
 
-TODO
+- `factor`: decompose an integer into prime factors
+
+- `bc`: arbitrary precision calculator
+
+```bash
+echo "sqrt(2)" | bc -l
+```
+
+- `dc`: a stack-oriented RPN calculator.
+
+- `awk`: this can do math too
+
 
 ### Miscellaneous
 

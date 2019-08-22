@@ -337,3 +337,29 @@ Three types of buffering are provided:
 - Unbuffered: `stderr` so that error messages can be displayed as quickly as possible.
 
 On most implementations, `stderr` is always unbuffered. All other streams are line buffered if they refer to a terminal device, otherwise they are fully buffered. `setbuf` and `setvbuf` can change the buffering of a certain stream. In general, we should let the system choose the buffer size and automatically allocate the buffer.
+
+
+`fflush()` force a stream to be flushed.
+
+## Open a stream
+
+The `fopen`, `freopen`, `fdopen` functions open a standard I/O streams. `fdopen` takes an existing file descriptor, obtained from `open`, `dup`, `dup2`, `fcntl`, `pipe`, `socket`, `socketpair` or `accept` and associate a standard I/O stream with the descriptor, often used with descriptors returned by the functions that create pipes and network communication channels. `b` mode has no effect on any POSIX OSes. When in read/write mode, output cannot be directly followed by input without an intervening `fflush()`, `fseek`, `fsetpos` or `rewind`; input cannot be directly followed by output without an intervening `fseek`, `fsetpos`, `rewind` or an input operation that encounters an end of file. POSIX.1 requires implementation to create the file with the `S_IRUSR | S_IWUSR | S_IRGRP |  S_IWGRP |  S_IROTH | S_IWOTH`. However, we can restrict permissions by adjusting `umask` value. 
+
+An open stream is closed by `fclose`. Any buffered output data is flushed before the file is closed. Any input data that may be buffered is discarded. When a process terminates normally, all standard I/O streams with unwritten buffered data are flushed and all open standard I/O streams are closed.
+
+## Reading and Writing a Stream
+
+- Character-at-a-time: `getc()`, `fgetc()`, `getchar()`; to distinguish the error they return, use `ferror()` and `feof()`; `clearerr()` clears these errors. After reading from a stream, we can push back characters by calling `ungetc()`. `putc()`, `fputc()`, `putchar()` output characters.
+
+- Line-at-a-time: input: `fgets()`, `gets()` (never use it). output: `fputs()`, `puts` (not unsafe, but should be avoided).
+
+- Direct I/O (binary): common use: read or write a binary array; read or write a structure
+
+```c
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+
+size_t fwrite(const void *ptr, size_t size, size_t nmemb,
+              FILE *stream);
+```
+
+A fundamental problem with binary I/O is that it can be used to read only data that has been written on the same system since they have different byte order and memory alignment.
