@@ -405,10 +405,64 @@ Read `man sched`.
 
 Lower nice values have higher scheduling priority.
 
-A process can retrieve and change its nice value with `nice()`. `gerpriority()` get the nice value for a process or a group of related process. `setpriority` can be used to set the priority of a process, a process group, or all the processes belonging to a particular user ID.
+A process can retrieve and change its nic
+
+e value with `nice()`. `gerpriority()` get the nice value for a process or a group of related process. `setpriority` can be used to set the priority of a process, a process group, or all the processes belonging to a particular user ID.
 
 nice value range ????
 
 ## Process Times
 
 Any process can call the `times` function to obtain wall clock time, user CPU time and system CPU time for itself and any terminated children.
+
+# Process Relationships
+
+## Logins
+
+`init` does a `fork` and `exec`s `getty`. `getty` opens terminal device, reads user name, set initial environment and `exec`s `login`. `login` checks the password (on modern Unix, it's done by PAM library) we give it, exits with wrong password. Otherwise, it changes to our home directory, changes the ownership and permissions of our terminal device, sets our group ID, initialize `HOME`, `SHELL`, `USER`, `LOGNAME` and a default `PATH` and finally invoke our login shell. The login shell now reads its startup files.
+
+A software driver called _pseudo terminal_ is used to terminate the behavior of a serial terminal and map terminal operations to network operations and vice versa. In BSD, a single process, `inetd`, waits for most network connections. `inetd` does a `fork` and `exec` of the appropriate program.
+
+## Process Groups
+
+Each process belongs to a process group, a collection of one or more processes, usually associated with the same job. Each process group can have a process group leader. The leader is identified by its process group ID being equal to its process ID. It is possible for a process group leader to create a process group, create processes in the group, and then terminate.
+
+```c
+       int setpgid(pid_t pid, pid_t pgid);
+       pid_t getpgid(pid_t pid);
+
+       pid_t getpgrp(void);                 /* POSIX.1 version */
+       pid_t getpgrp(pid_t pid);            /* BSD version */
+
+       // create a new process group
+       int setpgrp(void);                   /* System V version */
+       int setpgrp(pid_t pid, pid_t pgid);  /* BSD version */
+```
+
+A process can set the process group ID of only itself or any of its children.
+
+## Sessions
+
+A session is a collection of one or more process groups. The processes in a process group are usually placed there by a shell pipeline.
+
+```c
+       pid_t setsid(void);
+       pid_t getsid(pid_t pid);
+```
+
+## Controlling terminal
+
+TODO
+
+## Job Control
+
+Job control allows us to start multiple jobs from a single terminal and to control which jobs can access the terminal and which jobs are run in the background.
+
+TODO
+
+## Shell Execution
+
+TODO
+
+# Daemon Processes
+
