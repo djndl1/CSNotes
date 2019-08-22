@@ -59,6 +59,8 @@ In a common implementation, the physical layer process and some of the data link
 When the data link layer accepts a packet, it encapsulates the packet in a frame by adding a data link header and trailer to it. A frame consists of an embedded packet, some control information (in the header) and a checksum (in the trailer).
 
 ```c
+// file `protocol.h`
+
 #define MAX PKT 1024
 
 typedef enum {false, true} boolean;
@@ -112,3 +114,85 @@ void disable_network_layer(void);
 #define inc(k) if (k < MAX SEQ) k = k + 1; else k = 0
 
 ```
+
+## A Utopian Simplex Protocol
+
+```c
+/* Protocol Utopia provides for data transmission in one direction only,
+ from sender to receiver. The communication channel is assumed to be error 
+ free and the receiver is assumec to be able to process all the input infinitely quickly
+ infinite buffer space is available */
+ 
+typedef enum { frame_arrival } event_type;
+
+#include "protocol.h"
+
+
+void sender1(void)
+{
+        frame s;
+        packet buffer;
+
+        while (true) {
+                from_network_layer(&buffer);
+                s.info = buffer;
+                to_physical_layer(&s);
+        }
+}
+
+void receiver1(void)
+{
+        frame r;
+        event_type event;
+
+        while (true) {
+                wait_for_event(&event);
+                from_physical_layer(&r);
+                to_network_layer(&info);
+        }
+}
+```
+
+## A Simplex Stop-and-Wait Protocol for an Error-Free Channel
+
+A general solution to flow control between senders and receivers is to have the receiver provide a feedback to the sender.  After having passed a packet to its network layer, the receiver sends a little dummy frame back to the sender which, in effect, gives the sender permission to transmit the next frame. A half-duplex physical channel would suffice here.
+
+```
+/* Protocol 2 Stop-and-Wait also provides for a one-directional flow of data from sender to receiver.
+ The communication channel is once again assumed to be error free. However, this time the receiver
+ has only a finite buffer capacity and a finite processing speed, so the protocol must explicitly
+ prevent the sender from flooding the receiver with data faster than it can be handled */
+
+typedef enum { frame_arrival } event_type;
+#include "protocol.h"
+
+void sender2(void)
+{
+        frame s;
+        packet buffer;
+        event_type event;
+
+        while (true) {
+                from_network_layer(&buffer);
+                s.info = buffer;
+                to_physical_layer(&s);
+                wait_for_event(&event); // do not proceed until given the go ahead
+        }
+}
+
+void receiver2(void)
+{
+        frame r, s;
+        event_type event;
+        while (true) {
+                wait_for_event(&event);
+                from_physical_layer(&r);
+                to_network_layer(&r.info);
+                to_physical_layer(&s); // send a dummy frame to awaken sender
+        }
+}
+```
+
+## A Simplex Stop-and-Wait Protocol for a Noisy Channel
+
+Add a timer to sender for retransmitting a lost frame. A 1-bit sequence number is added to the frame to prevent duplicates.
