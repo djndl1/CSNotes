@@ -314,12 +314,34 @@ The  exec()  functions return only if an error has occurred. It has been replace
 
 ## Changing User IDs and Group IDs
 
+Read `man 7 credentials`.
+
+When programs need additional privileges or need to gain access to resources that they currently aren't allowed to access, they need to change their user to group ID or an ID that has the appropriate privilege or access. 
+
 ```c
        int setuid(uid_t uid);
        int setgid(gid_t gid);
 ```
 
-TODO
+If process has superuser privileges, `setuid` set the real user ID, effective user ID, and saved set-user-ID to `uid`. If the process does not have superuser privileges but `uid` equals the real user ID or the saved set-user-ID, `setuid` sets only the effective user ID to `uid`.
+
+Only a superuser process can change the real user ID. The effective user ID is set by the `exec` functions only if the set-user-ID bit is set for the program file. We have no portable way to obtain the current value of the saved set-user-ID.
+
+```c
+       int setreuid(uid_t ruid, uid_t euid);
+       int setregid(gid_t rgid, gid_t egid);
+```
+
+set real and effective user/group IDs of the calling process.
+
+```c
+       int seteuid(uid_t euid);
+       int setegid(gid_t egid);
+```
+
+An unprivileged user can set its effective user ID to either its real user ID or its saved set-user-ID.
+
+By using set-user-ID, we can use the extra privileges only when we need elevated privileges.
 
 ## Interpreter File
 
@@ -334,3 +356,59 @@ TODO
 ## `system` function
 
 it is convenient to execute a command string from within a program. `system` is implemented by calling `fork`, `exec` and `waitpid`.
+
+If we call `system` call from a set-user-ID program, it causes a security hole. The spawned process have the privileged effective ID. If the parent of a spawned process is a set-user/group-ID program, the child process must change back to normal permissions after the `fork` before `exec`.
+
+## Process Accounting
+
+The kernel writes an accounting record each time a process terminates if enabled.
+
+```c
+           #define ACCT_COMM 16
+
+           typedef u_int16_t comp_t;
+
+           struct acct {
+               char ac_flag;           /* Accounting flags */
+               u_int16_t ac_uid;       /* Accounting user ID */
+               u_int16_t ac_gid;       /* Accounting group ID */
+               u_int16_t ac_tty;       /* Controlling terminal */
+               u_int32_t ac_btime;     /* Process creation time
+                                          (seconds since the Epoch) */
+               comp_t    ac_utime;     /* User CPU time */
+               comp_t    ac_stime;     /* System CPU time */
+               comp_t    ac_etime;     /* Elapsed time */
+               comp_t    ac_mem;       /* Average memory usage (kB) */
+               comp_t    ac_io;        /* Characters transferred (unused) */
+               comp_t    ac_rw;        /* Blocks read or written (unused) */
+               comp_t    ac_minflt;    /* Minor page faults */
+               comp_t    ac_majflt;    /* Major page faults */
+               comp_t    ac_swaps;     /* Number of swaps (unused) */
+               u_int32_t ac_exitcode;  /* Process termination status
+                                          (see wait(2)) */
+               char      ac_comm[ACCT_COMM+1];
+                                       /* Command name (basename of last
+                                          executed command; null-terminated) */
+               char      ac_pad[X];    /* padding bytes */
+           };
+```
+
+TODO
+
+## User Identification
+
+`getlogin()` fetches the login name. A single user might have multiple login names, each with the same user ID.
+
+## Process Scheduling
+
+Read `man sched`.
+
+Lower nice values have higher scheduling priority.
+
+A process can retrieve and change its nice value with `nice()`. `gerpriority()` get the nice value for a process or a group of related process. `setpriority` can be used to set the priority of a process, a process group, or all the processes belonging to a particular user ID.
+
+nice value range ????
+
+## Process Times
+
+Any process can call the `times` function to obtain wall clock time, user CPU time and system CPU time for itself and any terminated children.
