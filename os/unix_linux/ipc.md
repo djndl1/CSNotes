@@ -40,6 +40,104 @@ Each process has _signal mask_ that defines the set of signals currently blocked
 
 ## Sending a Signal
 
-`kill()` sends a signal to a process or a group of processes. `raise` allows a process to send a signal to itself. `alarm` sets a timer and generates a `SIGALRM` after the timeout. The default disposition is to terminate the program. `pause` suspends the calling process until a signal is caught.
+`kill()` sends a signal to a process or a group of processes. `raise` allows a process to send a signal to itself. `alarm` sets a timer and generates a `SIGALRM` after the timeout. The default disposition is to terminate the program. Most processes that use an alarm clock catch this signal. `pause` suspends the calling process until a signal is caught.
 
-TODO
+```c
+
+#include <setjmp.h>
+#include <signal.h>
+#include <unistd.h>
+
+static jmp_buf env_alrm;
+
+static void sig_alrm(int signo)
+{
+        longjmp(env_alrm, 1);
+}
+
+unsigned int sleep2(unsigned int seconds)
+{
+        if (signal(SIGALRM, sig_alrm) == SIG_ERR)
+                return seconds;
+        if (setjmp(env_alrm) == 0) {
+                alarm(seconds);
+                pause();
+        }
+
+        return alarm(0);
+}
+// this implementation of sleep will interrupt other signal handlers
+```
+
+A common use for `alarm` is to put an upper time limit on operations that can block.
+
+```c
+#include <stdio.h>
+#include <setjmp.h>
+#include <signal.h>
+#include <unistd.h>
+
+#define MAXLINE 4096
+
+static jmp_buf env_alrm;
+
+static void sig_alrm()
+{
+        longjmp(env_alrm, 1);
+}
+
+int main(int argc, char *argv[])
+{
+        int     n;
+        char    line[MAXLINE];
+
+        if (signal(SIGALRM, sig_alrm) == SIG_ERR)
+                fprintf(stderr, "signal(SIGALRM) error");
+        if (setjmp(env_alrm) != 0) {
+                fprintf(stderr, "read timeout");
+                return 1;
+        }
+
+        alarm(10);
+        if ((n = read(STDIN_FILENO, line, MAXLINE)) < 0) {
+                fprintf(stdout, "read error");
+                return 2;
+        }
+        alarm(0);
+
+        write(STDOUT_FILENO, line, n);
+        return 0;
+}
+```
+
+## Signal Sets
+
+Signals can be grouped into a set `sigset_t` so that the kernel can mask a group of them.
+
+```c
+       int sigemptyset(sigset_t *set);
+
+       int sigfillset(sigset_t *set);
+
+       int sigaddset(sigset_t *set, int signum);
+
+       int sigdelset(sigset_t *set, int signum);
+
+       int sigismember(const sigset_t *set, int signum);
+```
+
+A process can examine its signal mask, change its signal mask, or perform both operations in one step by calling `sigprocmask()`. `sigpending` returns the set of signals that are blocked from delivery and currently pending for the calling process.
+
+## `sigaction`
+
+`sigaction` supersedes `signal` and what's more:
+
+```c
+void (*signal(int sig, void (*func)(int)))(int)
+{
+	struct sigaction sa_old, sa = { .sa_handler = func, .sa_flags = SA_RESTART };
+	if (__sigaction(sig, &sa, &sa_old) < 0)
+		return SIG_ERR;
+	return sa_old.sa_handler;
+}
+```
