@@ -466,3 +466,8 @@ TODO
 
 # Daemon Processes
 
+Daemons are processes that live for a long time.
+
+`ps -axj`: kernel daemons appear with names in square brackets.
+
+TODO
