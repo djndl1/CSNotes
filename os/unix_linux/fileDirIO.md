@@ -358,8 +358,55 @@ An open stream is closed by `fclose`. Any buffered output data is flushed before
 ```c
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
-size_t fwrite(const void *ptr, size_t size, size_t nmemb,
+size_t fwrite(const void *ptr, size_t size, size_t nmem
+b,
               FILE *stream);
 ```
 
 A fundamental problem with binary I/O is that it can be used to read only data that has been written on the same system since they have different byte order and memory alignment.
+
+## Positioning a Stream
+
+- `ftell`/`fseek`/`rewind` (ISO C): `long` file position; 
+
+
+- `ftello`/`fseeko`: `off_t` (larger than 32 bits);
+
+- `fgetpos`/`fsetpos` (ISO C): `fpos_t`, as big as necessary to record a file's position. 
+
+## Formatted I/O
+
+```c
+       #include <stdio.h>
+
+       int printf(const char *format, ...);
+       int fprintf(FILE *stream, const char *format, ...);
+       int dprintf(int fd, const char *format, ...);
+       int sprintf(char *str, const char *format, ...);
+       int snprintf(char *str, size_t size, const char *format, ...);
+```
+
+```c
+       int vprintf(const char *format, va_list ap);
+       int vfprintf(FILE *stream, const char *format, va_list ap);
+       int vdprintf(int fd, const char *format, va_list ap);
+       int vsprintf(char *str, const char *format, va_list ap);
+       int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+```
+
+```c
+       #include <stdio.h>
+
+       int scanf(const char *format, ...);
+       int fscanf(FILE *stream, const char *format, ...);
+       int sscanf(const char *str, const char *format, ...);
+
+       #include <stdarg.h>
+
+       int vscanf(const char *format, va_list ap);
+       int vsscanf(const char *str, const char *format, va_list ap);
+       int vfscanf(FILE *stream, const char *format, va_list ap);
+```
+## Implementatin Details
+
+`fileno()` obtains the descriptor for a stream. We need this function if we want to call the `dup` or `fcntl` functions.
