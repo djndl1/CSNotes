@@ -71,7 +71,7 @@ unsigned int sleep2(unsigned int seconds)
 
 A common use for `alarm` is to put an upper time limit on operations that can block.
 
-```c
+```c 
 #include <stdio.h>
 #include <setjmp.h>
 #include <signal.h>
@@ -126,7 +126,7 @@ Signals can be grouped into a set `sigset_t` so that the kernel can mask a group
        int sigismember(const sigset_t *set, int signum);
 ```
 
-A process can examine its signal mask, change its signal mask, or perform both operations in one step by calling `sigprocmask()`. `sigpending` returns the set of signals that are blocked from delivery and currently pending for the calling process.
+A process can examine its signal mask, change its signal mask, or perform both operations in one step by calling `sigprocmask()`. `sigpending` returns the set of signals that are blocked from delivery and currently pending for the calling process. We can use signal mask to protect critical regions of code that we don't want interrupted by a signal.
 
 ## `sigaction`
 
@@ -141,3 +141,61 @@ void (*signal(int sig, void (*func)(int)))(int)
 	return sa_old.sa_handler;
 }
 ```
+
+## `sigsetjmp` and `siglongjmp`
+
+When a signal is caught, the signal-catching function is entered, with the current signal automatically being added to the signal mask of the process. To allow to choose non-local goto save and restore signal mask, POSIX defines `sigsetjmp` and `siglongjmp`. They should always be used when branching from a signal handler.
+
+```c
+       int sigsetjmp(sigjmp_buf env, int savesigs);
+       void siglongjmp(sigjmp_buf env, int val);
+```
+
+## `sigsuspend`
+
+After we unblock a few signals, the pending signals  may immediately be delivered. `sigsuspend()` restores  the signal mask and put the process to sleep in a single atomic operation. The process is suspended until a signal is caught or until a signal occurs that terminates the process. If a signal is caught and if the signal handler returns, then `sigsuspend` returns, and the signal mask of the process is set to its value before the call to `sigsuspend`.
+
+TODO 
+
+## `abort`
+
+`abort()` sends the `SGIABRT` to the caller. The intent of letting the process catch the `SIGABRT` is to allow it to perform any cleanup that it wants to do before the process terminates.  If the process doesn’t terminate itself from this signal handler, POSIX.1 states that, when the signal handler returns, abort terminates the process.
+
+Catching the signal is intended to provide the application developer with a portable means  to abort processing, free from possible interference from any implementation-supplied functions.
+
+```c
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+void my_abort(void)
+{
+        sigset_t            mask;
+        struct sigaction    action;
+
+        // restore SIGABRT disposition
+        sigaction(SIGABRT, NULL, &action);
+        if (action.sa_handler == SIG_IGN) {
+                action.sa_handler = SIG_DFL;
+                sigaction(SIGABRT, &action, NULL);
+        }
+        if (action.sa_handler == SIG_DFL)
+                fflush(NULL);           // flush all open stdio streams
+
+        // ensure that SIGABRT is not ignored
+        sigfillset(&mask);
+        sigdelset(&mask, SIGABRT);
+        sigprocmask(SIG_SETMASK, &mask, NULL);
+        kill(getpid(), SIGABRT); // may not be default action
+
+        fflush(NULL);           // the signal handler may generate some output
+        action.sa_handler = SIG_DFL;
+        sigaction(SIGABRT, &action, NULL);
+        sigprocmask(SIG_SETMASK, &mask, NULL); // just in case
+        kill(getpid(), SIGABRT);               // one more time
+        exit(1);
+}
+```
+
+TODO
