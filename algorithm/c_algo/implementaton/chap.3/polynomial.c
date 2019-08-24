@@ -1,3 +1,10 @@
+/* When designing a ctor-like interface that may allocate some memory, 
+ * return the pointer instead of returning by argument, in which
+ * case the outer variable will not be initialized, causing memory
+ * leak.
+ */
+
+
 #include <stdlib.h>
 #include <stdio.h>
 
