@@ -844,3 +844,9 @@ TODO
 Structs are still used in C++, mainly to store and pass around aggregates of different data types. A commonly used term for these structs is aggregate (in some languages known as plain old data (pod)). Aggregates are commonly used in C++ programs to merely combine data in dedicated (struct) types. Some members (constructors, destructors, overloaded assignment operator) may implicitly be defined.
 
 Aggregates should not have user provided special member functions, virtual members. Aggregates should inherit only publicly and the base classes aren't not virtual. Its non-static members have public access rights.
+
+
+# Inheritance/derivation
+
+_is-a_ or _is-implemented-in-terms-of_.
+

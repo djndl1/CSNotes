@@ -33,4 +33,40 @@ It consists of a series of structures, of which each contains the element and a 
 
 For a singly linked list, `PrintList(L)` and `Find(L,Key)` takes linear time. `FindKth` takes $O(i)$ time and works by traversing down the list. `Delete()` can be executed in one pointer change. `Insert` requires a `malloc` call and two pointer maneuvers. We can keep a dummy header node, which is common practice.
 
+###### Examples
 
+To represent a single variable polynomial, we can use a singly linked list instead of an array. Each term in the polynomial is contained in one cell and the cells are in decreasing order of exponents.
+
+##### Cursor Implementation
+
+TODO
+
+### The Stack/LIFO ADT
+
+A stack is a list of the restriction that insertions and deletions can be performed in only one position, the end of the list, called the _top_.
+
+The fundamental operations on a stack are _push_  and _pop_.
+
+#### Implementation
+
+TODO
+
+#### Applications
+
+TODO 
+
+### The Queue ADT 
+
+With a queue, insertion is done at one end, whereas deletion is performed at the other end.
+
+The basic operations on a queue are 
+
+- `Euqueue`: inserts an element at the end of the list (rear)
+
+- `Dequeue`: deletes and returns the element at the start of the list (front)
+
+TODO 
+
+## Trees 
+
+For large amounts of input, the linear access time of linked lists is prohibitive. Tree has a running time $O(\log N)$ of most operations on average.
