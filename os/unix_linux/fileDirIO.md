@@ -410,3 +410,43 @@ A fundamental problem with binary I/O is that it can be used to read only data t
 ## Implementatin Details
 
 `fileno()` obtains the descriptor for a stream. We need this function if we want to call the `dup` or `fcntl` functions.
+
+## Temporary Files
+
+```c
+       char *tmpnam(char *s); // generates a tmp file name
+       FILE *tmpfile(void); // create such a file
+```
+
+The standard technique often used by the tmpfile function is to create a unique pathname by calling tmpnam, then create the file, and immediately unlink it.
+
+```c
+char *mkdtemp(char *template);
+int mkstemp(char *template);
+int mkostemp(char *template, int flags);
+int mkstemps(char *template, int suffixlen);
+int mkostemps(char *template, int suffixlen, int flags);
+```
+
+Use of tmpnam and tempnam does have at least one drawback: a window exists
+between the time that the unique pathname is returned and the time that an application creates a file with that name. During this timing window, another process can create a file of the same name. The `tmpfile` and `mkstemp` functions should be used instead, as they don’t suffer from this problem.
+
+## Memory Streams
+
+The SUS adds support for memory streams, standard I/O streams for which there are no underlying files. All I/O is done by transferring bytes to and from buffers in main memory.
+
+```c
+       FILE *fmemopen(void *buf, size_t size, const char *mode);
+
+       #include <stdio.h>
+
+       FILE *open_memstream(char **ptr, size_t *sizeloc);
+
+       #include <wchar.h>
+
+       FILE *open_wmemstream(wchar_t **ptr, size_t *sizeloc);
+```
+
+ If  buf  is specified as NULL, then `fmemopen()` allocates a buffer of size bytes.  This is useful for an application that wants to write data  to  a temporary  buffer  and  then read it back again.  The initial position is set to the start of the buffer.  The buffer is automatically  freed  when the  stream  is  closed.
+
+Memory streams are well suited for creating strings, because they prevent buffer overflows. They can also provide a performance boost for functions that take standard I/O stream arguments used for temporary files, because memory streams access only main memory instead of a file stored on disk.
