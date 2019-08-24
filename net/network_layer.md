@@ -26,3 +26,45 @@ The algorithms that choose the routes and the data structures that they use are 
  TODO
 
 # Congestion Control
+
+Too many packets present in a part of the network causes packet delay and loss that degrades performance. The network and transport layers share the responsibility for handling congestion.  it is the network layer that directly experiences it and must ultimately determine what to do with the excess packets. the most effective way to control congestion is to reduce the load that the transport layer is placing on the network. This requires the network and transport layers to work together.
+
+Unless the network is well designed, it may experience a _congestion collapse_, in which performance plummets as the offered load increases beyond the capacity. packets can be sufficiently delayed inside the network that they are no longer useful when they leave the network. A different failure mode occurs when senders retransmit packets that are greatly delayed, thinking that they have been lost, which wasting the capacity again.
+
+If routers have an infinite amount of memory, congestion gets worse, not better. This is because by the time packets get to the front of the queue, they have already timed out (repeatedly) and duplicates have been sent.
+
+Flow control relates the traffic between a particular sender and a particular receiver. Congestion control is a global 
+
+- provisioning: the most basic way to avoid congestion is to build a network that is well matched to the traffic that it carries. 
+
+- traffic-aware routing: splitting traffic across multiple paths
+
+- admission control: decrease the load
+
+- traffic throttling: request the sources to throttle their traffic
+
+- load shedding: just choose the packets to discard
+
+TODO 
+
+
+# Quality of Service
+
+Provide qualify of service that is matched to application needs. An easy solution to provide  good quality of service is to build a network with enough capacity for whatever traffic will be thrown at it (overprovisioning).
+
+Four issues must be addressed to ensure quality of service:
+
+- What applications need from the network 
+
+- How to regulate the traffic that enters the network 
+
+- How to reserve resources at routers to guarantee performance
+
+- Whether the network can safely accept more traffic.
+
+TODO 
+
+
+# Internetworking
+
+Numerous protocols are in widespread use across different networks in every layer. Getting packets from one network to another is not always so easy. The Internet is the prime example of interconnection. 
