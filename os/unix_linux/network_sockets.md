@@ -64,10 +64,41 @@ const char *inet_ntop(int af, const void *src,
 int inet_pton(int af, const char *src, void *dst);
 ```
 
-TODO
+Historically, BSD networking software has provided interfaces to access the various network configuration information.
 
 # Associating Addresses with Sockets
 
 For a server, we need to associate a well-known address with the server's socket on which client requests will arrive.
 
 `bind` function associates an address with a socket. For the Internet domain, if we specify the special IP address `INADDR_ANY` (defined in the socket endpoint will be bound to all the system’s network interfaces. `getsockname` discover the address bound to a socket. If the socket is connected to a peer, the peer's address  can be obtained by calling `getpeername`.
+
+# Connection Establishment 
+
+When dealing with a connection-oriented network service, we need to create a connection between the sockets before we can exchange data. `connect()` creates a connection.
+
+```c
+#include <unistd.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <sys/types.h>
+
+#define MAXSLEEP 128
+
+// exponential backoff
+int connect_try(int domain, int type, int protocol,
+                const struct sockaddr *addr, socklen_t alen)
+{
+    int numsec, fd;
+
+    for (numsec = 1; numsec < MAXSLEEP; numsec <<= 1) {
+        if ((fd = socket(domain, type, protocol)) < 0)
+            return -1;
+        if (connect(fd, addr, alen) == 0)
+            return fd;
+        close(sockfd);
+        if (numsec <= MAXSLEEP)
+            sleep(numsec);
+    }
+    return -1;
+}
+```
