@@ -199,3 +199,16 @@ void my_abort(void)
 ```
 
 TODO
+
+# Pipes
+
+Pipes are the oldest form of UNIX System IPC and are provided by all UNIX systems. Half-duplex pipes are the most commonly used form of IPC. Every time a shell pipeline is used, the shell create a separate process for each command and links the standard output of one process to the standard input of the next using a pipe.
+
+Pipes are on many systems half-duplex. Pipes can be used only between processes that have a common ancestor.
+
+```c
+int pipe(int pipefd[2]); // CREATES a pipe, which has two ends, represented by two file descriptors.
+```
+
+A pipe in a single process is next to useless. Normally, the process that calls pipe then calls fork, creating an IPC channel from the parent to the child, or vice versa. For a pipe from the parent to the child, the parent closes the read end of the pipe and the child closes the write end. For a pipe from the child to the parent, the parent closes `fd[1]`, and the child closes `fd[0]`.
+
