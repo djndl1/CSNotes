@@ -10,14 +10,22 @@ Operating systems perform two essentially unrelated functions:
 
 # History
 
-## The First Generations
+## The First Generation
 
 plugboards, punched cards.
 
-## The Second Generations
+## The Second Generation
 
 A program first writes the program on paper and then punch it on cards. It was then handed to the input machine, which collected a tray full of _jobs_ and output them onto a magnetic tape. The batch system on the mainframe then processed the job  and printed their output to a tape, one by one.
 
-## The Third Generations
+## The Third Generation
 
 OS/360, IC, compatible across different computer systems, multiprogramming (CPU multiplexing and memory partitioning), spooling (Simulatenous Peripheral Operation On Line, that is, read next job into memory while processing the previous job), timesharing. MULTICS (MULTiplexed Information and Computing Service), primitive cloud computing concept. UNIX, POSIX, MINIX, Linux.
+
+## The Fourth Generation
+
+Personal computers, CP/M, DOS, MS-DOS, Mac OS, Windows 95/98/ME, Windows NT, Linux, FreeBSD, distributed operating systems, network operating systems.
+
+## The Fifth Generation: Mobile Computers
+
+PDA, Android, iOS, Symbian OS, Blackberry OS
