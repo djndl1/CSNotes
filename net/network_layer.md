@@ -68,3 +68,11 @@ TODO
 # Internetworking
 
 Numerous protocols are in widespread use across different networks in every layer. Getting packets from one network to another is not always so easy. The Internet is the prime example of interconnection. 
+
+Networks may differ in modulation techniques or frame formats, which are internal to the physical and data  link layers. It's the interfaces between between the network layer and the data link layer that matter. When packets sent by a source on one network must transit one or more foreign networks before reaching the destination, many problems can occur at the interfaces between networks. e.g. how multicast is supported, how packets are splitted, connectionless-to-connection transit
+
+With a router, the packet is extracted from the frame and the network address in the packet is used for deciding where to send it.  With a switch (or bridge), the entire frame is transported on the basis of its MAC address. Switches do not have to understand the network layer protocol being used to switch packets. Routers do. when bridges were introduced, it was intended that they would join different types of networks, or at least different types of LANs. They were to do this by translating frames from one LAN into frames from another LAN. Today, bridges are predominantly used to connect the same kind of network at the link layer, and routers connect different networks at the network layer.
+
+Internetworking has been very successful at building large networks, but it only works when there is a common network layer. There have been many network protocols over time. A router that can handle multiple network protocols is called a _multiprotocol router_. It must either translate the protocols, or leave connection for a higher protocol layer.
+
+- tunneling: the source and the destination hosts are on the same type of network but there is a different network in between. It transmits one computer network protocol that is encapsulated inside another network protocol, e.g. IPv6 over IPv4. The path through the other network can be seen as a big tunnel extending from one multiprotocol router to the other (tunneling a car from France to England). Tunneling is widely used to connect isolated hosts and networks using other networks. The network that results is called an _overlay_.

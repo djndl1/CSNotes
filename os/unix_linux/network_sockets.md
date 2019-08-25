@@ -64,7 +64,41 @@ const char *inet_ntop(int af, const void *src,
 int inet_pton(int af, const char *src, void *dst);
 ```
 
+# Network Configuration and Data Files
+
 Historically, BSD networking software has provided interfaces to access the various network configuration information.
+
+The hosts known by a given computer system are found by calling `gethostent()`. It returns the next entry in the file (`/etc/hosts`).
+
+We can get network names and numbers with a similar set of interfaces (`/etc/networks`).
+
+```c
+       struct netent *getnetent(void);
+       struct netent *getnetbyname(const char *name);
+       struct netent *getnetbyaddr(uint32_t net, int type);
+       void setnetent(int stayopen);
+       void endnetent(void);
+```
+
+We can map between protocol names and numbers:
+
+```c
+       struct protoent *getprotoent(void);
+       struct protoent *getprotobyname(const char *name);
+       struct protoent *getprotobynumber(int proto);
+       void setprotoent(int stayopen);
+       void endprotoent(void);
+```
+
+Services are represented by the port number portion of the address. Each service is offered on a unique, well-known port number. We can map a service name to a port.
+
+```c
+       struct servent *getservent(void);
+       struct servent *getservbyname(const char *name, const char *proto);
+       struct servent *getservbyport(int port, const char *proto);
+       void setservent(int stayopen);
+       void endservent(void);
+```
 
 # Associating Addresses with Sockets
 
@@ -100,5 +134,34 @@ int connect_try(int domain, int type, int protocol,
             sleep(numsec);
     }
     return -1;
+}
+```
+
+The `connect` function can also be used with a connectionless network service (`SOCK_DGRAM`).
+
+A server announces that it is willing to accept connect requests by calling the `listen` function. It can specify a maximum number of acceptable connections. `accept` retrieves a connect request and  convert it int a connection. 
+
+```c
+int initserver(int type, const struct sockaddr *addr, socklen_t alen,
+    int qlen)
+{
+        int fd;
+        int err = 0;
+
+        if ((fd = socket(addr->sa_family, type, 0)) < 0)
+                return -1;
+        if (bind(fd, addr, alen) < 0)
+                goto errout;
+        if (type == SOCK_STREAM || type == SOCK_SEQPACKET) {
+                if (listen(fd, qlen) < 0)
+                        goto errout;
+        }
+        return fd;
+
+errout:
+        err = errno;
+        close(fd);
+        errno = err;
+        return -1;
 }
 ```
