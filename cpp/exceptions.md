@@ -184,3 +184,58 @@ Error conditions are associated with ‘higher level’ errors causes, like bad 
 In POSIX systems the errno variable may be associated with many, often rather cryptic, symbols. The predefined `enum class errc` is an attempt to use intuitively more appealing symbols instead. Since its symbols are defined in a strongly typed enumeration, they cannot directly be used when defining a matching error_code. Instead, a function `make_error_code` is available, converting `enum class errc` values to error_code objects.
 
 More at [Your Own Error Code](https://akrzemi1.wordpress.com/2017/07/12/your-own-error-code/)
+
+# Exception Guarantees
+
+Software should be exception safe: the program should continue to work according to its specifications in the face of exceptions. Since exceptions may be generated from within all C++ functions, exceptions may be generated in many situations. Not all of these situations are immediately and intuitively recognized as situations where exceptions can be thrown.
+
+Although it is possible for exceptions to leave destructors this would violate the C++ standard and so it must be prevented in well-behaving C++ programs.
+
+Serious problems are prevented when we're able to provide at least one of the guarantees:
+
+- basic guarantee: no resources are leaked. The functions that fail to complete their assigned tasks must return all allocated resources, usually memory before terminating. 
+
+```cpp
+X *xp = 0;
+Y *yp = 0;
+try {
+    xp = new X[nX]; // might fail and throw
+    yp = new Y[nY];
+} catch(...) {
+    delete xp;      // the first new succeeds and the second one  fails
+    throw;
+}
+
+delete[] *xDest; // nothrow
+*xDest = xp;
+delete[] *yDest
+*yDest = yp;
+```
+
+- strong guarantee: the program's state remains unaltered when an exception is thrown.  This is realized by performing all operations that might throw on a separate copy of the data. All the code that might throw an exception affecting the current state of an object should perform its tasks separately from the data controlled by the object. Once this code has performed its tasks without throwing an exception replace the object’s data by the new data.
+
+```cpp
+Class &operator=(Class const& other)
+{
+    Class tmp{other};
+    swap(tmp);
+    return *this;
+}
+```
+
+Member functions modifying their object’s data should not return original (contained) objects by value.
+
+```cpp
+void PersonData::erase(Person* dest, size_t idx)
+{
+    if (idx >= d_size)
+        throw string("Array bounds exceeded");
+    *dest = d_data[idx];
+    Person *tmp = copyAllBut(idx);
+    delete[] d_data;
+    d_data = tmp;
+    --d_size;
+}
+```
+ 
+- nothrow guarantee: no exception can be thrown from it. Exception safety can only be realized if some functions and operations are guaranteed not to throw exceptions. `std::swap`, `operator delete`, `operator delete[]` offer the nothrow guarantee. Destructors may themselves not throw exceptions. Since the C programming language does not define the exception concept functions from the standard C library offer the nothrow guarantee by implication. Operations on primitive types offer the nothrow guarantee. Pointers may be reassigned, references may be returned etc. without having to worry about exceptions that might be thrown.
