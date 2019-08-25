@@ -37,6 +37,8 @@ For a singly linked list, `PrintList(L)` and `Find(L,Key)` takes linear time. `F
 
 To represent a single variable polynomial, we can use a singly linked list instead of an array. Each term in the polynomial is contained in one cell and the cells are in decreasing order of exponents.
 
+Bucket sort: to sort N integers in a particular range, read them and count them a list of buckets, each of which represent a part of the range. Radix sort: TODO
+
 ##### Cursor Implementation
 
 TODO
@@ -45,11 +47,11 @@ TODO
 
 A stack is a list of the restriction that insertions and deletions can be performed in only one position, the end of the list, called the _top_.
 
-The fundamental operations on a stack are _push_  and _pop_.
+The fundamental operations on a stack are _push_,  _pop_ and _top_.
 
 #### Implementation
 
-TODO
+There can be a linked list implementation, with the stack pointer pointing to the next element of the header. An alternative implementation avoids pointers and is the more popular solution. In practice, there may be more than one stack. Using global variables to represent a stack is not a good choice.
 
 #### Applications
 
@@ -59,13 +61,17 @@ TODO
 
 With a queue, insertion is done at one end, whereas deletion is performed at the other end.
 
-The basic operations on a queue are 
+The basic operations on a queue are:
 
 - `Euqueue`: inserts an element at the end of the list (rear)
 
 - `Dequeue`: deletes and returns the element at the start of the list (front)
 
-TODO 
+Both have constant running time.
+
+#### Implementation
+
+linked list or circular array implementation
 
 ## Trees 
 
