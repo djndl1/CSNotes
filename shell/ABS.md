@@ -1293,8 +1293,91 @@ echo "sqrt(2)" | bc -l
 
 ### Miscellaneous
 
-TODO
+- `seq`: emit a sequence of integers
+
+- `run-parts`: executes all the scripts in a target directory.
+
+- `yes`: the output of `yes` can be redirected or piped into a program expecting user input.
+
+- `printenv`: show all the environment variables
+
+- `mkfifo`: creates a named pipe
+
+- `pathchk`: checks the validity of a filename
+
+- `od`: octal dump
+
+- `hexdump`
+
+- `objdump`: displays information about an object or binary executable in either hexadicimal form or as a disassembled listing.
+
+- `units`: units of measure
+
+- `m4`: a macro processor ???
+
+- `zenity`: display a GTK+ dialog widget and very suitable for scripting purposes
+
+- `kdialog`/`gdialog`: calling interactive dialog boxes from a script
 
 ## System and Administrative Commands
 
+- `users`, `groups`
 
+- `chown`, `chgrp`: change the ownership/group of a file or files
+
+- `useradd`, `userdel`
+
+- `usermod`, `groupmod`
+
+- `id`: lists the real and effective user IDs and the group IDs of the user associated with the current process
+
+- `who`: show all users logged onto the system; `w`: an extended version of `who`
+
+- `logname`: logging name. Different than `whoami` after `sudo`.
+
+```bash
+sudo whoami
+sudo logname
+```
+
+- `passwd`
+
+- `newgrp`: change user's group ID without logging out
+
+### Terminal
+
+- `stty`: shows and/or changes terminal settings
+
+- `tty`:  filename of the current user's terminal
+
+TODO
+
+### Information and Statistics
+
+- `uname`: system specification
+
+- `arch`: system architecture
+
+- `lastcomm`: gives information about previous commands
+
+- `lastlog`: list the last login name of all system users.
+
+- `lsof`: list open files, `lsof -i` lists open network socket files
+
+- `strace`: diagnostic and debugging tool for tracing system calls and signals; `ltrace`: traces library calls
+
+- `nc`: complete toolkit for connecting to and listening to TCP and UDP ports. Useful for diagnostic and testing tool.
+
+- `free`
+
+- `vmstat`: virtual memory statistics
+
+- `procinfo`: information and statistics from `/proc`
+
+- `lsdev`: list devices
+
+- `dmesg`: lists all system bootup message to `stdout`
+
+- `stat`
+
+- `uptime`
