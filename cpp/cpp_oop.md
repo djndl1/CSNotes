@@ -850,3 +850,198 @@ Aggregates should not have user provided special member functions, virtual membe
 
 _is-a_ or _is-implemented-in-terms-of_.
 
+A rule of thumb for choosing between inheritance and composition distinguishes _is-a_ and _has-a_ relationships.
+
+As a rule of thumb, derived classes must be fully recompiled (but don’t have to be modified) when the data organization (i.e., the data members) of their base classes change. Adding new member functions to the base class doesn’t alter the data organization so no recompilation is needed when new member functions are added (virtual member functions excluded).
+
+Repeatedly deriving classes from classes quickly results in big, complex class hierarchies that are hard to understand, hard to use and hard to maintain. Hard to understand and use as users of our derived class now also have to learn all its (indirect) base class features as well. Hard to maintain because all those classes are very closely coupled. When designing classes always aim at the lowest possible coupling. Big class hierarchies usually indicate poor understanding of robust class design.
+
+Often classes can be defined in-terms-of existing classes: some of their features are used, but others need to be shielded off.
+
+Avoid the temptation to declare data members in a class’s protected section: it’s a sure sign of bad class design as it needlessly results in tight coupling of base and derived classes. If a derived class (but not other parts of the software) should be given access to its base class’s data, use member functions: accessors and modifiers declared in the base class’s protected section.
+
+## Public, protected and private derivation
+
+When protected derivation is used all the base class’s public and protected members become protected members in the derived class. Classes that are in turn derived from the derived class view the base class’s members as protected.
+
+When private derivation is used all the base class’s members turn into private members in the derived class. The derived class members may access all base class public and protected members but base class members cannot be used elsewhere.
+
+Public derivation should be used to define an is-a relationship between a derived class and a base class: the derived class object is-a base class object allowing the derived class object to be used poly- morphically as a base class object in code expecting a base class object. Private inheritance is used in situations where a derived class object is defined in-terms-of the base class where composition can- not be used. There’s little documented use for protected inheritance, but one could maybe encounter protected inheritance when defining a base class that is itself a derived class making its base class members available to classes derived from it.
+
+Combinations of inheritance types do occur.
+
+When private or protected derivation is used, users of derived class objects are denied access to the base class members. Private derivation denies access to all base class members to users of the derived class, protected derivation does the same, but allows classes that are in turn derived from the derived class to access the base class’s public and protected members.
+
+### promoting acess rights
+
+ Access promotion allows us to specify which members of private (or protected) base classes become available in the protected (or public) interface of the derived class.
+
+```cpp
+class RandStream : private RandBuf, public std::istream { // RandBuf derived from std::streambuf
+    public:
+        using std::streambuf::in_avail; 
+}
+```
+
+Another way is to define a shadow member
+
+```cpp
+class RandStream: private RandBuf, public std::istream
+{
+    // implements a stream to extract random values from
+    public:
+    std::streamsize in_avail();
+};
+inline std::streamsize RandStream::in_avail()
+{
+    return std::streambuf::in_avail();
+}
+```
+
+## Special Member Functions
+
+The base class must have been constructed before the actual derived class elements can be initialized. 
+
+- When constructing a derived class object a base class constructor is always called before any action is performed on the derived class object itself. By default the base class’s default constructor is going to be called.
+
+- Using the base class constructor only to reassign new values to its data members in the derived class constructor’s body usually is inefficient. In those cases a specialized base class constructor must be used instead of the base class default constructor.
+
+Calling a base class constructor in a constructor’s initializer clause is called a base class initializer. The base class initializer must be called before initializing any of the derived class’s data members and when using the base class initializer none of the derived class data members may be used.
+
+A move constructor for a derived class whose base class is move-aware must anonymize the rvalue reference before passing it to the base class move constructor.
+
+```cpp
+Car &Car::operator=(Car &&tmp)
+{
+    static_cast<Land &>(*this) = std::move(tmp);
+    // move Car's own data members next
+    return *this;
+}
+```
+
+Derived classes can be constructed without explicitly defining derived class constructors.
+
+Derived classes may redefine base class members, which will shadow the one from the base class. To use the base definition, call it explicitly.
+
+```cpp
+void Truck::setMass(size_t tractor_mass, size_t trailer_mass)
+{
+    d_mass = tractor_mass + trailer_mass;
+    Car::setMass(tractor_mass);
+     // note: Car:: is required
+     
+}
+
+void Truck::setMass(size_t tractor_mass, size_t trailer_mass)
+{
+        d_mass = tractor_mass + trailer_mass;
+        Car::setMass(tractor_mass);
+        // note: Car:: is required
+}
+
+```
+
+To prevent hiding the base class members a using declaration may be added to the derived class interface.  This prevents non-member from using `Car::setMass` without scope resolution.
+
+```cpp
+class Truck: public Car
+{
+public:
+    using Car::setMass;
+    void setMass(size_t tractor_mass, size_t trailer_mass);
+};
+```
+
+## Multiple Inheritance
+
+When using multiple inheritance it should be defensible to consider the newly derived class an instantiation of both base classes. Otherwise, composition is more appropriate.  In C++ there are various good arguments for using multiple inheritance as well, without violating the ‘one class, one responsibility’ principle.
+
+```cpp
+class NavSet {
+public:
+    NavSet(Intercom &intercom, VHF_Dial &dial);
+
+    size_t activeFrequency() const;
+    size_t standByFrequency() const;
+
+    void setStandByFrequency(size_t freq);
+    size_t toggleActiveStandBy();
+    void setVolume(size_t level);
+    void identEmphasis(bool on_off);
+};
+
+class ComSet {
+public:
+    ComSet(Intercom &intercom);
+
+    size_t frequency() const;
+    size_t passiveFrequency() const;
+
+    void setPassiveFrequency(size_t freq);
+    size_t toggleFrequenciezs();
+
+    void setAudioLevel(size_t level);
+    void powerOn(bool on_off);
+    void testState(bool on_off);
+    void transmit(Message &msg);
+};
+```
+
+```cpp
+class NavComSet : public ComSet, public NavSet {
+public:
+    NavComSet(Intercom &intecom, VHF_dial &dial) :
+    ComSet(intercom), NavSet(intercom, dial)
+    {}
+
+```
+
+In situations where two base classes offer identically named members special provisions need to be made to prevent ambiguity:
+
+- The intended base class can explicitly be specified using the base class name and scope resolution operator;
+
+-  If the NavComSet class is obtained from a third party, and cannot be modified, a disambiguating wrapper class may be used;
+
+- The class interface is provided with member functions that can be called unambiguously (wrappers around conflicting base class member functions). These additional members are usually defined inline.
+
+## Conversions between base classes and derived classes
+
+When assigning a base class object from a derived class object only the base class data members are assigned, other data members are dropped, a phenomenon called _slicing_. 
+
+In assignments in which base class objects and derived class objects are involved, assignments in which data are dropped are legal (called slicing). Assignments in which data remain unspecified are not allowed. Of course, it is possible to overload an assignment operator to allow the assignment of a derived class object from a base class object.
+
+```cpp
+Land land(1200, 130);
+Car car(500, 75, "Daf");
+Truck truck(2600, 120, "Mercedes", 6000);
+Vehicle *vp;
+
+vp = &land;
+vp = &car;
+vp = &truck;
+```
+
+When using `vp` only the member functions manipulating mass can be called as this is the Vehicle’s only functionality.  When a function is called using a pointer to an object, then the type of the pointer (and not the type of the object) determines which member functions are available and can be executed. If the actual type of the object pointed to by a pointer is known, an explicit type cast can be used to access the full set of member functions that are available for the object.
+
+# Using non-default constructor with `new[]`
+
+Usually 
+
+```cpp
+string *sp = new string[10];
+fill(sp, sp + 10, string("hello world"));
+```
+
+Inheritance can be used to call non-default constructors in combination with operator `new[]`
+
+```cpp
+namespace {
+struct Xstr : public string {
+    Xstr() : string{"hello world"} {}
+};
+}
+
+string *sp = new Xstr[10];
+```
+
+TODO
