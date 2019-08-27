@@ -80,3 +80,82 @@ Internetworking has been very successful at building large networks, but it only
 Within each network, an intradomain or interior gateway protocol is used for routing. Across the networks that make up the internet, an interdomain or exterior gateway protocol (Border Gateway Protocol).
 
 Each network or link imposes some maximum size on its packets. The network designer are not free to choose any old maximum packet size they wish. One solution is to make sure the problem not occur in the first place (which is impractical). The alternative solution to the problem is to allow routers to break up packets into fragments, sending each fragment ass a separate network layer packet. One way to recombine the fragments back into the original is transparent fragmentation, that is, the network that fragments the packet is responsible for recombining them when forwarding to another network. The other fragmentation strategy is to refrain from recombining fragments at any intermediate routers and reassembly is performed only at the destination host. The design used by IP is to give every fragment a packet number, carried on all packets, an absolute byte offset within the packet, and a flag indicating whether it is the end of the packet. Modern Internet uses _path MTU discovery_. Each IP packet is sent with its header bits to indicate that no fragmentation is allowed to be performed. If a router receives a packet that is too large, it generates an error packet, returns it to the source and drops the packet. The source then refragment the packet according to the error packet. TCP and IP typically implemented together to be able to pass this sort of information. This adds some startup delay.
+
+# The Network Layer in the Internet
+
+Ten principles:
+
+1. make sure it works; do not finalize the design or standard until multiple prototypes have successfully communicated with each other.
+
+2. Keep it simple
+
+3. Make clear choices: choose only one way to do a thing
+
+4. Exploit modularity
+
+5. Expect heterogeneity 
+
+6. avoid static options and parameters
+
+7. a good design need not to be perfect
+
+8. Be strict when sending and tolerant when receiving
+
+9. Think scalability
+
+10. consider performance and cost
+
+
+the biggest backbones to which everyone else connects to reach the rest of the Internet, are called _Tier 1 networks_. Attached to the backbones are ISPs (Internet Service Providers) that provide Internet access to homes and businesses, data centers and colocation facilities full of server machines, and regional (mid-level) networks. The glue that holds the whole Internet together is the network layer protocol, IP (Internet Protocol). It provides a _best-effort_ way to transport packets from source  to destination.
+
+## The IP Version 4 Protocol 
+
+An IPv4 datagram consists of a header part and a body or payload part. The header has a 20-byte fixed part and a variable-length optional part.
+
+```
+<------------------------------------- 32  bits ----------------------------------------->
+
++------------|--------------|------------------------------|------------------------------+
+|  Version   |     IHL      |  Differentiated services     |       Total length           |
++------------|--------------|-------------------------------------------------------------+
+|                    identification                        |  |DF|MF|   Fragment offset   |
++------------------------------|----------------------------------------------------------+
+|     Time to live             |        Protocol           |      Header Checksum         |
++------------------------------|---------------------------|------------------------------+
+|                                  Source address                                         |
++-----------------------------------------------------------------------------------------+
+|                                Destination address                                      |
++-----------------------------------------------------------------------------------------+
+|                                    Options (0 or more words)                            |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
+```
+
+- IHL: how long the header is, 20-60 bytes;
+
+- differentiated services: distinguish between different type of service; the top 6 bits mark the packet with its service class, the bottom 2 bits are used to carry explicit congestion notification information;
+
+- total length: length everything in the datagram;
+
+- identification: allow the destination host to determine which packet a newly arrived fragment belongs to;
+
+- DF: don't fragment;
+
+- MF: yet more fragments to come;
+
+- fragment offset: tells where in the current packet this fragment belongs;
+
+- TtL (time to live): a counter used to limit packet lifetimes, hop count. It prevents packets from wandering around forever.
+
+- protocol: which transport process to give the packet to, e.g. TCP, UDP et al.;
+
+- checksum: the header rates its own checksum for protection;
+
+- options: allow subsequent versions of the protocol to include information not present in the original design, to permit experimenters to try out new ideas. It has fallout out of favor, partly supported and rarely used.
+
+## IP Address
+
+
+
+
+
