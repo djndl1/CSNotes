@@ -212,3 +212,107 @@ int pipe(int pipefd[2]); // CREATES a pipe, which has two ends, represented by t
 
 A pipe in a single process is next to useless. Normally, the process that calls pipe then calls fork, creating an IPC channel from the parent to the child, or vice versa. For a pipe from the parent to the child, the parent closes the read end of the pipe and the child closes the write end. For a pipe from the child to the parent, the parent closes `fd[1]`, and the child closes `fd[0]`.
 
+```c
+
+int
+main(void)
+{
+	int		n;
+	int		fd[2];
+	pid_t	pid;
+	char	line[MAXLINE];
+
+	if (pipe(fd) < 0)
+		err_sys("pipe error");
+	if ((pid = fork()) < 0) {
+		err_sys("fork error");
+	} else if (pid > 0) {		/* parent */
+		close(fd[0]);
+		write(fd[1], "hello world\n", 12);
+	} else {					/* child */
+		close(fd[1]);
+		n = read(fd[0], line, MAXLINE);
+		write(STDOUT_FILENO, line, n);
+	}
+	exit(0);
+}
+```
+
+To make a pipeline, we create a pipe, fork a child, duplicate the file descriptor of the read end of the child onto the the standard input
+
+```c
+#define	DEF_PAGER	"/bin/more"		/* default pager program */
+
+int
+main(int argc, char *argv[])
+{
+	int		n;
+	int		fd[2];
+	pid_t	pid;
+	char	*pager, *argv0;
+	char	line[MAXLINE];
+	FILE	*fp;
+
+	if (argc != 2)
+		err_quit("usage: a.out <pathname>");
+
+	if ((fp = fopen(argv[1], "r")) == NULL)
+		err_sys("can't open %s", argv[1]);
+	if (pipe(fd) < 0)
+		err_sys("pipe error");
+
+	if ((pid = fork()) < 0) {
+		err_sys("fork error");
+	} else if (pid > 0) {								/* parent */
+		close(fd[0]);		/* close read end */
+
+		/* parent copies argv[1] to pipe */
+		while (fgets(line, MAXLINE, fp) != NULL) {
+			n = strlen(line);
+			if (write(fd[1], line, n) != n)
+				err_sys("write error to pipe");
+		}
+		if (ferror(fp))
+			err_sys("fgets error");
+
+		close(fd[1]);	/* close write end of pipe for reader */
+
+		if (waitpid(pid, NULL, 0) < 0)
+			err_sys("waitpid error");
+		exit(0);
+	} else {										/* child */
+		close(fd[1]);	/* close write end */
+		if (fd[0] != STDIN_FILENO) {
+			if (dup2(fd[0], STDIN_FILENO) != STDIN_FILENO)
+				err_sys("dup2 error to stdin");
+			close(fd[0]);	/* don't need this after dup2 */
+		}
+
+		/* get arguments for execl() */
+		if ((pager = getenv("PAGER")) == NULL)
+			pager = DEF_PAGER;
+		if ((argv0 = strrchr(pager, '/')) != NULL)
+			argv0++;		/* step past rightmost slash */
+		else
+			argv0 = pager;	/* no slash in pager */
+
+		if (execlp(pager, argv0, (char *)0) < 0)
+			err_sys("execl error for %s", pager);
+	}
+	exit(0);
+}
+```
+
+## `popen`, `pclose`
+
+Since a common operation is to create a pipe to another process to either read its output or send it input, the standard I/O library has historically provided the `popen` and `pclose` functions. These two functions handle all the dirty work: creating a pipe, forking a child, closing the unused ends of the pipe, executing a shell to run the command, and waiting for the command to terminate.
+
+```c
+
+```
+
+# Coprocesses
+
+TODO
+
+# FIFO

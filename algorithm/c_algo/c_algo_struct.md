@@ -76,3 +76,100 @@ linked list or circular array implementation
 ## Trees 
 
 For large amounts of input, the linear access time of linked lists is prohibitive. Tree has a running time $O(\log N)$ of most operations on average.
+
+A tree can be defined recursively. A tree is a collection of nodes. It can be empty. A tree consists of a distinguishing node $r$, the root, and zero or more nonempty subtrees $T_1, T_2, ..., T_k$, each of whose roots are connected by a directed edge from $r$. The root of each subtree is said to be a _child_ of $r$ and $r$ is the parent of each subtree root. Nodes with no children are known as _leaves_. Nodes with the same parent are _siblings_. 
+
+A path from node $n_1$ to $n_k$ is defined as a sequence of nodes $n_1, n_2, ..., n_k$ such that $n_i$ is the parent of $n_{i+1}$ for $1 \leq i < k$. The length of this path is the number of edges on the path, namely $k-1$. There is a path of length zero from every node to itself. For any node $n_i$, the depth of $n_i$ is the length of the unique path form the root to $n_i$. If there is a path from $n_1$ to $n_2$,  then $n_1$ is an ancestor of $n_2$ and $n_2$ is a descendant of $n_1$. If $n_1 \neq n_2$, then they are proper ancestor and proper descendant. The sum of the depths of all nodes in a tree is known as the _internal path length_.
+
+### Implementation 
+
+One way is to keep the children of each node in a linked list of tree nodes.
+
+```c
+struct TreeNode {
+    element_t element;
+    pNode firstChild;
+    pNode nextSibling;
+};
+```
+
+### Traversals
+
+```c
+// preorder traverse a hierarchical file system
+// a node is perforemd before its children are processed
+ListDir(GenericFile d, int depth)
+{
+        if (isLegitEntry(d)) {
+                printName(d, depth);
+                if (isDir(d))
+                        for child of d { // siblings
+                                ListDir(child, depth + 1);
+                        }
+        }
+}
+
+ListDir("/", 0);
+```
+
+In another common method of traversing, the _postorder traversal_, the work at a node is performed after its children are evaluated.
+
+```c
+void sizeDirectory(GenericFile d)
+{
+        int totalSize = 0;
+
+        if (isLegitEntry(d)) {
+                totalSize = fileSize(d);
+                if (isDir(d))
+                        for child of d {
+                                totalSize += SizeDirectory(d);
+                                }
+        }
+        return totalSize;
+}
+```
+
+### Binary Trees
+
+A binary tree is a tree in which no node can have more than two children. The average depth is $O\left(\sqrt{N}\right)$, and for a binary search tree, the average depth is $O\left(\log N\right)$.
+
+#### Implementation 
+
+```c
+typedef struct TreeNode *pNode;
+typedef struct Element element_t;
+
+struct TreeNode {
+    element_t element;
+    pNode leftChild;
+    pNode rightChild;
+};
+```
+#### Applications
+
+##### Expression Trees
+
+The leaves of an expression tree are operands, and the other nodes contain operators. This uses inorder traversal (normal order) or postorder (reverse polish). If we are to convert a reverse polish expreossion to a normal expression:
+
+1. push operands (seen as trees with a single node) into the stack until an operator is encountered
+
+2. pop the two operands before the operator and make them the children of the operator
+
+3. continue until there is only one element in the stack 
+
+### Binary Search Tree 
+
+For every node X in the tree, the values of all the keys in its left subtree are smaller than the key value in X and the values of all the keys in its right subtree are larger than the key value in X.
+
+The running time of all the operations except `makeEmpty` is $O\left(d\right)$, where $d$ is the depth of the node containing the accessed key.
+
+Let $D\left(N\right)$ be the internal path length for some tree $T$ of $N$ nodes.
+
+$$
+D(1) = 0 \\
+
+D\left(N\right)=D\left(i\right)+D\left(N-1-i\right)+N-1 \quad \text{for} \quad 0 \leq i < N
+$$
+
+TODO

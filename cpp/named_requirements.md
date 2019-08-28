@@ -48,3 +48,23 @@ A class does not have to implement a move constructor to satisfy this type requi
 - `CopyAssignable`: requires `MoveAssignable` first.
 
 - `Destructible`: all scalar types meet the requirement of Destructible, while array types and reference types do not. Note that std::is_destructible allows arrays and reference types.
+
+# Library-wide
+
+- `swappable`: Any lvalue or rvalue of this type can be swapped with any lvalue or rvalue of some other type, using unqualified function call `swap()` in the context where both `std::swap` and the user-defined `swap()`s are visible.
+
+# Iterator
+
+- `LegacyIterator`: an abstraction of pointers, `CopyCOnstructible`, `CopyAssignable`, `Destructible`, `Swappable` and has `*r`, `++r`  for a lvalue of the type
+
+- `LegacyInputIterator`: can read from the pointed-to element, but once it has been incremented, all copies of its previous value may be invalidated. `LegacyIterator`, `EqualityComparable`, has `i != j`, `*i`, `i->m`, `++i`, `(void)i++`, `*i++`
+
+- `LegacyOutputIterator`: can write to the pointed-to element, `LegacyIterator`, a class type or a pointer class, supports `*r = o`, `r++`, `++r`, `*r++ = o`.
+
+- `LegacyForwardItartor`: can read data from the pointed-to element, `LegacyInputIterator`, `DefaultConstructible`
+
+- `LegacyBidrectionalIterator`: can be moved in both directions, `LegacyForwardItartor`, supports `--a`, `a--`, `*a--`.
+
+- `LegacyRandomAccessIterator`: a `LegacyBidrectionalIterator` that can be moved to point to any element in constant time, supports `r += n`, `a + n`, `n + a`, `r -= n`, `i - n`, `b - a`, `i[n]`, `a < b`, `a > b`, `a >= b`, `a <= b`
+
+
