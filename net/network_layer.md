@@ -155,7 +155,23 @@ An IPv4 datagram consists of a header part and a body or payload part. The heade
 
 ## IP Address
 
+An IP address does not actually refer a host, but a network interface. An IP address has a prefix, denoting network, often represented by a number of length `128.208.0.0/24`, which forms a _subnet mask_ `255.255.255.0`.  Routers can forward packets based on only the network portion of the address, as long as each of the networks has a unique address block.
 
+Allowing the block of addresses to be split into several parts for internal use as multiple networks is called _subnetting_, which creates _subnets_. A router simply ANDs the destination address and all the subnet masks and decides to which network it should forward. The subnet divisions can be changed later if necessary, by updating all subnet masks at routers
+
+Routers in organizations at the edge of a network, such as a university, need to have an entry for each of their subnets, telling the router which line to use to get to that network. For routes to destinations outside of the organization, they can use the simple default rule of sending the packets on the line toward the ISP that connects the organization to the rest of the Internet. Routers in ISPs and backbones in the middle of the Internet. must know which way to go to get to every network and no simple default will work. These core routers are said to be in the default-free zone of the Internet. Routing algorithms require each router to exchange information about the addresses it can reach with other routers.
+
+To form a hierarchy, we can also combine multiple small prefixes into a single larger prefix, called route aggregation, forming a _supernet_. With aggregation, IP addresses are contained in prefixes of varying sizes. It is up to each router to have the corresponding prefix information. This design works with subnetting and is called _CIDR_ (Classless Inter-Domain Routing). Aggregation is heavily used throughout the Internet and can reduce the size of router tables to around 200,000 prefixes.
+
+Prefixes are allowed to overlap. The rule is that packets are sent in the direction of the most specific route, or the longest matching prefix that has the fewest IP addresses. Note this does not mean mean IPs are reused. It's just that some of IPs that seem to be under a subnet are not used in that subnet, instead, they are IPs under another subnet.
+
+Conceptually, CIDR works as follows. When a packet comes in, the routing table is scanned to determine if the destination lies within the prefix. It is possible that multiple entries with different prefix lengths will match, in which case the entry with the longest prefix is used. 
+
+### Classful and Special Addressing
+
+TODO
+
+## NAT (Network Address Translation)
 
 
 
