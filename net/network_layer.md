@@ -163,7 +163,7 @@ Routers in organizations at the edge of a network, such as a university, need to
 
 To form a hierarchy, we can also combine multiple small prefixes into a single larger prefix, called route aggregation, forming a _supernet_. With aggregation, IP addresses are contained in prefixes of varying sizes. It is up to each router to have the corresponding prefix information. This design works with subnetting and is called _CIDR_ (Classless Inter-Domain Routing). Aggregation is heavily used throughout the Internet and can reduce the size of router tables to around 200,000 prefixes.
 
-Prefixes are allowed to overlap. The rule is that packets are sent in the direction of the most specific route, or the longest matching prefix that has the fewest IP addresses. Note this does not mean mean IPs are reused. It's just that some of IPs that seem to be under a subnet are not used in that subnet, instead, they are IPs under another subnet.
+Prefixes are allowed to overlap. The rule is that packets are sent in the direction of the most specific route, or the longest matching prefix that has the fewest IP addresses. Note this does not mean  IPs are reused. It's just that some of IPs that seem to be under a subnet are not used in that subnet, instead, they are IPs under another subnet.
 
 Conceptually, CIDR works as follows. When a packet comes in, the routing table is scanned to determine if the destination lies within the prefix. It is possible that multiple entries with different prefix lengths will match, in which case the entry with the longest prefix is used. 
 
