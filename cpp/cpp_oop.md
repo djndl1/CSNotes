@@ -1023,7 +1023,7 @@ vp = &truck;
 
 When using `vp` only the member functions manipulating mass can be called as this is the Vehicle’s only functionality.  When a function is called using a pointer to an object, then the type of the pointer (and not the type of the object) determines which member functions are available and can be executed. If the actual type of the object pointed to by a pointer is known, an explicit type cast can be used to access the full set of member functions that are available for the object.
 
-# Using non-default constructor with `new[]`
+## Using non-default constructor with `new[]`
 
 Usually 
 
@@ -1045,3 +1045,51 @@ string *sp = new Xstr[10];
 ```
 
 TODO
+
+
+# Polymorphism
+
+_Liskov Substitution Principle_ (???)
+ 
+ LSP is implemented using polymorphism.  Polymorphism allows us to reimplement members of base classes and to use those reimplemented members in code expecting base class references or pointers. Using polymorphism existing code may be reused by derived classes reimplementing the appropriate members of their base classes. Reusability is enhanced if we add a redefinable interface to the base class’s interface. A redefinable interface allows derived classes to fill in their own implementation, without affecting the user interface. At the same time the user interface will behave according to the derived class’s wishes, and not just to the base class’s default implementation. Members of the reusable interface can be declared in the class’s private sections: conceptually they merely belong to their own classes. Separating the user interface from the redefinable interface is a sensible thing to do. It allows us to fine-tune the user interface (only one point of maintenance), while at the same time allowing us to standardize the expected behavior of the members of the redefinable interface.
+ 
+ C++ uses early binding and offers both dynamic and static dispatch. [What the hell are those binding](https://softwareengineering.stackexchange.com/questions/387697/what-is-late-binding) 
+
+The following code does not result in duck typing
+
+```cpp
+class Base
+{
+protected:
+    void hello()
+    {
+        cout << "base hello\n";
+    }
+public:
+    void process()
+    {
+        hello();
+    }
+};
+
+class Derived: public Base
+{
+protected:
+    void hello()
+    {
+        cout << "derived hello\n";
+    }
+};
+
+int main()
+{
+    Derived derived;
+    derived.process();
+}
+```
+ 
+since `process()` is statically compiled against `Base::hello()`.
+
+The keyword virtual should not be mentioned for members in derived classes which are declared virtual in base classes. In derived classes those members should be provided with the override indicator, allowing the compiler to verify that you’re indeed referring to an existing virtual member function.
+
+Destructors should always be defined virtual in classes designed as a base class from which other classes are going to be derived.
