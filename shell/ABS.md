@@ -395,6 +395,8 @@ Quoting has the effect of protecting special character in the string from reinte
 
 When referencing a variable, it is generally advisable to enclose its name in double quotes, which prevents reinterpretation of all special charactes within the quoted string, except `$`, ```(backquote) and `\`(escape). Use double quotes to prevent word splitting.
 
+
+
 `\b` is not the backspace on the keyboard, more like the left arrow.
 
 `$'abc'` is string expansion.
@@ -426,6 +428,8 @@ echo "foo\
 bar"
 #foobar
 ```
+
+`quote`: quotes an argument
 
 ## Exit
 
@@ -1380,4 +1384,120 @@ TODO
 
 - `stat`
 
+- `hostid`: a 32-bit hexadecimal numerical identifier for the host machine
+
 - `uptime`
+
+- `readelf`: show information and statistics about a designated ELF binary.
+
+- `size`: gives the segment size of a binary executable
+
+### System Logs
+
+- `logger`: appends a user-generated message to the system log `/var/log/messages`.
+
+```bash
+logger -t $0 -i Logging at line "$LINENO"
+```
+
+- `logrotate`: manages the system log files, rotating, compressing, deleting, and/or emailing them, as appropriate
+
+### Job Control
+
+- `ps`: process statistics, usually invodes with `ax`, `aux` and may be piped to `grep` and `sed` to search for a specific process.
+
+- `pgrep`, `pkill`: combining `ps` with `grep` and `kill`
+
+- `pstree`: list currently executing processes in tree format.
+
+- `nice`: run a background job with an alterred priority
+
+- `nohup`: keeps a command running even after user logs off
+
+- `pidof`: idenfies PID of a running job
+
+```bash
+pidof plasmashell
+```
+
+- `fuser`: displays the PIDs of processes using the specified files or file systems. Combining with `-k` kills those processes.
+
+### Network
+
+- `nmap`: network mapper and port scanner
+
+- `ifconfig`: network inteface configuration
+
+- `netstat`: show current network statistics and information; `netstat -r` = `route`
+
+- `iwconfig`: wireless equivalent of `ifconfig`
+
+- `ip`: general purpose utility for setting up, changing, and analyzing IP networks and attached devices.
+
+- `iptables`: a packet filtering tool for security purposes such as network firewalls
+
+- `tcpdump`: network filter sniffer
+
+### Filesystem
+
+- `mount`/`umount`: mount/unmount a filesystem
+
+- `sync`: forces an immediate write of all updated data from buffers to hard drive
+
+- `losetup`: sets up and configures loopback devices
+
+- `mkswap`: creates a swap partition or file.
+
+- `mke2fs`: create a Linux ext4 filesystem
+
+- `dumpe2fs`: dump very verbose filesystem info
+
+- `hdparm`: list or change hard disk parameters
+
+- `fdisk`: create or change a partition table on a storage device
+
+- `lspci`/`lsusb`
+
+- `badblocks`: checks for bad blocks
+
+- `fsck`, `e2fsck`, `debugfs`: filesystem check, repair, and debug command set
+
+- `chroot`: chnage root directory
+
+- `mknod`: creates block or character device files
+
+- `flock`: sets an advisory lock on a file and then executes a command while the lock is on.
+
+### System Resources
+
+- `ulimit`: an upper limit on use of system resources
+
+- `umask`: user file creation permission mask
+
+### Modules
+
+- `lsmod`: list installed kernel modules
+
+- `insmod`: force installation of a kernel module
+
+- `rmmod`: force unloading
+
+- `modprobe`: module loader
+
+- `depmod`: creates module dependency file
+
+- `modinfo`: output information about loadable module
+
+### Miscellaneous
+
+- `env`: runs a program or script with certain environment variables set or changed
+
+- `ldd`: lib dependencies
+
+- `watch`: run a command repeated
+
+- `strip`: remove the debugging symbolic referencesfrom an executable binary
+
+- `nm`: list symbols in an unstripped compiled binary
+
+
