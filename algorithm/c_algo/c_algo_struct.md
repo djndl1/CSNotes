@@ -76,3 +76,58 @@ linked list or circular array implementation
 ## Trees 
 
 For large amounts of input, the linear access time of linked lists is prohibitive. Tree has a running time $O(\log N)$ of most operations on average.
+
+A tree can be defined recursively. A tree is a collection of nodes. It can be empty. A tree consists of a distinguishing node $r$, the root, and zero or more nonempty subtrees $T_1, T_2, ..., T_k$, each of whose roots are connected by a directed edge from $r$. The root of each subtree is said to be a _child_ of $r$ and $r$ is the parent of each subtree root. Nodes with no children are known as _leaves_. Nodes with the same parent are _siblings_. 
+
+A path from node $n_1$ to $n_k$ is defined as a sequence of nodes $n_1, n_2, ..., n_k$ such that $n_i$ is the parent of $n_{i+1}$ for $1 \leq i < k$. The length of this path is the number of edges on the path, namely $k-1$. There is a path of length zero from every node to itself. For any node $n_i$, the depth of $n_i$ is the length of the unique path form the root to $n_i$. If there is a path from $n_1$ to $n_2$,  then $n_1$ is an ancestor of $n_2$ and $n_2$ is a descendant of $n_1$. If $n_1 \neq n_2$, then they are proper ancestor and proper descendant.
+
+### Implementation 
+
+One way is to keep the children of each node in a linked list of tree nodes.
+
+```c
+struct TreeNode {
+    element_t element;
+    pNode firstChild;
+    pNode nextSibling;
+};
+```
+
+### Traversals
+
+```c
+// preorder traverse a hierarchical file system
+// a node is perforemd before its children are processed
+ListDir(GenericFile d, int depth)
+{
+        if (isLegitEntry(d)) {
+                printName(d, depth);
+                if (isDir(d))
+                        for child of d { // siblings
+                                ListDir(child, depth + 1);
+                        }
+        }
+}
+
+ListDir("/", 0);
+```
+
+In another common method of traversing, the _postorder traversal_, the work at a node is performed after its children are evaluated.
+
+```c
+void sizeDirectory(GenericFile d)
+{
+        int totalSize = 0;
+
+        if (isLegitEntry(d)) {
+                totalSize = fileSize(d);
+                if (isDir(d))
+                        for child of d {
+                                totalSize += SizeDirectory(d);
+                                }
+        }
+        return totalSize;
+}
+```
+
+### Binary Trees
