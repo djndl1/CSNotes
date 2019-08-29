@@ -1004,6 +1004,8 @@ In situations where two base classes offer identically named members special pro
 
 - The class interface is provided with member functions that can be called unambiguously (wrappers around conflicting base class member functions). These additional members are usually defined inline.
 
+The same base class might be inherited multiple times, causing ambiguity.
+
 ## Conversions between base classes and derived classes
 
 When assigning a base class object from a derived class object only the base class data members are assigned, other data members are dropped, a phenomenon called _slicing_. 
@@ -1039,7 +1041,7 @@ namespace {
 struct Xstr : public string {
     Xstr() : string{"hello world"} {}
 };
-}
+}mbt
 
 string *sp = new Xstr[10];
 ```
@@ -1090,6 +1092,50 @@ int main()
  
 since `process()` is statically compiled against `Base::hello()`.
 
-The keyword virtual should not be mentioned for members in derived classes which are declared virtual in base classes. In derived classes those members should be provided with the override indicator, allowing the compiler to verify that you’re indeed referring to an existing virtual member function.
+The keyword `virtual` should not be mentioned for members in derived classes which are declared virtual in base classes. In derived classes those members should be provided with the `override` indicator, allowing the compiler to verify that you’re indeed referring to an existing virtual member function. 
 
-Destructors should always be defined virtual in classes designed as a base class from which other classes are going to be derived.
+Destructors should _always be defined_ `virtual` in classes designed as a base class from which other classes are going to be derived. If a class is polymorphic (declares or inherits at least one virtual function), and its destructor is not virtual, deleting it is undefined behavior regardless of whether there are resources that would be leaked if the derived destructor is not invoked.
+
+The identifier `final` can be applied to class declarations to indicate that the class cannot be used as a base class. The identifier `final` can also be added to virtual member declarations, indicating that those virtual members cannot be overridden by derived classes.
+
+## Pure Virtual
+
+Virtual member functions do not necessarily have to be implemented in base classes. Abstract base classes are the foundation of many design patterns, allowing the programmer to create highly reusable software. Members that are merely declared in base classes are called pure virtual functions. A virtual member becomes a pure virtual member by postfixing `= 0` to its declaration. Pure virtual member functions may be implemented. Implementing a pure virtual member has limited use. 
+
+[About ctors and dtors constructor]](https://stackoverflow.com/questions/14184341/c-constructor-destructor-inheritance)
+
+[Pure virtual destructor](https://stackoverflow.com/questions/1219607/why-do-we-need-a-pure-virtual-destructor-in-c). However, a destructor of a derived class implicitly calls the destructor of its base class, even if that destructor is pure virtual. A pure virtual destructor must have an implementation.
+
+[About data members in an abstract class](https://stackoverflow.com/questions/1193138/virtual-base-class-data-members)
+
+
+
+Polymorphism can also be used in combination with multiple inheritance. To avoid ambiguity when inheriting a base class multiple times, use virtual base classes
+
+## Virtual Inheritance
+
+```cpp
+struct B { int n; };
+class X : public virtual B {};
+class Y : virtual public B {};
+class Z : public B {};
+// every object of type AA has one X, one Y, one Z, and two B's:
+// one that is the base of Z and one that is shared by X and Y
+struct AA : X, Y, Z {
+    AA() {
+        X::n = 1; // modifies the virtual B subobject's member
+        Y::n = 2; // modifies the same virtual B subobject's member
+        Z::n = 3; // modifies the non-virtual B subobject's member
+ 
+        std::cout << X::n << Y::n << Z::n << '\n'; // prints 223
+    }
+};
+```
+
+```bash
+223
+```
+
+An example of an inheritance hierarchy with virtual base classes is the iostreams hierarchy of the standard library: `std::istream` and `std::ostream` are derived from `std::ios` using virtual inheritance. `std::iostream` is derived from both `std::istream` and `std::ostream`, so every instance of `std::iostream` contains a `std::ostream` subobject, a `std::istream` subobject, and just one `std::ios` subobject (and, consequently, one `std::ios_base`).
+
+Virtual derivation is, in contrast to virtual functions, a pure compile-time issue. Virtual inheritance merely defines how the compiler defines a class’s data organization and construction process.
