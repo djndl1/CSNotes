@@ -170,6 +170,114 @@ $$
 D(1) = 0 \\
 
 D\left(N\right)=D\left(i\right)+D\left(N-1-i\right)+N-1 \quad \text{for} \quad 0 \leq i < N
+
 $$
 
 TODO
+
+#### AVL Trees
+
+An AVL (Adelson-Velskii and Landis) tree is a binary search tree with a balance condition that for every node in the tree, the height of the left and right subtrees can differ by at most 1 (The heigth of an empty is defined to be $-1$). Height information is kept for each node in the node structure. The height of an AVL tree is at most roughly $1.44\log\left(N+2\right)$, but in practice only slightly more than $O\left(\log N\right)$. The minimum number of nodes 
+
+$S
+\left(h\right)=S\left(h-1\right)+S\left(h-2\right)+1
+$$
+
+where $S\left(0\right)=1,S\left(h\right)=2$. All the tree operations can be performed in $O\left(\log N\right)$, except possibly insertion, which needs to update all the balancing information for the nodes on the path back to the root. What's more, simple insertion may violate the AVL tree property. After an insertion, only nodes that are on the path from the insertion point to the root might have their balance altered.
+
+For a tree $\alpha$, a violation might occur when an insertion into 
+
+- the left subtree of the left child
+
+- the right subtree of the left child
+
+- the left subtree of the right child
+
+- the right subtree of the right child
+
+
+##### Single Rotation
+
+For the left-left case, 
+
+1. make the left child the new root
+
+2. move the old root to the right child of the new root
+
+3. move the right child of the left child to the left of the old root.
+
+The right-right case is a symmetric case. After the rotation, the new height of the entire subtree is exactly the same as the height of the original subtree prior to the insertion.
+
+```
+                        +--+                                                            +--+
+               +--------+k2+--------------+                                     +-------+k1+--------+
+               |        +--+              |                                     |       +--+        |
+               |                          |                                     |                   |
+               |                          |                                     |                   |
+               |                          |                                     |                   |
+             +-++                    +----|---+                            +----|---+              ++-+
+             |k1|                    |        |                            |        |         +----+k2+--------+
+     +-----------------+             |   Z    |      +------------>        |        |         |    +--+        |
+     |                 |             |        |                            |        |         |                |
+     |                 |             +--------+                            |   X    |     +---|-+          +---|--+
+     |                 |                                                   |        |     |     |          |      |
+     |                 |                                                   |        |     |  Y  |          |      |
++----|--+           +--|---+                                               |        |     |     |          |  Z   |
+|       |           |      |                                               |        |     |     |          |      |
+|       |           |  Y   |                                               +--------+     +-----+          +------+
+|       |           |      |
+|  X    |           +------+
+|       |
+|       |
+|       |
++-------+
+```
+
+##### Double Rotation
+
+For the left-right case,
+
+1. make the left-right node the new root,
+
+2. move the left child of the new root to the right of the left child of the old root
+
+3. move the right child of the new root to the right of the old root
+
+4. make the left child of the old root the left child of the new root
+
+5. make the old root the right child of the new root
+
+The right-left case is a symmetric case.
+
+```
+                       +---+
+              +--------+k3 +--------------+
+              |        +---+              |                                                  +--+
+              |                           |                                         +--------+k2+--------+
+              |                           |                                         |        +--+        |
+            +-|-+                   +-----|---+                                     |                    |
+   +--------+k1 +-----+             |         |                                     |                    |
+   |        +---+     |             |         |                                   +-++                 +-++
+   |                  |             |         |                              +----+k1+----+          +-+k3+------+
++--|---+            +-++            |    D    |     +--------------->        |    +--+    |          | +--+      |
+|      |       +----+k2+-----+      |         |                              |            |          |           |
+|      |       |    +--+     |      |         |                              |            |          |           |
+|      |       |             |      |         |                           +--|--+      +--|--+    +--|--+     +--|---+
+|  A   |       |             |      +---------+                           |     |      |     |    |     |     |      |
+|      |       |             |                                            |     |      |     |    |     |     |      |
+|      |    +--|--+       +--|-+                                          |     |      |     |    |     |     |      |
+|      |    |     |       |    |                                          |  A  |      |  B  |    |  C  |     |   D  |
+|      |    |     |       |    |                                          |     |      |     |    |     |     |      |
++------+    |  B  |       | C  |                                          |     |      |     |    |     |     |      |
+            |     |       |    |                                          |     |      |     |    |     |     |      |
+            |     |       |    |                                          +-----+      +-----+    +-----+     +------+
+            |     |       |    |
+            +-----+       +----+
+```
+
+
+## Hashing
+
+The implementation of hash tables is frequently called _hashing_. Hashing is a technique used for performing insertions, deletions, and finds in constant average time. Operations that require any ordering information among the elements are not supported efficiently.
+
+The ideal hash is an array of some fixed size containing the keys. Each key is mapped (using a hash function, ideally injective, clearly impossible, but better evenly) into some number in the range $0$ to $\text{TableSize} - 1$ and placed in the appropriate cell.
