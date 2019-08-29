@@ -1139,3 +1139,17 @@ struct AA : X, Y, Z {
 An example of an inheritance hierarchy with virtual base classes is the iostreams hierarchy of the standard library: `std::istream` and `std::ostream` are derived from `std::ios` using virtual inheritance. `std::iostream` is derived from both `std::istream` and `std::ostream`, so every instance of `std::iostream` contains a `std::ostream` subobject, a `std::istream` subobject, and just one `std::ios` subobject (and, consequently, one `std::ios_base`).
 
 Virtual derivation is, in contrast to virtual functions, a pure compile-time issue. Virtual inheritance merely defines how the compiler defines a class’s data organization and construction process.
+
+## Run-time type identification
+
+C++ offers run-time type identification through the dynamic cast and typeid operators.
+
+The `dynamic_cast<>` operator is used to convert a base class pointer or reference to, respectively, a derived class pointer or reference. A dynamic cast’s actions are determined run-time; it can only be used if the base class declares at least one virtual member function. The cast fails and returns 0 (if a dynamic cast of a pointer was requested) or throws a `std::bad_cast` exception (if a dynamic cast of a reference was requested).
+
+We could determine the actual class of an object a pointer points to by performing a series of checks to find the derived class to which a base class pointer points.
+
+
+A dynamic cast is a cast, and casts should be avoided whenever possible. When using dynamic casts in your own code always properly document why the
+dynamic cast was appropriately used and was not avoided.
+
+As with the dynamic_cast operator, typeid is usually applied to references to base class objects that refer to derived class objects. Typeid should only be used with base classes offering virtual members. The typeid operator returns an object of type `type_info`. The typeid operator can be used to determine the name of the actual type of expressions, not just of class type objects.
