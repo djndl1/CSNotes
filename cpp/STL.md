@@ -105,3 +105,38 @@ The STL defines five types of iterators. Each category of iterator is defined by
 - `BidirectionalIterators`: They can traverse containers in both directions, for reading and writing.
 
 - `RandomAccessIterators`: provides random acess to container elements.
+
+`std::distance` expects two `InputIterator`s and returns the number of elements between them. `std::size` returns the number of elements in a container.
+
+Generic algorithms often require a target container into which the results of the algorithm are deposited. Situations exist where pointer arithmetic cannot be used. Analogously, the number of resulting elements sometimes differs from the number of elements in the initial range. In situations like these an inserter adaptor function can often be used to create elements in the destination container.
+
+- `back_inserter`: calls the container's `push_back` member to add new elements at the end of the container.
+
+- `front_inserter` calls the container’s push_front member, adding new elements at the beginning of the container. 
+
+-  `inserter` calls the container’s `insert` member adding new elements starting at a specified starting point.
+
+
+The `istream_iterator<Type>` can be used to define a set of iterators for `istream` objects. 
+
+```cpp
+vector<string> vs;
+copy(istream_iterator<string>(cin), istream_iterator<string>(), back_inserter(vs));
+```
+
+An `ostream_iterator<Type>` adaptor can be used to pass an `ostream` to algorithms expecting an `OutputIterator`.
+
+```cpp
+cin.unsetf(ios::skipws);
+copy(istream_iterator<char>(cin), istream_iterator<char>(),
+ostream_iterator<char>(cout));
+```
+
+Input iterators are also available for `streambuf` objects: `istreambuf_iterator`. Output iterators are also available for `streambuf` objects: `ostreambuf_iterator`.
+
+```cpp
+istreambuf_iterator<char> in(cin.rdbuf());
+istreambuf_iterator<char> eof;
+ostreambuf_iterator,char> out(cout.rdbuf());
+copy(in, eof, out);
+```
