@@ -333,3 +333,51 @@ avlTree avl_insert(avlTree tree, element_t elem)
 The implementation of hash tables is frequently called _hashing_. Hashing is a technique used for performing insertions, deletions, and finds in constant average time. Operations that require any ordering information among the elements are not supported efficiently.
 
 The ideal hash is an array of some fixed size containing the keys. Each key is mapped (using a hash function, ideally injective, clearly impossible, but better evenly) into some number in the range $0$ to $\text{TableSize} - 1$ and placed in the appropriate cell.
+
+If the input keys are integers, simply returning $\text{KEY} mod \text{TableSize}$ is generally a reasonable strategy. It is usually a good idea to ensure that the table size is prime. When the input keys are random integers, then this strategy is simple to compute and distributes the keys evenly.
+
+For string keys, one hash function can be
+
+```c
+index_t hash_str1(const char *key, int size)
+{
+    size_t hashval = 0;
+
+    while (*key != '\0')
+        hashval += *key++;
+
+    return hashval % size;
+}
+```
+
+With large table size, this function may not distribute the keys evenly.
+
+```c
+index_t hash_str2(const char *key, size_t size)
+{
+        return (key[0] + 27 * key[1] + 729 * key[2]) % size;
+}
+
+```
+
+This function doesn't give indices large enough.
+
+Another fairly good hash function is 
+
+$$
+\sum_{i=0}^{\text{size}-1}\text{Key}\text{\ensuremath{\left[\text{size}-i-1\right]}}\cdot32^{i}
+$$
+
+```c
+index_t hash_str3(const char *key, size_t size)
+{
+        unsigned long hashval = 0;
+
+        while (*key != 0)
+                hashval = (hashval << 5) + *key++;
+
+        return hashval % size;
+}
+```
+
+A common practice in this case is not to use all the characters.
