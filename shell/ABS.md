@@ -1501,3 +1501,25 @@ pidof plasmashell
 - `nm`: list symbols in an unstripped compiled binary
 
 
+# Advanced Topics
+
+## `/dev`
+
+The `/dev` directory contains entries for the physical devices that may or may not be present in the hardware.
+
+A loopback device is a gimmick that allows an ordinary file to be accessed as if it were a block device. This permits mounting an entire filesystem within a single large file.
+
+## `/proc`
+
+The `/proc` directory is actually a pseudo-filesystem. The files in /proc mirror currently running system and kernel processes and contain information and statistics about them.
+
+```bash
+cat /proc/devices 
+cat /proc/interrupts
+cat /proc/partitions
+cat /proc/apci/battery/BAT0/info
+cat /proc/version
+cat /proc/cpuinfo
+```
+
+The `stat` and `status` files keep running statistics on the process, the `cmdline` file holds the command-line arguments the process was invoked with, and the `exe` file is a symbolic link to the complete path name of the invoking process. 
