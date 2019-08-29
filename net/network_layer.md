@@ -173,5 +173,60 @@ TODO
 
 ## NAT (Network Address Translation)
 
+To solve the scarcity of IPv4 addresses, NAT is widely used. The basic idea behind NAT is for the ISP to assign each home or business a single IP address (or at most, a small number of them) for Internet traffic. Within the customer network, every computer gets a unique IP address, which is used for routing intramural traffic. before a packet exits the customer network and goes to the ISP, an address translation from the unique internal IP ad- dress to the shared public IP address takes place. This translation makes use of three ranges of IP addresses that have been declared as private. 
+
+- 10.0.0.0 - 10.255.255.255/8
+
+- 172.16.0.0 - 172.31.255.255/12
+
+- 192.168.0.0 - 192.168.255.255/16
+
+The NAT designers observed that most IP packets carry either TCP or UDP payloads. Ports are effectively an extra 16 bits of addressing that identify which process gets which incoming packet.  Whenever
+an outgoing packet enters the NAT box, the 10.x.y.z source address is replaced by the customer’s true IP address. In addition, the TCP Source port field is replaced by an index into the NAT box’s 65,536-entry translation table. This table entry contains the original IP address and the original source port. Finally, both the IP and TCP header checksums are recomputed and inserted into the packet. When a packet arrives at the NAT box from the ISP, the Source port in the TCP header is extracted and used as an index into the NAT box’s mapping table. From the entry located, the internal IP address and original TCP Source port are extracted and inserted into the packet. 
+
+1. NAT violates the architectural model of IP, which states that every IP address uniquely identifies a single machine worldwide.
+
+2. NAT breaks the end-to-end connectivity model of the Internet, which says that any host can send a packet to any other host at any time. A remote user cannot make connections to a game server on the home network,  Since the mapping in the NAT box is set up by outgoing packets.
+
+3. Third, NAT changes the Internet from a connectionless network to a peculiar kind of connection-oriented network. 
+
+4. NAT violates the most fundamental rule of protocol layering
+
+5. processes on the Internet are not required to use TCP or UDP.
+
+6. some applications use multiple TCP/IP connections or UDP ports in prescribed ways.
+
+7. since the TCP Source port field is 16 bits, at most 65,536 machines can be mapped onto an IP address. 
+
+Despite the issues, NAT is widely used in practice, especially for home and small business networks, as the only expedient technique to deal with the IP address shortage.
+
+
+## IP Version 6
+
+It uses 128-bit addresses; a shortage of these addresses is not likely any time in the foreseeable future. However, IPv6 has proved very difficult to deploy. It is a different network layer protocol that does not really interwork with IPv4, despite many similarities. 
+
+IPv6 is not compatible with IPv4, but it is compatible with the other auxiliary Internet protocols, including TCP, UDP, ICMP, IGMP, OSPF, BGP, and DNS, with small modifications being required to deal with longer addresses.
+
+IPv6 has longer address, simplifies the header, has better support for options.  Authentication and privacy are key features of the new IP. These were later retrofitted to IPv4.  More attention has been paid to quality of service.
+
+```
++-----------------------|-----------------+
+|Version|Diff.Services  |  Flow label     |
++-----------------------|-----------------+
+| Payload length    |NextHeader| Hop Limit|
++-----------------------------------------+
+|                                         |
+|            Source Address               |
+|             (16 bytes)                  |
+|                                         |
++-----------------------------------------+
+|                                         |
+|            Destination Address          |
+|              (16 bytes)                 |
+|                                         |
++-----------------------------------------+
+```
+
+- Differentiated services: used to distinguish the class of service for packets with different real-time delivery requirements.
 
 
