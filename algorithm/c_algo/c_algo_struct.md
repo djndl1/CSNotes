@@ -233,6 +233,21 @@ The right-right case is a symmetric case. After the rotation, the new height of 
 +-------+
 ```
 
+```c
+static pNode avl_leftSingleRotate(avlTree tree)
+{
+        pNode newRoot = tree->left;
+        tree->left = newRoot->right;
+        newRoot->right = tree;
+
+        tree->height = max(avl_height(tree->left), avl_height(tree->right)) + 1;
+        newRoot->height = max(avl_height(newRoot->left), avl_height(newRoot->right)) + 1;
+
+        return newRoot;
+}
+```
+
+
 ##### Double Rotation
 
 For the left-right case,
@@ -246,6 +261,8 @@ For the left-right case,
 4. make the left child of the old root the left child of the new root
 
 5. make the old root the right child of the new root
+
+It's actually two single rotations.
 
 The right-left case is a symmetric case.
 
@@ -275,8 +292,43 @@ The right-left case is a symmetric case.
             +-----+       +----+
 ```
 
+```c
+static pNode avl_leftDoubleRotate(avlTree tree)
+{
+        tree->left = avl_rightSingleRotate(tree->left);
+        return avl_leftSingleRotate(tree);
+}
+```
+
+```c
+avlTree avl_insert(avlTree tree, element_t elem)
+{
+        if (tree == NULL)
+                tree = avl_makeTree(elem);
+        else if (element_comp(&elem, &tree->elem) < 0) {
+                tree->left = avl_insert(tree->left, elem);
+                if (avl_height(tree->left) - avl_height(tree->right) == 2)
+                        if (element_comp(&elem, &tree->left->elem) < 0)
+                                tree = avl_leftSingleRotate(tree);
+                        else
+                                tree = avl_leftDoubleRotate(tree);
+        } else if (element_comp(&elem, &tree->right->elem) > 0) {
+                tree->right = avl_insert(tree->right, elem);
+                if (avl_height(tree->right) - avl_height(tree->left) == 2)
+                        if (element_comp(&elem, &tree->right->elem) < 0)
+                                tree = avl_rightSingleRotate(tree);
+                        else
+                                tree = avl_rightDoubleRotate(tree);
+        }
+        tree->height = max(avl_height(tree->left), avl_height(tree->right)) + 1; // important
+
+        return tree;
+}
+```
+
 
 ## Hashing
+
 
 The implementation of hash tables is frequently called _hashing_. Hashing is a technique used for performing insertions, deletions, and finds in constant average time. Operations that require any ordering information among the elements are not supported efficiently.
 
