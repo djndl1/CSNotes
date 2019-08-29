@@ -381,3 +381,27 @@ index_t hash_str3(const char *key, size_t size)
 ```
 
 A common practice in this case is not to use all the characters.
+
+### Splay Trees
+
+TODO
+
+### B-Trees
+
+ The B-tree is a generalization of a binary search tree in that a node can have more than two children
+
+A B-tree of order $M$ is a search tree:
+
+- the root is either a leaf or has between $2$ or $M$ children;
+
+- All nonleaf nodes (except the root) have between $\lceil M/2\rceil$ and $M$ children.
+
+- All leaves are at the same depth.
+
+All data are stored are the leaves. Every interior node (nonleaves) has pointers $P_{1,}P_{2},\dots,P_{M}$ to children and values representing the smallest key $k_{1},k_{2},\dots,k_{M-1}$ found in the subtrees $P_{2}, P_{3},\dots,P_{M}$ respectively. For every node, all the keys in subtree $P_{i-1}$ are smaller than the keys in subtree $P_{i}$. The keys act as separation values which divide its subtrees.
+
+The leaves contains all the actual data, which are either the keys themselves or pointers to records containing the keys.
+
+A B-tree of order is known as a 2-3-4 tree (permitted numbers of children)and a B-tree of order 3 is known as a 2-3 tree.
+
+In order to maintain the pre-defined range, internal nodes may be joined or split. A B-tree is kept balanced after insertion by splitting a would-be overfilled node, of $2d+1$ keys, into two $d$-key siblings and inserting the mid-value key into the parent. When the split happens at the root, the tree gains depth, a new root is created.
