@@ -229,4 +229,56 @@ IPv6 has longer address, simplifies the header, has better support for options. 
 
 - Differentiated services: used to distinguish the class of service for packets with different real-time delivery requirements.
 
+- Flow label: mark groups of packets that have the same requirements and should be treated in the same way by the network. Each flow for quality of service purposes is designated by the source address, destination address and flow number
 
+- Next header: which extension header; which transport protocol handler (UDP, TCP or something else) to pass the packet to;
+
+- Hop limit: keep packets from living forever;
+
+- Source/Destination address: 16 byte addresses: leading zeros within a group can be omitted, one or more groups of 16 zero bits can be replaced by a pair of colons.
+
+```
+8000:0000:0000:0000:0123:4567:89AB:CDEF
+8000::123:4567:89AB:CDEF
+```
+
+ IPv4 addresses can be written as a pair of colons and an old dotted decimal number: 
+ 
+ ```
+ ::192.31.20.46
+ ```
+
+All IPv6-conformant hosts dynamically determine the packet size to use  using the path MTU discovery. There is no need for another checksum field.
+
+IPv6 provides extension headers for extra information in an efficient way:
+
+- hop-by-hop: miscellaneous information that all routers along the path must examine. e.g. support of datagrams exceeding 64KB.
+ 
+TODO
+
+
+## Internet Control Protocols
+
+The Internet has several companion cotnrol protocols that are used in the network layer, including ICMP, ARP, and DHCP.
+
+### ICMP The Internet Control Message Protocol
+
+When some unexpected occurs during packet processing at router, the event is reported by the ICMP. It is also used to test the Internet.
+
+Each ICMP message type is carried encapsulated in an IP packet.
+
+- `DELINEATION UNREACHABLE`: a router cannot locate the destination
+
+- `TIME EXCEEDED`: TtL counter reaches zero. `traceroute` uses this.
+
+- `PARAMETER PROBLEM`: an illegal value has been detected in a header field
+
+- `SOURCE QUENCH`: conjestion control, rarely used; 
+
+- `REDIRECT`: incorrectly routing.
+
+- `ECHO`/`ECHO REPLY`: sent by the hosts see if a given destination is reachable and currently alive. Used by `ping`
+
+- `TIMESTAMP REQUEST`/`TIMESTAMP REPLY`: similar to `ECHO`, with arrival time and departure time included
+
+- `ROUTER ADVERTISEMENT`/`ROUTER SOLICITATION`: let hosts find nearby routers.
