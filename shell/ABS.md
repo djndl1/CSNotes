@@ -1523,3 +1523,114 @@ cat /proc/cpuinfo
 ```
 
 The `stat` and `status` files keep running statistics on the process, the `cmdline` file holds the command-line arguments the process was invoked with, and the `exe` file is a symbolic link to the complete path name of the invoking process. 
+
+## `sed`
+
+`sed` receives text input, whether from stdin or from a file, performs certain operations on specified lines of the input, one line at a time, then outputs the result to stdout or to a file.
+
+Sed determines which lines of its input that it will operate on from the address range passed to it. 
+
+```bash
+3d # delete line 3
+/window/d # delete every line containing `window`
+/^$/d # delete empty line
+```
+
+- `[range]/p`: print range
+
+- `[range]/d`: delete range
+
+- `s/pattern1/pattern2/`: substitute `pattern2` for first instance of `pattern1` in a line
+
+- `[range]/s/pattern1/pattern2/`: substitute `pattern2` for first instance of `pattern1` in a line over `range`
+
+- `[range]/y/pattern1/pattern2/`: replace any character in pattern1 with the corresponding chacter in pattern2, over `range`
+
+- `[address] i pattern Filename`: insert pattern at address indicated in file `Filename`
+
+- `g`: global, operate on every pattern match within each match line of input
+
+read more at  http://www.grymoire.com/Unix/Sed.html
+
+## Here Documents
+
+A here document is a special-purpose code block. It uses a form of I/O redirection to feed a command list to an interactive program or a command, such as `ftp`, `cat`, or the `ex` text editor. `<<` precedes the limit string. A limit string delineates (frames) the command list. 
+
+```bash
+cat <<EOF
+fadfas
+
+dfadfafa
+
+fEOF
+EOF
+```
+
+A here document supports parameter and command substitution.
+
+```bash
+export RESPONDENT=djn
+cat <<EndOfMessage
+Hello, $USER
+Greetings to you, $USER, from $RESPONDENT
+EndOfMessage
+```
+
+Quoting or escaping the "limit string" at the head of a here document disables parameter substitution within its body. Here documents may be used to generate another script.
+
+```bash
+GetPersonalData() {
+    read firstname
+    read lastname
+    read address
+    read city
+    read state
+    read zipcode
+}
+
+GetPersonalData <<RECORD001
+A
+B
+C
+D
+E
+F
+RECORD001
+```
+
+Also, there is the anonymous here document:
+
+```bash
+: << TESTVAR
+${HOSTNAME?} ${USER?} ${MAIL?}
+TESTVAR
+```
+
+Anonymous here documents can be used as comment blocks.
+
+Here documents create temporary files, but these files are deleted after opening and are not accessible to any other process.
+
+A here string can be considered as a stripped-down form of a here document. `COMMAND <<< $WORD`
+
+```bash
+if grep -q "txt" <<< "$VAR"
+then
+    echo ...
+fi
+```
+
+```bash
+read -r -a Words <<< "This is a string of words"
+```
+
+It is possible to feed the output of a here string into the `stdin` of a loop.
+
+```bash
+ArrayVar=(elm0 elm1 elm2 elm3)
+
+while read element; do
+echo "$element" 1>&2
+done <<< $(echo ${ArrayVar[*]})
+```
+
+It can be used with `bc`.
