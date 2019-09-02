@@ -308,11 +308,161 @@ main(int argc, char *argv[])
 Since a common operation is to create a pipe to another process to either read its output or send it input, the standard I/O library has historically provided the `popen` and `pclose` functions. These two functions handle all the dirty work: creating a pipe, forking a child, closing the unused ends of the pipe, executing a shell to run the command, and waiting for the command to terminate.
 
 ```c
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <stdio.h>
 
+#define PAGER "${PAGER:-most}"
+#define MAXLINE 4096
+
+
+int main(int argc, char *argv[])
+{
+        char    line[MAXLINE];
+        FILE    *fpin, *fpout;
+
+        if (argc != 2) {
+                fprintf(stderr, "usage: a.out <pathname>\n");
+                return 1;
+        }
+
+        if ((fpin = fopen(argv[1], "r")) == NULL) {
+                fprintf(stderr ,"cannot open %s\n", argv[1]);
+                exit(2);
+        }
+        if ((fpout = popen(PAGER, "w")) == NULL) {
+               perror("popen error\n");
+                exit(3);
+        }
+
+        while (fgets(line, MAXLINE, fpin) != NULL) {
+                if (fputs(line, fpout) == EOF) {
+                        perror("fputs error to pipe\n");
+                        exit(4);
+                }
+        }
+        if (pclose(fpout) == -1)
+                exit(5);
+        return 0;
+}
 ```
+
+`popen` and `pclose` implementation
+
+```c
+#include <errno.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <stdlib.h>
+#include <stdio.h>
+
+static pid_t *childpid = NULL;
+static int maxfd;
+
+#include <limits.h>
+
+#ifdef	OPEN_MAX
+static long	openmax = OPEN_MAX;
+#else
+static long	openmax = 0;
+#endif
+
+/*
+ * If OPEN_MAX is indeterminate, this might be inadequate.
+ */
+#define	OPEN_MAX_GUESS	256
+
+static long open_max(void)
+{
+	if (openmax == 0) {		/* first time through */
+		errno = 0;
+		if ((openmax = sysconf(_SC_OPEN_MAX)) < 0) {
+			if (errno == 0)
+				openmax = OPEN_MAX_GUESS;	/* it's indeterminate */
+			else {
+                                fprintf(stderr, "Cannot obtain OPEN_MAX");
+                                exit(1);
+                        }
+		}
+	}
+	return(openmax);
+}
+
+
+FILE *popen(const char* cmdstring, const char* type)
+{
+        int     i;
+        int     pfd[2];
+        pid_t   pid;
+        FILE    *fp;
+
+        // only allow "r" or "w"
+        if ((type[0] != 'r' && type[0] != 'w') || type[1] != '\0') {
+                errno = EINVAL;
+                return NULL;
+        }
+
+        if (childpid == NULL) {
+                maxfd = open_max();
+                if ((childpid = calloc(maxfd, sizeof(pid_t))) == NULL)
+                        return NULL;
+        }
+
+        if (pipe(pfd) < 0)
+                return NULL;
+        if (pfd[0] >= maxfd || pdf[1] >= maxfd) {
+                close(pfd[0]);
+                close(pfd[1]);
+                errno = EMFILE;
+                return NULL;
+        }
+
+        if ((pid = fork()) < 0)
+                return NULL;
+        else if (pid == 0) { // child process
+                if (*type == 'r') { // child writes
+                        close(pfd[0]);
+                        if (pfd[1] != STDOUT_FILENO) {
+                                dup2(pfd[1], STDOUT_FILENO);
+                                close(pfd[1]);
+                        }
+                } else {
+                        close(pfd[1]);
+                        if (pfd[0] != STDIN_FILENO) {
+                                dup2(pfd[0], STDIN_FILENO);
+                                close(pfd[0]);
+                        }
+                }
+                /* close all descriptors in childpid[] */
+                for (i = 0; i < maxfd; i++)
+                        if (childpid[i] > 0)
+                                close(i);
+
+                execl("/bin/sh", "sh", "-c", cmdstring, (char *)0);
+                _exit(127);
+        }
+
+        /* parent continues */
+        if (*type == 'r') {
+                close(pfd[1]);
+                if ((fp = fdopen(pfd[0], type)) == NULL)
+                        return NULL;
+        } else {
+                close(pfd[0]);
+                if ((fp = fdopen(pfd[1], type)) == NULL)
+                        return NULL;
+        }
+        childpid[fileno(fp)] = pid;
+        return  fp;
+}
+```
+
 
 # Coprocesses
 
 TODO
 
+
 # FIFO
+
