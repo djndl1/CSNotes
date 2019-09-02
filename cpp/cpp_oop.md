@@ -860,6 +860,8 @@ Often classes can be defined in-terms-of existing classes: some of their feature
 
 Avoid the temptation to declare data members in a class’s protected section: it’s a sure sign of bad class design as it needlessly results in tight coupling of base and derived classes. If a derived class (but not other parts of the software) should be given access to its base class’s data, use member functions: accessors and modifiers declared in the base class’s protected section.
 
+
+
 ## Public, protected and private derivation
 
 When protected derivation is used all the base class’s public and protected members become protected members in the derived class. Classes that are in turn derived from the derived class view the base class’s members as protected.
@@ -871,6 +873,10 @@ Public derivation should be used to define an is-a relationship between a derive
 Combinations of inheritance types do occur.
 
 When private or protected derivation is used, users of derived class objects are denied access to the base class members. Private derivation denies access to all base class members to users of the derived class, protected derivation does the same, but allows classes that are in turn derived from the derived class to access the base class’s public and protected members.
+
+Private inheritance should be used when deriving a class `Derived` from `Base` where `Derived` is-implemented-in-terms-of Base. In general terms composition results in looser coupling and should therefore be preferred over inheritance. Protected inheritance may be considered when the derived class (D) itself is intended as a base class that should only make the members of its own base class (B) available to classes that are derived from it (i.e., D).
+
+TODO
 
 ### promoting acess rights
 
@@ -1098,6 +1104,10 @@ Destructors should _always be defined_ `virtual` in classes designed as a base c
 
 The identifier `final` can be applied to class declarations to indicate that the class cannot be used as a base class. The identifier `final` can also be added to virtual member declarations, indicating that those virtual members cannot be overridden by derived classes.
 
+Virtual functions should never be implemented inline. Since the vtable contains the addresses of the class’s virtual functions, these functions must have addresses and so they must have been compiled as real (out-of-line) functions.
+
+The notion of a virtual constructor is not supported.
+
 ## Pure Virtual
 
 Virtual member functions do not necessarily have to be implemented in base classes. Abstract base classes are the foundation of many design patterns, allowing the programmer to create highly reusable software. Members that are merely declared in base classes are called pure virtual functions. A virtual member becomes a pure virtual member by postfixing `= 0` to its declaration. Pure virtual member functions may be implemented. Implementing a pure virtual member has limited use. 
@@ -1153,3 +1163,17 @@ A dynamic cast is a cast, and casts should be avoided whenever possible. When us
 dynamic cast was appropriately used and was not avoided.
 
 As with the dynamic_cast operator, typeid is usually applied to references to base class objects that refer to derived class objects. Typeid should only be used with base classes offering virtual members. The typeid operator returns an object of type `type_info`. The typeid operator can be used to determine the name of the actual type of expressions, not just of class type objects.
+
+examples TODO
+
+## Implementation
+
+when multiple inheritance is used (each base class defining virtual members) another approach is followed to determine which virtual function to call, the class Derived receives two vtables, one for each of its base classes and each Derived class object harbors two hidden vpointers, each one pointing to its corresponding vtable.
+
+## Prototype Design Pattern
+
+TODO
+
+# Friends
+
+By using the friend keyword functions are granted access to a class’s private members. Even so, this does not imply that the principle of data hiding is abandoned when the friend keyword is used. Friend declarations are true declarations. Once a class contains friend declarations these friend functions do not have to be declared again below the class’s interface. This also clearly indicates the class designer’s intent: the friend functions are declared by the class, and can thus be considered functions belonging to the class.
