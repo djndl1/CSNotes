@@ -282,3 +282,15 @@ Each ICMP message type is carried encapsulated in an IP packet.
 - `TIMESTAMP REQUEST`/`TIMESTAMP REPLY`: similar to `ECHO`, with arrival time and departure time included
 
 - `ROUTER ADVERTISEMENT`/`ROUTER SOLICITATION`: let hosts find nearby routers.
+
+### ARP The Address Resolution Protocol
+
+Data link layer NICs do not understand Internet addresses. To get the mapping from IP addresses to Ethernet addresses, the host outputs a broadcase to ask who owns a specific IP address. The protocol used for asking this question and getting the reply is _ARP_ (Address Resolution Protocol). Once a machine has run ARP, it caches the result in case it needs to contact the same machine shortly. The process of querying can also be the process of sending its mapping. Every machine broadcasts its mapping when it is configured. Proxy ARP is used in special cases in which a host wants to appear on a network even though it acatually resides on another one.
+
+### DHCP The Dynamic Host Configuration Protocol
+
+With DHCP, every network must have a DHCP server that is responsible for configuration. A host without an IP address broadcasts a DHCP DISCOVERY packet. The router may relay the packet if the DHCP server is not attached to the network. The server then allocates a free IP address and sends to the requesting host in a DHCP OFFER packet. IP address assignment may be for a fixed period time, a technique called _leasing_. The host must ask for a DHCP renewal before the lease expires. 
+
+DHCP is used by ISPs to set the parameters of devices over the Internet access link, so that customers do not need to phone their ISPs to get this information (the network mask, the IP address of the default gatewawy, the IP address of DNS and time servers). 
+
+
