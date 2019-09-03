@@ -255,3 +255,5 @@ template <> char const *add(char const *const &p1, char const *const &p2);
 If in addition template <> could be omitted the template character would be removed from the declaration. The resulting declaration is now a mere function declaration. This is not an error: function templates and ordinary (non-template) functions may mutually overload each other. Ordinary functions are not as restrictive as function templates with respect to allowed type conversions. This could be a reason to overload a template with an ordinary function every once in a while.
 
 TODO
+
+# Class Template
