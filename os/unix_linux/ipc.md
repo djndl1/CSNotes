@@ -510,10 +510,77 @@ To implement semaphores correctly, the test of a semaphore’s value and the dec
 
 A common form of semaphore is called a binary semaphore. It controls a single resource, and its value is initialized to 1. In general, however, a semaphore can be initialized to any positive value, with the value indicating how many units of the shared resource are available for sharing.
 
+
 TODO
 
 ## Shared Memory
 
 # POSIX Semaphore
 
-The POSIX semaphore mechanism is one of three IPC mechanisms that originated with the real-time extensions to POSIX.1.
+The POSIX semaphore mechanism is one of three IPC mechanisms that originated with the real-time extensions to POSIX.1. POSIX semaphores are available in two flavors: named and unnamed. Unamed semaphores exist in memory only and require that processes have access to the memory to be able to use the semaphores. This means they can be used only by threads in the same process or threads in different processes that have mapped the same memory extent into their address spaces. Named semaphores, in contrast, are accessed by name and can be used by threads in any processes that know their names.
+
+`sem_open` creates a new named semaphore. `sem_close` release any resources associated with the semaphore. If our process exits without having first called sem_close, the kernel will close any open semaphores automatically. To destroy a named semaphore, we can use the `sem_unlink` function.The sem_unlink function removes the name of the semaphore. If there are no open references to the semaphore, then it is destroyed. Otherwise, destruction is deferred until the last open reference is closed. To decrement the value of a semaphore, we can use the `sem_wait`, `sem_trywait`, `sem_timedwait` function. To increment the value of a semaphore, we call the `sem_post` function.
+
+When we want to use POSIX semaphores within a single process, it is easier to use
+unnamed semaphores. `sem_init` creates an unnamed semaphore. When we are done using the unnamed semaphore, we can discard it by calling the `sem_destroy` function. `sem_getval` retrieves the value of a semaphore. Be aware that the value of the semaphore can change by the time that we try to use the value just read. Unless we use additional synchronization mechanisms to avoid this race, the sem_getvalue function is useful only for debugging.
+
+One of the motivations for introducing the POSIX semaphore interfaces was that they
+can be made to perform significantly better than the existing XSI semaphore interfaces.
+
+```c
+#include <fcntl.h>
+#include <semaphore.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+
+struct slock {
+        sem_t *semp;
+        char name[_PC_NAME_MAX];
+};
+
+typedef struct slock slock_t;
+
+void s_free(slock_t *sp)
+{
+        sem_close(sp->semp);
+        free(sp);
+}
+
+int s_lock(slock_t *sp)
+{
+        return sem_wait(sp->semp);
+}
+
+int s_trylock(slock_t *sp)
+{
+        return sem_trywait(sp->semp);
+}
+
+int s_unlock(slock_t *sp)
+{
+        return sem_post(sp->semp);
+}
+
+slock_t *s_alloc()
+{
+        struct slock *sp;
+        static int cnt;
+        if ((sp = malloc(sizeof(struct slock))) == NULL)
+                return NULL;
+        do {
+                snprintf(sp->name, sizeof(sp->name), "/%ld.%d", (long)getpid(),
+                         cnt++);
+                sp->semp = sem_open(sp->name, O_CREAT|O_EXCL, S_IRWXU, 1);
+        } while ((sp->semp == SEM_FAILED) && (errno == EEXIST));
+        if (sp->semp == SEM_FAILED) {
+                free(sp);
+                return(NULL);
+        }
+        sem_unlink(sp->name); // this does not destroy the semaphore immdiately
+        return(sp);
+}
+
+```
