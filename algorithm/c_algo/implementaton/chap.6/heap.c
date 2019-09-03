@@ -61,5 +61,51 @@ int priority_queue_insert(priority_queue_t heap, element_t elm)
         return 0;
 }
 
+bool priority_queue_is_empty(priority_queue_t heap)
+{
+        return heap->size == 0;
+}
 
+element_t priority_queue_delete_min(priority_queue_t heap)
+{
+        if (priority_queue_is_empty(heap))
+                return heap->elems[0];
+        element_t min = heap->elems[1];
+        element_t last = heap->elems[heap->size--];
 
+        size_t i, child;
+        for (i = 1; i * 2 <= heap->size; i = child) {
+                child =  i * 2;
+                if ( child != heap->size &&
+                     element_comp(&heap->elems[child+1], &heap->elems[child]) < 0)
+                        child++;
+
+                if (element_comp(&last, &heap->elems[child]) > 0)
+                        heap->elems[i] = heap->elems[child];
+                else
+                        break;
+        }
+        heap->elems[i] = last;
+        return min;
+        
+}
+
+void priority_queue_make_heap_order(priority_queue_t heap)
+{
+        if (priority_queue_is_empty(heap))
+                return;
+        element_t root = heap->elems[1];
+        size_t i, child;
+        for (i = 1; i * 2 <= heap->size; i = child) {
+                child =  i * 2;
+                if ( child != heap->size &&
+                     element_comp(&heap->elems[child+1], &heap->elems[child]) < 0)
+                        child++;
+
+                if (element_comp(&root, &heap->elems[child]) > 0)
+                        heap->elems[i] = heap->elems[child];
+                else
+                        break;
+        }
+        heap->elems[i] = root;
+}

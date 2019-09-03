@@ -1177,3 +1177,146 @@ TODO
 # Friends
 
 By using the friend keyword functions are granted access to a class’s private members. Even so, this does not imply that the principle of data hiding is abandoned when the friend keyword is used. Friend declarations are true declarations. Once a class contains friend declarations these friend functions do not have to be declared again below the class’s interface. This also clearly indicates the class designer’s intent: the friend functions are declared by the class, and can thus be considered functions belonging to the class.
+
+# Classes Having Pointers to Members
+
+Pointers to members can profitably be used to configure the behavior of objects of classes. Depending on which member a pointer to a member points to objects will show certain behavior.
+
+To define a pointer to a member of a class, the scope of the pointer must indicate class scope, by prefixing the pointer data member by the class name plus scope resolution operator.
+
+```cpp
+char const *(String::*d_sp)() const;
+```
+
+Pointers to members may be defined in their target classes (so they become data members), or in another class, or as a local variable or as a global variable. The important part is that a pointer to member can be initialized or assigned without requiring the existence of an object of the pointer’s target class. Initializing or assigning an address to such a pointer merely indicates to which member the pointer points. This can be considered some kind of relative address; relative to the object for which the function is called. No object is required when pointers to members are initialized or assigned.
+
+```cpp
+#include <cstddef>
+
+class PointerDemo {
+public:
+    size_t d_value;
+    size_t get() const;
+};
+
+inline size_t PointerDemo::get() const
+{
+    return d_value;
+}
+
+int main(int argc, char *argv[])
+{
+    size_t (PointerDemo::*getPtr)() const = &PointerDemo::get;
+    size_t PointerDemo::*valuePtr = &PointerDemo::d_value;
+
+    getPtr = &PointerDemo::get;
+    valuePtr = &PointerDemo::d_value;
+    
+    PointerDemo object{};
+    PointerDemo *ptr = &object;
+    object.*valuePtr = 12345;
+    ptr->*valuePtr = 54321;
+    return 0;
+}
+```
+
+Pointers to members can be used profitably in situations where a class has a member that behaves differently depending on a configuration setting.
+
+```cpp
+#include <string>
+
+class PersonData {
+    static std::string (PersonData::*s_infoPtr[])(Person *p);
+
+    std::string (PersonData::*d_infoPtr)(Person *p);
+
+    PersonData(PersonData::EmployeeCategory cat);
+
+    std::string personInfo(char const *name);
+
+private:
+    std::string allInfo(Person *p);
+    std::string noPhone(Person *p);
+    std::string nameOnly(Person *p);
+};
+
+std::string PersonData::personInfo(char const *name)
+{
+    Person *p = lookup(name);
+
+    return p ? (this->*d_infoPtr)(p) :  "not found";
+}
+
+PersonData::PersonData(PersonData::EmployeeCategory cat)
+    : d_infoPtr(s_infoPtr[cat])
+{}
+
+std::string (PersonData::PersonData::*s_infoPtr[])(Person *p) = {
+    &PersonData::allInfo,
+    &PersonData::allInfo,
+    &PersonData::noPhone,
+    &PersonData::nameOnly
+};
+```
+
+Static members of a class can be used without having available an object of their class. Public static members can be called like free functions, albeit that their class names must be specified when they are called. Since static members have no associated objects their addresses can be stored in ordinary function pointer variables, operating at the global level. Pointers to members cannot be used to store addresses of static members.
+
+```cpp
+void fun()
+{
+    size_t (*pf)() = String::count;
+    cout << (*pf)() << '\n';
+}
+```
+
+Pointers to member function may differ from those of normal pointers in size. 
+
+```cpp
+size of pointer to data-member:     8
+size of pointer to member function: 16
+size of pointer to non-member data: 8
+size of pointer to free function:   8
+```
+
+With polymorphism and multiple inheritance, the implicit parameter of a non-static member function may not be the address of the object itself, rather plus an offset. When calling a member function, this offset is needed so that the correct implicit parameter is passed. The offset is also stored in the pointer now, requiring extra bits.
+
+```cpp
+#include <iostream>
+
+struct A {
+    int a;
+};
+
+struct B {
+    int b;
+    void bfun() {}
+};
+
+struct C : public A, public B
+{
+
+};
+
+int main(int argc, char *argv[])
+{
+    union BPTR {
+        void (B::*ptr)();
+        unsigned long value[2];
+    } bp;
+    bp.ptr = &B::bfun;
+    std::cout << std::hex << bp.value[0] << ' ' << bp.value[1] << std::dec << '\n';
+
+    union CPTR {
+        void (C::*ptr)();
+        unsigned long value[2];
+    } cp;
+    cp.ptr = &C::bfun;
+    std::cout << std::hex << cp.value[0] << ' ' << cp.value[1] << std::dec << '\n';
+    return 0;
+}
+```
+
+```bash
+4012e0 0 
+4012e0 4 # when calling, (*4012e0)(this + 4, args);
+```
