@@ -464,5 +464,56 @@ FILE *popen(const char* cmdstring, const char* type)
 TODO
 
 
-# FIFO
+# FIFO (named pipes)
 
+Unnamed pipes can be used only between related processes when a common ancestor has created the pipe. With FIFOs, unrelated processes can exchange data. 
+
+Creating a FIFO is similar to creating a file. `mkfifo` and `mkfifoat` create a FIFO. Once a FIFO is created,  `open`, `close`, `read`, `write`, `unlink` all work with FIFOs. As with a pipe, if we write to a FIFO that no process has open for reading, the signal `SIGPIPE` is generated. When the last writer for a FIFO closes the FIFO, an end of file is generated for the reader of the FIFO.
+
+```bash
+mkfifo fifo1
+prog3 < fifo1 & prog1 < infile | tee fifo1 | prog2
+```
+
+A use for FIFOs is to send data between a client and a server. If we have a server that is contacted by numerous clients, each client can write its request to a well-known FIFO that the server creates.  The constant `PIPE_BUF` specifies the maximum amount of data that can be written atomically to a FIFO. Since there are multiple writers for the FIFO, the requests sent by the clients to the server need to be less than `PIPE_BUF` bytes in size. This prevents any interleaving of the client writes.  The
+server then creates a unique FIFO for each client, using a pathname based on the client’s process ID to send back responses.
+
+# XSI IPC: message queue, semaphores and shared memory
+
+Each IPC structure (message queue, semaphore, or shared memory segment) in the kernel is referred to by a non-negative integer identifier. The identifier is an internal name for an IPC object. An IPC object is associated with a key that acts as an external name. Whenever an IPC structure is being created, a key must be specified.
+
+TODO
+
+## Message Queues
+
+A message queue is a linked list of messages stored within the kernel and identified by a message queue identifier. 
+
+A new queue is created or an existing queue opened by `msgget`. New messages are added to the end of a queue by `msgsnd`. The `msgctl` (`ioctl`-like functions for XSI IPC) function performs various operations on a queue. Messages are retrieved from a queue by `msgrcv`.
+
+Use: If we need a bidirectional flow of data between a client and a server, we can use either message queues or full-duplex pipes.
+
+TODO
+
+## Semaphores
+
+A semaphore is a counter used to provide access to a shared data object for multiple processes.
+
+To obtain a shared resource, a process:
+
+1. Test the semaphore that controls the resource.
+
+2. Use the resource if the value of the semaphore is positive. The semaphore is decremented by 1.
+
+3. If the value of the semaphore is 0, the process goes to sleep unitl the semaphore value is greater than 0.
+
+To implement semaphores correctly, the test of a semaphore’s value and the decrementing of this value must be an atomic operation.
+
+A common form of semaphore is called a binary semaphore. It controls a single resource, and its value is initialized to 1. In general, however, a semaphore can be initialized to any positive value, with the value indicating how many units of the shared resource are available for sharing.
+
+TODO
+
+## Shared Memory
+
+# POSIX Semaphore
+
+The POSIX semaphore mechanism is one of three IPC mechanisms that originated with the real-time extensions to POSIX.1.
