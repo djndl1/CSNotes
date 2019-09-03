@@ -358,7 +358,7 @@ A B-tree of order is known as a 2-3-4 tree (permitted numbers of children)and a 
 
 In order to maintain the pre-defined range, internal nodes may be joined or split. A B-tree is kept balanced after insertion by splitting a would-be overfilled node, of $2d+1$ keys, into two $d$-key siblings and inserting the mid-value key into the parent. When the split happens at the root, the tree gains depth, a new root is created.
 
-
+https://github.com/gcc-mirror/gcc/blob/master/libgomp/priority_queue.h
 
 ## Hashing
 
@@ -418,3 +418,120 @@ A common practice in this case is not to use all the characters.
 The main programming detail is collision resolution. _Separate chaining_ is to keep a list of all elements that hash to the same value. Any scheme could be used besides linked lists to resolve the collisions; a binary search tree or even another table would work.
 
 
+## Priority Queues (Heaps)
+
+A priority queue has at least a `DeleteMin()` operation and an `Insert()` operation.
+
+### Simple Implementation
+
+A linked list, a binary search tree.
+
+### Binary Heap
+
+It is common for priority queue implementation to use a (binary) heap. Heaps have two properties.
+
+#### Structure Property
+
+a heap is a binary tree that is completely filled, with the possible exception of the bottom level, which is filled from left to right (Complete binary tree). The height of a complete binary tree is $\lfloor \log N \rfloor$. A complete binary tree can be represented in an array and no pointers are necessary. For any element in array position $i$, the left child is in position $2i$, the right child is in position $2i+1$ and the parent in position $\lfloor i/2 \rfloor$. The only problem with array implementations is that an estimate of the maximum heap size is required in advance. A heap data structure can consists of an array and an integer representing the maximum and current heap sizes.
+
+```c
+struct heap {
+    size_t      capacity;
+    size_t      size;
+    element_t   *elems;*
+};
+```
+
+#### Heap Order Property
+
+In a heap, for every node $X$, the key in the parent of $X$ is smaller than (or equal to) the key in $X$, with the exception of the root (min-heap).
+
+#### Heap operations
+
+- `insert`: if the element can be inserted into the pre-allocated position without violating the heap order, then we are done. Otherwise, the pre-allocated empty position bubbles up toward the root until the heap order is not violated (percolate up). 
+
+```c
+int priority_queue_insert(priority_queue_t heap, element_t elm)
+{
+        if (priority_queue_is_full(heap)) {
+                return 1;
+        }
+
+        size_t i;
+        for (i = ++heap->size;
+             element_comp(&heap->elems[i/2], &elm) > 0 || i == 1;
+             i /= 2)
+                heap->elems[i] = heap->elems[i/2];
+        heap->elems[i] = elm;
+
+        return 0;
+}
+```
+
+The time to do the insertion could be as much as $O(\log N)$, if the element to be inserted is the new minimum and is percolated all the way to the root.
+
+```c
+element_t priority_queue_delete_min(priority_queue_t heap)
+{
+        if (priority_queue_is_empty(heap))
+                return heap->elems[0];
+        element_t min = heap->elems[1];
+        element_t last = heap->elems[heap->size--];
+
+        size_t i, child;
+        for (i = 1; i * 2 <= heap->size; i = child) {
+                child =  i * 2;
+                if ( child != heap->size &&
+                     element_comp(&heap->elems[child+1], &heap->elems[child]) < 0)
+                        child++;
+
+                if (element_comp(&last, &heap->elems[child]) > 0)
+                        heap->elems[i] = heap->elems[child];
+                else
+                        break;
+        }
+        heap->elems[i] = last;
+        return min;
+        
+}
+```
+
+The worst-case and average running time for `deleteMin` is $O(\log N)$.
+
+A minheap is of no help in finding the maximum element.
+
+Assuming that the position of every element is known by some other method, `decreaseKey`/`increaseKey` (lower/increase the value of the key at position $P$ by a positive amount), `delete`, `buildHeap` (takes as input $N$ keys and places them into an empty heap) all run in logarithmic worst-case time.
+
+The general algorithm of `buildHeap` is to place the $N$ keys into the tree in any order and then create a heap order.
+
+```c
+for (i = N / 2; i > 0; i--) // from the first node of the lowest level
+    PercolateDown(i);       // percolate up by level or more precisely, makeHeapOrder
+```
+
+with an average running time $O(N)$ and a worst-case time $O(N \log N)$.
+
+TODO
+
+# Sorting
+
+## Insertion Sort
+
+Insertion sort consists of $N-1$ passes. For each pass, insertion sort ensures that the element in position $0$ through $P$ are in sorted order.
+
+ The average running time $\Theta(N^{2})$.
+ 
+ ```c
+ void insertSort(element_t elms[], size_t n)
+{
+        element_t tmp;
+        for (size_t i = 1; i < n; i++) {
+                tmp = elms[i];
+
+                size_t j;
+                for (j = i; j > 0 && element_comp(elms[j-1], tmp) > 0; j--)
+                        elms[j] = elms[j-1];
+                elms[j] = tmp;
+        }
+}
+ ```
