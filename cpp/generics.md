@@ -256,4 +256,31 @@ If in addition template <> could be omitted the template character would be remo
 
 TODO
 
+## Variables as Template
+
+```cpp
+template <typename T = long double>
+constexpr T pi = T{3.1415926535897932385};
+
+// specialization
+template<>
+constexpr char const *pi<char const *> = "pi";
+
+```
+
 # Class Template
+
+Class template type parameter not being able to be deducted resulted in a proliferation of `make_*` functions.
+
+```cpp
+template <class ...T>
+class Deduce {
+public:
+    Deduce(T ...params);
+    void fun();
+};
+
+template <class T>
+Deduce makePtr{static_cast<T*>(0)};
+```
+
