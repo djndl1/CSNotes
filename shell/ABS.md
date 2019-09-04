@@ -1438,6 +1438,8 @@ pidof plasmashell
 
 - `tcpdump`: network filter sniffer
 
+- `netcat`: network swiss knife
+
 ### Filesystem
 
 - `mount`/`umount`: mount/unmount a filesystem
