@@ -284,3 +284,313 @@ template <class T>
 Deduce makePtr{static_cast<T*>(0)};
 ```
 
+With nested classes,
+
+```
+template <typename OuterType>
+class Outer {
+public:
+    template <class InnerType>
+    struct Inner {
+        Inner(OuterType);
+        Inner(OuterType, InnerType);
+        template <typename ExtraType>
+        Inner(ExtraType, InnerType);
+    };
+};
+
+Outer<int>::Inner inner{2.0, 1};
+```
+
+To deduct template arguments: ???
+
+- first, a list of constructors is formed. 
+
+- For each element of of the list, a parallel imaginary function is formed by the compiler, with the return type the class types of the constructors, using the template parameter of the original class template.
+
+- Ordinary argument deduction and overload resolution is applied to the set of imaginary functions.
+
+The signature of a constructor may be independent of the template type parameter. In such cases, the ???
+
+https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
+
+
+## Constructor a Class Template
+
+
+Members (functions or nested classes) of class templates that are themselves templates are called
+member templates. When a template member is implemented below its class interface, the template class header must precede the function template header of the member template;
+
+```cpp
+#include <algorithm>
+#include <iterator>
+#include <cstddef>
+#include <utility>
+#include <stdexcept>
+#include <cstring>
+
+template <typename Data>
+class CirQue {
+private:
+    size_t  d_size;
+    size_t  d_maxSize;
+    Data   *d_data;
+    Data   *d_front;
+    Data   *d_back;
+
+    Data *inc(Data *ptr)
+        {
+            ++ptr;
+            return ptr == d_data + d_maxSize ? d_data : ptr;
+        }
+
+public:
+    typedef Data value_type;
+    typedef value_type const &const_reference;
+
+    template <size_t Size>
+    explicit
+    CirQue(Data const (&arr)[Size]) : d_maxSize{Size}, d_size{0},
+                                      d_data{static_cast<Data*>(operator new(Size * sizeof(Data)))},
+                                      d_front{d_data}, d_back{d_data}
+        {
+            std::copy(arr, arr + Size, std::back_inserter(*this));
+        }
+
+    CirQue(Data const *data, size_t size) : d_maxSize{size}, d_size{0},
+                                            d_data{static_cast<Data*>(operator new(size * sizeof(Data)))},
+                                            d_front{d_data}, d_back{d_data}
+        {
+            std::copy(data, data + size, std::back_inserter(*this));
+        }
+
+    explicit
+    CirQue(size_t d_maxSize): d_size{0}, d_maxSize{d_maxSize},
+                            d_data(d_maxSize == 0 ? 0 :
+                                   static_cast<Data *>(operator new(d_maxSize * sizeof(Data)))),
+                            d_front{d_data}, d_back{d_data}
+        {}
+
+    CirQue(CirQue<Data> const &other) : d_size{other.d_size}, d_maxSize{other.maxSize()},
+                                        d_data{d_maxSize == 0 ? 0 :
+                                               static_cast<Data*>(operator new(d_maxSize * sizeof(Data)))},
+                                        d_front{d_data + (other.d_front - other.d_data)}
+        {
+            Data const *src = other.d_front;
+            d_back = d_front;
+            for (size_t count = 0; count != d_size; ++count) {
+                new(d_back) Data(*src); // placement new
+                d_back = inc(d_back);
+                if (++src == other.d_data + d_maxSize)
+                    src = other.d_data;
+            }
+        }
+
+    CirQue(CirQue<Data> &&tmp) : d_data{nullptr}
+        {
+            swap(tmp);
+        }
+
+    ~CirQue()
+        {
+            if (d_data == 0)
+                return;
+            for (; d_size--; ) {
+                d_front->~Data(); // memory allocation is done in one shot
+                d_front = inc(d_front);
+            }
+            operator delete(d_data);
+        }
+
+    Data &back()
+        {
+            return d_back == d_data ? d_data[d_maxSize - 1] : d_back[-1];
+        }
+
+    Data &front()
+        {
+            return *d_front;
+        }
+
+    bool empty() const
+        {
+            return d_size == 0;
+        }
+
+    bool full() const
+        {
+            return d_size == d_maxSize;
+        }
+
+    size_t size() const
+        {
+            return d_size;
+        }
+
+    size_t maxSize() const
+        {
+            return d_maxSize;
+        }
+
+    CirQue &operator=(CirQue<Data> const &rhs)
+        {
+            CirQue<Data> tmp{rhs};
+            swap(tmp);
+            return *this;
+        }
+
+    CirQue &operator=(CirQue<Data> &&tmp)
+        {
+            swap(tmp);
+            return *this;
+        }
+
+    void pop_front()
+        {
+            if (d_size == 0)
+                throw std::out_of_range("Empty Queue!");
+            d_front->~Data();
+            d_front = inc(d_front);
+            --d_size;
+        }
+
+    void push_back(Data const &object)
+        {
+            if (d_size == d_maxSize)
+                throw std::out_of_range("Full queue!");
+            new(d_back) Data(object);
+            d_back = inc(d_back);
+            ++d_size;
+        }
+
+    void swap(CirQue<Data> &other)
+        {
+            static size_t const size = sizeof(CirQue<Data>);
+
+            char tmp[size];
+            std::memcpy(tmp, &other, size);
+            std::memcpy(reinterpret_cast<char*>(&other), this, size);
+            std::memcpy(reinterpret_cast<char*>(this), tmp, size);
+        }
+};
+```
+When objects of a class template are instantiated, only the definitions of all the template’s member
+functions that are actually used must have been seen by the compiler.
+
+Even though default arguments can be specified, the compiler must still be informed that object definitions refer to templates. When instantiating class template objects using default template arguments the type specifications may be omitted but the angle brackets must be retained. When a class template uses multiple template parameters, all may be given default values. Like default function arguments, once a default value is used all remaining template parameters must also use their default values.
+
+Class templates may also be declared. Default template arguments cannot be specified for both the declaration and the definition of a class template. As a rule of thumb default template arguments should be omitted from declarations, as class template declarations are never used when instantiating objects but are only occasionally used as forward references.
+
+In C++ templates are instantiated when the address of a function template or class template object is taken or when a function template or class template is used. It is possible to (forward) declare a class template to allow the definition of a pointer or reference to that template class or to allow it being used as a return type.  C++ allows programmers to prevent templates from being instantiated, using the `extern` template syntax.   The compiler assumes (as it always does) that what is declared has been implemented elsewhere.  The instantiations of the templates must be available before the linker can build the final program.
+
+```cpp
+extern template class std::vector<int>;
+```
+
+## Generic Lambda Expressions
+
+Generic lambda expressions may use `auto` to define their parameters. Generic lambda expressions are in fact class templates.
+
+```cpp
+auto lambda = [](auto lhs, auto rhs)
+{
+     return lhs + rhs;
+};
+```
+
+For generic lambdas, capturing outer scope variables has no restrictions on whether variables are acptured by value or by reference.
+
+```cpp
+std::unique_ptr<int> ptr(new int(10));
+auto fun = [value = std::move(ptr)] {
+    return *value;
+}
+```
+
+```cpp
+//compile with concepts option
+auto accumulate(auto const &container, auto function)
+{
+    auto accu = decltype(container[0]){};
+
+    for (auto &value: container)
+        accu = function(accu, value);
+
+    return accu;
+}
+
+auto lambda = [](auto lhs, auto rhs)
+            {
+                return lhs + rhs;
+            };
+
+int main()
+{
+    vector<int> values  = {1, 2, 3, 4, 5};
+    vector<string> text = {"a", "b", "c", "d", "e"};
+
+    cout << accumulate(values,  lambda) << '\n' <<
+            accumulate(text,    lambda) << '\n';
+}
+```
+
+Generic lambda functions can also be defined like ordinary tempates, in which case the template header immediately follows the lambda-introducer.
+
+```cpp
+auto generic = []<typename Type>(Type &it, typename Type::ValueType value) {
+    typename Type::ValueType val2{value};
+    Type::staticMember();
+}
+```
+
+## Static data members
+
+When static members are defined in class templates, they are defined for every new type for which the class template is instantiated.  They are only declared and must be defined separately. With static members of class templates this is no different. The definitions of static members are usually provided immediately following the template class interface.
+
+## `typename`
+
+`typename` is also used to disambiguate code inside templates.
+
+```cpp
+template <typename Type>
+Type function(Type t)
+{
+    typename Type::Ambiguous *ptr; // otherwise, it would be the multiplication of two variables
+    
+    return *ptr + t;
+}
+```
+
+When such subtypes appear inside template definitions as subtypes of template type parameters the typename keyword must be used to identify them as subtypes.
+
+```cpp
+template <typename Container>
+class Handler
+{
+    Container::const_iterator d_it; //error, Container::const_iterator is taken as a static member
+public:
+    Handler(Container const &container)
+    :
+    d_it(container.begin())
+    {}
+};
+```
+
+Typenames can be embedded in typedefs. As is often the case, this reduces the complexities of dec-
+larations and definitions appearing elsewhere.
+
+## Specialization class templates for deviating types
+
+When considering a specialization one should also consider inheritance. the inherited class inherits the members of its base class while the specialization inherits nothing. 
+
+A template specialization is recognized by the template argument list following a function or class template’s name and not by an empty template parameter list. Class template specializations may have non-empty template parameter lists. If so, a partial class template specialization is defined.
+
+TODO
+
+## Variadic Templates
+
+Variadic templates allow us to specify an arbitrary number of template arguments of any type. Variadic templates were added to the language to prevent us from having to define many overloaded templates and to be able to create type safe variadic functions.
+
+```cpp
+template <typename ...params> class Variadic;
+```
