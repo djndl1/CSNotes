@@ -591,6 +591,125 @@ TODO
 
 Variadic templates allow us to specify an arbitrary number of template arguments of any type. Variadic templates were added to the language to prevent us from having to define many overloaded templates and to be able to create type safe variadic functions.
 
+
 ```cpp
 template <typename ...params> class Variadic;
 ```
+
+Parameter pack can be used to bind type and non-type template arguments to template parameters. The ellipsis to the right of the template pack's parameter name is the _unpack operator_ as it unpacks a series of arguments in a function's argument list.
+
+```cpp
+template <typename ...Params>
+struct StructName {
+    enum: size_t { s_size = sizeof ...(Params) };
+};
+
+StructName<int, char>::s_size; // 2
+```
+
+The argument associated with a variadic template parameter are not directly available to the implementation of a function or class template. By defining a partial specialization of a variadic template, explicitly defining an additional template type parameter, we can associate the first template argument of a parameter pack with this additional (first) type parameter.
+
+```cpp
+template <typename First, typename ...Params>
+void printcpp(std::string const &format, First value, Params ...params)
+{
+    size_t  left = 0;
+    size_t  right = 0;
+    while (true) {
+        if ((right = format.find('%', right)) == string::npos)
+            throw std::runtime_error("printcpp: too many arguments");
+        if (format.find("%%", right) != right)
+            break;
+        
+        // output '%'
+        ++right;
+        std::cout << format.substr(left, right - left);
+        left = ++right;
+    }
+    std::cout << format.substr(left, right - left) << value;
+    printcpp(format.substr(right + 1), params...);
+}
+
+void printcpp(string const& format)
+{
+    size_t left = 0;
+    size_t right = 0;
+    
+    while (true) {
+        if ((right = format.find('%', right)) == string::npos)
+            break;
+        if (format.find("%%", right) != right)
+            throw std::runtime_error("printcpp: missing arguments);
+        ++right;
+        std::cout << format.substr(left, right-left);
+        left = ++right;
+    }
+    std:;cout << format.substr(left);
+}
+```
+
+## Perfect Forwarding
+
+With perfect forwarding the arguments passed to functions are ‘perfectly forwarded’ to nested functions. Forwarding is called perfect as the arguments are forwarded in a type-safe way.
+
+The forwarding function is defined as a template (usually a variadic template, but single argument forwarding is also possible). `std::forward` is used to forward the forwarding function’s arguments to the nested function, keeping track of their types and number.
+
+```cpp
+class Inserter {
+    std::string d_str;
+    
+public:
+    Inserter();
+    Inserter(std::string const &str);
+    Inserter(Inserter const &other);
+    Inserter(Inserter &&other);
+    
+    template <typename ...Params>
+    void insert(Params &&... params)
+    {
+        d_str.insert(std:;forward<Params>(params)...);
+    }
+};
+```
+
+About `std::forward`
+
+```cpp
+#include <type_traits>
+#include <utility>
+
+#include <iostream>
+
+void lref_fun(int& a)
+{
+    std::cout << "lref" << std::endl;
+}
+
+void rref_fun(int&& a)
+{
+    std::cout << "rref" << std::endl;
+}
+
+int main(int argc, char *argv[])
+{
+    int b = 5;
+
+    rref_fun(std::forward<int>(b));
+    lref_fun(std::forward<int&>(b)); // when perfectly forwarding, this is what happens to lvalue
+    return 0;
+}
+```
+
+No mechanism other than recursion is available to obtain the individual types and values of a variadic template.
+
+TODO
+
+
+
+Folding expression TODO
+
+## Tuples 
+
+TODO
+
+
