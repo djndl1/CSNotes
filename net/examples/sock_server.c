@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
         char buf[BUF_SIZE];
         struct sockaddr_in channel;
 
-        if (argc <= 2) {
+        if (argc < 2) {
                 printf("Usage: server server_IP\n");
                 exit(0);
         }
@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
         channel.sin_addr.s_addr = server_addr.s_addr;
         channel.sin_port = htons(SERVER_PORT);
 
-        char rv_addr[5];
-        inet_ntop(AF_INET, &channel.sin_addr, rv_addr, INET_ADDRSTRLEN);
+        char rv_addr[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &channel.sin_addr, &rv_addr[0], sizeof(channel));
         printf("Server Address: %s, %x:%d\n", rv_addr,
                ntohl(channel.sin_addr.s_addr), ntohs(channel.sin_port));
         // passive open, Waiting for connection
