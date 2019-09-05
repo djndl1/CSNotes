@@ -702,6 +702,8 @@ int main(int argc, char *argv[])
 
 No mechanism other than recursion is available to obtain the individual types and values of a variadic template.
 
+https://stackoverflow.com/questions/8526598/how-does-stdforward-work
+
 TODO
 
 
@@ -713,3 +715,8 @@ Folding expression TODO
 TODO
 
 
+## Template Argument Deduction
+
+Top level `const`s in either the parameter or the argument are ignored. A function parameter that is a reference or pointer to a `const` can be passed a reference or pointer to a nonconst object.
+
+CPPSTD17-17.8.2
