@@ -182,10 +182,15 @@ int main(int argc, char *argv[])
 
 # Elements of Transport Protocols
 
+
 At the transport layer, the physical channel is the entire network, explicit addressing of destinations is required. Datagrams may loiter inside the network for a while before arriving at the destination out of order. Buffering and flow control are needed.
 
 ## Addressing
 
 TSAP (Transport Service Access Point) means a specific endpoint in the transport layer. NSAP (Network Service Access Point) are endpoints in the network layer (e.g. IP addresses).
 
-Stable ports may be a way to determine where to connect. Another way is to query a known port, behind which runs the portmapper that returns the port of the queried service.
+Stable ports may be a way to determine where to connect. Another way is to query a known port, behind which runs the portmapper that returns the port of the queried service. (Initial connection protocol) Instead of every service server listening to a port, a process server `inetd` listens to these ports and spawns the requested server and allow it to inherit the existing connection. The new server then does the requested work.
+
+## Multiplexing
+
+Multiple processes use the same network address; a user use multiple networks (inverse multiplexing).
