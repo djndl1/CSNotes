@@ -710,6 +710,10 @@ TODO
 
 Folding expression TODO
 
+## Instantiation
+
+Only template member functions that are actually used are instantiated. A function expecting or returning a class template object, reference, or parameter automatically becomes a function template itself. The compiler must have read the class template’s implementation and has performed a basic check for syntactic correctness of member functions. It checks whether the actual type name that is used for instantiating the object is valid.
+
 ## Tuples 
 
 TODO
@@ -720,3 +724,4 @@ TODO
 Top level `const`s in either the parameter or the argument are ignored. A function parameter that is a reference or pointer to a `const` can be passed a reference or pointer to a nonconst object.
 
 CPPSTD17-17.8.2
+
