@@ -47,7 +47,7 @@ User-defined types are often preferred over built-in types because they are easi
 The use of "naked" unions is best minimized.
 (C++-17)The standard library type, `variant` can be used to eliminate most direct uses of unions.
 
-Enumerations are used to represent small sets of integer values. They are used to make code more readable and less error-prone than it would have been had the symbolic and enumerator names not bben used.
+Enumerations are used to represent small sets of integer values. They are used to make code more readable and less error-prone than it would have been had the symbolic and enumerator names not been used.
 
 
 ```cpp
@@ -138,7 +138,7 @@ We return “by reference” only when we want to grant a caller access to somet
 
 To pass large amounts of information out of a function, use move semantics, i.e. a move constructor or move assignment. Returning large objects by returning a pointer to it is common in older code and a major source of hard-to-find errors. 
 
-## Structured binding
+## Structured binding (C++17)
 
 The mechanism for giving local names to members of a class object is called _structured binding_.
 
@@ -209,7 +209,7 @@ The constructor/destructor combination is the basis of many elegant techniques. 
 
 ### Abstract Types
 
- An _abstract type_ is a type that completely insulates a user form implementation details. Since we don't know anything about the representation of an abstract type, not even its size, we must allocate objects on the free store and access them through references or pointers.
+ An _abstract type_ is a type that completely insulates a user from implementation details. Since we don't know anything about the representation of an abstract type, not even its size, we must allocate objects on the free store and access them through references or pointers.
  
  ```c++
  class Container {
@@ -274,7 +274,7 @@ double& List_container::operator[](int i)
 ```
 
 
-Note the keyword `override`. It is optional, but using it allows the compiler to catch mistakes, such as misspelling of function names or slight differences between the type of a `virtual` function and its intended overrider. The explicit use of override is particularly useful in larger class hiearchies where it can otherwise be hard to know what is supposed to override what.
+Note the keyword `override`. It is optional, but using it allows the compiler to catch mistakes, such as misspelling of function names or slight differences between the type of a `virtual` function and its intended overrider. The explicit use of override is particularly useful in larger class hierarchies where it can otherwise be hard to know what is supposed to override what.
 
 ### Class Hierarchy
 
@@ -369,7 +369,7 @@ private:
 
 One simple solution is to use `std::unique_ptr`. 
 
-```C++
+```cpp
 class Smiley : public Circle {
      // ...
 private:
@@ -485,7 +485,7 @@ The compiler is obliged (by the C++ standard) to eliminate most copies associate
 
 ### Resource Management
 
-A resource is anything that has to be acquired and released after use. E.g. memory, lock, sockets, file handles and thread handles. Leak must be avoided in any long-running system, but excessive resource retention can be almost as bad as  aleak. RAII is the resource management scheme usually used by C++, integrated with error handling. Resources can be moved from scope to scope using move semantics or smart pointers, and shared ownership can be represented by shared pointers.
+A resource is anything that has to be acquired and released after use. E.g. memory, lock, sockets, file handles and thread handles. Leak must be avoided in any long-running system, but excessive resource retention can be almost as bad as a leak. RAII is the resource management scheme usually used by C++, integrated with error handling. Resources can be moved from scope to scope using move semantics or smart pointers, and shared ownership can be represented by shared pointers.
 
 Use resource handles like `vector`, `thread` or smart pointers to achieve resource safety, eliminating `new` and `delete`. Garbage collection is fundamentally a global memory management scheme. As systems are getting more distributed, locality is more important than ever.
 
@@ -641,7 +641,7 @@ public:
 ```c++
 template<typename C, typename P>
      // requires Sequence<C> && Callable<P,Value_type<P>>
-int count(const C& c, P pred)
+int count_if(const C& c, P pred)
 {
      int cnt = 0;
      for (const auto& x : c)
@@ -837,7 +837,7 @@ aut x = to_vector<double>(1, 2.0, 3, 'a');
 
 ### Forwarding Arguments
 
-TODO
+Perfect forwarding
 
 ## Template Compilation Model
 
