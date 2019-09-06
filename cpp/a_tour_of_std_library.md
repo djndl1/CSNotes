@@ -38,6 +38,83 @@ TODO
 
 # Input and Output
 
+The I/O stream library provides formatted and unformatted buffered I/O of text and numeric values. An `ostream` converts typed objects to a stream of characters (bytes); An `istream` converts a stream of characters (bytes) to typed objects. The operations provided by them are type-safe, type-sensitive, and extensible to handle user-defined types. These streams can be used for binary I/O, be used for a variety of character types, be locale specific, and use advanced buffering strategies.
+
+Using the formatted I/O operations is usually less error-prone, more efficient, and less code than manipulating characters one by one. In particular, istreams take care of memory management and range checking. We can do formatting to and from memory using `stringsteam`s.
+
+An `iostream` has a state that we can examine to determine whether an operation succeeded. In general, the I/O state holds all the information needed to read or write, such as formatting information, error state (e.g., has end-of-input been reached?), and what kind of buffering is used. In particular, a user can set the state to reflect that an error has occurred and clear the state if an error wasn’t serious.
+
+In addition to the I/O of built-in types and standard strings, the `iostream` library allows programmers to define I/O for their own types. 
+
+```cpp
+istream& operator>>(istream& is, Entry& e)
+     // read { "name", number } pair. Note: formatted with { " ", and }
+{
+     char c, c2;
+     if (is>>c && c=='{' && is>>c2 && c2=='"') { // start with a { "
+           string name;                   // the default value of a string is the empty string: ""
+           while (is.get(c) && c!='"')    // anything before a " is part of the name
+                 name+=c;
+
+           if (is>>c && c==',') {
+                 int number = 0;
+                 if (is>>number>>c && c=='}') { // read the number and a }
+                        e = {name,number};      // assign to the entry
+                        return is;
+                 }
+           }
+     }
+     is.setstate(ios_base::failbit);      // register the failure in the stream
+     return is;
+}
+```
+
+The `iostream` library provides a large set of operations for controlling the format of input and output. The simplest formatting controls are called _manipulators_.
+
+In `<fstream>`, the standard library provides streams to and from a file. 
+
+- `ifstream` for reading from a file;
+
+- `ofstream` for writing to a file;
+
+- `fstream` for reading from and writing to a file.
+
+Testing that a file stream has been properly opened is usually done by checking its state.
+
+(Java `StringBuilder` ???)In `<sstream>`, the standard library provides streams to and from a string: 
+
+- `istringstream` for reading from a string;
+
+- `ostringstream` for writing to a string;
+
+- `stringstream` for reading from and writing to a string.
+
+One common use of an `ostringstream` is to format before giving the resulting string to a GUI. Similarly, a string received from a GUI can be read using formatted input operations by putting it into an `istringstream`.
+
+```cpp
+template<typename Target =string, typename Source =string>
+Target to(Source arg)      // convert Source to Target
+{
+  stringstream interpreter;
+  Target result;
+
+  if (!(interpreter << arg)                 // write arg into stream
+      || !(interpreter >> result)           // read result from stream
+      || !(interpreter >> std::ws).eof())   // stuff left in stream?
+      throw runtime_error{"to<>() failed"};
+
+  return result;
+}
+
+auto x1 = to<string,double>(1.2);   // very explicit (and verbose)
+auto x2 = to<string>(1.2);          // Source is deduced to double
+auto x3 = to<>(1.2);                // Target is defaulted to string; Source is deduced to double
+auto x4 = to(1.2);                  // the <> is redundant;
+                                    // Target is defaulted to string; Source is deduced to double
+```
+
+## File System
+
 TODO
 
 # Containers
@@ -411,7 +488,6 @@ By default, standard-library containers allocate space using `new`. Operators `n
 
 The standard-library containers offer the opportunity to install allocators with specific semantics where needed. This has been used to address a wide variety of concerns related to performance (e.g., pool allocators), security (allocators that clean-up memory as part of deletion), per-thread allocation, and non-uniform memory architectures (allocating in specific memories with pointer types to match).
 
-TODO
 
 ## Time
 
@@ -462,12 +538,50 @@ A type function is a function that is evaluated at compile time given a type as 
 
 Such type functions are part of C++’s mechanisms for compile-time computation that allow tighter type checking and better performance than would otherwise have been possible. Use of such features is often called metaprogramming or (when templates are involved) template metaprogramming.
 
-TODO
 
+### Tag dispatch
+
+
+```cpp
+template<typename Ran>                                             // for random-access iterators
+void sort_helper(Ran beg, Ran end, random_access_iterator_tag)     // we can subscript into [beg:end)
+{
+     sort(beg,end);     // just sort it
+}
+
+template<typename C>
+     using Value_type = typename C::value_type; // C's value type
+
+template<typename For>                                       // for forward iterators
+void sort_helper(For beg, For end, forward_iterator_tag)     // we can traverse [beg:end)
+{
+     vector<Value_type<For>> v {beg,end};  // initialize a vector from [beg:end)
+     sort(v.begin(),v.end());              // use the random access sort
+     copy(v.begin(),v.end(),beg);          // copy the elements back
+}
+
+template<typename Iter>
+    using Iterator_category = typename std::iterator_traits<Iter>::iterator_category; // Iter's category
+
+template<typename C>
+void sort(C& c)
+{
+     using Iter = Iterator_type<C>;
+     sort_helper(c.begin(),c.end(),Iterator_category<Iter>{});
+}
+```
 
 In `<type_traits>`, the standard library offers simple type functions, called _type predicates_ that answers a fundamental question about types. They are most useful when we write templates.
 
-Obvious ways of using type predicates includes conditions for `static_assert`s, compile-time `if`s, and `enable_if`s. The standard-library `enable_if` is a widely used mechanism for conditonally introducing definitions. The syntax of enable_if is odd, awkward to use, and will in many cases be rendered redundant by concepts. It relies on a subtle language feature called SFINAE (“Substitution Failure Is Not An Error”).
+Obvious ways of using type predicates includes conditions for `static_assert`s, compile-time `if`s, and `enable_if`s. The standard-library `enable_if` is a widely used mechanism for conditonally introducing definitions. The syntax of `enable_if` is odd, awkward to use, and will in many cases be rendered redundant by concepts. It relies on a subtle language feature called SFINAE (“Substitution Failure Is Not An Error”).
+
+```cpp
+template<typename T>
+class Smart_pointer {
+    T& operator*();
+    std::enable_if<Is_class<T>(), T&> operator->(); // is defined iff T is a class
+};
+```
 
 # Numerics
 
