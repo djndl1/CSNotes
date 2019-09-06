@@ -34,7 +34,7 @@ The facilities provided by the standard library can be
 
 # Strings and Regular Expressions
 
-TODO
+
 
 # Input and Output
 
@@ -134,7 +134,7 @@ t best serves the needs of an application:
 
 - `set<T>`: a set (a `map` wit just a key and no value)
 
-- `unordered_set<T>`: a set using a hashed lookup`
+- `unordered_set<T>`: a set using a hashed lookup
 
 - `multiset<T>`: a set in which a value can occur many times
 
@@ -223,7 +223,7 @@ In the context of the C++ standard library, an algorithm is a function template 
 
 ## Iterators
 
-Iterators are used to separate algorithms and containers. An algorithm operates on its data through iterators and knows nothing about the container in which the elements are stored. Conversely, a container knows nothing about the algorithms operating on its elements; all it does is to supply iterators upon request (e.g., begin() and end()). This model of separation between data storage and algorithm delivers very general and flexible software.
+Iterators are used to separate algorithms and containers. An algorithm operates on its data through iterators and knows nothing about the container in which the elements are stored. Conversely, a container knows nothing about the algorithms operating on its elements; all it does is to supply iterators upon request (e.g., `begin()` and `end()`). This model of separation between data storage and algorithm delivers very general and flexible software.
 
 
 For a container, a few iterators referring to useful elements can be obtained.
