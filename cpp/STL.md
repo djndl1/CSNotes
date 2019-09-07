@@ -140,3 +140,91 @@ istreambuf_iterator<char> eof;
 ostreambuf_iterator,char> out(cout.rdbuf());
 copy(in, eof, out);
 ```
+
+# Algorithms
+
+- `<algorithm>`: generic algorithms except for operators
+
+- `<numeric>`: generic algorithm in the operator category
+
+Almost every generic algorithm expects an iterator range [first, last), defining the series of elments on which the algorithm operates. 
+
+## Operators performing arithmetic operations of some sort
+
+- `accumulate` in `<numeric>`
+
+```cpp
+int ia[] = {1, 2, 3, 4};
+vector<int> iv(ia, ia + 4);
+
+cout << accumulate(ia, ia+4, int{}) << ' ' << accumulate(iv.cbegin(), iv.cend(), int{1}, multiplies<int>()) << '\n';
+```
+
+```bash
+10 24
+```
+
+- `adjacence_difference` in `<numeric>`
+
+```cpp
+    int ia[] = {1, 2, 3, 4};
+    vector<int> iv(ia, ia + 4);
+
+   vector<int> ov(iv.size());
+    adjacent_difference(iv.begin(), iv.end(), ov.begin());
+    copy(ov.begin(), ov.end(), ostream_iterator<int>(cout, " "));
+    cout << '\n';
+
+    adjacent_difference(iv.begin(), iv.end(), ov.begin(), multiplies<int>());
+    copy(ov.begin(), ov.end(), ostream_iterator<int>(cout, " "));
+    cout << '\n';
+```
+
+```bash
+1 1 1 1
+1 2 6 12
+```
+
+- `inner_product` in `<numeric>`
+
+```cpp
+    size_t ia1[] = {1, 2, 3, 4, 5, 6, 7};
+    size_t ia2[] = {7, 6, 5, 4, 3, 2, 1};
+    size_t init = 0;
+    cout << inner_product(ia1, ia1+7, ia1, init) << '\n';
+    cout << inner_product(ia1, ia1+7, ia2, init) << '\n';
+```
+
+```bash
+140
+84
+```
+
+- `partial_sum` in `<numeric>`
+
+```cpp
+    size_t ia1[] = {1, 2, 3, 4, 5, 6, 7};
+
+    size_t ia3[7];
+    copy(ia3, partial_sum(ia1, ia1+7, ia3), ostream_iterator<size_t>(cout, " "));
+    cout << '\n';
+    copy(ia3, partial_sum(ia1, ia1+7, ia3, multiplies<int>()), ostream_iterator<size_t>(cout, " "));
+    cout << '\n';
+```
+
+```bash
+1 3 6 10 15 21 28 
+1 2 6 24 120 720 5040 
+```
+
+## Searchers performing search and find operations 
+
+- `adjecent_find`: Searches the range [first, last) for two consecutive identical elements
+
+- `binary_search`: ready sorted using `operator<` or a provided prdicate.
+
+- `equal_range`: 
+
+- `find`: 
+
+- `find_end`:
