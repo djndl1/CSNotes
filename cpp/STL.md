@@ -273,6 +273,49 @@ cout << accumulate(ia, ia+4, int{}) << ' ' << accumulate(iv.cbegin(), iv.cend(),
 
 - `transform`: A unary operator is applied to each of the elements in the range and the resulting values are stored in another range.
 
-- `unique_copy`: 
+- `unique_copy`: consecutively equal elements are copied only once.
 
+## Initializers initializing data
 
+- `fill`
+
+- `fill_n`
+
+- `generate`: initialized by the return value of generator, which can be a function or function object.
+
+```cpp
+class NaturalSquares {
+    size_t d_newsqr;
+    size_t d_last;
+
+public:
+    NaturalSquares() : d_newsqr{0}, d_last{0}
+        {}
+    size_t operator()()
+        {
+            return d_newsqr += (d_last++ << 1) + 1;
+        }
+};
+
+    vector<size_t> uv(10);
+    generate(uv.begin(), uv.end(), NaturalSquares{});
+    copy(uv.begin(), uv.end(), ostream_iterator<size_t>{cout, " "});
+    cout << '\n';
+```
+
+```bash
+1 4 9 16 25 36 49 64 81 100 
+```
+
+- `generate_n`:
+
+```cpp
+    vector<size_t> uv_n(10);
+    generate_n(uv_n.begin(), 5, NaturalSquares{});
+    copy(uv_n.begin(), uv_n.end(), ostream_iterator<size_t>{cout, " "});
+    cout << '\n';
+```
+
+```bash
+1 4 9 16 25 0 0 0 0 0 
+```
