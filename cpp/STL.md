@@ -450,3 +450,17 @@ public:
 ```bash
 1 4 9 16 25 0 0 0 0 0 
 ```
+
+## Comparators comparing (range of)) elements
+
+- `equal`: pairwise equality comparison
+
+- `includes`: sorted beforehand; check if the second range is contained in the first
+
+- `lexicographical_compare`
+
+- `max`: larger of the two
+
+- `min`: smaller of the two
+
+- `mismatch`: find mismatch (nonequal) pair
