@@ -141,6 +141,137 @@ ostreambuf_iterator,char> out(cout.rdbuf());
 copy(in, eof, out);
 ```
 
+## `unique_ptr` in `<memory>`
+
+`unique_ptr`s are objects masquerading as pointers. Since they are objects, their destructors are called when they go out of scope. Their destructors automatically delete the dynamically allocated memory to which they point. 
+
+- when assigning a `unique_ptr` to another move semantics is used.
+
+- multiple unique_ptr objects should not be allowed to point to the same block of dynamically allocated memory.
+
+- If `T` is a derived class of some base `B`, then `std::unique_ptr<T>` is implicitly convertible to `std::unique_ptr<B>`. The default deleter of the resulting `std::unique_ptr<B>` will use `operator delete` for B, leading to undefined behavior unless the destructor of `B` is virtual. However, a custom deleter can be provided to `unique_ptr` so that proper deletion is guaranteed.
+
+A `unique_ptr` can be constructed with a deleter, used in situations like the followintg
+
+```cpp
+struct Deleter {
+    size_t d_size;
+    Deleter(size_t size = 0) : d_size{size} {}
+    void operator()(string **ptr) const {
+        for (size_t idx = 0; idx < d_size; ++idx) {
+            delete ptr[idx];
+        }
+        delete[] idx;
+    }
+};
+
+unique_ptr<sstring*, Deleter> sp2{new string *[10], Deleter{10}};
+```
+
+A `unique_ptr` can point to an array:
+
+```cpp
+unique_ptr<int[]> intArr(new int[3]);
+intArr[2] = intArr[0];
+```
+
+## `shared_ptr` in `<memory>`
+
+The shared pointer automatically destroys its contents once its reference count has decayed to zero.
+
+If `T` is a derived class of some base `B`,  `std::shared_ptr<B>` will use the `operator delete` for the type `T` and the owned object will be deleted correctly even if the destructor of `B` is not virtual. Polymorphism isn’t required.
+
+Different from the `unique_ptr` class no specialization exists for the shared_ptr class to handle dynamically allocated arrays of objects.
+
+To avoid double free error, pointer cast operations are provided so that after casting, the resulting pointer still share the ownership of the same object
+
+```cpp
+template< class T, class U > 
+std::shared_ptr<T> static_pointer_cast( const std::shared_ptr) noexcept;
+
+template< class T, class U > 
+std::shared_ptr<T> dynamic_pointer_cast( std::shared_ptr) noexcept;
+
+template< class T, class U > 
+std::shared_ptr<T> const_pointer_cast( const std::shared_ptr) noexcept;
+
+template< class T, class U > 
+std::shared_ptr<T> reinterpret_pointer_cast( std::shared_ptr) noexcept;
+```
+
+## `weak_ptr` in `<memory>`
+
+``std::weak_ptr is a smart pointer that holds a non-owning ("weak") reference to an object that is managed by `std::shared_ptr`. It must be converted to `std::shared_ptr` in order to access the referenced object.
+
+`std::weak_ptr` models temporary ownership: when an object needs to be accessed only if it exists, and it may be deleted at any time by someone else, `std::weak_ptr` is used to track the object, and it is converted to `std::shared_ptr` to assume temporary ownership. If the original `std::shared_ptr` is destroyed at this time, the object's lifetime is extended until the temporary `std::shared_ptr` is destroyed as well. It has the semantics that the lifetime of a reference to an object outlives the object it refers to. Raw pointers may be used but it's risky.
+
+In situations like cyclic references, `shared_ptr` may cause memory leak.
+
+```cpp
+class Person {
+public:
+    string name;
+    shared_ptr<Person> mother;
+    shared_ptr<Person> father;
+    vector<shared_ptr<Person>> kids;
+    Person (const string& n,
+            shared_ptr<Person> m = nullptr,
+            shared_ptr<Person> f = nullptr)
+        : name(n), mother(m), father(f) {
+    }
+    ~Person() {
+        cout << "delete " << name << endl;
+    }
+};
+
+shared_ptr<Person> initFamily (const string& name)
+{
+    shared_ptr<Person> mom(new Person(name+"’s mom"));
+    shared_ptr<Person> dad(new Person(name+"’s dad"));
+    shared_ptr<Person> kid(new Person(name,mom,dad));
+    mom->kids.push_back(kid);
+    dad->kids.push_back(kid);
+    return kid;
+}
+int main()
+{
+    shared_ptr<Person> p = initFamily("nico");
+    cout << "nico’s family exists" << endl;
+    cout << "- nico is shared " << p.use_count() << " times" << endl;
+    cout << "- name of 1st kid of nico’s mom: " << p->mother->kids[0]->name << endl;
+    p = initFamily("jim");
+    cout << "jim’s family exists" << endl;
+}
+```
+
+Here `"nico"`, his mother and father are never destroyed but no handle to him is now available. The solution is to use `weak_ptr`:
+
+```cpp
+class Person {
+public:
+    string name;
+    shared_ptr<Person> mother;
+    shared_ptr<Person> father;
+    vector<weak_ptr<Person>> kids; // weak pointer !!!
+    Person (const string& n,
+            shared_ptr<Person> m = nullptr,
+            shared_ptr<Person> f = nullptr)
+        : name(n), mother(m), father(f) {
+    }
+    ~Person() {
+        cout << "delete " << name << endl;
+    }
+};
+```
+
+
+
+
+
+## `make_shared` and `make_unique` in `<memory>`
+
+To avoid double allocation overhead, use `make_*` instead of smart pointers' constructors. It employs perfect forwarding.
+
 # Algorithms
 
 - `<algorithm>`: generic algorithms except for operators
