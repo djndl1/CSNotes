@@ -219,12 +219,60 @@ cout << accumulate(ia, ia+4, int{}) << ' ' << accumulate(iv.cbegin(), iv.cend(),
 
 ## Searchers performing search and find operations 
 
-- `adjecent_find`: Searches the range [first, last) for two consecutive identical elements
+- `adjacent_find`: Searches the range [first, last) for two consecutive identical elements
 
 - `binary_search`: ready sorted using `operator<` or a provided prdicate.
 
-- `equal_range`: 
+- `equal_range`
 
-- `find`: 
+- `find`
 
-- `find_end`:
+- `find_end`: find the last occurrent of an element in the the sequence of elements
+
+- `find_first_of`: find the first occurrent of an element in the sequence of elements
+
+- `find_if`
+
+- `lower_bound`
+
+- `upper_bound`
+
+- `max_element`
+
+- `min_element`
+
+- `search`: search the first occurrence of the sequence of elements
+
+- `search_n`: search the sequence of n consecutive elements having the same value
+
+- `set_difference`: must be sorted beforehand
+
+- `set_intersection`: must be sorted beforehand (true for `std::set`)
+
+- `set_symmetric_difference`:
+
+- `set_union`
+
+## Counters performing count operations
+
+- `count`
+
+- `count_if`
+
+## Visitors visiting elements in a range
+
+- `for_each`: apply a function to each element in the range. The return value of the function is ignored. If the elements should be transformed, use `transform`
+
+- `replace`: replace all oldval in the range with the newval
+
+- `replace_copy`: replace and the result is copied
+
+- `replace_copy_if`
+
+- `replace_if`
+
+- `transform`: A unary operator is applied to each of the elements in the range and the resulting values are stored in another range.
+
+- `unique_copy`: 
+
+
