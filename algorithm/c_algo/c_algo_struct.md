@@ -367,7 +367,7 @@ The implementation of hash tables is frequently called _hashing_. Hashing is a t
 
 The ideal hash is an array of some fixed size containing the keys. Each key is mapped (using a hash function, ideally injective, clearly impossible, but better evenly) into some number in the range $0$ to $\text{TableSize} - 1$ and placed in the appropriate cell.
 
-If the input keys are integers, simply returning $\text{KEY} mod \text{TableSize}$ is generally a reasonable strategy. It is usually a good idea to ensure that the table size is prime. When the input keys are random integers, then this strategy is simple to compute and distributes the keys evenly.
+If the input keys are integers, simply returning $\text{KEY}\ mod\ \text{TableSize}$ is generally a reasonable strategy. It is usually a good idea to ensure that the table size is prime. When the input keys are random integers, then this strategy is simple to compute and distributes the keys evenly.
 
 For string keys, one hash function can be
 
@@ -398,7 +398,7 @@ This function doesn't give indices large enough.
 Another fairly good hash function is 
 
 $$
-\sum_{i=0}^{\text{size}-1}\text{Key}\text{\ensuremath{\left[\text{size}-i-1\right]}}\cdot32^{i}
+\sum_{i=0}^{\text{size}-1}\text{Key}\text{{[size-i-1]}}\cdot32^{i}
 $$
 
 ```c
@@ -415,8 +415,27 @@ index_t hash_str3(const char *key, size_t size)
 
 A common practice in this case is not to use all the characters.
 
+### Solving Collisions
+
 The main programming detail is collision resolution. _Separate chaining_ is to keep a list of all elements that hash to the same value. Any scheme could be used besides linked lists to resolve the collisions; a binary search tree or even another table would work.
 
+Separate chaining hashing has the disadvantage of requiring pointers. Open addressing hashing is an alternative to resolving collisions with linked lists. Alternative cells are tried until an empty cell is found. Cells $h_0(x), h_1(X), h_2(X),...$ are tried in successions, where $h_i(X) = (Hash(X) + F(i)) \mod\ \text{TableSize}$ with $F(0) = 0$. $F$ is the collision resolution strategy. Generally, the load factor should be below $\lambda=0.5$ for open addressing.
+
+- linear probing: $F(i) = i$. This amounts to trying cells sequentially with wraparound in search of an empty cell. The table should be big enough. Any key that hashes into the cluster may require several attempts to resolve the collision and causes _primary clustering_. Analysis TODO
+
+- quadratic probing: the collision function is quadratic (e.g. $F(i) = i^2$). There is no guarantee of finding an empty cell once the table gets more than half full or even before the table gets half full if the table size if not prime. If quadratic probing is used and the table size is prime, then a new element can always be inserted if the table is at least half empty (Proof TODO). Standard deletion cannot be performed in an open addressing hash table. Open addressing hash tables require lazy deletion. Quadratic probing eliminates primary clustering but introduces secondary clustering (?).
+
+- double hashing: e.g. $F(i) = i \times hash_2(X)$. A poor choice of $hash_2(X)$ can be disastrous. It it important that all cells can be probed. $hash_2$ should never evaluate to zero. A function such as $hash_{2}(X) = R - (X \mod R)$ where $R$ is a prime smaller than TabelSize.
+
+### Rehashing
+
+If the tables get too full, the running time for the operations will start taking too long and insertion might fail for open addressing hashing with quadratic resolution. Rehashing is a solution that builds another table that is about twice as big, with an associated new hash function, and scan down the entire original hash table, computing the new hash value for each nondeleted element and inserts it into the new table.
+
+The running time is $O(N)$ since there are $N$ elements to rehash. Rehashing can be done when the table is half full (with quadratic probing), or when an insertion fails, or when the load factor reaches a threshold.
+
+### Extendible Hashing
+
+TODO
 
 ## Priority Queues (Heaps)
 
