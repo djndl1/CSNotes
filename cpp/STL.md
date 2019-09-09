@@ -464,3 +464,111 @@ public:
 - `min`: smaller of the two
 
 - `mismatch`: find mismatch (nonequal) pair
+
+## Copiers performing copy operations
+
+- `copy`: copy a range of elements to a range starting with the specified destination
+
+- `copy_backward`: copy a range of elements to a range ending with the specified destination 
+
+```cpp
+
+    for (int i = 0; i < 10; i++) {
+        from_vector.push_back(i);
+    }
+ 
+    std::vector<int> to_vector(15);
+ 
+    std::copy_backward(from_vector.begin(), from_vector.end(), to_vector.end());
+ 
+    std::cout << "to_vector contains: ";
+    for (auto i: to_vector) {
+        std::cout << i << " ";
+```
+
+```bash
+to_vector contains: 0 0 0 0 0 0 1 2 3 4 5 6 7 8 9
+```
+
+
+- `partial_sort_copy`: Sorts some of the elements in the range [first, last) in ascending order, storing the result in the destination range.
+
+- `remove_copy`: remove all values that mismatch the given one to another place
+
+```cpp
+        string words[] =
+            { "kilo", "alpha", "lima", "mike", "alpha", "november", "alpha",
+                "oscar", "alpha", "alpha", "papa", "quebec" };
+        size_t const size = sizeof(words) / sizeof(string);
+        string remaining
+                [
+                    size -
+                    count_if
+                    (
+                        words, words + size,
+                        bind2nd(equal_to<string>(), string("alpha"))
+                    )
+                ];
+        string *returnvalue =
+                remove_copy(words, words + size, remaining, "alpha");
+
+        cout << "Removing all \"alpha\"s:\n";
+        copy(remaining, returnvalue, ostream_iterator<string>(cout, " "));
+        cout << '\n';
+```
+
+```bash
+Removing all "alpha"s:
+kilo lima mike november oscar papa quebec 
+```
+
+- `remove_copy_if`
+
+- `replace_copy`: replace and copy to a destination
+
+```cpp
+        string words[] =
+            { "kilo", "alpha", "lima", "mike", "alpha", "november", "alpha",
+                "oscar", "alpha", "alpha", "papa"};
+        size_t const size = sizeof(words) / sizeof(string);
+        string remaining[size];
+
+        copy
+        (
+            remaining,
+            replace_copy(words, words + size, remaining, string("alpha"),
+                                                         string("ALPHA")),
+            ostream_iterator<string>(cout, " ")
+        );
+        cout << '\n';
+```
+
+```bash
+kilo ALPHA lima mike ALPHA november ALPHA oscar ALPHA ALPHA papa 
+```
+
+- `replace_copy_if`
+
+- `reverse_copy`: copy to a destination in reverse order
+
+- `rotate_copy`: rotate around an axis and copy to a destination
+
+```cpp
+        string words[] =
+           { "kilo", "lima", "mike", "november", "oscar",
+              "foxtrot", "golf", "hotel", "india", "juliet" };
+        size_t const size = sizeof(words) / sizeof(string);
+        size_t const midsize = size / 2;
+        string out[size];
+
+        copy(out,
+            rotate_copy(words, words + midsize, words + size, out),
+            ostream_iterator<string>(cout, " "));
+        cout << '\n';
+```
+
+```cpp
+foxtrot golf hotel india juliet kilo lima mike november oscar 
+```
+
+- `unique_copy`: consecutively equal elements are not copied
