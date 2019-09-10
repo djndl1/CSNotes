@@ -22,6 +22,10 @@ int main(int argc, char *argv[])
         priority_queue_print(h);
         putchar('\n');
 
+        priority_queue_make_heap_order(h);
+        priority_queue_print(h);
+        putchar('\n');
+
         return 0;
 }
 
