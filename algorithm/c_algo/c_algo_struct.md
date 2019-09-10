@@ -425,7 +425,7 @@ Separate chaining hashing has the disadvantage of requiring pointers. Open addre
 
 - quadratic probing: the collision function is quadratic (e.g. $F(i) = i^2$). There is no guarantee of finding an empty cell once the table gets more than half full or even before the table gets half full if the table size if not prime. If quadratic probing is used and the table size is prime, then a new element can always be inserted if the table is at least half empty (Proof TODO). Standard deletion cannot be performed in an open addressing hash table. Open addressing hash tables require lazy deletion. Quadratic probing eliminates primary clustering but introduces secondary clustering (?).
 
-- double hashing: e.g. $F(i) = i \times hash_2(X)$. A poor choice of $hash_2(X)$ can be disastrous. It it important that all cells can be probed. $hash_2$ should never evaluate to zero. A function such as $hash_{2}(X) = R - (X \mod R)$ where $R$ is a prime smaller than TabelSize.
+- double hashing: e.g. $F(i) = i \times hash_2(X)$. A poor choice of $hash_2(X)$ can be disastrous. It it important that all cells can be probed. $hash_2$ should never evaluate to zero. A function such as $hash_{2}(X) = R - (X \mod R)$ where $R$ is a prime smaller than TableSize.
 
 ### Rehashing
 
@@ -457,7 +457,7 @@ a heap is a binary tree that is completely filled, with the possible exception o
 struct heap {
     size_t      capacity;
     size_t      size;
-    element_t   *elems;*
+    element_t   *elems;
 };
 ```
 
@@ -530,7 +530,21 @@ for (i = N / 2; i > 0; i--) // from the first node of the lowest level
 
 with an average running time $O(N)$ and a worst-case time $O(N \log N)$.
 
-TODO
+### Applications
+
+- The selection problem: the input is a list of $N$ elements, which can be totally ordered. The problem is to find the $k$th largest element. The first way is to make the input a heap and perform $k$ `DeleteMin` operations. The total running time is $O(N + \logN)$. Another way is to build a set (which is implemented as a heap) of $k$ elements. The first $k$ elements are placed in the set and remaining elements are compared with the $k$th largest one by one. If one of the remaining elements is larger than the $k$the element, it is inserted into the set. The total time is $O(k + (N - k)\log k) = O(N \log k)$.
+
+- Event Simulation: TODO
+
+#### Heap Sort
+
+Performing $N$ `DeleteMin` operations on a heap. The totial running time is $O(N \log N)$. The main problem is that it uses an extra array. The solution is to use the cell that is right past the final element of the heap to store the popped element.
+
+Analysis TODO
+
+### d-Heaps
+
+A d-heap is exactly like a binary heap except that all nodes have $d$ children. The running time of insertion is $O \log_{d} N$. There is evidence suggesting that 4-heaps may outperform binary heaps in practice.
 
 # Sorting
 
