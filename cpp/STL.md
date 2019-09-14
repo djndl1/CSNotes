@@ -572,3 +572,82 @@ foxtrot golf hotel india juliet kilo lima mike november oscar
 ```
 
 - `unique_copy`: consecutively equal elements are not copied
+
+## Heap operators: manipulating a max-heap
+
+Heaps can be constructed in containers supporting random access.
+
+- `make_heap`
+
+- `pop_heap`
+
+- `push_heap`
+
+- `sort_heap`
+
+
+## Shuffler performing reordering operations
+
+- `inplace_merge`: two sorted ranges merge in place 
+
+- `iter_swap`: elements pointed by two iterators are swapped, implemented as `swap(*__a, *__b)`.
+
+- `merge`: merge two sorted ranges into a destination
+
+- `next_permutation`: The elements are reordered such that each new permutation represents the next bigger value using `operator<`.
+
+- `nth_element`: `nth_element` partially sorts the range `[first, last)` in ascending order so that the condition `!(*j < *i)` is met for any i in the range `[first, nth)` and for any j in the range [nth, last). The element placed in the nth position is exactly the element that would occur in this position if the range was fully sorted.
+
+- `partial_sort`: find the n smallest elements
+
+- `partial_sort_copy`: depends on the range of the destination and the source
+
+- `partition`: partition a range according to a predicate
+
+- `prev_permutation`
+
+```cpp
+    int perms[]  = {2, 1, 3, 4, 5};
+    do {
+        copy(perms, perms+5, ostream_iterator<int>{cout, " "});
+        cout << '\n';
+    } while (prev_permutation(perms, perms+4));
+```
+
+```bash
+2 1 3 4 5 
+1 4 3 2 5 
+1 4 2 3 5 
+1 3 4 2 5 
+1 3 2 4 5 
+1 2 4 3 5 
+1 2 3 4 5 
+```
+
+- `remove`: [returnvalue, last) are all removable
+
+- `remove_copy`: anything not matching the specified one to remove is copied 
+
+- `remove_copy_if`
+
+- `remove_if`
+
+- `reverse`
+
+- `reverse_copy`
+
+- `rotate`: more like translation rather than rotation around an axis
+
+- `rotate_copy`
+
+- `sort`
+
+- `stable_partition`: 
+
+- `stable_sort`the relative order of equal elements are kept
+
+- `swap`
+
+- `unique`: all unique elements are moved before the return value
+
+
