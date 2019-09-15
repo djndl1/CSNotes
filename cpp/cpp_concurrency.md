@@ -4,7 +4,23 @@ A _thread of execution_ is a single flow of control within a program. All thread
 
 # Handling time
 
-TODO
+`sleep` and `select` are designed at a time when multithreading was not commonly available. The STL offers dedicated classes for specifying time.
+
+When specifying time, an appropriate time unit must be selected. Factors that can be used in combination with time units are defined in the class template `std::ratio`. The time units themselves are defined in the namespace `chrono`.
+
+Objects of the class `std::chrono::duration` define amounts of time. It requires a numeric type defining the druation's value and a time-unit called its _period_ (where `ratio` comes in). Various predefined duration types exist.
+
+C++ offers several predefined `clock` types:
+
+- `std::chrono::system_clock`: the system's real time clock, the wall clock
+
+- `std::chrono::steady_clock`: a clock whose time increases in parallel with the increase of real time
+
+- `std::chrono::high_resolution_clock`: in practice, the same clock as `system_clock`.
+
+Objects of the class `std::chrono::time_point` define a point in time.
+
+`std::put_time` formats time.
 
 # Multi Threading
 
@@ -53,7 +69,7 @@ std::thread safeLocal()
 
 The class `std::thread` does not provide a copy constructor.
 
-- `void detach()`: The thread for which `detach` is called continues to run. The parent thread calling `detach` continues immediately beyond the `detach` call. The `object` as in `object.detach()` no longer represents a thread of execution. As the `main` thread exits, the still running detached threads also stop. A detached thread may bery well continue to run after the function that launched it has finished.
+- `void detach()`: The thread for which `detach` is called continues to run. The parent thread calling `detach` continues immediately beyond the `detach` call. The `object` as in `object.detach()` no longer represents a thread of execution. As the `main` thread exits, the still running detached threads also stop. A detached thread may very well continue to run after the function that launched it has finished.
 
 ```cpp
 void fun(size_t count, char const* text)
@@ -233,7 +249,8 @@ class Singleton {
 };
 ```
 
-A `constexpr`, if statisfying the requirements for constant initialization, is guaranteed to be initialized before any code is run as part of the static initialization. A static variable defined within a compound statement are initialized the first time the function is called at the point in the code where the static variable is defined. This feature causes a thread to wait automatically if another thread is still initializing the static data (by C++ standard).
+A `constexpr`, if statisfying the requirements for constant initialization, is guaranteed to be initialized before any code is run as part of the static initialization. A static variable defined within a compound statement are initialized the first time the function is called at the point in the code where the static variable is defined. This feature causes a thread to wait automatically if another thread is still initializing the static data (by C++ standard). In both cases, concurrent initialization shouldn't be a problem.
+
 
 (C++17) The class `shared_mutex` provides a non-recursive mutex with shared ownership semantics. Multiple threads can simultaneously hold a shared lock ownership of a `shared_mutex` type of object. But no thread can hold a shared lock while another thread holds an exclusive lock on the same `shared_mutex` object and vice versa.
 
@@ -316,11 +333,61 @@ In addition to the condition variables, `std::notify_all_at_thread_exit` notifie
 
 The functionality that is offered by `condition_variable_any` is identical to the functionality offered by the class `condition_variable`, albeit that the lock type is not predefined. The requirements of these lock-types are identical to those of the stl-provided `unique-lock` and user-defined lock-type implementation should provide at least the interface and semantics that is also provided by `unique_lock`.
 
+```cpp
+#include <mutex>
+#include <condition_variable>
+
+class Semaphore
+{
+    mutable std::mutex d_mutex;
+    std::condition_variable d_condition;
+    size_t d_nAvailable;
+
+    public:
+        Semaphore(size_t nAvailable);
+
+        void wait();      // wait # available
+        void notify_all();    // notify_all # available, notify if initially 0
+
+        size_t size() const;
+};
+
+Semaphore::Semaphore(size_t nAvailable)
+:
+    d_nAvailable(nAvailable)
+{}
+
+size_t  Semaphore::size() const
+{
+    lock_guard<mutex> lk(d_mutex);    // get the lock
+    return d_nAvailable;
+}
+
+void Semaphore::notify_all()
+{
+    lock_guard<mutex> lk(d_mutex);    // get the lock
+    if (d_nAvailable++ == 0)
+        d_condition.notify_all();   // use notify_one to notify one other
+                                    // thread
+}
+
+void Semaphore::wait()
+{
+    unique_lock<mutex> lk(d_mutex);   // get the lock
+    while (d_nAvailable == 0)
+        d_condition.wait(lk);   // internally releases the lock
+                                // and waits, on exit
+                                // acquires the lock again
+    --d_nAvailable;              // dec. semaphore
+}
+
+```
+
 ## Atomic Actions
 
 Atomic data types are available for all basic types and also for trivial user defined types, which are all scalar types, arrays of elements of a trivial type, and classes whose constructors, copy constructors, and destructors all have default implementations and their non-static data members are themselves of trivial types.
 
-The class template `std::atomiic<T>` is available for all built-in types, including pointer types. `std::atomic<Trivial>` also defines an atomic variant of a trivial type.
+The class template `std::atomic<T>` is available for all built-in types, including pointer types. `std::atomic<Trivial>` also defines an atomic variant of a trivial type.
 
 Atomic types cannot be assigned to each other directly, but can be assgined to or initialized using non-atomic types.
 
@@ -329,7 +396,11 @@ atomic<int> a1 = 5;
 atomic<int> a2{static_cast<int>(a1)};
 ```
 
-`std::memory_order` TODO
+`std::memory_order`: http://senlinzhan.github.io/2017/12/04/cpp-memory-order
+
+https://www.zhihu.com/question/24301047
+
+
 
 There are some standard available member functions for `std::atomic<T>`:
 
@@ -352,3 +423,131 @@ Integral atomic types `Integral` also offers:
 - `fetch_add`; `fetch_sub`; `fetch_and`; `fetch_!=``; `fetch_^|`, increments, decrements, assignments.
 
 `std::atomic_compare_exchange_strong`; `std::atomic_compare_exchange_weak`; `std::atomic_exchange`; `std::atomic_init` (unfortunately it's not atomic); `std::atomic_is_lock_free`; `std::atomic_load` are available for all atomic types.
+
+## Shared States
+
+In multithreaded programs several classes and functions can be used that produce shared states, making it easy to communicate results to other threads. Objects that contain such shared states are called _asynchronous return objects_. 
+
+A thread may request the results of an asynchronous return object before these results are actually available. Asynchronous return objects offer `wait` and `get` members which, respectively, wait until the results have become available, and produce the asynchronous results once they are available. 
+
+Shared states are made ready by _asynchronous providers_. Asynchronous providers are simply objects or functions providing results to shared states. An asynchronous provider marks its shared states as being ready and unblocks any waiting threads. Shared states use reference counting to keep track of the number of asynchronous return objects or asynchronous providers that hold references to them. 
+
+Objects of the class `std::future` are asynchronous return objects, produced by `std:;async`, `std::packaged_task` and `std::promise`.
+
+### `std::future` in `<future>`
+
+Rather than waiting and using locks it would be nice if some asynchronous task could be started, allowing the initiating thread (or even other threads) to pick up the result at some point in the future, when the results are needed, without having to worry about data locks or waiting times. 
+
+Objects of the class template `std::future` harbor the results produced by asynchronously executed tasks. The asynchronously executed task may throw an exception (ending the task). In that case the future object catches the exception, and rethrows it once its return value (i.e., the value returned by the asynchronously executed task) is requested. Error conditions are returned through `std::future_error` exceptions.
+
+### `std::async` (`<future>`) starts a new thread
+
+`async` is used to start asynchronous tasks, returning values (or `void`) to the calling thread.
+
+If an exception leaves a thread, then the program ends. This scenario doesn’t occur when `std::async` is used. `Async` may start a new asynchronous task, and the activating thread may retrieve the return value of the function implementing the asynchronous task or any exception leaving that function from a `std::future` object returned by the `async` function.
+
+`std::async` accepts the `std::launch` enum to determine which launch policy to follow.
+
+```cpp
+#include <iostream>
+#include <future>
+
+int fun()
+{
+    std::cerr << "    hello from fun\n";
+    return 12;
+}
+
+int indirect(std::future<int> &fut)
+{
+    std::cerr << "calling indirect to obtain fun's results\n";
+    return fut.get();
+}
+
+int main()
+{
+    auto fut = std::async(fun);
+
+    auto ret = std::async(std::launch::async, indirect, std::ref(fut));
+    std::cerr << "receiving from fun: " << ret.get() << '\n';
+}
+```
+
+```bash
+receiving from fun: calling indirect to obtain fun's results
+    hello from fun
+12
+```
+
+### `std::promise` in `<future>`
+
+A `promise` is useful to obtain the results from another thread without further synchronization requirements.
+
+```cpp
+#include <iostream>
+#include <future>
+
+using namespace std;
+
+void compute1(promise<int> &ref)
+{
+    ref.set_value(9);
+}
+
+int main()
+{
+    std::promise<int> p;
+    std::thread(compute, ref(p)).detach();
+
+    cout << p.get_future().get() << '\n'; // the main thread blocks here
+}
+```
+
+Promises can be useful when implementing a multithreaded version of some algorithm without having
+to use additional synchronization statements.
+
+```cpp
+#include <iostream>
+#include <future>
+#include <iomanip>
+
+using namespace std;
+
+//code
+int m1[2][2] = {{1, 2}, 
+                {3, 4}};
+int m2[2][2] = {{3, 4}, 
+                {5, 6}};
+
+void innerProduct(promise<int> &ref, int row, int col)
+{
+    int sum = 0;
+    for (int idx = 0; idx != 2; ++idx)
+        sum += m1[row][idx] * m2[idx][col];
+
+    ref.set_value(sum);
+}
+
+int main()
+{
+    promise<int> result[2][2];
+
+    for (int row = 0; row != 2; ++row)
+    {
+        for (int col = 0; col != 2; ++col)
+            thread(innerProduct, ref(result[row][col]), row, col).detach();
+    }
+
+    for (int row = 0; row != 2; ++row)
+    {
+        for (int col = 0; col != 2; ++col)
+            cout << setw(3) << result[row][col].get_future().get();
+        cout << '\n';
+    }
+}
+```
+
+```bash
+ 13 16
+ 29 36
+```
