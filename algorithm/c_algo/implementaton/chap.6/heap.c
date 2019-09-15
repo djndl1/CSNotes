@@ -10,9 +10,9 @@ static inline int element_comp(const void *l, const void *r)
         const element_t* lhs = l;
         const element_t* rhs = r;
         if (lhs->dummy > rhs->dummy)
-                return 1;
-        else if (lhs->dummy < rhs->dummy)
                 return -1;
+        else if (lhs->dummy < rhs->dummy)
+                return 1;
         else
                 return 0;
 }
@@ -67,9 +67,12 @@ int priority_queue_insert(priority_queue_t heap, element_t elm)
 
         size_t i;
         for (i = ++heap->size;
-             element_comp(&heap->elems[i/2], &elm) > 0 || i == 1;
-             i /= 2)
+             element_comp(&heap->elems[i/2], &elm) > 0 ;
+             i /= 2) {
+                if (i == 1)
+                        break;
                 heap->elems[i] = heap->elems[i/2];
+        }
         heap->elems[i] = elm;
 
         return 0;

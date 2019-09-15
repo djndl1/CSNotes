@@ -504,14 +504,13 @@ element_t priority_queue_delete_min(priority_queue_t heap)
                      element_comp(&heap->elems[child+1], &heap->elems[child]) < 0)
                         child++;
 
-                if (element_comp(&last, &heap->elems[child]) > 0)
+                if (element_comp(&last, &heap->elems[child]) > 0) // since size--, last must find a position to place itself
                         heap->elems[i] = heap->elems[child];
                 else
                         break;
         }
         heap->elems[i] = last;
         return min;
-        
 }
 ```
 
@@ -538,7 +537,7 @@ with an average running time $O(N)$ and a worst-case time $O(N \log N)$.
 
 #### Heap Sort
 
-Performing $N$ `DeleteMin` operations on a heap. The totial running time is $O(N \log N)$. The main problem is that it uses an extra array. The solution is to use the cell that is right past the final element of the heap to store the popped element.
+Performing $N$ `DeleteMin` operations on a heap. The total running time is $O(N \log N)$. The main problem is that it uses an extra array. The solution is to use the cell that is right past the final element of the heap to store the popped element.
 
 Analysis TODO
 
@@ -546,11 +545,20 @@ Analysis TODO
 
 A d-heap is exactly like a binary heap except that all nodes have $d$ children. The running time of insertion is $O \log_{d} N$. There is evidence suggesting that 4-heaps may outperform binary heaps in practice.
 
+## The Disjoint Set 
+
+
+
 # Sorting
+
+An inversion in an array of numbers is any ordered pair $(i, j)$ having the property that $i < j$ but $A[i] > A[j]$. It is the exactly the number of swaps that needed to be performed by insertion sort. A sorted array has no inversions.
+
+The average number of inversions in an array of $N$ distinct numbers is $N(N-1)/4$. Any algorithm that sorts by exchanging adjacent elements require $\Omega(N^2)$ time on average.
 
 ## Insertion Sort
 
-Insertion sort consists of $N-1$ passes. For each pass, insertion sort ensures that the element in position $0$ through $P$ are in sorted order.
+Insertion sort consists of $N-1$ passes. For each pass, insertion sort ensures that the element in position $0$ through $P$ are in sorted order. 
+
 
  The average running time $\Theta(N^{2})$.
  
@@ -568,3 +576,108 @@ Insertion sort consists of $N-1$ passes. For each pass, insertion sort ensures t
         }
 }
  ```
+
+## Shellsort
+
+The general strategy to $h_k$ sort is for each position $i$, in $h_k, h_k+1, \dots, N-1$ place the element in the correct spot among $i, i-h_k, i-2h_k, \dots$. The action of an $h_k$-sort is to perform an insertion on $h_k$ independent subarrays. The _increment sequence_ $h_1, h_2, dots, h_t$ requires $h_1 = 1$. A popular but poor choice for increment sequence is to use the sequence $h_{t} = \lfloor N/2 \rfloor and $h_k = \lfloor h_{k=1} / 2\rfloor.
+
+```c
+void shellSort(element_t elms[], size_t n)
+{
+        for (size_t inc = n / 2; inc > 0; inc /= 2) {
+                for (size_t i = inc; i < n; i++) {
+                        element_t tmp = elms[i];
+
+                        size_t j;
+                        for (j = i; j >= inc; j -= inc)
+                                if (tmp < elms[j-inc])
+                                        elms[j] = elms[j-inc];
+                                else
+                                        break;
+                        elms[j] = tmp;
+                }
+        }
+}
+```
+
+The worst case running time of shell sort using Shell's increments is $\Theta(N^2)$. Using Hibbard's increment ($1,3,7,...,$2^k - 1$), it's $\Theta(N^{3/2})$. 
+
+Analysis TODO
+
+## Mergesort
+
+Merge sort runs in $O(N \log N)$ worst-case running time, and the number of comparisons used is nearly optimal.
+
+The fundamental operation in this algorithm is merging two sorted lists. The time to merge two sorted lists is linear. At most $N-1$ comparisons are made, where $N$ is the total number of elements. This algorithm is a classic divide-and-conquer strategy.
+
+```c
+static void merge(element_t A[], element_t tmp[],
+                  size_t lpos, size_t rpos, size_t rend,
+                  comp_t element_comp)
+{
+        size_t lend = rpos - 1;
+        size_t tpos = lpos;
+        size_t num = rend - lpos + 1;
+
+        while (lpos <= lend && rpos <= rend) {
+                if (element_comp(A[lpos], A[rpos]) <= 0)
+                        tmp[tpos++] = A[lpos++];
+                else
+                        tmp[tpos++] = A[rpos++];
+        }
+
+        while (lpos <= lend) {
+                tmp[tpos++] = A[lpos++];
+        }
+
+        while (rpos <= rend) {
+                tmp[tpos++] = A[rpos++];
+        }
+
+        for (size_t i = 0; i < num; i++, rend--)
+                A[rend] = tmp[rend];
+}
+
+static void __mergeSort(element_t A[], element_t tmp[],
+                        size_t left, size_t right, comp_t element_comp)
+{
+        if (left < right) {
+                size_t center = (left + right) / 2;
+                __mergeSort(A, tmp, left, center, element_comp);
+                __mergeSort(A, tmp, center+1, right, element_comp);
+                merge(A, tmp, left, center+1, right, element_comp);
+        }
+}
+
+int mergeSort(element_t A[], size_t n, comp_t element_comp)
+{
+        element_t *tmp = malloc(n * sizeof(element_t));
+        if (tmp == NULL)
+                return -1;
+        __mergeSort(A, tmp, 0, n-1, element_comp);
+        free(tmp);
+
+        return 0;
+}
+```
+
+Analysis TODO
+
+## Quicksort
+
+Quicksort is the fastest known sorting algorithm in practice. Its average running time is $O(N \log N)$ and worst case running time of $O(N^2)$. Quicksort is a divide-and-conquer recursive algorithm.
+
+1. If the number of elements in $S$ is 0 or 1, then return;
+
+2. pick any element v in S as the _pivot_. The popular choice is to use the first element as the pivot (acceptable if the input is random), which is a horrible idea. A safe course is to choose the pivot randomly. The best choice of pivot would be the median of the array. A good estimate can be obtained by picking three elements randomly and using the median of these three as a pivot. The common course is to use as pivot the median of the left, right and center elements.
+
+3. partition S into $S_{1} = \{x\in S- {v} | x \leq v\}$ and $S_{2} = \{x\in S - {v} | x\geq v\}$. The first step is to swap the pivot with the element. Set `i` to the first element and `j` to the next-to-last. Continue to advance `i`  to a small element (relative to the pivot) and `j` to a large element and swap them until `i` and `j` cross. Then swap the pivot back in the middle. We have both `i` and `j` stop if they encounter a key equal to the pivot.
+
+4. return quicksort($S_{1}$) followed by v followed by quicksort($S_{2}$)
+
+The reason why quicksort is faster is that the partitioning step can actually be performed in place.
+
+For very small arrays ($N \leq 20$) quicksort does not perform as well as insertion sort.
+
+TODO
+
