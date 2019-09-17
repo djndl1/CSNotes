@@ -233,8 +233,8 @@ template<typename C, typename V>
 vector<typename C::iterator> find_all(C& c, V v)
 {
      vector<typename C::iterator> res;          // typename, otherwise, ::iterator may be some constant
-     for (auto p = s.begin(); p!=s.end(); ++p)
-           if (*p==c)
+     for (auto p = c.begin(); p!=c.end(); ++p)
+           if (*p==v)
                  res.push_back(p);
      return res;
 }
@@ -377,9 +377,9 @@ unique_ptr<X> make_X(int i)
 
 The `shared_ptr` for an object share ownership of an object, which will be destroyed only when the last of its `shared_ptr`s is destroyed. `shared_ptr` provides a form of garbage collection that respects the destructor-based resource management of the memory-managed objects. This is neither cost free nor exorbitantly expensive, but it does make the lifetime of the shared object hard to predict. Use `shared_ptr` only if you actually need shared ownership.
 
-The standard library provides functions for constructing an object and returning an approoriate smart pointer, `make_shared()` and `make_unique()`. Using make_shared() is not just more convenient than separately making an object using new and then passing it to a shared_ptr, it is also notably more efficient because it does not need a separate allocation for the use count that is essential in the implementation of a shared_ptr.
+The standard library provides functions for constructing an object and returning an approoriate smart pointer, `make_shared()` and `make_unique()`. Using `make_shared()` is not just more convenient than separately making an object using `new` and then passing it to a `shared_ptr`, it is also notably more efficient because it does not need a separate allocation for the use count that is essential in the implementation of a `shared_ptr`.
 
-Still, pointer semantics are not always recommended. We use pointer when
+Still, pointer semantics are not always recommended. We use pointers when
 
 - we share an object, we need pointers (or references) to refer to the shared object;
 
@@ -668,7 +668,7 @@ The correspondence between the shared data and a mutex is conventional: the prog
 
 It is not uncommon to need to simultaneously access several resources to perform some action. This can lead to deadlock. The `scoped_lock` helps by enabling us to acquire several locks simultaneously.
 
- One of the most common ways of sharing data is among many readers and a single writer. This “reader-writer lock” idiom is supported be `share_mutex`. A reader will acquire the mutex “shared” so that other readers can still gain access, whereas a writer will demand exclusive access.
+ One of the most common ways of sharing data is among many readers and a single writer. This “reader-writer lock” idiom is supported be `shared_mutex`. A reader will acquire the mutex “shared” so that other readers can still gain access, whereas a writer will demand exclusive access.
  
  ```cpp
  shared_mutex mx;          // a mutex that can be shared
@@ -729,7 +729,7 @@ void producer()
 
 The standard library provides a few facilities to allow programmers to operate at the conceptual level of tasks rather than directly at the lower level of threads and locks:
 
-- `future` and `promise` for returning a value from a task spawned on a separate thread. To deal with an exception transmitted through a future, the caller of get() must be prepared to catch it somewhere.
+- `future` and `promise` for returning a value from a task spawned on a separate thread. To deal with an exception transmitted through a `future`, the caller of `get()` must be prepared to catch it somewhere.
 
 ```cpp
 void g(future<X>& fx)       // a task: get the result from fx
@@ -748,7 +748,7 @@ void g(future<X>& fx)       // a task: get the result from fx
 
 - `packaged_task` to help launch tasks and connect up the mechanisms for returning a result. It is provided to simplify setting up tasks connected with `future`s and `promise`s to be run on `thread`s. A `packaged_task` provides wrapper code to put the return value or exception from the task into a `promise`. It is a wrapper around a callable object with its `future` and `promise`.
 
-- `async()` for launching of a task in a manner very similar to calling a function. It serves well for a wide range of needs. Basically, async() separates the “call part” of a function call from the “get the result part” and separates both from the actual execution of the task.
+- `async()` for launching of a task in a manner very similar to calling a function. It serves well for a wide range of needs. Basically, `async()` separates the “call part” of a function call from the “get the result part” and separates both from the actual execution of the task.
 
 ```cpp
 double comp4(vector<double>& v)
