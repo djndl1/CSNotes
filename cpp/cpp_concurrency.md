@@ -432,7 +432,7 @@ A thread may request the results of an asynchronous return object before these r
 
 Shared states are made ready by _asynchronous providers_. Asynchronous providers are simply objects or functions providing results to shared states. An asynchronous provider marks its shared states as being ready and unblocks any waiting threads. Shared states use reference counting to keep track of the number of asynchronous return objects or asynchronous providers that hold references to them. 
 
-Objects of the class `std::future` are asynchronous return objects, produced by `std:;async`, `std::packaged_task` and `std::promise`.
+Objects of the class `std::future` are asynchronous return objects, produced by `std::async`, `std::packaged_task` and `std::promise`.
 
 ### `std::future` in `<future>`
 
@@ -503,8 +503,7 @@ int main()
 }
 ```
 
-Promises can be useful when implementing a multithreaded version of some algorithm without having
-to use additional synchronization statements.
+Promises can be useful when implementing a multithreaded version of some algorithm without having to use additional synchronization statements.
 
 ```cpp
 #include <iostream>
@@ -550,4 +549,76 @@ int main()
 ```bash
  13 16
  29 36
+```
+
+## `std::packaged_task` in `<future>`
+
+`std::packaged_task` allows a program to package a function or functor and pass the package to a thread for further processing.
+
+Calling a `packaged_task`, is not identical to calling the harbored function, but eventually its function will be called.
+
+```cpp
+#include <iostream>
+#include <fstream>
+#include <future>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+
+using namespace std;
+
+//code
+mutex carDetailsMutex;
+condition_variable condition;
+string carDetails;
+packaged_task<size_t (std::string const &)> serviceTask;
+
+size_t volkswagen(string const &type)
+{
+    cout << "performing maintenance by the book for a " << type << '\n';
+    return type.size() * 75;            // the size of the bill
+}
+
+size_t peugeot(string const &type)
+{
+    cout << "performing quick and dirty maintenance for a " << type << '\n';
+    return type.size() * 50;             // the size of the bill
+}
+
+void garage()
+{
+    while (true)
+    {
+        unique_lock<mutex> lk(carDetailsMutex);
+        while (carDetails.empty())
+            condition.wait(lk);
+
+        cout << "servicing a " << carDetails << '\n';
+        serviceTask(carDetails);
+        carDetails.clear();
+    }
+}
+
+int main()
+{
+    thread(garage).detach();
+
+    while (true)
+    {
+        string car;
+        if (not getline(cin, car) || car.empty())
+            break;
+        {
+            lock_guard<mutex> lk(carDetailsMutex);
+            carDetails = car;
+        }
+        serviceTask =  packaged_task<size_t (string const &)>(
+                    car[0] == 'v' ? volkswagen : peugeot
+                );
+        auto bill = serviceTask.get_future();
+        condition.notify_one();
+        cout << "Bill for servicing a " << car <<
+                                ": EUR " << bill.get() << '\n';
+    }
+}
 ```
