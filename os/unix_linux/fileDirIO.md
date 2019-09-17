@@ -5,13 +5,13 @@
 
 Most file I/O on a UNIX system can be performed using only five functions: `open`, `read`, `write`, `lseek`, `close`. Each `read` and `write` are unbuffered.
 
-To the kernel, all open files of a process are referred to by file descriptors, a nonnegative integer. By convention, file descriptor `0` is the standard input of a process, `1` the standard input, `2` the standard error. It is not a feature of the UNIX kernel. They should be replaced by the symbolic constants `STDIN_FILENO`, `STDOUT_FILENO` and `STDERR_FILENO`. File descriptors range from 0 through `"OPEN_MAX-1` (On Linux 5.1 the value is 1024). 
+To the kernel, all open files of a process are referred to by file descriptors, a nonnegative integer. By convention, file descriptor `0` is the standard input of a process, `1` the standard input, `2` the standard error. It is not a feature of the UNIX kernel. They should be replaced by the symbolic constants `STDIN_FILENO`, `STDOUT_FILENO` and `STDERR_FILENO`. File descriptors range from 0 through `OPEN_MAX-1` (On Linux 5.1 the value is 1024). 
 
 A file is opened or created by calling either the `open` function or the `openat` function. The file descriptor returned by `open` and `openat` is guaranteed to be the lowest-numbered unused descriptor. `openat` gives threads a way to use relative pathnames to open files in directories other than the CWD and it provides a way to avoid time-of-check-to-time-of-use errors. `O_CREAT` flag creates the file if it doesn't exist.
 
 A new file can also be created by calling the `creat` function. It's equivalent to `open(path, O_WRONLY | O_CREAT | O_TRUNC, mode)`. This syscall is somewhat redundant. One deficiency with `creat` is that the file is opened only for writing.
 
-A open file is closed by calling the `close` function. Closing a file also releases any record locks that the process may have on the file. When a process terminates, all of its open files are closed automatically by the kernel.
+An open file is closed by calling the `close` function. Closing a file also releases any record locks that the process may have on the file. When a process terminates, all of its open files are closed automatically by the kernel.
 
 Every open file has an associated ‘‘current file offset,’’ normally a non-negative integer that measures the number of bytes from the beginning of the file. Read and write operations normally start at the current file offset and cause the offset to be incremented by the number of bytes read or written. By default, this offset is initialized to 0 when a file is opened, unless the `O_APPEND` option is specified. A open file's offset can be set explicitly by calling `lseek`. We can seek zero bytes from the current position to determine the current offset, or to determine if a file is capable of seeking.
 
@@ -40,9 +40,9 @@ Thre kernel uses three data structures to represent an openfile.
 - The kernel maintains a file table for all open files, containing the file status flags (read/write/append...), offset, and a pointer to the v-node table entry for the file.
 
 - Each open file has a _v-node_  strcture that contains information about the type of file and pointers to functions that operate on the file. For most files,the v-node also contains the i-node for the file. This information is read from disk when the file is opened. (Linux has a generic filesystem-independent 
-i-node insetead of a v-node).
+i-node instead of a v-node).
 
-```bash
+```
 process table entry                             +-----------+
 +----|-----+                               +--->-v-node info|
 | fd |     |       file table entry        |    |  v-data+----+
@@ -53,7 +53,7 @@ process table entry                             +-----------+
 +----------+  |     +--------------------+      |i-node info| |
 |    |     |  |                                 |file size  <-+
 |    |     |  |                                 |           |
-|    |     |  |                                 |i_^node    |
+|    |     |  |                                 |i-node     |
 |    |     |  |     +--------------------+      +-----------+
 |    |     |  |     | file status flags  |
 |    |     |  +-----> current file offset|
@@ -66,7 +66,7 @@ process table entry                             +-----------+
                                                 |i-node info|    |
                                                 |file size  <----< 
                                                 |           |
-                                                | i_^node   |
+                                                | i-node    |
                                                 +-----------+
 ```
 
@@ -242,7 +242,7 @@ The `chown` functions allow us to change a file's user ID and group ID.
     blkcnt_t  st_blocks;      /* Number of (typically 512B) blocks allocated */
 ```
 
-This field is meaningful only for regular files, directories and symbolic links. A regular file of size 0 is allowed. The file size of a symbol link is the nubmer of bytes in the filename it points to.
+`st_size` is meaningful only for regular files, directories and symbolic links. A regular file of size 0 is allowed. The file size of a symbol link is the nubmer of bytes in the filename it points to.
 
 `truncate()` and `ftruncate()` truncate an existing file to a specified size (may increase the size).
 
@@ -250,7 +250,7 @@ This field is meaningful only for regular files, directories and symbolic links.
 
 A disk is divided into one or more partitions, each of which contains a file system.
 
-```bash
+```
           file    system
   +------|-------|---------------------------------------|-------------------------------------|-----|------------------------------------------+
   |      |       |                                       |                                     |     |                                          |
@@ -274,7 +274,7 @@ boot block                                | block  |   cg   | i-node | block  | 
 
 Every i-node has link count that contains the number of directory entries that point to it. Only when the link count goes to 0 can the file be deleted (unlinking).
 
-The i-node contains all the information about the file. Most of the information in the `stat` structure is obtaiend from the i-node. Only two items of interest are stored in the directory entry: the filename and the i-node number.
+The i-node contains all the information about the file. Most of the information in the `stat` structure is obtaind from the i-node. Only two items of interest are stored in the directory entry: the filename and the i-node number.
 
 Any leaf directory has a link count of 2, the directory itself contains one and its parent directory contains the other.
 
@@ -359,8 +359,7 @@ An open stream is closed by `fclose`. Any buffered output data is flushed before
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
 size_t fwrite(const void *ptr, size_t size, size_t nmem
-b,
-              FILE *stream);
+b, FILE *stream);
 ```
 
 A fundamental problem with binary I/O is that it can be used to read only data that has been written on the same system since they have different byte order and memory alignment.
