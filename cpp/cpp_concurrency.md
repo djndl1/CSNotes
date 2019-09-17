@@ -590,7 +590,7 @@ void garage()
     while (true)
     {
         unique_lock<mutex> lk(carDetailsMutex);
-        while (carDetails.empty())
+        while (carDetails.empty()) // the condition may be satisfied from the very start, then it just goes on
             condition.wait(lk);
 
         cout << "servicing a " << carDetails << '\n';
@@ -611,12 +611,13 @@ int main()
         {
             lock_guard<mutex> lk(carDetailsMutex);
             carDetails = car;
-        }
-        serviceTask =  packaged_task<size_t (string const &)>(
+            serviceTask =  packaged_task<size_t (string const &)>(
                     car[0] == 'v' ? volkswagen : peugeot
                 );
+            condition.notify_one();
+        }
+        
         auto bill = serviceTask.get_future();
-        condition.notify_one();
         cout << "Bill for servicing a " << car <<
                                 ": EUR " << bill.get() << '\n';
     }
