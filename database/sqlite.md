@@ -1,3 +1,21 @@
+# Database
+
+An organized collection of data. The database management system (DBMS) is the software that interacts with end users, applications and the database itself to capture and analyze the data.
+
+Formally, a "database" refers to a set of related data and the way it is organized. Access to this data is usually provided by a "database management system" (DBMS) consisting of an integrated set of computer software that allows users to interact with one or more databases and provides access to all of the data contained in the database (although restrictions may exist that limit access to particular data). The DBMS provides various functions that allow entry, storage and retrieval of large quantities of information and provides ways to manage how that information is organized.
+
+Existing DBMSs provide various functions that allow management of a database and its data which can be classified into four main functional groups:
+
+- _Data definition_: creation, modification and removal of _definitions that define the organization of the data_.
+
+- _Update_: insertion, modification and deletion of the actual data.
+
+- _Retrieval_: Providing information in a form directly usable or for further processing by other applications. 
+
+- _Administration_: Registering and monitoring users, enforcing data security, monitoring performance, maintaining data integrity, dealing with concurrency control, and recovering information that has been corrupted by some event such as an unexpected system failure.
+
+A linked-list system would be very inefficient when storing "sparse" databases where some of the data for any one record could be left empty. The relational model solved this by splitting the data into a series of normalized tables (or relations), with optional elements being moved out of the main table to where they would take up room only if needed. The relational part comes from entities referencing other entities in what is known as one-to-many relationship, like a traditional hierarchical model, and many-to-many relationship, like a navigational (network) model. Thus, a relational model can express both hierarchical and navigational models, as well as its native tabular model, allowing for pure or combined modeling in terms of these three models, as the application requires.  In the relational model, some bit of information was used as a "key", uniquely defining a particular record.
+
 # SQL (Structured Query Language)
 
 SQL accesses and manipulates databases. It executes queries against a database; retrieve data from a database; insert records in a database; update records in a database; delete records in a database; create new database; create new tables in a database; create views in a database; sets permissions on tables, procedures and views.
@@ -126,6 +144,8 @@ DELETE FROM table_name; # Delete all records in the table
 
 SQLite uses dynamic types for tables. You can store any value in any column regardless of the data type. SQLite allows a single database connection to access multiple database files simultaneously. SQLite is capable of creating in-memory databases which are very fast to work with.
 
+SQLite stores the entire database (definitions, tables, indices, and the data itself) as a single cross-platform file on a host machine. It implements this simple design by locking the entire database file during writing. SQLite read operations can be multitasked, though writes can only be performed sequentially. SQLite is not the preferred choice for write-intensive deployments since it relies on file system locks. It has less knowledge of the other processes that are accessing the database at the same time.
+
 ## Serverless
 
 In a client/server architecture, A separate server process is running. The applications that want to access the database server use TCP/IP protocol to send and receive requests.
@@ -136,7 +156,7 @@ SQLite does not require a server to run. SQLite database is integrated with the 
 
 SQLite quires minimal support from the OS or external library. An application that uses SQLite just is compiled with SQLite together. SQLite does not use any configuration files.
 
-## Transactional
+## [Transactional](https://en.wikipedia.org/wiki/Database_transaction)
 
 All transactions in SQLite are fully ACID-compliant. It means all queries and changes are Atomic, Consistent, Isolated, and Durable.
 
