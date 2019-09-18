@@ -14,33 +14,37 @@ The slow system calls are those that can block forever
 
 - Some of the interprocess communication functions
 
-With nonblocking I/O, if the operation cannot be completed, the call returns immediately with an error noting that the operation would have blocked.
+With nonblocking I/O, if the operation cannot be completed, the call returns immediately with an error noting that the operation would have blocked. If the IO cannot be done immediately and the program keeps trying, this type of looping is _polling_.
 
 - `open()` with `O_NONBLOCK` flag
 
-- `fcntl` turns on `O_NONBLOCK`.
+- `fcntl()` turns on `O_NONBLOCK`.
 
-Sometimes, we can avoid using nonblocking I/O by designing our applications to use multiple threads. However, the overhead of synchronization can add more complexity than is saved from using threads.
+Sometimes, we can avoid using nonblocking I/O by designing our applications to use multiple threads. However, the overhead of synchronization can add more complexity than is saved from using threads. Individual threads block in I/O calls while other threads continue to work.
 
 # Record Locking (byte-range locking)
 
 Record locking is the term normamlly used to describe the ability of a process to prevent other processes from modifying a region of a file while the first process is reading or modifying that portion of a file. It is useful for running database systems.
 
+Record  locks  are  not inherited by a child created via `fork`, but are preserved across an `execve`. Because of the buffering performed by the stdio library,  the  use  of record  locking  with  routines  in  that  package should be avoided; use `read` and `write`instead.
+
+ If a process closes any file descriptor referring to a file, then  all of  the  process's  locks on that file are released, regardless of the file descriptor(s) on which the locks were obtained. The threads in a process share locks.  In other words, a multithreaded program can't use record locking to ensure that threads don't simulta‐ neously access the same region of a file. Record locks  are  automatically released when the process terminates.
+
 `fcntl` provides advisory record locking, with `F_SETLK`, `F_SETLKW` and `F_GETLK` as commands:
 
 ```c
-           struct flock {
-               ...
-               short l_type;    /* Type of lock: F_RDLCK,
-                                   F_WRLCK, F_UNLCK */
-               short l_whence;  /* How to interpret l_start:
-                                   SEEK_SET, SEEK_CUR, SEEK_END */
-               off_t l_start;   /* Starting offset for lock */
-               off_t l_len;     /* Number of bytes to lock */
-               pid_t l_pid;     /* PID of process blocking our lock
-                                   (set by F_GETLK and F_OFD_GETLK) */
-               ...
-           };
+struct flock {
+     ...
+     short l_type;    /* Type of lock: F_RDLCK,
+                         F_WRLCK, F_UNLCK */
+     short l_whence;  /* How to interpret l_start:
+                         SEEK_SET, SEEK_CUR, SEEK_END */
+     off_t l_start;   /* Starting offset for lock */
+     off_t l_len;     /* Number of bytes to lock */
+     pid_t l_pid;     /* PID of process blocking our lock
+                         (set by F_GETLK and F_OFD_GETLK) */
+     ...
+};
 ```
 
 ```c
