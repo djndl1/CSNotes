@@ -260,3 +260,5 @@
 - [ ] https://stackoverflow.com/questions/39927790/c-standard-library-functions-vs-system-calls-which-is-open
 
 - [ ] https://www.systutorials.com/5311/raii-like-error-handling-and-resource-management-in-c/
+
+- [ ] https://cs.stackexchange.com/questions/80038/how-are-binary-trees-represented-on-disk
