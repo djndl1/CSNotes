@@ -17,6 +17,7 @@ The old style `enum` has their values not restricted to the enum type name itsel
 ```c++
 enum class CharEnum : unsigned char {
     NOT_OK,
+    
     OK
 }
 ```
@@ -358,6 +359,8 @@ char32_t utf32[] = U"\u2018";
 C++ prorams should merely use the new style C++ casts as they offer the compiler facilities to verify the sensibility of the cast.
 
 https://stackoverflow.com/questions/573294/when-to-use-reinterpret-cast
+
+https://stackoverflow.com/questions/332030/when-should-static-cast-dynamic-cast-const-cast-and-reinterpret-cast-be-used
 
 ## `static_cast`
 
