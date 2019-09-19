@@ -138,6 +138,58 @@ DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
 DELETE FROM table_name; # Delete all records in the table
 ```
 
+- `SELECT TOP`: specify the number of records to return; in sqlite3, it's `select ... from ... (where ...) limit ...`;
+
+```sql
+SELECT column_name(s)
+FROM table_name
+WHERE condition
+LIMIT number;
+```
+
+```sql
+select * from employees where Country = 'Canada' limit 5
+```
+
+- `MIN()`, `MAX()`: the smallest/largest value of the selected column
+
+```sql
+select min(EmployeeId) from employees;
+```
+
+- `COUNT()`, `AVG()`, `SUM()`
+
+```sql
+select count(EmployeeId) from employees # 1
+select sum(EmployeeId) from employees;  # 8
+select avg(EmployeeId) from employees;  # 4.5
+```
+
+- `LIKE`: search for a specified pattern in a column; `%` represents zero, one or multiple characters, `_` represents a single character.
+
+```sql
+select * from employees where Country like 'C%';
+```
+
+- `IN`: specify multiple values in a `where` clause
+
+```sql
+select * from employees where EmployeeId in (1, 2);
+select * from employees where EmployeeId not in (1, 2);
+```
+
+- `BETWEEN`: selects values within a given range
+
+```sql
+select * from employees where EmployeeId between 4 and 6;
+select * from employees where EmployeeId not between 4 and 6;
+```
+
+- `AS`: give a table or a column in a table, a temporary name
+
+```sql
+select e.FirstName, e.LastName as Name, g.Name from employees as e, genres as g;
+```
 
 
 # SQLite Features
@@ -161,6 +213,7 @@ SQLite quires minimal support from the OS or external library. An application th
 All transactions in SQLite are fully ACID-compliant. It means all queries and changes are Atomic, Consistent, Isolated, and Durable.
 
 ## Zero-Configuration
+
 
 No server process that needs to be configured, started and stopped. Does not use any configuration files.
 
