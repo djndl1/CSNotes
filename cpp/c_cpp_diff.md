@@ -23,6 +23,12 @@ enum class CharEnum : unsigned char {
 
 `...` operator is allowed to show a sequence of symbols of a `enum class`.
 
+
+```cpp
+case SafeEnum::Not_OK ... SafeEnum:OK:
+    cout << "Status is known\n";
+```
+
 # `NULL` pointer, `0` pointer and `nullptr`
 
 In C++, all zero values are coded as 0.
@@ -173,7 +179,7 @@ Some advantages of using streams are:
 
 # References
 
-- When a function explicitly must change the values of its arguments, a pointer parameter is preferred. These pointer parameters should preferably be the function’s initial parameters. This is called return by argument. If the modification of the argument is a trivial side-effect, references can be used.
+When a function explicitly must change the values of its arguments, a pointer parameter is preferred. These pointer parameters should preferably be the function’s initial parameters. This is called return by argument. If the modification of the argument is a trivial side-effect, references can be used.
 
 
 
@@ -211,8 +217,7 @@ struct FirstIP4word
 
 # Type inference using `auto`
 
-The keyword `auto` can be used to simplify type definitions of variables and return types of functions if
-the compiler is able to determine the proper types of such variables or functions. It is no longer used as a storage class specifier.
+The keyword `auto` can be used to simplify type definitions of variables and return types of functions if the compiler is able to determine the proper types of such variables or functions. It is no longer used as a storage class specifier.
 
 Plain types and pointer types are used as-is when declared `auto`. A reference's basic type (without the reference, omitting `const` and `volatile`)  is used. If a reference is required, use `auto&` or `auto&&`. Likewise, `const` and/or pointer specifications can be used in combination with the `auto` keyword.
 
@@ -352,6 +357,8 @@ char32_t utf32[] = U"\u2018";
 
 C++ prorams should merely use the new style C++ casts as they offer the compiler facilities to verify the sensibility of the cast.
 
+https://stackoverflow.com/questions/573294/when-to-use-reinterpret-cast
+
 ## `static_cast`
 
 The `static_cast<type>(expression)` is used to convert ‘conceptually comparable or related types’ to each other.
@@ -368,15 +375,15 @@ The `static_cast` is used in the context of class inheritance to convert a point
 
 A const_cast<type>(expression) expression is used to undo the const attribute of a (pointer) type.
 
-The need for a const_cast may occur in combination with functions from the standard C library which traditionally weren’t always as const-aware as they should.
+The need for a `const_cast` may occur in combination with functions from the standard C library which traditionally weren’t always as const-aware as they should.
 
 ## `dynamic_cast`
 
-Different from the static_cast, whose actions are completely determined compile-time, the `dynamic_cast`’s actions are determined run-time to convert a pointer to an object of some class.
+Different from the `static_cast`, whose actions are completely determined compile-time, the `dynamic_cast`’s actions are determined run-time to convert a pointer to an object of some class.
 
 ## `reinterpret_cast`
 
-`reinterpret_cast` should only be used when it is known that the information as defined in fact is or can be interpreted as something completely different. Think of the reinterpret_cast as a cast offering a poor-man’s union: the same memory location may be interpreted in completely different ways. Avoid this unless necessary.
+`reinterpret_cast` should only be used when it is known that the information as defined in fact is or can be interpreted as something completely different. Think of the `reinterpret_cast` as a cast offering a poor-man’s union: the same memory location may be interpreted in completely different ways. Avoid this unless necessary.
 
 
 ```c++
@@ -385,4 +392,12 @@ reinterpret_cast<pointer type>(pointer expression)
 
 ```c++
 cout.write(reinterpret_cast<char const *>(&value), sizeof(double)); // value is a double variable
+```
+
+```cpp
+bool is_little_endian() {
+  std::uint16_t x=0x0001;
+  auto p = reinterpret_cast<std::uint8_t*>(&x);
+  return *p != 0;
+}
 ```
