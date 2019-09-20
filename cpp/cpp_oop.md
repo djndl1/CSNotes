@@ -419,7 +419,7 @@ However, traditional situations in which call back functions are used in C are t
 
 ## `new` and `delete`
 
-`new` is type safe. It knows about the type of allocated entity it may and will call the constructor of an allocated class type object. When confronted with failing memory allocation, `new`'s behavior is configurable ghrough the use of a `new_handler`.
+`new` is type safe. It knows about the type of allocated entity it may and will call the constructor of an allocated class type object. When confronted with failing memory allocation, `new`'s behavior is configurable through the use of a `new_handler`.
 
 All `malloc` and `str...` in C should be deprecated in favor of `string`, `new` and `delete`.
 
@@ -482,6 +482,87 @@ string *enlarge(string *old, size_t oldsize size_t newsize)
 
 Raw memory is made available by `operator new(sizeInBytes)` and also by `operator new[](sizeInBytes)`. They have no concept of data types the size of the intended data type must be specified. The counterparts are `operator delete()` and `operator delete[]()`.
 
+```cpp
+inline _LIBCPP_INLINE_VISIBILITY void *__libcpp_allocate(size_t __size, size_t __align) {
+#ifndef _LIBCPP_HAS_NO_ALIGNED_ALLOCATION
+  if (__is_overaligned_for_new(__align)) {
+    const align_val_t __align_val = static_cast<align_val_t>(__align);
+# ifdef _LIBCPP_HAS_NO_BUILTIN_OVERLOADED_OPERATOR_NEW_DELETE
+    return ::operator new(__size, __align_val);
+# else
+    return __builtin_operator_new(__size, __align_val);
+# endif
+  }
+#else
+  ((void)__align); // https://stackoverflow.com/questions/34288844/what-does-casting-to-void-really-do
+#endif
+#ifdef _LIBCPP_HAS_NO_BUILTIN_OPERATOR_NEW_DELETE
+  return ::operator new(__size);
+#else
+  return __builtin_operator_new(__size);
+#endif
+}
+
+_LIBCPP_NODISCARD_AFTER_CXX17 _LIBCPP_INLINE_VISIBILITY
+    pointer allocate(size_type __n, allocator<void>::const_pointer = 0)
+        {
+        if (__n > max_size())
+            __throw_length_error("allocator<T>::allocate(size_t n)"
+                                 " 'n' exceeds maximum supported size");
+        return static_cast<pointer>(_VSTD::__libcpp_allocate(__n * sizeof(_Tp), _LIBCPP_ALIGNOF(_Tp)));
+        }
+```
+
+```cpp
+_LIBCPP_INLINE_VISIBILITY void deallocate(pointer __p, size_type __n) _NOEXCEPT
+        {_VSTD::__libcpp_deallocate((void*)__p, __n * sizeof(_Tp), _LIBCPP_ALIGNOF(_Tp));}
+        
+inline _LIBCPP_INLINE_VISIBILITY void __libcpp_deallocate(void* __ptr, size_t __size, size_t __align) {
+  _DeallocateCaller::__do_deallocate_handle_size_align(__ptr, __size, __align);
+}
+
+  void __do_deallocate_handle_size_align(void *__ptr, size_t __size, size_t __align) {
+#if defined(_LIBCPP_HAS_NO_ALIGNED_ALLOCATION)
+    ((void)__align);
+    return __do_deallocate_handle_size(__ptr, __size);
+#else
+    if (__is_overaligned_for_new(__align)) {
+      const align_val_t __align_val = static_cast<align_val_t>(__align);
+      return __do_deallocate_handle_size(__ptr, __size, __align_val);
+    } else {
+      return __do_deallocate_handle_size(__ptr, __size);
+    }
+#endif
+  }
+  
+  static inline void __do_deallocate_handle_size(void *__ptr, size_t __size) {
+#ifdef _LIBCPP_HAS_NO_SIZED_DEALLOCATION
+    ((void)__size);
+    return __do_call(__ptr);
+#else
+    return __do_call(__ptr, __size);
+#endif
+  }
+  
+  template <class _A1>
+  static inline void __do_call(void *__ptr, _A1 __a1) {
+#if defined(_LIBCPP_HAS_NO_BUILTIN_OPERATOR_NEW_DELETE) || \
+    defined(_LIBCPP_HAS_NO_BUILTIN_OVERLOADED_OPERATOR_NEW_DELETE)
+    return ::operator delete(__ptr, __a1);
+#else
+    return __builtin_operator_delete(__ptr, __a1);
+#endif
+  }
+
+  static inline void __do_call(void *__ptr) {
+#ifdef _LIBCPP_HAS_NO_BUILTIN_OPERATOR_NEW_DELETE
+    return ::operator delete(__ptr);
+#else
+    return __builtin_operator_delete(__ptr);
+#endif
+  }  
+```
+
 ## the placement `new` operator
 
 Placement `new` is declared in `<memory>` header. Placement `new` is passed an existing block of memory into which `new` initializes an object or value (placing the object in a certain place in memory). 
@@ -490,7 +571,35 @@ Placement `new` is declared in `<memory>` header. Placement `new` is passed an e
 type *new(void *memory) type{arguments};
 ```
 
-TODO
+The placement `new` operator is useful in situations where classes set aside memory to be used later(e.g. `std::vector` allocate more memory than it currently needs).
+
+```cpp
+template <class _Tp>
+class _LIBCPP_TEMPLATE_VIS allocator
+{
+// ...
+template <class _Up, class... _Args>
+_LIBCPP_INLINE_VISIBILITY
+void
+construct(_Up* __p, _Args&&... __args)
+{
+            ::new((void*)__p) _Up(_VSTD::forward<_Args>(__args)...);
+}
+//...
+}
+```
+
+Memory allocated by objects initialized using placement new is returned by explicitly calling the object’s destructor.
+
+```cpp
+void Strings::destroy()
+{
+    for (std::string *sp = d_memory + d_size; sp-- != d_memory; )
+        sp->~string();
+        
+    operator delete(d_memory);
+}
+```
 
 ## The Destructor
 The destructors of dynamically allocated objects are not automatically activated and when a program is interrupted by an `exit` call, destructors of locally defined objects by functions are not called, only globally initialized objects are called (which is a good reason why C++ should avoid `exit()`).
@@ -1320,3 +1429,9 @@ int main(int argc, char *argv[])
 4012e0 0 
 4012e0 4 # when calling, (*4012e0)(this + 4, args);
 ```
+
+# Nested Classes
+
+TODO
+
+
