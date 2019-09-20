@@ -270,3 +270,5 @@ delete[] for: 0x55b827cb5e70of size 32
 https://isocpp.org/files/papers/n3778.html
 
 https://stackoverflow.com/questions/34407032/how-would-i-use-the-sized-operators-delete-delete-and-why-are-they-better
+
+https://eli.thegreenplace.net/2011/02/17/the-many-faces-of-operator-new-in-c
