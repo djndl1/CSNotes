@@ -264,3 +264,9 @@ destructor
 destructor
 delete[] for: 0x55b827cb5e70of size 32
 ```
+
+`new[]` is exception safe even when only some of the objects were properly constructed.
+
+https://isocpp.org/files/papers/n3778.html
+
+https://stackoverflow.com/questions/34407032/how-would-i-use-the-sized-operators-delete-delete-and-why-are-they-better
