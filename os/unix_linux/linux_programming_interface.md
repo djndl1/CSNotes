@@ -1,6 +1,14 @@
 # Fundamental Concepts
 
-TODO
+Operating system:
+
+1. the entire package consisting of the central software managing a computer's resources and all of the accompanying standard software tools, such as command-line interpreters, graphical user interfaces, file utilities and editors;
+
+2. (kernel) the central software that amnages and allocates computer resources.
+
+The kernel performs
+
+1. Process scheduling: Linux is a preemptive (otherwise it's one process that determines whether to switch to another process) multitasking OS.
 
 # System Programming Concepts
 

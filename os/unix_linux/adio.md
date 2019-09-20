@@ -112,6 +112,23 @@ Locks are associated with a process and a file. When a process terminates, all i
 
 Locks can be used to ensure that only one instance of the daemon is running.
 
+```c
+#include <unistd.h>
+#include <fcntl.h>
+
+int
+lockfile(int fd)
+{
+	struct flock fl;
+
+	fl.l_type = F_WRLCK;
+	fl.l_start = 0;
+	fl.l_whence = SEEK_SET;
+	fl.l_len = 0;
+	return(fcntl(fd, F_SETLK, &fl));
+}
+```
+
 Mandatory locking (enforcement-mode locking) causes the kernel to check every `open`, `read`, and `write` to verify that the calling process isn't violating a lock on the file being accessed. Mandatory locking is enabled for a particular file by turning on the set-group-ID bit and turning off  the group-execute bit (On Linux `mount -o mand` is needed).
 
 TODO 
