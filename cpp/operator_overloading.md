@@ -141,7 +141,8 @@ We can inform the compiler that a particular member should only be used when the
 Functions provided with rvalue reference bindings are selected by the compiler when used by anonymous temporary objects, whereas functions provided with lvalue reference bindings are selected by the compiler when used by other types of objects.
 
 ```cpp
-Binary Binary::operator+=(Binary const &rhs) && // semantically questionable
+Binary Binary::operator+=(Binary const &rhs) && // semantically questionable, += shouldn't return an rvalue
+
 {
     add(rhs);
     return std::move(*this);
@@ -158,3 +159,108 @@ Binary &Binary::operator+=(Binary const &other) &
 
 # Overloading `operator new(size_t)`, `operator delete(void*)`
 
+The overloaded versions may define multiple parameters.
+
+```cpp
+class String {
+    std::string *d_data;
+    
+    public:
+        void *operator new(size_t size) // the size is deduced from the size of objects of the class 
+        {
+            return memset(::operator new(size), 0, size);
+        }
+};
+```
+
+When `new String` is used, the `String::operator new` is called. This `operator new` is actually a static member function.
+
+Placement `new` can also be overloaded.
+
+```cpp
+void *String::operator new(size_t size, char *memory)
+{
+    return memset(memory, 0, size);
+}
+
+char buffer[sizeof(String)];
+String *sp = new(buffer) String;
+```
+
+It is good practice to overload `operator delete` whenever `operator new` is also overloaded. `operator delete` is called when deleting a dynamically allocated object after executing the destructor of the associated class. The overloaded `operator delete` may do whatever it wants to do with the memory pointed to.
+
+
+# Overloading `new[]` and `delete[]`
+
+```cpp
+// placement new
+void *String::operator new[](size_t size, char *memory)
+{
+    return memset(memory, 0, size);
+}
+
+char buffer[12 * sizeof(String)];
+String *sp = new(buffer) String[12];
+```
+Although the addresses returned by `new` and `new[]` point to the allocated object(s), there is an additional `size_t` value available immediately before the address returned by `new` and `new[]`.  This size_t value is part of the allocated block and contains the actual size of the block.  `operator new[]` does not receive the address returned by `new[]` but rather the address of the initial `size_t` value.
+
+`operator delete[]` may also be overloaded using an additional `size_t` parameter.
+
+```cpp
+void String::operator delete[](void *p, size_t size)
+{
+    cout << "deleting << size << " bytes\n" ;
+    ::operator delete[](ptr);
+}
+```
+
+`size` is automatically initialized to the size (in bytes) of the block of memory to which `void *p` points. If this form is defined, simple `operator delete[](void *)` should not be defined to avoid ambiguities.
+
+
+```cpp
+#include <cstddef>
+#include <iostream>
+
+using namespace std;
+
+struct Demo
+{
+    size_t idx;
+    Demo()
+        {
+            cout << "default cons\n";
+        }
+    ~Demo()
+        {
+            cout << "destructor\n";
+        }
+    void *operator new[](size_t size) { return ::operator new(size); }
+    void operator delete[](void *vp, size_t sz)
+                            {
+                                cout << "delete[] for: " << vp <<  "of size " << sz << '\n';
+                                ::operator delete[](vp);
+                            }
+};
+
+int main()
+{
+    Demo *xp;
+    cout << ((size_t *)(xp = new Demo[3]))[-1] << '\n';
+    cout << xp << '\n';
+    cout << "==================\n";
+    delete[] xp;
+}
+```
+
+```bash
+default cons
+default cons
+default cons
+3
+0x55b827cb5e78
+==================
+destructor
+destructor
+destructor
+delete[] for: 0x55b827cb5e70of size 32
+```
