@@ -198,4 +198,44 @@ When a lambda captures a member using implicit by-copy capture, it does not make
 
 Named lambda expressions nicely fit in the niche of local functions: when a function needs to perform computations which are at a conceptually lower level than the function’s task itself, then it’s attractive to encapsulate these computations in a separate support function and call the support function where needed.
 
+
 use lambda expressions sparingly. When they are used make sure that their sizes remain small. As a rule of thumb: lambda expressions should be treated like in-line functions, and should merely consist of one, or maybe occasionally two expressions.
+
+# Overloading `operator|`
+
+Combining `enum` values using arithmetic results in `int`-types values. it is possible to overload the enum type's operators.
+
+```cpp
+enum Permission {
+    READ =   1 << 0,
+    WRITE    1 << 1,
+    EXECUTE  1 << 2
+};
+
+void setPermission(Permission perm);
+
+Permission operator|(Permission left, Permission right) 
+{
+    return static_cast<Permission>(static_cast<int>(left) | right);
+}
+```
+
+# Using defined literals (extensible literals)
+
+A user-defined literal is defined by a function that must be defined at namespace scope. Such a function is called a literal operator. A literal operator cannot be a class member function.
+
+```cpp
+Type operator""_identifier(parameter-list);
+```
+
+
+Note that when the paramter is `const char *`, the literal must not be given double quotes and must represent a numeric constant.
+
+```cpp
+double operator""_NM2km(const char *nm)
+{
+    return std::stod(nm) *1.852;
+}
+```
+
+Arguments to literal operators are themselves always constants.
