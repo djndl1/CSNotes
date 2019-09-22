@@ -1432,6 +1432,104 @@ int main(int argc, char *argv[])
 
 # Nested Classes
 
-TODO
+Classes can be defined inside other classes. Nested classes are used in situation where the nested class has a close conceptual relationship to its surrounding class. e.g. (`string::iterator` inside the class `string`).
+
+The normal access and rules in classes apply to nested classes. If a class is nested in the public section of a class, it is visible outside the surrounding class. If it is nested in the protected section it is visible in subclasses, derived from the surrounding class, if it is nested in the private section, it is only visible for the members of the surrounding class.
+
+To grant the surrounding class access rights to the private members of its nested classes or to grant nested classes access rights to the private members of the surrounding class, the classes can be defined as friend classes.
+
+Nested classes can be considered members of the surrounding class, but members of nested classes are not members of the surrounding class. Nested classes are just typenames. It is not implied that objects of such classes automatically exist in the surrounding class. If a member of the surround- ing class should use a (non-static) member of a nested class then the surrounding class must define a nested class object, which can thereupon be used by the members of the surrounding class to use members of the nested class.
+
+Inline and in-class functions can use any nested class, even if the nested class's definition appears later in the outer class's interface. When (nested) member functions are defined inline, their definitions should be put below their class interface. Static nested data members are also usually defined outside of their classes. 
+
+Nested classes may be declared before they are actually defined in a surrounding class. Such forward declarations are required if a class contains multiple nested classes, and the nested classes contain pointers, references, parameters or return values to objects of the other nested classes.
+
+No friend declaration is required to grant a nested class access to the private members of its surrounding class. A nested class is a type defined by its surrounding class and as such objects of the nested class are members of the outer class and thus can access all the outer class’s members.
+
+```cpp
+class Outer {
+    int d_value;
+    static int s_value;
+    
+public:
+    Outer() : d_value(12) {}
+    class Inner {
+        public:
+            Inner() 
+            {
+                cout << s_value << '\n';
+            }
+            Inner(Outer &outer) 
+            {
+                cout << outer.d_value << '\n';
+            }
+    };
+};
+```
+
+Friend declarations may be provided beyond the definition of the entity that is to be considered a friend. So a class can be declared a friend beyond its definition. ???
 
 
+Nested classes aren’t automatically each other’s friends. Here friend declarations must be provided
+to grant one nested classes access to another nested class’s private members.
+
+```cpp
+class SecondWithin;
+
+class Surround {
+    static int s_variable;
+    public:
+        class FirstWithin {
+            friend class Surround;
+            friend class SecondWithin; //a friend declaration is also considered a forward declaration.
+
+            friend class ::SecondWithin;
+            
+            static int s_variable;
+            public:
+                int value();
+        };
+        int value();
+    private:
+        class SecondWithin {
+            friend class Surround;
+            friend class FirstWithin;
+            
+            static int s_variable;
+            public:
+                int value();
+        };
+};
+
+inline int Surround::FirstWithin::value()
+{
+    Surround::s_variable = SecondWithin::s_variable;
+    return s_variable;
+}
+
+inline int Surround::SecondWithin::value()
+{
+    Surround::s_variable = FirstWithin::s_variable;
+    return s_variable;
+}
+```
+
+## Nesting Enumerations
+
+Enumerations may also be nested in classes. Nesting enumerations is a good way to show the close connection between the enumeration and its class. Nested enumerations have the same controlled visibility as other class members.
+
+```cpp
+class DataStructure {
+    public:
+        enum Traversal {
+            FORWARD;
+            BACKWARD;
+        };
+        setTraversal(Traversal mode);
+    private:
+        Traversal   d_mode;
+};
+
+DaataStructure::Traversal localMode = DataStructure::FORWARD;
+```
+`enum` types usually define symbolic values. Types may be defined without any associated values. An empty enum can be defined which is an `enum` not defining any values. The empty `enum`’s type name may thereupon be used as a legitimate type in, e.g. a catch clause.
