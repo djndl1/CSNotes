@@ -6,6 +6,8 @@ Namespaces can be defined without a name, such an anynomous namespace restricts 
 
 A `using` declaration can have restricted scope. It can be used inside a block.
 
+https://stackoverflow.com/questions/11016220/what-are-inline-namespaces-for
+
 # Koenig lookup
 
 If a function is called without specifying its namespaces, then the namespace of its argument types are used to determine the function's namespace. If the namespaces in which the argument type are defined contains such a function, then the fucntion is used.
