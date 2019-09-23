@@ -2,7 +2,7 @@ The Standard Template Library is a general purpose library consisting of contain
 
 # Predefined Function Objects `<functional>`
 
-Function objects play important roles in generic algorithms.
+Function objects play important roles in generic algorithms. By default, function objects are passed by value rather than by reference. Passing function objects by value instead of by reference has the advantage of being able to pass constant and temporary expressions. The disadvantage of passing the function object by value is that you can’t benefit from modifications of the state of the function objects
 
 ```cpp
 class CaseInsensitiveComp {
@@ -15,6 +15,46 @@ class CaseInsensitiveComp {
 
 sort(argv, argv + argc, CaseInsensitiveComp());
 ```
+
+
+To get a result from function objects passed to algorithms:
+
+1. keep the state externally and let the function objects refer to it;
+
+2. pass the function objects by reference
+
+```cpp
+IntSequence seq(1);
+generate_n<back_insert_iterator<list<int>>, int, IntSequence&>(back_inserter(coll), 4, seq); // 2 3 4 5
+generate_n(back_inserter(coll), 4, seq); // insert 6 7 8 9
+```
+
+3. use the return value of `for_each`
+
+```cpp
+class MeanValue {
+private:
+    long num;
+    long sum;
+public:
+    MeanValue() : num(0), sum(0) {
+    }
+    
+    void operator() (int elem) {
+        ++num;
+        sum += elem;
+    }
+    
+    double value() {
+        return static_cast<double>(sum) / static_cast<double>(num);
+    }
+};
+
+vector<int> coll = {1, 2, 3, 4, 5, 6, 7, 8};
+MeanValue mv = for_each(coll.begin(), coll.end(), MeanValue());
+```
+
+Not every function that returns a Boolean value is a valid predicate for the STL. A predicate should always be stateless.
 
 The arithmetic function objects support the standard arithmetic operations: 
 
@@ -57,6 +97,73 @@ std::transform(bArr, bArr + bArrSize, logical_not<bool>()); # inverts a boolean 
 ```
 
 (C++17) A negator (`std::not_fn`) is a function object toggling the truth value of a function that's called from the negator: if the function returns `true`, the negator returns false and vice versa. This is useful when the negated function cannot be modified.
+
+A function adapter is a function object that enables the composition of function objects with each other, with certain values, or with special functions.
+
+- `bind(op, args...)`: binds parameters `args` to a callable object`op`. It allows for adapting and composing new function objects out of existing or predefined function objects; call global functions; call member functions for objects, pointers to objects and smart pointers to objects
+
+```cpp
+auto plus10 = std::bind(std::plus<int>(), std:;placeholder::_1, 10); // + 10
+auto plus10times2 = std:;bind(std::mutliplies<int>(), 
+                              std::bind(std::plus<int>(),
+                                        std::placeholders::_1,
+                                        10),
+                              2)); // + 10  *2 
+                              
+    auto pow3 = std::bind(std::multiplies<int>(),
+                  std::bind(std::multiplies<int>(),
+                            std::placeholders::_1,
+                            std::placeholders::_1),
+                  std::placeholders::_1); // x * x * x
+                  
+auto inversDivide = std::bind(std::divides<double>(),
+                                  std::placeholders::_2,
+                                  std::placeholders::_1); // inverse division 
+
+```
+
+The `binder` can be called directly.
+
+```cpp
+std::cout << std::bind(std::plus<int>(), _1, 10)(32) << std::endl;
+std::transform(coll.begin(), coll.end(), coll.begin(), coll.begin(), 
+            std:;bind(std::plus<int>(), _1, 10));
+```
+
+`bind()` internally copies passed arguments. To let the function object use a reference to a passed argument, use `ref()`, `cref()`.
+
+```cpp
+void incr(int& i)
+{
+    i++;
+}
+
+int i = 0;
+bind(incr, i)();
+bind(incr, ref(i)();
+```
+
+
+- `mem_fn(op)`: call `op()` as a member function for an object or pointer to object
+
+- `not1(op)`: unary negation `!op(param)`
+
+- `not2(op)`: binary negation `!op(param1, param2)`
+
+`bind()` can be used to call global functions
+
+```cpp
+char myToupper(char c)
+{
+    std::locale loc;
+    return std::use_facet<std::ctype<char>>(loc).toupper(c);
+}
+
+pos = search(str.begin(), str.end(),
+            subs.begin(), subs.end(),
+            bind(equal_to<char>(), bind(myToupper, _1), bind(myToupper, _2)));
+```
+
 
 # Iterators
 
@@ -273,6 +380,8 @@ public:
 To avoid double allocation overhead, use `make_*` instead of smart pointers' constructors. It employs perfect forwarding.
 
 # Algorithms
+
+All STL algorithms process one or more iterator ranges. The caller must ensure that the ranges are valid. Algorithms work in overwrite mode rather than insert mode. The caller must ensure that destination ranges have enough elements. Insert iterators switch from overwrite to insert mode.
 
 - `<algorithm>`: generic algorithms except for operators
 
