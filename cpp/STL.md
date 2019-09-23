@@ -187,6 +187,105 @@ std::for_each(coll.begin(), coll.end(),
 
 - `bind1st`, `bind2st`, `ptr_fun`, `mem_fun`, `mem_fun_ref`, `not1`, `not2` are all deprecated (most are removed in C++17).
 
+- `std::function` provides support for storing arbitrary function objects. It is a (general-purpose polymorphic function wrapper)[https://probablydance.com/2012/12/16/the-importance-of-stdfunction/]. Instances of `std::function` can store, copy and invoke any `Callable` target -- lambdas, functions, bind expressions or other function objects as well as pointers to member functions and pointers to data members. Invoking an empty `std::function` results in `std::bad_function_call` exception being thrown.
+
+## Lambdas versus Binders
+
+```cpp
+auto plus10 = [] (int i) {
+    return i + 10;
+};
+
+auto plus10times2 = [] (int i) {
+    return (i + 10) * 2;
+};
+
+auto pow3 = [] (int i) {
+    return i * i * i;
+}
+
+auto inversDivide = [] (double d1, double d2) {
+    return d2 / d1;
+};
+```
+
+## Lambdas versus Stateful Function Objects
+
+```cpp
+vector<int> coll = { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+   // process and print mean value
+   long sum = 0; // the state is now outside the function
+   for_each (coll.begin(), coll.end(),  // range
+             [&sum] (int elem) {
+                 sum += elem;
+             });
+   double mv = static_cast<double>(sum)/static_cast<double>(coll.size());
+   cout << "mean value: " << mv << endl;
+```
+
+```cpp
+list<int> coll = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+list<int>::iterator pos;
+    int count=0;     // call counter
+    pos = remove_if(coll.begin(),coll.end(),   // range
+                    [count] (int) mutable {   // count now an internal state
+                        return ++count == 3;
+                    });
+    coll.erase(pos,coll.end());
+```
+
+However, to make this work correctly
+
+```cpp
+list<int> coll = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+list<int>::iterator pos;
+    int count=0;     // call counter
+    pos = remove_if(coll.begin(),coll.end(),   // range
+                    [&count] (int)  {   // count must be an external state
+                        return ++count == 3;
+                    });
+```
+
+## Lambdas Calling Global and Member Functions
+
+```cpp
+search(s.begin(), s.end(),
+    sub.begin(), sub.end(),
+    [] (char c1, char c2) {
+        return myToupper(c1) == myToupper(c2);
+    });
+```
+
+```cpp
+for_each(coll.begin(), coll.end(),
+    [] (const Person& p) {
+        p.print();
+    });
+    
+for_each(coll.begin(), coll.end(),
+    [] (const Person& p) {
+        p.print2("Person: ");
+    });
+```
+
+## Lambdas as hash function, sorting or equivalence criterion
+
+```cpp
+auto hash = [] (const Person& p) {
+    ...
+};
+auto eq = [] (const Person& p1, Person& p2) {
+    ...
+};
+
+unordered_set<Person, decltype(hash), decltype(eq)> pset(10, hash, eq);
+```
+
+`decltype` is needed here. However, specifying a class for the function objects here can be considered as being more readable and even more convenient.
+
 # Iterators
 
 Iterators are objects acting like pointers (a generalization, plain pointers can be used as iterators). Iterators have the following general characteristics:
