@@ -143,12 +143,17 @@ bind(incr, i)();
 bind(incr, ref(i)();
 ```
 
+Calling member function. Calling virtual member functions also work.
 
-- `mem_fn(op)`: call `op()` as a member function for an object or pointer to object
+```cpp
+for_each(coll.begin(), coll.end(),
+        bind(&Person::print, _1)); // the first argument is this pointer
+```
 
-- `not1(op)`: unary negation `!op(param)`
-
-- `not2(op)`: binary negation `!op(param1, param2)`
+```cpp
+int sum = accumulate(coll.begin(), coll.end(), 0,
+                    bind(plus<int>(), _1, bind(&map<string, int>::value_type::second, _2)));
+```
 
 `bind()` can be used to call global functions
 
@@ -164,6 +169,23 @@ pos = search(str.begin(), str.end(),
             bind(equal_to<char>(), bind(myToupper, _1), bind(myToupper, _2)));
 ```
 
+
+- `mem_fn(op)`: call `op()` as a member function for an object or pointer to object. The placeholder for the object the member function is called for can be skipped.
+
+```cpp
+std::for_each(coll.begin(), coll.end(), std::mem_fn(&Person::print));
+```
+
+However, to bind an additional argument to the function object, `bind()` is still needed:
+
+```cpp
+std::for_each(coll.begin(), coll.end(), 
+            std::bind(std::mem_fn(&Person::print2), std::placeholders::_1, "Person: ));
+```
+
+- (removed in C++20)`not1(op)`: unary negation `!op(param)`;  `not2(op)`: binary negation `!op(param1, param2)`, they can be replaced by `std:;bind(std::logical_not<bool>(), func`. There is no real-world scenario for `not1()` and `not2()`.
+
+- `bind1st`, `bind2st`, `ptr_fun`, `mem_fun`, `mem_fun_ref`, `not1`, `not2` are all deprecated (most are removed in C++17).
 
 # Iterators
 
