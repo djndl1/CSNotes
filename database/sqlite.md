@@ -191,6 +191,90 @@ select * from employees where EmployeeId not between 4 and 6;
 select e.FirstName, e.LastName as Name, g.Name from employees as e, genres as g;
 ```
 
+- A `JOIN` clause is used to combine rows from two or more tables, based on related column between them. There are inner, left (outer), right (outer) and full (outer) joins.
+
+The `INNER JOIN` selects records that have matching values in both tables.
+
+```sql
+select column_names
+from table1
+inner join table2
+on table1.column_name = table2.column_name
+```
+
+```sql
+select distinct artists.ArtistId, artists.Name
+from artists
+inner JOIN albums on artists.Artistid = albums.ArtistId;
+```
+
+The `LEFT JOIN` keyword returns all records from the left table (table1), and the matched records from the right table (table2). The result is `NULL` from the right side, if there is no match. The same for `RIGHT JOIN`.
+
+The `FULL OUTER JOIN` keyword return all records when there is a match in left (table1) or right (table2) table records.
+
+```sql
+SELECT A.CustomerName AS CustomerName1, B.CustomerName AS CustomerName2, A.City
+FROM Customers A, Customers B
+WHERE A.CustomerID <> B.CustomerID
+AND A.City = B.City 
+ORDER BY A.City;
+
+
+select a.Name as Name1, b.Name as Name2, b.GenreId from tracks a, tracks b
+where a.Name <> b.Name and a.GenreId = b.GenreId;
+```
+
+- `UNION`: combine the result-set of two or more `SELECT` statements; Both the result-sets must have the same number of columns and also similar data types for each column.
+
+```sql
+SELECT City FROM Customers
+UNION
+SELECT City FROM Suppliers
+ORDER BY City;
+
+SELECT Address, City FROM Customers
+UNION
+SELECT Address, City FROM Suppliers
+ORDER BY City;
+```
+
+- `GROUP BY`: The `GROUP BY` statement groups rows that have the same values into summary rows
+
+```sql
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+ORDER BY COUNT(CustomerID) DESC;
+
+SELECT Shippers.ShipperName,COUNT(Orders.OrderID) AS NumberOfOrders FROM Orders
+JOIN Shippers ON Orders.ShipperID = Shippers.ShipperID
+GROUP BY ShipperName;
+```
+
+- `HAVING`: `WHERE` could not be used with aggregate functions
+
+```sql
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+HAVING COUNT(CustomerID) > 5;
+
+SELECT Employees.LastName, COUNT(Orders.OrderID) AS NumberOfOrders
+FROM (Orders
+INNER JOIN Employees ON Orders.EmployeeID = Employees.EmployeeID)
+GROUP BY LastName
+HAVING COUNT(Orders.OrderID) > 10;
+```
+
+- `EXISTS`: used to test for the existence of any record in a subquery
+
+```sql
+SELECT SupplierName
+FROM Suppliers
+WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price < 20);
+```
+
+
 
 # SQLite Features
 
