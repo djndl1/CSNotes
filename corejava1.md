@@ -18,7 +18,7 @@ Java is a strongly typed language, with eight _primitive types_.
 
 All floating-point computation follow the IEEE 754 specification. Three flags denoting floating-point values: `Double.POSITIVE_INFINITY`, `Double.NEGATIVE_INIFINITY`, `Double.NaN` are present.
 
-`char` type may represent one character or just part of a Unicode character. `\u` escape unicode characters. Unicode escpae sequences are processed before the code is parsed. In Java, the `char` type describes a _code unit_ in the UTF-16 encoding.
+`char` type may represent one character or just part of a Unicode character. `\u` escape unicode characters. Unicode escape sequences are processed before the code is parsed. In Java, the `char` type describes a _code unit_ in the UTF-16 encoding.
 
 `boolean` cannot be converted into and compared with integers.
 
@@ -48,7 +48,7 @@ The `Math` class contains an assortment of mathematical functions.
 
 ## Strings
 
-Conceptually, Java strings are sequences of Unicode characters.
+Conceptually, Java strings are sequences of Unicode characters. Strings are immutable. 
 
 `.substring()`: extract a substring
 
@@ -59,6 +59,8 @@ Conceptually, Java strings are sequences of Unicode characters.
 `""` is an empty string while a String variable can hold a special value `null`.
 
 `.length()`, `.charAt()` operate by code units. `.codePointCount()`, `codePointAt()` by code points.
+
+String buffers support mutable strings. `StringBuffer` is a thread-safe, mutable sequence of character. It is like a string but can be modified. The principal operations on a StringBuffer` are `append` and `insert`, which are overloaded so as to accept data of any type.
 
 
 ## Statements that break control flow
@@ -79,8 +81,10 @@ label:
 
 Java has a foreach loop
 
-```javafor (variable : collection) statement 
+```java
+for (variable : collection) statement 
 ```
+
 
 `java.util.Arrays` provides many methods to manipulate arrays. static `.Copyof` copy all values of one array into a new array, one of whose common uses is to increase the size of an array.
 
@@ -214,7 +218,7 @@ There is only one reason to make a cast - to use an object in its full capacity 
 
 A class with one or more `abstract` methods must itself be declared abstract. Abstract classes can have concrete methods. Common fields and methods whether abstract or not, should always be moved to the superclass. A class can be declared as `abstract` though it has no abstract methods.
 
-In C++, an abstract method is called _pure virtual function_ with a training `= 0`. In C++, there is no special keyword to denote abstract classes.
+In C++, an abstract method is called _pure virtual function_ with a trailing `= 0`. In C++, there is no special keyword to denote abstract classes.
 
 ## Access control (TODO: may be expanded)
 
@@ -254,6 +258,7 @@ The `Object` class defines the `toString` method to print the class name and the
 getClass().getName + "[field1=" + field1 + ",field2=" + field2 + ... + "]"
 ```
 
+
 The string concatenation operator `+` implicitly calls `toString` methods. 
 
 `"" + x` is a more general way to call `.toString()`. Howevery, arrays does not call its own `toString` instead, they call `object`'s. To correctly print multidimensional arrays, use `Array.deepToString`.
@@ -262,7 +267,7 @@ The `toString` method is a great tool for logging. It is strongly recommended th
 
 ## Object Wrappers and Autoboxing
 
-All primitive types have class counterparts: `integer`, `Long`, `Float`, `Double`, `Short`, `Byte`, `Character` and `Boolean`, inheriting `Number`. Primitive wrappers are all immutable and `final`. It is used when a primitive cannot be used in a generic collection class. Wrapping and unboxing take place automatically between primitive types and wrappers, done by the compiler. Wrappers also have some static related methods.
+All primitive types have class counterparts: `Integer`, `Long`, `Float`, `Double`, `Short`, `Byte`, `Character` and `Boolean`, inheriting `Number`. Primitive wrappers are all immutable and `final`. It is used when a primitive cannot be used in a generic collection class. Wrapping and unboxing take place automatically between primitive types and wrappers, done by the compiler. Wrappers also have some static related methods.
 
 ## Methods with varargs
 
@@ -438,8 +443,7 @@ A lambda expression has three ingredients:
 
 2. parameters
 
-3. values for the free variables, that is, the variables that are not parameters and not defined inside the code. The _captured_ free variables reference valu
-es that don't change. Any captured variable in a lambda expression must be effectively final. 
+3. values for the free variables, that is, the variables that are not parameters and not defined inside the code. The _captured_ free variables reference values that don't change. Any captured variable in a lambda expression must be effectively final. 
  
 A block of code together with the values of the free variables is a _closure_. The body of a lambda expression has the same scope as a nested block. The same rules for name conflicts and shadowing apply. The `this` keyword refers to the `this` parameter of the method that contains the lambda.
 
@@ -465,7 +469,7 @@ If the parameter types of a lambda expression can be inferred, then they can be 
 ```java
 Comparator<String> comp = (first, second) -> first.length() == second.length();
 ```
-The result tuype of a lambda expression is never specified. It is always inferred from context.
+The result type of a lambda expression is never specified. It is always inferred from context.
 
 it is illegal for a lambda expression to return a value in some branches but not in others.
 
@@ -487,7 +491,7 @@ A particularly useful interface in the `java.util.function` package is `Predicat
 
 ```java
 public interface Predicate<T> {
-    boolean test(T, t);
+    boolean test(T t);
     // more
 }
 ```
@@ -613,7 +617,8 @@ public class TalkingClock
 }
 ```
 
-The compiler modifies all inner clas constructors, adding a parameter for the outer class reference. The explicit outer class reference is `OuterClass.this`. The `beep` above can be rewritten as `TalkingClock.this.beep`. The inner object constructor can be `outerObject.new InnerClass(args)`. It is also possible to set the outer reference to another object by eplicitly naming it.
+The compiler mo
+difies all inner class constructors, adding a parameter for the outer class reference. The explicit outer class reference is `OuterClass.this`. The `beep` above can be rewritten as `TalkingClock.this.beep`. The inner object constructor can be `outerObject.new InnerClass(args)`. It is also possible to set the outer reference to another object by eplicitly naming it.
 
 ```java
 var jabberer = new TalkingClock(1000, true);
@@ -884,7 +889,7 @@ walker.forEach(frame -> analyze frame)
 
 - Do not micromanage exceptions. `try`-block should not be used at a micro-level, i.e. statement-level.
 
-- Make good use of the exception hierarchy. Don’t just throw a RuntimeException. Find an appropriate subclass or create your own. Don’t just catch Throwable. It makes your code hard to read and maintain. Respect the difference between checked and unchecked exceptions. Do not hesitate to turn an exception into another exception that is more appropriate.
+- Make good use of the exception hierarchy. Don’t just throw a `RuntimeException`. Find an appropriate subclass or create your own. Don’t just catch `Throwable`. It makes your code hard to read and maintain. Respect the difference between checked and unchecked exceptions. Do not hesitate to turn an exception into another exception that is more appropriate.
 
 - Do not squelch exceptions.
 
@@ -901,7 +906,7 @@ assert condition
 assert condition : expression // expression is passed to the constructor of the `AssertionError` object and tuned into a meesage string
 ```
 
-Both statements evaluate the condition and throw an AssertionError if it is false. 
+Both statements evaluate the condition and throw an `AssertionError` if it is false. 
 
 To enable assertions, running the program with `-enableassertions` or `-ea`. Note that you do not have to recompile your program to enable or disable assertions. Enabling or disabling assertions is a function of the class loader.
 
@@ -957,7 +962,7 @@ use `Level.ALL` to turn on logging for all levels or `Level.OFF` to turn all log
 
 # Generic Programming (Not for application development but for library coding)
 
-Generic programming means writing code that can be reused for objects of many different types. Before generic classes were added to Java, generic programming was achieved with polymorphism. The ArrayList class simply maintained an array of Object references. Casts are everywhere and there is no error checking. Under the hood, Java generics are nothing more implicit casting, using type erasure (erased to `Object` or the first type they are bound to, which is why in Java a primitive type cannot be used in generics). Type information is not retained at runtime, so it cannot do generic specialization. It's nothing like C++ templates.
+Generic programming means writing code that can be reused for objects of many different types. Before generic classes were added to Java, generic programming was achieved with polymorphism. The `ArrayList` class simply maintained an array of Object references. Casts are everywhere and there is no error checking. Under the hood, Java generics are nothing more implicit casting, using type erasure (erased to `Object` or the first type they are bound to, which is why in Java a primitive type cannot be used in generics). Type information is not retained at runtime, so it cannot do generic specialization. It's nothing like C++ templates.
 
 (Java 9) It is possible to use diamonds with anonymous subclasses
 
@@ -1058,6 +1063,10 @@ Generic classes can extend or implement other generic classes.
 
 ## Wildcard Types
 
+https://docs.oracle.com/javase/tutorial/extra/generics/wildcards.html
+
+http://tutorials.jenkov.com/java-generics/wildcards.html
+
 Since `Pair<Manager>` and `Pair<Employee>` are two unrelated classes, a method accepting `Pair<Employee>` cannot accept `Pair<Manager>`. To solve this problem, we can use wildcard types. In a wildcard type, a type parameter is allowed to vary:
 
 ```java
@@ -1068,6 +1077,8 @@ public static void printBuddies(Pair<? extends Employee> p)
    System.out.println(first.getName() + " and " + second.getName() + " are buddies.");
 }
 ```
+
+However, this makes it impossible to call `setFirst` method. `void setFirst(? extends Employee)` refuses to pass any specific type. It is a way of distinguishing between the safe accessor methods and unsafe mutator methods.
 
 Wildcard allows for supertype bound:
 
@@ -1088,12 +1099,17 @@ public static void minmaxBonus(Manager[] a, Pair<? super Manager> result)
 }
 ```
 
-?????????
-
-
 Intuitively speaking, wildcards with supertype bounds let you write to a generic object, while wildcards with subtype bounds let you read from a generic object.
 
-????? TODO
+With unbound wildcards, the return type of an accessor can only be assigned to an `Object`, a mutator method can never be called.
+
+```java
+public static boolean hasNulls(Pair<?> p)
+{
+    return p.getFirst() == null || p.getSecond() == null;
+}
+```
+
 
 ## Reflection and Generics
 
