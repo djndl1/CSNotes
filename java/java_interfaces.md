@@ -49,3 +49,7 @@ Since `clone()` method actually is inherited from the `Object` class, it is one 
 Even if the default shallow copy implemention of `clone` is adequate, `Cloneable` interface still needs implementing and redefining as `public`.
 
 At any rate, cloning is less common than you may think. Less than 5 percent of the classes in the standard library implement `clone`.
+
+# Functional Interfaces
+
+Functional interfaces provide target types for lambda expressions and method references. Each functional interface has a single abstract method, called the functional method for that functional interface, to which the lambda expression's parameter and return types are matched or adapted. Functional interfaces often represent abstract concepts like functions, actions, or predicates.
