@@ -35,9 +35,23 @@ More at [Android Architecture](https://source.android.com/devices/architecture)
 
 . Android allows for different resources to be provided for different devices.
 
+# Model-View-Controller
+
+A model object holds the application's data and business logic. Model classes are typically designed to model the things the app is concerned with.
+
+View objects know how to draw themselves on the screen and how to respond to user input.
+
+Controller objects tie the view and model objects together. They contain application logic. In Android, a controller is typically a subclass of `Activity`, `Fragment` or `Service`.
+
+# Android Build Process
+
+The Android tools take the resources, code, and the `AndroidManifest.xml` (which contains metadata about the application) and turn them into an `.apk` file. `aapt` (Android Asset Packaging Tool) compiles layout file resources into a more cmpact format and packges into the `.apk` file. It is possible to create a view class programmatically in the activity instead of defining them in XML.
+
 # View System
 
+A reference to an inflated widget is obtained by calling `Activity.findViewById()`. A click event is handled by a `View.OnClickListener`.
 
+The `Context` parameter is typically an instance of `Activity` (which is a subclass of Context).
 
 # Activities
 
@@ -45,8 +59,13 @@ Activities serve as the entry point for a user's interaction with an app, and ar
 
 An activity provides the window in which the app draws its UI. Generally, one activity implements one screen in an app. Typically, one activity in an app is specified as the main activity, which is the first screen to appear when the user launches the app. Each activity can then start another activity in order to perform different actions. Although activities work together to form a cohesive user experience in an app, each activity is only loosely bound to the other activities; there are usually minimal dependencies among the activities in an app.
 
+
 # APIs
 
 ## Support Library
 
 With the release of Android 9.0 (API level 28) there is a new version of the support library called `AndroidX` which is part of Jetpack. The AndroidX library contains the existing support library and also includes the latest Jetpack components. 
+
+# Resource
+
+A layout is a resource. A resource is a piece of the application that is not code, things like image files, audio files and XML files.
