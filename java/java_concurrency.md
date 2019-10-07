@@ -98,7 +98,7 @@ The `run` method of a thread cannot throw any checked exceptions, but it can be 
 
 ## Thread Priorities
 
-A thread inherits the priority of the thread that constructed it. You can increase or decrease the priority of any thread with the setPriority method. You can set the priority to any value between `MIN_PRIORITY` (defined as 1 in the Thread class) and `MAX_PRIORITY` (defined as 10). `NORM_PRIORITY` is defined as 5.
+A thread inherits the priority of the thread that constructed it. You can increase or decrease the priority of any thread with the `setPriority` method. You can set the priority to any value between `MIN_PRIORITY` (defined as 1 in the Thread class) and `MAX_PRIORITY` (defined as 10). `NORM_PRIORITY` is defined as 5.
 
 Thread priorities are highly system-dependent. When the virtual machine relies on the thread implementation of the host platform, the Java thread priorities are mapped to the priority levels of the host platform, which may have more or fewer thread priority levels.
 
@@ -111,7 +111,7 @@ The problem is that access to shared data is not atomic, it can be interrupted i
 
 ## Lock Objects
 
-`ReentrantLock`: It is critically important that the unlock operation is enclosed in a finally clause. If the code in the critical section throws an exception, the lock must be unlocked. Otherwise, the other threads will be blocked forever. 
+`ReentrantLock`: It is critically important that the unlock operation is enclosed in a `finally` clause. If the code in the critical section throws an exception, the lock must be unlocked. Otherwise, the other threads will be blocked forever. 
 
 ```java
 myLock.lock();
@@ -143,10 +143,10 @@ public void transfer(int from, int to, int amount) {
    }
    finally {
       bankLock.unlock();
-p   } 
+   } 
 ```
 
- A lock object can have one or more associated condition. There is an essential difference between a thread that is waiting to acquire a lock and a thread that has called await. Once a thread calls the await method, it enters a wait set for that condition. The thread is not made runnable when the lock is available. Instead, it stays deactivated until another thread has called the `signalAll` method on the same condition. When a thread calls `await`, it has no way of reactivating itself.
+ A lock object can have one or more associated condition. There is an essential difference between a thread that is waiting to acquire a lock and a thread that has called `await`. Once a thread calls the `await` method, it enters a wait set for that condition. The thread is not made runnable when the lock is available. Instead, it stays deactivated until another thread has called the `signalAll` method on the same condition. When a thread calls `await`, it has no way of reactivating itself.
 
 `signal()` notifies one thread, which can be dangerous since if this thread's condition has not been satisfied, the whole system deadlocks. 
 
@@ -192,7 +192,7 @@ It is also legal to declare static methods as synchronized. If such a method is 
 
 Do not use lock, conditions or `synchronized` if possible. There are other mechanism in `java.util.concurrent`. Use `synchronized` first if sufficient. Use Lock/Condition for additional power.
 
-Another way to use the intrinsic lock is to use the synchronized block.
+Another way to use the intrinsic lock is to use the `synchronized` block.
 
 ```java
 synchronized (obj) {
@@ -209,7 +209,7 @@ public class Bank
    private var lock = new Object();
    . . .
    public void transfer(int from, int to, int amount) {
-      synchronized (lock) // an ad-hoc lock {
+      synchronized (lock) // an ad-hoc lock, RAII simulation! {
          accounts[from] -= amount;
          accounts[to] += amount;
       }
@@ -277,7 +277,7 @@ Unsatisfied conditions blocks all threads and the program eventually hang. Unfor
 
 Sometimes it is possible to avoid sharing by giving each thread its own instance, using the `ThreadLocal` helper class.
 
-```local
+```java
 public static final ThreadLocal<SimpleDateFormat> dateFormat
    = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
 
@@ -298,12 +298,12 @@ A blocking queue causes a thread to block when you try to add an element when th
 
 Use `put` and `take` when using the queue as a thread management tool.
 
-The `java.util.concurrent` package supplies several variations of blocking queues. By default, the `LinkedBlockingQueue` has no upper bound on its capacity, but a maximum capacity can be optionally specified. The `LinkedBlockingDeque` is a double-ended version. The `ArrayBlockingQueue` is constructed with a given capacity and an optional parameter to require fairness. The `PriorityBlockingQueue` is a priority queue, not a first-in/first-out queue. Elements are removed in order of their priority. A DelayQueue contains objects that implement the `Delayed` interface. Elements can only be removed from a DelayQueue if their delay has elapsed. Java 7 adds a `TransferQueue` interface that allows a producer thread to wait until a consumer is ready to take on an item.
+The `java.util.concurrent` package supplies several variations of blocking queues. By default, the `LinkedBlockingQueue` has no upper bound on its capacity, but a maximum capacity can be optionally specified. The `LinkedBlockingDeque` is a double-ended version. The `ArrayBlockingQueue` is constructed with a given capacity and an optional parameter to require fairness. The `PriorityBlockingQueue` is a priority queue, not a first-in/first-out queue. Elements are removed in order of their priority. A `DelayQueue` contains objects that implement the `Delayed` interface. Elements can only be removed from a `DelayQueue` if their delay has elapsed. Java 7 adds a `TransferQueue` interface that allows a producer thread to wait until a consumer is ready to take on an item.
 
 
 ## Efficient Maps, Sets and Queues
 
-The java.util.concurrent package supplies efficient implementations for maps, sorted sets, and queues: `ConcurrentHashMap`, `ConcurrentSkipListMap`, `ConcurrentSkipListSet`, and `ConcurrentLinkedQueue`. These collections return _weakly consistent iterators_, meaning that these iterators may not reflect all modifications that are made after they were constructed. The concurrent hash map can efficiently support a large number of readers and a fixed number of writers.
+The `java.util.concurrent` package supplies efficient implementations for maps, sorted sets, and queues: `ConcurrentHashMap`, `ConcurrentSkipListMap`, `ConcurrentSkipListSet`, and `ConcurrentLinkedQueue`. These collections return _weakly consistent iterators_, meaning that these iterators may not reflect all modifications that are made after they were constructed. The concurrent hash map can efficiently support a large number of readers and a fixed number of writers.
 
 To atomically update an entry of a map, use `compute` method:
 
@@ -368,7 +368,7 @@ public interface Callable<V>
 }
 ```
 
-A `Future` holds the result of an asynchronous computation. A computation is started and the `Future` is given. The owner of the `Future` object can obtain the result when it is ready.
+A `Future` returns the results of a function, allows determination of whether execution has completed, and provides a means to cancel execution. A `Future` holds the result of an asynchronous computation. A computation is started and the `Future` is given. The owner of the `Future` object can obtain the result when it is ready.
 
 ```java
 V get()                             // blocks until the computation is finished
@@ -394,6 +394,8 @@ Integer result = task.get(); // it's a Future
 
 ## Executors
 
+`Executor` is a simple standardized interface for defining custom thread-like subsystems, including thread pools, asynchronous I/O, and lightweight task frameworks. `ExecutorService` provides a more complete asynchronous task execution framework. An `ExecutorService` manages queuing and scheduling of tasks, and allows controlled shutdown. 
+
 The `Executors` class has a number of static factory methods for constructing thread pools.
 
 - `newCachedThreadPool`: new threads are created as needed; idle threads are kept for 60 seconds;
@@ -408,9 +410,9 @@ The `Executors` class has a number of static factory methods for constructing th
 
 - `newSingleThreadScheduledExecutor`: A single-thread “pool” for scheduled execution.
 
-Submit a Runnable or Callable to an ExecutorService with one of the following methods:
+Submit a `Runnable` or `Callable` to an `ExecutorService` with one of the following methods:
 
-```bash
+```java
 Future<T> submit(Callable<T> task)
 Future<?> submit(Runnable task)
 Future<T> submit(Runnable task, T result)

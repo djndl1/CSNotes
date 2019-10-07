@@ -1,12 +1,20 @@
 # The Java Collection Framework
 
+A _collection_ is an object that represents a group of objects. A collections framework is a unified architecture for representing and manipulating collections, enabling collections to be manipulated independently of implementation details.
+
+The collection interfaces are divided into two groups. 
+
+- `java.util.Collection`
+
+- `java.util.Map` (not true collections): These interfaces contain collection-view operations, which enable them to be manipulated as collection.
+
 ## Separating Collection Interfaces and Implementation.
 
 When you use a queue in your program, you don’t need to know which implementation is actually used once the collection has been constructed. Therefore, it makes sense to use the concrete class only when you construct the collection object. With this approach, if you change your mind, you can easily use a different implementation.
 
 ## The collection Interface
 
-The fundamental interface for collection classes in the Java library is the Collection interface.
+The fundamental interface for collection classes in the Java library is the `Collection` interface.
 
 ```java
 public interface Collection<E>
@@ -79,8 +87,9 @@ The library supplies a class `AbstractCollection` that leaves the fundamental me
 
 ```bash
                                       +----------+
-                                      | Abstract |
-                                      |Collection|
+                                      | Abstract   |
+                                      | Collection |
+                                      |            |
                                       +-----^----+
                                             |
         +------------------------------------------------------------------|----------------+
@@ -166,7 +175,7 @@ for (int i = 0; i < list.size(); i++)
 
 ### Hash Sets
 
-In Java, hash tables are implemented as arrays of linked lists (called _buckets_). As of Java 8, the buckets change from linked lists into balanced binary trees when they get full. To find the place of an object in the table, compute its hash code and reduce it modulo the total number of buckets. The resulting number is the index of the bucket that holds the element. The standard library uses bucket counts that are powers of 2 (any value supplied is automatically rounded), with a default of 16.
+As of Java 8, the buckets change from linked lists into balanced binary trees when they get full. The standard library uses bucket counts that are powers of 2 (any value supplied is automatically rounded), with a default of 16.
 
 If the hash table gets too full, it needs to be rehashed. A table with more buckets is created, all elements are inserted into the new table and the original table is discarded. The _load factor_ (default 75% and rehashed to twice the original size) determines when a hash table is rehashed.
 
@@ -178,8 +187,7 @@ A priority queue retrieves elements in sorted order after they were inserted in 
 
 A typical use for a priority queue is job scheduling.
 
-- `PriorityQueue`: A collection that allows efficient removal of the smallest element, which must be of a class that implements the `Comparable` interface. The iteration over a `PriorityQueue` does not visit the elements
-in sorted order.
+- `PriorityQueue`: A collection that allows efficient removal of the smallest element, which must be of a class that implements the `Comparable` interface. The iteration over a `PriorityQueue` does not visit the elements in sorted order.
 
 - `ArrayDeque`: A double-ended queue that is implemented as a circular array
 
@@ -213,7 +221,7 @@ Set<Map, Entry<K, V>> entrySet()
 
 A collection that manipulates the elements of another container.
 
-(Java 9) introduces static methods yielding a set of list with given lements and a map with given key/value pairs.
+(Java 9) introduces static methods yielding a set of list with given elements and a map with given key/value pairs.
 
 ```java
 List<String> names = List.of("Peter", "Paul", "Mary");
