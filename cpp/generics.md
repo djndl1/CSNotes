@@ -729,3 +729,7 @@ Top level `const`s in either the parameter or the argument are ignored. A functi
 
 CPPSTD17-17.8.2
 
+## SFINAE
+
+https://oopscenities.net/2012/04/30/c-sfinae/
+

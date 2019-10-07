@@ -43,7 +43,7 @@ Iostream objects cannot be declared using standard forward declarations, instead
 
 - Formating is to a great extent possible using the facilities defined in the `ios` class, but also possbile to insert formatting commands directly into streams using manipulators.
 
-- Stream objects are the interface between the objects to be input or or output and the `streambuf` which is responsible for the actual I/O to the device. This allows to construct a new kind of `streambuf` for a new kind of device and use it in combination with `istream`- and `ostream`-class facilities. iostream objects perform formatting roles. Interfacing to new decivecs requires the construction of a new kind of `streambuf` rather than a new kind of stream object. A wrapper class around stream classes eases the access to a special device, which is how the `stringstream` classes were constructed.
+- Stream objects are the interface between the objects to be input or or output and the `streambuf` which is responsible for the actual I/O to the device. This allows to construct a new kind of `streambuf` for a new kind of device and use it in combination with `istream`- and `ostream`-class facilities. `iostream` objects perform formatting roles. Interfacing to new devices requires the construction of a new kind of `streambuf` rather than a new kind of stream object. A wrapper class around stream classes eases the access to a special device, which is how the `stringstream` classes were constructed.
 
 # Class `ios_base`
 

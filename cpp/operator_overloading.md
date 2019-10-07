@@ -262,6 +262,7 @@ default cons
 destructor
 destructor
 destructor
+
 delete[] for: 0x55b827cb5e70of size 32
 ```
 
