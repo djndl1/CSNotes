@@ -1,0 +1,9 @@
+
+
+(dap-register-debug-template "LLDB::Run"
+  (list :type "lldb-mi"
+        :request "launch"
+        :name "LLDB::Run"
+        :terminal "x-terminal-emulator"
+        :target "./a.out"
+        :cwd "${workspaceFolder}"))
