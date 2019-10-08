@@ -43,29 +43,168 @@ View objects know how to draw themselves on the screen and how to respond to use
 
 Controller objects tie the view and model objects together. They contain application logic. In Android, a controller is typically a subclass of `Activity`, `Fragment` or `Service`.
 
-# Android Build Process
+
+# Application Fundamentals
+
+Android apps can be written using Kotlin, Java, and C++ languages. Code along with any data and resources are compiled into an APK (Android package) file. 
+
+Each Android app lives in its own security sandbox. Each app is a different user. The system assigns each app a unique Linux user ID. The system sets permissions for all the files in an app so that only the user ID assigned to that app can access them. Each process has its own virtual machine. Every app runs in its own Linux process. The Android System implements the _principle of least privilege_.
+
+App components are the essential building block of an Android app:
+
+- Activities: a single screen with a user interface;
+
+- Services: runs in the background to perform long-running operations or to perform work for remove processes. They may or may not be noticed by the user. Another component can start the service and let it run or bind to it in order to interact with it.
+
+- Broadcast receivers: enable the system to deliver events to the app outside of a regular user flow, allowing the app to respond to system-wide broadcast announcements. Well-defined entry into an app. Both the system and apps can initiate a broadcast.
+
+- Content providers: manages a shared set of app data that can be stored in the file system, in a SQLite database, on the web, or on any other persistent storage locatioon that the app can access. To the system, a contet provider is an entry pint into an app for publicshing named data items, identified by a URI scheme.
+
+Any app can start another app's component. When the system starts a component, it starts the process for that app if it's not already running and instantiates the classes needed for the component. 
+
+## Activating Components
+
+Activities, services and broadcast receivers are activated by an asynchronous messages called an _intent_. Intents bind individual components to each other at runtime, working as messengers that request an action from other components.
+
+For activities and services, an intent defines the action to perform. For broadcast receivers, the intent simply defines the announcement being broadcast.
+
+Content providers are activated when targeted by a request from a `ContentResolver`. The content resolver handles all direct transactions with the content provider.
+
+### Intent 
+
+TODO
+
+## The manifest file
+
+The system know the components of an app by inspecting its `AndroidManifest.xml`. All the components of the app must be declared in it. The manifest file identifies any user permission the app requires, declares the minimum API level required, declares hardware and software features required, declares API libraries other than the Android framework APIs the app needed to be linked against.
+
+Activities, services, and content providers that you include in your source but do not declare in the manifest are not visible to the system and, consequently, can never run.
+
+## Android Build Process
 
 The Android tools take the resources, code, and the `AndroidManifest.xml` (which contains metadata about the application) and turn them into an `.apk` file. `aapt` (Android Asset Packaging Tool) compiles layout file resources into a more cmpact format and packges into the `.apk` file. It is possible to create a view class programmatically in the activity instead of defining them in XML.
 
-# View System
+## View System
+
+The user interface for an Android app is built as a hierarchy of _layouts_ and _widgets_. The layouts are `ViewGroup`, containers that control how their child views are positioned on the screen. Widgets are `View` objects, UI components.
+
 
 A reference to an inflated widget is obtained by calling `Activity.findViewById()`. A click event is handled by a `View.OnClickListener`.
 
 The `Context` parameter is typically an instance of `Activity` (which is a subclass of Context).
 
-# Activities
+- `FrameLayout`: simplest `ViewGroup` and does not arrange its children in any particular manner. Child views are arranged according to their `android:layout_gravity` attributes.
 
-Activities serve as the entry point for a user's interaction with an app, and are also central to how a user navigates within an app (as with the Back button) or between apps (as with the Recents button). The Android system initiates code in an Activity instance by invoking specific callback methods that correspond to specific stages of its lifecycle. Android apps are built as combination of components that can be invoked individually. When one app invokes another, the calling app invokes an activity in the other app, rather than the app as an atomic whole.
+## Activities
 
-An activity provides the window in which the app draws its UI. Generally, one activity implements one screen in an app. Typically, one activity in an app is specified as the main activity, which is the first screen to appear when the user launches the app. Each activity can then start another activity in order to perform different actions. Although activities work together to form a cohesive user experience in an app, each activity is only loosely bound to the other activities; there are usually minimal dependencies among the activities in an app.
+The Android system initiates code in an `Activity` instantce by invoking specific callback methods that correspond to specific stages of its lifecycle.
 
+The mobile-app experience requires that the app doesn't always begin in the same place. An activity provides the window in which the app draws its UI. Each activity can start another activity in order to perform different actions. An activity provides the window in which the app draws its UI. Although activities work together to form a cohesive user experience in an app, each activity is only loosely bound to the other activities; there are usually minimal dependencies among the activities in an app.
+
+Activities serve as the entry point for a user's interaction with an app, and are also central to how a user navigates within an app (as with the Back button) or between apps (as with the Recents button). Android apps are built as combination of components that can be invoked individually. When one app invokes another, the calling app invokes an activity in the other app, rather than the app as an atomic whole.
+
+### Life Cycle
+
+ The Activity instances in an app transition through different states in their lifecycle. The Activity class provides a number of callbacks that allow the activity to know that a state has changed and take certain actions. Each callback perform specific work that's appropriate to a given change of state.
+
+```
+                                      +-----------+
+                                      | Launched  |
+                                      +-----|-----+
+                                            |
+                                      +-----v-----+
+        +---------------------------->+ onCreate()|
+        |                             +-----|-----+
+        |                                   |
+        |                             +-----v-----+                       +---------------+
+        |                             | onStart() +<----------------------+  onRestart()  |
+        | User navigates              +-----|-----+                       +--------|------+
+        | to the activity                   |                                      ^
+        |                             +-----v-----+                                |
+        |                             |onResume() +<-------------+                 |
+        |                             +-----|-----+              |                 |
+        |                                   |                    |                 |
++-------|----------+                 +--------------+            |                 |
+|  App process     |                 |  Activity    |            | User returns    |
+|     killed       |                 |  running     |            | to the activity |
+|                  |                 |              |            |                 |
++-------|----------+                 +------|-------+            |                 |
+        ^                                   |                    |                 |
+        |                                   |Another activity    |                 |
+        |                                   |in foreground       |                 |
+        | Apps with higher priority    +----v-----+              |                 |  User navigates
+        +------------------------------+onPause() +--------------+                 |  to the activity
+        | need memory                  +----|-----+                                |
+        |                                   | No longer visible                    |
+        |                                   |                                      |
+        |                            +------v-------+                              |
+        +----------------------------+  onStop()    +------------------------------+
+                                     +------|-------+
+                                            | finishing or destroyed by the system
+                                     +------v-------+
+                                     | onDestroy()  |
+                                     +------|-------+
+                                            |
+                                            |
+                                     +------v-------+
+                                     |  shutdown    |
+                                     +--------------+
+
+```
+
+```
+      +---------------+
+      |  Nonexistent  |
+      +--|---------|--+
+         |         ^
+         |         |
+onCreate |         |onDestroy
+         |         |
+      +--v---------|--+
+      |   Stopped     |   Entire lifetime in memory
+      +--|---------|--+             +
+         |         ^                |
+         |         |                |
+onStart  |         |onStop          |
+         v         |                |
+      +--|---------|--+             |
+      |   Paused      |             |  Visible lifetime
+      +--|--------|---+             |  to user
+         |        ^                 |          +
+         |        |                 |          |
+onResume |        |onPause          |          |
+         |        |                 |          |  Foreground lifetime
+      +--v--------|---+             |          |           +
+      |   Resumed     |             |          |           |
+      +---------------+             |          |           |
+                                  <-+        <-+         <-+
+
+```
+
+Rotating the device changes the _device configuration_, a set of characteristics that describe the current state of an individual device, including screen orientation, screen density, screen size, keyboard type, dock mode, language and more. Typically, applications provide alternatives resources to match device configurations. When a runtime configuration change occurs, there may be resources that are a better match for the new configuration. Android destroys the activity, looks for the activity with those resources.
+
+- `onCreate()` (must implement): perform startup logic that should happen only once for the entire life of the activity. Typically, it inflates widgets, gets references to inflated widgets, sets listeners on widgets to handle user interaction, connecting to external model data.
 
 # APIs
+
+## Logging
+
+The `android.util.Log` class sends log messages to a shared system-level log. Verbose logs should never compile into an app except during development. Debug logs are compiled in but stripped at runtime, while error, warning, and info logs are always kept.
+
+The message format is
+
+```bash
+date time PID-TID/package priority/tag: message
+```
 
 ## Support Library
 
 With the release of Android 9.0 (API level 28) there is a new version of the support library called `AndroidX` which is part of Jetpack. The AndroidX library contains the existing support library and also includes the latest Jetpack components. 
 
 # Resource
+
+An app requires resources that are separate from the source code. Using app resources makes it easy to update various characteristics of an app without modifying code. Every resource is given a unique integer ID. Different resources are provided for different device configuration.
+
+TODO
 
 A layout is a resource. A resource is a piece of the application that is not code, things like image files, audio files and XML files.
