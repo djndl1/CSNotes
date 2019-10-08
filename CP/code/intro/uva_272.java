@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-class uva_272 {
+class Main {
     public static void main(String[] args) {
         String tmp;
         boolean quote = false;
