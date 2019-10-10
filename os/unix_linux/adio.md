@@ -28,7 +28,8 @@ Record locking is the term normamlly used to describe the ability of a process t
 
 Record  locks  are  not inherited by a child created via `fork`, but are preserved across an `execve`. Because of the buffering performed by the stdio library,  the  use  of record  locking  with  routines  in  that  package should be avoided; use `read` and `write`instead.
 
- If a process closes any file descriptor referring to a file, then  all of  the  process's  locks on that file are released, regardless of the file descriptor(s) on which the locks were obtained. The threads in a process share locks.  In other words, a multithreaded program can't use record locking to ensure that threads don't simulta‐ neously access the same region of a file. Record locks  are  automatically released when the process terminates.
+ If a process closes any file descriptor referring to a file, then  all of  the  process's  locks on that file are released, regardless of the file descriptor(s) on which the locks were obtained. The threads in a process share locks.  In other words, a multithreaded program can't use record locking to ensure that threads don't simultaneously access the same region of a file. Record locks  are  automatically released when the process terminates.
+
 
 `fcntl` provides advisory record locking, with `F_SETLK`, `F_SETLKW` and `F_GETLK` as commands:
 
@@ -128,6 +129,8 @@ lockfile(int fd)
 	return(fcntl(fd, F_SETLK, &fl));
 }
 ```
+
+## Mandatory Locking
 
 Mandatory locking (enforcement-mode locking) causes the kernel to check every `open`, `read`, and `write` to verify that the calling process isn't violating a lock on the file being accessed. Mandatory locking is enabled for a particular file by turning on the set-group-ID bit and turning off  the group-execute bit (On Linux `mount -o mand` is needed).
 
