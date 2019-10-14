@@ -1,6 +1,6 @@
 Operating system provides user programs with a better, simpler, cleaner, model of the computer.
 
-Most computers have two modes of operation: _kernel mode_ and _user mode_. The operating system runs in kernel mode (also called [supervisor mode](https://en.wikipedia.org/wiki/Protection_ring#Supervisor_mode)), in which, it has access to all the hardware and can execute any instructions the machine is capable of executing. It is sometimes difficult to draw a line between kernel space and user space. Some OSes, specially embedded one, do not have this distinction. Many sensitive OS-related programs run in user mode.
+Most computers have two modes of operation: _kernel mode_ and _user mode_. The operating system runs in kernel mode (also called [supervisor mode](https://en.wikipedia.org/wiki/Protection_ring#Supervisor_mode), usually represented as a bit in the program status word), in which, it has access to all the hardware and can execute any instructions the machine is capable of executing. It is sometimes difficult to draw a line between kernel space and user space. Some OSes, specially embedded one, do not have this distinction. Many sensitive OS-related programs run in user mode.
 
 Operating systems perform two essentially unrelated functions: 
 
@@ -29,3 +29,71 @@ Personal computers, CP/M, DOS, MS-DOS, Mac OS, Windows 95/98/ME, Windows NT, Lin
 ## The Fifth Generation: Mobile Computers
 
 PDA, Android, iOS, Symbian OS, Blackberry OS
+
+# OS zoo
+
+## Mainframe Operating Systems
+
+Large amound of I/O capacity; 
+
+services: batch, transaction processing (large numbers of small requests), timesharing
+
+## Server Operating Systems
+
+print service, file service, web service. Solaris, FreeBSD, Linux, Windows Server
+
+## Multiprocessor Operating Systems
+
+## Personal Computer Operating Systems
+
+All modern ones support multiprogramming.
+
+## Handheld Computer Operating Systems
+
+Android, iOS
+
+## Embedded Operating Systems
+
+Embedded Linux, QNX, VxWorks
+
+## Sensor-Node Operating Systems
+
+Event-driven. TinyOS.
+
+## Real-time Opearting Systems
+
+Hard deadlines, soft deadlines,  sometimes the operating system is simply a library linked in with the application programs, with everything tightly coupled and no protection between parts of the system.
+
+## Smart Card Operating Systems
+
+JVM
+
+# Hardware basics
+
+## CPU
+
+- fetch-decode-execute model
+
+- Program counter; stack pointer; program status word;
+
+- pipeline; superscalar (multiple execute units carrying out instructions from a buffer pool)
+
+Generally, all instructions involving I/O and memory protection are disallowed in user mode. Setting the PSW mode bit to enter kernel mode is also forbidden.
+
+Hyperthreading/hardware multithreading: allows the CPU to hold the state of multiple different threads and then switch back and forth on a nanosecond time scale. This does not offer true parallelism, but thread-switching time is reduced to the order of a nanosecond. Each thread appears to the OS as a separate CPU.
+
+Many CPUs have multiple cores. GPUs have thousands of tiny cores, good for many small computations done in parallel.
+
+## Memory
+
+- Hierarchical architecture; L1 cache: inside the CPU and usually feeds decoded instructions into the CPU's execution engine; L2: several megabytes of recently used memory words.
+
+## Disks
+
+- Surface, cylinder, track, sector
+
+SSDs are not disks at all, they are flash memory.
+
+## Booting
+
+BIOS - Self-Check - find boot devices - bootloader - load the OS
