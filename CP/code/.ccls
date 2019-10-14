@@ -1,0 +1,7 @@
+clang
+-c
+%h -x
+%h c++-header
+%cpp -x
+%cpp c++
+-std=c++14

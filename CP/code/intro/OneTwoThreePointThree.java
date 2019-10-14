@@ -1,7 +1,7 @@
 import java.time.LocalDate;
 import java.util.Scanner;
 
-class  OneTwoThreePointThree {
+class  Main {
     public static void main(String[] args) {
         var in = new Scanner(System.in);
         int y = in.nextInt();
@@ -12,3 +12,5 @@ class  OneTwoThreePointThree {
         System.out.println(day.getDayOfWeek());
     }
 }
+
+

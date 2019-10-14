@@ -1,5 +1,4 @@
 #include <cstdio>
-
 int main(int argc, char *argv[])
 {
     bool quote = false;
@@ -13,5 +12,8 @@ int main(int argc, char *argv[])
             putchar(c);
     }
 
+
     return 0;
 }
+
+

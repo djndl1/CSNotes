@@ -1,0 +1,5 @@
+clang
+-c
+%cpp -x
+%cpp c++
+-std=c++14

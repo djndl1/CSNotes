@@ -18,6 +18,6 @@ A programming contest problem usually contains:
 
 - input and output description: how the input is formatted and how to format the output.
 
-
 - sample input and sample output: usually only trivial test cases, for contestants to check their basic understanding of the problem and to verify if their code can parse the given input using the given input format.
+
 
