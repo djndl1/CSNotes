@@ -270,11 +270,76 @@ HAVING COUNT(Orders.OrderID) > 10;
 
 ```sql
 SELECT SupplierName
+
 FROM Suppliers
 WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price < 20);
 ```
 
+- `ANY`, `ALL`: used with a `WHERE` or `HAVING` clause.
 
+```sql
+SELECT ProductName 
+FROM Products
+WHERE ProductID = ANY (SELECT ProductID FROM OrderDetails WHERE Quantity = 10);
+```
+
+`SELECT INTO`: copies data from one table into a new table.
+
+- `INSERT INTO SELECT`: copies data from one table and inserts it into another
+
+```sql
+INSERT INTO Customers (CustomerName, City, Country)
+SELECT SupplierName, City, Country FROM Suppliers
+WHERE Country='Germany';
+```
+
+- `CASE`: goes through conditions and returns a value when the first condition is met
+
+```sql
+SELECT OrderID, Quantity,
+CASE
+    WHEN Quantity > 30 THEN "The quantity is greater than 30"
+    WHEN Quantity = 30 THEN "The quantity is 30"
+    ELSE "The quantity is under 30"
+END AS QuantityText
+FROM OrderDetails;
+
+SELECT CustomerName, City, Country
+FROM Customers
+ORDER BY
+(CASE
+    WHEN City IS NULL THEN Country
+    ELSE City
+END);
+```
+
+- `IFNULL`: return an alternative if an expression is `NULL`; `COALESCE`: returns a copy of its first non-NULL argument or NULL if all arguments are `NULL`.
+
+```sql
+SELECT ProductName, UnitPrice * (UnitsInStock + IFNULL(UnitsOnOrder, 0))
+FROM Products;
+
+SELECT ProductName, UnitPrice * (UnitsInStock + COALESCE(UnitsOnOrder, 0))
+FROM Products;
+```
+
+- A stored procedure is a prepared SQL code that you can save, so the code can be reused over and over again.
+
+```sql
+CREATE PROCEDURE SelectAllCustomers
+AS
+SELECT * FROM Customers
+GO;
+
+EXEC SelectAllCustomers;
+
+CREATE PROCEDURE SelectAllCustomers @City nvarchar(30)
+AS
+SELECT * FROM Customers WHERE City = @City
+GO;
+
+EXEC SelectAllCustomers @City = "London";
+```
 
 # SQLite Features
 
