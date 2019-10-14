@@ -117,6 +117,7 @@ element_t __median3(element_t A[], size_t left, size_t right, comp_t element_com
 {
         size_t center = (left + right) / 2;
 
+        // a bubble sort
         if (element_comp(A[left], A[center]) > 0)
                 element_swap(&A[left], &A[center]);
         if (element_comp(A[left], A[right]) > 0)

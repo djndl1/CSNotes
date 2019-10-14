@@ -2,7 +2,7 @@
 
 One of the basic rules concerning programming is that no routine should ever exceed a page.
 
-An _abstract data type_ (ADT) is a set of operations. Abstract data types are mathematical abstractions. Objects such as lists, sets, and graphs along with their operations, can be viewed as abstract data types, just as integers, reals, and booleans are data types. There is no rule telling us which operations msut be supported for each ADT; this is a design decision.
+An _abstract data type_ (ADT) is a set of operations. Abstract data types are mathematical abstractions. Objects such as lists, sets, and graphs along with their operations, can be viewed as abstract data types, just as integers, reals, and booleans are data types. There is no rule telling us which operations must be supported for each ADT; this is a design decision.
 
 ## Lists, Stacks, Queues
 
@@ -84,6 +84,7 @@ A path from node $n_1$ to $n_k$ is defined as a sequence of nodes $n_1, n_2, ...
 ### Implementation 
 
 One way is to keep the children of each node in a linked list of tree nodes.
+
 
 ```c
 struct TreeNode {
@@ -478,9 +479,13 @@ int priority_queue_insert(priority_queue_t heap, element_t elm)
 
         size_t i;
         for (i = ++heap->size;
-             element_comp(&heap->elems[i/2], &elm) > 0 || i == 1;
-             i /= 2)
-                heap->elems[i] = heap->elems[i/2];
+             element_comp(&heap->elems[i/2], &elm) > 0;
+             i /= 2) {
+              if (i == 1)
+                break;
+              heap->elems[i] = heap->elems[i/2];
+            
+        }
         heap->elems[i] = elm;
 
         return 0;
@@ -534,6 +539,7 @@ with an average running time $O(N)$ and a worst-case time $O(N \log N)$.
 - The selection problem: the input is a list of $N$ elements, which can be totally ordered. The problem is to find the $k$th largest element. The first way is to make the input a heap and perform $k$ `DeleteMin` operations. The total running time is $O(N + \logN)$. Another way is to build a set (which is implemented as a heap) of $k$ elements. The first $k$ elements are placed in the set and remaining elements are compared with the $k$th largest one by one. If one of the remaining elements is larger than the $k$the element, it is inserted into the set. The total time is $O(k + (N - k)\log k) = O(N \log k)$.
 
 - Event Simulation: TODO
+
 
 #### Heap Sort
 
@@ -679,5 +685,44 @@ The reason why quicksort is faster is that the partitioning step can actually be
 
 For very small arrays ($N \leq 20$) quicksort does not perform as well as insertion sort.
 
+
 TODO
 
+
+# Graph Algorithms
+
+A graph $G = (V, E)$ consists of a set of vertices, $V$, and a set of edges (arcs) $E$. Each edge is a pair $(v, w)$ where $v, w\in V$. If the pair is ordered, then the graph is _directed_. Directed graphs are sometimes referred to as _digraphs_. Vertex $w$ is _adjacent_ to $v$ iff $(v,w) \in E$. An edge can have a third component known as _weight_ or _cost_.
+
+A _path_ in a graph is a sequence of vertices $w_1, w_2, w_3, ..., w_N$ such that $(w_i, w_{i+1}) \in E$ for $1 \leq i < N$. The length of such a path is the number of edges on the path, equal to $N-1$. A _simple_ path is a path such that all vertices are distinct, except that the first and last could be the same.
+
+A _cycle_ in a directed graph is a path of length at least 1 such that $w_1 = w_N$. A directed graph is acyclic (DAG) if it has no cycles.
+
+An undirected graph is connected if there is a path from every vertex to every other vertex. A directed with this property is called _strongly connected_. If the corresponding undirected graph of the directed graph is connected but the directed graph itself is not, then it is _weakly connected_. A _complete graph_ is a graph in which there is an edge between every pair of vertices.
+
+One simple way to represent a graph is to use a two-dimensional array, known as an _adjacency matrix_ representation. The space requirement is $\Theta(\lVert V \rVert ^{2})$, which can be prohibitive of the graph does not have many edges. An adjacency matrix is an appropriate representation if the graph is dense, which is not true in most cases. If a graph is sparse, a better solution is an _adjacency list_ representation. For each vertex, there is a list of all adjacent vertices. The space requirement is $O(|E| + |V|)$. If the edge have weights, then the additional information is also stored in the cells. Adjacency lists are the standard way to represent graphs. Undirected graphs can be similarly represented; each edge appears in two lists. So the space usage essentially doubles. Vertices may have names, and can be mapped to numbers using a hash function. We then record for each internal number the corresponding vertex name, which can be stored in an array of strings or an array of pointers into the hash table.
+
+## Topological Sort
+
+A topological sort is an ordering of vertices in a directed acyclic graph, such that if there is a path from $v_i$ to $v_j$, then $v_j$ appears after $v_i$ in the ordering. A topological ordering is not possible if the graph has a cycle. The ordering is not necessarily unique, any legal ordering will do.
+
+- _indegree_: the number of edges of a vertex
+
+```c
+void topsort(graph_t G)
+{
+    int count;
+    vertex_t v, w;
+    
+    for (count = 0; count < G->num_vertex; count++) {
+        v = find_new_vertex_of_degree_zero();
+        if (!isVertex(v)) {
+            break;
+        }
+        topnum[v] = counter;
+        for each w adjacent to V
+            indegree[w]--;
+    }
+}
+```
+
+Each call takes $O(|V|)$ time. There are $|V|$ such calls, the running time of the algorithm is $O(|V|^2)$.

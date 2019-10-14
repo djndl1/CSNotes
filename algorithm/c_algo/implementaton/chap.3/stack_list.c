@@ -63,7 +63,7 @@ int makeEmpty(stack s)
 void push(stack s, ElementType x)
 {
         node_t n = makeNode(x);
-        n->next = s;
+        n->next = s->next;
         s->next = n;
 }
 
