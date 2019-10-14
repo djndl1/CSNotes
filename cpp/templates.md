@@ -27,8 +27,7 @@ T max (T a, T b);
 int const c = 42;
 max(5, c); // T == int, const is ignored
 int &ir = i;
-max(i, ir); // T == int
-int arr[4];
+max(i, ir); // T == intint arr[4];
 foo(&i, arr); // T == int*
 
 // Automatic type conversion is not considered for deduced template paramters
@@ -153,3 +152,15 @@ Passing by value in general is often better for:
 6. still, even designed for passing by value, it is possible to force passing by reference using `std::ref` and `std::cref`.
 
 In general, function templates don't have to be declared with `inline` unless there are many specializations of templates for specific types.
+
+## Class Templates
+
+Inside a class template, using the class name not followed by template arguments represents the class with its template parameters its arguments.
+
+For class templates, member functions are instantiated only if they are used.
+
+Template arguments only have to provide all necessary operations that are needed instead of all operations that the template requires.
+
+## Concept
+
+Since C++11, some basic constraints are checked by using `static_assert` and some predefined type traits.
