@@ -1,3 +1,4 @@
 a.out
 *ipch
 *.class
+*.ccls-cache
