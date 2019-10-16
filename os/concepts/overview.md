@@ -94,6 +94,12 @@ Many CPUs have multiple cores. GPUs have thousands of tiny cores, good for many 
 
 SSDs are not disks at all, they are flash memory.
 
+## Bus
+
+The main bus is PCIe bus. It has multiple serial lanes that transport different messages, instead of different bits of the same message. The CPU talks to memory over a DDR3 bus, to an external graphics device over PCIe, and to all other devices via a hub over a DMI (Direct Media Interface) bus. 
+
+Intel and M$ designed plug and play, which has the system automatically collect information about the I/O devices, centrally assign interrupt levels and I/O addresses, and then tells each device what its numbers are.
+
 ## Booting
 
 BIOS - Self-Check - find boot devices - bootloader - load the OS
