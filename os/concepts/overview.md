@@ -82,6 +82,7 @@ Generally, all instructions involving I/O and memory protection are disallowed i
 
 Hyperthreading/hardware multithreading: allows the CPU to hold the state of multiple different threads and then switch back and forth on a nanosecond time scale. This does not offer true parallelism, but thread-switching time is reduced to the order of a nanosecond. Each thread appears to the OS as a separate CPU.
 
+
 Many CPUs have multiple cores. GPUs have thousands of tiny cores, good for many small computations done in parallel.
 
 ## Memory
@@ -93,6 +94,18 @@ Many CPUs have multiple cores. GPUs have thousands of tiny cores, good for many 
 - Surface, cylinder, track, sector
 
 SSDs are not disks at all, they are flash memory.
+
+<<<<<<< HEAD
+=======
+## I/O Devices
+
+I/O devices generally consist of two parts: a _controller_ and the device itself. The controller presents a simpler interface to the OS. Each controller has a _device driver_. Each controller manufacturer has to supply a driver for each OS it supports. It may be relinked to the kernel, registered to the system or installed on the fly without rebooting. Controller is operated through the device register, which forms the _I/O port space_.
+
+Interrupt machanism.
+
+DMA chip can control the flow of bits between memory and some controller without constant CPU intervention.
+>>>>>>> refs/remotes/origin/master
+
 
 ## Bus
 
