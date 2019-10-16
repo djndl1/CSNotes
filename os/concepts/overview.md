@@ -95,8 +95,6 @@ Many CPUs have multiple cores. GPUs have thousands of tiny cores, good for many 
 
 SSDs are not disks at all, they are flash memory.
 
-<<<<<<< HEAD
-=======
 ## I/O Devices
 
 I/O devices generally consist of two parts: a _controller_ and the device itself. The controller presents a simpler interface to the OS. Each controller has a _device driver_. Each controller manufacturer has to supply a driver for each OS it supports. It may be relinked to the kernel, registered to the system or installed on the fly without rebooting. Controller is operated through the device register, which forms the _I/O port space_.
@@ -104,8 +102,6 @@ I/O devices generally consist of two parts: a _controller_ and the device itself
 Interrupt machanism.
 
 DMA chip can control the flow of bits between memory and some controller without constant CPU intervention.
->>>>>>> refs/remotes/origin/master
-
 
 ## Bus
 
@@ -116,3 +112,15 @@ Intel and M$ designed plug and play, which has the system automatically collect 
 ## Booting
 
 BIOS - Self-Check - find boot devices - bootloader - load the OS
+
+# OS Concepts
+
+## Process
+
+A program in execution, with its address space, registers, a list of open files, outstanding alarms, lists of related processes, et al. A container that holds all the information needed to run a program. In many OSes, all the information about a process other than the contents of its own address space, is stored in an operating sytem table called the _process table_. A process consists of its address space (_core image_).
+
+## Address Space
+
+- Memory Protection
+
+- Virtual Memory
