@@ -164,3 +164,98 @@ Template arguments only have to provide all necessary operations that are needed
 ## Concept
 
 Since C++11, some basic constraints are checked by using `static_assert` and some predefined type traits.
+
+TODO
+
+## Friends
+
+A friend function can be defined inside a class template, without redeclaring the type parameter. When trying to declare the friend function and define it afterwards:
+
+- implicitly declare a new function template, which must use a different template parameter:
+
+```cpp
+template <typename T>
+class Stack {
+    ...
+    template <typename U>
+    friend std::ostream& operator<< (std::ostream&, Stack<U> const &);
+};
+```
+
+- forward declare the output operator to be a template
+
+```cpp
+template <typename T>
+class Stack;
+
+template <typename T>
+std::ostream& operator<<(std::ostream&, Stack<T> const&);
+
+template <typename T>
+class Stack {
+    friend std::ostream& operator<< <T>(std::ostream&, Stack<T> const&); // a specialization of a nonmember function template as friend
+};
+```
+
+## Specialization of Class Templates
+
+Specializing class templates allows for optimization of implementations for certain types or to fix a misbehavior of certain types for an instantiation of the class template. All member functions must be specialized if a class template is specialized.
+
+```cpp
+template<>
+class Stack<std::string> {
+private:
+    std::deque<std::string> elems;
+
+public:
+    void push(std::string const&);
+    void pop();
+    std::string const &top() const;
+    bool empty() const { return elems.empty(); }
+};
+```
+
+### Partial Specialization
+
+```cpp
+template<typename T>
+class Stack<T*> {
+private:
+    std::vector<T*> elems;
+
+public:
+    void push(T*);
+    T* pop();               // a slightly different interface
+    T* top() const;
+    bool empty() const { return elems.empty(); }
+};
+```
+
+Class templates might also specialize the relationship between multiple template parameters:
+
+```cpp
+template <typename T1, typename T2>
+class MyClass {
+    // ...
+};
+
+template <typename T>
+class <T,T> {
+    // ...
+};
+
+template <typename T>
+class MyClass<T, int> {
+    // ...
+};
+
+template <typename T>
+class MyClass<T*, T*> {
+    // ...
+};
+
+MyClass<int, int> m; // error, ambiguous partial specilization;
+```
+
+If more than one partial specialization matches equally well, the declaration is ambiguous:
+
