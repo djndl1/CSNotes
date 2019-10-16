@@ -252,10 +252,78 @@ class MyClass<T, int> {
 template <typename T>
 class MyClass<T*, T*> {
     // ...
+    
 };
 
 MyClass<int, int> m; // error, ambiguous partial specilization;
 ```
 
 If more than one partial specialization matches equally well, the declaration is ambiguous:
+
+An alias declaration using `using` can be templated to provide a convenient name for a family of types, called _alias template_.
+
+```cpp
+template <typename T>
+using DequeStack = Stack<T, std::deque<T>>;
+
+DequeStack<int> // == Stack<int, std::deque<int>>
+
+template <typename T>
+using MytypeIterator = typename Mytype::iterator;
+```
+
+(C++14) The standard library uses this technique to define shortcuts for all type traits that yields a type.
+
+```cpp
+template <class _Tp> using decay_t = typename decay<_Tp>::type;
+template <class ..._Tp> using common_type_t = typename common_type<_Tp...>::type;
+```
+
+### (C++17) Class Template Argument Deduction
+
+The constructor is reponsible for deducing template parameters (that don't have a default value). 
+
+Be careful when using a string literal, this may result in weird paramter type deduction:
+
+```cpp
+// with Stack(T const& elm);
+Stack stringStack = "bottom"; // Stack<char[7], std::vector<std::allocator<char[7]>>>
+
+// with Stack(T const elm);
+Stack stringStack = "bottom"; // Stack<const char*, std::vector<std::allocator<const char*>>>
+```
+
+In general, when passing arguments of a template type T by reference, the parameter doesn't decay. When passing by value, the parameter decays.
+
+Instead of declaring the constructor to be called by value, we should disable automatically deducing raw character pointers for container classes by using deduction guides:
+
+```cpp
+Stack(const char*) -> Stack<std::string>;
+```
+
+This guide has to appear in the same scope as the class definition.
+
+[C++ Initialization Hell](mikelui.io/2019/01/03/seriously-bonkers.html)
+
+```cpp
+Stack<std::string> strst = "abc"; // error
+
+//no known conversion from 'const char [4]' to 'const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >' for 1st argument
+//    Stack(T const elm);
+```
+
+
+### (C++17) Deduction Guide for Aggregate Class Templates
+
+```cpp
+template <typename T>
+struct ValueWithComment {
+    T value;
+    std::string comment;
+};
+
+ValueWithComment(char const*, char const*) -> ValueWithComment<std::string>;
+
+ValueWithComment vc2 = {"hello" ,"initial value"};
+```
 
