@@ -4,9 +4,9 @@ Most computers have two modes of operation: _kernel mode_ and _user mode_. The o
 
 Operating systems perform two essentially unrelated functions: 
 
-- providing application programmers a clean abstract set of resources instead of the messy hardware ones; OS works as an extended machine. The abstract is the key to managing all the complexity.
+- extended machine: providing application programmers a clean abstract set of resources instead of the messy hardware ones; OS works as an extended machine. The abstract is the key to managing all the complexity.
 
-- managing hardware resources. OS works as a resource manager. Resource management includes multiplexing resources in time (CPU multiprocessing) and in space (virtual memory).
+- resource manager: managing hardware resources. OS works as a resource manager. Resource management includes multiplexing resources in time (CPU multiprocessing) and in space (virtual memory).
 
 # History
 
@@ -159,3 +159,11 @@ A procedure library makes syscalls written in assembly easier to use in C.
 - after handling the syscall, control returns to the user-space procedure;
 
 - the procedure returns to the user program.
+
+### Win32 API
+
+A Windows program is normall event driven.
+
+On Windows, the library calls and the actuall syscalls are highly decoupled. Win32 API are used to get OS services. By decoupling the API interface from the actuall syscalls, Microsoft retains the ability to change the actual syscalls in time. Win32 provides compatibility among versions of Windows.
+
+The Win32 API has a huge number of calls for managing windows, geometric figures, text, fonts, scrollbars, dialog boxes, menus, and other features of the GUI.
