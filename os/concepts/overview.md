@@ -103,6 +103,7 @@ Interrupt machanism.
 
 DMA chip can control the flow of bits between memory and some controller without constant CPU intervention.
 
+
 ## Bus
 
 The main bus is PCIe bus. It has multiple serial lanes that transport different messages, instead of different bits of the same message. The CPU talks to memory over a DDR3 bus, to an external graphics device over PCIe, and to all other devices via a hub over a DMI (Direct Media Interface) bus. 
@@ -124,3 +125,37 @@ A program in execution, with its address space, registers, a list of open files,
 - Memory Protection
 
 - Virtual Memory
+
+## Filesystem
+
+- file, directory
+
+- file descriptor
+
+- mounter file system, special file, pipe
+
+## Protection
+
+access control, privilege
+
+## Shell
+
+IT serves as a good example of how the system calls are used.
+
+## Ontogeny Recapitulates Phylogeny
+
+## Syscalls
+
+A procedure library makes syscalls written in assembly easier to use in C.
+
+- Pushing parameters onto the stack;
+
+- the library procedure puts the syscall number in a place where the OS expects it;
+
+- executes a trap instruction and switches into kernel mode;
+
+- the kernel examines the syscall number and then dispatches to the correct syscall handler;
+
+- after handling the syscall, control returns to the user-space procedure;
+
+- the procedure returns to the user program.
