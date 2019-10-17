@@ -1,3 +1,7 @@
+[C# for Java Developers](https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2008/ms228358(v=vs.90)?redirectedfrom=MSDN)
+
+
+
 # Intro
 
 With .NET Core, all assemblies have a `.dll` extension even if they are Console programs.
@@ -185,5 +189,165 @@ All header information about a library and its dependencies is found in a portio
 - C# 6.0 - M$ .NET 4.6
 
 - C# 7.0 - M$ .NET 4.7
+
+
+# Data Types
+
+## Predefined types
+
+All the fundamental types in C# have both a short name and a BCL name, which is the same across all languages: `System.typeName`
+
+- integer types: `sbyte`, `byte` (8-bit); `short`, `ushort` (16-bit); `int`, `uint` (32-bit), `123u`; `long`, `123l`, `123L`, `ulong` (64-bit), `123ul`; 
+
+- floating-point type: [`float` (32-bit)](https://en.wikipedia.org/wiki/Single-precision_floating-point_format) `8F` ; [`double` (64-bit)](https://en.wikipedia.org/wiki/IEEE_754); there are two properties for a floating-point number: precision and range. For an integer, they are the same.
+
+```python
+# double
+>> sum = 0
+>> for i in range(1,52):
+        sum += (1/2)**i
+
+>> 2**1023*(1+sum)
+1.7976931348623155e+308
+```
+
+```csharp
+string.Format("{0:R}", 1.61234168471843814783718431); // round-trip format
+
+const double number = 1.618033988749895;
+double result;
+string text;
+
+text = $"{number}";
+result = double.Parse(text);
+System.Console.WriteLine($"{result == number}: result == number");
+
+text = string.Format("{0:R}", number);
+result = double.Parse(text);
+System.Console.WriteLine($"{result == number}: result == number");
+```
+
+```bash
+False: result == number
+True: result == number
+```
+
+- decimal float: `decimal` (128-bit), `120M`; maintains exact accuracy for all denary number within the range. Doesn't follow IEEE-754
+
+- boolean types: `bool`, (8-bit)
+
+- character type: `char`, (16-bit), UTF-16, too small for all unicode characters, sometime require two `char`s.
+
+- `_`: digit separator; `9_814_072_356`.
+
+- `e`/`E`: exponent notation is available: `6.023E23`
+
+- `ob`: binary notation is supported
+
+```csharp
+System.Console.WriteLine($"0x{42:X}");
+```
+
+## String Type
+
+- `string`: `@` verbatim string (raw string except for `"`), `$` string interpolation (both can be combined together). String interpolation is a shorthand for invoking the `string.Format()` method. Strings are immutable.
+
+```csharp
+System.Console.WriteLine(@"\nThis is not escaped!");
+
+System.Console.Write(@"begin
+             /\
+            /  \
+           /    \
+          /      \
+         /________\
+end");
+```
+
+```bash
+\nThis is not escaped!
+begin
+             /\
+            /  \
+           /    \
+          /      \
+         /________\
+end
+```
+
+Important Static Methods
+
+- `string.Format()`
+
+- `string.Concat()`
+
+- `string.Compare()`
+
+`using static` directive allows for importing static methods.
+
+Rely on `System.WriteLine()` and `System.Environment.NewLine` rather than ‘\n’ in order to accommodate Windows specific operating system idiosyncrasies with the same code that runs on Linux and iOS.
+
+Use `System.Text.StringBuilder` to construct a long string in multiple steps.
+
+- `null`: the variable does not refer to any valid object. Reference types, pointer types and nullable value types can be assigned the value `null`.
+
+C# provides checked block and uncheked block to decide what should happen if the target data type is too small to contain the assigned data.
+
+Each numeric data type includes a `Parse()`/`TryParse()` function that enables conversion from a string to the corresponding numeric type.
+
+```csharp
+float kgElectronMass = float.Parse("9.11E-31");
+```
+
+Also `System.Convert`:
+
+```csharp
+double middleC = System.Convert.ToDouble("261.626");
+```
+
+(C# 7.0) `out` modifier allows a variable to be declared on the spot when using it as an out argument.
+
+```csharp
+// double number;
+string input;
+
+System.Console.Write("Enter a number: ");
+input = System.Console.ReadLine();
+if (double.TryParse(input, out double number))
+{
+    System.Console.WriteLine(
+        $"input was parsed successfully to {number}."); }
+else
+{
+    // Note: number scope is here too (although not assigned)
+    System.Console.WriteLine(
+        "The text entered was not a valid number.");
+}
+```
+
+All types fall into: 
+
+- value types:
+
+- reference types: in practice, a refrence is always the same size as the native size of the processor.
+
+`?` modifier declares a variable as nullable, which represents values that are missing for a value type. It is useful for database programming.
+
+```csharp
+int? count = null;
+do
+{
+/...
+}
+while (count == null);
+```
+
+`var`: declaring an implicitly typed local variable. It was added mainly to permit use of anonymous types.
+
+```csharp
+      var patent1 =
+          new { Title = "Bifocals",
+          YearOfPublication = "1784" };
+```
 
 
