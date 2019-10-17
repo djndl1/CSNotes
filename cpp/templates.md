@@ -327,3 +327,80 @@ ValueWithComment(char const*, char const*) -> ValueWithComment<std::string>;
 ValueWithComment vc2 = {"hello" ,"initial value"};
 ```
 
+# Nontype Template Parameters
+
+```cpp
+template <typename T, std::size_t Maxsize>
+class Stack {
+private:
+    std::array<T, Maxsize> elems;
+    std::size_t numElems;
+public:
+    Stack();
+    void push(T const& elem);
+    void pop();
+    T const& top() const;
+    bool empty() const { return elems.empty(); }
+    std::size_t size() const { return numElems; }
+};
+```
+
+In general, non-type parameters can be only constant integral values (including enumerations), pointers to objects/functions/members, lvalue references to objects or functions, or `std::nullptr_t`. Floating-point numbers and class-type objects are not allowed as nontype template parameters. When passing template arguments to pointers or references, the objects must not be string literals, temporaries, or data members and other subobjects. __(C++ mess warning!)__ Different standards have different additional linkage constraints. In C++17, it can have [no linkage](https://stackoverflow.com/questions/24864840/difference-between-internal-and-no-linkage).
+
+[Linkage](https://en.wikipedia.org/wiki/Linkage_(software))
+[Internal and External Linkage in C++](http://www.goldsborough.me/c/c++/linker/2016/03/30/19-34-25-internal_and_external_linkage_in_c++/)
+
+## (C++17) Template Paramter Type `auto`
+
+A nontype template parameter can accept genrically any type that is allowed for a nontype parameter.
+
+```cpp
+template <typename T, auto Maxsize>
+class Stack {
+private:
+    std::array<T, Maxsize> elems;
+    std::size_t numElems;
+public:
+    using size_type = decltype(Maxsize);
+
+    Stack();
+    void push(T const& elem);
+    void pop();
+    T const& top() const;
+    bool empty() const { return elems.empty(); }
+    auto size() const { return numElems; } // C++14 auto as a return type
+};
+```
+
+```cpp
+Stack<int, 20u> int20Stack; // uint 20
+Stack<std::string, 40> stringStack; // int 40
+
+std::is_same<decltype(size1), decltype(size2)>::value; // they dont have the same type
+// Also
+_LIBCPP_INLINE_VAR _LIBCPP_CONSTEXPR bool is_same_v
+    = is_same<_Tp, _Up>::value;
+```
+
+Also, it's possible to pass strings as constant arrays:
+
+```cpp
+template <auto T>
+class Message {
+// ...
+};
+
+static char const s[] = "hello";
+Messsage<s> msg2;
+```
+Even `template<decltype<auto> N>` is possible, allowing isntantiation of `N` as a reference.
+
+```cpp
+template <decltype(auto) N>
+class C {};
+
+int i;
+C<(i)> n; // N is int&, note the brackets.
+```
+
+[Note how decltype declares a reference type](https://en.cppreference.com/w/cpp/language/decltype)
