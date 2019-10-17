@@ -348,7 +348,10 @@ public:
 In general, non-type parameters can be only constant integral values (including enumerations), pointers to objects/functions/members, lvalue references to objects or functions, or `std::nullptr_t`. Floating-point numbers and class-type objects are not allowed as nontype template parameters. When passing template arguments to pointers or references, the objects must not be string literals, temporaries, or data members and other subobjects. __(C++ mess warning!)__ Different standards have different additional linkage constraints. In C++17, it can have [no linkage](https://stackoverflow.com/questions/24864840/difference-between-internal-and-no-linkage).
 
 [Linkage](https://en.wikipedia.org/wiki/Linkage_(software))
+
 [Internal and External Linkage in C++](http://www.goldsborough.me/c/c++/linker/2016/03/30/19-34-25-internal_and_external_linkage_in_c++/)
+
+[`const` external linkage in C++ but not in C](https://stackoverflow.com/questions/998425/why-does-const-imply-internal-linkage-in-c-when-it-doesnt-in-c), this actually replaces evil macros. But to enforce compile-time computation, `constexpr` was introduced. [Use of `constexpr` in headers](https://isocpp.org/blog/2018/05/quick-q-use-of-constexpr-in-header-file)
 
 ## (C++17) Template Paramter Type `auto`
 
