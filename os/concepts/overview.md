@@ -4,9 +4,9 @@ Most computers have two modes of operation: _kernel mode_ and _user mode_. The o
 
 Operating systems perform two essentially unrelated functions: 
 
-- providing application programmers a clean abstract set of resources instead of the messy hardware ones; OS works as an extended machine. The abstract is the key to managing all the complexity.
+- extended machine: providing application programmers a clean abstract set of resources instead of the messy hardware ones; OS works as an extended machine. The abstract is the key to managing all the complexity.
 
-- managing hardware resources. OS works as a resource manager. Resource management includes multiplexing resources in time (CPU multiprocessing) and in space (virtual memory).
+- resource manager: managing hardware resources. OS works as a resource manager. Resource management includes multiplexing resources in time (CPU multiprocessing) and in space (virtual memory).
 
 # History
 
@@ -103,6 +103,7 @@ Interrupt machanism.
 
 DMA chip can control the flow of bits between memory and some controller without constant CPU intervention.
 
+
 ## Bus
 
 The main bus is PCIe bus. It has multiple serial lanes that transport different messages, instead of different bits of the same message. The CPU talks to memory over a DDR3 bus, to an external graphics device over PCIe, and to all other devices via a hub over a DMI (Direct Media Interface) bus. 
@@ -124,3 +125,45 @@ A program in execution, with its address space, registers, a list of open files,
 - Memory Protection
 
 - Virtual Memory
+
+## Filesystem
+
+- file, directory
+
+- file descriptor
+
+- mounter file system, special file, pipe
+
+## Protection
+
+access control, privilege
+
+## Shell
+
+IT serves as a good example of how the system calls are used.
+
+## Ontogeny Recapitulates Phylogeny
+
+## Syscalls
+
+A procedure library makes syscalls written in assembly easier to use in C.
+
+- Pushing parameters onto the stack;
+
+- the library procedure puts the syscall number in a place where the OS expects it;
+
+- executes a trap instruction and switches into kernel mode;
+
+- the kernel examines the syscall number and then dispatches to the correct syscall handler;
+
+- after handling the syscall, control returns to the user-space procedure;
+
+- the procedure returns to the user program.
+
+### Win32 API
+
+A Windows program is normall event driven.
+
+On Windows, the library calls and the actuall syscalls are highly decoupled. Win32 API are used to get OS services. By decoupling the API interface from the actuall syscalls, Microsoft retains the ability to change the actual syscalls in time. Win32 provides compatibility among versions of Windows.
+
+The Win32 API has a huge number of calls for managing windows, geometric figures, text, fonts, scrollbars, dialog boxes, menus, and other features of the GUI.

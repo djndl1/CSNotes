@@ -164,3 +164,246 @@ Template arguments only have to provide all necessary operations that are needed
 ## Concept
 
 Since C++11, some basic constraints are checked by using `static_assert` and some predefined type traits.
+
+TODO
+
+## Friends
+
+A friend function can be defined inside a class template, without redeclaring the type parameter. When trying to declare the friend function and define it afterwards:
+
+- implicitly declare a new function template, which must use a different template parameter:
+
+```cpp
+template <typename T>
+class Stack {
+    ...
+    template <typename U>
+    friend std::ostream& operator<< (std::ostream&, Stack<U> const &);
+};
+```
+
+- forward declare the output operator to be a template
+
+```cpp
+template <typename T>
+class Stack;
+
+template <typename T>
+std::ostream& operator<<(std::ostream&, Stack<T> const&);
+
+template <typename T>
+class Stack {
+    friend std::ostream& operator<< <T>(std::ostream&, Stack<T> const&); // a specialization of a nonmember function template as friend
+};
+```
+
+## Specialization of Class Templates
+
+Specializing class templates allows for optimization of implementations for certain types or to fix a misbehavior of certain types for an instantiation of the class template. All member functions must be specialized if a class template is specialized.
+
+```cpp
+template<>
+class Stack<std::string> {
+private:
+    std::deque<std::string> elems;
+
+public:
+    void push(std::string const&);
+    void pop();
+    std::string const &top() const;
+    bool empty() const { return elems.empty(); }
+};
+```
+
+### Partial Specialization
+
+```cpp
+template<typename T>
+class Stack<T*> {
+private:
+    std::vector<T*> elems;
+
+public:
+    void push(T*);
+    T* pop();               // a slightly different interface
+    T* top() const;
+    bool empty() const { return elems.empty(); }
+};
+```
+
+Class templates might also specialize the relationship between multiple template parameters:
+
+```cpp
+template <typename T1, typename T2>
+class MyClass {
+    // ...
+};
+
+template <typename T>
+class <T,T> {
+    // ...
+};
+
+template <typename T>
+class MyClass<T, int> {
+    // ...
+};
+
+template <typename T>
+class MyClass<T*, T*> {
+    // ...
+    
+};
+
+MyClass<int, int> m; // error, ambiguous partial specilization;
+```
+
+If more than one partial specialization matches equally well, the declaration is ambiguous:
+
+An alias declaration using `using` can be templated to provide a convenient name for a family of types, called _alias template_.
+
+```cpp
+template <typename T>
+using DequeStack = Stack<T, std::deque<T>>;
+
+DequeStack<int> // == Stack<int, std::deque<int>>
+
+template <typename T>
+using MytypeIterator = typename Mytype::iterator;
+```
+
+(C++14) The standard library uses this technique to define shortcuts for all type traits that yields a type.
+
+```cpp
+template <class _Tp> using decay_t = typename decay<_Tp>::type;
+template <class ..._Tp> using common_type_t = typename common_type<_Tp...>::type;
+```
+
+### (C++17) Class Template Argument Deduction
+
+The constructor is reponsible for deducing template parameters (that don't have a default value). 
+
+Be careful when using a string literal, this may result in weird paramter type deduction:
+
+```cpp
+// with Stack(T const& elm);
+Stack stringStack = "bottom"; // Stack<char[7], std::vector<std::allocator<char[7]>>>
+
+// with Stack(T const elm);
+Stack stringStack = "bottom"; // Stack<const char*, std::vector<std::allocator<const char*>>>
+```
+
+In general, when passing arguments of a template type T by reference, the parameter doesn't decay. When passing by value, the parameter decays.
+
+Instead of declaring the constructor to be called by value, we should disable automatically deducing raw character pointers for container classes by using deduction guides:
+
+```cpp
+Stack(const char*) -> Stack<std::string>;
+```
+
+This guide has to appear in the same scope as the class definition.
+
+[C++ Initialization Hell](mikelui.io/2019/01/03/seriously-bonkers.html)
+
+```cpp
+Stack<std::string> strst = "abc"; // error
+
+//no known conversion from 'const char [4]' to 'const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >' for 1st argument
+//    Stack(T const elm);
+```
+
+
+### (C++17) Deduction Guide for Aggregate Class Templates
+
+```cpp
+template <typename T>
+struct ValueWithComment {
+    T value;
+    std::string comment;
+};
+
+ValueWithComment(char const*, char const*) -> ValueWithComment<std::string>;
+
+ValueWithComment vc2 = {"hello" ,"initial value"};
+```
+
+# Nontype Template Parameters
+
+```cpp
+template <typename T, std::size_t Maxsize>
+class Stack {
+private:
+    std::array<T, Maxsize> elems;
+    std::size_t numElems;
+public:
+    Stack();
+    void push(T const& elem);
+    void pop();
+    T const& top() const;
+    bool empty() const { return elems.empty(); }
+    std::size_t size() const { return numElems; }
+};
+```
+
+In general, non-type parameters can be only constant integral values (including enumerations), pointers to objects/functions/members, lvalue references to objects or functions, or `std::nullptr_t`. Floating-point numbers and class-type objects are not allowed as nontype template parameters. When passing template arguments to pointers or references, the objects must not be string literals, temporaries, or data members and other subobjects. __(C++ mess warning!)__ Different standards have different additional linkage constraints. In C++17, it can have [no linkage](https://stackoverflow.com/questions/24864840/difference-between-internal-and-no-linkage).
+
+[Linkage](https://en.wikipedia.org/wiki/Linkage_(software))
+
+[Internal and External Linkage in C++](http://www.goldsborough.me/c/c++/linker/2016/03/30/19-34-25-internal_and_external_linkage_in_c++/)
+
+[`const` external linkage in C++ but not in C](https://stackoverflow.com/questions/998425/why-does-const-imply-internal-linkage-in-c-when-it-doesnt-in-c), this actually replaces evil macros. But to enforce compile-time computation, `constexpr` was introduced. [Use of `constexpr` in headers](https://isocpp.org/blog/2018/05/quick-q-use-of-constexpr-in-header-file)
+
+## (C++17) Template Paramter Type `auto`
+
+A nontype template parameter can accept genrically any type that is allowed for a nontype parameter.
+
+```cpp
+template <typename T, auto Maxsize>
+class Stack {
+private:
+    std::array<T, Maxsize> elems;
+    std::size_t numElems;
+public:
+    using size_type = decltype(Maxsize);
+
+    Stack();
+    void push(T const& elem);
+    void pop();
+    T const& top() const;
+    bool empty() const { return elems.empty(); }
+    auto size() const { return numElems; } // C++14 auto as a return type
+};
+```
+
+```cpp
+Stack<int, 20u> int20Stack; // uint 20
+Stack<std::string, 40> stringStack; // int 40
+
+std::is_same<decltype(size1), decltype(size2)>::value; // they dont have the same type
+// Also
+_LIBCPP_INLINE_VAR _LIBCPP_CONSTEXPR bool is_same_v
+    = is_same<_Tp, _Up>::value;
+```
+
+Also, it's possible to pass strings as constant arrays:
+
+```cpp
+template <auto T>
+class Message {
+// ...
+};
+
+static char const s[] = "hello";
+Messsage<s> msg2;
+```
+Even `template<decltype<auto> N>` is possible, allowing isntantiation of `N` as a reference.
+
+```cpp
+template <decltype(auto) N>
+class C {};
+
+int i;
+C<(i)> n; // N is int&, note the brackets.
+```
+
+[Note how decltype declares a reference type](https://en.cppreference.com/w/cpp/language/decltype)
