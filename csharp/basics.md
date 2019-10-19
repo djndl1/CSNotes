@@ -446,3 +446,89 @@ Arrays include additional methods for manipulating the elements within the array
 Variables of type `string` are accessible like an array of characters. 
 
 [Equality Operators](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/equality-operators)
+
+# Operators
+
+Operands are always evaluated from left to right in C#. For `A() + B() * C()`,`A()` is first evaluated then `B()` and finally `C()`, in contrast to C/C++. `M(x++, x++)` with `x=1` is always `M(1,2)`.
+
+# Control Flow
+
+In C#, a local variable is in scope throughout the entire block in which it is declared, but it is illegal to refer to the local variable before its declaration (there might be another variable with the same ).
+
+The following is illegal in C# while totally fine with C++:
+
+```csharp
+int a = 5;
+{
+    a = 6;
+    int a = 8;
+}
+```
+
+- null-coalescing operator: `expr1 ?? expr2`, if `expr1` is null, use `expr2`
+
+```csharp
+string fileName = GetFileName();
+string fullName = fileName ?? "default.txt";
+```
+
+(C# 6.0) - null-conditional operator `?.`: checks whether the operand is null prior to invoking the method or property.
+
+```csharp
+args?.Length // this is equivalent to
+(args != null) ? (int?)args.Length : null
+```
+
+Null-conditional operators can also be used in combination with an index operator
+
+```csharp
+// not of much use though
+      string directoryPath = args?[0];
+      string searchPattern = args?[1];
+```
+
+- foreach loop
+
+```csharp
+foreach(type variable in collection) // `variable` is read-only
+  statement
+```
+
+For a switch-clause, C# does not allow control to accidentally fall through from one switch section to the next. To force a similar behavior, use `goto`. C# 7.0 introduced an improvement to the switch statement that enabled pattern matching.
+
+ C# supports `goto`, and it is the only method for supporting fall-through within a switch statement.
+
+```csharp
+switch (option)
+      {
+          case "/out":
+              isOutputSet = true;
+              isFiltered = false;
+              goto default;
+          case "/f":
+              isFiltered = true;
+              isRecursive = false;
+              goto default;
+          default:
+          ...
+      }
+```
+
+To branch to a switch section label other than the default label, use the syntax `goto case constant`;, where `constant` is the constant associated with the case label you wish to branch to.
+
+C# prevents using `goto` to branch into a code block; instead, `goto` may be used only to branch within a code block or to an enclosing code block. 
+
+# C# Preprocessor Directives
+
+compile-time control
+
+```csharp
+#line org-lien new-line
+
+#region pre-proc-message
+    code
+#endregion
+
+#pragma warning disable
+#pragma warning restore
+```
