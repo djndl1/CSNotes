@@ -350,4 +350,99 @@ while (count == null);
           YearOfPublication = "1784" };
 ```
 
+### (C# 7.0) Tuples
 
+Tuples are a light-weight solution for encapsulating data into a single object.
+
+```csharp
+(string country, string capital, double gdppercapita) =
+            ("Malawi", "Lilongwe", 226.50);
+            
+string country, capita;
+double gdppercapita;
+(country, capita, gdppercapita) = ("Malawi", "Lilongwe", 226.50);
+
+var (country, capital, gdppercapita) = ("Malawi", "Lilongwe", 226.50);
+
+(string country, string capital, double gdppercapita) info =
+            ("Malawi", "Lilongwe", 226.50);
+            
+var info = (Name: "Malawi", Capita, "Lilongwe", Gdppercapita: 226.50);
+// info.Name, info.Capita, info.Gdppercapita
+
+var info = ("Malawi", "Lilongwe", 226.50);
+// info.Item1, info.Item2, info.Item3
+
+(string name, _, double gdppercapita) countryInfo = ("Malawi", "Lilongwe", 225.50);
+var countryInfo = (country, capital, gdpPerCapita);
+```
+
+`System.ValueType` is the underlying implementation for the tuple syntax. The custom names are known by the compiler through the scope where these names are declared. The compiler looks at the item names within the tuple declaration and leverages those to allow code that uses those names within the scope. For all types that are part of the API (such as the return type), the compiler adds item names to the metadata of the member in the form of attributes.
+
+Tuples have more than seven parameter takes a subtuple for the rest of the parameters. `System.valueTTuple.Create()` was used before C# 7.0 tuple syntax.
+
+### Arrays
+
+Most programs now use generic collection types rather than arrays when storing collections of data.
+
+```csharp
+int[,] cellsOne; // 2D
+cellsTwo = {
+    {1, 0, 2},
+    {1, 2, 0},
+    {1, 2, 1}
+};
+int[,] cellsTwo = int[3,3];
+
+```
+
+- `deefault`: explicit default of any data type
+
+```csharp
+int count = default(int)
+```
+
+`new` may specifies the size of an array within the square brackets
+
+```csharp
+string[] languages = new string[9]{
+    "C#", "COBOL", "Java",
+    "C++", "Visual Basic", "Pascal",
+    "Fortran", "Lisp", "J#"};
+```
+
+Assigning an array but not initializing the initial values will still initialize each element.
+
+It is possible to specify the size at runtime
+
+```csharp
+string[] groceryList;
+System.Console.Write("How many items on the list? ");
+int size = int.Parse(System.Console.ReadLine());
+groceryList = new string[size];
+```
+
+It is also possible to define a jagged array, which is an array of arrays.
+
+```csharp
+int[][] cells = {
+    new int[]{1, 0, 2, 0},
+    new int[]{1, 2, 0},
+    new int[]{1, 2},
+    new int[]{1}
+};
+
+int[][] cells = {
+    new int[]{1, 0, 2},
+    new int[]{0, 2, 0},
+    new int[]{1, 2, 1}
+};
+```
+
+Note the difference between a multi-dimensional array and a jagged array. (this is different from in Java, where there is only array of arrays).
+
+Arrays include additional methods for manipulating the elements within the array—for example, `Sort()`, `BinarySearch()`, `Reverse()`, and `Clear()`, through `System.Array`
+
+Variables of type `string` are accessible like an array of characters. 
+
+[Equality Operators](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/equality-operators)
