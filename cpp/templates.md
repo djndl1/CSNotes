@@ -407,3 +407,214 @@ C<(i)> n; // N is int&, note the brackets.
 ```
 
 [Note how decltype declares a reference type](https://en.cppreference.com/w/cpp/language/decltype)
+
+# Variadic Templates
+
+## operator `sizeof...`
+
+`sizeof` for variadic templates expands to the number of elements a paramter pack contains:
+
+```cpp
+template<typename T, typename... Types>
+void print(T first, Types... args)
+{
+    std::cout << sizeof...(Types) << '\n';
+    // or
+    std::cout << sizeof...(args) << '\n';
+}
+```
+
+However, this doesn't work:
+
+```cpp
+template<typename T, typename... Types>
+void print(T first, Types... args)
+{
+    std::cout << first << '\n';
+
+    if (sizeof...(args) > 0) {
+        print(args...);
+    }
+}
+```
+
+Since `print(args...)` in the `if` block is always instantiated since `if` is a run-time decision. We need `if constexpr` to make this work (C++17):
+
+```cpp
+template<typename T, typename... Types>
+void print(T first, Types... args)
+{
+    std::cout << first << '\n';
+
+    if constexpr (sizeof...(args) > 0) {
+        print(args...);
+    }
+}
+```
+
+## (C++17) Fold Expressions
+
+A feature to compute the result of using a binary operator over all the arguments of a parameter pack, with an optional initial value.
+
+```cpp
+(... op pack) == (((pack1 op pack2) op pack3) ... op packN)
+(pack op ...) == (pack1 op (... (packN-1 op packN)))
+(init op ... op pack) == (((init op pack1) op pack2) ... op packN)
+(pack op ... op init) == (pack1 op (... (packN op init)))
+```
+
+```cpp
+template<typename T>
+class AddSpace {
+private:
+    T const& ref;
+public:
+    AddSpace(T const &r) : ref(r) {}
+    friend std::ostream &operator<<(std::ostream &os, AddSpace<T> s)
+        {
+            return os << s.ref << ' ';
+        }
+};
+
+template<typename... Types>
+void print(Types const&... args)
+{
+    (std::cout << ... << AddSpace(args)) << '\n';
+}
+```
+
+It is possible to use a fold expression to traverse a path in a binary tree using `->*`(???):
+
+```cpp
+struct Node {
+    int value;
+    Node* left;
+    Node* right;
+    Node(int i = 0) : value{i}, left{nullptr}, right(nullptr) {}
+};
+
+template<typename T, typename... TP>
+Node* traverse(T np, TP... paths)
+{
+    return (np->* ... ->* paths);
+}
+
+auto left = &Node::left; // pointer to member
+auto right = &Node::right;
+
+Node* node = traverse(root, left, right);
+```
+
+## Applications
+
+One typical application is the forwarding of a variadic number of arguments of arbitrary type.
+
+- shared pointer
+
+- `std::thread`
+
+- `vector.emplace`
+
+## Variadic Class Template and Variadic Expressions
+
+Parameter packs can appear in additional places, including expressions, using declarations, and even deduction guides.
+
+### Variadic Expressions
+
+```cpp
+template<typename... T>
+void printDoubled(T const&... args)
+{
+    print(args + args...);
+}
+printDoubled(7.5, std::string{"Hello"}, std::complex<float>(4.2));
+// it's like
+print(7.5 + 7.5,
+      std::string("Hello") + std::string("Hello"),
+      std::complex<float>(4.2) + std::complex<float>(4.2));
+
+
+template<typename... T>
+void addOne(T const&... args)
+{
+    print(args+1 ...);
+    // or
+    print((args + 1)...);
+}
+
+template<typename T1, typename... TN>
+constexpr bool isHomogeneous(T1, TN...)
+{
+    return (std::is_same<T1, TN>::value && ...);    //fold expression, since C++17
+}
+```
+
+### Variadic Indices
+
+```cpp
+template<typename C, typename... Idx>
+void printElems(C const& coll, Idx... idx)
+{
+    print(coll[idx]...);
+}
+
+std::vector<std::string> coll = {"good", "times", "say", "bye"};
+printElems(coll, 2, 0, 3);
+
+template<std::size_t... Idx, typename C>
+void printIdx(C const& coll)
+{
+    print(coll[Idx]...);
+}
+
+printIdx<2, 0, 3>(coll);
+```
+
+### Variadic Class Template
+
+```cpp
+template<std::size_t...>
+struct Indices {};
+
+template<typename T, std::size_t... Idx>
+void printByIdx(T t, Indices<Idx...>)
+{
+    print(std::get<Idx>(t)...);
+}
+
+std::array<std::string, 5> arr = {"H", "E", "L", "L", "O"};
+printByIdx(arr, Indices<0, 1, 2>);
+```
+
+### (C++17) Variadic Deduction Guides
+
+```cpp
+  template<typename T, typename… U> array(T, U…)
+    -> array<enable_if_t<(is_same_v<T, U> && …), T>,
+             (1 + sizeof…(U))>;
+```
+
+### Variadic Base Classes and `using`
+
+```cpp
+struct CustomerEq {
+    bool operator() (Customer const& c1, Customer const& c2) const {
+      return c1.getName() == c2.getName();
+    }
+};
+ 
+struct CustomerHash {
+    std::size_t operator() (Customer const& c) const {
+      return std::hash<std::string>()(c.getName());
+    }
+};
+ 
+// define class that combines operator() for variadic base classes:
+template<typename… Bases>
+struct Overloader : Bases…
+{
+      using Bases::operator()…;  // OK since C++17
+}; 
+```
+
+This derives `CustomOP` from `CustomerHash` and `CustomerEq` and enable both implementations of `operator()` in the derived class.
