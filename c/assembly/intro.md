@@ -43,3 +43,32 @@ p/FMT expression
 
 x/NFS address // NFS = N Format Size
 ```
+
+## Memory Mapping
+
+- CR3 (Control Register 3): a pointer to the top level of a hierarchical collection of tables in memory which define the translation from virtual addresses to physical addresses. CR3 is filled with the address of the top level table in the hierarchy (Page Map Level 4).
+
+A virtual or logical address is broken into 6 fields:
+
+```
+   63-48               47-39            38-30           29-21           20-12          11-0
++----------------|-----------------|----------------|-------------|-----------------|----------+
+|                |                 |                |             |                 |          |
++----------------|-----------------|----------------|-------------|-----------------|----------+
+     unused          PML-4 index     page directory  page directory page table index  page offset
+                                     pointer index      index
+```
+
+Addresses are 8 bytes so a page stores 512 entries. TODO
+
+- PML-4 index: for a virtual address, an index into the PML4 table. PML4 table is an array of 512 pointers that point to pages of memory. 
+
+- Page directory pointer index: an array of 512 pointers:
+
+- Page directory table:
+
+- Page offset:
+
+The CPU designer have added support for large pages using three levels of the existing tranlation tables, yielding a maximum of $2^{21}$ bytes.
+
+Fast lookup is done through TLB (Translation Lookaside Buffer) after a page translation has been performed and added to the TLB. Typical miss rates are from 0.01% to 1%.
