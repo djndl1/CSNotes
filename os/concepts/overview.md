@@ -167,3 +167,55 @@ A Windows program is normall event driven.
 On Windows, the library calls and the actuall syscalls are highly decoupled. Win32 API are used to get OS services. By decoupling the API interface from the actuall syscalls, Microsoft retains the ability to change the actual syscalls in time. Win32 provides compatibility among versions of Windows.
 
 The Win32 API has a huge number of calls for managing windows, geometric figures, text, fonts, scrollbars, dialog boxes, menus, and other features of the GUI.
+
+## OS Structures
+
+### Monolithic Systems
+
+The most common organization. The entire operating system runs as a single program in kernel mode. The OS is written as a collection of procedures linked together into a single large executable binary program. A crash in any of the procedures will take down the entire OS.
+
+The OS has a basic structure:
+
+- A main program that invokes the requested service procedure;
+
+- A set of service procedures that carry out the syscalls;
+
+- a set of utility procedures that help the service procedures.
+
+### Layered Systems
+
+A more generalized approach is to organize the OS as a hierarchy of layers, each one constructed upon the one below it.
+
+### Microkernels
+
+Puts as little as possible in kernel mode. The basic idea behind the microkernel design is to achieve high reliability by splitting the operating system up into small, well-defined modules, only one of which—the microkernel—runs in kernel mode and the rest run as relatively powerless ordinary user processes, in particular, running each device driver and file system as a separate user process.
+
+Common desktop operating systems do not use microkernels. However, they are dominant in real-time, industrial, avionics, and military applications that are mission critical and have very high reliability requirements.
+
+The MINIX3 OS has a microkernel that handles interrupts, processes, scheduling, interprocess communication, with a set of kernel calls and the clock driver. Outside the kernel, the system is structured as three layers of processes all running in user mode:
+
+- Drivers
+
+- Servers: do most of the work of the OS. File servers manage the file systems; the process manager creates, destroys, and manages processes. the reincarnation server checks if the other servers and drivers are functioning correctly and replaces a faulty one.
+
+- User Programs
+
+This puts the mechanism for doing something in the kernel and let user-mode processes handle the policy.
+
+### Virtual Machines
+
+In order to run virtual machine software on a computer, its CPU must be virtualizable. It is essential that the hardware trap to the virtual machine monitor so that instruction can be emulated in software.
+
+- type 1 hypervisor
+
+- type 2 hypervisor: running on top of a host OS 
+
+Practical hypervisors use a hybrid strategy. They add a kernel module to do the heavy lifting.
+
+- Paravirtualization
+
+- The Java virtual machine
+
+### Exokernels
+
+
