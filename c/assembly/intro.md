@@ -72,3 +72,62 @@ Addresses are 8 bytes so a page stores 512 entries. TODO
 The CPU designer have added support for large pages using three levels of the existing tranlation tables, yielding a maximum of $2^{21}$ bytes.
 
 Fast lookup is done through TLB (Translation Lookaside Buffer) after a page translation has been performed and added to the TLB. Typical miss rates are from 0.01% to 1%.
+
+# Registers
+
+- 16 general-purpose 64-bit registers: `rax`, `rbx`, `rcx`, `rdx`, `rsi`, `rdi`, `rbp`, `r8`-`r15`. The old 32-bit and 16-bit registers are still available as lower part of the 64-bit registers: `eax`/`ax`, `ebx`/`bx` ... `r8b`/`r8w`,`r8d`
+
+- 16 modern floating-point registers (128- or 256-bit)
+
+- 64-bit instruction pointer register `rip` (PC)
+
+- 64-bit flag register `rflags`: currently only 32 bits (`eflags`) are used. The flag register is usually not referred to directly. Conditional instructions are used which internally access  or more flags of the flag register to determine what action to take.
+
+Software can access the 64-bit registers as 64-bit, 32-bit, 6-bit and 8-bit values.
+
+## Moving Data
+
+Immediate operands can be 1, 2, or 4 bytes for most instructions. `mov` allows 8 byte immediate values.
+
+```assembly
+mov     rax, 100
+mov     eax, 100 // shorted, sometimes preferred.
+```
+
+Moving a 32-bit constant into a 64-bit register will clear out the top half. 
+
+```assembly
+mov   rax, [a]  ; load from memory
+```
+
+Also
+
+- `movzx`: move and zero extend
+
+- `movsx`: move and sign extend
+
+```assembly
+movsx   rax, byte [data] ; move byte, sign extend
+movzx   rbx, word [sum]  ; move word, zero extend
+movsxd  rcx, dword [count] ; move dword, sign extend
+```
+
+```assembly
+mov   [a], rax  ; move data from rax to a
+mov   rbx, rax  ; move data from rax to rbx
+```
+
+# Math
+
+- `neg`: two's complement of its operand, which can be either a general-purpose register or a memory reference; it sets the sign flag (SF) and the zero flag (ZF).
+
+```assembly
+neg   rax
+neg   dword [x]
+neg   byte  [x]
+```
+
+- `add`: add the contents of the source to the destination; the source can be an immediate value of 32 bits, a memory reference or a register. Only one of the operands can be a memory reference. `SF` is set to the sign bit of the result; the zero flag `ZF` is set if the result is 0; the overflow flag (OF) is set if the addition overflows.
+
+- `inc`: increment
+
