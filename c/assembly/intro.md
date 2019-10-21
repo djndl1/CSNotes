@@ -117,7 +117,7 @@ mov   [a], rax  ; move data from rax to a
 mov   rbx, rax  ; move data from rax to rbx
 ```
 
-# Math
+# Arithmetic
 
 - `neg`: two's complement of its operand, which can be either a general-purpose register or a memory reference; it sets the sign flag (SF) and the zero flag (ZF).
 
@@ -125,9 +125,27 @@ mov   rbx, rax  ; move data from rax to rbx
 neg   rax
 neg   dword [x]
 neg   byte  [x]
+
 ```
 
 - `add`: add the contents of the source to the destination; the source can be an immediate value of 32 bits, a memory reference or a register. Only one of the operands can be a memory reference. `SF` is set to the sign bit of the result; the zero flag `ZF` is set if the result is 0; the overflow flag (OF) is set if the addition overflows.
 
 - `inc`: increment
 
+- `sub`: substract the contents of the source from the destination
+
+- `dec`
+
+- `mul`: unsigned integer multiplication
+
+- `imul`: signed integer multiplication
+
+1. `quad` multiplies `rax` by the source (register or memory reference)and stores the result in `rdx`(high):`rax`(low);
+
+2. multiplies the destination by the source
+
+3. multiplies the first source by the second (register or memory) and store in the destination
+
+`CF` and `OF` flags are set when the product exceeds 64 bits, unless a smaller multiply is requested.
+
+- `idiv`/`div`: takes `rdx`:`rax` as the dividend and takes a single operand (register or memory reference)
