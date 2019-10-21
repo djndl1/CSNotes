@@ -1,3 +1,6 @@
+https://www.codeproject.com/Articles/45788/The-Real-Protected-Long-mode-assembly-tutorial-for
+
+
 Modern C/C++ compilers do excellent optimization and beginning assembly programmers are no match for a good compiler. It is unlikely for assembly to outperform C/C++ for most general purpose tasks. One advantage of assembly language is that it can do things not possible in high level languages.
 
 > A typical C program has a `main` function which is called indirectly via a `_start` function in the C library.
@@ -149,3 +152,20 @@ neg   byte  [x]
 `CF` and `OF` flags are set when the product exceeds 64 bits, unless a smaller multiply is requested.
 
 - `idiv`/`div`: takes `rdx`:`rax` as the dividend and takes a single operand (register or memory reference)
+
+There are a collection of conditional move instructions which can be used profitably rather than using branching.
+
+- `cmovnz`/`cmovz`: move if zero flag (not) set
+
+- `cmovl`/`cmovlz`: move if the result was negative (or zero)
+
+- `cmovg`/`cmovge`: move if the result was positive (or zero)
+
+```assembly
+; abs()
+mov rbx, rax
+neg rax
+cmovl rax, rbx
+```
+
+If a value from memory is used in more than 1 operation, it might be faster to move into a register first.
