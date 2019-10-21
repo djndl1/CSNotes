@@ -465,7 +465,8 @@ int a = 5;
 }
 ```
 
-- null-coalescing operator: `expr1 ?? expr2`, if `expr1` is null, use `expr2`
+- null-coalescing operator: `expr1 ?? exp
+r2`, if `expr1` is null, use `expr2`
 
 ```csharp
 string fileName = GetFileName();
@@ -848,9 +849,12 @@ When the compiler must choose which of several applicable methods is the best on
       {
           Console.WriteLine($"Goodbye { firstName }");
       }
+      
 
 ```
 
 As soon as the runtime determines that the exception will be unhandled, it checks whether a debugger is installed on the machine, because you might be the software developer who is analyzing this failure. If a debugger is present, it offers the user the chance to attach the debugger to the process before the finally block runs. If there is no debugger installed or if the user declines to debug the problem, the default behavior is to print the unhandled exception to the console, and then see if there are any finally blocks that could run.the runtime is not required to run finally blocks in this situation; an implementation may choose to do so or not. 
 
 All objects thrown as exceptions derive form `System.Exception`. 
+
+It is possible to specify a catch block that takes no parameters (general catch block). It is equivalent to speicifying a catch block that takes an `object` data type. Following a System.Exception catch block with a general catch block in C# 2.0 or later will result in a compiler warning indicating that the general catch block will never execute. AVOID general catch blocks and replace them with a catch of `System.Exception`.
