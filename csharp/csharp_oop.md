@@ -208,3 +208,84 @@ class Employee
 ## static class
 
 A class with no data field should be declared as `static` to prevent instantiation. The compiler automatically marks it as `abstract` and `sealed` within the CIL, rendering it inextensible.
+
+## Extension Methods
+
+The creation of an instance method on a different class can simulated via _extension methods_.
+
+```csharp
+public static class DirectoryInfoExtension
+{
+  public static void CopyTo(
+      this DirectoryInfo sourceDirectory, string target,
+      SearchOption option, string searchPattern)
+  {
+      // ...
+  }
+}
+  // ...
+      DirectoryInfo directory = new DirectoryInfo(".\\Source");
+      directory.CopyTo(".\\Target",
+          SearchOption.AllDirectories, "*");
+  // ...
+```
+
+As if `DirectoryInfo` has a method `CopyTo`, but actually a `static` method. However, specializing a type via inheritance is preferable to using an extension method.
+
+## `const`, `readonly`
+
+- In C#, `const` in a class is `static` automatically. Changing a public constant won't take effect since the constant has been compiled into the client code.
+
+- `readonly`: modifiable only from inside the constructor or via an initializer during declaration. Use a `readonly` or automatically implemented properties for arrays to freeze the array instance. The elements of the array are still writeable.
+
+## Nested Classes
+
+It is possible to define a class within a class. 
+
+Treat `public` nested classes with suspicion. 
+
+The `this` member within a nested class refers to an instance of the nested class. A nested class can access any member on the containing class, including private members.
+
+## Partial Classes
+
+Partial classes are portions of a class that the compiler can combine to form a complete class. The general purpose of a partial class is to allow the splitting of a class definition across multiple files.
+
+```csharp
+partial class Program
+{
+}
+```
+
+Another common use of partial classes is to place any nested classes into their own files, in accordance with the coding convention that places each class definition within its own file.
+
+```csharp
+// File: Program.cs
+partial class Program
+{
+  static void Main(string[] args)
+  {
+    CommandLine commandLine = new CommandLine(args);
+
+    switch (commandLine.Action)
+    {
+       // ...
+    }
+  }
+}
+// File: Program+CommandLine.cs
+partial class Program
+{
+  // Define a nested class for processing the command line.
+  private class CommandLine
+  {
+     // ...
+  }
+}
+```
+
+## Partial Methods
+
+Partial methods are allowed only within partial classes, and like partial classes, their primary purpose is to accommodate code generation. Partial methods allow for a declaration of a method without requiring an implementation. Any partial method must return `void`.
+
+In summary, partial methods allow generated code to call methods that have not necessarily been implemented. Furthermore, if there is no implementation provided for a partial method, no trace of the partial method appears in the CIL. This helps keep code size small while keeping flexibility high.
+
