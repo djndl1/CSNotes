@@ -169,3 +169,35 @@ cmovl rax, rbx
 ```
 
 If a value from memory is used in more than 1 operation, it might be faster to move into a register first.
+
+# Bit Operations
+
+- `not`: applied to bytes, words, double words, quad-words in registers or in memory
+
+- `and`
+
+- `or`
+
+- `xor`
+
+- `shl`/`shr`/`sal`: shift left/right
+
+- `sar`: propogates the sign bit into the newly vacated positions
+
+To extract a bit field form a word, shift the word right until the right most bit of the field is in the least significant bit position then mask it. To place some bits into position, clear the bits and `or` a mask.
+
+- `rol`/`ror`: rotate left/right 
+
+- `bt`: bit test, sets the carry flag to the value of the bit being tested
+
+- `bts`/`btr`: bit test and set/reset
+
+```assembly
+mov rax, [sample]
+ror rax, 23
+shr rax, 29    ; clear the lower 29 bits
+shl rax, 29
+or rax, [field]
+rol rax, 23
+mov [sample], rax
+```
