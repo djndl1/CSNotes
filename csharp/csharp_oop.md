@@ -289,3 +289,159 @@ Partial methods are allowed only within partial classes, and like partial classe
 
 In summary, partial methods allow generated code to call methods that have not necessarily been implemented. Furthermore, if there is no implementation provided for a partial method, no trace of the partial method appears in the CIL. This helps keep code size small while keeping flexibility high.
 
+
+# Inheritance
+
+The C# compiler allows an explicit conversion at compile time between potentially compatible types, the CLR will still verify the explicit cast at execution time, throwing an exception if the object instance is not actually of the targeted type.
+
+- Defining Custom Conversions
+
+Similar to C++
+
+```csharp
+class GPSCoordiates
+{
+    public static implicit operator UTMCoordinates(GPSCoordiates coordinates)
+    {
+    
+        // an implicit conversion from GPSCoordiates to UTMCoordinates
+    }
+}
+```
+
+
+every derived class may be used as an instance of any of its base classes, an extension method on one type also extends every derived type.
+
+for the rare cases that require a multiple-inheritance class structure, one solution is to use aggregation
+
+- `sealed` (= Java `final`) class: a class that cannot be derived from; a method that cannot be overriden
+
+- `virtual`: overridable, dynamic dispatch; the derived class overrides it with `override`
+
+- `new`: it hides a redeclared member of the derived class from the base class. Instead of calling the most derived member, a member of the base class calls the most derived member in the inheritance chain prior to the member with the new modifier. If neither override nor new is specified, new will be assumed. This ensures virtual dispatch for certain derived while it provides total independence for some derived class on this method.
+
+```csharp
+public class Program
+{
+  public class BaseClass
+  {
+      public void DisplayName()
+      {
+          Console.WriteLine("BaseClass");
+      }
+  }
+
+    public class DerivedClass : BaseClass
+    {
+        // Compiler WARNING: DisplayName() hides inherited
+        // member. Use the new keyword if hiding was intended.
+        public virtual void DisplayName()
+        {
+            Console.WriteLine("DerivedClass");
+        }
+    }
+
+  public class SubDerivedClass : DerivedClass
+  {
+      public override void DisplayName()
+      {
+          Console.WriteLine("SubDerivedClass");
+      }
+  }
+
+  public class SuperSubDerivedClass : SubDerivedClass
+  {
+      public new void DisplayName()
+      {
+          Console.WriteLine("SuperSubDerivedClass");
+      }
+  }
+
+  public static void Main()
+  {
+      SuperSubDerivedClass superSubDerivedClass
+          = new SuperSubDerivedClass();
+
+      SubDerivedClass subDerivedClass = superSubDerivedClass;
+      DerivedClass derivedClass = superSubDerivedClass;
+      BaseClass baseClass = superSubDerivedClass;
+
+      superSubDerivedClass.DisplayName();
+      subDerivedClass.DisplayName();
+      derivedClass.DisplayName();
+      baseClass.DisplayName();
+  }
+}
+```
+
+```bash
+SuperSubDerivedClass
+SubDerivedClass
+SubDerivedClass
+BaseClass
+```
+
+Programmers sometimes need to designate explicitly which base constructor to call inside the derived class constructor.
+
+- `is`: determines what the underlying type is. (C# 7.0) check and assign the result to a new variable
+
+```csharp
+public static void Save(object data)
+{
+  if (data is string text && text.Length > 0)
+  {
+      data = Encrypt(text);
+      // ...
+  }
+  else if (data is null)
+  {
+      throw new ArgumentNullException(nameof(data));
+  }
+  // ...
+}
+```
+
+- `as`: attempts a conversion to a particular data type and assigns `null` if the source type is not inherently of the target type. This strategy is significant because it avoids the exception that could result from casting.
+
+## Pattern Matching
+
+Some kind of RTTI?
+
+```csharp
+static public void Eject(Storage storage)
+{
+  switch (storage)
+  {
+      case null: // The location of case null doesn't matter
+          throw new ArgumentNullException(nameof(storage));
+      // ** Causes compile error because case statments below
+      // ** are unreachable.
+      // case Storage tempStorage:
+      //    throw new Exception();
+      //    break;
+      case UsbKey usbKey when usbKey.IsPluggedIn:
+          usbKey.Unload();
+          Console.WriteLine("USB Drive Unloaded!");
+          break;
+      case Dvd dvd when dvd.IsInserted:
+          dvd.Eject();
+          Console.WriteLine("DVD Ejected!");
+          break;
+      case Dvd dvd when !dvd.IsInserted:
+          throw new ArgumentException(
+              "There was no DVD present.", nameof(storage));
+      case HardDrive hardDrive:
+          throw new InvalidOperationException();
+      default:   // The location of case default doesn't matter
+          throw new ArgumentException(nameof(storage));
+  }
+}
+```
+
+Pattern matching should only be used when polymorphism is not an option.
+
+## Abstract Class
+
+An abstract member is a method or property that has no implementation. Its purpose is to force all derived classes to provide the implementation. Abstract members are intended to be a way to enable polymorphism.
+
+`System.Object.Equals`, `System.Object.GetHashCode`, `System.Object.ToString`, `System.Object.Finalize` etc. are intended to be polymorphic.
