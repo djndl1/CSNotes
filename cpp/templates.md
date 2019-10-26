@@ -46,7 +46,7 @@ void (T = "");
 f(); // OK
 ```
 
-When there is no connection between template and call parameters and when template parameters cannot be determined, the template argument must be explicitly specified. Template argument deduction does not take return types into account.
+When there is no connection between template parameters and call parameters and when template parameters cannot be determined, the template argument must be explicitly specified. Template argument deduction does not take return types into account.
 
 ```cpp
 template <typename T1, typename T2, typename RT>
@@ -129,7 +129,7 @@ RT max(T1 a, T2 b)
 
 ### Overloading
 
-1. A nontemplate function can coexist with a function template that has the same name and can be instantiated with the same type. All other factors being equal, the overload resolution process preferes the nontemplate over one generated from the template. If the template can generate a function with a better match, the template is selected.
+1. A nontemplate function can coexist with a function template that has the same name and can be instantiated with the same type. All other factors being equal, the overload resolution process prefers the nontemplate over one generated from the template. If the template can generate a function with a better match, the template is selected.
 
 2. Multiple function templates with the same name can coexist:
 
@@ -618,3 +618,49 @@ struct Overloader : Bases…
 ```
 
 This derives `CustomOP` from `CustomerHash` and `CustomerEq` and enable both implementations of `operator()` in the derived class.
+
+# Tricky Basics
+
+- In general, `typename` has to be used whenever a name that depends on a template parameter is a type.
+
+- Zero Initialization: 
+
+```cpp
+T x{};  // works even if the constructor is explicit
+T x = T(); // only works if the constructor selected for the copy-initialization is not `explicit` before C++17
+```
+
+```cpp
+template<typename T>
+class MyClass {
+private:
+    T x;
+public:
+    MyClass() : x{} {}
+};
+
+// C++11
+template<typename T>
+class MyClass {
+private:
+    T x{};
+    ...
+}
+```
+
+However, for default arguments, it must be:
+
+```cpp
+template<typename T>
+void foo(T p = T{}) {
+    //...
+}
+```
+
+- For class templates with base classes that depend on template parameters, using a name `x` by itself is not always equivalent to `this->x`, even though a member `x` is inherited. As a rule of thumb, use `this->` or `Base<T>::`.
+
+- It is possible to use a template template parameter:
+
+```cpp
+
+```
