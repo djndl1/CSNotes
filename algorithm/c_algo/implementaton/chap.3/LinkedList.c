@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "../lib/xmalloc.h"
+
 struct Node {
         ElementType Element;
         Position    Next;
@@ -13,10 +15,7 @@ struct Node {
 
 List MakeEmpty(List L)
 {
-        if ((L = malloc(sizeof(struct Node))) == NULL) {
-                fprintf(stderr, "Failed to create a list");
-                return NULL;
-        }
+        L = xmalloc(sizeof(struct Node));
         L->Next = NULL;
         L->Element = 0;
 
@@ -71,11 +70,7 @@ void insert(List L, ElementType X, Position P)
 {
         Position tempCell;
 
-        if ((tempCell = malloc(sizeof(struct Node))) == NULL) {
-                fprintf(stderr, "out of space");
-                return;
-        }
-
+        tempCell = xmalloc(sizeof(struct Node));
         tempCell->Element = X;
         tempCell->Next = P->Next;
         P->Next = tempCell;

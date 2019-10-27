@@ -1,4 +1,4 @@
-/* When designing a ctor-like interface that may allocate some memory, 
+/* When designing a ctor-like interface that may allocate some memory,
  * return the pointer instead of returning by argument, in which
  * case the outer variable will not be initialized, causing memory
  * leak.
@@ -7,6 +7,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "../lib/xmalloc.h"
 
 typedef struct Term *pTerm;
 
@@ -29,8 +31,7 @@ typedef pTerm Polynomial;
 pTerm makeTerm(int coef, int exp)
 {
         pTerm tmp;
-        if ((tmp = malloc(sizeof(struct Term))) == NULL)
-                return NULL;
+        tmp = xmalloc(sizeof(struct Term));
         tmp->Coefficient = coef;
         tmp->Exponent = exp;
         tmp->Next = NULL;
@@ -48,19 +49,11 @@ pTerm makeTerm(int coef, int exp)
 Polynomial ZeroPolynomial(void)
 {
         Polynomial poly = makeTerm(0, 0);
-        if (poly == NULL)
-                goto poly_fail;
         pTerm zeroTerm = makeTerm(0, 0);
-        if (zeroTerm == NULL)
-                goto zero_fail;
+
         poly->Next = zeroTerm;
 
         return poly;
-
-zero_fail:
-        free(poly);
-poly_fail:
-        return NULL;
 }
 
 /**
@@ -99,8 +92,6 @@ int addTerm(Polynomial poly, int exp, int coef)
         pTerm pos = findPosition(poly, exp);
         if (pos->Next == NULL) {
                 pTerm tmp = makeTerm(coef, exp);
-                if (tmp == NULL)
-                        return -1;
                 pos->Next = tmp;
                 return 0;
         }
@@ -109,8 +100,6 @@ int addTerm(Polynomial poly, int exp, int coef)
                 pos->Next->Coefficient += coef;
         } else {
                 pTerm tmp = makeTerm(coef, exp);
-                if (tmp == NULL)
-                        return -1;
                 tmp->Next = pos->Next;
                 pos->Next = tmp;
         }
@@ -148,8 +137,6 @@ void deleteSubPolynomial(pTerm term)
 Polynomial dupPolynomial(const Polynomial old)
 {
         Polynomial new = ZeroPolynomial();
-        if (new == NULL)
-                return NULL;
 
         pTerm nTerm = new->Next;
         pTerm oTerm = old->Next;
@@ -161,10 +148,6 @@ Polynomial dupPolynomial(const Polynomial old)
         oTerm = oTerm->Next;
         while (oTerm != NULL) {
                 pTerm newTerm = makeTerm(oTerm->Coefficient, oTerm->Exponent);
-                if (newTerm == NULL) {
-                        deleteSubPolynomial(new->Next->Next);
-                        return NULL;
-                }
                 nTerm->Next = newTerm;
                 nTerm = nTerm->Next;
                 oTerm = oTerm->Next;
@@ -184,42 +167,31 @@ Polynomial dupPolynomial(const Polynomial old)
 Polynomial addPolynomial(const Polynomial first,const Polynomial second)
 {
         Polynomial result;
-        if ((result = ZeroPolynomial()) == NULL)
-                goto zero_fail;
-        if ((result = dupPolynomial(first)) == NULL)
-                goto dup_fail;
+        result = ZeroPolynomial();
+        result = dupPolynomial(first);
 
         pTerm tmp = second->Next;
         while (tmp != NULL) {
-                if (addTerm(result, tmp->Exponent, tmp->Coefficient) != 0)
-                        goto dup_fail;
+                addTerm(result, tmp->Exponent, tmp->Coefficient);
                 tmp = tmp->Next;
         }
         return result;
-
-dup_fail: deleteSubPolynomial(result);
-zero_fail: return NULL;
 }
 
 
 Polynomial multiplyPolynomial(const Polynomial first, const Polynomial second)
 {
         Polynomial result;
-        if ((result = ZeroPolynomial()) == NULL)
-                goto zero_fail;
+        result = ZeroPolynomial();
 
         for (pTerm ftmp = first->Next; ftmp != NULL; ftmp = ftmp->Next) {
                 for (pTerm stmp = second->Next; stmp != NULL; stmp = stmp->Next) {
                         int coef = ftmp->Coefficient * stmp->Coefficient;
                         int exp = ftmp->Exponent + stmp->Exponent;
-                        if (addTerm(result, exp, coef) != 0)
-                                goto bad_alloc;
+                        addTerm(result, exp, coef);
                 }
         }
         return result;
-
-bad_alloc: deleteSubPolynomial(result);
-zero_fail: return NULL;
 }
 
 void printPolynomial(const Polynomial poly)
