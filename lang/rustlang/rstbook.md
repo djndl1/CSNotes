@@ -174,3 +174,33 @@ fn plus_one(x: i32) -> i32 {
     x + 1
 }
 ```
+
+# Ownership
+
+__Ownership__ is the central feature of Rust. Memory is managed through a system of ownership with a set of rules that the compiler checks at compile time.
+
+- Each value has a variable called its _owner_;
+
+- There can only be one owner at a time;
+
+- When the owner goes out of scope, the value will be dropped.
+
+Assignment in Rust by default moves a value (Stack-only data are copied). Rust will never automatically create deep copies of data. If deep copy is needed, use a common method `clone`.
+
+Rust has a special annotation `Copy` trait that indicates that a type is placed on stack only. If a type has the `Copy` trait, an older variable is still usable after assignment. All basic numeral types, `bool`, `char`, tuples of `Copy` types are of `Copy` trait.
+
+Passing a variable to a function will move or copy. Returning values can also transfer ownership, which follows the same pattern.
+
+References allow for referring to some value without taking ownership of it. `&var` creates a reference that refers to `var`. The value will not be dropped when the reference goes out of scope. The signature of the function uses `&` to indicate the type of the parameter is a reference. Having references as function parameters is called _borrowing_. References are immutable by default.
+
+```rust
+fn calculate_length(s: &String) -> usize {
+    s.len()
+}
+
+fn change_string(s: &mut String) {
+    s.push_str(" World!");
+}
+```
+
+However, you can have only one mutable reference to a particular piece of data in a particular scope (the original variable not included).
