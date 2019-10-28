@@ -201,6 +201,54 @@ fn calculate_length(s: &String) -> usize {
 fn change_string(s: &mut String) {
     s.push_str(" World!");
 }
+
 ```
 
-However, you can have only one mutable reference to a particular piece of data in a particular scope (the original variable not included).
+However, you can have only one mutable reference to a particular piece of data in a particular scope. This can prevent data races. Also, we cannot have a mutable reference while we have an immutable one. A reference's scope starts from where it is introduced and continues through the last time that reference is used (not just block scope).
+
+```rust
+// totally legal
+fn main() {
+    let mut s = String::from("hello");
+
+    let r1 = &s; // no problem
+    let r2 = &s; // no problem
+    println!("{} and {}", r1, r2);
+    // r1 and r2 are no longer used after this point
+
+    let r3 = &mut s; // no problem
+    println!("{}", r3);
+}
+```
+
+```rust
+fn main() {
+    let mut s = String::from("hello");
+
+    let r1 = &s; // no problem
+    let r2 = &s; // no problem
+    
+    println!("{} and {}", r1, r2);
+    // r1 and r2 are no longer used after this point
+
+    let r3 = &mut s; // no problem
+    // s.push_str("abc");  E0499
+    r3.push_str("efg");
+    println!("{}", r3);
+    s.push_str("abc"); // okay
+}
+```
+
+In Rust, the compiler guarantees that references will never be dangling references. The compiler will ensure that the data a reference points to will not go out of scope before the reference to the data does.
+
+```rust
+fn no_dangle() -> String {
+    let s = String::from("Dangling");
+    s
+}
+
+fn dangles() -> &String {
+    let s = String::from("Dangling");
+    &s
+}
+```
