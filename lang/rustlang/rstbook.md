@@ -247,8 +247,60 @@ fn no_dangle() -> String {
     s
 }
 
+
 fn dangles() -> &String {
     let s = String::from("Dangling");
     &s
 }
 ```
+
+- A _string slice_  is a reference to part of a `String`:
+
+```rust
+let mut s = String::from("hello world");
+
+    let hello = &s[0..5];
+    let world = &s[6..11];
+
+    let len = s.len();
+    let slice = &s[3..len];
+    let slice2 = &s[3..];
+    let slice3 = &s[0..len];
+    let slice4 = &s[..];
+    
+    //  String slice range indices must occur at valid UTF-8 character boundaries. 
+```
+
+```rust
+fn first_word(s: &String) -> &str{
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item = b' ' {
+            return &s[0..i];
+        }
+    }
+    &s[..]
+}
+
+fn main() {
+    let mut s = String::from("hello world");
+    let word = first_word(&s);
+    s.clear();      // 
+    println!("the first word is: {}", word);
+}
+```
+
+```bash
+error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
+ --> rust_scratchpad.rs:4:5
+  |
+3 |     let word = first_word(&s);
+  |                           -- immutable borrow occurs here
+4 |     s.clear();
+  |     ^^^^^^^^^ mutable borrow occurs here
+5 |     println!("the first word is: {}", word);
+  |                                       ---- immutable borrow later used here
+```
+
+String literals are slices. `&str` makes a string slice used as a parameter.
