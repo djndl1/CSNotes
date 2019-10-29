@@ -304,3 +304,57 @@ error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immuta
 ```
 
 String literals are slices. `&str` makes a string slice used as a parameter.
+
+# Structs
+
+## Definition and Instantiation
+
+```rust
+struct  User {
+    // fields
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+
+fn main() {
+    let mut user1 = User {
+        email: String::from("someone@email.com"),
+        username: String::from("someusername"),
+        sign_in_count: 1,
+        active: true
+    };
+    user1.email = String::from("someother@email.com");
+
+    let user2 = build_user(String::from("another"), String::from("another@email.com"));
+    let user3 = User {
+        ..user2
+    };
+    let user4 = User {
+        username: String::from("user4"),
+        ..user3
+    };
+}
+
+fn build_user(email: String, username: String) -> User {
+    User {
+        username,
+        email,
+        sign_in_count: 1,
+        active: true,
+    }
+}
+```
+
+Structs can be defined in a similar way to tuples, called _tuple structs_.
+
+```rust
+struct Pixel(u8, u8, u8);
+    let blackpoint = Pixel(0, 0, 0);
+    let Pixel(red, green, blue) = blackpoint; // destructuring
+```
+
+- Unit-like struct: structs without any data, used to implement a trait.
+
+It’s possible for structs to store references to data owned by something else, but to do so requires the use of _lifetimes_.
