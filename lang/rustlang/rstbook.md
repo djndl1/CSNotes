@@ -358,3 +358,53 @@ struct Pixel(u8, u8, u8);
 - Unit-like struct: structs without any data, used to implement a trait.
 
 It’s possible for structs to store references to data owned by something else, but to do so requires the use of _lifetimes_.
+
+- `Debug` trait output:
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn area(rectangle: &Rectangle) -> u32{
+    rectangle.height * rectangle.width
+}
+
+fn main() {
+    let rect1 = Rectangle {width: 30, height: 50};
+    println!("{:#?}", rect1);
+}
+```
+
+```bash
+Rectangle {
+    width: 30,
+    height: 50,
+}
+```
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32{
+        self.height * self.width
+    }
+
+    fn can_hold(&self ,other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.width
+    }
+
+    fn square(size: u32) -> Rectangle{
+        Rectangle {width: size, height: size}
+    }
+}
+```
+
+It is possbile to separate these methods into multiple `impl` blocks.
