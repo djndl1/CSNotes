@@ -401,10 +401,115 @@ impl Rectangle {
         self.width > other.width && self.height > other.width
     }
 
-    fn square(size: u32) -> Rectangle{
+    fn square(size: u32) -> Rectang
+    le{
         Rectangle {width: size, height: size}
     }
 }
 ```
 
 It is possbile to separate these methods into multiple `impl` blocks.
+
+# Enums and Pattern Matching
+
+```rust
+enum IpAddr {
+    V4(String),
+    V6(String),
+}
+
+let home = IpAddr::V4(String::from("127.0.0.1"));
+
+let loopback = IpAddr::V6(String::from("::1"));
+```
+
+Each variant can have different types and amount of associated data.
+
+```rust
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+```
+
+
+```rust
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 }, // anonymous struct
+    Write(String),
+    ChangeColor(i32, i32, i32), // three i32
+}
+```
+
+Enums can have their methods:
+
+```rust
+impl Message {
+    fn call(&self) {
+        // method body would be defined here
+    }
+}
+```
+
+Expressing a concept in terms of the type system means the compiler can check whether a case is handled the way it should be. Rust doesn’t have the null feature that many other languages have. Rust does not have nulls, but it does have an enum that can encode the concept of a value being present or absent. This enum is `Option<T>`.  Everywhere that a value has a type that isn’t an `Option<T>`, you can safely assume that the value isn’t null.
+
+## `match` Control Flow Operator
+
+Patterns can be made up of literal values, variable names, wildcards and many other things.
+
+```rust
+#[derive(Debug)] // so we can inspect the state in a minute
+enum UsState {
+    Alabama,
+    Alaska,
+    // --snip--
+}
+
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter(UsState),
+}
+
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter(state) => {
+            println!("State quarter from {:?}!", state);
+            25
+        },
+    }
+}
+```
+
+With `Option<T>`: 
+
+```rust
+fn plus_one(x: Option<i32>) -> Option<i32> {
+    match x {
+        None => None,
+        Some(i) => Some(i + 1),
+    }
+}
+
+let five = Some(5);
+let six = plus_one(five);
+let none = plus_one(None);
+```
+
+Rust also has a pattern `_` we can use when we don’t want to list all possible values and `()` (unit value) when doing nothing.
+
+```rust
+let some_u8_value = 0u8;
+match some_u8_value {
+    1 => println!("one"),
+    3 => println!("three"),
+    5 => println!("five"),
+    7 => println!("seven"),
+    _ => (),
+}
+```
