@@ -498,6 +498,7 @@ fn plus_one(x: Option<i32>) -> Option<i32> {
 
 let five = Some(5);
 let six = plus_one(five);
+
 let none = plus_one(None);
 ```
 
@@ -511,5 +512,34 @@ match some_u8_value {
     5 => println!("five"),
     7 => println!("seven"),
     _ => (),
+}
+```
+
+## `if let`
+
+The `if let` syntax combines `if` and `let` into a less verbose way to handle values that match one pattern while ignoring the rest.
+
+```rust
+if let Some(3) = some_u8_value { // not an assignment
+    println!("three);
+}
+```
+
+```rust
+let mut count = 0;
+if let Coin::Quarter(state) = coin {
+    println!("State quarter from {:?}!", state);
+} else {
+    count += 1;
+}
+```
+
+is equivalent to
+
+```rust
+let mut count = 0;
+match coin {
+    Coin::Quarter(state) => println!("State quarter from {:?}!", state),
+    _ => count += 1,
 }
 ```
