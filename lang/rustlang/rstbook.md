@@ -557,6 +557,7 @@ let mut v = Vec::new();
     v2.push(6);
 
     let v3 = vec![1, 2, 3, 4, 5];
+    let v4 = vec![1; 5];
 
     let third: &i32 = &v[2]; // unsafe
     println!("{}", third);
@@ -565,6 +566,8 @@ let mut v = Vec::new();
         Some(third) => println!("The third element is {}", third);
         None => println!("There is no third element.", );
     }
+    
+    
 ```
 
 With `enum`, we can store multiple types in a vector:
@@ -586,3 +589,35 @@ fn main() {
 ```
 
 Rust needs to know what types will be in the vector at compile time so it knows exactly how much memory on the heap will be needed to store each element.
+
+## `String`
+
+`String` is growable, mutable, owned, UTF-8 encoded string type. 
+
+`push_str()` does not take ownership of another string. `+` concatenation is hard to use and has an ugly syntax.
+
+Rust strings don't support indexing. Internally, `String` is a wrapper over a `Vec<u8>`. Using string slicings may not be safe, either. The best way to perform operations on individual Unicode scalar values is to use `s.chars()` method.
+
+```rust
+    let mut s = String::from("foo");
+    s.push_str("bar");
+
+    let s1 = String::from("Hello, ");
+    let s2 = String::from("world!");
+    let s3 = s1 + &s2; // s1 is moved and no longer available
+    println!("{}", s3);
+
+    // it's better to use `format!`
+    let s4 = String::from("tic");
+    let s5 = String::from("tac");
+    let s6 = String::from("toe");
+    let s7 = format!("{}-{}-{}", s4, s5, s6);
+    println!("{}", s7);
+
+    for c in s7.chars() {
+        println!("{}", c);
+    }
+    for b in s7.bytes() {
+        println!("{}", b);
+    }
+```
