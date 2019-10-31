@@ -543,3 +543,46 @@ match coin {
     _ => count += 1,
 }
 ```
+
+# Common Collections
+
+The data that collections point to is stored on the heap.
+
+```rust
+let mut v = Vec::new();
+    v.push(12.0);
+
+    let mut v2 = vec![1, 2, 3];
+    v2.push(5);
+    v2.push(6);
+
+    let v3 = vec![1, 2, 3, 4, 5];
+
+    let third: &i32 = &v[2]; // unsafe
+    println!("{}", third);
+
+    match v3.get(2) {   // safe access, return None if not available
+        Some(third) => println!("The third element is {}", third);
+        None => println!("There is no third element.", );
+    }
+```
+
+With `enum`, we can store multiple types in a vector:
+
+```rust
+enum SpreadsheeCell {
+    Int(i32),
+    Float(f64),
+    Text(String)
+}
+
+fn main() {
+    let row = vec![
+        SpreadsheeCell::Int(3),
+        SpreadsheeCell::Text(String::from("blue")),
+        SpreadsheeCell::Float(10.12),
+    ];
+}
+```
+
+Rust needs to know what types will be in the vector at compile time so it knows exactly how much memory on the heap will be needed to store each element.
