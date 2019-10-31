@@ -201,3 +201,104 @@ or rax, [field]
 rol rax, 23
 mov [sample], rax
 ```
+
+# Branching and Looping
+
+- `jmp`: assembly version of `goto`
+
+```assembly
+segment .data
+switch:
+  ;; local labels, defined within the range of enclosing regular labels
+  dq    main.case0
+  dq    main.case1
+  dq    main.case2
+i: dq    2    ; jump to .case2
+
+  segment .text
+  global main
+
+  ;;  a switch clause
+main:
+  mov   rax, [i]
+  jmp   [switch+rax*8]
+.case0:
+  mov   rbx, 100
+  jmp   .end
+.case1:
+  mov   rbx, 101
+  jmp   .end
+.case2:
+  mov   rbx, 102
+.end:
+  xor   eax, eax
+  ret
+```
+
+- conditional jump: the condition codes are based on specific flags in `eflags` such as the zero flag, the sign flag, and the carry flag. `jz`(`je`)/`jnz`(`jne`); `jg`(`jnle`)/`jge`(`jnl`); `jl`(`jngs`, `js`)/`jle`(`jng`); `jc`(`jb`, `jnae`)/`jnc`(`jae`, `jnb`). It is best to stick wit high level coding structures translated to assembly language.
+
+```c
+if (a < b) {
+  temp = a;
+  a = b;
+  b = temp;
+}
+```
+
+```assembly
+  mov   rax, [a]
+  mov   rbx, [b]
+  cmp   rax, rbx
+  jge   in_order
+  mov   [temp], rax
+  mov   [a], rbx
+  mov   [b], rax
+in_order:
+```
+
+```c
+if (a < b)
+  max = b;
+else
+  max = a;
+```
+
+```assembly
+      mov   rax, [a]
+      mov   rbx, [b]
+      cmp   rax, rbx
+      jge   else
+      mov   [max], rbx
+      jmp   endif
+else: mov   [max], rax
+endif:
+```
+
+```c
+if (a < b) 
+  result = 1;
+else if (a > c)
+  result = 2
+else 
+  result = 3
+```
+
+Arbitrary sequence of tests can be used to simulate multiple `else-if` clauses in C:
+
+```assembly
+  mov   rax, [a]
+  mov   rbx, [b]
+  cmp   rax, rbx
+  jnl   else_if
+  mov   qword [result], 1
+  jmp   endif
+else_if:
+  mov   rcx, [c]
+  cmp   rax, rcx
+  jng   else
+  mov   qword [result], 2
+  jmp   endif
+else:
+  mov   qword [result], 3
+endif
+```
