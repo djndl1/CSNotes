@@ -607,6 +607,7 @@ Rust strings don't support indexing. Internally, `String` is a wrapper over a `V
     let s3 = s1 + &s2; // s1 is moved and no longer available
     println!("{}", s3);
 
+
     // it's better to use `format!`
     let s4 = String::from("tic");
     let s5 = String::from("tac");
@@ -620,4 +621,41 @@ Rust strings don't support indexing. Internally, `String` is a wrapper over a `V
     for b in s7.bytes() {
         println!("{}", b);
     }
+```
+
+## `HashMap`
+
+`insert` an owned value into a `HashMap` moves the data. However, we can move references, but the references must be valid at least as long as the hash map is valid. By default, HashMap uses a “cryptographically strong”1 hashing function that can provide resistance to Denial of Service (DoS) attacks. 
+```rust
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Yellow"), 50);
+
+    let teams = vec![String::from("Blue"), String::from("Yellow")];
+    let initial_scores = vec![10, 50];
+
+    let scores2: HashMap<_, _> = teams.iter().zip(initial_scores.iter()).collect();
+
+    let s = String::from("Moved");
+    scores.insert(s, 30);
+    // println!("{}", s);
+    //                ^ value borrowed here after move
+    let team_name = String::from("Blue");
+    let score = scores.get(&team_name); // returns an Option<&T>
+
+    scores.entry(String::from("Red")).or_insert(20);
+    for (name, scor) in &scores {
+        println!("{}: {}", name, scor);
+    }
+
+    let text = "hello world wonderful day";
+    let mut counts = HashMap::new();
+    for word in text.split_whitespace() {
+        let count = counts.entry(word).or_insert(0);
+        *count += 1;
+    }
+
+    println!("{:?}", counts);
 ```
