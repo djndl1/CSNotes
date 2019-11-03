@@ -14,11 +14,10 @@
 
 [Inline functions in C](Cpp/C/Cnotes/Inline functions in C _ Oracle Darryl Gove's Blog.pdf)
 
-[Is "inline" without "static" or "extern" ever useful in C99](Cpp/C/Cnotes/c%20-%20Is%20_inline_%20without%20_static_%20or%20_extern_%20ever%20useful%20in%20C99_%20-%20Stack%20Overflow.html)
 
-[What's the difference between “static” and “static inline” function?](Cpp/C/Cnotes/c%20-%20What's%20the%20difference%20between%20_static_%20and%20_static%20inline_%20function_%20-%20Stack%20Overflow.html)
+[What's the difference between “static” and “static inline” function?](https://stackoverflow.com/questions/7762731/whats-the-difference-between-static-and-static-inline-function)
 
-[Myth and reality about `inline` in C99 by Jens Gusedt](Cpp/C/Cnotes/Myth%20and%20reality%20about%20inline%20in%20C99%20–%20Jens%20Gustedt's%20Blog.html) 
+[Myth and reality about `inline` in C99 by Jens Gusedt]() 
 
 [FAQ about C++ inline functions](https://isocpp.org/wiki/faq/inline-functions)
 
@@ -39,6 +38,8 @@
 ---
 
 [includes in header files and source files](https://stackoverflow.com/questions/2596449/including-includes-in-header-file-vs-source-file)
+
+[Comparing the Cost of Different Multiple-return Techniques in C](https://spin.atomicobject.com/2013/12/23/c-return-multiple-values/)
 
 ---
 
