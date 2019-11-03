@@ -638,6 +638,7 @@ Rust strings don't support indexing. Internally, `String` is a wrapper over a `V
 
     let scores2: HashMap<_, _> = teams.iter().zip(initial_scores.iter()).collect();
 
+
     let s = String::from("Moved");
     scores.insert(s, 30);
     // println!("{}", s);
@@ -659,3 +660,101 @@ Rust strings don't support indexing. Internally, `String` is a wrapper over a `V
 
     println!("{:?}", counts);
 ```
+
+# Error Handling
+
+Rust groups errors into two major categories: recoverable and unrecoverable errors. Rust doesn’t have exceptions. Instead, it has the type `Result<T, E>` for recoverable errors and the `panic!` macro that stops execution when the program encounters an unrecoverable error. 
+
+By default, when a panic occurs, the program starts unwinding, which means Rust walks back up the stack and cleans up the data from each function it encounters.
+
+```rust
+enum Result<T, E> {
+    Ok(T),   // the type of the value that will be returned in a success case within the `Ok` variatn
+    Err(E),  // 
+}
+```
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = match File::open("rust_scratchpad.rs") {
+        Ok(file) => file,
+        Err(error) => match error.kind() {
+            ErrorKind::NotFound => match File::create("hello.txt") {
+                Ok(fc) => fc,
+                Err(e) => panic!("Problem creating thefile {:?}", e),
+            },
+            other_error => panic!("Problem opening the file: {:?}", other_error),
+        },
+    };
+}
+```
+
+- `Result<T, E>.unwrap()`: a shortcut that is implemented like the `match` expression above
+
+- `Result<T, E>.expect()`: the `panic!` error message can be customized.
+
+Error propagating is done by returning `Result<T, E>`.
+
+```rust
+// full version
+use std::io;
+use std::io::Read;
+use std::fs::File;
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let f = File::open("hello.txt");
+
+    let mut f = match f {
+        Ok(file) => file,
+        Err(e) => return Err(e),
+    };
+
+    let mut s = String::new();
+
+    match f.read_to_string(&mut s) {
+        Ok(_) => Ok(s),
+        Err(e) => Err(e),
+    }
+}
+
+// short version using the `?` operator
+use std::io;
+use std::io::Read;
+use std::fs::File;
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let mut f = File::open("hello.txt")?; 
+    // { ok(file) => file,
+    //  Err(e) => return Err(e),
+    // } 
+    let mut s = String::new();
+    f.read_to_string(&mut s)?;
+    Ok(s)
+}
+
+// even shorter
+use std::fs::File;
+use std::io;
+use std::io::Read;
+
+fn main() {
+    let mut s = String::new();
+    File::open("hello.txt")?.read_to_string(&mut s)?;
+    Ok(s)
+}
+
+// shorter!
+fn read_username_from_file() -> Result<String, io::Error> {
+    fs::read_to_string("hello.txt")
+}
+```
+
+Error values that have the `?` operator called on them go through the from function. The error type received is converted into the error type defined in the return type of the current function. The `?` operator can only be used in functions that have a return type of `Result<T, E>`. One valid return type for `main` is `()`, and another valid type is `Result<T, E>`.
+
+Returning Result is a good default choice when you’re defining a function that might fail. Call `unwrap` or `expect` during prototyping and testing. Even if sometimes it's impossible to fail in a certain situation, the compiler will insists that the error be handled (it doesn't have enough information). The solution is to add a `unwrap` to ensure this.
+
+It’s advisable to have your code panic when it’s possible that your code could end up in a bad state. 
+
+TODO
