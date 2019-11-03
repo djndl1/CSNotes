@@ -1,6 +1,93 @@
-# Cargo and related
+# Project Management with `cargo`; Packages, Crates and Modules
 
 `Cargo.lock` ensures reproducible builds by recording versions of the dependencies when first building, instead of resolving dependencies whenever building. `cargo update` bypasses this.
+
+## Module System
+
+### Packages and Crates
+
+- _crate_: a binary or library; 
+
+- _package_: one or more crates that provide a set of functionality. A package contains a `Cargo.toml` file that describes how to build those crates. `Cargo` follows a convention that `src/main.rs` is the crate root of a binary crate with the same name as the package. `src/lib.rs`, if it exists, then the package contains a library crate with the same name as the package, and `src/lib.rs` is its crate root. A package can have multiple binary crates by placing files in the `src/bin` directory.
+
+- _module_: organizes code within a crate into groups for readability and easy reuse. Modules also control the privacy of items, which is whether an item can be used by outside code (public) or is an internal implementation detail and not available for outside use (private). Modules also define Rust's privacy boundary. All items (functions, methods, structs, enums, modules, and constants) are private by default. Items in a parent module can’t use the private items inside child modules, but items in child modules can use the items in their ancestor modules. To make an item public, both the module and the item needs to be marked `pub`. Also, fields of a struct in a module are private by default. All variants of a public enum are public.
+
+```rust
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+
+        fn seat_at_table() {}
+    }
+
+    mod serving {
+        fn take_order() {}
+
+        fn serve_order() {}
+
+        fn take_payment() {}
+    }
+}
+```
+
+```
+crate
+ └── front_of_house
+     ├── hosting
+     │   ├── add_to_waitlist
+     │   └── seat_at_table
+     └── serving
+         ├── take_order
+         ├── serve_order
+         └── take_payment
+```
+
+A module can be split into different files, with a file structure similar to Java, not forced though. Using a semicolon after `mod` clause rather than using a block tells Rust to load the contents of the module from another file with the same name as the module. 
+
+```rust
+// src/lib.rs
+mod front_of_house; // declare the module
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+
+```rust
+// src/front_of_house.rs
+pub mod hosting; // declared its submodule
+```
+
+```rust
+// src/front_of_house/hosting.rs
+pub fn add_to_waitlist() {}
+```
+
+- _path_: absolute path starts from a crate root by using a crate name or a literal `crate` (like `/`); relative path starts from the current module and uses `self` (like `.`), `super` (like `..`), or an identifier in the current module.
+
+- `use` keyword: brings paths into scope. It is idiomatic to use a full path to bring in structs, enums and other items with `use` unless there are name conflicts. For a function, however, it is common to `use` its surrounding module rather than bringing in itself directly. When we bring a name into scope with the `use` keyword, the name available in the new scope is private. To enable the code that calls our code to refer to that name as if it had been defined in that code’s scope, we can combine pub and use. This technique is called re-exporting. Re-exporting is useful when the internal structure of the  code is different from how programmers calling your code would think about the domain. Doing so makes our library well organized for programmers working on the library and programmers calling the library. To `use` multiple items under the same prefix,
+
+```rust
+use std::{cmp::Ordering, io, self}; // self adds `std` itself
+```
+
+- Glob operator: bring all public items defined in a path into scope:
+
+```rust
+use std::collections::*;
+```
+
+- `as` keyword: provides an alias
+
+```rust
+use std::fmt::Result;
+use std::io::Result as IoResult;
+```
+
 
 # Guessing game
 
