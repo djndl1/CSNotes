@@ -41,6 +41,8 @@
 
 [Comparing the Cost of Different Multiple-return Techniques in C](https://spin.atomicobject.com/2013/12/23/c-return-multiple-values/)
 
+https://stackoverflow.com/questions/6357038/is-multiplication-and-division-using-shift-operators-in-c-actually-faster
+
 ---
 
 #### About ABI and binary objects
