@@ -59,6 +59,7 @@ pub fn eat_at_restaurant() {
 
 ```rust
 // src/front_of_house.rs
+
 pub mod hosting; // declared its submodule
 ```
 
@@ -845,3 +846,67 @@ Returning Result is a good default choice when you’re defining a function that
 It’s advisable to have your code panic when it’s possible that your code could end up in a bad state. 
 
 TODO
+
+# Generics, Traits and Lifetimes
+
+## Generic Data Type
+
+```rust
+fn largest<T>(list: &[T]) -> T {
+    let mut largest = list[0];
+
+    for &item in list.iter() {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+```
+
+Specialization is possible:
+
+```rust
+impl Point<f32> {
+    fn distance_from_origin(&self) -> f32 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+}
+```
+
+Generic type parameters in a struct definition aren’t always the same as those used in that struct’s method signatures. Some generic parameters are declared with impl and some are declared with the method definition.
+
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+impl<T, U> Point<T, U> {
+    fn mixup<V, W>(self, other: Point<V, W>) -> Point<T, W> {
+        Point {
+            x: self.x,
+            y: other.y,
+        }
+    }
+}
+
+    let p1 = Point { x: 5, y: 10.4 };
+    let p2 = Point { x: "Hello", y: 'c'};
+
+    let p3 = p1.mixup(p2);
+```
+
+Rust accomplishes this by performing monomorphization of the code that is using generics at compile time. Monomorphization is the process of turning generic code into specific code by filling in the concrete types that are used when compiled. When the code runs, it performs just as it would if we had duplicated each definition by hand.
