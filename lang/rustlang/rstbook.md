@@ -852,7 +852,18 @@ TODO
 ## Generic Data Type
 
 ```rust
-fn largest<T>(list: &[T]) -> T {
+fn largest<T: PartialOrd>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list.iter() {
+        if item > largest {
+            largest = item;
+        }
+    }
+    largest
+}
+
+fn largest<T: PartialOrd + Copy>(list: &[T]) -> T {
     let mut largest = list[0];
 
     for &item in list.iter() {
@@ -860,7 +871,6 @@ fn largest<T>(list: &[T]) -> T {
             largest = item;
         }
     }
-
     largest
 }
 
@@ -910,3 +920,114 @@ impl<T, U> Point<T, U> {
 ```
 
 Rust accomplishes this by performing monomorphization of the code that is using generics at compile time. Monomorphization is the process of turning generic code into specific code by filling in the concrete types that are used when compiled. When the code runs, it performs just as it would if we had duplicated each definition by hand.
+
+## Traits
+
+A trait tells the compiler about functionality a particular type has and can share with other types. Traits define shared behavior in an abstract way. Traits are similar to a feature often called _interfaces_ in other languages. A type’s behavior consists of the methods we can call on that type. Trait definitions are a way to group method signatures together to define a set of behaviors necessary to accomplish some purpose.
+
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String {  // a default implementation
+        format!("(Read more from {}...)", self.summarize_author())
+    }
+
+    fn summarize_author(&self) -> String;
+}
+
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{} by {} ({})", self.headline, self.author, self.location)
+    }
+
+    fn summarize_author(&self) -> String {
+        format!("{}", self.author)
+    }
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for Tweet {
+    // fn summarize(&self) -> String 
+    //     format!("{}: {}", self.username, self.content)
+    // }
+
+    fn summarize_author(&self) -> String {
+        format!("@{}", self.username)
+    }
+}
+```
+
+It's impossible to implement an external trait for an external type. This ensures other people's code can't break one's code and vice versa.
+
+Default implementations can call other methods in the same trait, even if those other methods don’t have a default implementation. 
+
+```rust
+pub fn notify(item: impl Summary) {
+    print!("Breaking news! {}", item.summarize());
+}
+
+// just a syntax sugar for trait bound syntax
+
+pub fn notify<T: summary>>(item: T) {
+    print!("Breaking news! {}", item.summarize());
+}
+
+// an alternate form with `where` clause, like C++ concept
+fn some_function<T, U>(t: T, u: U) -> i32
+where T: Display + Clone,
+      U: Clone + Debug
+{
+//...
+}
+
+fn return_summarizable() -> impl Summary {       // however, this `impl Summary` is only one type that implements `Summary`
+    Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from("of course as ou probably already know, people"),
+        reply: false,
+        retweet: false,
+    }
+}
+```
+
+Traits bounds can be used to conditionally implement methods:
+
+```rust
+use std::fmt::Display;
+
+struct Pair<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Pair<T> {
+    fn new(x: T, y: T) -> Self {
+        Self {
+            x,
+            y,
+        }
+    }
+}
+
+impl<T: Display + PartialOrd> Pair<T> {
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("The largest member is x = {}", self.x);
+        } else {
+            println!("The largest member is y = {}", self.y);
+        }
+    }
+}
+```
