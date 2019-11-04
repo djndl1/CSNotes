@@ -302,3 +302,109 @@ else:
   mov   qword [result], 3
 endif
 ```
+
+- while loops
+
+```c
+        int sum = 0;
+        int i = 0;
+        while (i < 64) {
+                sum += data & 1;
+                data = data >> 1;
+                i++;
+        }
+        return sum;
+```
+
+```assembly
+  ;;    register usage
+  ;;
+  ;;    rax: bits being examined
+  ;;    rcx: carry bit after bt, setc
+  ;;    rdx: sum of one bits
+  ;;
+
+  mov   rax, [data]
+  xor   ebx, ebx
+  xor   ecx, ecx
+  xor   edx, edx
+
+while:
+  cmp   rcx, 64
+  jnl   end_while
+  bt    rax, 0
+  setc  bl
+  add   ebx, ebx
+  shr   rax, 1
+  inc   rcx
+  jmp   while
+```
+
+```assembly
+; GCC generated, better than hand-written
+
+count_ones_bits:
+.LFB0:
+	.cfi_startproc
+	movl	$64, %eax
+	xorl	%edx, %edx
+	.p2align 4,,10
+	.p2align 3
+.L2:
+	movl	%edi, %ecx
+	shrq	%rdi
+	andl	$1, %ecx
+	addl	%ecx, %edx
+	subl	$1, %eax
+	jne	.L2
+	movslq	%edx, %rax
+	ret
+	.cfi_endproc
+
+; GCC -funroll-all-loops
+count_ones_bits:
+.LFB0:
+	.cfi_startproc
+	movl	$64, %ecx
+	xorl	%eax, %eax
+	.p2align 4,,10
+	.p2align 3
+.L2:
+	movl	%edi, %edx
+	movq	%rdi, %rsi
+	movq	%rdi, %r8
+	movq	%rdi, %r9
+	andl	$1, %edx
+	shrq	%rsi
+	movq	%rdi, %r10
+	movq	%rdi, %r11
+	shrq	$3, %r8
+	addl	%edx, %eax
+	andl	$1, %esi
+	shrq	$4, %r9
+	addl	%eax, %esi
+	movq	%rdi, %rax
+	andl	$1, %r8d
+	andl	$1, %r9d
+	shrq	$2, %rax
+	shrq	$5, %r10
+	andl	$1, %eax
+	andl	$1, %r10d
+	shrq	$6, %r11
+	addl	%eax, %esi
+	movq	%rdi, %rax
+	andl	$1, %r11d
+	shrq	$8, %rdi
+	addl	%esi, %r8d
+	shrq	$7, %rax
+	addl	%r9d, %r8d
+	andl	$1, %eax
+	addl	%r8d, %r10d
+	addl	%r11d, %r10d
+	addl	%r10d, %eax
+	subl	$8, %ecx
+	jne	.L2
+	cltq
+	ret
+	.cfi_endproc
+```
