@@ -1,4 +1,5 @@
 ## numpy.array
+
 `numpy.array(object, dtype=None, copy=True, order='K', subok=False, ndmin=0)`
 
 Create an array
@@ -6,6 +7,7 @@ Create an array
 - `object`: any object exposing the array interface, an object whose `__array__` method returns an array
 
 - `dtype`: if not given, determined as the minimum type required to hold the objects
+
 
 - `copy`: if the object is copies.
 
@@ -17,7 +19,7 @@ _returns_: the resulting array
 
 ## Class `numpy.ndarray`
 
-`numpy.ndarray(shape, dtype=float, buffer=None, offset=0, strides=None, order=None****
+`numpy.ndarray(shape, dtype=float, buffer=None, offset=0, strides=None, order=None**`
 
 **container** object
 
@@ -38,7 +40,7 @@ array([1.+1.j, 2.+0.j, 3.+0.j, 4.-1.j])
 ### Internal memory layout
 
 A contiguous one-dimension segment of computer memory, combining with an _indexing scheme_, interpreted by the data-type object associated with the array.
-Given the index of an element of an array, say $(n_0, n_1, \dots, n_{N-1})$ and the strides of the array $(s_0, s_1, \dots, s_{N-1}), i.e. the bytes between two elements along a certain axis, the offset from the beginning of the array is 
+Given the index of an element of an array, say $(n_0, n_1, \dots, n_{N-1})$ and the strides of the array $(s_0, s_1, \dots, s_{N-1})$, i.e. the bytes between two elements along a certain axis, the offset from the beginning of the array is 
 
 $$
 n_{\text{offset}} = \sum^{N-1}_{k=0} s_k n_k
@@ -335,8 +337,24 @@ NumPy arrays may be indexed with other arrays (or any other sequence- like objec
 array([[ 0,  1,  2,  3,  4,  5,  6],
        [14, 15, 16, 17, 18, 19, 20],
        [28, 29, 30, 31, 32, 33, 34]])
->>> y[np.array([0,2,4]), np.array([0,1,2])]
+>>> y[np.array([0,2,4]), np.array([0,1,2])] # y[(0,2,4), (0,1,2)]
 array([ 0, 15, 30])
+>>> y[np.array([[0,2,4], [0,1,2]])]
+array([[[ 0,  1,  2,  3,  4,  5,  6],
+        [14, 15, 16, 17, 18, 19, 20],
+        [28, 29, 30, 31, 32, 33, 34]],
+
+       [[ 0,  1,  2,  3,  4,  5,  6],
+        [ 7,  8,  9, 10, 11, 12, 13],
+        [14, 15, 16, 17, 18, 19, 20]]])
+>>> y[np.array([0,2,4])[:, np.newaxis], np.array([1,2])]
+array([[ 1,  2],
+       [15, 16],
+       [29, 30]])
+>>> y[np.ix_([0,2,4], [1,2])]
+array([[ 1,  2],
+       [15, 16],
+       [29, 30]])
 ```
 
 Boolean arrays must be of the same shape as the initial dimensions of the array being indexed. In the most straightforward case, the boolean array has the same shape. Unlike in the case of integer index arrays, in the boolean case, the result is a 1-D array containing all the elements in the indexed array corresponding to all the true elements in the boolean array
@@ -348,6 +366,13 @@ array([21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34])
 ```
 
 Index arrays may be combined with slices.
+
+```python
+>>> y[np.array([0,2,4]),1:3]
+array([[ 1,  2],
+       [15, 16],
+       [29, 30]])
+```
 
 ### Structural indexing tools
 
@@ -371,11 +396,24 @@ One can select a subset of an array to assign to using a single index, slices, a
 >>> x[2:7] = np.arange(5)
 ```
 
+Repeated references are actually only one temporary:
+
+```python
+>>> x = np.arange(0, 50, 10)
+>>> x
+array([ 0, 10, 20, 30, 40])
+>>> x[np.array([1, 1, 3, 1])] += 1
+>>> x
+array([ 0, 11, 20, 31, 40])
+```
+
 ## Data types
 
 There are 5 basic numerical types representing booleans (bool), integers (int), unsigned integers (uint) floating point (float) and complex.
 
 Data-types can be used as functions to convert python numbers to array scalars (see the array scalar section for an explanation), python sequences of numbers to arrays of that type. To convert the type of an array, use the `.astype()` method (preferred) or the type itself as a function.
+
+`numpy.iinfo`, `numpy.finfo` verify the min/max values of a numpy numeric type.
 
 A data type object describes describes how the bytes in the fixed-size block of memory corresponding to an array item should be interpreted.
 
@@ -391,7 +429,7 @@ dtype(('float64',(2,)))
 
 Each built-in data-type has a character code (the updated Numeric typecodes), that uniquely identifies it.
 
-### Structured Datatypes
+### Structured Data Types
 
 Structured datatypes are designed to be able to mimic ‘structs’ in the C language, and share a similar memory layout. A structured datatype can be thought of as a sequence of bytes of a certain length (the structure’s itemsize) which is interpreted as a collection of fields. Each field has a name, a datatype, and a byte offset within the structure. 
 
