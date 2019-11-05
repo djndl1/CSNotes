@@ -173,6 +173,7 @@ let guess: u32 = "42".parse().expect("Not a number");
 
 ### Compound Types
 
+
 - `tuple`: a general way of grouping together some number of other values with a variety of types
 
 ```rust
@@ -198,7 +199,7 @@ Rust does array boundary check.
 
 ## Control Flow
 
-- `if`: too many `else if` can be replaced by `match`. Since `if` is an expression:
+- `if`: repeated `else if` can be replaced by `match`. Since `if` is an expression:
 
 ```rust
 let number = if condition {
