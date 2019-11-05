@@ -45,6 +45,18 @@ https://stackoverflow.com/questions/6357038/is-multiplication-and-division-using
 
 ---
 
+#### C Error Handling
+
+https://www.reddit.com/r/cpp/comments/4hw6ku/a_result_type_for_nonthrowing_c_code/
+
+https://channel9.msdn.com/Shows/Going+Deep/C-and-Beyond-2012-Andrei-Alexandrescu-Systematic-Error-Handling-in-C
+
+https://github.com/ptal/expected
+
+https://github.com/oktal/result
+
+https://softwareengineering.stackexchange.com/questions/289576/rust-style-error-handling-in-c
+
 #### About ABI and binary objects
 
 ---
