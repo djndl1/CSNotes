@@ -405,6 +405,82 @@ count_ones_bits:
 	subl	$8, %ecx
 	jne	.L2
 	cltq
+    
 	ret
 	.cfi_endproc
+```
+
+- Do-while loops
+
+```c
+        int i = 0;
+        char c = data[i];
+        if (c != '\0')
+                do {
+                        if (c == x) break;
+                        i++;
+                        c = data[i];
+                } while (c != '\0');
+        return c == 0 ? -1 : i;
+```
+
+```assembly
+section .data
+        data    db      "hello world", 0
+        n       dq      0
+        needle  db      'w'
+
+section .text
+  global main
+
+main:
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 16
+
+  ;; Register usage
+  ;; rax: byte of data array
+  ;; rbx: byte to search for
+  ;; rcx: loop counter, 0-63
+  ;;
+
+        mov     bl, [needle]
+        xor     ecx, ecx
+        mov     al, [data+rcx]
+        cmp     al, 0
+        jz      end_while
+while:
+        cmp     al, bl
+        je      found
+        inc     rcx
+        mov     al, [data+rcx]
+        cmp     al, 0
+        jnz     while
+end_while:
+        mov     rcx, -1
+found:  mov     [n], rcx
+        xor     eax, eax
+        ret
+
+```
+
+- counting loops:
+
+```c
+        for (int i = 0; i < n; i++)
+                c[i] = a[i] + b[i];
+```
+
+```assembly
+  mov   rdx, [n]
+  xor   ecx, ecx
+for:
+  cmp   rcx, rdx
+  je    end_for
+  mov   rax, [a+rcx*8]
+  add   rax, [b+rcx*8]
+  mov   [c+rcx*8], rax
+  inc   rcx
+  jmp   for
+end_for:
 ```
