@@ -1032,3 +1032,35 @@ impl<T: Display + PartialOrd> Pair<T> {
     }
 }
 ```
+
+## Lifetimes
+
+We must annotate lifetimes when the lifetimes of references could be related in a few different ways. The main aim of lifetimes is to prevent dangling references. The Rust compiler has a _borrow checker_ that compares scopes to determine whether all borrows are valid.
+
+Lifetime annotations don’t change how long any of the references live. One lifetime annotation by itself doesn’t have much meaning. Lifetime annotations describe the relationships of the lifetimes of multiple references to each other without affecting the lifetimes.
+
+```rust
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+```
+
+The function signature also tells Rust that the string slice returned from the function will live at least as long as lifetime `'a`. In practice, it means that the lifetime of the reference returned by the `longest` function is the same as the smaller of the lifetimes of the references passed in. The borrow checker should reject any values that don't adhere to these constraints. When we pass concrete references to `longest`, the concrete lifetime that is substituted for `'a` is the part of the scope of `x` that overlaps with the scope of `y`.
+
+```rust
+fn main() {
+    let string1 = String::from("long string is long");
+    let result;
+    {
+        let string2 = String::from("xyz");
+        result = longest(string1.as_str(), string2.as_str());
+    }
+    println!("The longest string is {}", result);
+}
+```
+
+Had we not annotated `longest`, the compiler could not have known that `result` had a lifetime as long as `string2`. It might well assume that `result`'s lifetime is the outer scope.
