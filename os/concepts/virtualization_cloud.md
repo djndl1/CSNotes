@@ -29,3 +29,35 @@ For a computer architecture to support virtualization efficiently, a set of requ
 - type 1 hypervisor: support multiple copies of the actual hardware, called _virtual machines_.
 
 - type 2 hypervisor (hosted hypervisors): runs on top of a host operating system.
+
+# Efficient Virtualization
+
+## Before VT
+
+Making use of binary translation and hardware features such as protection rings. For many years, x86 processors has supported four protection modes/rings:
+
+1. Ring 3: least privileged, where normal user processes execute; Cannot execute sensitive instructions
+
+2. Ring 1, 2: normally not used; Guest OSes run on Ring 1 with type 1 hypervisors
+
+3. Ring 0: where bare metal OSes and type 1 hypervisors run; free to use whatever instructions.
+
+- basic block: a short, straight-line sequence of instructions that ends with a branch.
+
+For guest's kernel code, The hypervisor rewrites the code, one basic block at a time. It replaces sensitive instructions in a basic block with a call into the hypervisor. The branch on the last instruction is also replaced by a call into the hypervisor to make sure it can repeat the above procedure for the next basic block (control is returned to the hypervisor, which locates its successor). Dynamic translation and emulation are not expensive as usually expected. Most code blocks do not contain sensitive or privileged instructions and thus can be executes natively. Blocks can be cached. Eventually, most of the program will be in the cache and run at close to full speed.
+
+However, type 2 hypervisors is required to manipulate the hardware at the lowest level since guest kernel code runs as a user process. Most modern type 2 hypervisors have a kernel module operating in ring 0 that allows them to manipulate the hardware with privileged instructions. If the host kernel code needs to run, the hypervisor restores the processor context. 
+
+- _world switch_: going from a hardware configuration for the host kernel to a configuration for the guest operating system
+
+## With VT
+
+https://arstechnica.com/technopaedia/2008/05/binary-translation/
+
+With VT, _trap-and-emulate_ virtualization is possible. However, this is not always faster than binary translation.
+
+## Paravirtualization and Microkernel
+
+With paravirtualization, the OS knowns that it's not running on bare metal. The OS itself is modified so that when it contains no sensitive instructions. Instead, it makes hypercalls to obtain the same results. The hypervisor itself just carries out hypercalls. There  is not need for the emulation of sensitive instructions and the hypervisor behaves like a microkernel, which just provides very basic services such as process dispatching and managing the MMU.
+
+VMI (Virtual Machine Interface) was proposed to form a low-level layer that interfaces with the hardware or hypervisor, designed to be generic and not tied to any specific hardware platform or any particular hypervisor. This way, the core of the operating system remains portable yet is hypervisor friendly and still efficient. Another similar idea is _paravirt ops_, which is already included in the Linux mainline kernel.
