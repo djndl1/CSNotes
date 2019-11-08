@@ -1049,7 +1049,8 @@ fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
 }
 ```
 
-The function signature also tells Rust that the string slice returned from the function will live at least as long as lifetime `'a`. In practice, it means that the lifetime of the reference returned by the `longest` function is the same as the smaller of the lifetimes of the references passed in. The borrow checker should reject any values that don't adhere to these constraints. When we pass concrete references to `longest`, the concrete lifetime that is substituted for `'a` is the part of the scope of `x` that overlaps with the scope of `y`.
+The function signature also tells Rust that the string slice returned from the function will live at least as long as lifetime `'a`. In practice, it means that the lifetime of the reference returned by the `longest` function is the same as the smaller of the lifetimes 
+of the references passed in. The borrow checker should reject any values that don't adhere to these constraints. When we pass concrete references to `longest`, the concrete lifetime that is substituted for `'a` is the part of the scope of `x` that overlaps with the scope of `y`.
 
 ```rust
 fn main() {
@@ -1064,3 +1065,37 @@ fn main() {
 ```
 
 Had we not annotated `longest`, the compiler could not have known that `result` had a lifetime as long as `string2`. It might well assume that `result`'s lifetime is the outer scope.
+
+It's possible for structs to hold references
+
+```rust
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+fn main() {
+    let novel = String::from("Call me Ishmael. Some years ago...");
+    let first_sentence = novel.split('.')
+        .next()
+        .expect("Could not find a '.'");
+    let i = ImportantExcerpt { part: first_sentence };
+}
+```
+
+The patterns programmed into Rust’s analysis of references are called the _lifetime elision rules_. Lifetimes on function or method parameters are called _input lifetimes_, and lifetimes on return values are called _output lifetimes_:
+
+1. each parameter that is a reference gets its own lifetime parameter;
+
+2. If there is exactly one input lifetime parameter, that lifetime is assigned to all output lifetime parameters.
+
+3. If there are multiple input lifetime parameters, but one of them is `&self` or `&mut self` because this is a method, the lifetime of `self` is assigned to all output lifetime parameters. 
+
+If the three rules are applied and the return parameter lifetime is still not determined, there is a compiler error.
+
+One special lifetime we need to discuss is ``'static`, which means that this reference can live for the entire duration of the program.
+
+```rust
+let s: &'static str = "I have a static lifetime.";
+```
+
+The text of this string is stored directly in the program’s binary, which is always available. Before specifying 'static` as the lifetime for a reference, think about whether the reference you have actually lives the entire lifetime of your program or not.
