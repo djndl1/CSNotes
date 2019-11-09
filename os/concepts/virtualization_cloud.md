@@ -61,3 +61,27 @@ With VT, _trap-and-emulate_ virtualization is possible. However, this is not alw
 With paravirtualization, the OS knowns that it's not running on bare metal. The OS itself is modified so that when it contains no sensitive instructions. Instead, it makes hypercalls to obtain the same results. The hypervisor itself just carries out hypercalls. There  is not need for the emulation of sensitive instructions and the hypervisor behaves like a microkernel, which just provides very basic services such as process dispatching and managing the MMU.
 
 VMI (Virtual Machine Interface) was proposed to form a low-level layer that interfaces with the hardware or hypervisor, designed to be generic and not tied to any specific hardware platform or any particular hypervisor. This way, the core of the operating system remains portable yet is hypervisor friendly and still efficient. Another similar idea is _paravirt ops_, which is already included in the Linux mainline kernel.
+
+# Memory Virtualization
+
+TODO
+
+# Clouds
+
+1. On-demand self-service
+
+2. broad network access
+
+3. resource pooling: the computing resource should be pooled to serve multiple users and with the ability to assign and reassign resources dynamically;
+
+4. rapid elasticity: possible to acquire and release resources elastically, perhaps even automatically, to scale immediately with the user's demands.
+
+5. measured service
+
+- Infrastructure As a Service (IAAS): direct access to virtual machine, which the user can use in any way he sees fit: Amazon EC2
+
+- Platform As A Service (PAAS): delivers an environment that includes things such as a specific OS
+
+- Software As A Service (SAAS): offers access to specific software
+
+Hypervisors decouple the virtual machine from the physical hardware. The administrator could simply shutdown all the virtual machines and restart them again on a new machine. A slightly better approach is to pause the virtual machine, copy over the memory pages used by the virtual machines to the new hardware as quickly as possible, configure things correctly in the new hypervisor and then resume execution. What modern virtualization solutions offer is _live migration_. They employ techniques like _pre-copy memory migration_ (copying memory pages while the machine is still serving requests).
