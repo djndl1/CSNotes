@@ -484,3 +484,34 @@ for:
   jmp   for
 end_for:
 ```
+
+# Functions
+
+- `call`: call a function, the operand is a label in the text segment of a program; it pushes the address of instruction following the call onto the stack and to transfer control to the address associated with the label.
+
+- `ret`: return from a function; pops the address from the top of the stack and transfer control to that address
+
+Under Linux, the first 6 integer parameters are passed in registers `rdi`, `rsi`, `rdx`, `rcx`, `r8`, `r9`. The first 8 floating point parameters are passed in `xmm0`-`xmm7`. Additional parameters are pushed onto the stack in reverse order. Functions with a variable number of parameters pass the number of floating point parameters in the function call using `rax`. `rax` for integer return values and `xmm0` for floating point return values. The stack pointer is expected to be maintained on 16 byte boundaries in memory (ending in `0`) to allow local variables in functions to be placed at 16 byte alignments for SSE and AVX instructins. Executing a `call` would then decrement `rsp`, leaving it ending with an `8`. Conforming functions should either push something or subtract from `rsp` to get it back on a 16 byte boundary.
+
+```assembly
+  section .data
+msg:    db      "Hello World!", 0x0a, 0
+
+  section .text
+  global main
+  extern printf
+
+main:
+  push  rbp
+  mov   rbp, rsp
+
+  lea   rdi, [msg]              ; parameter 1 for printf
+  xor   eax, eax                ; 0 floating point parameters
+  call  printf
+  xor   eax, eax                ; return 0
+
+  pop   rbp
+  ret
+```
+
+`_start` needs all parameters on the stack. `main` is like all other normal C functions.
