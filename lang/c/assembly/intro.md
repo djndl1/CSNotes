@@ -485,6 +485,60 @@ for:
 end_for:
 ```
 
+
+- `rep`: repeats a string/array instruction the number of times specified in `rcx` (count register). The repeat instructions allow setting array elements to a specified value, copying one array to another, and shifting a specific value in an array. The string instructions use `rax` (holding a specific value), `rsi` (source index), `rdi` (destination index). The string operations update `rsi` and `rdi` after each use, managed by `DF` flag (0 for increasing, 1 for decreasing).
+
+- `movs` + `b`/`w`/`d`/`p`: moves from the address specified by `rsi` to the address specified by `rdi`. After each data item is moved, `rdi` and `rsi` registers are advanced 1, 2, 4 or 8 bytes depending on the size of the item.
+
+```assembly
+lea     rsi, [source]   ; load effective address
+lea     rdi, [destination]
+mov     rcx, 100000
+rep     movsb
+```
+
+- `stos` + `b`/`w`/`d`/`q`: moves the item in `al`/`ax`/`eax`/`rax` to memory
+
+```assembly
+;; fill an array with 1000000 double words all equal to 1
+mov     eax, 1
+mov     ecx, 1000000
+lea     rdi, [destination]
+rep     stosd
+```
+
+- `lods` + `b`/`w`/`d`/`q`: moves the item from the address specified by `rsi` to `al`/`ax`/`eax`/`rax`
+
+```assembly
+lea     rsi, [source]
+lea     rdi, [destination]
+mov     ecx, 1000000
+more:   lodsb
+        cmp     al, 13
+        je      skip
+        stosb
+skip:   sub     ecx, 1
+        jnz     more
+```
+
+- `scasb`: searches through an array looking for an item matching the item in `al`
+
+```assembly
+segment .text
+global strlen
+strlen:
+    cld     ; clear DF to 0, the opposite is `std`
+    mov     rcx, -1 ; maximum number of iterations
+    xor     al, al
+    repne   scasb
+    mov     rax, -2
+    sub     rax, rcx
+    ret
+```
+
+- `cmpsb`, used with `repe` to compare values until either the count reaches 0 or two different values are located
+
+
 # Functions
 
 - `call`: call a function, the operand is a label in the text segment of a program; it pushes the address of instruction following the call onto the stack and to transfer control to the address associated with the label.
