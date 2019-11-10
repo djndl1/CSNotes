@@ -1082,6 +1082,7 @@ fn main() {
 }
 ```
 
+
 The patterns programmed into Rust’s analysis of references are called the _lifetime elision rules_. Lifetimes on function or method parameters are called _input lifetimes_, and lifetimes on return values are called _output lifetimes_:
 
 1. each parameter that is a reference gets its own lifetime parameter;
@@ -1099,3 +1100,9 @@ let s: &'static str = "I have a static lifetime.";
 ```
 
 The text of this string is stored directly in the program’s binary, which is always available. Before specifying 'static` as the lifetime for a reference, think about whether the reference you have actually lives the entire lifetime of your program or not.
+
+# Functional Language Features: Iterators and Closures
+
+## Closure
+
+- closure: anonymous functions that can be saved in a variable or passed as arguments to other functions. Closures can capture values from the scope in which they are defined.
