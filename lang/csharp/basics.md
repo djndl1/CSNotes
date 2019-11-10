@@ -1,7 +1,5 @@
 [C# for Java Developers](https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2008/ms228358(v=vs.90)?redirectedfrom=MSDN)
 
-
-
 # Intro
 
 With .NET Core, all assemblies have a `.dll` extension even if they are Console programs.
@@ -27,6 +25,7 @@ the `Main` method returns either `void` or `int` and takes either no parameters 
 Local variable names are camelCase and do not include underscores. C# requires that local variables be determined by the compiler to be “definitely assigned” before they are read.
 
 Console I/O is done through `System.Console`
+
 
 - string interpolation:
 
@@ -439,7 +438,7 @@ int[][] cells = {
 };
 ```
 
-Note the difference between a multi-dimensional array and a jagged array. (this is different from in Java, where there is only array of arrays).
+Note the difference between a multi-dimensional array and a jagged array. (this is different from in Java, where there is only arrays of arrays).
 
 Arrays include additional methods for manipulating the elements within the array—for example, `Sort()`, `BinarySearch()`, `Reverse()`, and `Clear()`, through `System.Array`
 
@@ -589,7 +588,7 @@ When the called method specifies a parameter as ref, the caller is required to s
 
 - output parameter `out`: it is often the case that a method that takes a reference to a variable intends to write to the variable, but not to read from it. An out parameter is functionally identical to a ref parameter. Whenever a parameter is marked with out, the compiler will check that the parameter is set for all code paths within the method that return normally.
 
-A common coding error when working with out parameters is to forget to declare the out variable before you use it. (C# 7.0) `out` modifier allows a variable to be declared on the spot when using it as an out argument. Also, it is possible to discard an `out` parameter entirely by using an underscore as the `out` variable. 
+A common coding error when working with out parameters is to forget to declare the `out` variable before you use it. (C# 7.0) `out` modifier allows a variable to be declared on the spot when using it as an out argument. Also, it is possible to discard an `out` parameter entirely by using an underscore as the `out` variable. 
 
 ```csharp
 class ConvertToPhoneNumber

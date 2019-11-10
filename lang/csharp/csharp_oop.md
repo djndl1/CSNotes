@@ -244,7 +244,7 @@ It is possible to define a class within a class.
 
 Treat `public` nested classes with suspicion. 
 
-The `this` member within a nested class refers to an instance of the nested class. A nested class can access any member on the containing class, including private members.
+The `this` member within a nested class refers to an instance of the nested class instead of the containing class. A nested class can access any member on the containing class, including private members.
 
 ## Partial Classes
 
@@ -449,6 +449,7 @@ An abstract member is a method or property that has no implementation. Its purpo
 # Interface
 
 The interface defines the contract between the types that implement the interface and the code that uses the interface. 
+
 
 Interfaces may be named `IPascalCase`.
 
