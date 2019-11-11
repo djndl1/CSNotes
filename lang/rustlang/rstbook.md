@@ -1149,11 +1149,13 @@ All closures implement at least one of the traits:
 A lazy evaluation example
 
 ```rust
+use std::collections::HashMap;
+
 struct Cacher<T>
 where T: Fn(u32) -> u32
 {
     calculation: T,
-    value: Option<u32>
+    values: HashMap,
 }
 
 impl<T> Cacher<T>
@@ -1162,22 +1164,29 @@ where T: Fn(u32) -> u32
     fn new(calculation: T) -> Cacher<T> {
         Cacher {
             calculation,
-            value: None,
+            values: HashMap::new(),
         }
     }
 
     fn value(&mut self, arg: u32) -> u32 {
-        match self.value {
+        match self.values.get(arg) {
             Some(v) => v,
             None => {
                 let v = self.calculation(arg);
-                self.value = Some(v);
+                self.values.insert(arg, v);
                 v
             }
         }
-        
     }
 }
 ```
 
+Closures can capture their environment and access variables from the scope in which they're defined in three traits:
 
+1. `FnOnce`: consumes the variables it captures from its enclosing scope;
+
+2. `FnMut`: mutably borrow values;
+
+3. `Fn`: immutably borrow values.
+
+Rust infers which trait to use based on how the closure uses the values from the environment. All closures implement `FnOnce` because they can all be called at least once. Closures that don’t move the captured variables also implement `FnMut`, and closures that don’t need mutable access to the captured variables also implement `Fn`. `move` keyword before the parameter list forces the closure to take ownership of the values it uses in the environment, useful when passing a closure to a new thread. Most of the time when specifying one of the `Fn` trait bounds, you can start with `Fn` and the compiler will tell you if you need `FnMut` or `FnOnce` based on what happens in the closure body.
