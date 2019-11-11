@@ -66,6 +66,7 @@ How Boxing can be avoided TODO
 
 An enum can be used as a more readable replacement for Boolean valeus as well: `DeviceState.On` versus `true`.
 
+
 ```csharp
 enum ConnectionState : short // default to `int` which is recommended
 {
@@ -79,3 +80,63 @@ enum ConnectionState : short // default to `int` which is recommended
 The base class for enums is `System.Enum`, which in turn is derived from `System.ValueType`. Enum type allows for assginment of unknown value other the named value at runtime through explicitly cast. However, there is an implicit conversion from `0` to any enum.
 
 Besides inserting an enum value at the end of the list, one way to avoid changing enum values is to assign values explicitly.
+
+C# does not support a direct cast between arrays of two different enums. The workaround is to cast first to `System.Array`. However, this approach is not guaranteed.
+
+One of the conveniences associated with enums is that the `ToString()` method writes out the enum value identifier.
+
+```csharp
+enum Result
+{
+    OK,
+    Error
+}
+
+      
+        Result ok = (Result) System.Enum.Parse(typeof(Result), "OK");
+        System.Console.WriteLine($"Test Enums {ok}");
+
+        if (System.Enum.TryParse("Error", out Result res))
+        {
+                System.Console.WriteLine($"It's {res}");
+        }
+```
+
+It's possible to define flag enum:
+
+```csharp
+[Flags] public enum FileAttributes  // FlagsAttribute
+{
+  ReadOnly =          1<<0,      // 000000000000000001
+  Hidden =            1<<1,      // 000000000000000010
+  System =            1<<2,      // 000000000000000100
+  Directory =         1<<4,      // 000000000000010000
+  Archive =           1<<5,      // 000000000000100000
+  Device =            1<<6,      // 000000000001000000
+  Normal =            1<<7,      // 000000000010000000
+  Temporary =         1<<8,      // 000000000100000000
+  SparseFile =        1<<9,      // 000000001000000000
+  ReparsePoint =      1<<10,     // 000000010000000000
+  Compressed =        1<<11,     // 000000100000000000
+  Offline =           1<<12,     // 000001000000000000
+  NotContentIndexed = 1<<13,     // 000010000000000000
+  Encrypted =         1<<14,     // 000100000000000000
+  IntegrityStream =   1<<15,     // 001000000000000000
+  NoScrubData  =         1<<17,     // 100000000000000000
+}
+```
+
+```csharp
+[Flags] enum DistributedChannel
+{
+  None = 0,
+  Transacted = 1,
+  Queued = 2,
+  Encrypted = 4,
+  Persisted = 16,
+  FaultTolerant =
+      Transacted | Queued | Persisted
+}
+```
+
+Flag check can be done using `EnumTypeName.HasFlag()` instead of using bit operations.
