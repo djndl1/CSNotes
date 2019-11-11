@@ -62,4 +62,20 @@ Boxing can occur in some unexpected situations, and frequent occurrences can hav
 
 How Boxing can be avoided TODO
 
+## Enums
 
+An enum can be used as a more readable replacement for Boolean valeus as well: `DeviceState.On` versus `true`.
+
+```csharp
+enum ConnectionState : short // default to `int` which is recommended
+{
+    Disconnected,
+    Connecting,
+    Connected,
+    Disconnecting
+}
+```
+
+The base class for enums is `System.Enum`, which in turn is derived from `System.ValueType`. Enum type allows for assginment of unknown value other the named value at runtime through explicitly cast. However, there is an implicit conversion from `0` to any enum.
+
+Besides inserting an enum value at the end of the list, one way to avoid changing enum values is to assign values explicitly.
