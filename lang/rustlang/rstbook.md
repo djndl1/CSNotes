@@ -1089,6 +1089,7 @@ The patterns programmed into Rust’s analysis of references are called the _lif
 
 2. If there is exactly one input lifetime parameter, that lifetime is assigned to all output lifetime parameters.
 
+
 3. If there are multiple input lifetime parameters, but one of them is `&self` or `&mut self` because this is a method, the lifetime of `self` is assigned to all output lifetime parameters. 
 
 If the three rules are applied and the return parameter lifetime is still not determined, there is a compiler error.
@@ -1105,4 +1106,78 @@ The text of this string is stored directly in the program’s binary, which is a
 
 ## Closure
 
-- closure: anonymous functions that can be saved in a variable or passed as arguments to other functions. Closures can capture values from the scope in which they are defined.
+- closure: anonymous functions that can be saved in a variable or passed as arguments to other functions. Closures can capture values from the scope in which they are defined. Closures are not used in an exposed interface so type annotations are not required. Within limited contexts, the compiler is reliably able to infer the types of the parameters and the return type. Still, we can add type annotations if we want to increase explicitness and clarity at the cost of being more verbose than is strictly necessary.
+
+```rust
+let expensive_closure = |num: u32| -> u32 {
+    println!("calculating slowly...");
+    thread::sleep(Duration:from_secs(2));
+    num
+};
+
+```
+
+```rust
+     let example_closure = |x| x ;
+
+     let s = example_closure(String::from("hello"));
+     let n = example_closure(5);
+```
+
+```bash
+error[E0308]: mismatched types
+ --> rust_scratachpad.rs:5:30
+  |
+5 |      let n = example_closure(5);
+  |                              ^
+  |                              |
+  |                              expected struct `std::string::String`, found integer
+  |                              help: try using a conversion method: `5.to_string()`
+  |
+  = note: expected type `std::string::String`
+             found type `{integer}`
+```
+
+All closures implement at least one of the traits:
+
+1. `Fn`;
+
+2. `FnMut`;
+
+3. `FnOnce`.
+
+A lazy evaluation example
+
+```rust
+struct Cacher<T>
+where T: Fn(u32) -> u32
+{
+    calculation: T,
+    value: Option<u32>
+}
+
+impl<T> Cacher<T>
+where T: Fn(u32) -> u32
+{
+    fn new(calculation: T) -> Cacher<T> {
+        Cacher {
+            calculation,
+            value: None,
+        }
+    }
+
+    fn value(&mut self, arg: u32) -> u32 {
+        match self.value {
+            Some(v) => v,
+            None => {
+                let v = self.calculation(arg);
+                self.value = Some(v);
+                v
+            }
+        }
+        
+    }
+}
+```
+
+
