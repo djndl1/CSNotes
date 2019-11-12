@@ -51,3 +51,8 @@ The implementation of generics is different for value-based type parameters than
 Beyond the inclusion of the arity and type parameter in the class header and the type parameter denoted with exclamation points in code, there is little difference between the CIL generated for a generic class and the CIL generated for a nongeneric class.
 
 
+https://stackoverflow.com/questions/31876372/what-is-reification
+
+http://microsoftdev.blogspot.com/2007/07/how-generics-work.html
+
+https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java#Type_erasure_versus_reified_generics
