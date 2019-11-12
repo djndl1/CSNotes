@@ -1,0 +1,5 @@
+C# generics are very different from both Java generics and C++ templates in the details of their implementation and impact upon the type system of their respective languages. Generics using type erasure has a type safety problem and seriously affects performance when dealing with value types, which boxes and unboxes data. Generics improves type safety and perfromance (no casting, boxing and unboxing), eleminates code bloat.
+
+Every generic type must be of a specific arity. There is no support in the CLR type system for variadic generic types.
+
+Generic support the ability to define constraints on type 

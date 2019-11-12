@@ -140,3 +140,27 @@ It's possible to define flag enum:
 ```
 
 Flag check can be done using `EnumTypeName.HasFlag()` instead of using bit operations.
+
+# Well-Formed Types
+
+## Overriding Object Members
+
+- overriding `ToString()`: Consider overloading the ToString() method whenever relevant diagnostic information can be provided from the output.
+
+- overriding `GetHashCode()`: override `GetHashCode()` when overriding `Equals()`. Equal objects must have equal hash codes; `GetHashCode()`’s returns over the life of a particular object should be constant (the same value), even if the object’s data changes. In many cases, you should cache the method return to enforce this constraint.
+
+- overriding `Equals()`: check for `null`; check for reference equality if the type is a reference type; check for equivalent types; TODO
+
+## Operator Overloading
+
+implemented as static methods.
+
+`=` cannot be overloaded.
+
+Unless the intent is for a type to act like a primitive type, operator overloading should be avoided.
+
+- `==`/`!=`: reference equality check by default, which is a flaw. For the most part, the implementation for these operators can delegate the logic to `Equals`
+
+It is possible to overload conversion operator.
+
+TODO
