@@ -16,6 +16,7 @@ public class BinaryTree<T>
         {
             IComparable<T> first;
             // Notice that the cast can now be eliminated.
+            
             first = value.First.Item;
                     
             if (first.CompareTo(value.Second.Item) < 0)
@@ -34,3 +35,19 @@ public class BinaryTree<T>
     private Pair<BinaryTree<T>> _SubItems;
 }
 ```
+
+Neither generic type parameters nor their constraints are inherited by a derived class. The type parameters must have equal (or stronger) constraints as those on the base class. In contrast to the situation with type parameters declared on a generic class, constraints on overriding virtual generic methods (or explicit interface) methods are inherited implicitly and may not be restated. In the generic class inheritance case, the type parameter on the derived class can be further constrained by adding not only the constraints on the base class (required), but also other constraints. However, overriding virtual generic methods need to conform exactly to the constraints defined by the base class method. Additional constraints could break polymorphism, so they are not allowed and the type parameter constraints on the overriding method are implied.
+
+Delegate types, array types, and enumerated types may not be used as class type constraints, because they are effectively sealed types.
+
+For generic methods, the compiler can infer the type parameters from the formal parameters passed to the method. Contradictory inferred types result in a common type, instead of an error.
+
+Covariance TODO
+
+# Internals
+
+The implementation of generics is different for value-based type parameters than for generics with reference type parameters. When a generic type is first constructed with a value type as a type parameter, the runtime creates a specialized generic type with the supplied type parameter(s) placed appropriately in the CIL. Generics work slightly differently for reference types. The first time a generic type is constructed with a reference type, the runtime creates a specialized generic type with `object` references substituted for type parameters in the CIL, not a specialized generic type based on the type argument. Each subsequent time a constructed type is instantiated with a reference type parameter, the runtime reuses the previously generated version of the generic type, even if the reference type is different from the first reference type. To still gain the advantage of type safety, for each object reference substituted in place of the type parameter, an area of memory for an Order type is specifically allocated and the pointer is set to that memory reference.
+
+Beyond the inclusion of the arity and type parameter in the class header and the type parameter denoted with exclamation points in code, there is little difference between the CIL generated for a generic class and the CIL generated for a nongeneric class.
+
+
