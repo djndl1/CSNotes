@@ -644,3 +644,25 @@ greater:
 ```
 
 The Linux syscall intefaace is different for 32-bit mode and 64-bit mode. Syscalls are defined in `/usr/binclude/asm/unistd_xx.h`. For 32-bit syscalls, place the syscall number in `eax` and use the software interrupt instruction `int 0x80`. Syscalls have parameters which are placed in `ebx`, `ecx`, `edx`, `esi`, `edi` and `ebp`, return values are in `eax`. For 64-bit syscalls, the syscall number is placed in `rax`, the parameters are placed in `rdi`, `rsi`, `rdx`, `r10`, `r8`, `r9`, return values are in `rax`. x86-64 linux uses the `syscall` instruction to execute a syscall.
+
+```assembly
+segment .data
+msg:    db      "Hello World!",0x0a
+len:    equ     $-msg           ; the current assembly point minus the address of msg
+
+  segment .text
+  global        main
+  extern        write, exit
+
+main:
+  push  rbp
+  mov   rbp, rsp
+
+  mov   rdx, len
+  mov   rsi, msg
+  mov   rdi, 1
+  call  write
+  xor   rdi, rdi
+  call  exit
+
+```
