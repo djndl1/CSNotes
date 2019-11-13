@@ -556,6 +556,7 @@ msg:    db      "Hello World!", 0x0a, 0
   extern printf
 
 main:
+    ;; establish a stack frame, `leave` before a `ret` undoes it.
   push  rbp
   mov   rbp, rsp
 
@@ -569,3 +570,77 @@ main:
 ```
 
 `_start` needs all parameters on the stack. `main` is like all other normal C functions.
+
+
+It's possible to give local variables symbolic names:
+
+```assembly
+x   equ     0
+y   equ     8
+
+;; save two registers
+mov [rsp+x], r8
+mov [rsp+y], r9
+```
+
+For SysV ABI, registers `rbx`, `rbp` and `r12-15` must be preserved.
+
+```assembly
+  segment .data
+x     dq      0
+scanf_format  db      "%ld",0
+printf_format db      "fact(%ld) = %ld",0x0a,0
+
+  segment .text
+  global main
+  global fact
+  extern scanf
+  extern printf
+
+main:
+  push  rbp
+  mov   rbp, rsp
+
+  ;; call scanf
+  lea   rdi, [scanf_format]
+  lea   rsi, [x]
+  xor   eax, eax
+  call  scanf
+
+  ;; read input and call factorial
+  mov   rdi, [x]
+  call  fact
+
+  ;; print the result
+  lea   rdi, [printf_format]
+  mov   rsi, [x]
+  mov   rdx, rax
+  xor   eax, eax
+  call  printf
+
+  xor   eax, eax
+  leave
+  ret
+
+fact:
+n       equ     8
+  push  rbp
+  mov   rbp, rsp
+  sub   rsp, 16
+
+  cmp   rdi, 1
+  jg    greater
+  mov   eax, 1
+  leave
+  ret
+greater:
+  mov   [rsp+n], rdi
+  dec   rdi
+  call  fact
+  mov   rdi, [rsp+n]
+  imul  rax, rdi
+  leave
+  ret
+```
+
+The Linux syscall intefaace is different for 32-bit mode and 64-bit mode. Syscalls are defined in `/usr/binclude/asm/unistd_xx.h`. For 32-bit syscalls, place the syscall number in `eax` and use the software interrupt instruction `int 0x80`. Syscalls have parameters which are placed in `ebx`, `ecx`, `edx`, `esi`, `edi` and `ebp`, return values are in `eax`. For 64-bit syscalls, the syscall number is placed in `rax`, the parameters are placed in `rdi`, `rsi`, `rdx`, `r10`, `r8`, `r9`, return values are in `rax`. x86-64 linux uses the `syscall` instruction to execute a syscall.
