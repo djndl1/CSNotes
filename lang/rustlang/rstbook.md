@@ -1187,6 +1187,32 @@ Closures can capture their environment and access variables from the scope in wh
 
 2. `FnMut`: mutably borrow values;
 
+
 3. `Fn`: immutably borrow values.
 
 Rust infers which trait to use based on how the closure uses the values from the environment. All closures implement `FnOnce` because they can all be called at least once. Closures that don’t move the captured variables also implement `FnMut`, and closures that don’t need mutable access to the captured variables also implement `Fn`. `move` keyword before the parameter list forces the closure to take ownership of the values it uses in the environment, useful when passing a closure to a new thread. Most of the time when specifying one of the `Fn` trait bounds, you can start with `Fn` and the compiler will tell you if you need `FnMut` or `FnOnce` based on what happens in the closure body.
+
+## Iterators
+
+In Rust, iterators are _lazy_, meaning they have no effect until methods that consume them are called to use it up. All iterators implement a trait named `Iterator`.
+
+```rust
+pub trait Iterator {
+    type Item;              // associated type
+
+    fn next(&mut self) -> Option<Self::Item>;
+
+    // methods with default implementations elided
+}
+```
+
+Implementing `Iterator` requries defining an `Item` type. Only `next()` is required for implementors. `vec.iter()` produces an iterator over immutable references. `.into_iter()` returns iterators taking ownership; `iter_mut()` returns iterators over mutable references.
+
+- _Consuming adaptors_: methods that call `next()`.
+
+- _iterator adaptors_: changes iterators into different kinds of iterators. Since iterators are lazy, consuming adaptors must be called (such as `.collect()`).
+
+```rust
+let v1: Vec<i32> = vec![1, 2, 3];
+let v2: Vec<_> = v1.iter().map(|x| x + 1).collect();
+```
