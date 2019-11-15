@@ -666,3 +666,19 @@ main:
   call  exit
 
 ```
+
+# Arrays
+
+The user should be cautioned not to attempt to assemble programs with large static memory needs on a computer with less RAM than required.
+
+## General Pattern for memory references
+
+- `[label/reg]`
+
+- `[label+2/4/8 *ind]`
+
+- `[reg+k*ind]`
+
+- `[label+reg+k*ind]`
+
+- `number+reg+k*ind`
