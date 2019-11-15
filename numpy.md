@@ -40,11 +40,11 @@ array([1.+1.j, 2.+0.j, 3.+0.j, 4.-1.j])
 ### Internal memory layout
 
 A contiguous one-dimension segment of computer memory, combining with an _indexing scheme_, interpreted by the data-type object associated with the array.
-Given the index of an element of an array, say $`(n_0, n_1, \dots, n_{N-1})`$ and the strides of the array $`(s_0, s_1, \dots, s_{N-1})`$, i.e. the bytes between two elements along a certain axis, the offset from the beginning of the array is 
+Given the index of an element of an array, say $(n_0, n_1, \dots, n_{N-1})$ and the strides of the array $(s_0, s_1, \dots, s_{N-1})$, i.e. the bytes between two elements along a certain axis, the offset from the beginning of the array is 
 
-```math
+$$
 n_{\text{offset}} = \sum^{N-1}_{k=0} s_k n_k
-```
+$$
 
 
 Different stride scheme like fortran's column-major or C's row-major order exist. However, if `self.shape[k] == 1`, i.e. `self` and `self.squeeze()` always have the same contiguity and aligned flags value.
