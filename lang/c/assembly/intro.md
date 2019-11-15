@@ -681,4 +681,101 @@ The user should be cautioned not to attempt to assemble programs with large stat
 
 - `[label+reg+k*ind]`
 
-- `number+reg+k*ind`
+- `[number+reg+k*ind]`
+
+## Array Processing
+
+- creating arrays
+
+```assembly
+imul  rdi, 4
+call  malloc
+```
+
+- fill the array with random numbers. Note that some registers need to be saved on stack across funcall.
+
+```asm
+  ;; fill(array, size)
+
+fill:
+  ;; local labels
+  .array        equ     0 
+  .size         equ     8
+  .i            equ     16
+  push  rbp
+  mov   rbp, rsp
+  sub   rsp, 32
+
+  mov   [rsp+.array], rdi
+  mov   [rsp+.size], rsi
+  xor   ecx, ecx
+.more   mov     [rsp+.i], rcx
+  call  random
+  mov   rcx, [rsp+.i]
+  mov   rdi, [rsp+.array]
+  mov   [rdi+rcx*4], eax
+  inc   rcx
+  cmp   rcx, [rsp+.size]
+  jl    .more
+  leave
+  ret
+
+```
+
+- printing the array
+
+```asm
+  ;; print(array, size)
+print:
+  .array        equ     0
+  .size         equ     8
+  .i            equ     16
+  push  rbp
+  mov   rbp, rsp
+  sub   rsp, 32
+
+  mov   [rsp+.array], rdi
+  mov   [rsp+.size], rsi
+  xor   ecx, ecx
+  mov   [rsp+.i], rcx
+
+  segment .data
+.format:
+  db    "%10d",0x0a,0
+
+  segment .text
+.more
+  lea   rdi, [.format]
+  mov   rdx, [rsp+.array]
+  mov   rcx, [rsp+.i]
+  mov   esi, [rdx+rcx*4]
+  mov   [rsp+.i], rcx
+  call  printf
+  mov   rcx, [rsp+.i]
+  inc   rcx
+  mov   [rsp+.i], rcx
+  cmp   rcx, [rsp+.size]
+  jl    .more
+  leave
+  ret
+```
+
+- finding the minimum
+
+```asm
+  ;;  x = min(array, size)
+
+min:
+  mov   eax, [rdi]
+  mov   rcx, 1
+.more
+  mov   r8d, [rdi+rcx*4]
+  cmp   r8d, eax
+  cmovl eax, r8d
+  inc   rcx
+  cmp   rcx, rsi
+  jl    .more
+  ret
+```
+
+TODO
