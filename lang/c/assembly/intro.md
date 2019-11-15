@@ -779,3 +779,29 @@ min:
 ```
 
 TODO
+
+# Floating point instructions
+
+- `xmm0` ~ `xmm15`: 128-bit; 4 floats or 2 doubles for SSE
+
+- `ymm0` ~ `ymm15`: 256-bit; 8 floats or 4 doubles for AVX
+
+Each `xmm` occupies the first 128 bits of the corresponding `ymm`.
+
+- `movss`, `movsd`: 32-bit/64-bit floating-point scalar move
+
+- `movaps`/`movapd`: aligned, on a 16-byte boundary in memory; move four floats/two doubles
+
+- `movups`/`movupd`: unaligned
+
+- `alignb`: pseudo-op for an array in the bss section
+
+- `align 16`: aligns an array in the data section
+
+Using an aligned move on an unaligned address results in a segfault.
+
+```asm
+movups  xmm0, [x]   ; move 4 floats
+movups  ymm0, [x]
+movupd  [a], xmm15
+```
