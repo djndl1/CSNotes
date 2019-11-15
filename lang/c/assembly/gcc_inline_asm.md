@@ -77,3 +77,5 @@ https://wiki.osdev.org/Inline_Assembly/Examples
 https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html
 
 http://cholla.mmto.org/computers/gcc_inline.html
+
+https://stackoverflow.com/questions/257418/do-while-0-what-is-it-good-for
