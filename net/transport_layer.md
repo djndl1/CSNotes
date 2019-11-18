@@ -191,6 +191,12 @@ TSAP (Transport Service Access Point) means a specific endpoint in the transport
 
 Stable ports may be a way to determine where to connect. Another way is to query a known port, behind which runs the portmapper that returns the port of the queried service. (Initial connection protocol) Instead of every service server listening to a port, a process server `inetd` listens to these ports and spawns the requested server and allow it to inherit the existing connection. The new server then does the requested work.
 
+## Connection Establishment
+
+To avoid the problem of segment duplicates, one way is to use throwaway transport addresses. Another way is to give each connection a unique identifier chosen by the initiating party and put in each segment. However, the practical way is to specify a packet lifetime. In practice, a hopt count is a close enough approximation to age. We also introduce a periord $T$, which is some small multiple of the true maximum packet lifetime. After $T$ time, we are sure that a send packet is long gone. The heart of the method is for the source to label segments with sequence numbers that will not be resued within $T$ time. To avoid the effect of a machine crash and resync, take a clock that has a universal interval that won't go down, and use its lower k bits as the k-bit initial sequence number. When the same segment sequence number occurs, the old segment is long gone. Each connection starts numbering its segments with a different initial sequence number. TODO ???
+
+Three-way-handshake: Host 1 chooses a sequence number, x, and sends a CONNECTION REQUEST segment containing it to host 2. Host 2 replies with an ACK segment acknowledging x and announcing its own initial se- quence number, y. Finally, host 1 acknowledges host 2’s choice of an initial se- quence number in the first data segment that it sends.
+
 ## Multiplexing
 
 Multiple processes use the same network address; a user use multiple networks (inverse multiplexing).

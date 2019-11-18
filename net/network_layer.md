@@ -294,3 +294,27 @@ With DHCP, every network must have a DHCP server that is responsible for configu
 DHCP is used by ISPs to set the parameters of devices over the Internet access link, so that customers do not need to phone their ISPs to get this information (the network mask, the IP address of the default gatewawy, the IP address of DNS and time servers). 
 
 
+### MPLS: MultiProtocol Label Switching
+
+TODO
+
+### OSPF: An Interior Gateway Routing Protocol
+
+TODO
+
+### BGP: The Exterior Gateway Routing Protocol
+
+TODO
+
+
+### Internet Multicasting
+
+IP supports one-to-many communication or mutlicasting, using class D IP addresses. Twenty-eight bits are available for identifying groups. A best-effort attempt is made to deliver it to all the members of the group addressed but no guarantees are given.
+
+The range of `224.0.0.0/24` is reserved for multicast on the local network. The packets are multicasst by simply broadcasting them on the LAN with a multicast address. Routers do not forward the packet off the LAN.
+
+TODO
+
+### Mobile IP
+
+TODO
