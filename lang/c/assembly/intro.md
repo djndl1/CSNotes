@@ -805,3 +805,29 @@ movups  xmm0, [x]   ; move 4 floats
 movups  ymm0, [x]
 movupd  [a], xmm15
 ```
+
+- addition: `addss`/`addsd`; the floating point add instrucitons do not set any flags, so testing must be done using a compare instruction. `addps`/`addpd`
+
+```asm
+  movss	xmm0, [a]
+  addss	xmm0, [b]
+  movss	[c], xmm0
+
+  movapd	xmm0, [b]
+  addpd	xmm0, [b]
+  movapd	[c], xmm0
+
+  movupd	ymm0, [a]
+  addpd	ymm0, [b]
+  movupd	[c], ymm0
+```
+
+- subtraction: `subss`/`subsd`; `subps`/`subpd`
+
+- multiplication: `mulss`/`mulsd`; `mulps`/`mulpd`
+
+- division: `divsd`/`divss`; `divpd`/`divps`
+
+- conversion: `cvtss2sd`, one float to double; `cvtps2pd`: two packed floats to 2 packed doubles; `cvtsd2ss`/`cvtpd2ps`; `cvtss2si`: float to quad-word integer or a double, `cvtsd2si`: double to a double or a quad-word integer. `cvttss2si`/`cvttsd2si`: truncate and convert. `cvtsi2ss`/`cvtsi2sd`: convert a quad-word integer to a single/double. When using a memory location, `dword` or `qword` may be added to specify the size.
+
+

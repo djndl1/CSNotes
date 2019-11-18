@@ -282,7 +282,7 @@ Important Static Methods
 
 - `string.Compare()`
 
-`using static` directive allows for importing static methods.
+`using static` directive allows access static members and nested types of a type
 
 Rely on `System.WriteLine()` and `System.Environment.NewLine` rather than ‘\n’ in order to accommodate Windows specific operating system idiosyncrasies with the same code that runs on Linux and iOS.
 
