@@ -17,3 +17,5 @@ null >= 0; // true, >= converts null.
 Treat any comparison with `null`/`undefined` except the strict equality with exceptional care. Do not use comparisons with a variable which may be `null`/`undefined` casually.
 
 `typeof` determines the data type. `null` returns `object`, which is an error in the languages.
+
+`break`/` continue` can be used with labels. Any expression can be a `switch/case` argument. The other control flow constructs are basically the same as in Java.
