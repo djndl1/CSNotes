@@ -671,6 +671,7 @@ main:
 
 The user should be cautioned not to attempt to assemble programs with large static memory needs on a computer with less RAM than required.
 
+
 ## General Pattern for memory references
 
 - `[label/reg]`
@@ -830,4 +831,145 @@ movupd  [a], xmm15
 
 - conversion: `cvtss2sd`, one float to double; `cvtps2pd`: two packed floats to 2 packed doubles; `cvtsd2ss`/`cvtpd2ps`; `cvtss2si`: float to quad-word integer or a double, `cvtsd2si`: double to a double or a quad-word integer. `cvttss2si`/`cvttsd2si`: truncate and convert. `cvtsi2ss`/`cvtsi2sd`: convert a quad-word integer to a single/double. When using a memory location, `dword` or `qword` may be added to specify the size.
 
+- max/min: `minss`/`maxss`; `minsd`/`maxsd`; `minps`/`minpd`; `maxps`/`maxpd`
 
+```asm
+  movss xmm0, [x]
+  maxss xmm0, [y]
+
+  movapd        xmm0, [a]
+  minpd         xmm0, [b]
+```
+
+- rounding: `roundss`/`roundps`; `roundsd`/`roundpd`: rounding floating point numbers to whole numbers. A third operand is for rounding mode selection.
+
+- square roots: `sqrtss`/`sqrtsd`; `sqrtps`/`sqrtpd`
+
+$$
+d=\sqrt{\left(\left(x_{1}-x_{2}\right)^{2}+\left(y_{1}-y_{2}\right)^{2}+\left(z_{1}-z_{2}\right)^{2}\right)}
+$$
+
+```asm
+distance3d:
+  push  rbp
+  mov   rbp, rsp
+
+  movss xmm0, [rdi]
+  subss xmm0, [rsi]
+  mulss xmm0, xmm0
+  movss xmm1, [rdi+4]
+  subss xmm1, [rsi+4]
+  mulss xmm1, xmm1
+  movss xmm2, [rdi+8]
+  subss xmm2, [rsi+8]
+  mulss xmm2, xmm2
+  addss xmm0, xmm1
+  addss xmm0, xmm2
+  sqrtss xmm0, xmm0
+  leave
+  ret
+```
+
+$$
+d=x_{1}x_{2}+y_{1}y_{2}+z_{1}z_{2}
+$$
+
+```asm
+dot_product:
+  push  rbp
+  mov   rbp, rsp
+
+  movss xmm0¸ [rdi]
+  mulss xmm0, [rsi]
+  movss xmm1, [rdi+4]
+  mulss xmm1, [rsi+4]
+  movss xmm2, [rdi+8]
+  mulss xmm2, [rsi+8]
+  addss xmm0, xmm1
+  addss xmm0, xmm2
+
+  leave
+  ret
+```
+
+Polynomial evalutation
+
+$$
+P\left(x\right)=p_{0}+p_{1}x+p_{2}x^{2}+\cdots+p_{n}x^{n}
+$$`
+
+```asm
+polynomial:
+  ;; rdi: array of double coefficients
+  ;; xmm0: x
+  ;; rsi: degree
+
+  push  rbp
+  mov   rbp, rsp
+.horner:
+  movsd xmm1, xmm0              ; xmm1 for x
+  movsd xmm0, [rdi+8*rsi]       ; b_k
+  cmp   rsi, 0
+  jz    .done
+.more:
+  sub   rsi, 1
+  mulsd xmm0, xmm1
+  addsd xmm0, [rdi+8*rsi]
+  jnz   .more
+.done:
+  leave
+  ret
+```
+
+# Structs
+
+```asm
+  struc Customer
+.id      resd    1
+.name    resb    64
+.address resb    64
+.balance resd    1
+  endstruc
+```
+
+Now it is possible to refer to the offset using `Customer.id`.
+
+```asm
+  segment .data
+name    db      "Calvin",0
+address db      "12 Mockingbird Lane", 0
+balance dd      12500
+c       dq      0
+  struc Customer
+.id             resd    1
+.name           resb    64
+.address        resb    64
+.balance        resd    1
+  endstruc
+  segment .text
+  global main
+  extern malloc, strcpy
+
+main:
+  push  rbp
+  mov   rbp, rsp
+  sub   rsp, 32
+
+  mov   rdi, Customer_size      ; defined by the assembler
+  call  malloc
+  mov   [c], rax
+  mov   [rax+Customer.id], dword 7
+  lea   rdi, [rax+Customer.name]
+  lea   rsi, [name]
+  call  strcpy
+  mov   rax, [c]
+  lea   rdi, [rax+Customer.address]
+  lea   rsi, [address]
+  call  strcpy
+  mov   rax, [c]
+  mov   rdx, [balance]
+  mov   [rax+Customer.balance], edx
+  xor   eax, eax
+  leave
+  ret
+```
