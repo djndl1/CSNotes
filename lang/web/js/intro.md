@@ -19,3 +19,27 @@ Treat any comparison with `null`/`undefined` except the strict equality with exc
 `typeof` determines the data type. `null` returns `object`, which is an error in the languages.
 
 `break`/` continue` can be used with labels. Any expression can be a `switch/case` argument. The other control flow constructs are basically the same as in Java.
+
+A function has full access to an outer (global) variable. The outer variable is only used if there's no local one. Function parameters can have default values. A function is an object, a value.
+
+```javascript
+// Function Declaration
+function sum(a, b) {
+  return a + b;
+}
+
+// Function Expression
+let sum = function(a, b) {
+  return a + b;
+};
+
+// Arrow Function
+let welcome = (age < 18) ?
+  () => alert('Hello') :
+  () => alert("Greetings!");
+
+welcome(); // ok now
+```
+
+A Function Declaration can be called earlier than it is defined. A Function Expression is created when the execution reaches it and is usable only from that moment. In strict mode, when a Function Declaration is within a code block, it’s visible everywhere inside that block. But not outside of it.
+
