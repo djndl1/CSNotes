@@ -1,5 +1,6 @@
 https://www.codeproject.com/Articles/45788/The-Real-Protected-Long-mode-assembly-tutorial-for
 
+https://www.agner.org/optimize/
 
 Modern C/C++ compilers do excellent optimization and beginning assembly programmers are no match for a good compiler. It is unlikely for assembly to outperform C/C++ for most general purpose tasks. One advantage of assembly language is that it can do things not possible in high level languages.
 
