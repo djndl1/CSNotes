@@ -124,3 +124,40 @@ ch:     .byte   'A','B',0
         .align 2      @ advances to the next `*00`
 ary     .word   0,1,2,3,4
 ```
+
+## Setting and Manipulating Symbols
+
+Labels are just a kind of symbols.
+
+- `.equ symbol, expression`/`.set symbol expression`: sets the value of `symbol` to `expression`, similar to `#define` in C.
+
+- `.equiv symbol expression`: same as above except that the assembler will signal an error if the symbol is already defined.
+
+- `.global symbol`/`.globl symbol`: make the symbol visible to the linker. Otherwise, symbols are visible only within the file where they are defined.
+
+- `.comm symbol, length`: a common symbol, defined in more than one file, and all instances should be merged into a single symbol. `length` defines the memory allocated (the largest value will be used if there are multiple definitions).
+
+```asm
+ary:    word    0,1,2,3,4
+        .equ    arysize, (. - ary) / 4   @ `.` the current address
+```
+
+## Conditional Assembly
+
+- `.if expression`
+
+- `.ifdef symbol`
+
+- `.ifndef symbol`
+
+- `.else`
+
+- `.endif`
+
+## Including Other Source Files
+
+- `.include "filename`: includes supporting files at specified points in the source program.
+
+## Macros
+
+Macros are expanded to generate assembly code.
