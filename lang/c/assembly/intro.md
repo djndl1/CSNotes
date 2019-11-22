@@ -28,6 +28,7 @@ In Linux, memory for a process is divided into 4 logical regions:
 
 - data: above text `.data`; above data there  is `.bss`, which has uninitialized symbols, thus not stored in the executables.
 
+
 - heap: dynamically resizable region of memory; also used for loaded shared object
 
 - stack: high address (0x7fffffffffff) (47bits); restricted in size by the Linux kernel, typically to 16 MB. 
@@ -49,7 +50,7 @@ x/NFS address // NFS = N Format Size
 
 ## Memory Mapping
 
-- CR3 (Control Register 3): a pointer to the top level of a hierarchical collection of tables in memory which define the translation from virtual addresses to physical addresses. CR3 is filled with the address of the top level table in the hierarchy (Page Map Level 4).
+- CR3 (Control Register 3): a pointer to the top level of a hierarchical collection of tables in memory which define the translation from virtual addresses to physical addresses. CR3 is filled with the address of the top level table in the hierarchy (Page Map Level 4). Each process has a unique CR3 value.
 
 A virtual or logical address is broken into 6 fields:
 
@@ -75,6 +76,10 @@ Addresses are 8 bytes so a page stores 512 entries. TODO
 The CPU designer have added support for large pages using three levels of the existing tranlation tables, yielding a maximum of $2^{21}$ bytes.
 
 Fast lookup is done through TLB (Translation Lookaside Buffer) after a page translation has been performed and added to the TLB. Typical miss rates are from 0.01% to 1%.
+
+https://simonis.github.io/Memory/
+
+https://www.kernel.org/doc/html/latest/x86/x86_64/mm.html#complete-virtual-memory-map-with-4-level-page-tables
 
 # Registers
 
