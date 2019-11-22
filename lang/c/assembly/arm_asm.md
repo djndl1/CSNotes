@@ -51,7 +51,7 @@ Storage space for a variable can be allocated in three ways:
 
 1. statistically: `.data` section
 
-2. dynamically: on the heapj. The address of a dynamic variable is always stored in another pointer variable.
+2. dynamically: on the heap. The address of a dynamic variable is always stored in another pointer variable.
 
 3. automatically: on the stack. The address of an automatic variable is computed as an offset from the stack pointer.
 
@@ -59,13 +59,13 @@ Storage space for a variable can be allocated in three ways:
 
 An assembly program consists of four basic elements:
 
-1. assembler directives; reserve memory, control which program section is being used; define macros; include other files; perform other operations that control assembling. All assembler directives begin with `.`.
+1. _assembler directives:_ reserve memory, control which program section is being used; define macros; include other files; perform other operations that control assembling. All assembler directives begin with `.`.
 
-2. label: On the first pass, the assembler builds a symbol table, which maps each label or symbol to a numerical value. On the second pass, the assembler converts the assembly instructions and data declarations into binary, using the symbol table to supply numerical values whenever they are needed.
+2. _label_: On the first pass, the assembler builds a symbol table, which maps each label or symbol to a numerical value. On the second pass, the assembler converts the assembly instructions and data declarations into binary, using the symbol table to supply numerical values whenever they are needed.
 
-3. assembly instructions
+3. _assembly instructions_
 
-4. comments.
+4. _comments_.
 
 ## Directives
 
@@ -94,6 +94,8 @@ If the subsection number is not specified, it defaults to zero.
 - `.word expressions`: a word, four bytes for ARM
 
 - `.long expressions`: four bytes for ARM
+
+- `ascii "string"`: no trailing ASCII NULL.
 
 - `.asciz "string"`/`.string "string"`: each string is followedby an ASCII NULL.
 
@@ -133,7 +135,7 @@ Labels are just a kind of symbols.
 
 - `.equiv symbol expression`: same as above except that the assembler will signal an error if the symbol is already defined.
 
-- `.global symbol`/`.globl symbol`: make the symbol visible to the linker. Otherwise, symbols are visible only within the file where they are defined.
+- `.global symbol`/`.globl symbol`: make the symbol visible to the linker. Otherwise, symbols are visible only within the file where they are defined. GAS treats all undefined symbols as external. `.local` is needed if declared local to a file.
 
 - `.comm symbol, length`: a common symbol, defined in more than one file, and all instances should be merged into a single symbol. `length` defines the memory allocated (the largest value will be used if there are multiple definitions).
 
@@ -158,6 +160,36 @@ ary:    word    0,1,2,3,4
 
 - `.include "filename`: includes supporting files at specified points in the source program.
 
+
 ## Macros
 
 Macros are expanded to generate assembly code.
+
+- `.macro macname`/`.macro macname macargs ...`: the programmer can supply a default value for any macro argument by following the name with `=deflt_val`
+
+```asm
+.macro reserve_str p1=0, p2
+// called as
+reserve_str x, y
+```
+
+- `.endm`: end the current macro definition
+
+- `.exitm`: exit early from the current macro definition, used only within a `.if` or `.ifdef`.
+
+- `\@`: a pseudo-variable used by the assembler to maintain a count of how many macros it has executed.
+
+```asm
+.macro  SHIFT   a,b
+.if     \b < 0
+  mov   \a, \a, asr 3-\b
+.else
+  mov   \a, \a, lsl #\b
+.endm
+
+.macro  enum first=0, last=5
+.long   \first
+.if     \last-\first
+  enum  "(\first+1)",\last
+.endif
+```
