@@ -81,8 +81,16 @@ A thread can be in:
 
 There are two main places to implement threads:
 
-- user space: can be implemented on an OS that does not support threads. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Makeing a local call into the runtime is much more efficient than calling a kernel call. User-level threads allow each process to have its own scheduling algorithm. Some major problems with user-level threads are: 1. blocking syscalls block the whole process, which defeats one of the major goals of having multiple threads. The whole process is blocked when a page fault occurs. 2. within a single process, there are no clock interrupts, making it impossible to schedule processes round-robin fashion. The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
+- user space: can be implemented on an OS that does not support threads. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Makeing a local call into the runtime is much more efficient than calling a kernel call. User-level threads allow each process to have its own scheduling algorithm. Some major problems with user-level threads are: 1. blocking syscalls blocks the whole process, which defeats one of the major goals of having multiple threads. The whole process is blocked when a page fault occurs. 2. within a single process, there are no clock interrupts, making it impossible to schedule processes round-robin fashion. The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
 
-- kernel: the hernel tacks all the threads in the system. In some systems, in order to save some overhead, when a thread is destroyed, it is marked as not runnable, but its kernel data structures are not affected. Later when a new thread must be created, an old thread is reactivated. The main disadvantage is that the cost of a syscall is substantial.
+- kernel: the kernel handles all the threads in the system. In some systems, in order to save some overhead, when a thread is destroyed, it is marked as not runnable, but its kernel data structures are not affected. Later when a new thread must be created, an old thread is reactivated. The main disadvantage is that the cost of a syscall is substantial.
 
-- hybrid: use kernel-level threads and then multiplex user-level onto some or all of them
+- hybrid: use kernel-level threads and then multiplex user-level onto some or all of them.
+
+Scheduler activations TODO http://polaris.imag.fr/vincent.danjean/papers/anderson.pdf
+
+Pop-up threads TODO
+
+Accessing global variables can cause problems from different threads. Many library procedures are not reentrant (they are not designed to have a second call made to any given procedure while a previous call has not yet finished). Signals are hard to handle in multhreading.
+
+`errno` is thread-local.
