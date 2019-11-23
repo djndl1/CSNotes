@@ -126,6 +126,29 @@ mov   [a], rax  ; move data from rax to a
 mov   rbx, rax  ; move data from rax to rbx
 ```
 
+There are a collection of conditional move instructions which can be used profitably rather than using branching.
+
+- `cmovnz`/`cmovz`: move if zero flag (not) set
+
+- `cmovl`/`cmovlz`: move if the result was negative (or zero)
+
+- `cmovg`/`cmovge`: move if the result was positive (or zero)
+
+```assembly
+; abs()
+mov rbx, rax
+neg rax
+cmovl rax, rbx
+```
+
+If a value from memory is used in more than 1 operation, it might be faster to move into a register first.
+
+- `xchg`: the exchange operation is atomic. This can have a large performance penalty. Only one operand can be in memory, the other must be a register.
+
+- `cmpxchg`: compare and exchange. There is no implicit `lock` prefix.
+
+- ``
+
 # Arithmetic
 
 - `neg`: two's complement of its operand, which can be either a general-purpose register or a memory reference; it sets the sign flag (SF) and the zero flag (ZF).
@@ -159,22 +182,7 @@ neg   byte  [x]
 
 - `idiv`/`div`: takes `rdx`:`rax` as the dividend and takes a single operand (register or memory reference)
 
-There are a collection of conditional move instructions which can be used profitably rather than using branching.
 
-- `cmovnz`/`cmovz`: move if zero flag (not) set
-
-- `cmovl`/`cmovlz`: move if the result was negative (or zero)
-
-- `cmovg`/`cmovge`: move if the result was positive (or zero)
-
-```assembly
-; abs()
-mov rbx, rax
-neg rax
-cmovl rax, rbx
-```
-
-If a value from memory is used in more than 1 operation, it might be faster to move into a register first.
 
 # Bit Operations
 
