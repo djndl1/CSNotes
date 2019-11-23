@@ -196,6 +196,48 @@ reserve_str x, y
 
 # Architecture
 
+ARMv4T (Thumb 16bit) -> ARMv5TE (DSP-type operations and saturated arithmetic) -> ARMv6 (unaligned memory access, multi-core support, SIMD operations within 32-bit registers, Thumb-2, TrustZone) -> ARMv7-A (mandatory Thumb-2 and NEON). Almost all architecture changes are backwards-compatible, meaning software written for the ARMv4T architecture can still be used on ARMv7 processors.
+
+ARMv7 contains two main instruction sets, of which Thumb is a 16-bit long subset of the most commonly used 32-bit ARM instructions. The main reason for using Thumb code is to reduce code density. Thumb-2 is not an instruction set. It extends the original 16-bit Thumb instruction set to include 32-bit instructions to allow Thumb code to achieve performance similar to ARM code. NEON shares register files with VFP, and supports 8, 16, 32 and 64-bit integer and single-precision floating point data, operated on as vectors in 64-bit and 128-bit registers. Cortex-A only supports internal coprocessors.
+
+A number of key points are common to the Cortex-A family:
+
+1. 32-bit RISC core, with $16 \times 32$ visible registers with mode-based register banking
+
+2. Modified Harvard Architecture (separate, concurrent access to instructions and data)
+
+3. Load/Store Architecture
+
+4. Thumb-2 as standard
+
+5. VFP and NEON options
+
+6. Backward compatibility with code from previous ARM processors
+
+7. SMP support
+
+8. Unaligned memory access
+
+9. Big-endian and little-endian data access support
+
+10. Physically indexed, physically tagged data caches
+
+The ARM has a non-priviledged user mode and six priviledged mdoes:
+
+1. FIQ: entered on an FIQ interrupt exception
+
+2. IRQ: entered on an IRQ interrupt exception
+
+3. Supervisor (SVC): on reset or when a supervisor call instruction is executed
+
+4. Abort (ABT): on a memory access exception
+
+5. Undef (UND): when an undefined instruction executed
+
+6. System (SYS): mode in which the OS runs, sharing the register view with user mode
+
+Processors that implement the TrustZone extension (Monitor/MON mode) achieve system security by dividing all of the hardware and software resources for the device so that they exist in either the _Secure world_ for security subsystem or the _Normal world_ for everything else. The _Virtulization Extensions_ add a hypervisor mode (Hyp) in addition to the existing privileged modes. If the Virtualization Extensions are implemented there is a privilege model different to that of previous architectures. A general purpose Operating System, such as Linux, and its applications, are expected to run in Non-secure state. The Secure state is expected to be occupied by vendor-specific firmware, or security-sensitive software.
+
 - `r0`-`r12`: general-purpose registers
 
 - `r15`/`pc`: program counter
@@ -208,6 +250,22 @@ reserve_str x, y
 
 - `r12`/`ip`: inter-procedure scratch register, used by the C library when calling functions in dynamically linked libraries.
 
-- `CPSR`: Current Program Status Register. The first four flags `N`, `Z`, `C` and `V` (overflow) are the _condition flags_.
+- `CPSR`: Current Program Status Register. The first four flags `N`, `Z`, `C` and `V` (overflow) are the _condition flags_. In user mode, a restricted form of CPSR called the Application Program Status Register (APSR) is accessed instead. The core can change between modes using instructions that directly write to the CPSR mode bits. More commonly, the processor changes mode automatically as a result of exception events.
 
-The ARM processors supports a relatively small set of instructions grouped into four basic instruction types. Most instructions have optional _modifiers_ which can be used to change their behavior.
+- `SPSR`: Saved Program Status Register, a saved copy of the CPSR fro mthe previously executed mode.
+
+Depending on which mode the software is executing in and the register being accessed, a register might correspond to a different physical storage location. This is called _banking_. In all modes, 'Low Registers' and R15 share the same physical storage location. `r15`  always points eight bytes ahead of the current instruction in ARM state and four bytes ahead of the current instruction in Thumb state, a legacy of the three stage pipeline of the original ARM1 processor. 
+
+# ARM Assembly Instructions
+
+A RISC processor, unlike CISC processors that have significant amounts of internal logic that decode machine instructions to sequence of internal operations (microcode), have a smaller number of more general purpose instructions. ARM instructions typically have a two or three operand format.
+
+## The ARM instruction sets
+
+A word = 32 bits. 
+
+An explicit instruction is used to change between instruction sets. Calling functions that are compiled for a different state is known as interworking. 
+
+For Thumb assembly code, there is often a choice of 16-bit and 32-bit instruction encodings, with the 16-bit versions being generated by default. The .W (32-bit) and .N (16-bit) width specifiers can be used to force a particular encoding (if such an encoding exists)
+
+All GCC inline assembly code types can be built for Thumb or ARM depending on GCC configuration and command line switches.
