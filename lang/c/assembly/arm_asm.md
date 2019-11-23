@@ -193,3 +193,21 @@ reserve_str x, y
   enum  "(\first+1)",\last
 .endif
 ```
+
+# Architecture
+
+- `r0`-`r12`: general-purpose registers
+
+- `r15`/`pc`: program counter
+
+- `r14`/`lr`: link register, holding the return address for subroutines.
+
+- `r13`/`sp`: stack pointer. On most systems, the stack grows downwards. The use of `r13` as the stack pointer is a programming convention.
+
+- `r11`/`fp`: frame pointer, used by high-level language compilers to track the current stack frame.
+
+- `r12`/`ip`: inter-procedure scratch register, used by the C library when calling functions in dynamically linked libraries.
+
+- `CPSR`: Current Program Status Register. The first four flags `N`, `Z`, `C` and `V` (overflow) are the _condition flags_.
+
+The ARM processors supports a relatively small set of instructions grouped into four basic instruction types. Most instructions have optional _modifiers_ which can be used to change their behavior.
