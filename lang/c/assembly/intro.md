@@ -1,3 +1,7 @@
+
+
+
+
 https://www.codeproject.com/Articles/45788/The-Real-Protected-Long-mode-assembly-tutorial-for
 
 https://www.agner.org/optimize/
@@ -5,6 +9,18 @@ https://www.agner.org/optimize/
 Modern C/C++ compilers do excellent optimization and beginning assembly programmers are no match for a good compiler. It is unlikely for assembly to outperform C/C++ for most general purpose tasks. One advantage of assembly language is that it can do things not possible in high level languages.
 
 > A typical C program has a `main` function which is called indirectly via a `_start` function in the C library.
+
+# GAS Syntax
+
+1. GAS assembly instructions are generally suffixed with the letters `b`, `s`, `w`, `l`, `q` or `t` to determine what size operand is being manipulated. If the suffix is not specified, and there are no memory operands for the instruction, GAS infers the operand size from the size of the destination register operand.
+
+- `s` = single (32-bit floating point)
+
+- `l` = long (32 bit integer or 64-bit floating point)
+    
+- `q` = quad
+
+- `t` = ten bytes (80-bit floating point)
 
 # Numbers
 
@@ -96,14 +112,14 @@ Software can access the 64-bit registers as 64-bit, 32-bit, 6-bit and 8-bit valu
 
 ## Moving Data
 
-Immediate operands can be 1, 2, or 4 bytes for most instructions. `mov` allows 8 byte immediate values.
+Immediate operands can be 1, 2, or 4 bytes for most instructions. 
+
+- `mov` allows 8 byte immediate values. The source and destination must be the same size and cannot be both memory locations.
 
 ```assembly
 mov     rax, 100
 mov     eax, 100 // shorted, sometimes preferred.
 ```
-
-Moving a 32-bit constant into a 64-bit register will clear out the top half. 
 
 ```assembly
 mov   rax, [a]  ; load from memory
@@ -111,9 +127,9 @@ mov   rax, [a]  ; load from memory
 
 Also
 
-- `movzx`: move and zero extend
+- `movzx`/`movz`(GAS): move and zero extend
 
-- `movsx`: move and sign extend
+- `movsx`/`movs`(GAS): move and sign extend
 
 ```assembly
 movsx   rax, byte [data] ; move byte, sign extend
@@ -147,7 +163,26 @@ If a value from memory is used in more than 1 operation, it might be faster to m
 
 - `cmpxchg`: compare and exchange. There is no implicit `lock` prefix.
 
-- ``
+```c
+static inline int a_cas(volatile int *p, int t, int s)
+{
+	__asm__ __volatile__ (
+		"lock ; cmpxchg %3, %1"
+		: "=a"(t), "=m"(*p) : "a"(t), "r"(s) : "memory" );
+	return t;
+}
+```
+
+- `movs` + `b`/`w`/`d`/`p`: moves from the address specified by `rsi` to the address specified by `rdi`. After each data item is moved, `rdi` and `rsi` registers are advanced 1, 2, 4 or 8 bytes depending on the size of the item.
+
+```assembly
+lea     rsi, [source]   ; load effective address
+lea     rdi, [destination]
+mov     rcx, 100000
+rep     movsb
+```
+
+- `lea`: Load Effective Address. Calculates the address of `src` and loads it into `dest`. It calculates the address in the same way as `mov`, but it loads the address itself instead of loads the content at that address.
 
 # Arithmetic
 
@@ -502,14 +537,7 @@ end_for:
 
 - `rep`: repeats a string/array instruction the number of times specified in `rcx` (count register). The repeat instructions allow setting array elements to a specified value, copying one array to another, and shifting a specific value in an array. The string instructions use `rax` (holding a specific value), `rsi` (source index), `rdi` (destination index). The string operations update `rsi` and `rdi` after each use, managed by `DF` flag (0 for increasing, 1 for decreasing).
 
-- `movs` + `b`/`w`/`d`/`p`: moves from the address specified by `rsi` to the address specified by `rdi`. After each data item is moved, `rdi` and `rsi` registers are advanced 1, 2, 4 or 8 bytes depending on the size of the item.
 
-```assembly
-lea     rsi, [source]   ; load effective address
-lea     rdi, [destination]
-mov     rcx, 100000
-rep     movsb
-```
 
 - `stos` + `b`/`w`/`d`/`q`: moves the item in `al`/`ax`/`eax`/`rax` to memory
 
