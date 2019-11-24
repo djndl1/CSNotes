@@ -119,13 +119,8 @@ Immediate operands can be 1, 2, or 4 bytes for most instructions.
 ```assembly
 mov     rax, 100
 mov     eax, 100 // shorted, sometimes preferred.
-```
-
-```assembly
 mov   rax, [a]  ; load from memory
 ```
-
-Also
 
 - `movzx`/`movz`(GAS): move and zero extend
 
