@@ -1,5 +1,5 @@
 
-
+https://stackoverflow.com/questions/49474166/how-to-write-build-c-code-to-avoid-conflicts-with-existing-assembly-code
 
 
 https://www.codeproject.com/Articles/45788/The-Real-Protected-Long-mode-assembly-tutorial-for
@@ -385,6 +385,52 @@ while:
   shr   rax, 1
   inc   rcx
   jmp   while
+```
+
+```asm
+/* a hand-coded supposedly correct bit counts */
+  .text
+  .global bit_count_asm
+  .type bit_count_asm, @function
+bit_count_asm:
+  pushq %rbp
+  movq  %rsp, %rbp
+  subq  $16, %rsp
+
+  xorq  %rax, %rax
+  movq  %rdi, 8(%rsp)
+.count_start:
+  cmp    $0, 8(%rsp)
+  jz    .count_end
+  
+  movq  8(%rsp), %rdi
+  andq  $1, %rdi
+  addq  %rdi, %rax
+  shrq   $1, 8(%rsp)
+  jmp   .count_start
+.count_end:
+  leave
+  ret
+
+
+/* compiler-generated */
+bit_count:
+        pushq   %rbp
+        movq    %rsp, %rbp
+        movq    %rdi, -24(%rbp)
+        movq    $0, -8(%rbp)
+        jmp     .L2
+.L3:
+        movq    -24(%rbp), %rax
+        andl    $1, %eax
+        addq    %rax, -8(%rbp)
+        shrq    -24(%rbp)
+.L2:
+        cmpq    $0, -24(%rbp)
+        jne     .L3
+        movq    -8(%rbp), %rax
+        popq    %rbp
+        ret
 ```
 
 ```assembly
