@@ -137,6 +137,7 @@ mov   [a], rax  ; move data from rax to a
 mov   rbx, rax  ; move data from rax to rbx
 ```
 
+
 There are a collection of conditional move instructions which can be used profitably rather than using branching.
 
 - `cmovnz`/`cmovz`: move if zero flag (not) set
@@ -187,14 +188,17 @@ rep     movsb
 neg   rax
 neg   dword [x]
 neg   byte  [x]
-
 ```
 
-- `add`: add the contents of the source to the destination; the source can be an immediate value of 32 bits, a memory reference or a register. Only one of the operands can be a memory reference. `SF` is set to the sign bit of the result; the zero flag `ZF` is set if the result is 0; the overflow flag (OF) is set if the addition overflows.
+- `add`: add the contents of the source to the destination; the source can be an immediate value of 32 bits, a memory reference or a register. Only one of the operands can be a memory reference. `SF` is set to the sign bit of the result; the zero flag `ZF` is set if the result is 0; the overflow flag (OF) is set if the addition overflows. There is no special add for signed numbers versus unsigned numbers.
+
+- `adc`: add with carry
 
 - `inc`: increment
 
 - `sub`: substract the contents of the source from the destination
+
+- `sbb`: subtract with borrow
 
 - `dec`
 
@@ -210,8 +214,7 @@ neg   byte  [x]
 
 `CF` and `OF` flags are set when the product exceeds 64 bits, unless a smaller multiply is requested.
 
-- `idiv`/`div`: takes `rdx`:`rax` as the dividend and takes a single operand (register or memory reference)
-
+- `idiv`/`div`: takes `rdx`:`rax` as the dividend and takes a single operand (register or memory reference). `rax` for the quotient and `rdx` for the remainder.
 
 
 # Bit Operations
