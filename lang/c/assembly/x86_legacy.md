@@ -39,3 +39,9 @@ In real mode, segment registers were used to addressing a 20-bit address bus usi
 The `EFLAGS` is a 32-bit register used as a collection of boolean bits to store the results of operations and the state of the processors.
 
 https://en.wikibooks.org/wiki/X86_Assembly/16,_32,_and_64_Bits
+
+https://wiki.osdev.org/Segmentation
+
+https://unix.stackexchange.com/questions/469253/does-linux-not-use-segmentation-but-only-paging#
+
+https://wiki.osdev.org/Global_Descriptor_Table
