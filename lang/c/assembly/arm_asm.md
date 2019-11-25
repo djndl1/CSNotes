@@ -365,6 +365,7 @@ ldmfd sp!, {r0-r9}  @ equiv to `ldmia`
 
 - `ldrex`/`strex`: exclusive load/store. `strex` stores only if the tagging is valid. It sets a bit to indicate whether the store succeeded.
 
+
 ```asm
   ldr   r12, =sem @ semaphore address
   ldr   r1, =LOCKED
@@ -375,3 +376,20 @@ splck:
   cmpne r0, #1
   beq   splck
 ```
+
+### Branch Instructions
+
+- `b`: branch, the target label can be any label in the current file, or any label that is defined as `.globl` in any file that is linked in.
+
+- `bl`: It copies the current program counter to the link register before branching.
+
+```asm
+mov r0, =fmt_string
+bl  printf
+```
+
+### Pseudo-instruction
+
+- `ldr`
+
+- `adr`/`adrl` (long): more efficient than `ldr rx, =label`. Translated into add or subtract operations and do not require a load from memory. The address must be in the same section. They cannot be used to load addresses of labels in the `.data` section.
