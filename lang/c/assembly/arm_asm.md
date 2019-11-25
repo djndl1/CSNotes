@@ -300,3 +300,78 @@ ARM cores can only perform data processing on registers, never directly on memor
 ```asm
 Operation{cond}{s}  Rd, Rn, Operand2
 ```
+
+## Load/Store
+
+### Addressing
+
+Register addressing
+
+- `[Rn]`
+
+Pre-indexed
+
+- `[Rn, #±<offset_12>]`
+
+- `[Rn, ±Rm]`
+
+- `[Rn, ±Rm, <shift_op> #<shift>]`: `Rn` + shifted `Rm`
+
+Pre-indexed with write-back
+
+- `[Rn, #±<offset_12>]!`: the address used is stored in `Rn` after the load/store
+
+- `[Rn, ±Rm]!`
+
+- `[Rn, ±Rm, <shift_op> #<shift>]!`: 
+
+- Post indexed with wirte-back
+
+- `[Rn], #±<offset_12>`: `Rn` used as the address, `Rn` is then updated.
+
+- `[Rn], ±Rm`
+
+- `[Rn], ±Rm, <shift_op> #<shift>`
+
+A pseudo-instruction
+
+- `[Rn], =<immediate|symbol>`: A `mov` instruction or a load of a symbol in a literal pool.
+
+### Load/Store Registers
+
+A size can be specified: `b` (byte), `h` (half-word), `sb` (signed byte), `sh` (signed half-word). Signed versions are for sign extension. Unsigned numbers are zero-extended.
+
+- `ldr`/`str`; load/store a single register
+
+- `ldm`/`stm`: load/store multiple registers, used to store registers on the stack, and for copying blocks of data. The operation proceeds from the lowest register to the highest in the list. By convention, only the _Full Descending_ (FD) option is used for stacks in ARM processor-based systems. The stack pointer points to the last filled location in the stack. Nearly only used are `stmfd` and `ldmfd`.
+
+```asm
+/* transfer a memory block */
+  ldr     r8, =source
+  ldr     r9, =dest
+  ldmia   r8, {r0-r7}
+  stmia   r9, {r0-r7}
+```
+
+```asm
+/* push to the stack */
+stmfd sp!, {r0-r9}  @ equiv to `stmdb`
+
+/* pop them */ 
+ldmfd sp!, {r0-r9}  @ equiv to `ldmia`
+```
+
+- `swp`/`swpb`: atomic load and store. Deprecated, works only on uni-processor systems.
+
+- `ldrex`/`strex`: exclusive load/store. `strex` stores only if the tagging is valid. It sets a bit to indicate whether the store succeeded.
+
+```asm
+  ldr   r12, =sem @ semaphore address
+  ldr   r1, =LOCKED
+splck:
+  ldrex r0, [r12]
+  cmp   r0, r1
+  strexne r0, r1, [r12]
+  cmpne r0, #1
+  beq   splck
+```
