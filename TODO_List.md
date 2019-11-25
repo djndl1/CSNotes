@@ -69,7 +69,7 @@
 
 - [ ] https://en.wikipedia.org/wiki/Lexical_analysis
 
-- [ ] https://en.wikipedia.org/wiki/Weak_symbol
+- [x] https://en.wikipedia.org/wiki/Weak_symbol
 
 - [ ] https://stackoverflow.com/questions/1041866/what-is-the-effect-of-extern-c-in-c
 
@@ -270,3 +270,5 @@
 - [ ] https://stats.stackexchange.com/questions/380040/what-is-an-ablation-study-and-is-there-a-systematic-way-to-perform-it
 
 - [ ] https://www.ibm.com/cloud/learn/cloud-computing
+
+- [ ] https://blog.packagecloud.io/eng/2016/04/05/the-definitive-guide-to-linux-system-calls/
