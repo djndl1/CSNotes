@@ -393,3 +393,36 @@ bl  printf
 - `ldr`
 
 - `adr`/`adrl` (long): more efficient than `ldr rx, =label`. Translated into add or subtract operations and do not require a load from memory. The address must be in the same section. They cannot be used to load addresses of labels in the `.data` section.
+
+### Data Processing
+
+```asm
+Operation{cond}{S} Rd, Rn, Operand2
+```
+
+`Rn` must always be a register, `Operand2` can be an immediate value, a register, or a register shifted by an immediate value or register.
+
+- `lsl`/`lsr`: logical left shift
+
+- `asr`: arithmetic right-shift
+
+- `ror`/`rrx`: rotate-right (extended)
+
+ARM assembly does not require explicit shift instructions. The `mov` instruction can be used for shifts and rotates.
+
+```asm
+mov r0, r1, lsr #2   @ R0 = R1 >> 2
+
+add r0, r0, r0, LSL #2  @ R0 *= 5
+```
+
+Apart from multiplication and division, another common use for shifted operands is array index:
+
+```asm
+/* R1: base; R2: index*/
+
+```
+
+There is no scope to multiply by an immediate value. Multiplies operate only on values in registers.
+
+Integer SIMD provides the ability to pack, extract and unpack 8-bit and 16-bit quantities within 32-bit registers and to perform arithmetic operations with a single instruction. Subword quantities in each register are operated on in parallel and the GE flags are set or cleared according to the results of the instruction to indicate overflow.
