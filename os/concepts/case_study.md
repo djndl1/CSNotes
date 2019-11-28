@@ -12,7 +12,51 @@ MINIX: functionally equivalent to Version 7 UNIX; one of the first UNIX-like sys
 
 Linux: initially as a rewrite of MINIX, grew into a full, production UNIX clone. Linux makes use of many special features of GCC (Clang 10 now compiles the mainline Linux kernel). Linux 1.0 in 1994 was sufficiently compatible with UNIX. Linux 2.0 in 1996 included support for 64-bit architectures, symmetric multiprogramming, new networking protocols and numerous other features.
 
-TODO
+## Overview
+
+UNIX was designed by programmers, for programmers, to use in an environment in which the majority of the users are relatively sophisticated and are engaged in software development projects. The model of a group of experienced programmers working together closely to produce advanced software is obviously very different from the personal-computer model of a single beginner working alone with a word processor, and this difference is reflected throughout UNIX from start to finish.
+
+### Kernel Structure
+
+```
+                       +-----------------------------------------------------------+
++----------------------+                      System Calls                         +-----------------+
+|                      +-----------------------------------------------------------+                 |
+|                                                                                                    |
+|                                                                                                    |
+|                  I/O Component                           Memory Managment       Process Management |
+|                                                             Component                              |
+|  +--------------------------------------------+         +----------------+     +---------------+   |
+|  |    +-------------------------------+       |         |                |     |               |   |
+|  |    |      Virtual File System      |       |         |   Virtual      |     |   Signal      |   |
+|  |    +-------------------------------+       |         |   Memory       |     |   Handling    |   |
+|  |                                            |         |                |     |               |   |
+|  | +--------+   +---------+  +--------------+ |         +----------------+     +---------------+   |
+|  | |Terminal|   |         |  |    File      | |         |                |     |               |   |
+|  | |        |   | Sockets |  |   systems    | |         |    Paging      |     |Process/thread |   |
+|  | +--------+   |         |  +--------------+ |         |     page       |     |   creation &  |   |
+|  | | line   |   +---------+  |   Generic    | |         |    replacement |     |  termination  |   |
+|  | |disci-  |   | Network |  |  block layer | |         |                |     |               |   |
+|  | |line    |   |protocols|  +--------------+ |         |                |     |               |   |
+|  | +--------+   +---------+  | I/O Scheduler| |         +----------------+     +---------------+   |
+|  | |Character   | Network |  +--------------+ |         |                |     |               |   |
+|  | | Device |   | device  |  | Block Device | |         |     Page       |     |               |   |
+|  | | Drivers|   | drivers |  |   Drivers    | |         |                |     |      CPU      |   |
+|  | +--------+   +---------+  +--------------+ |         |     Cache      |     |               |   |
+|  |                                            |         |                |     |  Scheduling   |   |
+|  |                                            |         |                |     |               |   |
+|  +--------------------------------------------+         +----------------+     +---------------+   |
+|                                                                                                    |
+|                                                                                                    |
+|                                                                                                    |
+|               +--------------------------------------------------------------------+               |
+|               |       Interrupt                          Dispatcher                |               |
+|               +--------------------------------------------------------------------+               |
++----------------------------------------------------------------------------------------------------+
+```
+
+Interrupt handlers are the primary way for interacting with devices. The dispatching occurs when an interrupt happens. I/O operations all integrated under a VFS.
+
 
 # Windows 8
 
@@ -29,6 +73,47 @@ TODO
 - Modern Windows (from Windows 8): Microsoft began a process to redesign itself as a _devices and services_ company. Fundamental changes in the programming models.
 
 ## Windows Programming Models
+
+```
+       Modern Windows Apps               Windows Services                Windows Desktop Apps
+
+     +--------------------+            +--------------------+       +---------------------------+
+     | Modern app mgr     |            |      Modern        |       |  Desktop Manager(explorer)|
+     +--------------------+            | broker processes   |       +---------------------------+
+     |WinRT:.NET/C++, WWA |            +--------------------+       |  .NET: base classes, GC   |
+     +--------------------+            |NT services, smss,  |       +---------------------------+
+     |        COM         |            |lsass, services     |       |GUI :shell32, user32, gdi32|
+     +--------------------+            |      winlogon      |       +---------------------------+
+     |    AppContainer    |            +--------------------+       |dynamic libraries (ole,rpc)|
+     +--------------------+            |  Win32 subsystem   |       +---------------------------+
+     |Process Lifetime mgr|            |process (csrss.exe) |       |Subsystem API (kernel32)   |
+     +--------------------+            +--------------------+       +---------------------------+
+
+                    +--------------------------------------------------------+
+                    |       Native NT API, C/C++ run|time (ntdll.dll)        |
+    User mode       +--------------------------------------------------------+
+   +-----------------------------------------------------------------------------------------------------+
+    kernel mode     +--------------------------------------------------------+
+                    |           NTOS kernel layer (ntoskrnl.exe)             |
+                    +--------------------------------------------------------+
+
+      +----------------------+      +---------------------+  +----------------------+
+      | Drivers: devices,    |      |                     |  |                      |
+      | file systems         |      | NTOS executive layer|  |      GUI driver      |
+      |     network          |      |    (ntoskrnl.exe)   |  |      win32k.exe      |
+      |                      |      |                     |  |                      |
+      |                      |      |                     |  |                      |
+      +----------------------+      +---------------------+  +----------------------+
+
+         +---------------------------------------------------------------------------+
+         |                    Hardware abstraction layer (hal.dll)                   |
+         +---------------------------------------------------------------------------+
+
++--------------------------------------------------------------------------------------------------------+
+     +-----------------------------------------------------------------------------------+
+     |                              Hypervisor (hvix, hvax)                              |
+     +-----------------------------------------------------------------------------------+
+```
 
 Windows includes a number of programming interfaces which are implemented as services that run as separate processes. Applications communicate with user-mode services through RPCs.
 
@@ -47,3 +132,13 @@ NT subsystems are constructed out of four components:
 - hooks
 
 - support in the kernel: general-purpose facilities that can be used writing operating-system-specific subsystems.
+
+NTOS's syscalls are implemented in the NTOS executive layer. Most of the native NT syscalls operate on kernel-mode objects of one kine or another, including files, processes, threads, pipes, semaphores, and so on. Every call creating or opening an object returns a result called a _handle_ to the caller. Every object has a _security descriptor_, specifying the kinds of operations on the object. Kernel objects in Windows use a uniform facility based on handles and names in the NT namespace (a hierarchical tree-structured collection of directories, symbolic links and objects)  to reference kernel objects, along with a unified implementation in a centralized _object manager_. The object manager provides unified facilities for synchronization, security, and object lifetime management. The root of the NT namespace is maintained in the kernel's virtual memory. A named object can be marked _permanent_ so that it continues to exist until explicitly deleted or the system reboots.
+
+Most of the functionality of the native NT APIs are provided through the Win32 API. Win32 API has poor layering that intermixes both high-level and low-level functions in the same API. Memory-mapping files are notable. TODO
+
+Each filesystem volume is implicitly mounted in the NT namespace. The low-level I/O model in Windows is fundamentally asynchronous.
+
+Every thread has a _token_, which provides information about the identity and privileges associated with the thread.
+
+Windows attaches a special kind of filesystem to the NT namespace called the _registry_. The registry is organized into separate volumes called _hives_. Each hive is kept in a separate file. The SYSTEM hive is loaded into memory by the system boot program when booting. It keeps a great deal of crucial information in SYSTEM hive. The registry has become seriously disorganized over time as Windows has evolved. The registry is a strange cross between a file system and a database.
