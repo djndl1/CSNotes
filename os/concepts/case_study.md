@@ -58,6 +58,62 @@ UNIX was designed by programmers, for programmers, to use in an environment in w
 Interrupt handlers are the primary way for interacting with devices. The dispatching occurs when an interrupt happens. I/O operations all integrated under a VFS.
 
 
+## Processes
+
+parent/child hierarchy; PID; daemon process; pipes; signal; process group; 
+
+In most cases, after a fork, the child will need to execute different code from the parent. It uses the `exec` syscall which causes its entire core image to be replaced by the file named in its first paramter. Several signal-related syscalls exist for setting signal handlers, sending signals. 
+
+### Implementation
+
+The Linux kernel internally represents processes as _tasks_, via the structure `task_struct`. Linux uses this task structure to represent any execution context. A multithreaded process has one task structure for each of the user-level threads. The kernel itself is multithreaded, and has kernel-level threads which are not associated with any user process and are executing kernel code. The kernel organizes all processes in a doubly linked list of task structures. The information in the process descriptor falls into a number of broad categories that can be roughly described:
+
+1. scheduling parameters: process priority, amount of CPU time consumed recently, amount of time spent sleeping recently.
+
+2. memory image: pointer to the text, data, and stack segments, or page tables; information about whether it's on disk and how to find its parts on disk.
+
+3. signals: masks showing which signals are being ignored, which are being caught, which are being temporarily blocked, and which are in the process of being delivered.
+
+4. machine registers: the machine registers are saved here
+
+5. syscall state: information about the current syscall, including the paramter and results
+
+6. file descriptor table
+
+7. accounting: pointer to a table that keeps track of the user and system CPU time used by the process.
+
+8. kernel stack: a fixed stack for use by the kernel part of the process
+
+9. miscellaneous: current process state, event being waited for, time until alarm clock goes off, PID, PID of the parent process, and user and group identification
+
+For a process to be created, a new process descriptor and user area are created for the child process and filled in largely from the parent. The child is gen a PID, its memory map is set up, and it is given shared access to its parent's files. Then its registers are set up and it is ready to run. The PID hash table entry points to the new task structure. The new process' memory image is shared with the parent and is copied on write to save RAM. After `exec`ing, the old address space and its page tables are replaced by a new empty page table. The executable file is memory mapped. When the new process starts to run, a page fault brings the first page of the executable into memory. The arguments and environment strings are copied to the new stack, the signals are reset and the registers are initialized to all zeros.
+
+#### Threads in Linux
+
+The `clone` syscall blurred the distinction between processes and threads and possibly even inverted the primacy of the two concepts. It provides fine grained control over how a new thread is created, whether it shares different resources with the calling thread.
+
+This fine-grained sharing is possible because Linux maintains separate data structures for various items in the task structure. A new task structure has these item pointer either point to the old thread's scheduling, memory and other data structures. Both PID and TID fields are stored in the tasks structure.
+
+```bash
+man 2 clone
+```
+
+More see "Linux thrading model compared: LinuxThreads and NPTL"
+
+
+
+# Android
+
+The open source part of Android is **Android Open Source Project** (**AOSP**). _Compatibility Definition Document_ describes the way Android must behave to be compatible with third party applications. It describes what is required to be a compatible Android device. Google provides some proprietary services, especially Google Play, to ensure that applications will work on the device it delivers to.
+
+## Architecture
+
+- `init` starts as the first user process. It spawns `zygote`, which is the root of the higher-level Java language processes. The daemon `adbd` listens for remote connections that request shell access. Other service started include `system_server`, which contains all of the core operating system services. Applications interact with the OS through calls to libraries, which together compose the _Android Framework_.
+
+## Linux Extensions
+
+
+
 # Windows 8
 
 ## History
@@ -142,3 +198,88 @@ Each filesystem volume is implicitly mounted in the NT namespace. The low-level 
 Every thread has a _token_, which provides information about the identity and privileges associated with the thread.
 
 Windows attaches a special kind of filesystem to the NT namespace called the _registry_. The registry is organized into separate volumes called _hives_. Each hive is kept in a separate file. The SYSTEM hive is loaded into memory by the system boot program when booting. It keeps a great deal of crucial information in SYSTEM hive. The registry has become seriously disorganized over time as Windows has evolved. The registry is a strange cross between a file system and a database.
+
+## System Structure
+
+```
+                            +------------------------------------------------------------------------------------------------+
+                            |       System library kernel user-mode dispatch routines (ntdll.dll)                            |
+               User mode    +------------------------------------------------------------------------------------------------+
+
++------------------------------------------------------------------------------------------------------------------------------------------+
+
+                +------------------------------------------------------------------------------------------------------------+
+   Kernel mode  |             +--------------------------------------------------------------------------------------------+ |
+                | NTOS        |                         Trap/exception/interrupt dispatch                                  | |
+                | kernel      +--------------------------------------------------------------------------------------------+ |
+                | layer       +--------------------------------------------------------------------------------------------+ |
+                |             |                CPU scheduling and synchronization: threads, ISRs, DPCs, APCs               | |
+                |             +--------------------------------------------------------------------------------------------+ |
+                +------------------------------------------------------------------------------------------------------------+
+
+                +-----------------+  +---------------------------------------------------------------------------------------+
+                |      Drivers    |  | NTOS executive layer                                                                  |
+                |                 |  |                                                                                       |
+                | File systems    |  | +----------------------+ +---------------------+ +---------------+ +----------------+ |
+                |                 |  | |Processes and threads | |   Virtual memory    | | Object Manager| |  Config manager| |
+                | volume manager  |  | +----------------------+ +---------------------+ +---------------+ +----------------+ |
+                |                 |  |                                                                                       |
+                | TCP/IP stack    |  | +----------------------+ +---------------------+ +---------------+ +----------------+ |
+                |                 |  | |        LPC           | |    Cache Manager    | |   I/O manager | |Security Monitor| |
+                | net interfaces  |  | +----------------------+ +---------------------+ +---------------+ +----------------+ |
+                |                 |  | +-----------------------------------------------------------------------------------+ |
+                | graphics devices|  | |                          Executive run-time library                              | |
+                | and others      |  | +-----------------------------------------------------------------------------------+ |
+                +-----------------+  +---------------------------------------------------------------------------------------+
+
+                +------------------------------------------------------------------------------------------------------------+
+                |                                   Hardware abstraction layer                                               |
+                +------------------------------------------------------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------------------------+
+
+    Hardware    +------------------------------------------------------------------------------------------------------------+
+                |                    CPU, MMU, interrupt controller, memory, physical devices, BIOS                          |
+                +------------------------------------------------------------------------------------------------------------+
+
+```
+
+- `ntdll.dll`: a number of support functions for the compiler run-time and low-level libraries, similar to `libc` in Unix. It also contains special code entry points used by the kernel to initialize threads and dispatch exceptions and user-mode APCs (Asynchronous Procedure Calls). Every user-mode process created by NTOS has `ntdll` mapped at the same fixed address.
+
+- _Hardware abstraction layer_: abstracts low-level hardware details like access to device registers  and DMA operations and the way parentboard firmware represents configuration information and deals with differences in the CPU support chips, such as various interrupts controllers. The HAL abstractions are presented in the form of machine-independent services that NTOS and the driver can use. The HAL provices a service for identifying devices by mapping bus-relative device addresses onto systemwide logical addresses.  It also provides services to name interrupts in a systemwide way and also provides ways to allow drivers to attach interrupt service routines to interrupt in a portable way. It sets up and manages DMA transfers in a device-independent way. The time services decouple the drivers from the actual frequencies at which the clocks run. The HAL provides primitives to manage synchronizaton in multiprocessor systems. The HAL talks to BIOS and inspects the system configuration to find out which buses and I/O devices the system contains and how they have been configured after booting, and put into the registry.
+
+- Hyper-V hypervisor: optional
+
+- device drivers: Windows uses device drivers for any kernel-mode facilities which are not part of NTOS or HAL, including filesystems, network protocol stacks, and kernel extensions like antivirus and DRM software as well as drivers for managing physical devices, interfacing to hardware buses and so on. The I/O and virtual memory components cooperate to load/unload device drivers into kernel memory and link them to the NTOS and HAL layers. Device drivers in Windows are dynamic link libraries which are loaded by the NTOS executive. Much of the Win32 subsystem is loaded as a driver.
+
+NTOS (running in kernel mode) consists of two layers
+
+- _executive_: contains most of the services. It runs using the control abstractions provided by the kernel layer.
+
+- _kernel_ : implements the underlying thread scheduling and synchronization abstractions. The term `kernel` may mean `ntoskrnl.exe` file (the kernel layer and the executive layer), the kernel layer within NTOS, or Win32 library `kernel32.dll` or all the code that runs in kernel mode. The kernel layer provides a set of abstractions for managing the CPU. The most central abstraction is threads, the kernel also implements exception handling, traps and several kinds of interrupts. The kernel layer is responsible for scheduling and synchronization of threads. The executive layer can be implemented using the same preemptive multithreading model used to write concurrent code in user mode. The kernel layer is also responsible for providing low-level support for _control objects_ (data structures that the kernel layer provides as abstractions as the executive layer for managing the CPU) and _dispatch objects_ (the class of ordinary executive objects that use a common data structure for synchronization).
+
+### Booting
+
+```
+                                                                    +-------------+
+                                                        +---------->+WinResume.exe|
+                                                        |           +-------------+
++------------+              +------------+              |
+|            |              |            | hibernated   |
+|  Firmware  +------------->+  BootMgr   +------------->+                                    +-------------+
+|            |              |            |              |                                    |             |
++------------+              +------------+              |                                    | ntoskrnl.exe|           +---------+
+                                                        |           +-------------+          |             |           |         |
+                                                        +---------->+ WinLoad.exe +--------->+    hal.dll  +---------->+ smss.exe|
+                                                                    +-------------+          |             |           |         |
+                                                                                             | SYSTEM hive |           +---------+
+                                                                                             |             |
+                                                                                             | win32k.sys  |
+                                                                                             |             |
+                                                                                             |other drivers|
+                                                                                             |             |
+                                                                                             |hypervisor if|
+                                                                                             |  enabled    |
+                                                                                             +-------------+
+
+```
