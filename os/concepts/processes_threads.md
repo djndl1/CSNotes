@@ -275,7 +275,8 @@ mutex_unlock:
 - **condition variable**: allows threads to block due to some condition not being met. Almost always mutexes and condition variables are used together. Condition variables, unlike semaphores, have no memory. The key point is that releasing the lock and going to sleep or obtaining the lock and waking up) must be an atomic operation so that the condition is still the same as when it was checked. 
 
 
-- **futex** (fast userspace mutex, actually a mechanism to implement such a mutex): Efficient synchronization and locking is very important for performance.  A wait queue for processes is in the kernel. Suppose the lock variable is 1, a thread atomically decrements and tests the lock and inspects the result to see whether the lock was free. If it was not locked, the thread has claimed the lock, otherwise, a syscall puts the thread on the wait queue and the thread is blocked. When the locks released, if there's no blocked thread, the kernel is not involved. Here, the lock variable is a userspace data structure and can be modified in user mode. See `man 7/2 futex`. The Linxu futex is not a mutex, but a kernel syscall as a general building block for mutex and semaphore implementation.
+- **futex** (fast userspace mutex, actually a mechanism to implement such a mutex): Efficient synchronization and locking is very important for performance.  A wait queue for processes is in the kernel. Suppose the lock variable is 1, a thread at
+omically decrements and tests the lock and inspects the result to see whether the lock was free. If it was not locked, the thread has claimed the lock, otherwise, a syscall puts the thread on the wait queue and the thread is blocked. When the locks released, if there's no blocked thread, the kernel is not involved. Here, the lock variable is a userspace data structure and can be modified in user mode. See `man 7/2 futex`. The Linxu futex is not a mutex, but a kernel syscall as a general building block for mutex and semaphore implementation.
 
 ```c
 // 
@@ -384,3 +385,39 @@ Addressing can be done by assigning each process an identifier. A different way 
 - **barrier**: When a thread reaches the barrier, it is blocked until all processes have reached the barrier. This allows groups of threads to synchronize. e.g. multiple threads computing a matrix transformation iteratively.
 
 - **avoiding lock - read-copy-update**: the key is to ensure that each reader either reads the old version of the data or the new one entirely. **RCU** decouples the removal and reclamation of the update.
+
+# Scheduling
+
+Process switching is expensive: a switch from user mode to kernel mode must occur; the state of the current process must be saved; in some systems the memory map must be saved as well; the MMU must be reloaded with the memory map of the new process; the new process must be started; the memory cache and related tables may be invalidated.
+
+Processes may have different bahaviors: 
+
+- CPU-bound 
+
+- I/O-bound
+
+The scheduler must decide whether to run the parent processes or the child processes; which process to run when a process is blocks; which process to run when an I/O interrupt service has finished.
+
+Scheduling algorithms can be divided into two categories depending on how they handle clock interrupts: 
+
+- _nonpreemptive scheduling_:  a process runs until it blocks or voluntarily releases the CPU;
+
+- _preemptive scheduling_: doing preemptive scheduling requires having a clock interrupt occur at the end of the time interval to give control of the CPU back to the scheduler.
+
+In different environments different scheduling algorithms are needed: 
+
+1. batch: still in widespread use in the businesses world for doing payroll, inventory, accounts receivable, accounts payable, interest calculation, claims processing and other periodic tasks. Nonpreemptive algorithms or preemptive algorithms with long time periods for each process are often acceptable.
+
+2. interactive: server
+
+3. real time
+
+On all systems, each process should be given a fair share of the CPU; all parts of the system should be kept busy. 
+
+- batch systems: throughput, turnaround time (the time between submission and termination)  and CPU utilization are major metrics: first-come, first-served; shortest job first (assuming the run times are known in advance, only optimal (turnaround time) only when all the jobs are available simultaneously); shortest remaining time next; 
+
+- interactive systems: response time should be minimized. Proportionality (the expected time for a certain task) should be taken care of: round-robin scheduling (each processs is assigned a quantum. If the process has blocked or finished before the quantum has elapsed, the CPU switching is done); priority scheduling (priority can change after each clock tick. Round robin can be used inside a priority class); multiple queues (priority class 1 gets one quantum, priorty class gets 2 gets two quanta..., whenever a process used up all the quanta allocated to it, it was moved down one class); shortest process next (make estimates based on past behavior and run the process with the shortest estimated running time); guaranteed scheduling (make promises to the users about running time and live up to those promises); lottery scheduling (give processes lottery tickets for various system resources such as CPU time. a lottery ticket is chosen at random, and the process holding that ticket gets the resource. A high-priorty process gets more tickets so more likely to gain CPU time; cooperating processes may exchange tickets if they wish); fair-share scheduling (each user is allocated some fraction of the CPU and the scheduler picks processes in such a way as to enforce it)
+
+- real-time systems: deadlines should be met, scheduling should be highly predictable and regular. Typically, one or more physical devices external to the computer generate stimuli, and the computer must react appropriately to them within a fixed amount of time. The events that a real-time system may have to respond to can be _periodic_ or _aperiodic_. Some periodic events are not _schedulable_ since handling them requires more than the CPU time available. Real-time scheduling algorithms can static (scheduling decisions made before the system starts running) or dynamic (making decisions at runtime)
+
+
