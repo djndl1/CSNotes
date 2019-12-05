@@ -64,18 +64,31 @@ VMI (Virtual Machine Interface) was proposed to form a low-level layer that inte
 
 # Memory Virtualization
 
-Virtualization greatly complicates memory management.
+(type 1 hypervisor assumed)
 
-TODO
+Virtualization greatly complicates memory management. In general, for each virtual machine, the hypervisor needs to create a _shadow page table_ that maps the virtual (physical) pages used by the virtual machine onto the actual pages the hypervisor gave it. Every time the guest OS changes its page table, the hypervisor must change the shadow page table as well, but the hypervisor may not be able to know the change. 
+
+One solution is that the hypervisor keeps track of which page in the guest's virtual memory contains the top-level page table after the first time the guest attempts to load the hardware register that points to it because this information is sensitive and traps. The hypervisor then marks this page as read-only. When the guest tries to modify the table, a page fault occurs and the hypervisor takes control, which can analyze the instruction stream, figure out what the guest OS is trying to do and update the shadow page table accordingly.
+
+Another solution is to allow the guest to add new mappings to its page tables at will. As soon as the guest tries to access any of the new pages, a fault will occur and the hypervisor takes control.
+
+Page faults are expensive (both guest-induced and hypervisor-induced). The hypervisor gains control (_VM exit_), and records the cause of the VM exit and the address of the guest instruction that caused the exit. Next, a context switch is done. Then the hypervisor's processor state is loaded. Then the hypervisor starts handling the page fault.
+
+In a paravirtualized OS, the guest can inform the hypervisor by making hypercalls.
 
 ## Hardware Support for Nested Page Tables
 
-nested page tables (AMD); Extended Page Tables (Intel)
+nested page tables (AMD); Extended Page Tables (Intel). They remove most of the overhead by handling the addition page-table manipulation all in hardware without any traps.
 
-TODO
+guest virtual addresses -> guest physical addresses -> host physical addresses. The hardware first walks the regular page tables to translate the guest virtual address to a guest physical address.
+
+## Reclaiming Memory
+
+_ballooning_: a common solution to memory overcommitment is to trick the guest OS into making paging decisions for it.
 
 # I/O Virtualization
 
+TODO
 
 # Virtual Appliances
 
