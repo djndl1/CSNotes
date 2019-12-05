@@ -15,13 +15,13 @@ For a computer architecture to support virtualization efficiently, a set of requ
 
 1. Safety: the hypervisor should have full control of the virtualized resources. Some instructions can be executed directly, while some unsafe ones must be simulated.
 
-2. Fidelity: the behavior of a program on a virtual machine should be identical to that of the same program on bare hardware. _Sensitive instructions_ (instructions that behave differently when executed in kernel mode than when in user mode) must be a subset of _privileged instructions_ (instructions that cause a trap when executed in user mode). In simple words, something that cannot be done in user mode should make the hardware trap when doing in user mode ???. x86 failed to satisfy this property until 2005, when Intel and AMD introduced VT (Virtualization Technology) and SVM (Secure Virtual Machine) respectively. The basic idea is to create containers in which virtual machines can be run. Before that, virtualization on x86 is done through _binary translation_ (emulating unsafe instructions in safe code).
+2. Fidelity: the behavior of a program on a virtual machine should be identical to that of the same program on bare hardware. _Sensitive instructions_ (instructions that behave differently when executed in kernel mode than when in user mode) must be a subset of _privileged instructions_ (instructions that cause a trap when executed in user mode). In simple words, something that cannot be done in user mode should make the hardware trap when doing in user mode. x86 failed to satisfy this property until 2005, when Intel and AMD introduced VT (Virtualization Technology) and SVM (Secure Virtual Machine) respectively. The basic idea is to create containers in which virtual machines can be run ???. Before that, virtualization on x86 is done through _binary translation_ (emulating unsafe instructions in safe code).
 
 3. Efficiency: much of the code in the virtual machine should run without intervention by the hypervisor
 
-- Paravirtualization: presents a machine-like interface that explicitly exposes the fact that it is a virtualized environment. Guests use _hypercalls_ for privileged sensitive operations like updating the page tables. The overall system can be simpler and faster. However, the guest has to be aware of the virtual machine API. It should be customized explicitly for the hypervisor.
+_Paravirtualization_: presents a machine-like interface that explicitly exposes the fact that it is a virtualized environment. Guests use _hypercalls_ for privileged sensitive operations like updating the page tables. The overall system can be simpler and faster. However, the guest has to be aware of the virtual machine API. It should be customized explicitly for the hypervisor.
 
-- Process-level virtualization: WINE compatibility layer.
+_Process-level virtualization_: WINE compatibility layer.
 
 
 # Type 1 and Type 2 Hypervisors
@@ -64,7 +64,28 @@ VMI (Virtual Machine Interface) was proposed to form a low-level layer that inte
 
 # Memory Virtualization
 
+Virtualization greatly complicates memory management.
+
 TODO
+
+## Hardware Support for Nested Page Tables
+
+nested page tables (AMD); Extended Page Tables (Intel)
+
+TODO
+
+# I/O Virtualization
+
+
+# Virtual Appliances
+
+A preconfigured virtual machine image, ready to run on a hypervisor.
+
+# Virtual Machines on Multicore CPUs
+
+The number of CPUs available can be set by the software. A single computer becomes a virtual multiprocesssor.
+
+Virtual machines can share memory.
 
 # Clouds
 
@@ -78,10 +99,22 @@ TODO
 
 5. measured service
 
-- Infrastructure As a Service (IAAS): direct access to virtual machine, which the user can use in any way he sees fit: Amazon EC2
+_Infrastructure As a Service (IAAS)_: direct access to virtual machine, which the user can use in any way he sees fit: Amazon EC2
 
-- Platform As A Service (PAAS): delivers an environment that includes things such as a specific OS
+_Platform As A Service (PAAS)_: delivers an environment that includes things such as a specific OS
 
-- Software As A Service (SAAS): offers access to specific software
+_Software As A Service (SAAS)_: offers access to specific software
 
 Hypervisors decouple the virtual machine from the physical hardware. The administrator could simply shutdown all the virtual machines and restart them again on a new machine. A slightly better approach is to pause the virtual machine, copy over the memory pages used by the virtual machines to the new hardware as quickly as possible, configure things correctly in the new hypervisor and then resume execution. What modern virtualization solutions offer is _live migration_. They employ techniques like _pre-copy memory migration_ (copying memory pages while the machine is still serving requests).
+
+# Case Study: VMWARE
+
+VMware Workstation: type 2 hypervisor, the first virtualization product for 32-bit x86 computers.
+
+VMware ESX Server - type 1 hypervisor
+
+vSphere - a single point of management for a cluster of servers running virtual machines
+
+VMotion: live migration
+
+TODO
