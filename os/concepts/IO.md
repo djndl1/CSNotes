@@ -75,4 +75,24 @@ return_to_user();
 
 3. I/O using DMA: in essence, DMA is programmed I/O, only with the DMA controller doing all the work, instead of the main CPU. However, the DMA controller is usually much slower than the main CPU.
 
+# I/O Software Layer
 
+```
+       +------------------------------------+
+       |      User|level I/O software       |
+       +------------------------------------+
+       |   Device-independent OS software   |
+       +------------------------------------+
+       |          Device Drivers            |
+       +------------------------------------+
+       |         Interrupt handlers         |
++------|------------------------------------|------+
+|                                                  |
+|                    Hardware                      |
+|                                                  |
++--------------------------------------------------+
+```
+
+- _interrupt handlers_: interrupts should be hidden way, deep in the bowels of the OS. The driver can block itself after starting an I/O operation and the interrupt procedure can unblock the driver that was waiting for it. This model works best if drivers are structured as kernel processses.
+
+- device drivers: each I/O device attached to a computer needs some device specific code for controlling it. Sometimes, wildly different devices are based on the same underlying technology (e.g. USB). It is possible to construct drivers that run in user space, with syscalls for reading and writing the device registers. Most OSes define a standard interface that all block drivers must support and a second standard interface that all character drivers must support. A device driver accepts abstract read and write requests from the device independent software above it and see that they are carried out. The driver must initialize the device if needed. It may also need to manage its power requirements and log events. Drivers have to be reentrant.
