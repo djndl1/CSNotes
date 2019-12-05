@@ -41,3 +41,38 @@ To save the current context before handing an interrupt, some register values ha
 - imprecise interrupt: machines with imprecise interrupts usually vomit a large amount of internal state onto the stack to give the OS the possibility of figuring out what was going on, which makes OS complicated and slow. This leads to a situation where very fast superscalar CPU sometimes being unsuitable for real-time work due to slow interrupts.
 
 Some computers are designed so that some kinds of of interrupts and traps are precise and others are not. Some superscalar machines have precise interrupts, resulting in complex interrupt logic within the CPU and large chip area.
+
+## Software
+
+Some issues:
+
+- device-independent
+
+- uniform naming: name of a file or a device should simply be a string or an integer and not depend on the device in any way
+
+- error handling: errors should be handled as close to the hardware as possible. Only if the lower layers are not able to deal with the problem should the upper layers be told about it.
+
+- synchronous/asynchronous: most physical I/O is asynchronous. User programs are easier to write if the I/O operations are blocking. It is up to the OS to make operations that are actually interrupt-driven look blocking to the user programs.
+
+- buffering:
+
+- sharable vs. dedicated devices: Some I/O devices such as dissk can be used by many users at the same time; other devices, such as printers, have to be dedicated to a single user until that user is finished.
+
+There are three fundamentally different ways that I/O can be performed:
+
+1. programmed I/O: have the CPU do all the work. The CPU continuous polls the device to see if it is ready to accept another request. Programmed I/O is simple but has the disadvantage of tying up the CPU full time until all the I/O is done.
+
+```c
+copy_from_user(buffer, p, count);
+for (i = 0; i < count; i++) {
+    while (*printer_status_reg != READY);
+    *printer_data_register = p[i];
+}
+return_to_user();
+```
+
+2. interrupt-driven I/O
+
+3. I/O using DMA: in essence, DMA is programmed I/O, only with the DMA controller doing all the work, instead of the main CPU. However, the DMA controller is usually much slower than the main CPU.
+
+
