@@ -131,3 +131,5 @@ vSphere - a single point of management for a cluster of servers running virtual 
 VMotion: live migration
 
 TODO
+
+http://www.kernelthread.com/publications/virtualization/
