@@ -82,13 +82,22 @@ nested page tables (AMD); Extended Page Tables (Intel). They remove most of the 
 
 guest virtual addresses -> guest physical addresses -> host physical addresses. The hardware first walks the regular page tables to translate the guest virtual address to a guest physical address.
 
+
 ## Reclaiming Memory
 
 _ballooning_: a common solution to memory overcommitment is to trick the guest OS into making paging decisions for it.
 
 # I/O Virtualization
 
-TODO
+A disk image file for each guest OS; virtual disk controllers for guest OSes. 
+
+I/O MMU virtualizes the I/O the same way the MMU virtualizes the memory. The I/O MMU uses page tables to map a memory address that a device wants to use to a physical address. Device passthrough allows the physical device to be directly assigned to a particular VM. Device isolation ensures that a device assigned to a virtual machine can directly access that virtual machine without jeopardizing the integrity of the other guests.  Also, modern I/O MMUs support _interrupt remapping_.
+
+Another approach is to let one of the VMs (_domain 0_)reflect all I/O calls from the other ones to it.
+
+Single root I/O virtualization allows for bypassing the hypervisor's involvement in the communication between the driver and the device. Devices that support SR-IOV provide an independent memory space, interrupts and DMA streams to each VM that uses it. SR-IOV allows devices to be virtualized in hundreds of virtual functiosn that trick VMs into believing they are the sole owner of the device.
+
+I/O virtualization is an area in which type 2 hypervisors have a practical advantage over type 1 hypervisors: the host OS contains the device drivers for all the weird and I/O  devices attached to the computer.
 
 # Virtual Appliances
 
