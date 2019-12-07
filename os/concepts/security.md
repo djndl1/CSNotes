@@ -216,7 +216,9 @@ Buffer overflows are some of the oldest and most important memory corruption tec
 
 ## Format String Attacks
 
-TODO
+By accident the programmer allows the user of the programmer to enter a format string. Since printing a format string can overwrite memory, it can be a tool to overwrite the return address of the `printf` function on the stack.
+
+`printf` will assume there is a second parameter after the format string. It will take the next value on the stack and use that. The attacker can use `%08x %08x %n` to control the position of the stack which he will overwrite.
 
 ## Dangling Pointers
 
@@ -245,6 +247,7 @@ if (access("./my_doc)", W_OK) != 0)
 fd = open ("./my_doc",O_WRONLY);
 write(fd, user_input, sizeof(user_input));
 ```
+
 
 The attacker manages to create a symbolic link with the same file name to the password file after the check by `access`.
 
