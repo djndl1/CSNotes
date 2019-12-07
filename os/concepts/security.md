@@ -102,3 +102,149 @@ To get the signature property, the order of the application must not matter, tha
 To distribute public keys, a common method is for message senders to attach a _certificate_ to the message, which contains the user's name and public key and is digitally signed by a trusted third party (Certification Authority). _Public Key Infrastructure_ (_PKI_) is required to ensure this. All browsers come preloaded with the public keys of popular CAs.
 
 _Trusted Platform Module_ (TPM), a specialized hardware, a cryptoprocessor with some nonvolatile storage inside it for keys, is used to store keys. One of the major use of TPM is _remote attestation_.  The one thing TPM does not do is make computers more secure against external attacks. What it really focuses on is using cryptography to prevent users from doing anything not approved directly or indirectly by whoever controls the TPM.
+
+# Authentication
+
+Most methods of authenticating users are baed on:
+
+1. something the user knows
+
+2. something the user has
+
+3. something the user is
+
+OS password is not much better than nothing. The attacker can always boot into another system.
+
+weak passwords; ping and portscanning;
+
+Hashed passwords are not as secure as they seem. The cracker can spend his time matching them as long as he has obtained the password file. Salt can be concatenated to a password and encrypted as the real password.
+
+one-time passwords: a book of passwords changed each time after using
+
+one-way hash chain:
+
+TODO
+
+# Exploiting Software
+
+Red-queen effect
+
+## Buffer Overflow 
+
+```c
+void A() {
+    char B[128];
+    printf("Type log message:);
+    gets(B);
+    writeLog(B);
+}
+```
+
+An attacker can provide a tailored message specifically aimed at subverting the program's control flow. The buffer is allocated on stack, of which the bottom of the current frame is the return address. The attacker controls the buffer contents and can fill it with machine instructions and overwrite the return address to the beginning of the buffer. The program is now under the attacker's control, who would `exec` a shell in the buffer code. Such code is known as **shell code**. To ensure the return lands safely, the attacker can prepend the shellcode with a _nop sled_, a sequence of nop.
+
+This trick works for any code that copies user-provided data in a buffer without checking for boundary violations.
+
+- heap spraying: placing nop sleds and shellcode all over the heap.
+
+_stack canaries_: at places where the program makes a function call, the compiler inserts code to save a random canary value on the stack, just below the return address. Upon a return from the function, the compiler inserts code to check the value of the canary. If the value changed, something is wrong.
+
+```c
+void A(char *date)
+{
+        int len;
+        char B[128];
+        char logMsg[256];
+
+        strcpy(logMsg, date);
+        len = strlen(date);
+        gets(B);
+        strcpy(logMsg + len, B);
+        writeLog(logMsg);
+}
+```
+
+The attacker can overflow `B` and overwrite `len`. The value of `len` will make sure that the place `B` will be written to is below the canary so that the canary will be bypassed.
+
+Any function pointer that is reachable via an overflow can be exploited.
+
+To prevent code injection attack, modern CPUs have a feature: NX bit, useful to distinguish between data segments and text segments. Many OSes try to ensure that data segments are writable but not executable and the text segment is executable but not writable (_DEP_, _Data Execution Prevention_).
+
+- Code Reuse Attack: code injection may not be possible since the stack may not be executable. Constructing the necessary functionality out of the existing functions and instructions in the binaries and libraries.
+
+return-to-libc is such a technique that the control flow is directed to a libc function such as `system`, `mprotect` (which can make part of the data segment executable).  The attacker may return to the PLT (Procedure Linkage Table).
+
+Return-Oriented Programming: look for small sequences of code that do something useful and end with a return instruction. The attacker can string together theses sequences (called _gadgets_) by means of the return address he places on the stack. The attacker has to make do with gadgets that are perhaps less than ideal but enough for the job. ROP is one of the most important exploitation techniques used in the wild.
+
+- _ASLR_ (_Address Space Layout Randomization_): randomize the addresses of functions and data between each every run of the program.
+
+Randomization may not be random enough. The attacker can brute-force it. A more important attack against ASLR is formed by memory disclosures.
+
+```c
+
+void C()
+{
+        int index;
+        int prime[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,13,14, 15, 16};
+        index = read_user_input();
+        printf("%d: %d\n", index, prime[index]);
+}
+```
+
+The address may be discovered by setting `index` out of range and relative addresses between functions are generally fixed.
+
+Canaries, DEP and ASLR form an important line of defense in modern operating systems.
+
+- Noncontrol-flow diverting attacks
+```c
+
+void A()
+{
+        int authorized;
+        char name[128];
+        authorized = check_credentials();
+        printf("Your name?\n");
+        gets(name);
+        if (authorized != 0) {
+                printf("Welcome %s, here is all our secret data\n", name);
+        } else
+                printf("Sorry %s, but you are not authorized.\n");
+        
+}
+```
+
+Buffer overflows are some of the oldest and most important memory corruption techniques that are used by attackers. If is difficult to fix because there are so many existing C programs around that do not check for buffer overflow.
+
+## Format String Attacks
+
+TODO
+
+## Dangling Pointers
+
+The location to which dangling pointers point to may be occupied by a specific heap object placed by the attacker. 
+
+Heap fengshui.
+
+## Null Pointer Dereference Attacks
+
+In Linux, the kernel is mapped into every process' address space and whenever the kernel starts executing to handle a syscall, it will run in the process' address space.
+
+A null pointer in kernel is dereferenced to user space. The system may crash. Or page 0 is mapped to shellcode (no possible on modern operating systems anymore).
+
+## Integer Overflow Attacks
+
+## Command Injection Attacks
+
+Getting the target program to execute commands without realizing it is doing so. e.g. the target program uses the `system()` function.
+
+## Time of Check to Time of Use Attacks
+
+```c
+int fd;
+if (access("./my_doc)", W_OK) != 0) 
+    exit(1); // checks if the read ID can access  this file
+fd = open ("./my_doc",O_WRONLY);
+write(fd, user_input, sizeof(user_input));
+```
+
+The attacker manages to create a symbolic link with the same file name to the password file after the check by `access`.
+
