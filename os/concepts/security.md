@@ -42,7 +42,7 @@ e.g. in Unix, the domain of a process is defined by its UID and GID. Running a p
 
 The actual implementation is not a matrix that lists a collection of domains since that would be waste of resources.
 
-- _Access Control List_: associating with each object an (ordered) list containing all the users that may access the object and how. The users in the list are called _subjects_/_principals_.
+- _Access Control List_: associating with each object an (ordered) list containing domains that may access the object and how. The users in the list are called _subjects_/_principals_.
 
 Many systems support the concept of a _group_ of users. A user has a different _role_ when in different groups.
 
