@@ -130,6 +130,48 @@ At the lowest level, Linux provides wrappers around the hardware-supported atomi
 
 Spinlock; mutexes; semaphores; futexes; completions; RCU locks etc.
 
+## Memory Management
+
+In order to avoid allocating a physical page frame full of zeros, during initialization, Linux allocates a static _zero page_, a write-protected page full of zeros for bss. Whenever a process actually attempts to write in this area, an actual page frame is allocated to the process. The data segment can change. The data segment can grow an shrink during execution (`brk`/`sbrk`).
+
+When a program starts up, the stack is not empty. It contains all the env-var as well as the command line typed to the shell to invoke.
+
+Linux supports shared text segments so that two processes can share the same piece of text. Data and stack segments are never shared except after a fork.
+
+Processes in Linux can access file data through memory-mapped files. Mapping a file in makes random access to it much easier than using I/O syscalls. Shared libraries are accessed by mapping them in using this mechanism. A file can be mapped into multiple processes at the same time. Writes to the file by any one of them are them instantly visible to the others.
+
+The most used Linux syscalls for memory management is `sbrk`/`brk`, `mmap`/`munmap`
+
+### Implementation
+
+32-bit Linux process typically gets 3GB of virtual process for user space with the remaining 1GB for page tables and other kernel data.
+
+#### Physical Memory
+
+Linux maintains node descriptors. Each node descriptor contains information about the memory usage and zones on that particular node. on UMA platforms, all memory is decribed via one node descriptor. The first few bits within each page descriptor are used to identify the node descriptor.
+
+Linux distinguishes between the following memory zones and maintains a `zone` structure for each of three zones:
+
+1. `ZONE_DMA` and `ZONE_DMA32`: pages that can be used for DMA;
+
+2. `ZONE_NORMAL`: normal, regularly mapped pages;
+
+3. `ZONE_HIGHMEM`: pages with high-memory addresses, which are not permanently mapped. Not defined on x86_64 machines.
+
+For each zone Linux maintains a zone descriptor: memory utilization, an array of free areas.
+
+Main memory in Linux consists of three parts. The first two steps, the _kernel_ and _memory map_ are pinned in memory, never paged out. The rest of memory is divided into page frames, each of which can contain a text, data, or stack page, a page-table page, or be on free list. 
+
+The kernel maintains a map of the main memory which contains all information about the use of the physical memory in the system, such as its zones, free page frames and so forth.
+
+Linux maintains an array `mem_map` of _page descriptors_ (`page`), one for each physical page frame. A page descriptor contains a pointer to the address space that it belongs to and a pair of pointers that allow it to form doubly-linked lists with other descriptors (e.g. to keep together all free page frames) and a few other fields.
+
+Linux makes use of a four-level paging scheme for 32- and 64-bit architectures. On machines supporting fewer levels, the upper levels have only one entry.
+
+The kernel itself is hardwired, no part of it never paged out. 
+
+- page cache: holding pages containing file blocks that have recently been read or have been read in advance in expectation of being used in the near future, or page of file blocks which need to be written to disk. Dynamic in size and competes for the same pool of pages as the user processes. The set of user page that are no longer needed and are waiting around to be paged out.
+
 # Android
 
 The open source part of Android is **Android Open Source Project** (**AOSP**). _Compatibility Definition Document_ describes the way Android must behave to be compatible with third party applications. It describes what is required to be a compatible Android device. Google provides some proprietary services, especially Google Play, to ensure that applications will work on the device it delivers to.
