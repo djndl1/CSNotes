@@ -166,7 +166,7 @@ The kernel maintains a map of the main memory which contains all information abo
 
 Linux maintains an array `mem_map` of _page descriptors_ (`page`), one for each physical page frame. A page descriptor contains a pointer to the address space that it belongs to and a pair of pointers that allow it to form doubly-linked lists with other descriptors (e.g. to keep together all free page frames) and a few other fields.
 
-Linux makes use of a four-level paging scheme for 32- and 64-bit architectures. On machines supporting fewer levels, the upper levels have only one entry.
+Linux makes use of a four-level paging scheme for 32- and 64-bit architectures. On machines supporting fewer levels, the upper levels have only one entry in a table of size zero. 
 
 The kernel itself is hardwired, no part of it never paged out. 
 
