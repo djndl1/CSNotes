@@ -2,7 +2,7 @@
 
 `numpy.array(object, dtype=None, copy=True, order='K', subok=False, ndmin=0)`
 
-Create an array
+creates an array
 
 - `object`: any object exposing the array interface, an object whose `__array__` method returns an array
 
@@ -12,6 +12,7 @@ Create an array
 - `copy`: if the object is copies.
 
 - `subok`: if pass-through the subclasses, otherwise the returned array will be forced to be a base-class array
+
 
 - `ndmin`: specifies the minimum number of dimensions that the output array should have
 
