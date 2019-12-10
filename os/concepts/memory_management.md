@@ -187,4 +187,4 @@ bytes/pages<---+   |                       |    |    |    +-> Segment Type and P
 +-----------------------------------------|--------------------------------+
 ```
 
-All current OSes for the x86 has Base = 0 and Limit set to the maximum, in effect, normal paging.
+All current OSes for the x86 has Base = 0 and Limit set to the maximum, in effect, normal paging. All the segment registers can be set up with the same selector.
