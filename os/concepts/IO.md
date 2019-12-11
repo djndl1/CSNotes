@@ -46,7 +46,7 @@ Some computers are designed so that some kinds of of interrupts and traps are pr
 
 Some issues:
 
-- device-independent
+- device-independence
 
 - uniform naming: name of a file or a device should simply be a string or an integer and not depend on the device in any way
 
@@ -79,7 +79,7 @@ return_to_user();
 
 ```
        +------------------------------------+
-       |      User|level I/O software       |
+       |      User-level I/O software       |
        +------------------------------------+
        |   Device-independent OS software   |
        +------------------------------------+
@@ -93,6 +93,30 @@ return_to_user();
 +--------------------------------------------------+
 ```
 
-- _interrupt handlers_: interrupts should be hidden way, deep in the bowels of the OS. The driver can block itself after starting an I/O operation and the interrupt procedure can unblock the driver that was waiting for it. This model works best if drivers are structured as kernel processses.
+## interrupt handlers
 
-- device drivers: each I/O device attached to a computer needs some device specific code for controlling it. Sometimes, wildly different devices are based on the same underlying technology (e.g. USB). It is possible to construct drivers that run in user space, with syscalls for reading and writing the device registers. Most OSes define a standard interface that all block drivers must support and a second standard interface that all character drivers must support. A device driver accepts abstract read and write requests from the device independent software above it and see that they are carried out. The driver must initialize the device if needed. It may also need to manage its power requirements and log events. Drivers have to be reentrant.
+Interrupts should be hidden way, deep in the bowels of the OS. The driver can block itself after starting an I/O operation and the interrupt procedure can unblock the driver that was waiting for it. This model works best if drivers are structured as kernel processses.
+
+## device drivers
+
+Each I/O device attached to a computer needs some device specific code for controlling it. Sometimes, wildly different devices are based on the same underlying technology (e.g. USB). It is possible to construct drivers that run in user space, with syscalls for reading and writing the device registers. Most OSes define a standard interface that all block drivers must support and a second standard interface that all character drivers must support. A device driver accepts abstract read and write requests from the device independent software above it and see that they are carried out. The driver must initialize the device if needed. It may also need to manage its power requirements and log events. The driver may need to wait for an interrupt if the I/O takes long. Drivers have to be reentrant.
+
+## device-independent I/O
+
+Some functions can be done in a device-independent way
+
+- uniform interfacing for device drivers: all drivers have the same interface. It is much easier to plug in a new driver, providing it conforms to the driver interface. For each class of devices, such as disks or printers, the OS defines a set of functions that the driver must supply. When the driver is loaded, the OS records the address of this table of function pointers. Another aspect is how I/O devices are named. In Unix, a device name specifies the i-node for a special file, and this i-node contains the major and minor device number. In both Unix and Windows, devices appear in the file system as named objects. The usual protection rules for files would apply to I/O devices.
+
+- buffering: user-space buffering; kernel-space buffering; double buffering (two buffers in kernel space taking turns); circular buffering (a circular queue); The device itself might have a buffer too.
+
+- error reporting: the framework for error handling is device independent.
+
+- allocating and releasing dedicated devices: perform `open` on devices; the OS managing the blocking queue
+
+- providing a device-independent block size.
+
+## User-Space I/O software
+
+Syscalls, including the I/O syscalls, are normally made by library procedures.
+
+Spooling system, running as a daemon.
