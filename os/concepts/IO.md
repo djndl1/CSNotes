@@ -120,3 +120,226 @@ Some functions can be done in a device-independent way
 Syscalls, including the I/O syscalls, are normally made by library procedures.
 
 Spooling system, running as a daemon.
+
+# Disks
+
+TODO
+
+# Clocks (timers)
+
+## Clock Hardware
+
+Clocks/timers are essential to the operation of any multiprogrammed system for a variety of reasons. They maintain the time of day and prevent one process from monopolize the CPU, among other things. The clock software can take the form of a device driver.
+
+A clock is typically built out of a crystal oscillator, a counter, and a holding register. The counter is decremented at each pulse. When the counter goes to zero, it cuases a CPU interrupt.
+
+- clock tick: the periodic interrupts.
+
+Programmable clocks typically have several modes of operation:
+
+1. _one-shot mode_: it causes an interrupt and stops when it goes to zero until it is explicitly started again by the software.
+
+2. _square-wave mode_: the holding register is automatically copied into the counter and the whole process is repeated again indefinitely.
+
+The interrupt frequency can be controlled by software.
+
+All the clock hardware does is generate interrupts at known intervals.
+
+## Clock Software
+
+The duties of the clock driver usually include among:
+
+1. maintaining time of day; (real time)
+
+2. preventing processes from running longer than they are allowed to;
+
+3. accounting for CPU usage;
+
+4. handling the `alarm` syscall made by user processes: the clock driver must simulate multiple virtual clocks with a single physical clock.
+
+5. providing watchdog timers for parts of the system itself: when a timer goes off, the clock driver calls procedure supplied by the caller.
+
+6. doing profiling, monitoring, and statistics gathering.
+
+During a clock interrupt, the clock driver has to increment the real time,, decrement the quantum and ckeck for zero, do CPU accounting, and decrement the alarm counter. Each of these operations has been carefully arranged to be very fast.
+
+## Soft Timers
+
+TODO
+
+# User Interfaces: Keyboard, mouse, monitor
+
+## Input Software
+
+- keyboard: an interrupt is generated whenever a key is struck and a second one is generated whenever a key is released. Normal keyboards have fewer than 128 keys, so only 7 bits are needed to represent the key number (scan code). The eighth bit is set to 0 on a key press and to 1 on a release. It is up to the driver to keep track of the status of each key and the driver determines whether it is lowercase, uppercase, CTRL-A, ALT-A, CTRL-ALT-A or some other combination. Since driver can tell which keys have been struck but not yet released. 
+
+```
+depress SHIFT, depress A, release A, release SHIFT      # SHIFT-A, an uppercase
+```
+
+Two possible approaches can be adopted for the driver:
+
+- _character oriented_: a program reading from the keyboard gets a raw sequence of ASCII codes e.g. emacs
+
+- _line oriented_: the dreiver handles all the intraline editing and just delivers corrected lines to the user programs.
+
+TODO
+
+## Output Software
+
+### Text Windows
+
+Escape sequences: a series of commands to move the cursor, insert and delete characters or line at the cursor and so on.
+
+There were hundreds of terminal types, each with its own escape sequences. To solve this issue, BSD Unix introduced a terminal database called _termcap_. It defines a number of basic actions.
+
+### The X Windowing System
+
+Runs completely in user space, intended for connecting a large number of remote user terminals with a central computer server.
+
+- X server: the software that collects input and writes output to the screen
+
+
+- X client: the running GUI programs
+
+```
++--------|---------+
+| Window |   GUI   |
+|        | program |
+| Manager|         |
++------------------+
+|       Motif      | uniform look and feel
++------------------+
+|    Intrinsics    | manages widgets
++------------------+
+|       Xlib       | X functionality
++------------------+              +------------------+
+|     X client     | +          +-+     X server     |
++------------------+ |          | +------------------+
+|       UNIX       | |          | |       UNIX       |
++------------------+ |          | +------------------+
+|     Hardware     | |          | |     Hardware     |
++------------------+ |          | +------------------+
+                     |          |
+                     +----------+
+                      X protocol on network
+```
+
+- window manager: controls the creatiion, deletion and movement of windows on the screen. It sends commands to the X server telling it what to do.
+
+In Windows, the windowing and GUI systems are mixed together in the GDI and located in the kernel.
+
+- _resource_: a key concept in X, a data structure that holds certain information, e.g. windows, fonts, colormaps (color palettes), pixmaps (bitmaps), cursors, and graphic contexts (in which properties of a window are stored).
+
+When an X program starts, it opens a connection to one or more X servers. X considers this connection to be reliable in the sense that lost and duplicate messages are handled by the networking software. Usually, TCP/IP is used between the client and server. Four kinds of messages go over the connection:
+
+1. drawing commands from the program to the workstation: most drawing commands are sent as one-way messages.
+
+2. replies by the workstation to program queries;
+
+3. keyboard, mouse, and other event announcements;
+
+4. error messages.
+
+```c
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+
+int main(int argc, char *argv[])
+{
+        Display disp;                   // server
+        Window win;                     // window  
+        GC gc;                          // graphic context
+        XEvent event;                   // storage for one event
+        int running = 1;
+
+        disp = XOpenDisplay(argv[1]);           // connect to the X server
+        win = XCreateSimpleWindow(disp, ...); // allocate memory for new window
+        XSetStandardProperties(disp,...);       // announces window to window manager
+        gc = XCreateGC(disp, win, 0, 0);        // create graphic context
+        XSelectInput(disp, win, ButtonPressMask | KeyPressMask | ExposureMask);
+        XMapRaised(disp,win);           // display window; send exposure event
+
+        while (running) {
+                XNextEvent(disp, &event);  // get next event
+                switch (event.type) {
+                case Expose: 
+                        ...
+                        break;
+                case ButtonPress:
+                        ...
+                        break;
+                case KeyPress:
+                        ...
+                        break;
+                }
+        }
+
+        XFreeGC(disp, gc);
+        XDestroyWindow(disp, win);
+        XCloseDisplay(disp);
+        return 0;
+}
+``**
+
+### Graphical User Interfaces
+
+A GUI has four essential elements: WIMP
+
+1. Windows: rectangular blocks of screen area used to run programs
+
+2. Icons: little symbols that can be clicked on;
+
+3. Menus: lists of actions to choose;
+
+4. Pointing device: mouse, trackball, or other hardware device used to move a cursor around the screen to select them
+
+Output of GUI goes to a graphics adapter, which contains video RAM that holds the images that appear on the screen.
+
+Win32 GUI TODO
+
+#### Touch Screen
+
+- opaque touch device: touchpad on a notebook
+
+- transparent device: touch screen on a smartphone or tablet
+
+A capacitive touch display was decribed as early as 1965.
+
+- resistive screens: a flexible plastic surface on top, under which a thin film of ITO is printed in thin lines. Another surface under is also coated with a layer of ITO. Two layers run horizontally and vertically respectively. When the screen is touched, the upper line touches the lower line. Measuring the resistance in both layers at all positions will determine the position of the touch. Typically does not support multitouch.
+
+- capacitive screens: two hard surfaces, each coated with ITO. Two separate charged surfaces form a grid of small capacitors. Voltages are applied alternately to the horizontal and vertical lines, The voltage values are affected by the capacitance of each intersection.
+
+# Power Management
+
+Two general approaches to reducing energy consumption:
+
+1. for the OS to turn off parts of the computer when they are not in use.
+
+2. for the application to use less energy.
+
+## Hardware Issues
+
+The general approach most computer vendors take to battery conservation is to design the CPU, memory and I/O devices to have multiple states: on, sleeping, hibernating and off.
+
+## OS Issues
+
+- display: shutting down the display when no activity for some time.
+
+- hard disk: spinning. Many computers, especially notebooks, spin the disk down after a certain number of minutes of being idle.
+
+- the CPU: there is relationship between CPU voltage, clock cycle and power usage. Scaling down CPU cores does not always imply a reduction in performance.
+
+- the memory: hibernation (writing the contents of main memory to the disk)
+
+- wireless: one way is to allow the base station and the mobile device to synchronize somehow so that the device wouldn't miss messages. In 802.11, a mobile computer can notify the access point that it is going to sleep but it will wake up before the base station sends the next beacon frame.
+
+- thermal management
+
+- battery: smart batteries that can be controlled and queried by the OS.
+
+Several OSes have an elaborate mechanism for power management called **ACPI** (**Advanced Configuration and Power Interface**). The OS can send any conformant driver commands asking it to report on the capabilities of its devices and their current states. It can also send commands to drivers instructing them to cut their power levels.
+
+## Application Issues
+
+Telling the programs to use less energy at the price of poorer user experience.
