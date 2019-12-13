@@ -3,3 +3,4 @@ a.out
 *.class
 *.ccls-cache
 *.o
+*.html
