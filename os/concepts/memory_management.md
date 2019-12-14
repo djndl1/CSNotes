@@ -79,5 +79,112 @@ _inverted page tables_ (Itanium): one entry per page frame in real memory. The e
 
 TODO
 
-# 
+# Design Issues for Paging Systems
 
+## Local versus Global Allocation Policies
+
+TODO
+
+## Load Control
+
+TODO
+
+## Page Size
+
+TODO
+
+## Separate Instruction and Data Spaces
+
+Most computers have a single address space that holds both programs and data.
+
+PDP-11 I-space, D-space
+
+In L1 cache, separate I-spaces and D-spaces are still common.
+
+## Shared Pages
+
+In a large multiprogramming system, it is common for several processes to be running the same program at the same time. If separate I- and D-spaces are supported, it is relatively straightforward to share programs by having two or more processes use the same page table for their I-space but different page tables for their D-spaces.
+
+## Shared Libraries
+
+When a program is linked with shared libraries, instead of including the actual function called, the linker includes a small stub routine that binds to the called function at run time. A shared library is not read into memory in a single blow. It is paged in, page by page, as needed, so functions that are not called will not be brought into RAM.
+
+_Position-independent Code_: since shared libraries are to be located in different addresses in virtual memory space, absolute addresses cannot be used. 
+
+## Mapped Files
+
+Shared libraries are a special case of memory-mapped files. In most implementations, no pages are brought in at the time of the mapping, but as pages are touched. When the process exits, or explicitly unmaps the file, all the modified pages are written back to the file on disk. If two or more processes map onto the same file at the same time, they can communicate over shared memory. This mechanism provides a high-band-width channel between processes and is often used as such.
+
+## Cleaning Policy
+
+Paging daemon: sleeps most of the time but is awakened periodically to inspect the state of memory. If two few page frame are free, it begins selecting pages to evit using some page replacement algorithm.
+
+# Implementation Issues
+
+TODO
+
+# Segmentation
+
+For many problems, having two or more separate virtual address spaces may be much better than having only one. e.g. compilation, when code source text, parse tree, symbol tables and call stack all take part of the address space and may collide. A segment is a logical entity, which the programmer is aware of and uses as a logical entity.
+
+To specify an address in this segmented or two-dimensional memory, the program must supply a two-part address, a segment number and number within the segment. 
+
+Segments can facilitate linking, in which case, each procedure occupies a segment, and one recompiled procedure does not affect the others. Some shared code can occupy a segment. Different segments can have different kinds of protection.
+
+# Implementation and Examples
+
+One essential difference between paging and segments is that pages are of fixed size and segments are not.
+
+## MULTICS 
+
+TODO
+
+## Intel x86
+
+x86 has 16K independent segments. The heart of the x86 virtual memory consists of two tables:
+
+- Local Descriptor Table: describes segments local to each program, including its code, data, stack, and so on.
+
+- Global Descriptor Table: describes system segments, including the OS itself.
+
+Each program has its own LDT, but there is only one single GDT, shared by all the programs on the machine.
+
+To access a segment, a 16-bit selector (number) for that segment is loaded into one of the segment registers. CS for code segment, DS for data segment. 
+
+```
+           13                   1           2
++---------------------------------------------------+
+|         Index             |Gdt/LDT|Privilege level|
++---------------------------------------------------+
+```
+
+(selector, offset) is converted to a physical address, selector selects the segment, offset denotes the address in the segment.
+
+After loading the selector, the corresponding descriptor (64-bit) is fetched from the LDT or GDT and stored in microprogram registers. If the segment does not exist, or is currently paged out, a trap occurs. The hardware then uses `Limit` field to check if the offset is beyond the end of the segment. The x86 adds the 32-bit Base field in the descriptor to the offset to form _linear address_. If paging is disabled, the linear address is interpreted as the physical address and sent to the memory for read/write. With paging disabled, it's a pure segmentation scheme. If paging is enabled, the linear address is interpreted as a virtual address and mapped onto the physical address using page tables. The page tables are three-level hierarchy.
+
+
+
+```
+                            x86 Code Segment Descriptor
+
+                                           +----------------> segment present/absent
+                                           |                  in/from memory
+16/32 bit segment                          |
+         <---------+                       |    +-----------> privilege level
+                   |                       |    |
+                   |                       |    |
+                   |                       |    |    +------> System/Application
+                   |                       |    |    |
+Limit in           |                       |    |    |
+bytes/pages<---+   |                       |    |    |    +-> Segment Type and Protection
+               |   |                       |    |    |    |
+               |   |                       |    |    |    |
++--------------|---|-|---|---------------|-|-|--|--|-|-|--|---|------------+
+|   Base 24|31| G| D | 0 |  Limit 16|19  | P | DPL | S | Type | Base 16|23 |
++--------------------|---|-------------------|-----|---|------|------------+
+|                                         |                                |
+|                 Base 0-15               |           Limit 0-15           |
++-----------------------------------------|--------------------------------+
+```
+
+All current OSes for the x86 has Base = 0 and Limit set to the maximum, in effect, normal paging. All the segment registers can be set up with the same selector.

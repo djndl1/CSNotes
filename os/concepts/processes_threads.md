@@ -425,4 +425,110 @@ Policy-mechanism separation is an important idea. A parent can control its child
 
 # Classical IPC Problems
 
-TODO
+## The Dining Philosophers
+
+Formulation: five philosophers are seated around a circular table, Each philosopher has a plate of spaghetti. A philosopher needs two forks to eat it. Between each pair of plates is one fork. The life of a philosopher consists of alternating periods of eating and thinking.
+
+The dining philosophers problem is useful for modeling processes that are competing for exclusive access to limited number of resources, such as I/O devices.
+
+_starvation_: all the programs continue to run indefinitely but fail to make any progress.
+
+```c
+#include <stdbool.h>
+
+#define N 5
+#define LEFT (i+N-1)% N
+#define RIGHT (i+1) % N
+#define THINKING 0
+#define HUNGRY 1
+#define EATING 2
+
+typedef int semaphore;
+int state[N];
+semaphore mutex = 1;
+semaphore s[N];         // whether a philosopher has acquired two forks
+
+// philosophers' action, one process per philosopher
+void philosopher(int i)
+{
+        while (true) {
+                think();
+                take_forks(i);             // acquire two forks and block
+                eat();
+                put_forks(i);
+        }
+}
+
+void take_forks(int i)
+{
+        down(&mutex);
+        state[i] = HUNGRY;
+        test(i);
+        up(&mutex);
+        down(&s[i]);    // blocks if forks were not acquired
+}
+
+void put_forks(int i)
+{
+        down(&mutex);
+        state[i] = THINKING;
+        test(LEFT);     // see if the left neighbor can now eat
+        test(RIGHT);
+        up(&mutex);
+}
+
+void test(int i)
+{
+        if (state[i] == HUNGRY &&
+            state[LEFT] != EATING &&
+            state[RIGHT] != EATING) {
+                state[i] = EATING;
+                up(&s[i]);
+        }
+}
+```
+
+## The Readers and Writers Problem
+
+The readers and writers problem models access to a database. 
+
+It is acceptable to have multiple processes reading the database at the same time, but if one process is updating/writing the database, no other processes may have access to the database, not even readers.
+
+```c
+#include <stdbool.h>
+
+typedef int semaphore;
+semaphore mutex = 1;    // controls access to rc
+semaphore db = 1;       // controls access to the database
+int rc = 0;     // reader counter
+
+
+void reader(void)
+{
+        while (true) {
+                down(&mutex);
+                rc = rc + 1;
+                if (rc == 1) down(&db);
+                up(&mutex);
+
+                read_data_base();
+
+                down(&mutex);
+                rc = rc - 1;
+                if (rc == 0) up(&db);
+                up(&mutex);
+
+                use_data_read();
+        }
+}
+
+void writer(void)
+{
+        while (true) {
+                think_up_data();
+                down(&db);
+                write_data_base();
+                up(&db);
+        }
+}
+```

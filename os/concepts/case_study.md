@@ -100,7 +100,77 @@ man 2 clone
 
 More see "Linux thrading model compared: LinuxThreads and NPTL"
 
+Linux distinguishes three classes of threads for scheduling purposes:
 
+The first two classes have priority of 0-99
+
+1. read-time FIFO: highest priority, not preemptible by a newly readied real-time FIFO with even higher priority
+
+2. real-time round robin: preemptible; 
+
+3. timesharing: conventional threads form a separate class and are scheduled by a separate algorithm so they do not compete with the real-time threads, with priority level from 100 to 139.
+
+In Linux, time is measured as the number of clock ticks. Originally, each tick was 1ms, called a _jiffy_. The tick now can be configured to 500, 250 or even 1Hz. The kernel can be configured in tickless mode, useful when there is only one process running in the system or when the CPU is idle and needs to go into power-saving mode. On newer systems, high-resolution timers allow the kernel to keep track of time in sub-jiffy granularity.
+
+Nice value (ranging from -20 to 19)defaults to 0. Only the sysadmin can ask for better (-20 to -1).
+
+- _runqueue_: a key data structure used by the scheduler to track all the runnable tasks in the system and select the next one to run.
+
+- **O(1) scheduler**: performs task-management operations on the runqueue in constant time, independent of the total number of tasks in the system. The runqueue is orgainized in two arrays, _active_ and _expired_, each of which is an array of 140 (priority level) doubly-linked-list heads. The scheduler selects a task from the highest-priority list in the active array. If a task's quantum expires, it is moved to the expired list. Blocking tasks were placed back in the active array when the expected even occurs. When there are no more tasks in the active array, the scheduler simply swaps the pointers of two arrays. Different priority levels are assigned different quanta. Linux distinguishes between static and dynamic priority. A thread's dynamic priority is continuously recalculated, so as to reward interactive threads, and punish CPU-hogging threads. In O(1), bonus/penalty ranges from -5 to 5. A `sleep_avg` variable is maintained to determine the bonus. O(1) resulted in poor performance for interactive tasks.
+
+- **Completely Fair Scheduler** (**CFS**): uses a red-black tree as the runqueue data structure. Tasks are ordered in the tree based on the amount of time they spend running on the CPU (_vruntime_). The children on the left had less time on the CPU. CFS always schedules the task which has had the least amount of time on the CPU. CFS increments the task's vruntime and compares with the leftmost node to decide if it will continue to run or otherwise to be inserted at the appropriate place in the tree. The priorities and niceness are represented through the different effective rate at which a task's virtual time passes when it is running on the CPU. Selecting a node to run can be done in constant time whereas inserting a task in the runqueue is done in $O(\log (N))$ time.
+
+The Linux scheduler includes special features particularly useful multiprocessor or multicore platforms. The runqueue structure is associated with each CPU in the multiprocessing platform. A set of syscalls are available to further specify or modify the affinity requirements of a select thread. The scheduler performs periodic load balancing across runqueues of different CPUs to ensure that the system load is well balanced.
+
+The scheduler considers only runnable tasks in the runqueue. Tasks that are not runnable and are waiting on various events are placed on _waitqueue_. A waitqueue is associated with each event that task may wait on. The head of the waitqueue includes a pointer to a linked list and a spinlock, necessary to ensure that the waitqueue can be concurrently manipulated.
+
+### Synchronization
+
+At the lowest level, Linux provides wrappers around the hardware-supported atomic instructions. Linux provides memory barriers.
+
+Spinlock; mutexes; semaphores; futexes; completions; RCU locks etc.
+
+## Memory Management
+
+In order to avoid allocating a physical page frame full of zeros, during initialization, Linux allocates a static _zero page_, a write-protected page full of zeros for bss. Whenever a process actually attempts to write in this area, an actual page frame is allocated to the process. The data segment can change. The data segment can grow an shrink during execution (`brk`/`sbrk`).
+
+When a program starts up, the stack is not empty. It contains all the env-var as well as the command line typed to the shell to invoke.
+
+Linux supports shared text segments so that two processes can share the same piece of text. Data and stack segments are never shared except after a fork.
+
+Processes in Linux can access file data through memory-mapped files. Mapping a file in makes random access to it much easier than using I/O syscalls. Shared libraries are accessed by mapping them in using this mechanism. A file can be mapped into multiple processes at the same time. Writes to the file by any one of them are them instantly visible to the others.
+
+The most used Linux syscalls for memory management is `sbrk`/`brk`, `mmap`/`munmap`
+
+### Implementation
+
+32-bit Linux process typically gets 3GB of virtual process for user space with the remaining 1GB for page tables and other kernel data.
+
+#### Physical Memory
+
+Linux maintains node descriptors. Each node descriptor contains information about the memory usage and zones on that particular node. on UMA platforms, all memory is decribed via one node descriptor. The first few bits within each page descriptor are used to identify the node descriptor.
+
+Linux distinguishes between the following memory zones and maintains a `zone` structure for each of three zones:
+
+1. `ZONE_DMA` and `ZONE_DMA32`: pages that can be used for DMA;
+
+2. `ZONE_NORMAL`: normal, regularly mapped pages;
+
+3. `ZONE_HIGHMEM`: pages with high-memory addresses, which are not permanently mapped. Not defined on x86_64 machines.
+
+For each zone Linux maintains a zone descriptor: memory utilization, an array of free areas.
+
+Main memory in Linux consists of three parts. The first two steps, the _kernel_ and _memory map_ are pinned in memory, never paged out. The rest of memory is divided into page frames, each of which can contain a text, data, or stack page, a page-table page, or be on free list. 
+
+The kernel maintains a map of the main memory which contains all information about the use of the physical memory in the system, such as its zones, free page frames and so forth.
+
+Linux maintains an array `mem_map` of _page descriptors_ (`page`), one for each physical page frame. A page descriptor contains a pointer to the address space that it belongs to and a pair of pointers that allow it to form doubly-linked lists with other descriptors (e.g. to keep together all free page frames) and a few other fields.
+
+Linux makes use of a four-level paging scheme for 32- and 64-bit architectures. On machines supporting fewer levels, the upper levels have only one entry in a table of size zero. 
+
+The kernel itself is hardwired, no part of it never paged out. 
+
+- page cache: holding pages containing file blocks that have recently been read or have been read in advance in expectation of being used in the near future, or page of file blocks which need to be written to disk. Dynamic in size and competes for the same pool of pages as the user processes. The set of user page that are no longer needed and are waiting around to be paged out.
 
 # Android
 
