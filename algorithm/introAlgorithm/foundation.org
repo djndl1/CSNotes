@@ -31,6 +31,7 @@ pnlgn = plot(nlgn, (x, 0, 10), color='blue',
 pquad = plot(quad, (x, 0, 10), color='green',
             legend_label='$n^{2}$')
 pcube = plot(cube, (x, 0, 10), color='yellow',
+
             legend_label='$n^{3}$', ymax=20, xmax=10)
 
 pfact = list_plot([factori(n) for n in range(10)], color='orange',
@@ -56,7 +57,6 @@ A variable representing an array or object represents a pointer/reference to the
 
 6. ~and~, ~or~ are short circuiting.
 
-
 ** An example with insertions sort
 
 Insertion sort is an efficient algorithm for sorting a small number of elements.
@@ -69,13 +69,12 @@ Output: a permutation (reordering) $\langle a_{1}^{\prime},a_{2}^{\prime},\dots,
 
 ****** Pseudocode algorithm
 
-#+begin_src c
+#+begin_src python
 for j = 2 to A.length
     key = A[j] // insert A[j] into the sorted sequence A[1...j-1].
     i = j - 1
     while i > 0 and A[i] > key
-        A[i+1
-        ] = A[i]
+        A[i+1] = A[i]
         i = i - 1
     A[i+i] = key
 #+end_src
@@ -117,6 +116,22 @@ o    //--------------------------------------------------------------------
         *it_insertion = std::move (Aux);
     };
 };
+#+end_src
+
+#+begin_src c
+void insert_sort_nonincreasing(int arr[], size_t len)
+{
+        size_t i;
+        for (size_t j = 1; j < len; j++) {
+                int key = arr[j];
+                i = j ;
+                while (i > 0 && arr[i-1] < key) {
+                        arr[i] = arr[i-1];
+                        i--;
+                }
+                arr[i] = key;
+        }
+}
 #+end_src
 
 ** Analyzing Algorithms
