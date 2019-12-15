@@ -41,7 +41,7 @@ array([1.+1.j, 2.+0.j, 3.+0.j, 4.-1.j])
 
 *** Internal memory layout
 
-A contiguous one-dimension segment of computer memory, combining with an _indexing scheme_, interpreted by the data-type object associated with the array.
+A contiguous one-dimension segment of computer memory, combining with an *indexing scheme*, interpreted by the data-type object associated with the array.
 Given the index of an element of an array, say $(n_0, n_1, \dots, n_{N-1})$ and the strides of the array $(s_0, s_1, \dots, s_{N-1})$, i.e. the bytes between two elements along a certain axis, the offset from the beginning of the array is 
 
 $$
@@ -161,7 +161,7 @@ array([[False, False, False],
 
 > keepdims: If this is set to True, the axes which are reduced are left in the result as dimensions with size one. With this option, the result will broadcast correctly against the input array.
 
-> _returns_: boolean
+> *returns*: boolean
 
 #+begin_src python
 a = np.array([[1,2],
