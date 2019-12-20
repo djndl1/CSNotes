@@ -6,7 +6,7 @@
 
 - ~:w!~: overwrite the existing file
 
-- ~c~: change
+- ~c~: change, a combination of delete followed by insert.
 
 - ~cc~: change the entire line
 
@@ -58,6 +58,17 @@
 
 * Advanced Operations
 
+~y~/~d~ can be used with a-z named buffers that are specifically available for copying and moving text. A-Z appends text to these buffers.
+
+#+begin_src
+"dyy
+"a7yy
+
+"dP
+"ap
+#+end_src
+
+- ~mx~/~'x~/~`x~/~``~
 
 * Basic Concepts
 
@@ -76,3 +87,22 @@ The general form of ~vi~ commands is
 
 =vi= saves the last nine deleted line in nine numbered deletion buffers.
 
+* ex commands
+
+A command without a line number is assumed to affect the current line.
+
+- ~co~: copy lines
+
+- ~g!~/~v~: the opposite of ~g~
+
+- ~|~: command separator
+
+- ~;~: the first line address isrecalculated as the current line
+
+Line addressing can be used to save part of a file.
+
+~>>~ can also be used in ex mode to append to a file.
+
+- ~#~: alternative buffer, ~%~: current file 
+
+- ~Ctrl-^~: switching between buffers
