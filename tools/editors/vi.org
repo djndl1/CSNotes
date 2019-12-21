@@ -106,3 +106,78 @@ Line addressing can be used to save part of a file.
 - ~#~: alternative buffer, ~%~: current file 
 
 - ~Ctrl-^~: switching between buffers
+
+* Pattern Matching
+
+slashes can be replaced by colons as delimiters.
+ 
+- ~\( \)~: saves the pattern enclosed between into a special holding space or a hold buffer.
+  
+#+begin_src 
+:%s/\(abcd\)\1/alphabet-soup/
+# changes `abcdabcd` into `alphbaet-soup`
+#+end_src
+
+- ~\< \>~: matches characters at the beginning or at the end of a word
+
+- ~~~: matches whatever regex was used in the last search, only available in a regular search
+
+- ~\( \)~: saves the pattern enclosed between into a special holding space
+
+#+begin_src 
+:s/\(abcd\)\1/alphabet-soup/
+# changes abcdabcd to alphabet-soup
+#+end_src
+
+- ~\< \>~: matches characters at the beginning or at the end of a word
+
+- ~~~: matches whatever regex was used in the last search.
+
+- character classes, collating symbols, equivalence classes
+
+#+begin_src 
+[[.ch.]] # a multicharacter sequence that should be treated as a unit
+[[=e=]] # match any of e, e with acute, e with 
+#+end_src 
+
+- ~\n~: replaced with text matched the nth pattern previously saved by ~\(~ and ~\)~
+
+- ~&~: replaced with the entire text matched by the search problem
+
+- ~~~: the string found is replaced with the replacement text specified in the last substitute command. The search pattern doesn't need to be the same.
+
+#+begin_src 
+:s/thier/their/
+:s/thier/~/
+#+end_src
+
+- ~\u~/~\l~: causes the next character in the replacement string to be changed to uppercase or lowercase. ~\U~\~\L~\~\e~\~\E~: all following characters are converted to 
+uppercase or lowercase until the end of the replacement string or until ~\e~/~\E~.
+
+#+begin_src 
+:%s/yes, doctor/\uyes, \udoctor/
+:%s/Fortran/\UFortran/
+#+end_src 
+
+#+begin_src 
+:%s/child\( ,.;:!?\)/children\1/g
+:%s/\<child\>/children/g
+#+end_src 
+
+#+begin_src 
+:g /SYNTAX/.,/DESCRIPTION/-1 move /PARAMTERS/-1
+#+end_src 
+
+** Some Pattern Matching Examples
+ 
+- delete all blank lines plus any lines that contain only whitespace
+
+#+begin_src 
+:g/^[ tab]*$/d
+#+end_src
+
+- delete all leading spaces
+
+#+begin_src 
+:%s/^  *\(.*\)/\1/
+#+end_src
