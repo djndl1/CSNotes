@@ -181,3 +181,67 @@ uppercase or lowercase until the end of the replacement string or until ~\e~/~\E
 #+begin_src 
 :%s/^  *\(.*\)/\1/
 #+end_src
+
+- insert a ~>  ~ at the start of every line in a file
+
+#+begin_src 
+:%s/^/>  /
+#+end_src
+
+- reverse the order of lines in a file
+
+#+begin_src 
+:g/.*/mo0
+#+end_src
+
+- repeat a command
+
+#+begin_src 
+# copy lines 12-17 to the end of the file ten times
+:1,10g/^/ 12,17t$
+#+end_src
+
+* Advanced Usage
+
+#+begin_src
+:set option
+:set nooption
+#+end_src
+
+~:set all~ displays all options.
+
+#+begin_src 
+:1,30!sort # sort 1,30 using `sort`
+#+end_src
+
+- ~map x sequence~: a macros for command mode; ~unmap x~; ~map~: list mappings
+
+#+TODO
+
+* VIM 
+
+** Command line options
+
+- ~-b~: in binary mode
+
+- ~-d~: diff mode
+
+- ~-E~: improved ex mode, with extended regex
+
+- ~-F~/~-A~: Farsi or Arabic mode
+
+- ~view~: vim in read-only mode
+
+- ~vimdiff~: diff mode
+
+- ~ex~: ex mode, useful in scripts
+
+** Extended Regex
+
+- ~\|~: indicates alternation
+
+- ~\+~
+
+- ~\=~: matches zero or one of the preceding regex
+
+- {-(n),(m)}: non-greed matching
