@@ -244,4 +244,29 @@ uppercase or lowercase until the end of the replacement string or until ~\e~/~\E
 
 - ~\=~: matches zero or one of the preceding regex
 
+
 - {-(n),(m)}: non-greed matching
+
+** Multiwindows behavior
+
+- ~-o~/~-oNumber~
+
+- ~:split~, ~Ctrl-Ws~
+
+- ~:new~, ~Ctrl-Wn~
+
+- ~:vnew~/~:vsplit~, ~Ctrl-Wv~
+
+- ~Ctrl-W~ + ~h,j,k,l~, ~t~ (top), ~b~ (bottom), ~p~ (previous)
+
+- ~Ctrl-W~ + ~r~: rotate windows, + ~x~: exchange two windows in a row or column
+
+- ~Ctrl-W~ + ~K, J, H, L, T (tab)~: move the current window, full height
+
+- ~Ctrl-W~ + ~+, -~: increase/decrease the current windows, ~=~: resize all windows to equal size. + ~<, >~: decrease/increase, + ~|~: resizes the current window to the widest size possible
+
+- ~Ctrl-W~ + ~q~: quit a window; + ~c~: close the current window
+
+* Vimscripts
+
+#+TODO
