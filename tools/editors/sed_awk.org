@@ -1,0 +1,94 @@
+* Quick Awk
+
+Each awk program is a sequence of one or more pattern-action statements:
+
+#+begin_src awk
+  pattern { action }
+  pattern { action }
+  ...
+#+end_src
+
+- ~NF~: number of fields, ~$NF~: the final field
+
+- ~NR~: number of lines read so far, used to print line numbers.
+
+~printf~ can produce almost any kind of output.
+
+#+begin_src awk
+printf(format, value_1, value_2, ..., value_n)
+#+end_src
+
+Sorting is done through the ~sort~ unix util.
+
+Awk patterns are good for selecting lines from the input for further processing.
+
+- by comparison
+
+#+begin_src awk
+$2 * $3 > 50 { printf("$%.2f for %s\n", $2 * $3, $1) }
+#+end_src
+
+- by text content
+
+#+begin_src 
+$1 == "Susie"
+#+end_src
+
+Awk is an excellent tool for checking that data has reasonable values and is in the right format,
+a task called /data validation/.
+
+The special pattern ~BEGIN~ matches before the first line of the first input file is read. 
+~END~ matches after the last line of the last file has been processed.
+
+#+begin_src awk
+  BEGIN { printf("NAME\tRate\tHOURS\n")}
+{ print }
+#+end_src
+
+String concatenation is represented by writing string values one after the other.
+
+Printing the last input line 
+
+#+begin_src awk
+  { last = $0 }
+END { print last }
+#+end_src
+
+#+begin_src awk
+  { 
+    nc = nc + length($0) + 1
+    nw = nw + NF
+  }
+END { print NR, "lines, ", nw, "words", nc, "characters"}
+#+end_src
+
+All C control flow structures are available. 
+
+Awk provides arrays for storing groups of related values.
+
+#+begin_src awk
+# print lines reverses
+    { line[NR] = $0 }
+  END { i = NR 
+        while (i > 0) {
+          print line[i]
+          i = i - 1
+  }
+      }
+#+end_src
+
+** Builtin Functions
+
+- ~length()~
+
+** Some one-liners
+   
+#+begin_src awk
+  # print the total number of input lines
+    END { print NR }
+  # print the total number of lines that contain `Beth`
+  /Beth/ { nlines = nlines + 1 }
+  END    { print nlines }
+  # Erasing the second field
+  { $2 = ""; print }
+#+end_src

@@ -1,0 +1,13 @@
+* Intro
+
+** ~diff~ and ~patch~
+
+https://www.geeksforgeeks.org/diff-command-linux-examples/
+
+https://linuxacademy.com/blog/linux/introduction-using-diff-and-patch/
+
+https://www.thegeekstuff.com/2014/12/patch-command-examples/
+
+#+begin_src shell
+diff original updated
+#+end_src

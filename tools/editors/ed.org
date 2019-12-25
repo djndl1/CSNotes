@@ -1,0 +1,58 @@
+* Basic Operations
+
+- ~a~: append, ~.~: end
+
+- ~e~: edit a file
+
+- ~f~: show file info
+
+- ~r~: read file into the current buffer
+
+- ~.~: the current line
+
+- ~;~: the current through line last lines in the buffer
+
+
+- ~.,.+3p~: print the next three lines
+
+- ~.=~: the value of dot
+
+- ~start, end, s/change this/to this/~: ~g~ means global
+
+- context searching ~/../~: we can do both the search for the desired line and a substitution all at once like
+context searches are interchangeable with line numbers
+
+#+begin_src
+/their/s/their/the/p
+#+end_src
+
+- ~c~: change, ~i~: insert
+
+- ~m~: move, cut and paste to
+
+
+- ~g~: executes one or more commands on all the lines in the buffer that match some specified string
+
+- ~t~: copies the addressed lines to after the specified destination address
+
+#+begin_src
+g/peling/s//pelling/gp
+#end_src
+
+- ~v~: opposite of ~g~
+
+- ~&~: used on the right-hand part of a substitute command where it means "whatever was matched on the left-hand side"
+
+* Basic Concept
+
+Editing is done in two distinct modes: 
+
+- command
+
+- input
+
+The general commands structure:
+
+#+begin_src
+[Address, [Addres]]Command[Paramters]
+#+end_src

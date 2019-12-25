@@ -70,7 +70,7 @@ pub fn add_to_waitlist() {}
 
 - _path_: absolute path starts from a crate root by using a crate name or a literal `crate` (like `/`); relative path starts from the current module and uses `self` (like `.`), `super` (like `..`), or an identifier in the current module.
 
-- `use` keyword: brings paths into scope. It is idiomatic to use a full path to bring in structs, enums and other items with `use` unless there are name conflicts. For a function, however, it is common to `use` its surrounding module rather than bringing in itself directly. When we bring a name into scope with the `use` keyword, the name available in the new scope is private. To enable the code that calls our code to refer to that name as if it had been defined in that code’s scope, we can combine pub and use. This technique is called re-exporting. Re-exporting is useful when the internal structure of the  code is different from how programmers calling your code would think about the domain. Doing so makes our library well organized for programmers working on the library and programmers calling the library. To `use` multiple items under the same prefix,
+- `use` keyword: brings paths into scope. It is idiomatic to use a full path to bring in structs, enums and other items with `use` unless there are name conflicts. For a function, however, it is common to `use` its surrounding module rather than bringing in itself directly. When we bring a name into scope with the `use` keyword, the name available in the new scope is private. To enable the code that calls our code to refer to that name as if it had been defined in that code’s scope, we can combine `pub` and `use`. This technique is called _re-exporting_. Re-exporting is useful when the internal structure of the  code is different from how programmers calling your code would think about the domain. Doing so makes our library well organized for programmers working on the library and programmers calling the library. To `use` multiple items under the same prefix,
 
 ```rust
 use std::{cmp::Ordering, io, self}; // self adds `std` itself
@@ -490,8 +490,7 @@ impl Rectangle {
         self.width > other.width && self.height > other.width
     }
 
-    fn square(size: u32) -> Rectang
-    le{
+    fn square(size: u32) -> Rectangle{
         Rectangle {width: size, height: size}
     }
 }
@@ -1201,6 +1200,7 @@ pub trait Iterator {
     type Item;              // associated type
 
     fn next(&mut self) -> Option<Self::Item>;
+    
 
     // methods with default implementations elided
 }

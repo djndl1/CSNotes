@@ -77,7 +77,7 @@ Directory operations:
 
 ### Files 
 
-- Contiguous Allocation: easy to implement, good read performance; fragmented over time. Feasible on CD-ROMs. DVD moves are generally stored as three or four 1-GB files.
+- Contiguous Allocation: easy to implement, good read performance; fragmented over time. Feasible on CD-ROMs. DVD movies are generally stored as three or four 1-GB files.
 
 - linked-list allocation: No space is lost to disk fragmentation. Random access is extremely slow.
 
@@ -91,7 +91,7 @@ The directory entry provides the information needed to find the disk blocks. Thi
 
 ### Shared Files
 
-- hard linking: both the owner and the sharers can have pointers to a file. However, if the owner deletes the file, the file can still be there and owned by the owner, but may not under a directory controlled by the owner.
+- hard linking: both the owner and the sharers can have pointers to a file. However, if the owner deletes the file (the original link), the file can still be there and owned by the owner, but may not under a directory controlled by the owner.
 
 - symbolic linking: only the true owner has a pointer to the i-node. Extra overhead required.
 
@@ -152,4 +152,115 @@ The key idea is to abstract out the part of the file system that is common to al
 +--------------------------------------------------------------------------+
 ```
 
-Internally, most VFS implementation are essentially object oriented, enen if they are written in C rather than C++. These objects include the _superblock_ (which describes a file system), the _v-node_ (which describe a file) and the _directory_ (which describes a file system directory). When a file system registers, what it basically does is provide a list of the addresses of the functions the VFS require. When reading a file from a file system, the VFS finds the file system where the file is and creates a v-node (in RAM) for the file and fills the v-node with the information in the i-node of the file along with a pointer to the table of functions to call for operations on v-nodes. Now using the file descriptor we can find the v-table of the file and perform operations. `read` locates the v-node form the process and file descriptor and follows the pointer to the table of functiions, all of which are addresses within the concrete file system on which thee requested file resides.
+
+Internally, most VFS implementation are essentially object oriented, even if they are written in C rather than C++. These objects include the _superblock_ (which describes a file system), the _v-node_ (which describe a file) and the _directory_ (which describes a file system directory). When a file system registers, what it basically does is provide a list of the addresses of the functions the VFS require. When reading a file from a file system, the VFS finds the file system where the file is and creates a v-node (in RAM) for the file and fills the v-node with the information in the i-node of the file along with a pointer to the table of functions to call for operations on v-nodes. Now using the file descriptor we can find the v-table of the file and perform operations. `read` locates the v-node from the process and file descriptor and follows the pointer to the table of functiions, all of which are addresses within the concrete file system on which thee requested file resides.
+
+# File System Management and Optimization
+
+## Disk-Spacee Management
+
+Nearly all file system chop files up into fixed-size blocks that need not be adjacent.
+
+### block size
+
+In a paging system, the page size is a major candidate. Reading each block normally requires a seek and rotational delay, so reading a file consisting of many small blocks will be slow. Performance and space utilization are inherently in conflict.we. Small blocks are bad for performance but good for disk-space utilization. 
+
+### keeping track of free blocks
+
+- linked list: generally, free blocks are used to hold the free list, so the storage is essentially free. Only one block of pointers need be kept in main memory. When it runs out, a new block of pointers is read in from the disk. When a file is deleted, its block are freed and added to the block of pointers in main memory.
+
+- bitmap: a fixed-size data structure
+
+
+Only if the disk is nearly full will the linked-list scheme require fewer blocks than the bitmap.
+
+### Disk Quotas
+
+Multiuser OSes often provide a mechanism for enforcing disk quotas.
+
+## File System Backups
+
+1. It is desirable to back up only specific directories and everything in them ratherthan the entire file system;
+
+2. It is wasteful to back up files that have not changed since the previous backup, which leads to the idea of _incremental dumps_ ;
+
+3. compression;
+
+4. backup on an active file system
+
+Two strategies can be used for dumping a disk to a backup disk:
+
+1. physical dump: writes all the disk blocks onto the output disk in order and stops when it has copied the last one. Simple and fast . However, there is no value in backing up unused disk blocks. Blocks may go bad. Paging and hibernation files are not needed.
+
+2. logical dump: starts at vone or more specified directories and recursively dumps all files and directories found there that have changed since some given base date. Logical dumping is the most common form.
+
+## File System Consistency
+
+Many file systems read blocks, modify them, and write them out later. If the system crashes before all the modified blocks have been written out, the file system can be left in an inconsistent state.
+
+The general principle is to use the file system's inherent redundancy to repair it.
+
+Two kinds of consistency checks can be made: 
+
+1. blocks: checks the use of blocks in each file's i-node. It then builds a table of blocks in use and their use counts, and a table of free blocks. It checks the state of these two tables and checks one against the other.
+
+2. files: checks the directory system and builds a table of file use. It then checks the table against the file i-nodes.
+
+## File System Performance
+
+- block/buffer cache: a collection of blocks that logically belong on the disk but are being kept in memory for performance reasons. Windows tends to use _write-through caches_, since originally, MS-DOS runs on removable floppy disks. As hard disks became the norm, the UNIX approach with its better efficiency, became the norm.
+
+Caching algorithms are  similar to paging algorithms.
+
+- block read ahead: trying to get blocks into the cache before they are needed to increase the hit rate.
+
+- reducing disk-arm motion: keeping track of disk storage in groups of consecutive blocks; group i-nodes and their corresponding data blocks together.
+
+## Defragmenting Disks
+
+The performance can be restored by moving files around to make contiguous and to put all of the free space in one or more large contiguous regions on the disk.
+
+SSDs do not really suffer from fragmentation at all. Defragmenting an SSD is counterproductive. SSDs would wear out.
+
+# Example File System
+
+## MS-DOS File System
+
+```
+                                The MS-DOS Directory Entry
+
++---------|-----------|----------|------|------|--------------------|------+
+|FileName | Extension | Reserved | Time | Date | First Block Number | Size |
++---------|-----------|----------|------|------|--------------------|------+
+```
+
+MS-DOS keeps track of file blocks via a file allocation table in main memory. The first file block is used as an index into a 64K entry FAT in main memory. By following the chain, all the blocks can be found.
+
+FAT-12/16/32 (28 actually) has disk block pointers of different length and supports different block sizes.
+
+## The UNIX V7 File System
+
+Filenames can be up to 14 character and can contain any ASCII char except `/`. `NUL` pads out names shorter than 14 chars.
+
+```
+Bytes    2                        14
+     +----------|---------------------------+
+     | I-number |       File Name           |
+     +----------|---------------------------+
+```
+
+64K files per file system.
+
+The UNIX i-node contains some attributes. The attributes contain the file size, create/last access/last modification times, owner, group, protection information, and a count of the number of directory entries that point to the i-node.
+
+The first 10 disk addresses are stored in the i-node itself. For somewhat larger files, one of the addresses in the i-node is the address of a disk block called _single indirect blocks_. For even larger files, another address in the i-node, called a _double indirect block_ contains the address of a block that contains a list of single indirect blocks. Triple indirect blocks can be used if not enough.
+
+To open a file, the system locates the root directory, and then finds the directory entry matching the filename recursively. The directory entry contains the i-node for the file.
+
+## CD-ROM File Systems (ISO-9660)
+
+No bookkeeping mechanism for free blocks.
+
+CD-ROMs has a single continuous spiral containing the bits in a linear sequence. Logical blocks are of 2352 bytes, of which 2048 are payload portion. The function of the first 16 blocks is not defined by the standard, which can be used as bootloader. One block after is the _primary volume descriptor_, which contains some general information about the CD-ROM.
+
+ISO-9660 uses directory entries of variable length, with the first byte indicating the length of the entry.
