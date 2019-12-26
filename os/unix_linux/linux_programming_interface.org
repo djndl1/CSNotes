@@ -1,3 +1,15 @@
+* Fundamental Concepts
+
+kernel; kernel mode and user mode; The kernel mediates all critical actions.
+
+Users, groups, superuser.
+
+PID, PPID; privilege; identifiers; capabilities; init; daemons; environment list; resource limits (set by ~setrlimit()~)
+
+memory mappings ~mmap()~; file mapping, anonymous mapping;
+
+static libraries; shared libraries
+
 * System Programming Concepts
 
 - system call: a system call is a controlled entry point into the kernel, allowing a process to request that the kernel perform some action on the process's behalf. A syscall changes the processor state from user mode to kernel mode so that the CPU can access protected kernel memory. Each syscall is identified by a unique number. 
