@@ -661,7 +661,7 @@ let mut v = Vec::new();
 With `enum`, we can store multiple types in a vector:
 
 ```rust
-enum SpreadsheeCell {
+enum SpreadsheetCell {
     Int(i32),
     Float(f64),
     Text(String)
@@ -669,9 +669,9 @@ enum SpreadsheeCell {
 
 fn main() {
     let row = vec![
-        SpreadsheeCell::Int(3),
-        SpreadsheeCell::Text(String::from("blue")),
-        SpreadsheeCell::Float(10.12),
+        SpreadsheetCell::Int(3),
+        SpreadsheetCell::Text(String::from("blue")),
+        SpreadsheetCell::Float(10.12),
     ];
 }
 ```
@@ -713,7 +713,7 @@ Rust strings don't support indexing. Internally, `String` is a wrapper over a `V
 
 ## `HashMap`
 
-`insert` an owned value into a `HashMap` moves the data. However, we can move references, but the references must be valid at least as long as the hash map is valid. By default, HashMap uses a “cryptographically strong”1 hashing function that can provide resistance to Denial of Service (DoS) attacks. 
+`insert` an owned value into a `HashMap` moves the data. However, we can move references, but the references must be valid at least as long as the hash map is valid. By default, HashMap uses a “cryptographically strong” hashing function that can provide resistance to Denial of Service (DoS) attacks. 
 ```rust
     use std::collections::HashMap;
 
@@ -839,7 +839,7 @@ fn read_username_from_file() -> Result<String, io::Error> {
 }
 ```
 
-Error values that have the `?` operator called on them go through the from function. The error type received is converted into the error type defined in the return type of the current function. The `?` operator can only be used in functions that have a return type of `Result<T, E>`. One valid return type for `main` is `()`, and another valid type is `Result<T, E>`.
+Error values that have the `?` operator called on them go through the `from` function. The error type received is converted into the error type defined in the return type of the current function. The `?` operator can only be used in functions that have a return type of `Result<T, E>`. One valid return type for `main` is `()`, and another valid type is `Result<T, E>`.
 
 Returning Result is a good default choice when you’re defining a function that might fail. Call `unwrap` or `expect` during prototyping and testing. Even if sometimes it's impossible to fail in a certain situation, the compiler will insists that the error be handled (it doesn't have enough information). The solution is to add a `unwrap` to ensure this.
 
