@@ -47,7 +47,7 @@
 
 - [x] https://en.wikibooks.org/wiki/Object_Oriented_Programming
 - [ ] http://dbp-consulting.com/tutorials/debugging/linuxProgramStartup.html
-- [ ] https://blogs.oracle.com/linux/hello-from-a-libc-free-world-part-1-v2
+- [x] https://blogs.oracle.com/linux/hello-from-a-libc-free-world-part-1-v2
 - [ ] C runtime
 - [ ] https://en.wikipedia.org/wiki/Region-based_memory_management#Region_inference
 - [ ] https://en.wikipedia.org/wiki/Buffer_overflow
@@ -272,4 +272,4 @@
 - [ ] https://www.ibm.com/cloud/learn/cloud-computing
 
 - [ ] https://blog.packagecloud.io/eng/2016/04/05/the-definitive-guide-to-linux-system-calls/
-https://blog.ryanlevick.com/down-the-stack-part-1/
+
