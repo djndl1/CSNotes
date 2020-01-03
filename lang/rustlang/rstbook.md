@@ -1256,3 +1256,13 @@ impl Iterator for Counter {
                                  .sum();
 
 ```
+
+# Automated Tests
+
+Rust includes support for writing automated software tests within the language. Tests are functions that verify that the non-test code is functioning in the expected manner. The bodies of test functions typically perform three actions:
+
+1. Set up any needed data or state;
+
+2. Run the code to test;
+
+3. Assert the results are what are expected.
