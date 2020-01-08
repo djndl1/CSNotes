@@ -67,7 +67,7 @@ Input: A sequence of $n$ numbers (called *keys*)  $\left\langle a_{1},a_{2},\dot
 
 Output: a permutation (reordering) $\langle a_{1}^{\prime},a_{2}^{\prime},\dots,a_{n}^{\prime}\rangle$ of the input sequence s.t. $a_{1}^{\prime}\leq a_{2}^{\prime}\leq\cdots\leq a_{n}^{\prime}$.
 
-****** Pseudocode algorithm
+****** Pseudocode algorithm 
 
 #+begin_src python
 for j = 2 to A.length
@@ -86,6 +86,20 @@ To show the algorithm is correct, we require that for such a loop, the propertie
 - Maintenance: If it is true before an iteration of the loop, it remains true before the next iteration;
 
 - Termination: When the loop terminates, the invariant gives us a useful property that helps show that the algorithm is correct. (a point where mathematical induction should stop)
+
+#+BEGIN_SRC python
+def insertion_sort(arr):
+    if len(arr) < 2:
+        return arr
+    for j in range(1, len(arr)):
+        key = arr[j]
+        i = j
+        while i > 0 and arr[i-1] > key:
+            arr[i] = arr[i-1]
+            i -= 1
+        arr[i] = key
+    return arr
+#+END_SRC
 
 
 #+begin_src cpp
@@ -127,7 +141,6 @@ void insert_sort_nonincreasing(int arr[], size_t len)
                 i = j ;
                 while (i > 0 && arr[i-1] < key) {
                         arr[i] = arr[i-1];
-
                         i--;
                 }
                 arr[i] = key;
