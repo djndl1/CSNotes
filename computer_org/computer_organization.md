@@ -1,6 +1,8 @@
 # Introduction
 
 
+
+
 # Chap. 6 Parallel Processors From Client to Cloud
 
 keywords: multiprocessors, task-level parallelism, process-level parallelism, parallel processing program(a single program that runs on multiple processors simultaneously), cluster, multicore microprocessors, shared memory processors (SMPs, a parallel processor with a single physical address space), 
