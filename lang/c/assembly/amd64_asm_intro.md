@@ -235,11 +235,14 @@ To extract a bit field form a word, shift the word right until the right most bi
 
 - `rol`/`ror`: rotate left/right 
 
+[Best Practices for Circular Shift Rotate in C](https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c)
+
 - `bt`: bit test, sets the carry flag to the value of the bit being tested
 
 - `bts`/`btr`: bit test and set/reset
 
 ```assembly
+; fill in bits 23-51 of sample
 mov rax, [sample]
 ror rax, 23
 shr rax, 29    ; clear the lower 29 bits
@@ -248,6 +251,8 @@ or rax, [field]
 rol rax, 23
 mov [sample], rax
 ```
+
+- `set_` for each of the condition flags in the `eflags` register.
 
 # Branching and Looping
 
