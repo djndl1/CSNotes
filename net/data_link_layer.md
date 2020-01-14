@@ -157,7 +157,7 @@ void receiver1(void)
 
 A general solution to flow control between senders and receivers is to have the receiver provide a feedback to the sender.  After having passed a packet to its network layer, the receiver sends a little dummy frame back to the sender which, in effect, gives the sender permission to transmit the next frame. A half-duplex physical channel would suffice here.
 
-```
+```c
 /* Protocol 2 Stop-and-Wait also provides for a one-directional flow of data from sender to receiver.
  The communication channel is once again assumed to be error free. However, this time the receiver
  has only a finite buffer capacity and a finite processing speed, so the protocol must explicitly
