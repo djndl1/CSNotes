@@ -13,6 +13,16 @@
 
 - ~recursive_peak_finder_1d~: $Theta(\log_{2) n$
 
+#+BEGIN_SRC python
+peak_finder(a, 1, n)
+if a[n/2] < a[n/2-1]:
+    return peak_finder(a, 1, n/2-1)
+elif a[n/2] < a[n/2+1]:
+    return peak_finder(a, n/2+1, n)
+else:
+    return n/2
+#+END_SRC
+
 ** Peak Finding (2D Version)
 
 - Formulation: $a$ is a 2D-peak 
@@ -21,6 +31,8 @@ iff $a$ is greater than or equal to all its neighbors (the four cells around it)
 #+INCLUDE: "python-implementation/peak_finder_2d.py" src python
 
 - ~greedy_ascent_peak_finder~: worst case $\Theta(nm)$
+
+- ~recursive_peak_finder_2d~: $T(n, m) + T(n, m/2) + \Theta(n)$. Worst case $\Theta(n \log m)$
 
 ** Reading Notes
 
