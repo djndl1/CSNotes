@@ -1,0 +1,71 @@
+\documentclass[a4paper, 11pt]{article}
+
+% Macros
+\newcommand{\TUG}{Tex Users Group\xspace}
+\newcommand{\keyword}[1]{\textbf{#1}}
+
+% If a dot, a comma, an exclamation or a quotation mark follows, it won't insert a space, but if a normal letter 
+% follows, then it will.
+\usepackage{xspace}
+\usepackage{minted}
+
+\begin{document}
+
+Text can be \emph{emphasized}.
+
+Besides being \textit{italic} words could be \textbf{bold},
+\textsl{slanted} or typeset in \textsc{Small Caps}.
+
+Such commands can be \textit{\textbf{nested}}.
+
+
+\emph{See how \emph{emphasizing} looks when nested.}
+\texttt{http://www.ctan.rog}
+
+\textrm{Roman text}
+
+\section{\sffamily\LaTeX resources in the internet}    % sans-serif font declaration
+\rmfamily The best place for downloading LaTex related software is CTAN 
+Its address is \texttt{http://www.ctan.org \sffamily(CTAN)} 
+
+% We use curly braces to tell LaTex where to apply a command and where to stop that
+% an opening curly brace tells LaTex to begin a group
+{\sffamily
+Text can be {\em emphasized}.
+
+Besides being {\itshape italic} words could be {\bfseries bold}, {\slshape slanted} or typeset in {\scshape Small Caps}.
+
+Such commands can be {\itshape \bfseries nested.} 
+
+{\em See how {\em emphasizing looks when nested}}
+}
+ 
+\title{\sffamily Sans serif}
+\maketitle
+Hi
+
+% font size
+
+\noindent \tiny tiny \scriptsize scriptsize \footnotesize footnotesize \small small, \normalsize normalsize \large large \Large Large \LARGE LARGE 
+\huge huge and \Huge Huge \bigskip
+
+\normalsize  The actual resulting font size depends on the base font. One way to apply font size is to use environment:
+
+\begin{huge}
+A huge example
+\end{huge}
+\bigskip % skip some space vertically
+This is just another small illustrative example.
+
+\LaTeX allows you to define our own commands in the preamble, called \emph{macros}.
+
+The \TUG is an organization for people who are interested in \TeX\ or \LaTeX.
+
+\keyword{Grouping} by curly braces limits the \keyword{scope} of \keyword{declarations}.
+
+\mint{latex}|\newcommand{command}[arguments][optional]{definition}|
+
+where arguments are integers from 1 to 9. It is the key to introduce logical formatting. We should avoid using \LaTeX font commands inside the document.
+
+\end{document}
+
