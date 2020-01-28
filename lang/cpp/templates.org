@@ -1,0 +1,820 @@
+* Basics
+  :PROPERTIES:
+  :CUSTOM_ID: basics
+  :END:
+
+** Function Templates
+   :PROPERTIES:
+   :CUSTOM_ID: function-templates
+   :END:
+
+Function templates are functions that are parameterized so that they
+represent a family of functions.
+
+Templates are compiled in two phases (names are checked twice,
+/two-phase lookup/):
+
+1. Without instantiation at definition time, the template code itself is
+   checked for correctness ignoring the template parameters.
+
+2. At instantiation time, the template code is checked to ensure that
+   all code is valid. All parts that depend on template parameters are
+   double-checked.
+
+When a template is used in a way that triggers its instantiation, a
+compiler will need to see its definition. The simplest approach is to
+implement each template inside a header file.
+
+*** Template Argument Deduction
+    :PROPERTIES:
+    :CUSTOM_ID: template-argument-deduction
+    :END:
+
+Automatic type conversions are limited during type deduction:
+
+1. When declaring call parameters by reference, conversions do not apply
+   to type deduction. Two arguments declared with the same template
+   parameter must match exactly.
+
+2. When declaring call parameters by value, only trivial conversions
+   that decay are supported, e.g. (=const=, =volatile= are ignored,
+   references convert the to the referenced type, raw arrays or
+   functions convert to the corresponding pointer type), the decayed
+   types must match.
+
+#+BEGIN_SRC C++
+    template<typename T>
+    T max (T a, T b);
+
+    int const c = 42;
+    max(5, c); // T == int, const is ignored
+    int &ir = i;
+    max(i, ir); // T == intint arr[4];
+    foo(&i, arr); // T == int*
+
+    // Automatic type conversion is not considered for deduced template paramters
+    max(4,2, 4); // error, no promotion. 
+
+    max(4.2, static_cast<double>(4)); // correct
+    max<double>(4.2, 4); // correct
+#+END_SRC
+
+Type deduction does not work for default call arguments. One solution is
+to declare a default argument.
+
+#+BEGIN_SRC C++
+    template<typename T = std::string>
+    void (T = "");
+
+    f(); // OK
+#+END_SRC
+
+When there is no connection between template parameters and call
+parameters and when template parameters cannot be determined, the
+template argument must be explicitly specified. Template argument
+deduction does not take return types into account.
+
+#+BEGIN_SRC C++
+    template <typename T1, typename T2, typename RT>
+    RT max(T1 a, T2 b);
+
+    ::max<int, double, double>(4, 7.2);
+#+END_SRC
+
+In general, all the argument types up to the last argument that cannot
+be determined implicitly must be specified.
+
+#+BEGIN_SRC C++
+    template <typename RT, typename T1, typename T2>
+    RT max(T1 a, T2 b);
+
+    ::max<double>(4, 7.2);
+#+END_SRC
+
+(C++14) It is possible to let the compiler find out the return type by
+simply not declaring any return type.
+
+#+BEGIN_SRC C++
+    template <typename T1, typename T2>
+    auto max(T1 a, T2 b) // without trailing return type and always decay, no need for std::decay
+    {
+        return b < a ? a : b;
+    }
+#+END_SRC
+
+Before C++14, this is done by
+
+#+BEGIN_SRC C++
+    template <typename T1, typename T2>
+    auto max(T1 a, T2 b) -> decltype(b < a ? a : b)
+    {
+        return b < a ? a : b;
+    }
+#+END_SRC
+
+To prevent the return type from being deduced as a reference type:
+
+#+BEGIN_SRC C++
+    template <typename T1, typename T2>
+    auto max(T1 a, T2 b) -> typename std::decay(decltype(true ? a : b))::type
+    {
+        return b < a ? a : b;
+    }
+#+END_SRC
+
+=std::common_type<>::type= yields the common type of two or more
+different types.
+
+#+BEGIN_SRC C++
+    template <typename T1, typename T2>
+    std::common_type<T1, T2>::type max(T1, T2);
+
+    // C++14
+    template <typename T1, typename T2>
+    std::common_type_t<T1, T2> max(T1, T2);
+#+END_SRC
+
+*** Default Template Arguments
+    :PROPERTIES:
+    :CUSTOM_ID: default-template-arguments
+    :END:
+
+Template parameters can have default values:
+
+#+BEGIN_SRC C++
+    #include <type_traits>
+
+    template<typename T1, typename T2,
+             typename RT = std::decay_t<decltype(true? T1() : T2())>>
+    RT max(T1 a, T2 b)
+    {
+        return b < a ? a : b;
+    }
+
+    template<typename T1, typename T2,
+             typename RT = std::common_type_t<T1, T2>>
+    RT max(T1 a, T2 b)
+    {
+        return b < a ? a : b;
+    }
+#+END_SRC
+
+*** Overloading
+    :PROPERTIES:
+    :CUSTOM_ID: overloading
+    :END:
+
+1. A nontemplate function can coexist with a function template that has
+   the same name and can be instantiated with the same type. All other
+   factors being equal, the overload resolution process prefers the
+   nontemplate over one generated from the template. If the template can
+   generate a function with a better match, the template is selected.
+
+2. Multiple function templates with the same name can coexist:
+
+Make sure all overloaded versions of a function are declared before the
+function is called, otherwise, some versions may not be seen when the
+overloading is resolved.
+
+https://www.geeksforgeeks.org/passing-reference-to-a-pointer-in-c/
+
+Passing by value in general is often better for:
+
+1. the syntax is simple;
+
+2. compilers optimize better;
+
+3. move semantics often make copies cheap;
+
+4. sometimes there is no copy or move at all;
+
+5. a template might be used for both simple and complex types;
+
+6. still, even designed for passing by value, it is possible to force
+   passing by reference using =std::ref= and =std::cref=.
+
+In general, function templates don't have to be declared with =inline=
+unless there are many specializations of templates for specific types.
+
+** Class Templates
+   :PROPERTIES:
+   :CUSTOM_ID: class-templates
+   :END:
+
+Inside a class template, using the class name not followed by template
+arguments represents the class with its template parameters its
+arguments.
+
+For class templates, member functions are instantiated only if they are
+used.
+
+Template arguments only have to provide all necessary operations that
+are needed instead of all operations that the template requires.
+
+** Concept
+   :PROPERTIES:
+   :CUSTOM_ID: concept
+   :END:
+
+Since C++11, some basic constraints are checked by using =static_assert=
+and some predefined type traits.
+
+TODO
+
+** Friends
+   :PROPERTIES:
+   :CUSTOM_ID: friends
+   :END:
+
+A friend function can be defined inside a class template, without
+redeclaring the type parameter. When trying to declare the friend
+function and define it afterwards:
+
+- implicitly declare a new function template, which must use a different
+  template parameter:
+
+#+BEGIN_SRC C++
+    template <typename T>
+    class Stack {
+        ...
+        template <typename U>
+        friend std::ostream& operator<< (std::ostream&, Stack<U> const &);
+    };
+#+END_SRC
+
+- forward declare the output operator to be a template
+
+#+BEGIN_SRC C++
+    template <typename T>
+    class Stack;
+
+    template <typename T>
+    std::ostream& operator<<(std::ostream&, Stack<T> const&);
+
+    template <typename T>
+    class Stack {
+        friend std::ostream& operator<< <T>(std::ostream&, Stack<T> const&); // a specialization of a nonmember function template as friend
+    };
+#+END_SRC
+
+** Specialization of Class Templates
+   :PROPERTIES:
+   :CUSTOM_ID: specialization-of-class-templates
+   :END:
+
+Specializing class templates allows for optimization of implementations
+for certain types or to fix a misbehavior of certain types for an
+instantiation of the class template. All member functions must be
+specialized if a class template is specialized.
+
+#+BEGIN_SRC C++
+    template<>
+    class Stack<std::string> {
+    private:
+        std::deque<std::string> elems;
+
+    public:
+        void push(std::string const&);
+        void pop();
+        std::string const &top() const;
+        bool empty() const { return elems.empty(); }
+    };
+#+END_SRC
+
+*** Partial Specialization
+    :PROPERTIES:
+    :CUSTOM_ID: partial-specialization
+    :END:
+
+#+BEGIN_SRC C++
+    template<typename T>
+    class Stack<T*> {
+    private:
+        std::vector<T*> elems;
+
+    public:
+        void push(T*);
+        T* pop();               // a slightly different interface
+        T* top() const;
+        bool empty() const { return elems.empty(); }
+    };
+#+END_SRC
+
+Class templates might also specialize the relationship between multiple
+template parameters:
+
+#+BEGIN_SRC C++
+    template <typename T1, typename T2>
+    class MyClass {
+        // ...
+    };
+
+    template <typename T>
+    class <T,T> {
+        // ...
+    };
+
+    template <typename T>
+    class MyClass<T, int> {
+        // ...
+    };
+
+    template <typename T>
+    class MyClass<T*, T*> {
+        // ...
+        
+    };
+
+    MyClass<int, int> m; // error, ambiguous partial specilization;
+#+END_SRC
+
+If more than one partial specialization matches equally well, the
+declaration is ambiguous:
+
+An alias declaration using =using= can be templated to provide a
+convenient name for a family of types, called /alias template/.
+
+#+BEGIN_SRC C++
+    template <typename T>
+    using DequeStack = Stack<T, std::deque<T>>;
+
+    DequeStack<int> // == Stack<int, std::deque<int>>
+
+    template <typename T>
+    using MytypeIterator = typename Mytype::iterator;
+#+END_SRC
+
+(C++14) The standard library uses this technique to define shortcuts for
+all type traits that yields a type.
+
+#+BEGIN_SRC C++
+    template <class _Tp> using decay_t = typename decay<_Tp>::type;
+    template <class ..._Tp> using common_type_t = typename common_type<_Tp...>::type;
+#+END_SRC
+
+*** (C++17) Class Template Argument Deduction
+    :PROPERTIES:
+    :CUSTOM_ID: c17-class-template-argument-deduction
+    :END:
+
+The constructor is reponsible for deducing template parameters (that
+don't have a default value).
+
+Be careful when using a string literal, this may result in weird
+paramter type deduction:
+
+#+BEGIN_SRC C++
+    // with Stack(T const& elm);
+    Stack stringStack = "bottom"; // Stack<char[7], std::vector<std::allocator<char[7]>>>
+
+    // with Stack(T const elm);
+    Stack stringStack = "bottom"; // Stack<const char*, std::vector<std::allocator<const char*>>>
+#+END_SRC
+
+In general, when passing arguments of a template type T by reference,
+the parameter doesn't decay. When passing by value, the parameter
+decays.
+
+Instead of declaring the constructor to be called by value, we should
+disable automatically deducing raw character pointers for container
+classes by using deduction guides:
+
+#+BEGIN_SRC C++
+    Stack(const char*) -> Stack<std::string>;
+#+END_SRC
+
+This guide has to appear in the same scope as the class definition.
+
+[[file:mikelui.io/2019/01/03/seriously-bonkers.html][C++ Initialization
+Hell]]
+
+#+BEGIN_SRC C++
+    Stack<std::string> strst = "abc"; // error
+
+    //no known conversion from 'const char [4]' to 'const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >' for 1st argument
+    //    Stack(T const elm);
+#+END_SRC
+
+*** (C++17) Deduction Guide for Aggregate Class Templates
+    :PROPERTIES:
+    :CUSTOM_ID: c17-deduction-guide-for-aggregate-class-templates
+    :END:
+
+#+BEGIN_SRC C++
+    template <typename T>
+    struct ValueWithComment {
+        T value;
+        std::string comment;
+    };
+
+    ValueWithComment(char const*, char const*) -> ValueWithComment<std::string>;
+
+    ValueWithComment vc2 = {"hello" ,"initial value"};
+#+END_SRC
+
+* Nontype Template Parameters
+  :PROPERTIES:
+  :CUSTOM_ID: nontype-template-parameters
+  :END:
+
+#+BEGIN_SRC C++
+    template <typename T, std::size_t Maxsize>
+    class Stack {
+    private:
+        std::array<T, Maxsize> elems;
+        std::size_t numElems;
+    public:
+        Stack();
+        void push(T const& elem);
+        void pop();
+        T const& top() const;
+        bool empty() const { return elems.empty(); }
+        std::size_t size() const { return numElems; }
+    };
+#+END_SRC
+
+In general, non-type parameters can be only constant integral values
+(including enumerations), pointers to objects/functions/members, lvalue
+references to objects or functions, or =std::nullptr_t=. Floating-point
+numbers and class-type objects are not allowed as nontype template
+parameters. When passing template arguments to pointers or references,
+the objects must not be string literals, temporaries, or data members
+and other subobjects. *(C++ mess warning!)* Different standards have
+different additional linkage constraints. In C++17, it can have
+[[https://stackoverflow.com/questions/24864840/difference-between-internal-and-no-linkage][no
+linkage]].
+
+[[https://en.wikipedia.org/wiki/Linkage_(software)][Linkage]]
+
+[[http://www.goldsborough.me/c/c++/linker/2016/03/30/19-34-25-internal_and_external_linkage_in_c++/][Internal
+and External Linkage in C++]]
+
+[[https://stackoverflow.com/questions/998425/why-does-const-imply-internal-linkage-in-c-when-it-doesnt-in-c][=const=
+external linkage in C++ but not in C]], this actually replaces evil
+macros. But to enforce compile-time computation, =constexpr= was
+introduced.
+[[https://isocpp.org/blog/2018/05/quick-q-use-of-constexpr-in-header-file][Use
+of =constexpr= in headers]]
+
+** (C++17) Template Paramter Type =auto=
+   :PROPERTIES:
+   :CUSTOM_ID: c17-template-paramter-type-auto
+   :END:
+
+A nontype template parameter can accept genrically any type that is
+allowed for a nontype parameter.
+
+#+BEGIN_SRC C++
+    template <typename T, auto Maxsize>
+    class Stack {
+    private:
+        std::array<T, Maxsize> elems;
+        std::size_t numElems;
+    public:
+        using size_type = decltype(Maxsize);
+
+        Stack();
+        void push(T const& elem);
+        void pop();
+        T const& top() const;
+        bool empty() const { return elems.empty(); }
+        auto size() const { return numElems; } // C++14 auto as a return type
+    };
+#+END_SRC
+
+#+BEGIN_SRC C++
+    Stack<int, 20u> int20Stack; // uint 20
+    Stack<std::string, 40> stringStack; // int 40
+
+    std::is_same<decltype(size1), decltype(size2)>::value; // they dont have the same type
+    // Also
+    _LIBCPP_INLINE_VAR _LIBCPP_CONSTEXPR bool is_same_v
+        = is_same<_Tp, _Up>::value;
+#+END_SRC
+
+Also, it's possible to pass strings as constant arrays:
+
+#+BEGIN_SRC C++
+    template <auto T>
+    class Message {
+    // ...
+    };
+
+    static char const s[] = "hello";
+    Messsage<s> msg2;
+#+END_SRC
+
+Even =template<decltype<auto> N>= is possible, allowing isntantiation of
+=N= as a reference.
+
+#+BEGIN_SRC C++
+    template <decltype(auto) N>
+    class C {};
+
+    int i;
+    C<(i)> n; // N is int&, note the brackets.
+#+END_SRC
+
+[[https://en.cppreference.com/w/cpp/language/decltype][Note how decltype
+declares a reference type]]
+
+* Variadic Templates
+  :PROPERTIES:
+  :CUSTOM_ID: variadic-templates
+  :END:
+
+** operator =sizeof...=
+   :PROPERTIES:
+   :CUSTOM_ID: operator-sizeof...
+   :END:
+
+=sizeof= for variadic templates expands to the number of elements a
+paramter pack contains:
+
+#+BEGIN_SRC C++
+    template<typename T, typename... Types>
+    void print(T first, Types... args)
+    {
+        std::cout << sizeof...(Types) << '\n';
+        // or
+        std::cout << sizeof...(args) << '\n';
+    }
+#+END_SRC
+
+However, this doesn't work:
+
+#+BEGIN_SRC C++
+    template<typename T, typename... Types>
+    void print(T first, Types... args)
+    {
+        std::cout << first << '\n';
+
+        if (sizeof...(args) > 0) {
+            print(args...);
+        }
+    }
+#+END_SRC
+
+Since =print(args...)= in the =if= block is always instantiated since
+=if= is a run-time decision. We need =if constexpr= to make this work
+(C++17):
+
+#+BEGIN_SRC C++
+    template<typename T, typename... Types>
+    void print(T first, Types... args)
+    {
+        std::cout << first << '\n';
+
+        if constexpr (sizeof...(args) > 0) {
+            print(args...);
+        }
+    }
+#+END_SRC
+
+** (C++17) Fold Expressions
+   :PROPERTIES:
+   :CUSTOM_ID: c17-fold-expressions
+   :END:
+
+A feature to compute the result of using a binary operator over all the
+arguments of a parameter pack, with an optional initial value.
+
+#+BEGIN_SRC C++
+    (... op pack) == (((pack1 op pack2) op pack3) ... op packN)
+    (pack op ...) == (pack1 op (... (packN-1 op packN)))
+    (init op ... op pack) == (((init op pack1) op pack2) ... op packN)
+    (pack op ... op init) == (pack1 op (... (packN op init)))
+#+END_SRC
+
+#+BEGIN_SRC C++
+    template<typename T>
+    class AddSpace {
+    private:
+        T const& ref;
+    public:
+        AddSpace(T const &r) : ref(r) {}
+        friend std::ostream &operator<<(std::ostream &os, AddSpace<T> s)
+            {
+                return os << s.ref << ' ';
+            }
+    };
+
+    template<typename... Types>
+    void print(Types const&... args)
+    {
+        (std::cout << ... << AddSpace(args)) << '\n';
+    }
+#+END_SRC
+
+It is possible to use a fold expression to traverse a path in a binary
+tree using =->*=(???):
+
+#+BEGIN_SRC C++
+    struct Node {
+        int value;
+        Node* left;
+        Node* right;
+        Node(int i = 0) : value{i}, left{nullptr}, right(nullptr) {}
+    };
+
+    template<typename T, typename... TP>
+    Node* traverse(T np, TP... paths)
+    {
+        return (np->* ... ->* paths);
+    }
+
+    auto left = &Node::left; // pointer to member
+    auto right = &Node::right;
+
+    Node* node = traverse(root, left, right);
+#+END_SRC
+
+** Applications
+   :PROPERTIES:
+   :CUSTOM_ID: applications
+   :END:
+
+One typical application is the forwarding of a variadic number of
+arguments of arbitrary type.
+
+- shared pointer
+
+- =std::thread=
+
+- =vector.emplace=
+
+** Variadic Class Template and Variadic Expressions
+   :PROPERTIES:
+   :CUSTOM_ID: variadic-class-template-and-variadic-expressions
+   :END:
+
+Parameter packs can appear in additional places, including expressions,
+using declarations, and even deduction guides.
+
+*** Variadic Expressions
+    :PROPERTIES:
+    :CUSTOM_ID: variadic-expressions
+    :END:
+
+#+BEGIN_SRC C++
+    template<typename... T>
+    void printDoubled(T const&... args)
+    {
+        print(args + args...);
+    }
+    printDoubled(7.5, std::string{"Hello"}, std::complex<float>(4.2));
+    // it's like
+    print(7.5 + 7.5,
+          std::string("Hello") + std::string("Hello"),
+          std::complex<float>(4.2) + std::complex<float>(4.2));
+
+
+    template<typename... T>
+    void addOne(T const&... args)
+    {
+        print(args+1 ...);
+        // or
+        print((args + 1)...);
+    }
+
+    template<typename T1, typename... TN>
+    constexpr bool isHomogeneous(T1, TN...)
+    {
+        return (std::is_same<T1, TN>::value && ...);    //fold expression, since C++17
+    }
+#+END_SRC
+
+*** Variadic Indices
+    :PROPERTIES:
+    :CUSTOM_ID: variadic-indices
+    :END:
+
+#+BEGIN_SRC C++
+    template<typename C, typename... Idx>
+    void printElems(C const& coll, Idx... idx)
+    {
+        print(coll[idx]...);
+    }
+
+    std::vector<std::string> coll = {"good", "times", "say", "bye"};
+    printElems(coll, 2, 0, 3);
+
+    template<std::size_t... Idx, typename C>
+    void printIdx(C const& coll)
+    {
+        print(coll[Idx]...);
+    }
+
+    printIdx<2, 0, 3>(coll);
+#+END_SRC
+
+*** Variadic Class Template
+    :PROPERTIES:
+    :CUSTOM_ID: variadic-class-template
+    :END:
+
+#+BEGIN_SRC C++
+    template<std::size_t...>
+    struct Indices {};
+
+    template<typename T, std::size_t... Idx>
+    void printByIdx(T t, Indices<Idx...>)
+    {
+        print(std::get<Idx>(t)...);
+    }
+
+    std::array<std::string, 5> arr = {"H", "E", "L", "L", "O"};
+    printByIdx(arr, Indices<0, 1, 2>);
+#+END_SRC
+
+*** (C++17) Variadic Deduction Guides
+    :PROPERTIES:
+    :CUSTOM_ID: c17-variadic-deduction-guides
+    :END:
+
+#+BEGIN_SRC C++
+      template<typename T, typename… U> array(T, U…)
+        -> array<enable_if_t<(is_same_v<T, U> && …), T>,
+                 (1 + sizeof…(U))>;
+#+END_SRC
+
+*** Variadic Base Classes and =using=
+    :PROPERTIES:
+    :CUSTOM_ID: variadic-base-classes-and-using
+    :END:
+
+#+BEGIN_SRC C++
+    struct CustomerEq {
+        bool operator() (Customer const& c1, Customer const& c2) const {
+          return c1.getName() == c2.getName();
+        }
+    };
+     
+    struct CustomerHash {
+        std::size_t operator() (Customer const& c) const {
+          return std::hash<std::string>()(c.getName());
+        }
+    };
+     
+    // define class that combines operator() for variadic base classes:
+    template<typename… Bases>
+    struct Overloader : Bases…
+    {
+          using Bases::operator()…;  // OK since C++17
+    }; 
+#+END_SRC
+
+This derives =CustomOP= from =CustomerHash= and =CustomerEq= and enable
+both implementations of =operator()= in the derived class.
+
+* Tricky Basics
+  :PROPERTIES:
+  :CUSTOM_ID: tricky-basics
+  :END:
+
+- In general, =typename= has to be used whenever a name that depends on
+  a template parameter is a type.
+
+- Zero Initialization:
+
+#+BEGIN_SRC C++
+    T x{};  // works even if the constructor is explicit
+    T x = T(); // only works if the constructor selected for the copy-initialization is not `explicit` before C++17
+#+END_SRC
+
+#+BEGIN_SRC C++
+    template<typename T>
+    class MyClass {
+    private:
+        T x;
+    public:
+        MyClass() : x{} {}
+    };
+
+    // C++11
+    template<typename T>
+    class MyClass {
+    private:
+        T x{};
+        ...
+    }
+#+END_SRC
+
+However, for default arguments, it must be:
+
+#+BEGIN_SRC C++
+    template<typename T>
+    void foo(T p = T{}) {
+        //...
+    }
+#+END_SRC
+
+- For class templates with base classes that depend on template
+  parameters, using a name =x= by itself is not always equivalent to
+  =this->x=, even though a member =x= is inherited. As a rule of thumb,
+  use =this->= or =Base<T>::=.
+
+- It is possible to use a template template parameter:
+
+#+BEGIN_SRC C++
+#+END_SRC

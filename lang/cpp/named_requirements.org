@@ -1,0 +1,104 @@
+The named requirements here are the named requirements used in the
+normative text of the C++ standard to define the expectations of the
+standard library.
+
+* Basic
+  :PROPERTIES:
+  :CUSTOM_ID: basic
+  :END:
+
+- =DefaultConstructible=: not just through default constructors, but
+  mostly.
+
+- =MoveConstructible=:
+
+#+BEGIN_SRC C++
+    class movable {
+    private:
+        int x;
+    public:
+        movable() : x{0} {}
+        movable(int x) : x{x} {}
+        movable(movable&& other) : x{std::move(other.x)} {}
+        movable& operator=(movable&& rhs)
+            {
+                this->x = rhs.x;
+                rhs.x = 0;
+
+                return *this;
+            }
+
+    };
+
+    int main(int argc, char *argv[])
+    {
+        movable a_mov{5};
+
+        // movable b = a_move
+        // error: use of deleted function 'constexpr movable::movable(const movable&)'
+        movable b = std::move(a_mov);
+        
+        //movable c{b};
+        //  error: use of deleted function 'constexpr movable::movable(const movable&)'
+
+        movable c{std::move(b)};
+    }
+#+END_SRC
+
+A class does not have to implement a move constructor to satisfy this
+type requirement: a copy constructor that takes a =const T&= argument
+can bind rvalue expressions.
+
+- =CopyConstructible=: requires =MoveConstructible= first.
+
+- =MoveAssignable=: The type does not have to implement move assignment
+  operator in order to satisfy this type requirement: a copy assignment
+  operator that takes its parameter by value or as a =const Type&=, will
+  bind to rvalue argument.
+
+- =CopyAssignable=: requires =MoveAssignable= first.
+
+- =Destructible=: all scalar types meet the requirement of Destructible,
+  while array types and reference types do not. Note that
+  std::is\_destructible allows arrays and reference types.
+
+* Library-wide
+  :PROPERTIES:
+  :CUSTOM_ID: library-wide
+  :END:
+
+- =swappable=: Any lvalue or rvalue of this type can be swapped with any
+  lvalue or rvalue of some other type, using unqualified function call
+  =swap()= in the context where both =std::swap= and the user-defined
+  =swap()=s are visible.
+
+* Iterator
+  :PROPERTIES:
+  :CUSTOM_ID: iterator
+  :END:
+
+- =LegacyIterator=: an abstraction of pointers, =CopyCOnstructible=,
+  =CopyAssignable=, =Destructible=, =Swappable= and has =*r=, =++r= for
+  a lvalue of the type
+
+- =LegacyInputIterator=: can read from the pointed-to element, but once
+  it has been incremented, all copies of its previous value may be
+  invalidated. =LegacyIterator=, =EqualityComparable=, has =i != j=,
+  =*i=, =i->m=, =++i=, =(void)i++=, =*i++=
+
+- =LegacyOutputIterator=: can write to the pointed-to element,
+  =LegacyIterator=, a class type or a pointer class, supports =*r = o=,
+  =r++=, =++r=, =*r++ = o=.
+
+- =LegacyForwardItartor=: can read data from the pointed-to element,
+  =LegacyInputIterator=, =DefaultConstructible=
+
+- =LegacyBidrectionalIterator=: can be moved in both directions,
+  =LegacyForwardItartor=, supports =--a=, =a--=, =*a--=.
+
+- =LegacyRandomAccessIterator=: a =LegacyBidrectionalIterator= that can
+  be moved to point to any element in constant time, supports =r += n=,
+  =a + n=, =n + a=, =r -= n=, =i - n=, =b - a=, =i[n]=, =a < b=,
+  =a > b=, =a >= b=, =a <= b=
+
+

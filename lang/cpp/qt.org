@@ -1,0 +1,9 @@
+** Basic Qt Widgets
+
+Layouts and spacers are not something that can be directly observed 
+but they can affect the positions and orientations of widgets. 
+Qt programs don't typically lay elements out using the fixed position 
+because layouts allow dialogs and windows to be dynamically resized 
+in a sensible manner while handling a varying length of text 
+when localized in different languages.
+
