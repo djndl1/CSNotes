@@ -22,13 +22,66 @@ iff $a$ is greater than or equal to all its neighbors (the four cells around it)
 
 - ~greedy_ascent_peak_finder~: worst case $\Theta(nm)$
 
+** Models of Computation (the mathematical analog to a computer)
+
+Algorithm: mathematical abstraction of computer program, computational procedure to solve a problem
+
+Specifies what operations an algorithm is allowed, cost (time, space ...) of each operation, cost of algorithm = sum of operations costs
+
+Some other analogs:
+
+- program <-> algorithm
+
+- programming languages <-> pseudocode
+
+- computer <-> model of computation
+
+*** Some Models 
+
+A way of structuring the thinking about how an algorithm is written, s
+imilar to how programming styles structure a program.
+
+**** Random Access Machine
+
+Basically what assembly programming is, ignoring caching. A realistic and powerful model.
+
+Every basic objects is assumed to fit into a word.
+
++ having random access memory
+
++ load/store a word from/in memory, do computations in registers in constant time
+
+**** Pointer Model
+
+A more abstract model but simpler. Dynamic memory allocation has been taken cared of already. 
+It can be implemented with a RAM and many data structures are built this way.
+
+A field is either a word, which stores a basic object, or a pointer (reference). 
+The only operation allowed on pointers is to follow them, which costs constant time.
+
+**** The Python Model
+
+Offers both the above models.
+
+- =list=: random-access array, but appending an element takes nearly constant time
+ through table doubling
+
+- Pointer-machine style OOP
+
+- =L.sort()= takes $\Theta(\left| n\right| \log\left|n\right|)$ via comparison sort
+
+- =len(L)=: constant time
+
 ** Reading Notes
+
+Chap.1, Chap.3, D.1
 
 *instance of the problem*: the input that satisfies the constraints of the problem
 
 *data structure*: a way to store and organize data in order to facilitate access and modifications.
 
-Algorithims considered as a technology, total system performance depends on choosing efficient algorithms as much as on choosing fast hardware. 
+Algorithims considered as a technology, total system performance depends on choosing
+ efficient algorithms as much as on choosing fast hardware. 
 Algorithims are at the core of most technologies used in contemporary computers.
 
 * Sorting and Trees
