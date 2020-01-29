@@ -1,0 +1,207 @@
+* =shared_mutex= and =shared_timed_mutex=
+  :PROPERTIES:
+  :CUSTOM_ID: shared_mutex-and-shared_timed_mutex
+  :END:
+
+(33.4.3.4) =shared_mutex= and =shared_timed_mutex= are shared mutex
+types that first meet the requirements of mutex types. In addition to
+the exclusion lock ownership mode, shared mutex type provide a shared
+lock ownership mode. Multiple execution agents can simultaneously hold a
+shared lock ownership of a shared mutex type. But no execution agent
+shall hold a shared lock while another execution agent holds an
+exclusive lock on the same shared mutex type, and vice-versa. The number
+of the agents that hold shared lock may not exceed a certain amount
+otherwise extra agents will be blocked. Shared mutex types shall have
+three interfaces:
+
+- =lock_shared()=
+
+- =unlock_shared()=
+
+- =try_lcok_shared()=
+
+More at
+[[http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2406.html][N2406]]
+
+** =shared_mutex=
+   :PROPERTIES:
+   :CUSTOM_ID: shared_mutex
+   :END:
+
+The class =shared_mutex= provides a non-recursive mutex with shared
+ownership semantics.
+
+#+BEGIN_SRC C++
+    namespace std {
+    class shared_mutex {
+    public:
+        shared_mutex();
+        ~shared_mutex();
+        
+        shared_mutex(const shared_mutex&) = delete;
+        shared_mutex& operator=(const shared_mutex&) = delete;
+        
+        // Exclusive ownership
+        void lock(); // blocking
+        bool try_lock();
+        void unlock();
+
+        // Shared ownership
+        void lock_shared(); // blocking
+        bool try_lock_shared();
+        void unlock_shared();
+
+        using native_handle_type = implementation-defined;
+        native_handle_type native_handle();
+    };
+#+END_SRC
+
+** =libstdc++= implementation
+   :PROPERTIES:
+   :CUSTOM_ID: libstdc-implementation
+   :END:
+
+There are two different implementations in =libstdc++=, one uses a POSIX
+reader-writer lock and the other uses condition variables. The former is
+basically a thin wrapper around =pthread_rwlock_t=. They map perfectly
+to the corresponding pthread interface. Note that when =lock_shared=ing,
+the =pthread_rwlock_rdlock= may return a =EAGAIN= simply because the
+reader count reaches the maximum amount. Returning =EDEADLK= is
+undefined behavior according to the standard.
+
+#+BEGIN_SRC C++
+    void
+        lock_shared()
+        {
+          int __ret;
+          // We retry if we exceeded the maximum number of read locks supported by
+          // the POSIX implementation; this can result in busy-waiting, but this
+          // is okay based on the current specification of forward progress
+          // guarantees by the standard.
+          do
+        __ret = pthread_rwlock_rdlock(&_M_rwlock);
+          while (__ret == EAGAIN);
+          if (__ret == EDEADLK)
+        __throw_system_error(int(errc::resource_deadlock_would_occur));
+          // Errors not handled: EINVAL
+          __glibcxx_assert(__ret == 0);
+        }
+#+END_SRC
+
+The other implmentation uses a =condition_variable= =_M_gate1= to block
+if the writer has acquired the mutex or the mutex has reached its
+maximum reader count, another =condition_variable= =_M_gate2= to block
+queued writers while reader count is non-zero, a =_M_state= unsigned
+integer as a mutex state data to indicate that a writer has held the
+mutex or the count of readers and a =std::mutex= to control access to
+the state.
+
+A constant =_S_write_entered= (writer presence indicator) and its
+bitwise NOT =_S_max_readers= (max reader count) are defined to bitwise
+operate on =_M_state=.
+
+#+BEGIN_SRC C++
+        unsigned s_write = 1U << (sizeof(unsigned)*__CHAR_BIT__ - 1);
+        std::cout << "sizeof(unsigned) = " << sizeof(unsigned) << "\n";
+        std::cout << "sizeof(unsigned) *__CHAR_BIT__ - 1 = " << (sizeof(unsigned) * __CHAR_BIT__ - 1) << '\n';
+        std::cout << std::setbase(16) << "_S_write_entered = 0x" << s_write
+                  << "\n_S_max_readers = 0x" << ~s_write << std::endl;
+#+END_SRC
+
+On my machine that's
+
+#+BEGIN_SRC sh
+    sizeof(unsigned) = 4
+    sizeof(unsigned) *__CHAR_BIT__ - 1 = 31
+    _S_write_entered = 0x80000000
+    _S_max_readers = 0x7fffffff
+#+END_SRC
+
+The maximum reader count is much larger than the standard suggests.
+
+The six public =lock=/=trylock=/=unlock= interfaces all have a RAII lock
+to protect the state data =_M_state=:
+
+#+BEGIN_SRC C++
+        void
+        lock()
+        {
+          unique_lock<mutex> __lk(_M_mut);
+          // Wait until we can set the write-entered flag.
+          _M_gate1.wait(__lk, [=]{ return !_M_write_entered(); });
+          _M_state |= _S_write_entered;
+          // Then wait until there are no more readers.
+          _M_gate2.wait(__lk, [=]{ return _M_readers() == 0; });
+        }
+#+END_SRC
+
+This mutex/lock is not the =shared_mutex= itself and is released when
+the locking operation is done. =_M_state |= _S_write_entered= puts the
+writer on waiting queue but doesn't drive away any reader that is
+holding the lock. It must wait until
+
+#+BEGIN_SRC C++
+    void
+    unlock_shared()
+    {
+          lock_guard<mutex> __lk(_M_mut);
+          __glibcxx_assert( _M_readers() > 0 );
+          auto __prev = _M_state--;
+          if (_M_write_entered())
+          {
+            // Wake the queued writer if there are no more readers.
+            if (_M_readers() == 0)
+                _M_gate2.notify_one();
+            // No need to notify gate1 because we give priority to the queued
+            // writer, and that writer will eventually notify gate1 after it
+            // clears the write-entered flag.
+          }
+          else
+            {
+          // Wake any thread that was blocked on reader overflow.
+            if (__prev == _S_max_readers)
+                _M_gate1.notify_one();
+            }
+    }
+#+END_SRC
+
+The withdrawing readers will check if any writer is waiting and notify
+them if necessary.
+
+The standard =std::shared_mutex= is a wrapper around the implementation:
+
+#+BEGIN_SRC C++
+    class shared_mutex
+    {
+        //...public intefaces
+        
+        // exclusive ownership
+        
+        void lock() { _M_impl.lock(); }
+        bool try_lock() { return _M_impl.try_lock(); }
+        void unlock() { _M_impl.unlock(); }
+
+        // Shared ownership
+
+        void lock_shared() { _M_impl.lock_shared(); }
+        bool try_lock_shared() { return _M_impl.try_lock_shared(); }
+        void unlock_shared() { _M_impl.unlock_shared(); }
+        
+    #if _GLIBCXX_USE_PTHREAD_RWLOCK_T
+        typedef void* native_handle_type;
+        native_handle_type native_handle() { return _M_impl.native_handle(); }
+
+      private:
+        __shared_mutex_pthread _M_impl;
+    #else
+      private:
+        __shared_mutex_cv _M_impl;
+    #endif
+    };
+#+END_SRC
+
+The second implementation doesn't implement the =native_handle_type=
+public type and =native_handle()=. The presence ofthese members and
+their semantics is implmentation-defined (33.2.3 Native handles).
+=libc++= uses the second implementation exclusively and does not provide
+these two members.
