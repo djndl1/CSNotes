@@ -34,15 +34,19 @@ class TestPeakFinder1d(unittest.TestCase):
 
     def test_single(self):
         l = [np.random.randint(self.low)]
-        self.assertEqual(naive_peak_finder_1d(l), None)
-        self.assertEqual(recursive_peak_finder_1d(l), None)
+        self.assertEqual(naive_peak_finder_1d(l), None,
+                         "naive_peak_finder_1d failed on\n" + str(l))
+        self.assertEqual(recursive_peak_finder_1d(l), None,
+                         "recursive_peak_finder_1d failed on\n" + str(l))
 
     def test_double(self):
         l1 = list(np.random.randint(self.low, size=2))
         ind1 = naive_peak_finder_1d(l1)
-        self.assertTrue(isPeak1d(l1, ind1))
+        self.assertTrue(isPeak1d(l1, ind1),
+                        "naive_peak_finder_1d failed on\n" + str(l1) + "\n with index " + str(ind1))
         ind2 = recursive_peak_finder_1d(l1)
-        self.assertTrue(isPeak1d(l1, ind2))
+        self.assertTrue(isPeak1d(l1, ind2),
+                        "recursive_peak_finder_1d failed on\n" + str(l1) + "\nwith index " + str(ind2))
 
         l2 = [4, 3]
         ind1 = naive_peak_finder_1d(l2)
@@ -55,11 +59,14 @@ class TestPeakFinder1d(unittest.TestCase):
         for list_len in list_lens:
             l = np.random.randint(self.low, size=list_len)
             ind = naive_peak_finder_1d(l)
-            self.assertTrue(isPeak1d(l, ind))
+            self.assertTrue(isPeak1d(l, ind),
+                    "naive_peak_finder_1d failed on\n" + str(l) + "\n with index " + str(ind))
             ind = recursive_peak_finder_1d(l)
-            self.assertTrue(isPeak1d(l, ind))
+            self.assertTrue(isPeak1d(l, ind),
+                           "recursive_peak_finder_1d failed on\n" + str(l) + "\nwith index " + str(ind))
 
-#class TestPeakFinder2d(unittest.TestCase):
+#class TestPeakFinder2d(unittest.TestCase)
+
 #   def setUp(self):
     
 
