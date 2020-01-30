@@ -84,6 +84,151 @@ Algorithims considered as a technology, total system performance depends on choo
  efficient algorithms as much as on choosing fast hardware. 
 Algorithims are at the core of most technologies used in contemporary computers.
 
+
+*** Pseudocode conventions
+
+1. indentation indicates block structure;
+
+2. The loop counter retains its value after exiting the loop and the counter is beyond the final value. ~to~ incremets the counter and ~downto~ decrements.
+
+3. Variables are local to the given procedure.
+
+4. Compound data are organized into *objects*, which are composed of attributes, ~A.length~. 
+A variable representing an array or object represents a pointer/reference to the data representing the array or object. Null pointer is denoted as ~NIL~.
+
+5. Parameters are passed by value in nature.
+
+6. ~and~, ~or~ are short circuiting.
+
+*** Growth of Functions
+
+For large enough inputs, the asymptotic efficiency of algorithms is 
+more of concern.
+
+**** Asymptotic Notation
+
+Typically confined to $\mathbb{N}$.
+
+- \Theta-notation: For a given function $g(n)$
+
+$$
+\Theta \left(g\left(n\right)\right)=\left\{ f \left(n \right)\colon\exists c_{1}>0,c_{2}>0\text{ and }n_{0}\in\mathbb{N}\text{ s.t. }0\leq c_{1}g\left(n\right)\leq f\left(n\right)\leq c_{2}g\left(n\right)\text{ for all } n\geq n_{0} \right\} 
+$$
+
+where $f(n)$ and $g(n)$ are required to be /asymptotically nonnegative/ 
+(nonnegative whenever $n$ is sufficient large). $g(n)$ is said to be
+ an /asymptotically tight bound/ for $f(n)$.
+
+Conventionally, we write $f(n) = \Theta(g(n))$ instead of $f(n) \in \Theta(g(n))$.
+
+The lower-order terms and the coefficient of the highest-order term
+of an asymptotically positive function can be ignored in determining
+asymptotically tight bounds.
+
+- The /O/-notation is for an symptotic upper bound, a superset of the
+\Theta-notation. When used to bound the worst-case running time,
+ it is a bound on the running time of the algorithm on every input.
+\Theta-notation bound on the worst-case running time does not imply
+ a \Theta bound on the running time on every input.
+
+- The \Omega-notation provides an /asymptotic lower bound/.
+
+e.g. For the insertion sort algorithm, the worst-case running time
+is $\Omega(n^{2})$, although a best-case runs in $\Theta(n)$ time. 
+It is an abuse to say that the running time of insertion sort is 
+$O(n^{2})$, since for a given $n$, the actual running time varies,
+depending on the particular input of size. "The running time is 
+$O(n^2)$" means there is a function that is $O(n^2)$ s.t. for any 
+ value of $n$, the running time on that input is bounded from above
+by the value $f(n)$.
+
+- /o/-notation: an upper bound that is not asymptotically tight, 
+defined as
+
+$o(g(n)) = \{ f(n):$ for *any* positive constant $c > 0$, there exists
+ a constant $n_{0} > 0$ s.t. $0 \leq f(n) < cg(n)$ for all $n \geq n_{0} \}$.
+
+Intutively, in /o/-notation, $f(n)$ becomes insignificant relative 
+to $g(n)$ as $n$ approaches infinity, i.e.
+
+$$
+\lim_{n\to\infty}\frac{f\left(n\right)}{g\left(g\right)}=0
+$$
+
+which is directly from the definition.
+
+- \omega-notation
+
+***** Some other notation abuses
+
+- $=$ means $\in$ for a standalone asymptotic notation
+
+- $=$ in a large formula means that a function $f(n)$ is in that set
+
+e.g. 
+
+$$
+2n^{2}+\Theta\left(n\right)=\Theta\left(n^{2}\right)
+$$
+
+means that for any function $f(n) \in \Theta(n)$, there is some 
+function $g(n) \in \Theta(n^{2})$ s.t. $2n^{2} + f(n) = g(n)$ for all
+ $n$.
+
+***** Some Properties of Asymptotic Notation
+
+- Transitivity for all five notations
+
+- Reflexivity for \Theta, /O/ and \Omega.
+
+\begin{aligned}
+f\left(n\right) &	= \Theta\left(f\left(n\right)\right) \\
+f\left(n\right)	& = O\left(f\left(n\right)\right) \\
+f\left(n\right)	& = \Omega\left(f\left(n\right)\right)
+\end{aligned}
+
+- Symmetry: $f(n) = \Theta(g(n))$ iff $g(n) = \Theta(f(n))$.
+
+- Transpose symmetry: 
+   + $f(n) = O(g(n))$ iff $g(n) = \Omega(f(n))$
+   + $f(n) = o(g(n))$ iff $g(n) = \omega(f(n))$
+
+Not all functions are asymptotically comparable.
+
+**** Running times comparison 
+
+#+BEGIN_SRC python
+# Run this in sage
+n = var('n')
+
+log2n = log(n, 2)
+sqt = sqrt(n)
+y = n
+nlgn = n*log(n, 2)
+quad = n^2
+cube = n^3
+factori = factorial(n)
+
+plog2n = plot(log2n, (x, 0, 10), color='red', 
+              legend_label='$\log_{2} n$')
+psqt = plot(sqt, (x, 0, 10), color='cyan',
+           legend_label='$\sqrt{n}$')
+py = plot(y, (x, 0, 10), color='black',
+         legend_label='$n$')
+pnlgn = plot(nlgn, (x, 0, 10), color='blue',
+            legend_label='$n \log_{2} n$')
+pquad = plot(quad, (x, 0, 10), color='green',
+            legend_label='$n^{2}$')
+pcube = plot(cube, (x, 0, 10), color='yellow',
+            legend_label='$n^{3}$', ymax=20, xmax=10)
+
+pfact = list_plot([factori(n) for n in range(10)], color='orange',
+            legend_label='$n!$',ymax=100)
+
+plog2n + psqt + py + pnlgn + pquad + pcube + pfact
+#+END_SRC
+
+
 * Sorting and Trees
 
 
