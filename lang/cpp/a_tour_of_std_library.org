@@ -1,4 +1,4 @@
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+#+SETUPFILE: /home/djn/Notes/CSNotes/tools/org-html-themes/setup/theme-readtheorg.setup
 
 * Library Overview
   :PROPERTIES:
@@ -25,7 +25,7 @@ The facilities provided by the standard library can be
 
 - support for /numerical computation/;
 
-- support for /concurrent programming/, include =thread=s and locks;
+- support for /concurrent programming/, include threads and locks;
 
 - /parallel/ versions of most STL algorithms and some numerical
   algorithms;
@@ -48,6 +48,8 @@ The facilities provided by the standard library can be
   :CUSTOM_ID: strings-and-regular-expressions
   :END:
 
+TODO
+
 * Input and Output
   :PROPERTIES:
   :CUSTOM_ID: input-and-output
@@ -65,7 +67,7 @@ strategies.
 Using the formatted I/O operations is usually less error-prone, more
 efficient, and less code than manipulating characters one by one. In
 particular, istreams take care of memory management and range checking.
-We can do formatting to and from memory using =stringsteam=s.
+We can do formatting to and from memory using =stringsteam=.
 
 An =iostream= has a state that we can examine to determine whether an
 operation succeeded. In general, the I/O state holds all the information
@@ -195,7 +197,7 @@ serves the needs of an application:
 
 - =unordered_multimap<K,V>=: a multimap using
 
-In addition, container adpators =queue<T>=, =stack<T>= and
+In addition, container adaptors =queue<T>=, =stack<T>= and
 =priority_queue<T>= are provided. The standard library also provides
 more specialized container-like types, such as a fixed-size array
 =array<T,N>= and =bitset<N>=.
@@ -233,13 +235,13 @@ allocated space. It holds an allocator, from which the =vector= acquire
 memory for its elements, defaulted to =new= and =delete=.
 
 The standard-library =vector= implemented so that growing a =vector= by
-repeated =push_back()=s is efficient.
+repeated =push_back()= is efficient.
 
 For classes that relies on =virtual= functions to get polymorphic
-behavior, store a pointer (including smart pointers)instead of objects
+behavior, store a pointer (including smart pointers) instead of objects
 itself in a container.
 
-Many performance-critical applications use =vector=s and checking all
+Many performance-critical applications use =vector= and checking all
 subscripting implies a cost on the order of 10%. The standard library
 =vector= does not guarantee range checking. The =at()= operation is a
 vector subscript operation that throws an exception of type
@@ -257,7 +259,7 @@ want to insert and delete elements without moving other elements.
 
 When we use a linked list, we tend not to access elements using
 subscripting the way for vectors. Instead, we search the list. Unless
-there is a compelling reason, use =vector=s, which perform better for
+there is a compelling reason, use =vector=, which perform better for
 traversal and for sorting and searching.
 
 =forward_list= is a singly-linked list, which allows for only forward
@@ -532,7 +534,7 @@ when
 
 - we refer to a polymorphic object in classical object-oriented code
 
-- A shared polymorphic object typically requires =shared_ptr=s.
+- A shared polymorphic object typically requires =shared_ptr=.
 
 ** =move()= and =forward()=
    :PROPERTIES:
@@ -725,7 +727,7 @@ object can be used when invoking a =std::mem_fn=.
 #+END_SRC
 
 Use =std::function=, a type that can hold any object that can be invoked
-using =()=. =function=s are useful for callbacks, for passing operations
+using =()=. =function= is useful for callbacks, for passing operations
 as arguments, for passing function objects, etc. it may introduce some
 run-time overhead compared to direct calls, and a function, being an
 object, does not participate in overloading. If you need to overload
@@ -797,7 +799,7 @@ called /type predicates/ that answers a fundamental question about
 types. They are most useful when we write templates.
 
 Obvious ways of using type predicates includes conditions for
-=static_assert=s, compile-time =if=s, and =enable_if=s. The
+=static_assert=, compile-time =if=, and =enable_if=. The
 standard-library =enable_if= is a widely used mechanism for conditonally
 introducing definitions. The syntax of =enable_if= is odd, awkward to
 use, and will in many cases be rendered redundant by concepts. It relies
@@ -949,7 +951,7 @@ communication because of "efficiency" without thought and preferably not
 without measurement.
 
 The basic support for communicating using external events is provided by
-condition\_variables found in =<condition_variable>=.
+condition variables found in =<condition_variable>=.
 
 #+BEGIN_SRC C++
     // a producer-consumer problem
@@ -1013,7 +1015,7 @@ lower level of threads and locks:
 
 - =packaged_task= to help launch tasks and connect up the mechanisms for
   returning a result. It is provided to simplify setting up tasks
-  connected with =future=s and =promise=s to be run on =thread=s. A
+  connected with =future= and =promise= to be run on =thread=. A
   =packaged_task= provides wrapper code to put the return value or
   exception from the task into a =promise=. It is a wrapper around a
   callable object with its =future= and =promise=.
