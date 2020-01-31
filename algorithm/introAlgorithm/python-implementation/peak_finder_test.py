@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import numpy as np
+import nuplas np
 from peak_finder_1d import *
 
 class PeakIndexError(RuntimeError):
@@ -40,7 +40,7 @@ class TestPeakFinder1d(unittest.TestCase):
                          "recursive_peak_finder_1d failed on\n" + str(l))
 
     def test_double(self):
-        l1 = list(np.random.randint(self.low, size=2))
+        l1 = np.random.randint(self.low, size=2).tolist()
         ind1 = naive_peak_finder_1d(l1)
         self.assertTrue(isPeak1d(l1, ind1),
                         "naive_peak_finder_1d failed on\n" + str(l1) + "\n with index " + str(ind1))
@@ -57,7 +57,7 @@ class TestPeakFinder1d(unittest.TestCase):
     def test_regulars(self):
         list_lens = np.random.randint(3, self.low, size=self.regular_lists)
         for list_len in list_lens:
-            l = np.random.randint(self.low, size=list_len)
+            l = np.random.randint(self.low, size=list_len).tolist()
             ind = naive_peak_finder_1d(l)
             self.assertTrue(isPeak1d(l, ind),
                     "naive_peak_finder_1d failed on\n" + str(l) + "\n with index " + str(ind))
