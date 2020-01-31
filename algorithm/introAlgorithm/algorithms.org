@@ -197,6 +197,27 @@ Not all functions are asymptotically comparable.
 
 **** Running times comparison 
 
+- $n^{b}=o\left(a^{n}\right)$, any exponential function with a base greeater
+ than $1$ grows faster than any polynomial function.
+
+- $\lg^{b}n=o\left(n^{a}\right)$: any positive polynomial function grows
+ faster than any polylogarithmic function
+
+- For factorial:
+    + $n!=o\left(n^{n}\right)$
+    + $n!=\omega\left(2^{n}\right)$
+    + $\lg\left(n!\right)=\Theta\left(n\lg n\right)$
+
+- Function iteration: a function itertively applied $i$ times to an initial 
+value of $n$.
+
+$$
+f^{\left(i\right)}\left(n\right)=\begin{cases}
+n & \text{if }i=0\\
+f\left(f^{\left(i-1\right)}\left(n\right)\right) & \text{if }i>0
+\end{cases}
+$$
+
 #+BEGIN_SRC python
 # Run this in sage
 n = var('n')
@@ -207,25 +228,36 @@ y = n
 nlgn = n*log(n, 2)
 quad = n^2
 cube = n^3
+expon = 2^n
 factori = factorial(n)
 
-plog2n = plot(log2n, (x, 0, 10), color='red', 
+
+plog2n = plot(log2n, (x, 0, 20), color='red', 
               legend_label='$\log_{2} n$')
-psqt = plot(sqt, (x, 0, 10), color='cyan',
+psqt = plot(sqt, (x, 0, 20), color='cyan',
            legend_label='$\sqrt{n}$')
-py = plot(y, (x, 0, 10), color='black',
+py = plot(y, (x, 0, 20), color='black',
          legend_label='$n$')
-pnlgn = plot(nlgn, (x, 0, 10), color='blue',
+pnlgn = plot(nlgn, (x, 0, 20), color='blue',
             legend_label='$n \log_{2} n$')
-pquad = plot(quad, (x, 0, 10), color='green',
+pquad = plot(quad, (x, 0, 20), color='green',
             legend_label='$n^{2}$')
-pcube = plot(cube, (x, 0, 10), color='yellow',
-            legend_label='$n^{3}$', ymax=20, xmax=10)
+pcube = plot(cube, (x, 0, 20), color='yellow',
+            legend_label='$n^{3}$', xmax=20)
+pexpon = plot(expon, (x, 0, 20), color='purple',
+             legend_label='$2^{n}$')
+pfact = list_plot([factori(n) for n in range(20)], color='orange',
+            legend_label='$n!$',ymax=50)
 
-pfact = list_plot([factori(n) for n in range(10)], color='orange',
-            legend_label='$n!$',ymax=100)
+plog2n + psqt + py + pnlgn + pquad + pcube + pfact + pexpon
 
-plog2n + psqt + py + pnlgn + pquad + pcube + pfact
+pexpon = plot(expon, (x, 0, 20), color='purple',
+             legend_label='$2^{n}$')
+pfact = list_plot([factori(n) for n in range(20)], color='orange',
+            legend_label='$n!$', ymax=1200)
+pcube = plot(cube, (x, 0, 20), color='yellow',
+            legend_label='$n^{3}$', xmax=20)
+pexpon + pfact + pcube
 #+END_SRC
 
 
