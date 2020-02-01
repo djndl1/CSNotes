@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import nuplas np
+import numpy as np
 from peak_finder_1d import *
 
 class PeakIndexError(RuntimeError):
