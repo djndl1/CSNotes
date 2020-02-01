@@ -1,4 +1,4 @@
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+#+SETUPFILE: /home/djn/Notes/CSNotes/tools/org-html-themes/setup/theme-readtheorg.setup
 
 * Introduction
 
@@ -291,7 +291,7 @@ An improvement to the naive version of insertion sort is to use binary
 $\Theta(n\lg n)$ running time if the swap operation is cheap.
 **** Implementations
 
-#+INCLUDE: "python-implmentation/insertion_sort.py" src python
+#+INCLUDE: "python-implementation/insertion_sort.py" src python
 
 #+begin_src cpp
 // The boost implementation
@@ -327,13 +327,42 @@ o    //--------------------------------------------------------------------
 
 *** Merge Sort
 
+Pseudocode
+
 #+BEGIN_SRC python
 def merge-sort(A, p, r):
-    q = (p + r) // 2
-    merge-sort(A, p, q)
-    merge-sort(A, q+1, r)
-    merge(A, p, q, r)
+    if p < r:
+        q = (p + r) // 2
+
+        merge-sort(A, p, q)
+        merge-sort(A, q+1, r)
+        merge(A, p, q, r)
+
+def merge(A, p, q, r):
+    n1 = q - p + 1
+    n2 = r - q
+    # copy for inplace merge
+    let L[1..n1 + 1] and R[1..n2 + 1] be new arrays
+    for i = 1 to n1:
+        L[i] = A[p + i - 1]
+    for j = 1 to n2:
+        R[j] = A[q + j]
+    L[n1 + 1] = inf # sentinel 
+    R[n2 + 1] = inf
+    i = 1
+    j = 1
+
+    # merge starts here
+    for k = p to r:
+        if L[i] <= R[j]:
+            A[k] = L[i]
+            i = i + 1
+        else:
+            A[k] = R[j]
+            j = j + 1
 #+END_SRC
+
+The =merge= procedure takes time $\Theta(n)$.
 
 The worst case running time is 
 
@@ -346,13 +375,116 @@ $$
 
 resolved to $T\left(n\right)=\Theta\left(n\lg n\right)$.
 
+**** Implementation
 
+Python implementation
+
+#+include: ./python-implementation/merge_sort.py src python
+
+Home brewed implementation
+
+#+include: ./c++-implmentation/chap.2/merge_sort.cc src C++
+
+libstdc++ =std::merge= implementation
+
+#+BEGIN_SRC C++
+  template<typename _InputIterator1, typename _InputIterator2,
+	   typename _OutputIterator, typename _Compare>
+    _OutputIterator
+    __merge(_InputIterator1 __first1, _InputIterator1 __last1,
+	    _InputIterator2 __first2, _InputIterator2 __last2,
+	    _OutputIterator __result, _Compare __comp)
+    {
+      while (__first1 != __last1 && __first2 != __last2)
+	{
+	  if (__comp(__first2, __first1))
+	    {
+	      *__result = *__first2;
+	      ++__first2;
+	    }
+	  else
+	    {
+	      *__result = *__first1;
+	      ++__first1;
+	    }
+	  ++__result;
+	}
+      return std::copy(__first2, __last2,
+		       std::copy(__first1, __last1, __result));
+    }  
+#+END_SRC
 
 ** Reading Notes
 
 1.2, 2.1-2.3, 4.3-4.6;
 
-#+TODO: 
+*** Loop Invariants and The correctness of an algorithm
+
+To show the algorithm is correct, we require that for such a loop, the
+ properties of ~A[i...j-1]~ (a loop invariant, here sortedness) must satisfy:
+
+- Initialization: it is true prior to the first iteration of the loop;
+
+- Maintenance: If it is true before an iteration of the loop, it remains
+ true before the next iteration;
+
+- Termination: When the loop terminates, the invariant gives us a useful
+ property that helps show that the algorithm is correct. (a point where 
+mathematical induction should stop)
+
+*** Algorithm Analysis
+
+*analyzing an algorithm*: predicting the resources that the algorithm requires 
+such as memory, communication bandwidth, or computer hardware, but most often
+computational time.
+
+*running time of an algorithm*: the number of primitive operations or "steps" 
+executed. More often, we consider the *rate/order of growth* of the 
+running time. We usually consider one algorithm to be more efficient than
+ another if its worst-case running time has a lower order of growth.
+
+Even for inputs of a given size, an algorithm's running time may depend on
+ which input of that size is given. The best case for insertion sort occurs
+if the array is already sorted, resulted in a linear running time. The 
+worst case running time is a quadratic function. Normally, we concentrate
+on finding only the *worst-case running time* (The average case is often
+ rougly as bad as the worst case, as in the case of insertion sort). When
+analyzing the average-case running time, the technique of probabilistic 
+analysis is applied.
+
+*** Algorithm Designing
+
+- /incremental/ approach: e.g. insertion sort
+
+- /divide-and-conquer/ approach: to solve a given problem, an algorithm
+ calls itself recursively one or more times to deal with closely related
+subproblems. e.g. merge sort
+    + Divide the problem into a number of subproblems that are smaller 
+    instances of the same problem
+    + conquer the subproblem by solving them recursively. If the subproblem
+    sizes are small enough, solve them in a straightforward manner.
+    + combine the solutions to the subproblems into the solution for the 
+    original problem.
+
+The running time of a recursive call is described by a /recurrence equation/
+or /recurrence/, which describes the overall running time on a problem
+of size $n$ in terms of the running time on smaller inputs.
+
+$$
+T\left(n\right)=\begin{cases}
+\Theta\left(1\right) & \text{if }n\leq c\\
+aT\left(n/b\right)+D\left(n\right)+C\left(n\right) & \text{otherwise}
+\end{cases}
+$$
+
+where $c$ is the size small enough for the straightforward solution; 
+$a$ is the number of subproblems; $D(n)$  is time to divide the problem
+ and $C(n)$ is the time to combine the solutions to the subproblems.
+
+This equation can be solved intuitively sometimes by drawing a 
+/recurrion tree/.
+
+*** More about Divide-and-Conquer (Chap.4)
 
 6.1-6.4
 
