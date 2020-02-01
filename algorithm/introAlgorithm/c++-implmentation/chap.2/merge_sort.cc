@@ -16,16 +16,12 @@ void merge(vector<int>& A, size_t p, size_t q, size_t r)
 
     for (size_t i = 0; i < n1; i++) {
         L[i] = A[p+i];
-        //       cout << L[i] << ' ';
     }
-    //cout << '\n';
     L[n1] = INT_MAX;
-    
+
     for (size_t i = 0; i < n2; i++) {
         R[i] = A[q+i+1];
-        //  cout << R[i] << ' ';
     }
-    //cout << '\n';
     R[n2] = INT_MAX;
 
     size_t i = 0;
@@ -41,14 +37,20 @@ void merge(vector<int>& A, size_t p, size_t q, size_t r)
     }
 }
 
-void merge_sort(vector<int>& A, size_t p, size_t r)
+void __merge_sort(vector<int>& A, size_t p, size_t r)
 {
     if (p < r) {
         size_t q = (p + r) / 2;
-        merge_sort(A, p, q);
-        merge_sort(A, q+1, r);
+        __merge_sort(A, p, q);
+        __merge_sort(A, q+1, r);
         merge(A, p, q, r);
     }
+}
+
+void merge_sort(vector<int>& A)
+{
+    if (A.size()!=0)
+        __merge_sort(A, 0, A.size()-1);
 }
 
 #include <algorithm>
@@ -65,35 +67,32 @@ void merge_lazy(vector<int>& A, size_t p, size_t q, size_t r)
     vector<int> B(r - p + 1);
     std::merge(start, middle, middle, end, B.begin());
 
-    for (auto sa = start, sb = B.begin(); sa != end && sb != B.end(); sa++, sb++) 
-        *sa = *sb;
+    std::copy(B.begin(), B.end(), A.begin());
 }
 
-void merge_sort_lazy(vector<int>& A, size_t p, size_t r)
+void __merge_sort_lazy(vector<int>& A, size_t p, size_t r)
 {
     if (p < r) {
         size_t q = (p + r) / 2;
-        merge_sort_lazy(A, p, q);
-        merge_sort_lazy(A, q+1, r);
+        __merge_sort_lazy(A, p, q);
+        __merge_sort_lazy(A, q+1, r);
         merge_lazy(A, p, q, r);
     }
-    
 }
 
-int main(int argc, char *argv[])
+void merge_sort_lazy(vector<int>& A)
 {
-    vector<int> A{31, 41, 59, 26, 42, 58};
+    if (A.size() > 0)
+        __merge_sort_lazy(A, 0, A.size()-1);
+}
 
-    vector<int> B{1, 3, 5, 2, 4, 6, 8};
-    merge(B,0, 2, B.size() - 1);
-    for ( auto i : B )
-        cout << i << ' ';
-    cout << endl;
-
-    merge_sort_lazy(A, 0, A.size() - 1);
-    for ( auto i : A )
-        cout << i << ' ';
-    cout << endl;
-
-    return 0;
+template <typename RandomIt>
+void merge_sort(RandomIt first, RandomIt last)
+{
+    if (last - first > 1) {
+        RandomIt middle = (first + last) / 2;
+        merge_sort(first, middle);
+        merge_sort(middle, last);
+        std::inplace_merge(first, middle, last);
+    }
 }
