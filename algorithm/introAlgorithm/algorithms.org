@@ -461,8 +461,9 @@ analysis is applied.
 subproblems. e.g. merge sort
     + Divide the problem into a number of subproblems that are smaller 
     instances of the same problem
-    + conquer the subproblem by solving them recursively. If the subproblem
-    sizes are small enough, solve them in a straightforward manner.
+    + conquer the subproblem by solving them recursively (recursive cases).
+    If the subproblem sizes are small enough, solve them in a straightforward 
+    manner.
     + combine the solutions to the subproblems into the solution for the 
     original problem.
 
@@ -486,6 +487,110 @@ This equation can be solved intuitively sometimes by drawing a
 
 *** More about Divide-and-Conquer (Chap.4)
 
+**** Three Methods for solving recurrences
+
+****** Substitution Method
+        
+1. Guess the form of the solution
+
+2. Use mathematical induction (the strong version is more often used) to find
+ the constants and show that the solution works.
+
+The guess is that $T(n) = O(n \lg n)$ for the following recurrence
+
+$$
+T\left(n\right)=2T\left(\lfloor n/2\rfloor\right)+n
+$$
+
+- Assuming that this bound holds for all positive $m < n$ for an appropriate 
+choice of $c$, in particular for $m = \lfloor n / 2\rfloor, yielding 
+$T\left(\lfloor n/2\rfloor\right)\leq c\lfloor n/2\rfloor\lg\left(\lfloor n/2\rfloor\right)$
+, substituting into the recurrence yields
+
+\begin{aligned}
+T\left(n\right)	& \leq2(c\lfloor n/2\rfloor\lg\left(\lfloor n/2\rfloor\right)+n \\
+	& \leq cn\lg\left(n/2\right)+n \\
+	& =cn\lg n-cn\lg2+n \\
+	 & =cn\lg n-cn+n \\
+	 & \leq cn\lg n \\
+\end{aligned}
+
+- Since we only need to prove $T(n) \leq cn\lg n$ for $n \geq n_{0}$, the 
+troublesome boundary condition $T(1) = 1$ is removed form consideration in the
+induction.
+
+Guessing a solution takes experience and creativity. Sometimes, a little 
+algebraic manipulation can make an unknown recurrence similar to what has been
+seen.
+
+$$
+T\left(n\right)=2T\left(\lfloor\sqrt{n}\rfloor\right)+\lg n
+$$
+
+Renaming $m = \lg n$ yields 
+
+$$
+T\left(2^{m}\right)=2T\left(2^{m/2}\right)+m
+$$
+
+Renaming $S(m) = T(2^{m})$
+
+$$
+S\left(m\right)=2S\left(m/2\right)+m
+$$
+
+Then 
+
+$$
+T\left(n\right)=T\left(2^{m}\right)=S\left(m\right)=O\left(m\lg m\right)=O\left(\lg n\lg\lg n\right)
+$$
+
+****** Recursion-tree Method
+
+A recursion tree is best used to generate a good guess, which can then be 
+verified by the substitution method.
+
+It converts the recurrence into a tree whose nodes represent the costs incurred
+at various levels of the recursion and uses techniques for bounding summations
+to solve the recurrence. Each node represents the cost of a single subproblem
+somewhere in the set of recursive function invocations. We sum the costs within
+each level of the tree to obtain a set of per-level costs.
+
+Floors and ceilings usually do not matter when solving recurrences, so finding
+an upper bound is easier without them.
+
+
+****** Master Method
+
+Provides bounds for recurrences of the form
+
+$$
+T\left(n\right)=aT\left(n/b\right)+f\left(n\right)
+$$
+
+where $a \geq 1$, $b > 1$ and $f(n)$ is a given function.
+
+- (Master theorem) Let $a \geq 1$ and $b \ge 1$ be constants, let $f(n)$ be a
+function, and let $T(n)$ be defined on the nonnegative integers by the 
+recurrence
+
+$$
+T\left(n\right)=aT\left(n/b\right)+f\left(n\right)
+$$
+
+where $n/b$ is interpreted to be mean either $\lfloor n/b \rfloor$ or 
+$\lceil n/b \rceil$. Then $T(n)$ has the following asymptotic bounds
+
+1. If $f\left(n\right)=O\left(n^{\log_{b}a-\epsilon}\right)$ for some constant
+ $\epsilon > 0$ then $T\left(n\right)=\Theta\left(n^{\log_{b}a}\right)$.
+
+2. If $f\left(n\right)=\Theta\left(n^{\log_{b}a}\right)$, then $T\left(n\right)=\Theta\left(n^{\log_{b}a}\lg n\right)$
+
+3. If $f\left(n\right)=\Omega\left(n^{\log_{b}a+\epsilon}\right)$ for some  constant $\epsilon > 0$ and if $a f(n/b) \leq cf(n)$ for some constant $c<1$
+and all sufficiently large $n$, then $T\left(n\right)=\Theta\left(f\left(n\right)\right)$.
+
+#+TODO: Proof of the master theorem
+
 6.1-6.4
 
 #+TODO: 
@@ -501,6 +606,8 @@ This equation can be solved intuitively sometimes by drawing a
 8.1-8.3
 
 #+TODO: 
+
+****** 
 
 * Hashing
 
