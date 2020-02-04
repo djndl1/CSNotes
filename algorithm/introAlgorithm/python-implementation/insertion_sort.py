@@ -3,7 +3,8 @@
 
 import operator
 
-def naive_insertion_sort(arr, comp=operator.le):
+def naive_insertion_sort(unsorted, comp=operator.le):
+    arr = unsorted
     if len(arr) < 2:
         return arr
     for j in range(1, len(arr)):

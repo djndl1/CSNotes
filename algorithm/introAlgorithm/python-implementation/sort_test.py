@@ -3,6 +3,7 @@
 
 import unittest
 import operator
+import copy
 import numpy as np
 import argparse
 
@@ -43,17 +44,18 @@ class TestSortingInteger(ParametrizedTestCase):
     def setUp(self):
         # control integer scale and array length
         self.low = np.random.randint(1, 2000)
-        self.regular_lists = 1000 # sort 1000 arrays
+        self.regular_lists = 10000 # sort 1000 arrays
+        print("For", self.param1.__name__)
 
     def test_empty_arr(self):
         arr = []
-        result = self.param1(arr, self.param2)
+        result = self.param1(arr.copy(), self.param2)
         self.assertTrue(isSorted(result, self.param2))
-        self.assertEqual(set(arr), set(arr))
+        self.assertEqual(set(arr), set(result))
 
     def test_single_arr(self):
         arr = np.random.randint(self.low, size=1).tolist()
-        result = self.param1(arr, self.param2)
+        result = self.param1(arr.copy(), self.param2)
         self.assertTrue(isSorted(result, self.param2))
         self.assertEqual(set(arr), set(arr))
 
@@ -61,9 +63,10 @@ class TestSortingInteger(ParametrizedTestCase):
         lens = np.random.randint(self.low, size=self.regular_lists)
         for i in lens:
             arr = np.random.randint(self.low, size=i).tolist()
-            result = self.param1(arr, self.param2)
-            self.assertTrue(isSorted(result, self.param2))
-            self.assertEqual(set(arr), set(result))
+            result = self.param1(arr.copy(), self.param2)
+            msg = "\nArr: {0}\nResult: {1}\n".format(arr, result)
+            self.assertTrue(isSorted(result, self.param2), msg)
+            self.assertEqual(set(arr), set(result), msg)
 
 from merge_sort import merge_sorted_array
 
@@ -72,6 +75,7 @@ class TestMerge(unittest.TestCase):
         # control integer scale and array length
         self.low = np.random.randint(1, 20000)
         self.regular_lists = 1000 # sort 1000 arrays
+        print("Testing Merge Procedure")
 
     def test_merge_empty(self):
         a = []
@@ -79,15 +83,15 @@ class TestMerge(unittest.TestCase):
         lst_len = np.random.randint(self.low)
         c = np.random.randint(self.low, size=lst_len).tolist()
         c.sort()
-        res = merge_sorted_array(a, b)
+        res = merge_sorted_array(a.copy(), b.copy())
         self.assertEqual(a, res)
         self.assertTrue(isSorted(res))
 
-        res = merge_sorted_array(a, c)
-        self.assertEqual(c, res)
+        res = merge_sorted_array(a.copy(), c.copy())
+        self.assertEqual(c.copy(), res)
         self.assertTrue(isSorted(res))
 
-        res = merge_sorted_array(c, a)
+        res = merge_sorted_array(c.copy(), a.copy())
         self.assertEqual(c, res)
         self.assertTrue(isSorted(res))
 
@@ -100,10 +104,10 @@ class TestMerge(unittest.TestCase):
             arr2.sort()
             arr3 = arr1 + arr2
             arr3.sort()
-            result = merge_sorted_array(arr1, arr2)
+            result = merge_sorted_array(arr1.copy(), arr2.copy())
             msg = "\nArr1: {0}\nArr2: {1}\nResult: {2}".format(arr1,
-                                                             arr2,
-                                                             result)
+                                                               arr2,
+                                                               result)
             self.assertTrue(isSorted(result), msg)
             self.assertEqual(arr3, result, msg)
 
@@ -117,16 +121,17 @@ class TestMerge(unittest.TestCase):
             arr2.sort()
             arr3 = arr1 + arr2
             arr3.sort()
-            result = merge_sorted_array(arr1, arr2)
+            result = merge_sorted_array(arr1.copy(), arr2.copy())
             msg = "\nArr1: {0}\nArr2: {1}\nResult: {2}".format(arr1,
-                                                             arr2,
-                                                             result)
+                                                               arr2,
+                                                               result)
             self.assertTrue(isSorted(result), msg)
             self.assertEqual(arr3, result, msg)
 
 
 import insertion_sort
 import merge_sort
+import heap_sort
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Sorting Algorithm Unit Tests")
@@ -134,6 +139,8 @@ if __name__ == '__main__':
                         help='enable tests for insertion sort')
     parser.add_argument('--merge_sort', action='store_true',
                         help='enable tests for merge sort')
+    parser.add_argument('--heap_sort', action='store_true',
+                        help='enable tests for heap sort')
     parser.add_argument('-a', '--all', action='store_true',
                         help='enable all tests')
 
@@ -153,5 +160,15 @@ if __name__ == '__main__':
                                TestMerge('test_merge_regular')],)
         sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
                                                               merge_sort.merge_sort,
-                                                          operator.le))
-    unittest.TextTestRunner(verbosity=2).run(sorted_suite)
+                                                              operator.le))
+
+    if args.heap_sort or args.all:
+        sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
+                                                              heap_sort.heap.heap_sort,
+                                                              operator.le))
+        sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
+                                                              heap_sort.heap.heap_sort2,
+                                                              operator.le))
+
+
+        unittest.TextTestRunner(verbosity=2).run(sorted_suite)
