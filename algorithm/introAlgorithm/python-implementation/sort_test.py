@@ -43,8 +43,8 @@ class ParametrizedTestCase(unittest.TestCase):
 class TestSortingInteger(ParametrizedTestCase):
     def setUp(self):
         # control integer scale and array length
-        self.low = np.random.randint(1, 2000)
-        self.regular_lists = 10000 # sort 1000 arrays
+        self.low = np.random.randint(1, 1000)
+        self.regular_lists = 1000 # sort 1000 arrays
         print("For", self.param1.__name__)
 
     def test_empty_arr(self):
@@ -132,6 +132,8 @@ class TestMerge(unittest.TestCase):
 import insertion_sort
 import merge_sort
 import heap_sort
+import selection_sort
+import bubble_sort
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Sorting Algorithm Unit Tests")
@@ -141,6 +143,10 @@ if __name__ == '__main__':
                         help='enable tests for merge sort')
     parser.add_argument('--heap_sort', action='store_true',
                         help='enable tests for heap sort')
+    parser.add_argument('--selection_sort', action='store_true',
+                        help='enable tests for selection sort')
+    parser.add_argument('--bubble_sort', action='store_true',
+                        help='enable tests for bubble sort')
     parser.add_argument('-a', '--all', action='store_true',
                         help='enable all tests')
 
@@ -169,6 +175,17 @@ if __name__ == '__main__':
         sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
                                                               heap_sort.heap.heap_sort2,
                                                               operator.le))
+    if args.selection_sort or args.all:
+        sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
+                                                              selection_sort.selection_sort,
+                                                              operator.le))
 
+    if args.bubble_sort or args.all:
+        sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
+                                                              bubble_sort.optimized_bubble_sort,
+                                                              operator.le))
+        sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
+                                                              bubble_sort.naive_bubble_sort,
+                                                              operator.le))
 
         unittest.TextTestRunner(verbosity=2).run(sorted_suite)
