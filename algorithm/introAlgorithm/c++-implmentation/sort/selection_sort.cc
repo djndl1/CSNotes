@@ -33,21 +33,3 @@ selection_sort(Iterator first, Iterator last)
 
     return;
 }
-
-#include <vector>
-using std::vector;
-using std::cout;
-using std::endl;
-
-int main(int argc, char *argv[])
-{
-    vector<int> A{31, 41, 59, 26, 42, 58};
-
-    selection_sort(A.begin(), A.end());
-    for ( auto i : A ) 
-        cout << i << ' ';
-    cout << endl;
-
-
-    return 0;
-}
