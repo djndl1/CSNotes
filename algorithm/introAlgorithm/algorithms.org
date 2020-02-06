@@ -260,6 +260,166 @@ pcube = plot(cube, (x, 0, 20), color='yellow',
 pexpon + pfact + pcube
 #+END_SRC
 
+* Data Structures
+
+/Sets/ are as fundamental to computer science as they are to mathematics. The sets
+that can grow, shrink or otherwise change over time when manipulated by algorithms
+are /dynamic/. Algorithms may require several different types of operations to be
+performed on sets.
+
+Each element of a dynamic set is represented by an object whose attributes can 
+be examined and manipulatged if a pointer to the object is available. Some 
+objects have an identifying /key/. The object may contain /satellite data/.
+
+Operations on a dynamic set can be grouped into two categories, /queries/ and 
+/modifying operations/: 
+  + =search(S, k)=: return a pointer =x= to an element in S s.t. =x.key = k= or =NIL= if not found
+  + =insert(S, x)=: =x= is a pointer to an object
+  + =delete(S, x)=
+  + =minimum(S)=: returns a pointer to the element of =S= with the smallest key
+  + =maximum(S)=
+  + =successor(S)=: for a totally ordered set
+  + =predecessor(S)=
+
+** Stacks and Queues
+
+Stacks and queues are dynamic sets in which the element removed from the set by
+=delete= is prespecified.
+
+*** Stacks
+
+- =insert=/=push=
+
+- =delete=/=pop=
+
+Assuming an array-based stack:
+
+#+BEGIN_SRC 
+stack-empty(S)
+    if S.top == 0
+        return True
+    else
+        return False
+
+push(S, x):
+    S.top = S.top + 1
+    S[S.top] = x
+
+pop(S):
+    if stack-empty(S)
+        error "underflow"
+    else
+        S.top = S.top - 1
+        return S[S.top+1]
+#+END_SRC
+
+*** Queues
+
+The queue has a /head/ and a /tail/.
+
+- =insert=/=enqueue=
+
+- =delete=/=dequeue=
+
+An array-based implementation would be:
+
+#+BEGIN_SRC 
+# Q.tail: the next location to place an element
+# Q.head: the first element of the queue
+# [Q.head, Q.tail): when Q.head == Q.tail, the queue is empty
+enqueue(Q, x):
+    Q[Q.tail] = x
+    if Q.tail == Q.length
+        Q.tail = 1
+    else
+        Q.tail = Q.tail + 1
+
+dequeue(Q)
+    x = Q[Q.head]
+    if Q.head == Q.length
+        Q.head = 1
+    else
+        Q.head = Q.head + 1
+    return x
+#+END_SRC
+
+*** Linked Lists
+
+A linked list may be singly linked, doubly linked and even circular.
+
+#+BEGIN_SRC 
+# Unsorted doubly linked list
+
+list-search(L, k)
+    x = L.head
+    while x != NIL and x.key != k
+          x = x.next
+    return x
+
+# splices x ont othe front of the linked list
+list-insert(L, x)
+    x.next = L.head
+    if L.head != NIL
+        L.head.prev = x
+    L.head = x
+    x.prev = NIL
+
+list-delete(L, x)
+    if x.prev != NIL
+        x.prev.next = x.next
+    else
+        L.head = x.next
+    if x.next != NIL
+        x.next.prev = x.prev
+#+END_SRC
+
+/sentinel/: a dummy object
+
+With a sentinel as the head and the tail of a circular doubly linked list, the
+boundary condition can be ignored since there must be a successor and a predecessor
+for any element.
+
+#+BEGIN_SRC 
+list-search'(L, k)  
+    x = L.nil.next
+    while x != L.nil and x.key != k
+        x = x.next
+    return x
+
+list-insert'(L, x)
+    x.next = L.nil.next
+    L.nil.next.prev = x
+    L.nil.next = x
+    x.prev = L.nil
+
+list-delete'(L, x)
+    x.prev.next = x.next
+    x.next.prev = x.prev
+#+END_SRC
+
+Sentinels can reduce constant factors. The gain from using sentinel within loops
+is usually a matter of clarity of code. Using sentinels helps to tighten the code
+in a loop, thus reducing the coefficients of $n$ or $n^{2}$ in the running time.
+
+*** Implementing pointers and objects
+
+1. We can represent a collection of objects that have the same attributes by using
+an array for each attribute. A pointer is an index.
+
+2. In many programming languages, an object occupies a contiguous set of locations
+in the computer memory. A pointer is simply the address. 
+
+*** Rooted Trees
+
+/binary trees/: node ={key, parent, left, right}=. If =x.parent == NIL=, then =x=
+is the root (has no parent), same for =x.left == NIL= or =x.right == NIL=.
+
+/Rooted trees with unbounded branching/: The /left-child, right-sibling representation/
+ is a clever scheme to represent trees with arbitrary numbers of children. 
+Using only $O(n)$ space for any n-node rooted tree. Each node has two pointers 
+besides =parent=:
+1. =x.left-child= points to the leftmost child of node =x=
+2. =x.right-sibling= points to the sibling of =x= immediately to its right.
 
 * Sorting and Trees
 
@@ -515,6 +675,57 @@ heap_sort(A):
 
 #+include: "./python-implementation/heap_sort.py" src python
 
+*** BST Sort
+
+
+
+*** Quicksort
+
+inplace; $\Theta(n^{2})$ worst case, $\Theta(n\lg n)$ expected running time; the
+constant factors are small; divide-and-conquer
+
+1. *divide*: partition the array into two (possibly empty) subarrays =A[p..q-1]= and A[q+1..r] such that each element of =A[p..q-1]= is less than or equal to A[q], which is, in turn, less than or equal to each element of =A[q+1..r]=. Compute the index =q= as part of this partitioning procedure
+
+2. *conquer*: sort the two subarrrays =A[p..q-1]= and =A[q+1..r]= by recursive calls
+
+3. *combine*: all subarrays are already sorted, no work for combining them.
+
+#+BEGIN_SRC 
+quicksort(A, p, r)
+  if p < r
+    q = partition(A, p, r)
+    quicksort(A, p, q-1)
+    quicksort(A, q+1, r)
+#+END_SRC
+
+The key to the algorithm is the =partition= procedure, which rearranges the subarray =A[p..r]= in place:
+
+#+BEGIN_SRC 
+partition(A, p, r)
+  x = A[r]
+  i = p - 1     # the last element of the first half subarray
+  for j = p to r-1  # the boundary of the rearranged part of the array
+    if A[j] <= x
+      i = i + 1
+      exchange A[i] with A[j] # place the smaller one to the left
+  exchange A[i+1] with A[r] # so that the pivot divides the two subarrays
+  return i+1  # index of the pivot
+#+END_SRC
+
+There are four regions maintained by this procedure:
+
+#+BEGIN_SRC 
+| <= pivot | > pivot | unrestricted | pivot |  
+#+END_SRC
+
+
+The loop invariant is: At the beginning of each iteration of the loop, for any
+array index $k$:
+  1. If $p\leq k\leq i$, then $A[k] \leq x$.
+  2. If $i+1 \leq k\leq j-1$ then $A[k] > x$
+  3. If $k = r$, then $A[k] = x$
+
+The running time of =partition= on =A[p..r]= is $\Theta(n)$ where $n=r-p+1$.
 
 *** Some other sorting algorithms
 
