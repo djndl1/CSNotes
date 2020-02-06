@@ -130,6 +130,7 @@ class TestMerge(unittest.TestCase):
 
 
 import insertion_sort
+import quicksort
 import merge_sort
 import heap_sort
 import selection_sort
@@ -147,6 +148,8 @@ if __name__ == '__main__':
                         help='enable tests for selection sort')
     parser.add_argument('--bubble_sort', action='store_true',
                         help='enable tests for bubble sort')
+    parser.add_argument('--quick_sort', action='store_true',
+                        help='enable tests for quick sort')
     parser.add_argument('-a', '--all', action='store_true',
                         help='enable all tests')
 
@@ -187,5 +190,9 @@ if __name__ == '__main__':
         sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
                                                               bubble_sort.naive_bubble_sort,
                                                               operator.le))
+    if args.quick_sort or args.all:
+        sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
+                                                              quicksort.quicksort,
+                                                              operator.le))
 
-        unittest.TextTestRunner(verbosity=2).run(sorted_suite)
+    unittest.TextTestRunner(verbosity=2).run(sorted_suite)
