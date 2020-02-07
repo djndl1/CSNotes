@@ -343,7 +343,7 @@ dequeue(Q)
     return x
 #+END_SRC
 
-*** Linked Lists
+** Linked Lists
 
 A linked list may be singly linked, doubly linked and even circular.
 
@@ -409,7 +409,7 @@ an array for each attribute. A pointer is an index.
 2. In many programming languages, an object occupies a contiguous set of locations
 in the computer memory. A pointer is simply the address. 
 
-*** Rooted Trees
+** Rooted Trees
 
 /binary trees/: node ={key, parent, left, right}=. If =x.parent == NIL=, then =x=
 is the root (has no parent), same for =x.left == NIL= or =x.right == NIL=.
@@ -420,6 +420,125 @@ Using only $O(n)$ space for any n-node rooted tree. Each node has two pointers
 besides =parent=:
 1. =x.left-child= points to the leftmost child of node =x=
 2. =x.right-sibling= points to the sibling of =x= immediately to its right.
+
+*** Binary Search Trees
+
+Basic operations on a binary search tree take time proportional to the height 
+of the tree. Basic dynamic-set operations on such a tree take $\Theta(\lg n)$ 
+time on average.
+
+- /binary-search-tree/ property: Let $x$ be a node in a binary search tree. If 
+  $y$ is a node in the left subtree of $x$, then $y.key \leq x.key$. If $y$ is a
+  node in the right subtree of $x$, then $y.key \geq x.key$.
+
+#+BEGIN_SRC 
+inorder-tree-walk(x):
+  if x != NIL:
+      inorder-tree-walk(x.left)
+      print x.key
+      inorder-tree-walk(x.right)
+#+END_SRC
+
+Theorem: If $x$ is the root of an $n$ -node subtree, then the call =inorder-tree-walk(x)=
+takes $\Theta(n)$ time.
+
+Proof: Since =inorder-tree-walk= visits all $n$ nodes of the subtree, 
+$T(n) = \Omega(n)$. Suppose $T(n) \leq (c+d)n +c$, by induction
+
+\begin{aligned}
+T\left(n\right) &	\leq T\left(k\right)+T\left(n-k-1\right)+d \\
+&	=\left(\left(c+d\right)k+c\right)+\left(\left(c+d\right)\left(n-k-1\right)+c\right)+d \\
+&	=\left(c+d\right)n+c-\left(c+d\right)+c+d \\
+&	=\left(c+d\right)n+c \\
+& = O(n)
+\end{aligned}
+
+where $d > 0$  is upper bound on the time to execute the body of =inorder-tree-walk(x)=,
+
+- =tree-search=: returns a pointer to a node whose key =k= of one exists, 
+  otherwise returns =NIL=:
+
+#+BEGIN_SRC 
+recursive-tree-search(x, k)
+    if x == NIL or k == x.key
+        return x
+    if k < x.key
+        return tree-search(x.left, k)
+    else
+        return tree-search(x.right, k)
+
+iterative-tree-search(x, k)
+    while x != NIL and k != x.key
+        if k < x.key
+            x = x.left
+        else
+            x = x.right
+    return x
+#+END_SRC
+
+- =minimum= / =maximum=: returns a pointer to the minimum element in a tree
+
+#+BEGIN_SRC 
+iterative-tree-minumum(x):
+    while x.left != NIL
+        x = x.left
+    return x
+
+recursive-tree-minimum(x):
+    if x.left == NIL
+        return x
+    else
+        return recursive-tree-minimum(x.left)
+
+iterative-tree-maximum(x):
+    while x.right != NIL
+        x = x.right
+    return x
+#+END_SRC
+
+- =sucessor= / =predecessor=: $O(h)$
+
+#+BEGIN_SRC 
+tree-successor(x)
+    if x.right != NIL
+        return tree-minumum(x.right)
+    y = x.parent
+    # if x.parent is on x's left, then x.parent and 
+    # the left subtree of x.parent can not be greater than x
+    # otherwise  continue to search until there is a parent node
+    # is on the right (when x is in the left subtree of this ancestor node)
+    while y != NIL and x == y.right
+        x = y
+        y = y.parent
+    return y
+#+END_SRC
+
+We can implement the dynamic-set operations =search=, =minimum=, =maximum=, 
+=sucessor= and =predecessor= so that each one runs in $O(h)$ time on a binary
+tree of height $h$.
+
+- =tree-insert=: takes a node =z= and inserts it into an appropriate position 
+  in the tree
+
+#+BEGIN_SRC 
+tree-insert-iterative(T, z)
+    y = NIL
+    x = T.root  
+    while x != NIL      # This NIL occupies where z should be placed
+        y = x           # save previous root node, a trailing pointer
+        if z.key < x.key
+            x = x.left  # change root node so that z is under this subtree
+        else
+            x = x.right
+    z.parent = y
+    if y == NIL
+        T.root = z
+    else if z.key < y.key
+        y.left = z
+    else
+        y.right = z
+#+END_SRC
+
 
 * Sorting and Trees
 
@@ -677,7 +796,7 @@ heap_sort(A):
 
 *** BST Sort
 
-
+BST sort can do fast insertion into sorted list.
 
 *** Quicksort
 
