@@ -123,3 +123,31 @@ Using hashing to search is rarely used.
 
 - /Hash Table/: C++ STL =unordered_map=; Java =HashMap=, =HashSet=, =HashTable=
   not recommended unless absolutely necessary.
+  + /Direct Addressing Tables/ (DAT): the keys are themselves indices; commonly used
+
+** Data Structures with Our Own Libraries
+
+Contestants should prepare bug-free implementations of these data structures.
+
+- /graph/: $G = (V, E)$, a set of vertices and edges. There are three basic ways
+  to represent a graph $G$ with $V$ vertices and $E$ edges:
+  + /The adjacency matrix/, in the form of a 2D array. Adjacency matrix cannot
+    be used to store multigraph. An adjacency matrix is a good choice if the
+    connectivity between two vertices in a small dense graph is frequently 
+    required. Usually infeasible to use when $V >= 1000$. It takes $O(V)$ to
+    enumerate the list of neighbors of a vertex $v$.
+  + /The adjacency list/: usually in the form of a vector of vectors of pairs.
+    The first choice of graph representation.
+    =vector<vii> AdjList; typedef pair<int, int> ii; typedef vector<ii> vii=;
+    Each pair contains the index of the neighboring vertex and the weight of 
+    the edge. Unweighted graph can have 0 or 1 weight value or simply drop the
+    weight attribute. The space complexity of adjacency list is $O(V+E)$. 
+    Adjacency list can be used to store multigraph. Enumerating the list of 
+    neighbors of a vertex $v$ can be efficient.
+  + /The Edge List/: a list of all $E$ edges, usually in the form of a vector of
+    triples. =vector< pair<int, ii> > EdgeList=. Storing graph information in 
+    edge list complicates many graph algorithms that require the enumeration of
+    edges incident to a vertex.
+
+/implicit graph/:Some graphs do not have to be stored in a graph data structure or explicitly 
+generated for the graph to be traversed or operated on.
