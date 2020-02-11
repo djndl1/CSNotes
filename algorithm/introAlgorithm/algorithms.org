@@ -539,6 +539,298 @@ tree-insert-iterative(T, z)
         y.right = z
 #+END_SRC
 
+- =tree-delete=: three basic cases
+  1. has no children. simply remove it
+  2. has just one child. Elevate that child to take over the position.
+  3. has two children. Then find its successor in its right subtree and have it
+     take its place.
+
+#+BEGIN_SRC
+# replaces one subtree as a child of its parent with another subtree
+# replaces the subtree rooted at node u with the subtree rooted at node v
+transplant(T, u, v)
+  if u.parent == NIL
+      T.root = v
+  else if u == u.parent.left
+      u.parent.left = v
+  else
+      u.parent.right = v
+  if v != NIL
+      v.parent = u.parent
+
+tree-delete(T, z)
+  # Four cases
+  if z.left == NIL
+      transplant(T, z, z.right) # including the case where z has no children
+  else if z.right == NIL
+      transplant(T, z, z.left)
+  else        # has both children
+      y = tree-minimum(z.right)
+      if y.parent != z  
+          transplant(T, y, y.right) # replace y with its right child
+          y.right = z.right # put y in place of z
+          z.right.parent = y
+      # replace z with y
+      transplant(T, z, y)
+      y.left = z.left
+      y.left.parent = y
+#+END_SRC
+
+- Theorem: The dynamic-set operation =insert= and =delete= can be implemented
+  in a BST of height $h$ so that each one runs in $O(h)$.
+
+**** Implementation
+
+#+include: "./python-implementation/BST_sort.py" src python
+
+*** Balanced BST
+
+Balanced BST maintains $h=O(\lg n)$, which makes all operations run in $O(\lg n)$
+time.
+
+**** Red-Black Trees
+
+A red-black tree is a binary search tree with one extra attribute per node: 
+/color/, which can be either /red/ or /black/. Red-black trees ensure that
+no such plan is more than twice as long as any other, so that the tree is 
+approximately /balanced/.
+
+/Red-black properties/: =NIL= pointers are regarded as being pointers to leaves,
+which can be replaced by a single sentinel node.
+  1. Every node is either red or black
+  2. The root is black
+  3. Every leaf (=NIL=) is black
+  4. If a node is red, then both its children are black (at least half of the nodes
+     on any simple path form the root to a leaf are black)
+  5. For each node, all simple paths from the node to descendant leaves contain
+     the same number of black nodes, not including the starting node, called
+       /black-height/, denoted by $bh(x)$.
+
+- Lemma: A red-black tree with $n$ internal nodes (real nodes excluding the =NIL= nodes) 
+  has height (not black height) at most $2\lg (n+1)$
+
+#+TODO: proof using induction on the assumption that the subtree rooted at any node $x$ contains at least $2^{bh(x)} - 1$ internal nodes. and then consider property 4.
+
+From this lemma, we can implement =search=, =minimum=, =maximum=, =successor= 
+and =predecessor= in $O(\lg n)$ time on red-black trees.
+
+***** Rotations
+
+Rotations are local operations in a search tree that preserves the binary-search-tree
+property. Rotations run in $O(1)$ time.
+
+#+BEGIN_SRC 
+                            Left-rotate
+             +---+      <-----------------+     +---+
+        +----+ y +---+                     +----+ x +---+
+        |    +---+   |                     |    +---+   |
+        |            |                     +            |
+      +-+-+          +                   alpha          |
+  +---+ x +---+    gamma                              +-+-+
+  |   +---+   |                                  +----+ y +-----+
+  +           +            Right-rotate          |    +---+     |
+alpha       beta        +----------------->      |              |
+                                                 +              +
+                                               beta           gamma
+#+END_SRC
+
+#+BEGIN_SRC 
+left-rotate(T, x)
+    y = x.right
+    x.right = y.left
+    # modify beta
+    if y.left != T.nil
+          y.left.parent = x
+    # modify y
+    y.parent = x.parent
+    # modify x.parent
+    if x.parent == T.nil
+        T.root = y
+    else if x == x.parent.left
+        x.parent.left = y
+    else
+        x.parent.right = y
+    # modify x and y
+    y.left = x
+    x.parent = y
+#+END_SRC
+
+- =rb-insert=: $O(\lg n)$.
+
+#+BEGIN_SRC 
+# All NILs are replaced by T.nil, z.color is set to RED
+rb-insert(T, z)
+    y = T.nil
+    x = T.root
+    while x != T.nil
+        y = x
+        if z.key < x.key
+            x = x.left
+        else
+            x = x.right
+    z.parent = y
+    if y == T.nil
+        T.root = z
+    else if z.key < y.key
+        y.left = z
+    else
+        y.right = z
+    z.left = T.nil
+    z.right = T.nil
+    z.color = RED
+    rb-insert-fixup(T, z)
+
+rb-insert-fixup(T, z)
+    while z.parent.color == RED
+        if z.parent == z.parent.parent.left
+            y = z.parent.parent.right
+            # case 1 corrects the lone violation of property 4
+            if y.color == RED               # case 1 z's uncle is red
+                z.parent.color = BLACK      # case 1 simply color the upper
+                y.color = BLACK             # case 1 two nodes black and 
+                z.parent.parent.color = RED # case 1 grandparent red
+                z = z.parent.parent         # case 1
+            else  
+                if z == z.parent.right      # case 2
+                    z = z.parent            # case 2
+                    left-rotate(T, z)       # case 2
+                z.parent.color = BLACK      # case 3
+                z.parent.parent.color = RED # case 3
+                right-rotate(T, z.parent.parent)  # case 3
+        else
+            (z is on the right side of z's grandparent,
+              same as left, but with left and right reversed)
+    T.root.color = BLACK
+#+END_SRC
+
+Property 2 may be violated if =z= is the root and also property 4 if =z= 's parent
+is red. The =while= loop in the fixup procedure maintains three-part invariant
+at the start of each iteration of the loop:
+    1. Node =z= is red
+    2. If =z.parent= is the root, then =z.parent= is black
+    3. If the tree violates any of the red-black properties, then it violates
+       at most one of them, and the violation is either of property 2 (=z= is 
+       the root) or property 4 (both =z= and =z.parent= are red)
+
+There are three cases (actually six, depending on whether =z.parent= is a left 
+child or a right child) where we enter the =while= loop.
+  1. =z='s uncle =y= is red
+  2. =z='s uncle is black and =z= is a right child
+  3. =z='s uncle is black and =z= is a left child
+
+#+TODO: loop invariant proof
+
+#+TODO: rb-deletion
+
+***** Implementation
+
+#+include: "./python-implementation/red_black_tree.py" src python
+
+**** AVL Tree
+
+The AVL trees are more balanced compared to RB-Tree, but they may cause more
+rotations during insertion and deletion. The Red Black trees should be 
+preferred if many frequent insertions and deletions are involved.
+
+For every node, heights of left and right children differ by at most $\pm 1$.
+Nil tree is treated as height $-1$. Each node stores its height (or difference
+in heights).
+
+Worst when every node differs by 1, let $N_{h}$ nodes in height-=h= AVL tree.
+
+\begin{aligned}
+N_{h} &	=N_{h-1}+N_{h-2}+1 \\
+&	>2N_{h-2} \\
+N_{h} & > 2^{h/2} \\
+h & < 2 \lg N_{h}
+\end{aligned}
+
+- =avl_insert=: insert as in simple BST, work the way up tree, restore AVL property.
+  $\Theta(n \lg n)$
+
+#+TODO: insertion, deletion
+
+***** Implementation
+
+#+TODO: python implementation
+
+#+include: "./python-implementation/avl_tree.py" src python
+
+
+** Hash Tables
+
+Under reasonable assumptions, the average time to search for an element in a 
+hash table is $O(1)$.
+
+When the number of keys actually stored is small relative to the total number of
+possible keys, hash tables become an effective alternative to directly addressing
+an array. Instead of using the key as an array index directly, the array index
+is computed from the key.
+
+*** Direct-Address Tables
+
+Direct addressing works well when the universe $U$ of keys is reasonably small.
+Direct-address table is basically an array, of which each position (/slot/) 
+corresponds to a key in the universe $U$.
+
+- =direct-address-search(T, k)=: =return T[k]=
+
+- =direct-address-insert(T, x)=: =T[x.key] = x=
+
+- =direct-address-delete(T, x)=: =T[.key] = NIL=
+
+Each of these operations takes $O(1)$ time.
+
+*** Hash Tables
+
+A hash table requires much less storage than a direct address table when the
+set $K$ of keys stored in a dictionary is much smaller than the universe $U$
+of all possible keys.
+
+/hash function/: $h\colon U\to \{0, 1, ..., m-1 \}$, $h$ maps the universe $U$
+of keys into the slots of a hash table $T[0..m-1]$, where the size $m$ of the
+hash table is typically much less than $|U|$. $h(k)$ is the /hash value/ of key
+$k$.
+
+/collision/: two keys hashing to the same slot. A suitable hash function may 
+eliminate collisions. Avoiding collisions altogether is impossible since hashing
+typically has a larger domain than a larger range.
+
+/Chaining/ and /open addressing/ are two methods to solve collision.
+
+/Chaining/: all the elements that hash to the same slot into the same linked
+ list. Slot $j$ contains a pointer to the head of the list of all stored 
+elements. If there are no such elements, slot $j$ contains =NIL=.
+
+- =chained-hash-insert(T, x)=: insert =x= at the *head* (so that we don't need to
+  traverse the list) of list =T[h(x.key)]=
+
+- =chained-hash-search(T, x)=: search for an element with key $k$ in list =T[h(k)]=
+
+- =chained-hash-delete(T, x)=: delete =x= from the list =T[h(x.key)]=
+
+/load factor/: given a hash table $T$ with $m$ slots that stores $n$ elements,
+the load factor $\alpha$ for $T$ is $n/m$, the average number of elements 
+stored in a chain.
+
+/simple uniform hashing/: any given element is equally likely to hash into any
+of the $m$ slots, independently of where any other element has hashed to.
+
+- theorem: In a hash table in which collisions are resolved by chaining, an 
+  unsuccessful search takes average-case time $\Theta(1+\alpha)$, a successful 
+  search takes average-case time $\Theta(1+\alpha)$, under the assumption of
+  simple uniform hashing.
+
+#+TODO: proof
+
+*** Hash functions
+
+A good hash function satisfies approximately the assumption of simple uniform
+hashing: each key equally likely to hash to any of the $m$ slots, independently
+of where any other key has hashed to. Some application s of hash functions
+might require stronger properties than are provided by simple uniform hashing.
+
+** Augmenting Data Structures
 
 * Sorting and Trees
 
@@ -1098,7 +1390,84 @@ algorithms are available.
 
 * Dynamic Programming
 
-#+TODO: 
+A dynamic-programming algorithm solves each subsubproblem just once and then
+saves its answer in a table, thereby avoiding the work of recomputing the answer
+every time it solves each subsubproblem.
+
+We typically apply dynamic programming to /optimization problems/.
+
+When developoing a dynamic-programming algorithm, a sequence of four steps are 
+followed in:
+  1. Characterize the structure of an optimal solution
+  2. Recursively define the value of an optimal solution
+  3. Compute the value of an optimal solution, typically in a bottom-up fashion
+  4. Construct an optimal solution from computed information
+
+** Rod Cutting
+
+/Problem formulation/: given a rod of length $n$ and a table of prices $p_i$ for $i=1, 2, 3, \dots , n$
+ determine the maximum revenue $r_{n}$ obtainable by cutting up the rod and 
+selling the pieces. If the price for a rod of length $n$ is large enough, an
+optimal solution may require no cutting at all.
+
+We have an independent option of cutting or not cutting at distance $i$ from the
+left end for $i=1,2,\dots ,n-1$, giving $2^{n-1}$ different ways. An optimal 
+decomposition 
+
+$$
+n = i_{1} + i_{2} + \cdots + i_{k}
+$$
+
+of the rod into pieces of lengths $i_{1}, i_{2}, \dots, i_{k}$ provides maximum
+corresponding revenue
+
+$$
+r_{n} = p_{i_1} + p_{i_2} + \cdots + p_{i_k}
+$$
+
+We can frame the values $r_n$ for $n\geq 1$ in terms of optimal revenues from
+shorter rods:
+
+$$
+r_{n} = \max (p_n, r_1 + r_{n-1}, r_2 + r_{n-2}, \dots , r_{n-1} + r_1)
+$$
+
+To solve the original problem of size $n$, we solve smaller problems of the same type
+ but of smaller sizes.
+
+/optimal substructure/: optimal solutions to a problem incorporate optimal 
+solutions to related subproblems, which may be solved independently.
+
+We can also approach the problem by seeing the first part as indecomposable. 
+Only the second part can be further divided (or of zero length).
+
+$$
+r_{n}=\underset{1\leq i\leq n}{\max}\left(p_{i}+r_{n-i}\right)
+$$
+
+which leads to the following recursive implementation:
+
+#+BEGIN_SRC 
+cut-rod(p, n)
+    if n == 0
+        return 0
+    q = -INF
+    for i = 1 to n
+        q = max(q, p[i] + cut-rod(p, n-i))
+    return q
+#+END_SRC
+
+The problem of this algorithm is that it calls itself recursively over and over
+again with the same parameter values. It solves the same subproblems repeatedly.
+Since when $n=10$ and when $n=9$, there is a =cut-rod(p, 8)= call.
+
+$$
+T(n) = 1 + \sum_{j=0}^{n-1} T(j) \\
+T(0) = 1
+$$
+
+
+which solves to $T(n) = 2^{n}$.
 
 * Advanced Topics
 
