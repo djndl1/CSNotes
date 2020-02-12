@@ -1,0 +1,46 @@
+* Overview
+
+Given an array =A= of integers,
+
+1. find the largest and smallest element  of =A=; (/complete search/)
+
+2. find the k-th smallest element in =A=: /divide and conquer/ e.g. sorting
+
+3. find the largest gap $g$ s.t. $x, y\in A$ and $g = |x - y|$. (/greedy/, find
+  the largest and smallest element and compute the difference)
+
+4. find the longest increasing subsequence of $A$. (/dynamic programming/)
+
+* Complete Search (Brute Force)
+
+/Complete search technique/ (/brute force/, /recursive backtracking/): solves
+a problem by traversing the entire or part (if other parts have no possiblilty
+ of containing the required solution) of the search space to obtain the 
+required solution.
+
+A complete search should be developed when there is clearly no other algorithm
+available or when better algorithms exist but are overkill as the input size
+happens to be small. If a complete search is likely to pass the time limit,
+then go ahead and implement one. Sometimes, running complete search on small
+instances of a challenging problem can help to understand its structure through
+patterns in the output than can be exploited to design a faster algorithm.
+
+There exist hard problems that are only solvable with creative complete search
+algorithms.
+
+** Iterative Complete Search
+
+Problem: UVa 725: =fghij= is in the range [01234, 98765/N].
+
+#+include: ./code/chap.3/uva_725.cc src C++
+
+Problem: UVa 441: 
+
+Competitive programmers must be comfortable writing code with more than two
+nested loops.
+
+* Divide-and-Conquer
+
+* Greedy approach
+
+* Dynamic Programming
