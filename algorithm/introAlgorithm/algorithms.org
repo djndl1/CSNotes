@@ -796,7 +796,9 @@ $k$.
 eliminate collisions. Avoiding collisions altogether is impossible since hashing
 typically has a larger domain than a larger range.
 
-/Chaining/ and /open addressing/ are two methods to solve collision.
+/Chaining/ and /open addressing/ are two methods to solve collision. Chaining
+is more commonly selected as a collision resolution technique when keys must be
+deleted.
 
 /Chaining/: all the elements that hash to the same slot into the same linked
  list. Slot $j$ contains a pointer to the head of the list of all stored 
@@ -829,6 +831,112 @@ A good hash function satisfies approximately the assumption of simple uniform
 hashing: each key equally likely to hash to any of the $m$ slots, independently
 of where any other key has hashed to. Some application s of hash functions
 might require stronger properties than are provided by simple uniform hashing.
+
+Most hash functions assume that the universe of keys is the set of natural 
+numbers. If the keys are not natural numbers, find a way to interpret them as
+natural numbers.
+
+**** The Division Method
+
+$$
+h(k) = k \mod m
+$$
+
+$m$ should not be a power of 2, otherwise the hash value depends on certain lower
+bits of $k$ rather than all bits of $k$. A prime not too close to an exact
+ power of 2 is often a good choice.
+
+**** The Multiplication Method
+
+$$
+h(k) = \lfloor m(k A \mod 1)\rfloor
+$$
+
+where $kA \mod 1$ means $kA - \lfloor kA\rfloor$, $0 < A < 1$.
+
+An advantage of the multiplication method is that the value of $m$ is not 
+critical. It is typically a power of 2. $\sqrt{5}-1/2$ may be a good choice 
+for $A$.
+
+*** Open Addressing
+
+Each table entry contains either an element of the dynamic set or =NIL=. When
+searching for an element, the table slots are systematically examined until
+either the desired element is found or it is ascertained that the element is 
+not in the table. In open addressing,, the hash table can be fill up. The load
+factor can never exceed $1$.
+
+The advantage of open addressing is that it avoids pointers altogether. Instead
+of following pointers, the sequence of slots to examine is the computed.
+
+To perform insertion, /probe/ the hash table until an empty slot in which to
+put the key is found. The sequence of position  probed depends on the key being
+inserted.
+
+The hash function becomes
+
+$$
+h\colon U\times\left\{ 0,1,\dots,m-1\right\} \to\left\{ 0,1,\dots,m-1\right\} 
+$$
+
+The /probe sequence/ $h\left(k,0\right),h\left(k,1\right),\dots,h\left(k,m-1\right)$
+must be a permutation of $0, 1, \dots ,m-1$ so that every hash table position
+is eventually considered as a slot for a new key as the table fills up.
+
+#+BEGIN_SRC 
+hash-insert(T, k)
+    i = 0
+    repeat
+        j = h(k, i)
+        if T[j] == NIL
+            T[j] = k
+            return j
+        else
+            i = i + 1
+    until i == m
+    error "Hash table overflow"
+
+hash-search(T, k)
+    i = 0
+    repeat
+        j = h(k, i)
+        if T[j] == k
+            return j
+        i = i + 1
+    until T[j] == NIL or i == m
+    return NIL
+#+END_SRC
+
+Deletion from an open-address hash table is difficult. One way is to set the 
+deleted slot to =deleted= instead of =NIL=.
+
+/uniform hashing/: the probe sequence of each key is equally likely to be any
+of the $m!$ permutations of $0, 1, \dots, m-1$.
+
+Three commonly used techniques to compute the probe sequences:
+
+1. /linear probing/: given an ordinary hash function 
+  $h^{\prime}\colon U\to\left\{ 0,1,\dots,m-1\right\}$ (/auxiliary hash function/),
+  linear probing uses $h\left(k,i\right)=\left(h^{\prime}\left(k\right)+i\right)\mod m$ 
+  for $i = 0, 1, \dots, m-1$. Linear probing suffers from /primary clustering/.
+  Long runs of occupied slots build up, increasing the average search time.
+
+2. /quadratic probing/: $h\left(k,i\right)=\left(h^{'}\left(k\right)+c_{1}i+c_{2}i^{2}\right)\mod m$
+  where $h^{'}$ is an auxiliary hash function, $c_1$ and $c_2$ are positive 
+  auxiliary constants and $i=0,1,\dots,m-1$. The values of $c_1$, $c_2$ and $m$
+  are constrained to make full use of the hash table. $h\left(k_{1},0\right)=h\left(k_{2},0\right)$
+  implies $h\left(k_{1},i\right)=h\left(k_{2},i\right)$, leading to a milder 
+  form of clustering, called /secondary clustering/.
+
+3. /double hashing/: One of the best methods available for open addressing.
+   $h\left(k,i\right)=\left(h_{1}\left(k\right)+ih_{2}\left(k\right)\right)\mod m$
+   where both $h_1$ and $h_2$ are auxiliary hash functions. The value $h_2(k)$
+   must be relatively prime to the hash-table size $m$ for the entire hash table.
+   (e.g. Let $m$ be a power of $2$ and design $h_{2}$ so that it always
+   produces an odd number). 
+
+#+TODO: analysis of open-address hashing
+
 
 ** Augmenting Data Structures
 
@@ -1468,6 +1576,85 @@ $$
 
 
 which solves to $T(n) = 2^{n}$.
+
+There are two equivalent ways to implement a dynamic-programming approach:
+
+1. /top-down with memoization/: write the procedure recursively in a natural 
+  manner, but modified to save the result of each subproblem, usually in an 
+  array or hash table. The procedure first checks to see whether it has 
+  previously solved this subproblem.
+
+2. /bottom-up method/: depends on some natural notion of the size of a 
+  subproblem s.t. solving any particular subproblem depends only on solving
+  smaller subproblems. The subproblems are sorted by size and solved in size
+  order, smallest first. When a problem is encountered, all its prerequisite
+  subproblems have been solved.
+
+#+BEGIN_SRC 
+memoize-cut-rod(p, n)   # 
+  let r[0..n] be a new array
+  for i = 0 to n
+      r[i] = -inf
+  return memoized-cut-rod-aux(p, n, r)
+
+memoized-cut-rod-aux(p, n, r) 
+  if r[n] >= 0
+      return r[n]
+  if n == 0
+      q = 0
+  else
+      q = -inf
+      for i = 1 to n
+          q = max(q, p[i] + memoized-cut-rod-aux(p, n-i, r))  # returns immediately
+  r[n] = q
+  return q
+
+botton-up-cut-rod(p, n) # \Theta(n^{2})
+    let r[0..n] be a new array
+    r[0] = 0
+    for j = 1 to n
+        q = -inf
+        for i = 1 to j
+            q = max(q, p[i] + r[j-i])
+        r[j] = q
+    return r[n]
+#+END_SRC
+
+- /subproblem  graph/: The subproblem graph has a directed edge from
+  the vertex for subproblem =x= to the vertex for subproblem =y= if 
+  determining an optimal solution for subproblem =x= involves directly
+  considering an optimal solution for subproblem =y=.
+
+The bottom-up method considers the vertices of the subproblem graph in
+such an order that the subproblems =y= adjacent to a given subproblem
+=x= is solved before solving subproblem =x=. No subproblem is considered
+until all of the subproblems it depends upon have been solved.
+
+The size of the subproblem graph $G=(V, E)$ can help us determine the
+running time of the dynamic programming algorithm. The running time
+is the sum of the times needed to solve each subproblem. The running
+time of dynamic programming is linear in the number of vertices and 
+edges.
+
+#+BEGIN_SRC 
+extended-bottom-up-cut-rod(p, n)  
+    let r[0..n] and s[0..n] be new arrays
+    r[0] = 0
+    for j = 1 to n
+        q = -inf
+        for i = 1 to j
+            if q < p[i] + r[j-i]
+                q = p[i] + r[j-i]
+                s[j] = i
+        r[j] = q
+    return r and s
+
+#+END_SRC
+
+
+*** Implementation
+
+#+include: "./python-implementation/cut_rod.py" src python
 
 * Advanced Topics
 
