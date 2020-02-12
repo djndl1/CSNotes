@@ -1656,6 +1656,43 @@ extended-bottom-up-cut-rod(p, n)
 
 #+include: "./python-implementation/cut_rod.py" src python
 
+** Elements of Dynamic Programming
+
+Whenever a problem exhibits optimal substructure, dynamic programming might apply.
+In dynamic programming, we build an optimal solution to the problem from optimal
+solutions to subproblems.
+
+To discover optimal substructure, there is a common pattern:
+
+1. A solution to the /problem consists of making a choice/. Making this choice
+  leaves one or more subproblems to be solved.
+
+2. For a given problem, there is a choice that /leads to an optimal solution/.
+
+3. Given this choice, determine which /subproblems ensue/ and how to best 
+  characterize the resulting space of subproblems.
+
+4. The solutions to the subproblems used within an optimal solution to the 
+  problem must themselves be optimal by using a cut-and-paste technique: cutting
+  out the nonoptimal solution and pasting in the optimal one, that is, a better
+  solution is possible.
+
+#+TODO: 
+
+*** Longest Common Subsequence
+
+Formally, given a sequence $X=\left\langle x_{1},x_{2},\dots,x_{m}\right\rangle$
+another sequence $Z=\left\langle z_{1},z_{2},\dots,z_{k}\right\rangle$ is a 
+subsequence of $X$ if there exists a strictly increasing sequence $\left\langle i_{1},i_{2},\dots,i_{k}\right\rangle$
+of $X$ s.t. for all $j=1,2,\dots,k$ we have $x_{i_{j}} = z_j$.
+
+/Longest common subsequence problem/: given two sequences $X$ and and $Y$, find
+a maximum-length common subsequence of $X$ and $Y$.
+
+**** Implementation
+
+#+include: "./python-implementation/longest_common_sequence.py" src python
+
 * Advanced Topics
 
 #+TODO: 
