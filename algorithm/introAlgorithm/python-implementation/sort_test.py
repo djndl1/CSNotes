@@ -135,6 +135,7 @@ import merge_sort
 import heap_sort
 import selection_sort
 import bubble_sort
+import BST_sort
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Sorting Algorithm Unit Tests")
@@ -150,6 +151,8 @@ if __name__ == '__main__':
                         help='enable tests for bubble sort')
     parser.add_argument('--quick_sort', action='store_true',
                         help='enable tests for quick sort')
+    parser.add_argument('--bst_sort', action='store_true',
+                        help='enable tests for BST sort')
     parser.add_argument('-a', '--all', action='store_true',
                         help='enable all tests')
 
@@ -193,6 +196,10 @@ if __name__ == '__main__':
     if args.quick_sort or args.all:
         sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
                                                               quicksort.quicksort,
+                                                              operator.le))
+    if args.bst_sort or args.all:
+        sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
+                                                              BST_sort.bst_sort,
                                                               operator.le))
 
     unittest.TextTestRunner(verbosity=2).run(sorted_suite)
