@@ -1772,6 +1772,72 @@ of $X$ s.t. for all $j=1,2,\dots,k$ we have $x_{i_{j}} = z_j$.
 /Longest common subsequence problem/: given two sequences $X$ and and $Y$, find
 a maximum-length common subsequence of $X$ and $Y$.
 
+**** Step 1: Characterizing a longest common subsequence.
+     SCHEDULED: <2020-02-13 Thu>
+
+- definition: given a sequence $X=\left\langle x_{1},x_{2},\dots,x_{m}\right\rangle$
+  the $i$-th prefix of $X$ is defined as $X_{i}=\left\langle x_{1},x_{2},\dots,x_{m}\right\rangle$.
+
+- /Optimal substructure of an LCS/:Let 
+  $X=\left\langle x_{1},x_{2},\dots,x_{m}\right\rangle$ and 
+  $Y=\left\langle y_{1},y_{2},\dots,y_{n}\right\rangle$ be sequences, and let
+  $Z=\left\langle z_{1},z_{2},\dots,z_{k}\right\rangle$ be any of LCS of $X$
+  and $Y$.
+    1. If $x_m = y_n$, then $z_k = x_m = y_n$ and $Z_{k-1}$ is an LCS of 
+       $X_{m-1}$ and $Y_{n-1}$.
+    2. If $x_m \neq y_n$ then $z_k \neq x_m$ implies that $Z$ is an LCS of 
+       $X_{m-1}$ and $Y$.
+    3. If $x_m \neq y_n$ then $z_k \neq y_n$ implies that $Z$ is an LCS of $X$
+       $Y_{n-1}$.
+
+#+TODO: proof
+
+An LCS of two sequences contains within it an LC S of prefixes of the two 
+sequences.
+
+**** Step 2. A recursive solution
+
+To find an LCS of $X$ and $Y$, we need to find the LCSs of $X$ and $Y_{n-1}$
+and $X_{m-1}$ and $Y$, doing either requires finding an LCS of $X_{m-1}$ and
+$Y_{n-1}$, which is the /overlapping-subproblems property/ in the LCS problem.
+
+Define $c[i, j]$ to be the length of an LCS of the sequences $X_{i}$ and $Y_{j}$
+
+$$
+c\left[i,j\right]=\begin{cases}
+0 & \text{if }i=0\text{ or }j=0\\
+c\left[i-1,j-1\right]+1 & \text{if }i,j>0\text{ and }x_{i}=y_{i}\\
+\max\left(c\left[i,j-1\right],c\left[i-1,j\right]\right) & \text{if }i,j>0\text{ and }x_{i}\neq y_{i}
+\end{cases}
+$$
+
+#+BEGIN_SRC 
+LCS-Length(X, Y)  
+    m = X.length
+    n = Y.length
+    # b is the solution, c is its length
+    let b[1..m, 1..n] and c[0..m, 0..n] be new tables
+    for i = 1 to m
+        c[1, 0] = 0
+    for j = 0 to n
+        c[0, j] = 0
+
+    for i = 1 to m
+        for j = 1 to n
+            if x[i] == y[j]
+                c[i, j] = c[i-1, j-1] + 1
+                b[i, j] = 1 # upper left
+            else if c[i-1, j] >= c[i, j-1]
+                c[i, j] = c[i-1, j]
+                b[i, j] = 2 # up
+            else
+                c[i, j] = c[i, j-1]
+                b[i, j] = 3 # left
+    return c, b
+#+END_SRC
+
+The running time is $\Theta(mn)$.
+
 **** Implementation
 
 #+include: "./python-implementation/longest_common_sequence.py" src python
