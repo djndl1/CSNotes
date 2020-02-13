@@ -1250,7 +1250,7 @@ The running time of =partition= on =A[p..r]= is $\Theta(n)$ where $n=r-p+1$.
 
 **** Selection Sort
 
-inplace comparison sort; $O(n^{2})$ comparison, $O(n)$ swaps (worst-case and 
+pinplace comparison sort; $O(n^{2})$ comparison, $O(n)$ swaps (worst-case and 
 average-case); generally performs worse than insertion sort; 
 
 The array is divided into a sorted subarray and an unsorted subarray. The algorithm
@@ -1480,9 +1480,6 @@ algorithms are available.
 
 ****** 
 
-* Hashing
-
-#+TODO: 
 
 * Numerics
 
@@ -1490,7 +1487,93 @@ algorithms are available.
 
 * Graphs
 
-#+TODO: 
+** Representation
+
+The adjacency-list representation provides a compact way to represent /sparse/
+graphs. The adjacency-matrix representation is preferred when its dense.
+
+/Adjacency-list representation/: an array $Adj$ of $|V|$ lists, one for each 
+vertex in $V$. For each $u\in V$, the adjacency list $Adj[u]$ contains all the
+vertices $v$ s.t. there is an edge $(u, v) in E$. The amount of memory required
+is $\Theta(V + E)$. The weight of an edge can also be stored in the list. The
+adjacency-list representation is robust in that it can be modified to support
+many other graph variants. A potential disavantage is that it provides no 
+quicker way to determine whether a given edge $(u, v)$ is present in the graph
+than to search for $v$ in the adjacency list $Adj[u]$.
+
+$|E|$: for a directed graph, the sum of the lengths of all the adjacency lists,
+for an undirected graph, half the sum.
+
+/Adjacency-matrix representation/: A matrix of a $|V| \times |V|$ matrix 
+$A = (a_{ij})$ s.t.
+
+$$
+a_{ij}=\begin{cases}
+1 & \text{if }\left(i,j\right)\in E\\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+For an undirected graph, $A = A^{T}$.
+
+Adjacency matrix representation is simpler, preferred when graphs are reasonably
+small.
+
+** Elementary Graph Algorithms
+
+*** Breadth-first search
+
+Given a graph $G=(V, E)$ and a distinguished source vertex $s$, breadth-first
+search systematically explores the edges of $G$ to discover every vertex that 
+is reachable from $s$. It expands the frontier between discovered and undiscovered
+ vertices uniformly across the breadth of the frontier. The algorithm all 
+vertices at distance $k$ from $s$ before discovering any vertices at distance
+$k+1$.
+
+To keep track of progress, each vertex is colored with /white/ (undiscovered),
+ /gray/ or /black/. All vertices to black vertices have been discovered; gray
+vertices may have some adjacent white vertices: they represent the frontier
+between discovered and undiscovered vertices.
+
+Breadth-first search constructs a breadt
+h-first tree, initially containing only
+its root (the source vertex $s$). Whenever the search discovers a white vertex
+$v$ when scanning an already discovered vertex $u$ (/predecessor/ or /parent/).
+A vertex is discovered at most once, thus it has at most one parent.
+
+Assuming we represent the input graph using adjacency lists:
+
+#+BEGIN_SRC 
+# u.color: color of each vertex
+# u.pre: predecessor
+# u.dist: distance from the source s to vertex u
+# Q: a FIFO
+BFS(G, s)
+    for each vertex u in G.V - {s}
+        u.color = WHITE
+        u.dist = inf
+        u.pre = NIL
+    
+    s.color = GRAY
+    s.d = 0
+    Let Q be an empty queue
+    enqueue(Q, s)
+    while Q is not empty # invariant: the queue consists of the set of gray vertices
+        u = dequeue(Q)
+        for each v in G.Adj[u]
+            if v.color == WHITE
+                v.color = GRAY
+                v.dist = u.d + 1
+                v.pre = u
+                enqueue(Q, v)
+        u.color = BLACK
+#+END_SRC
+
+The total time devoted to queue operations is $O(V)$. Each adjacency list is 
+scanned at most once. Since the sum of the lengths of all the adjacency lists
+is $\Theta(E)$, the total running time of BFS is $O(V+E)$. Breadth-first search
+runs in time linear in the size of the adjacency-list representation of $G$.
+
 
 * Shortest Paths
 
