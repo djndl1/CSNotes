@@ -30,14 +30,29 @@ algorithms.
 
 ** Iterative Complete Search
 
-Problem: UVa 725: =fghij= is in the range [01234, 98765/N].
+- Problem UVa 725: =fghij= is in the range [01234, 98765/N].
 
-#+include: ./code/chap.3/uva_725.cc src C++
+#+include: "./code/chap.3/uva_725.cc" src C++
 
-Problem: UVa 441: 
+- Problem UVa 441
 
 Competitive programmers must be comfortable writing code with more than two
 nested loops.
+
+#+include: "./code/chap.3/uva_441.cc" src C++
+
+- Problem UVa 11565: Suppose $C = 10000$ and $x, y$ are the least integers 
+  possible, then $-100 \geq x,y,z \geq 100$. Considering $xyz = B$, $x$ can be
+  pruned to $[-22, 22]$ ???
+
+- Problem Uva 11742: 
+
+#+include: "./code/chap.3/uva11742.cc" src C++
+
+- Problem UVa 12455: enumerate all subsets of the given sets, can be represented
+by bits.
+
+#+include: "./code/chap.3/uva12455.cc" src C++
 
 * Divide-and-Conquer
 
