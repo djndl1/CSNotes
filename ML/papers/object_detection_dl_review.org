@@ -1,0 +1,154 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+
+[1] Z. Q. Zhao, P. Zheng, S. T. Xu, and X. Wu, “Object Detection with Deep Learning: A Review,” IEEE Trans. Neural Networks Learn. Syst., vol. 30, no. 11, pp. 3212–3232, 2019.
+
+* Intro
+
+One of the fundamental computer vision problems, object detection provides valuable information for semantic
+understanding of images and videos.
+
++ *object detection*: to determine where objects are located in a given image (/object localization/) and which category each object belongs to (/object classification/).
+
+#+BEGIN_EXAMPLE
+face detection
+pedestrian detection
+skeleton detection
+#+END_EXAMPLE
+
+
+#+begin_src 
+      Local contrast
+       segmentation
+                    +------------------------+
+      +------------>+Salient object detection|
+      |             +------------------------+
+      |
+      |
++-----+-----+
+|  Object   |
+| Detection |                                       +--------------------+
++-----+-----+                                 +---> |Face detection      |
+      |                                       |     +--------------------+
+      |                                       |
+      |                                       |
+      |             +-------------------------+             .
+      +------------>+Generic object detection|------->      .
+                    +-------------------------+             .
+   bounding box                               |
+    regression                                |
+                                              |   +-----------------------+
+                                              +-->+  Pedestrian detection |
+                                                  +-----------------------+
+#+end_src
+
+
+Traditionally, this is done in three stages:
+
+1. *informative region selection*
+        + different objects may appear in any positions of the image and have different aspect ratios or sizes
+        + multi-scale sliding window to find out all possible positions of the objects (redundant, inefficient and inaccurate), or 
+        + a fixed number of sliding window templates
+
+2. *feature extraction*: extract visual features which can provide a semantic and robust representation.
+        + the diversity of appearances, illumination conditions and backgrounds make it hard to design a robust feature descriptor to perfectly describe all kinds of objects.
+        + SIFT, HOG, Haar-like features
+
+3. *classification*: a classifier is needed to distinguish a target object from all the other categories and to make the representations more hierarchical, semantic and informative for recognition.
+
+Enter Deep Nerual Network. Based on basic CNN architectures, *generic object detection* is achieved with
+/bounding box regression/, while *salient object detection* is accomplished with /local constrast segmentation/
+and /pixel-level segmentation/.
+
+* Deep Learning 
+
+The recovery of deep learning in recent years can be attributed to 
+
+1. the emergence of large scale annotated training data such as ImageNet.
+
+2. high performance parallel computing systems
+
+3. significant advanced in the design of network structures and training strategies.
+   + AutoEncoder, Restricted Boltzmann Machine
+   + dropout, data augmentation
+   + batch normalization
+   + AlexNet, Overfeat, GoogleNet, VGG, ResNet
+
+
+** CNN
+
+- *feature map*: each layer of CNN
+
+- *recptive field*: a small portion of adjacent neurons from the input layer
+
+With an interleave between convolution and pooling, an initial feature hierarchy is constructed, 
+which can be fine-tuned in a supervised manner by adding several fully connected layers to adpat
+to different visual tasks.
+
+The advantages of CNN
+
++ hierarchical feature representation;
+
++ deeper architecture with an exponentially increased expressive capability;
+
++ jointly optimize several related tasks together
+
++ some classical computer vision challenges can be recast as high-dimensional data transform problems and solved form a different viewpoint
+
+* Generic Object Detection
+
+Generic object detection aims at locating and classifying existing objects in any one image 
+and labeling them with rectangular bounding boxes to show the confidences of existence.
+
+#+begin_src 
+                                                                                       +---->  R-FCN
+                                                                                       |
+                                                                                       |
+                    Region proposal                                             Faster |
+               +-->     based      +--> R-CNN +-----> SPP-net+----->FRCN+------>       +---->   FPN (feature pyramid)
+               |                                                                R-CNN  |
+               |                                                                       |
+               |                                                                       |                  instance
+               |                                                                       +----> Mask R-CNN
+               |                                                                                          segmentation
+               |
+Generic Object |
+   Detection   |                    Unified loss
+               |                   +--------------> MultiBox
+               |                   |                                                                 +----> DSSD
+               |                   |                                                                 |
+               |                   |                                                                 |
+               |    Regression/    |Direction                     Joint Grid              RPN        |
+               +--> Classification +--------------> AttentionNet +---------------> YOLO +------> SSD +----> YOLOv2
+                        based      |iteration                     Regression                         |
+                                   |                                                                 |
+                                   |                                                                 |
+                                   |Grid regression                                                  |
+                                   +--------------> G-CNN                                            +----> DSOD
+#+end_src
+
+** Region Proposal Based Framework
+
+A two-step process: a coarse scan of the whole scenario firstly and then focuses on regions of interest.
+
+*** R-CNN
+
+1. *selective search* for region proposal generation
+
+2. CNN based feature extraction: each region proposal is warped or cropped into a fixed resolution and is utilized to extract a 4096-dimension feature as the final representation.
+
+3. classification and location: pretrained category specific linear SVMs.
+
+#+TODO
+
+** Regression/Classification Based
+
+One-step frameworks based on global regression/classification, mapping straightly from image pixels to bounding box coordinates and class probabilities.
+
+*** Pioneer work
+
+#+TODO
+
+*** YOLO
+
+YOLO divides the input image into an $S \times S$ grid and each grid cell is responsible for predicting the object centered in that grid cell. 
+Each grid cell predicts $B$ bounding boxes and their corresponding confidence scores.

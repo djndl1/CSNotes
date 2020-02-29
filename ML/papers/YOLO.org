@@ -1,0 +1,93 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+
+[1] J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, “You only look once: Unified, real-time object detection,” in Proceedings of the IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 2016.
+
+https://towardsdatascience.com/yolov1-you-only-look-once-object-detection-e1f3ffec8a89
+
+A single regression problem from image pixels to bounding box coordinates and class probabilities. Fast, reasoning globally about the image when making predictions, generalizable representation of objects.
+
+* Unified Detection
+
+The input image is divided into an $S \times S$ grid. If the center of an object falls into a grid cell, that grid cell is responsible for detecting that object. 
+Each grid cell predicts $B$ bounding boxes and confidence scores for the boxes, formally defined as
+
+$$
+Pr(Object) * IOU^{truth}_{pred}
+$$
+
+that is, if no object exists in that cell, the confidence scores should be zero, otherwise, the it is equal to the intersection over union between the predicted box and the ground truth.
+
+Each bounding box consists of 5 predictions $(x, y, w, h, confidence)$, where $(x,y)$ represent
+ the center of the box and $
+
+Each grid cell also predicts a set of $C$ conditional class prbabilities $Pr(Class_i|Object)$, conditioned on the grid cell containing an object.
+
+At test time, all conditional class probabilities and the individual box confidence predications are multipled:
+
+$$
+Pr(Class_i | Object) * Pr(Object) * IOU_{pred}^{truth} = Pr(Class_i) * IOU_{pred}^{truth}
+$$
+
+which gives class specific confidence scores for each box. These scores encode both the probability of that class appearing in the box and how well the predicted box fits the object.
+
+* Network Design
+
+| The Architecture                                                                                                                            |
+|---------------------------------------------------------------------------------------------------------------------------------------------|
+| Conv Layer $7 \times 7 \times 64-s-2$; maxpool $2\times 2-s-2$                                                                              |
+| Conv Layer $3 \times 3 \times 192-s-2$; maxpool $2\times 2-s-2$                                                                             |
+| Conv Layers $1\times 1 \times 128$, $3\times 3 \times 256$, $1\times 1 \times 256$, $3\times 3 \times 512$; maxpool $2\times 2-s-2$         |
+| Conv layers $1\times 1\times 256$, $3\times 3 \times 512$ times 4, $1\times 1 \times 512$, $3\times 3 \times 1024$; maxpool $2\times 2-s-2$ |
+| conv layers $1 \times 1 \times 512$, $3\times 3 \times 1024$ times 2, $3\times 3 \times 1024$, $3\times 3 \times 1024 -s-2$                 |
+| conv layers $3\times 3 \times 1024$ times 2                                                                                                 |
+| flatten                                                                                                                                     |
+| FC 1024-512                                                                                                                                 |
+| FC 512-4096                                                                                                                                 |
+| FC 4096-$7 \times 7 \times 30$                                                                                                              |
+
+* Training
+
+Convolutional layers are pretrained on the ImageNet 1000-class dataset, followed by a average pooling layer and a FC layer. The input size is increased to $448 \times 448$.
+
+The bounding box is normalized by the image width and height so that they fall between $0$ and $1$. 
+$x$ and $y$ are set to be offsets of a particular grid cell location so they are bounded between $0$ and $1$.
+
+The final layer uses a linear activation function and all other alyers use the leaky rectified  linear activation:
+
+$$
+\phi\left(x\right)=\begin{cases}
+x & \text{if }x>0\\
+0.1x & \text{otherwise}
+\end{cases}
+$$
+
+Since $B$ bounding boxes are generated for one grid
+and only one bounding box predictor should be reponsible for each object,
+the bounding box predictor with the highest current IOU with the ground truth is selected.
+
+During training, the following multi-part loss function is optimized:
+
+\begin{aligned}
+\lambda_{\text{coord}} &	\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}1_{ij}^{\text{obj}}\left[\left(x_{i}-\hat{x}_{i}\right)^{2}+\left(y_{i}+\hat{y}_{i}\right)^{2}\right] \\
++ &	\lambda_{\text{coord}}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}1_{ij}^{\text{obj}}\left[\left(\sqrt{w_{i}}-\sqrt{\hat{w}_{i}}\right)^{2}+\left(\sqrt{h_{i}}-\sqrt{\hat{h}_{i}}\right)^{2}\right] \\
++	& \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}1_{ij}^{\text{obj}}\left(C_{i}-\hat{C}_{i}\right)^{2} \\
++	& \lambda_{\text{noobj}}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}1_{ij}^{\text{noobj}}\left(C_{i}-\hat{C}_{i}\right)^{2} \\
++	& \sum_{i=0}^{S^{2}}1_{i}^{\text{obj}}\sum_{c\in\text{classes}}\left(p_{i}\left(c\right)-\hat{p}_{i}\left(c\right)\right)^{2} \\
+\end{aligned}
+
+where $C$ is confidence score and $p(c)$ is the class probability, $1_{i}^{\text{obj}}$ denotes if object appears in cell $i$ 
+and $1_{ij}^{\text{obj}}$ denotes that the $j$th bounding box predictor in cell $i$ is responsible 
+for that prediction (the one with the highest IOU). The square root in the second line is used to
+reflect that small deviations in large boxes matter less than in small boxes.
+
+Some large objects can be predicted by multiple cells.
+Non-maximal suppression can be used to fix these multiple detections.
+
+YOLO imposes strong spatial constraints on bounding box predictions 
+since each grid cell only predicts two boxes can only have one class. 
+This limits the number of nearby objects that the model can predict. 
+The model struggles with small objects that appear in groups, such as flocks of birds.
+
+* Experiment
+
+#+TODO
