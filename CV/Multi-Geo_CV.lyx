@@ -1,0 +1,2873 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass book
+\begin_preamble
+% Added by lyx2lyx
+\renewcommand{\textendash}{--}
+\renewcommand{\textemdash}{---}
+\end_preamble
+\use_default_options true
+\begin_modules
+algorithm2e
+tabs-within-sections
+figs-within-sections
+eqs-within-sections
+theorems-ams-chap-bytype
+theorems-ams-extended-chap-bytype
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "tgtermes" "default"
+\font_sans "tgheros" "default"
+\font_typewriter "tgcursor" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+Intro
+\end_layout
+
+\begin_layout Standard
+An introduction to the principal ideas.
+\end_layout
+
+\begin_layout Section
+Projective geometry
+\end_layout
+
+\begin_layout Standard
+Straightness is preserved, the most general requirement on the mapping.
+\end_layout
+
+\begin_layout Standard
+In Euclidean space, parallel lines do not meet.
+ By adding an infinity point to a Euclidean space, projective space is introduce
+d, an extension of Euclidean space in which two lines always meet in a point.
+\end_layout
+
+\begin_layout Standard
+Points are represented by 
+\emph on
+equivalence classes
+\emph default
+ of coordinate triples, where two triples are equivalent when they differ
+ by a common multiple, called 
+\emph on
+homogeneous coordinates.
+
+\emph default
+ Given a point 
+\begin_inset Formula $\left(x,y,0\right)$
+\end_inset
+
+, divide by the last coordinate, 
+\begin_inset Formula $\left(x/0,y/0\right)$
+\end_inset
+
+ is the point at infinity.
+ The Euclidean space 
+\begin_inset Formula $\mathbb{R}^{n}$
+\end_inset
+
+ can be extended to a project space 
+\begin_inset Formula $\mathbb{P}^{n}$
+\end_inset
+
+ by representing poitns at homogenous vectors.
+\end_layout
+
+\begin_layout Subsection
+Homogeneity
+\end_layout
+
+\begin_layout Standard
+In classiclal Euclidean geometry all points are the same, no distringuished
+ point.
+ From the point of view of projective geometry, points at infinity are not
+ any different from other points.
+ By analogy of 
+\begin_inset CommandInset href
+LatexCommand href
+name "Euclidean transformation"
+target "https://en.wikipedia.org/wiki/Rigid_transformation"
+
+\end_inset
+
+, a projective transformation of projective space 
+\begin_inset Formula $\mathbb{P}^{n}$
+\end_inset
+
+ is defined by a linear transformation of homogeneous coordinates
+\begin_inset Formula 
+\[
+X^{'}=H_{\left(n+1\right)\times\left(n+1\right)}X.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In CV problems, projective space is used as convenient way of repressenting
+ the real 3D world.
+ In reality, the real world and images of it do not contain points at infinity.
+\end_layout
+
+\begin_layout Subsection
+Affine geometry
+\end_layout
+
+\begin_layout Standard
+Parallelism is not a concept of projective geometry, since all lines in
+ projective space meet at some point.
+ Parallel lines are just lines that intersect at points at infinity.
+\end_layout
+
+\begin_layout Standard
+The geometry of the projective plane and a distinguished line is known as
+ 
+\emph on
+affine geometry
+\emph default
+ and any projective transformation that maps the distringuished line in
+ one space to the distinguished line of the other space is known as an 
+\emph on
+affine transformation
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
+Euclidean geometry
+\end_layout
+
+\begin_layout Standard
+Singling out some special feature of the line or plane at infinity affine
+ geometry becomes Euclidean geometry.
+\end_layout
+
+\begin_layout Section
+Camera Projections
+\end_layout
+
+\begin_layout Standard
+The usual way of modelling the drop from 3D world to a 2D image is by 
+\emph on
+central projection
+\emph default
+ in which a ray from a point in space is drawn from a 3D world point through
+ a fixed point in space, called the 
+\emph on
+center of project
+\emph default
+.
+ All rays intersect a specific plane in space chosen as the 
+\emph on
+image plane
+\emph default
+.
+ Central projection is simply a map from 
+\begin_inset Formula $\mathbb{P}^{3}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+All points in a ray passing through the center of projection project to
+ the same point in an image.
+ Thus, the set of all image points is the same as the set of rays through
+ the camera center.
+ The set of rays themselves may be thought of as a representation of the
+ image space 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+.
+ All that is important is the camera center.
+\end_layout
+
+\begin_layout Part
+Projective Geometry, Transformations and Estimation
+\end_layout
+
+\begin_layout Standard
+The ideas of notation of projective geometry are central to an analysis
+ of multiple view geometry.
+\end_layout
+
+\begin_layout Chapter
+Projective Geometry and Transformations of 2D
+\end_layout
+
+\begin_layout Standard
+The main geometric ideas and notation that are required to understand the
+ main material.
+\end_layout
+
+\begin_layout Standard
+A significant advantage of the algebraic approach to geometry is that results
+ derived in this way may more easily be used to derive algorithms and practical
+ computational methods.
+\end_layout
+
+\begin_layout Section
+Homogeneous representation of points and lines on a plane
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "Equivalence class"
+target "https://en.wikipedia.org/wiki/Equivalence_class"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Lines
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $ax+by+c=0$
+\end_inset
+
+ and 
+\begin_inset Formula $kax+kby+kc=0$
+\end_inset
+
+ are the same line, any particular 
+\begin_inset Formula $(a,b,c)^{T}$
+\end_inset
+
+ , except 
+\begin_inset Formula $\left(0,0,0\right)^{T}$
+\end_inset
+
+, which is not a line, is a representative of the equivalence class of lines.
+ The set of equivalence classes of vectors in 
+\begin_inset Formula $\mathbb{R}^{3}-\left(0,0,0\right)^{T}$
+\end_inset
+
+ forms the projective space 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+.
+ The study of the geometry of 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+ is known as 
+\emph on
+projective geometry
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
+Points
+\end_layout
+
+\begin_layout Standard
+It is easy to see that for a point 
+\begin_inset Formula $(x,y)$
+\end_inset
+
+ and a line 
+\begin_inset Formula $\boldsymbol{l}$
+\end_inset
+
+, 
+\begin_inset Formula $\left(kx,ky,k\right)\boldsymbol{l}=0$
+\end_inset
+
+ iff 
+\begin_inset Formula $\left(x,y,1\right)\boldsymbol{l}=0$
+\end_inset
+
+, thus points as homogeneous vectors are also elements of 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Degrees of freedeom
+\end_layout
+
+\begin_layout Standard
+Lines and points need two parameters to specify.
+\end_layout
+
+\begin_layout Subsection
+Interseciton of lines
+\end_layout
+
+\begin_layout Standard
+The interseciton of two lines 
+\begin_inset Formula $\boldsymbol{l}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{l}^{\prime}$
+\end_inset
+
+ is the point 
+\begin_inset Formula $\boldsymbol{x}=\boldsymbol{l}\times\boldsymbol{l}^{\prime}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Line joining points
+\end_layout
+
+\begin_layout Standard
+The line through two points 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{x}^{\prime}$
+\end_inset
+
+ is 
+\begin_inset Formula $\boldsymbol{l}=\boldsymbol{x}\times\boldsymbol{x}^{\prime}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Ideal points and the line at infinity
+\end_layout
+
+\begin_layout Standard
+The points with last coordinate 
+\begin_inset Formula $x_{3}=0$
+\end_inset
+
+ are known as 
+\emph on
+ideal points
+\emph default
+, or 
+\emph on
+points at infinity, written as 
+\begin_inset Formula 
+\[
+\left(x_{1},x_{2},0\right)^{T},
+\]
+
+\end_inset
+
+which lies on the line at infinity 
+\begin_inset Formula $l_{\infty}=\left(0,0,1\right)^{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Given a line 
+\begin_inset Formula $l=\left(a,b,c\right)$
+\end_inset
+
+ and a parallel line 
+\begin_inset Formula $l^{\prime}=\left(a,b,c^{\prime}\right)$
+\end_inset
+
+, both intersects 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+ at 
+\begin_inset Formula $\left(b,-a,0\right)$
+\end_inset
+
+.
+ As the line's direction varies, the ideal point 
+\begin_inset Formula $\left(b,-a,0\right)$
+\end_inset
+
+ varies over 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+.
+ In 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+, two distinct lines always meet in a single point and two distincts lie
+ on a single line.
+\end_layout
+
+\begin_layout Standard
+Points and lines of 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+ are represented by rays and planes, through the origin in 
+\begin_inset Formula $\mathbb{R}^{3}$
+\end_inset
+
+.
+ Lines lying in the 
+\begin_inset Formula $x_{1}x_{2}$
+\end_inset
+
+-plane represent ideal points, and the 
+\begin_inset Formula $x_{1}x_{2}$
+\end_inset
+
+-plane represents 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proposition
+Duality principle
+\end_layout
+
+\begin_layout Proposition
+To any theorem of 
+\begin_inset Formula $2$
+\end_inset
+
+-dimensional projective geometry, there corresponds a dual theorem, which
+ may be derived by interchanging roles of points and lines in the original
+ theorem.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The proof of hte dual theorem will be the dual of the proof of the original
+ theorem.
+ Once the original theorem has been proved, it is not necessary to prove
+ the dual of a given theorem.
+\end_layout
+
+\begin_layout Subsection
+Conics and dual conics
+\end_layout
+
+\begin_layout Standard
+In 2D projective geometry, all non-degenerate conics are equivalent under
+ projective transformations.
+ The homogeneous form of a conic can be obtained by replacing 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ with 
+\begin_inset Formula $x_{1}/x_{3}$
+\end_inset
+
+ and 
+\begin_inset Formula $x_{2}/x_{3}$
+\end_inset
+
+, resulting in 
+\begin_inset Formula 
+\[
+\boldsymbol{x}^{T}C\boldsymbol{x}=0
+\]
+
+\end_inset
+
+where the conic coefficient matrix 
+\begin_inset Formula $C$
+\end_inset
+
+ is given by 
+\begin_inset Formula 
+\[
+C=\begin{bmatrix}a & b/2 & d/2\\
+b/2 & c & e/2\\
+d/2 & e/2 & f
+\end{bmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The conic 
+\begin_inset Formula $C$
+\end_inset
+
+ is more properly termed a 
+\emph on
+point 
+\emph default
+conic, a sit defines an equation on points.
+\end_layout
+
+\begin_layout Standard
+The conic has five degrees of freedom 
+\begin_inset Formula $\left\{ a\colon b\colon c\colon d\colon e\colon f\right\} $
+\end_inset
+
+ or equivalently the six elements of a symmetric matrix less one for scale.
+\end_layout
+
+\begin_layout Proposition
+A conic is determined uniquely (up to scale) by five points in general position.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The method of fitting a geometric entity or relation by determining a null
+ space is frequently used.
+\end_layout
+
+\begin_layout Proposition
+The line 
+\begin_inset Formula $l$
+\end_inset
+
+ tangent to a conic 
+\begin_inset Formula $C$
+\end_inset
+
+ at a point 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+ is given by 
+\begin_inset Formula $\boldsymbol{l}=C\boldsymbol{x}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+The line passes through 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+, that is, 
+\begin_inset Formula 
+\[
+l^{T}x=x^{T}Cx=0.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proof
+If 
+\begin_inset Formula $l$
+\end_inset
+
+ has one point contact with the conic, then we are done with the proof.
+ Otherwise it meets the conic at another point 
+\begin_inset Formula $y$
+\end_inset
+
+.
+ Then 
+\begin_inset Formula $y^{T}Cy=0$
+\end_inset
+
+ and 
+\begin_inset Formula $x^{T}Cy=l^{T}y=0.$
+\end_inset
+
+ Then 
+\begin_inset Formula 
+\[
+\left(x+\alpha y\right)^{T}C\left(x+\alpha y\right)=0\quad\text{for all }\alpha.
+\]
+
+\end_inset
+
+which means the whole line 
+\begin_inset Formula $l$
+\end_inset
+
+ lies on the conic 
+\begin_inset Formula $C$
+\end_inset
+
+, which is degenerate.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Definition
+If the matrix 
+\begin_inset Formula $C$
+\end_inset
+
+ is not of full rank, then the conic is termed degenerate.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Degenerate point conics include two lines (rank 
+\begin_inset Formula $2$
+\end_inset
+
+), and a repeated line (rank 
+\begin_inset Formula $1$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Given the duality result, it is not surprising that there is also a conic
+ which defines an equaiton on lines.
+\end_layout
+
+\begin_layout Definition
+Dual conics, 
+\begin_inset Formula $C^{*}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Definition
+A line 
+\begin_inset Formula $l$
+\end_inset
+
+ tangent to the conic 
+\begin_inset Formula $C$
+\end_inset
+
+ satisfies 
+\begin_inset Formula $l^{T}C^{*}l=0$
+\end_inset
+
+.
+ 
+\begin_inset Formula $C^{*}$
+\end_inset
+
+ is the adjoint matrix of 
+\begin_inset Formula $C$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Definition
+Dual conics are also called conic envelopes because of tangent lines.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Projective transformations
+\end_layout
+
+\begin_layout Standard
+2D proejctive geometry is the study of properties of the projective palen
+ 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+ that are invariant under a group of transformations known as 
+\emph on
+projectivities
+\emph default
+.
+\end_layout
+
+\begin_layout Definition
+projectivity/collineation/projective transformation/homography
+\end_layout
+
+\begin_layout Definition
+A projectivity is an invertible (nonsingular) mapping 
+\begin_inset Formula $h$
+\end_inset
+
+ from 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+ to itself s.t.
+ three points 
+\begin_inset Formula $x_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $x_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $x_{3}$
+\end_inset
+
+ lie on the same line iff 
+\begin_inset Formula $h\left(x_{1}\right)$
+\end_inset
+
+, 
+\begin_inset Formula $h\left(x_{2}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $h\left(x_{3}\right)$
+\end_inset
+
+ do.
+\end_layout
+
+\begin_layout Standard
+Projectivities form a group since the inverse of a projectivity is also
+ a projectivity, and so is the composition of two projectivities.
+\end_layout
+
+\begin_layout Theorem
+\begin_inset CommandInset label
+LatexCommand label
+name "thm:non-singular matrix for projectivity"
+
+\end_inset
+
+A mapping 
+\begin_inset Formula $h\colon\mathbb{P}^{2}\to\mathbb{P}^{2}$
+\end_inset
+
+ is a projectivity iff there exists a non-singular 
+\begin_inset Formula $3\times3$
+\end_inset
+
+ matrix 
+\begin_inset Formula $H$
+\end_inset
+
+ s.t.
+ for any point in 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+represented by a vector 
+\begin_inset Formula $\vec{x}$
+\end_inset
+
+ it is true that 
+\begin_inset Formula $h\left(\vec{x}\right)=H\vec{x}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Any invertible linear transformation of homogeneous coordinates is a projectivit
+y.
+\end_layout
+
+\begin_layout Proof
+Let 
+\begin_inset Formula $x_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $x_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $x_{3}$
+\end_inset
+
+ lie on a line 
+\begin_inset Formula $l$
+\end_inset
+
+.
+ Thus 
+\begin_inset Formula $l^{T}x_{i}=0$
+\end_inset
+
+ for 
+\begin_inset Formula $i=1,2,3$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula $H$
+\end_inset
+
+ be a non-singular 
+\begin_inset Formula $3\times3$
+\end_inset
+
+ matrix.
+ 
+\begin_inset Formula $l^{T}H^{-1}Hx_{i}=0$
+\end_inset
+
+.
+ Thus the points 
+\begin_inset Formula $Hx_{i}$
+\end_inset
+
+ all lie on the line 
+\begin_inset Formula $H^{-1}l$
+\end_inset
+
+, and so collinearity is preserved by the transformation.
+\end_layout
+
+\begin_layout Proof
+The converse is omitted since it is not provided in the book.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+An alternative defition can be provided given the above theorem.
+\end_layout
+
+\begin_layout Definition
+Projective transformation
+\end_layout
+
+\begin_layout Definition
+A planar projective transformation is a linear transformation on homogeneous
+ 
+\begin_inset Formula $3$
+\end_inset
+
+-vectors represented by a non-singular 
+\begin_inset Formula $3\times3$
+\end_inset
+
+ matrix
+\begin_inset Formula 
+\[
+\begin{pmatrix}x_{1}^{\prime}\\
+x_{2}^{\prime}\\
+x_{3}^{\prime}
+\end{pmatrix}=\begin{bmatrix}h_{11} & h_{12} & h_{13}\\
+h_{21} & h_{22} & h_{23}\\
+h_{31} & h_{32} & h_{33}
+\end{bmatrix}\begin{pmatrix}x_{1}\\
+x_{2}\\
+x_{3}
+\end{pmatrix}
+\]
+
+\end_inset
+
+or more briefly 
+\begin_inset Formula $x^{\prime}=Hx$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Note that the matrix 
+\begin_inset Formula $H$
+\end_inset
+
+ may be changed by multiplication by an arbitrary non-zero scale without
+ altering the projective transformation, thus called a 
+\emph on
+homogenous 
+\emph default
+matrix.
+ Only the ratio of the matrix elements is significant, giving eight degrees
+ of freedom.
+\end_layout
+
+\begin_layout Subsection
+Transformations of lines and conics
+\end_layout
+
+\begin_layout Subsubsection
+Transformation of lines
+\end_layout
+
+\begin_layout Standard
+From the proof 
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "thm:non-singular matrix for projectivity"
+
+\end_inset
+
+, a line transforms as 
+\begin_inset Formula 
+\[
+l^{\prime}=\left(H^{-1}\right)^{T}l.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Transformation of conics
+\end_layout
+
+\begin_layout Standard
+Under a point transformation 
+\begin_inset Formula $x^{\prime}=Hx$
+\end_inset
+
+, a conic 
+\begin_inset Formula $C$
+\end_inset
+
+ transforms to 
+\begin_inset Formula 
+\[
+C^{\prime}=\left(H^{-1}\right)^{T}CH^{-1}.
+\]
+
+\end_inset
+
+a dual conic 
+\begin_inset Formula $C^{*}$
+\end_inset
+
+ transforms to 
+\begin_inset Formula 
+\[
+C^{*\prime}=HC^{*}H^{T}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+A hierarchy of transformations
+\end_layout
+
+\begin_layout Standard
+Projective transformations form a group, called the 
+\emph on
+projective linear group.
+ The following transformations goes from special to general.
+\end_layout
+
+\begin_layout Definition
+invariant
+\end_layout
+
+\begin_layout Definition
+A invariant of a geometric configuration is a function of the configuration
+ whose value is unchanged by a particular transformation.
+\end_layout
+
+\begin_layout Subsection
+Class Ⅰ: Isometries
+\end_layout
+
+\begin_layout Definition
+Isometries are transformations of the plane 
+\begin_inset Formula $\mathbb{R}^{2}$
+\end_inset
+
+ that preserve Euclidean distance (so called iso-metry), represented as
+ 
+\begin_inset Formula 
+\[
+\begin{pmatrix}x^{\prime}\\
+y^{\prime}\\
+1
+\end{pmatrix}=\begin{bmatrix}\epsilon\cos\theta & -\sin\theta & t_{x}\\
+\epsilon\sin\theta & \cos\theta & t_{y}\\
+0 & 0 & 1
+\end{bmatrix}\begin{pmatrix}x\\
+y\\
+1
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+where 
+\begin_inset Formula $\epsilon=\pm1$
+\end_inset
+
+.
+ 
+\begin_inset Formula $\epsilon=-1$
+\end_inset
+
+ reverses orientation.
+\end_layout
+
+\begin_layout Example*
+Euclidean transformations model the motion of a rigid object, the most important
+ isometries in practice, written as
+\begin_inset Formula 
+\[
+\mathbf{x}^{\prime}=H_{E}\mathbf{x}=\begin{bmatrix}R & \mathbf{t}\\
+\mathbf{0} & 1
+\end{bmatrix}\mathbf{x}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $R$
+\end_inset
+
+ is a 
+\begin_inset Formula $2\times2$
+\end_inset
+
+ rotation matrix (an orthogonal matrix s.t.
+ 
+\begin_inset Formula $R^{T}R=RR^{T}=I$
+\end_inset
+
+), 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ a translation 
+\begin_inset Formula $2$
+\end_inset
+
+-vector.
+ A Euclidenan transformation is also known as a 
+\emph on
+displacement
+\emph default
+.
+\end_layout
+
+\begin_layout Example*
+A planar Euclidean transformation has three degrees of freedom.
+ The transformation can be computed from two point correspondences.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Length, angle and area are invariants under isometries.
+\end_layout
+
+\begin_layout Subsection
+Class Ⅱ: Similarity transformations
+\end_layout
+
+\begin_layout Definition
+A similarity transformation (similarity) is an isometry composed with an
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "isotropic"
+target "https://en.wikipedia.org/wiki/Isotropy"
+
+\end_inset
+
+ scaling
+\begin_inset Formula 
+\[
+\begin{pmatrix}x^{\prime}\\
+y^{\prime}\\
+1
+\end{pmatrix}=\begin{bmatrix}s\cos\theta & -s\sin\theta & t_{x}\\
+s\sin\theta & s\cos\theta & t_{y}\\
+0 & 0 & 1
+\end{bmatrix}\begin{pmatrix}x\\
+y\\
+1
+\end{pmatrix}
+\]
+
+\end_inset
+
+or 
+\begin_inset Formula 
+\[
+\mathbf{x}^{\prime}=H_{S}\mathbf{x}=\begin{bmatrix}sR & \mathbf{t}\\
+\mathbf{0} & 1
+\end{bmatrix}\mathbf{x}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where the scalar 
+\begin_inset Formula $s$
+\end_inset
+
+ is the isotropic scaling.
+ A similary transformation is also known as an equi-form
+\emph on
+ transformation
+\emph default
+ because it preserves 
+\begin_inset Quotes eld
+\end_inset
+
+shape
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A planar similarity has four degrees of freedom, making it determinable
+ from two point correspondences.
+\end_layout
+
+\begin_layout Standard
+Parallelism, ratio of line lengths, ratio of areas, angles.
+\end_layout
+
+\begin_layout Subsection
+Class Ⅲ: Affine transformations
+\end_layout
+
+\begin_layout Definition
+An affine transformation (affinity) is a general non-singular linear transformat
+ion of inhomogeneous coordinates followed by a translation.
+\begin_inset Formula 
+\[
+\begin{pmatrix}x^{\prime}\\
+y^{\prime}\\
+1
+\end{pmatrix}=\begin{bmatrix}a_{11} & a_{12} & t_{x}\\
+a_{21} & a_{22} & t_{y}\\
+0 & 0 & 1
+\end{bmatrix}\begin{pmatrix}x\\
+y\\
+1
+\end{pmatrix}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+\mathbf{x}^{\prime}=H_{A}\mathbf{x}=\begin{bmatrix}A & \mathbf{t}\\
+\mathbf{0} & 1
+\end{bmatrix}\mathbf{x}
+\]
+
+\end_inset
+
+with 
+\begin_inset Formula $A$
+\end_inset
+
+ a 
+\begin_inset Formula $2\times2$
+\end_inset
+
+ non-singular matrix.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From the SVD, the linear component 
+\begin_inset Formula $A$
+\end_inset
+
+ can be decomposed into 
+\begin_inset Formula 
+\[
+A=UDV^{T}=\left(UV^{T}\right)\left(VDV^{T}\right)=R\left(\theta\right)\left(R\left(-\phi\right)DR\left(\phi\right)\right)
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+D=\begin{bmatrix}\lambda_{1} & 0\\
+0 & \lambda_{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+since 
+\begin_inset Formula $U$
+\end_inset
+
+ and 
+\begin_inset Formula $V$
+\end_inset
+
+ are orthogonal matrices, namely 
+\emph on
+rotations
+\emph default
+ and 
+\emph on
+non-isotropic
+\emph default
+ scalings.
+ The essence of an affinity is the scaling in orthogonal directions, oriented
+ at a particular angle.
+\end_layout
+
+\begin_layout Standard
+A planar affine transformation has six degrees of freedom, determinable
+ from three points correspondence.
+\end_layout
+
+\begin_layout Standard
+Length ratios and angels between lines are not preserved because of affine
+ transformation.
+ Three important invariants, line parallelism, ratio of lengths of parallel
+ line segments (the scaling is common to all lines with the same direction),
+ ratios of areas (the area is scaled by 
+\begin_inset Formula $\det A=\lambda_{1}\lambda_{2}$
+\end_inset
+
+).
+ An affinity is orientation-preserving or -reversing according to whether
+ 
+\begin_inset Formula $\det A$
+\end_inset
+
+ is positive or negative respectively.
+\end_layout
+
+\begin_layout Subsection
+Class Ⅵ: Projective transformations
+\end_layout
+
+\begin_layout Definition
+Non singular linear transformation of homogeneous coordinates.
+\begin_inset Formula 
+\[
+\mathbf{x}^{\prime}=H_{p}\mathbf{x}=\begin{bmatrix}A & \mathbf{t}\\
+\mathbf{v}^{T} & v
+\end{bmatrix}\mathbf{x}
+\]
+
+\end_inset
+
+where the vector 
+\begin_inset Formula $\mathbf{v}=\left(v_{1},v_{2}\right)^{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A projective transformation has eight degrees of freedom, and can be computed
+ from four point correspondences between two planes with no three collinear
+ on either plane.
+\end_layout
+
+\begin_layout Standard
+The most fundamental projective invariant is the corss ratio of four collinear
+ points.
+ For a given projective transformation, area scaling varies with position
+ and the orientation of a transformed line depends on both the orientation
+ and position of the source line.
+\end_layout
+
+\begin_layout Standard
+The vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ is responsible for the non-linear effects of the projectivity, mapping
+ a point at infinity to a finite point.
+\begin_inset Formula 
+\[
+\begin{bmatrix}A & \mathbf{t}\\
+\mathbf{v}^{T} & v
+\end{bmatrix}\begin{pmatrix}x_{1}\\
+x_{2}\\
+0
+\end{pmatrix}=\begin{pmatrix}A\begin{pmatrix}x_{1}\\
+x_{2}
+\end{pmatrix}\\
+v_{1}x_{1}+v_{2}x_{2}
+\end{pmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Decomposition of a projective transformation
+\end_layout
+
+\begin_layout Standard
+A projective transformation can be decomposed into a chain of transformations.
+\begin_inset Formula 
+\[
+H=H_{S}H_{A}H_{P}=\begin{bmatrix}sR & \mathbf{t}\\
+\mathbf{0}^{T} & 1
+\end{bmatrix}\begin{bmatrix}K & 0\\
+\mathbf{0}^{T} & 1
+\end{bmatrix}\begin{bmatrix}I & \mathbf{0}\\
+\mathbf{v^{T}} & v
+\end{bmatrix}=\begin{bmatrix}A & \mathbf{t}\\
+\mathbf{v}^{T} & v
+\end{bmatrix}.
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $A=sRK+\mathbf{tv}^{T}$
+\end_inset
+
+ and 
+\begin_inset Formula $K$
+\end_inset
+
+ is an upper-triangular matrix normalized as 
+\begin_inset Formula $\det K=1$
+\end_inset
+
+.
+ This decomposition is valid provided 
+\begin_inset Formula $v\neq0$
+\end_inset
+
+ and is unique if 
+\begin_inset Formula $s$
+\end_inset
+
+ is chosen positive.
+ The transformation 
+\begin_inset Formula $H_{p}$
+\end_inset
+
+ is an 
+\emph on
+elation.
+ The inverse of 
+\begin_inset Formula $H$
+\end_inset
+
+ is still projective, giving rise to the alternative decomposed form
+\begin_inset Formula 
+\[
+H=H_{p}H_{A}H_{S}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Invariants
+\end_layout
+
+\begin_layout Standard
+The number of functionally independent invariants is equal to or greater
+ than the number of degrees of freedom of the configuration less the number
+ of degrees of freedom of the transformation.
+\end_layout
+
+\begin_layout Section
+The projective geometry of 1D
+\end_layout
+
+\begin_layout Standard
+The cross ratio is the basic projective invariant of 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Definition
+Cross ratio
+\end_layout
+
+\begin_layout Definition
+Given 4 points 
+\begin_inset Formula $\bar{\mathbf{x}}_{i}$
+\end_inset
+
+ (1D points in homogeneous coordinates), the cross ratio is defined as 
+\begin_inset Formula 
+\[
+\text{Cross}\left(\bar{\mathbf{x}}_{1},\bar{\mathbf{x}}_{2},\bar{\mathbf{x}}_{3},\bar{\mathbf{x}}_{4}\right)=\frac{\left|\bar{\mathbf{x}}_{1}\bar{\mathbf{x}}_{2}\right|\left|\bar{\mathbf{x}}_{3}\bar{\mathbf{x}}_{4}\right|}{\left|\bar{\mathbf{x}}_{1}\bar{\mathbf{x}}_{3}\right|\left|\bar{\mathbf{x}}_{2}\bar{\mathbf{x}}_{4}\right|}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\[
+\left|\bar{\mathbf{x}}_{i}\bar{\mathbf{x}}_{j}\right|=\det\begin{bmatrix}x_{i1} & x_{j1}\\
+x_{i2} & x_{j2}
+\end{bmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Definition
+concurrent lines
+\end_layout
+
+\begin_layout Definition
+three or more lines in a plane or higher-dimensional space are said to be
+ concurrent if they intersect at a single point.
+\end_layout
+
+\begin_layout Standard
+The cross ratio of concurrent lines is an invariant to projective transformation
+ of the plane.
+\end_layout
+
+\begin_layout Section
+Recovery of affine and metric properties from images
+\end_layout
+
+\begin_layout Standard
+It is only necessary to specify 
+\begin_inset Formula $4$
+\end_inset
+
+ degrees of freedom in order to determine metric properties.
+ These 
+\begin_inset Formula $4$
+\end_inset
+
+ dof are associated with geometric objects: the line at infinity 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+ and the two circular points on 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Line at infinity
+\end_layout
+
+\begin_layout Proposition
+The line at infinity 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+ is a fixed line under the projective transformation 
+\begin_inset Formula $H$
+\end_inset
+
+ iff 
+\begin_inset Formula $H$
+\end_inset
+
+ is an affinity.
+\end_layout
+
+\begin_layout Standard
+However, 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+ is not fixed pointwise under an affine transformation.
+\end_layout
+
+\begin_layout Standard
+Once the limaged line at infinity is identified in an image of a plane,
+ it is then possible to make affine measurements on the original plane.
+ Lines may be identified as parallel on the original plane if the imaged
+ lines intersect on the imaged 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+.
+ A length ratio on a line may be computer from the cross ratio of the three
+ points specifying the lengths together with the intersection of the line
+ with 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+, which provides the fourth point.
+\end_layout
+
+\begin_layout Standard
+Given line at infinity imaged at 
+\begin_inset Formula $\left(l_{1},l_{2},l_{3}\right)^{T}$
+\end_inset
+
+ where 
+\begin_inset Formula $l_{3}\neq0$
+\end_inset
+
+, a suitable projective point transformation which map 
+\begin_inset Formula $l$
+\end_inset
+
+ back to 
+\begin_inset Formula $l_{\infty}=\left(0,0,1\right)^{T}$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\[
+H=H_{A}\begin{bmatrix}1 & 0 & 0\\
+0 & 1 & 0\\
+l_{1} & l_{2} & l_{3}
+\end{bmatrix}.
+\]
+
+\end_inset
+
+Appy this matrix to every imaged point to affinely rectify the image.
+\end_layout
+
+\begin_layout Subsection
+The circular points
+\end_layout
+
+\begin_layout Definition
+Under any similarity transformation there are two points on 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+ which are fixed, called the 
+\emph on
+circular points 
+\emph default
+or 
+\emph on
+absolute points.
+\begin_inset Formula 
+\[
+I=\begin{pmatrix}1\\
+i\\
+0
+\end{pmatrix}\quad J=\begin{pmatrix}1\\
+-i\\
+0
+\end{pmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+The circuluar points 
+\begin_inset Formula $I,J$
+\end_inset
+
+ are fixed points under the projective transformation 
+\begin_inset Formula $H$
+\end_inset
+
+ iff 
+\begin_inset Formula $H$
+\end_inset
+
+ is a similarity.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Every circle intersects 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+ at the circular points.
+ A circle can be computed using the general formula for a conic defined
+ by five points, where the five points are the three points that specify
+ the circle in Euclidean geometry augmented with the two circular points.
+\end_layout
+
+\begin_layout Standard
+Also, since 
+\begin_inset Formula $I=\left(1,0,0\right)+i\left(0,1,0\right)$
+\end_inset
+
+, decomposed int othe orthogonal directions of Euclidean gemotry, it is
+ not surprising that once the circular points are identified, orthogonality,
+ and other metric properties are then determined.
+\end_layout
+
+\begin_layout Definition
+the conic 
+\begin_inset Formula 
+\[
+C_{\infty}^{*}=IJ^{T}+JI^{T}
+\]
+
+\end_inset
+
+is dual to the circular points.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+The dual conic 
+\begin_inset Formula $C_{\infty}^{*}$
+\end_inset
+
+ is fixed under the projective transformation 
+\begin_inset Formula $H$
+\end_inset
+
+ iff 
+\begin_inset Formula $H$
+\end_inset
+
+ is a similarity.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+TODO
+\end_layout
+
+\begin_layout Chapter
+Projective Geometry and Transformations of 3D
+\end_layout
+
+\begin_layout Standard
+In 
+\begin_inset Formula $\mathbb{P}^{3}$
+\end_inset
+
+, there is a 
+\emph on
+plane 
+\emph default
+at infinity 
+\begin_inset Formula $\pi_{\infty}$
+\end_inset
+
+, analog of 
+\begin_inset Formula $l_{\infty}$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathbb{P}^{2}$
+\end_inset
+
+.
+ Parallel lines and parallel palens intersect on 
+\begin_inset Formula $\pi_{\infty}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Points and projective transformation
+\end_layout
+
+\begin_layout Standard
+Points are represented by a 
+\begin_inset Formula $4$
+\end_inset
+
+-vector.
+ A projective transformation acting on 
+\begin_inset Formula $\mathbb{P}^{3}$
+\end_inset
+
+ is a linear transformation on homogeneous 
+\begin_inset Formula $4$
+\end_inset
+
+-vectors represented by a non-singular 
+\begin_inset Formula $4\times4$
+\end_inset
+
+ matrix
+\begin_inset Formula 
+\[
+\mathbf{x}^{\prime}=H\mathbf{x}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $H$
+\end_inset
+
+ has 
+\begin_inset Formula $15$
+\end_inset
+
+ degrees of freedom.
+ The map is a collineation (lines are mapped to lines), which preserves
+ incidence relations such as the intersection point of a line with a plane,
+ and order of contact.
+\end_layout
+
+\begin_layout Standard
+In 
+\begin_inset Formula $\mathbb{P}^{3}$
+\end_inset
+
+ points and planes are dual.
+ Lines are self-dual in 
+\begin_inset Formula $\mathbb{P}^{3}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Planes
+\end_layout
+
+\begin_layout Standard
+A plane in 3D space may be written as 
+\begin_inset Formula 
+\[
+\pi_{1}x+\pi_{2}y+\pi_{3}z+\pi_{4}=0,
+\]
+
+\end_inset
+
+represented in homogenous coordinates 
+\begin_inset Formula $\boldsymbol{\mathbf{\pi}}=\left(\pi_{1},\pi_{2},\pi_{3},\pi_{4}\right)^{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proposition
+Three points define a plane.
+\end_layout
+
+\begin_layout Remark*
+Given three point 
+\begin_inset Formula $\mathbf{\mathbf{x}_{1}}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{x}_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{x_{3}}$
+\end_inset
+
+ that are linearly independent, and a plane vector 
+\begin_inset Formula $\boldsymbol{\pi}$
+\end_inset
+
+, the system of linear equations
+\begin_inset Formula 
+\[
+\begin{bmatrix}\mathbf{x}_{1}\\
+\mathbf{x}_{2}\\
+\mathbf{x}_{3}
+\end{bmatrix}\boldsymbol{\pi}=0
+\]
+
+\end_inset
+
+is full rank matrix, giving a unique solution/kernel to 
+\begin_inset Formula $\boldsymbol{\pi}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Remark*
+To determine this plane more directly, consider a general point 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ on 
+\begin_inset Formula $\boldsymbol{\pi}$
+\end_inset
+
+ and three points 
+\begin_inset Formula $\mathbf{x}_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{x}_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{x}_{3}$
+\end_inset
+
+.
+ Since this general point is a linear combination of the latter three, giving
+ a linear dependent list, the determinant of the matrix 
+\begin_inset Formula 
+\[
+\det\begin{bmatrix}\mathbf{x} & \mathbf{x}_{1} & \mathbf{x}_{2} & \mathbf{x}_{3}\end{bmatrix}=0
+\]
+
+\end_inset
+
+expanding it along 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ gives 
+\begin_inset Formula 
+\[
+x_{1}D_{234}-x_{2}D_{134}+x_{3}D_{124}-x_{4}D_{123}=0.
+\]
+
+\end_inset
+
+Then the plane coeffcients 
+\begin_inset Formula 
+\[
+\boldsymbol{\pi}=\left(D_{234},-D_{134},D_{123},-D_{123}\right)^{T}.
+\]
+
+\end_inset
+
+In vector algebra 
+\begin_inset Formula 
+\[
+\boldsymbol{\pi}=\begin{pmatrix}\left(\tilde{\mathbf{x}}_{1}-\tilde{\mathbf{x}}_{3}\right)\times\left(\tilde{\mathbf{x}}_{2}-\tilde{\mathbf{x}}_{3}\right)\\
+-\tilde{\mathbf{x}}_{3}^{T}\left(\tilde{\mathbf{x}}_{1}\times\tilde{\mathbf{x}}_{2}\right)
+\end{pmatrix}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{\mathbf{x}}_{i}$
+\end_inset
+
+ is the Euclidean coordinates of point 
+\begin_inset Formula $\mathbf{x}_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+Three planes define a point.
+\end_layout
+
+\begin_layout Remark*
+This is the dual case of three points defining a plane.
+ Consider the following the 
+\begin_inset Formula 
+\[
+\begin{bmatrix}\boldsymbol{\pi}_{1}^{T}\\
+\boldsymbol{\pi}_{2}^{T}\\
+\boldsymbol{\pi}_{3}^{T}
+\end{bmatrix}\mathbf{x}=0.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+Under the point transformation 
+\begin_inset Formula $\mathbf{x}^{\prime}=H\mathbf{x}$
+\end_inset
+
+, a plane transformation is 
+\begin_inset Formula 
+\[
+\boldsymbol{\pi}^{\prime}=\left(H^{-1}\right)^{T}\boldsymbol{\pi}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+Parameterized points on a plane
+\end_layout
+
+\begin_layout Proposition
+???
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Lines
+\end_layout
+
+\begin_layout Definition
+A line is defined by the join of two points or the intersection of two planes.
+\end_layout
+
+\begin_layout Standard
+Think of a line as defined by its intersection with two orthogonal planes.
+ Lines have 
+\begin_inset Formula $4$
+\end_inset
+
+ degrees of freedom in 3D space.
+ Representing lines in homogeneous coordinates requires 
+\begin_inset Formula $5$
+\end_inset
+
+-vectors, inconvenient to use in mathematical expressions.
+\end_layout
+
+\begin_layout Subsubsection
+Null-space and representation
+\end_layout
+
+\begin_layout Standard
+TODO
+\end_layout
+
+\begin_layout Section
+The hierarchy of transformation
+\end_layout
+
+\begin_layout Subsection
+The screw decomposition
+\end_layout
+
+\begin_layout Standard
+The screw decomposition enables any Euclidean action (a rotation composed
+ with a translation) to be reduced to a situation almost as simple as the
+ 2D case.
+\end_layout
+
+\begin_layout Definition
+\begin_inset CommandInset href
+LatexCommand href
+name "Screw axis"
+target "https://en.wikipedia.org/wiki/Screw_axis"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+Any particular translation and rotation is equivalent to a rotation about
+ a screw axis together with a translation along the screw axis.
+ The screw axis is parallel to the rotation axis.
+\end_layout
+
+\begin_layout Standard
+TODO
+\end_layout
+
+\begin_layout Chapter
+Estimation - 2D Projective Transformations
+\end_layout
+
+\begin_layout Standard
+Consider a set of point correspondences 
+\begin_inset Formula $\mathbf{x_{i}\leftrightarrow\mathbf{x}_{i}^{\prime}}$
+\end_inset
+
+ between two images.
+ The goal is to compute a 
+\begin_inset Formula $3\times3$
+\end_inset
+
+ matrix 
+\begin_inset Formula $H$
+\end_inset
+
+ s.t.
+ 
+\begin_inset Formula $H\mathbf{x}_{i}=\mathbf{x}_{i}^{\prime}$
+\end_inset
+
+ for each 
+\begin_inset Formula $i$
+\end_inset
+
+.
+ First, the number of corresponding points should be determined.
+ The given corresponding points are always the ideal choice and there may
+ be more.
+ There are algorithms that find the best solution.
+\end_layout
+
+\begin_layout Section
+The Direct Linear Transformation (DLT) algorithm
+\end_layout
+
+\begin_layout Standard
+Given a set of four point correspondences 
+\begin_inset Formula $\mathbf{x}_{i}\leftrightarrow\mathbf{x}_{i}^{\prime}$
+\end_inset
+
+, and the transformation 
+\begin_inset Formula $\mathbf{x}_{i}^{\prime}=H\mathbf{x}_{i}$
+\end_inset
+
+, the equation may be written as 
+\begin_inset Formula 
+\[
+\mathbf{x}_{i}^{\prime}\times H\mathbf{x}_{i}=\mathbf{0}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Camera Geometry and Single View Geometry
+\end_layout
+
+\begin_layout Chapter
+Camera models
+\end_layout
+
+\begin_layout Standard
+The camera mapping is represented by a matrix, and in case of mapping points
+ a 
+\begin_inset Formula $3\times4$
+\end_inset
+
+ matrix 
+\begin_inset Formula $P$
+\end_inset
+
+ which maps from homogeneous coordinates of a world point in 
+\begin_inset Formula $3$
+\end_inset
+
+D space to homogeneous coordinates of the imaged point on the image plane.
+ The matrix has in general 
+\begin_inset Formula $11$
+\end_inset
+
+ degrees of freedom and the properties of the camera, such as its center
+ and focal length may be extracted from it.
+\end_layout
+
+\begin_layout Standard
+A camera is a mapping between the 3D world (object space) and a 2D image.
+ The principal camera of interest is 
+\emph on
+central projection.
+ 
+\emph default
+However all cameras modeling central projection are specializations of the
+ 
+\emph on
+general projective camera
+\emph default
+.
+ The specialized models fall into two major classes: those with a finite
+ center and those with center at infinity.
+ Of the cameras at infinity, the 
+\emph on
+affine camera
+\emph default
+ is of particular importance because it is the natural generalization of
+ parallel projection.
+\end_layout
+
+\begin_layout Section
+Finite cameras
+\end_layout
+
+\begin_layout Standard
+These models are designed for CCD-like sensors, but also applicable to other
+ cameras like X-ray images, scanned photographic negatives, scanned photographs
+ from enlarged negatives.
+\end_layout
+
+\begin_layout Subsection
+The basic pinhole model
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename pinhole_camera.png
+	scale 70
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Definition
+basic definitions
+\end_layout
+
+\begin_layout Definition
+\begin_inset Formula $C$
+\end_inset
+
+: camera center;
+\end_layout
+
+\begin_layout Definition
+\begin_inset Formula $Z$
+\end_inset
+
+ axis: principal ray/axis;
+\end_layout
+
+\begin_layout Definition
+\begin_inset Formula $p$
+\end_inset
+
+: principal point, where the principal axis meets the image plane
+\end_layout
+
+\begin_layout Definition
+principal plane: the plane through the camera center parallel to the image
+ plane
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Homogeneous coordinates representation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\begin{pmatrix}X\\
+Y\\
+Z\\
+1
+\end{pmatrix}\mapsto\begin{pmatrix}fX\\
+fY\\
+1
+\end{pmatrix}=\begin{bmatrix}f &  &  & 0\\
+ & f &  & 0\\
+ &  & 1 & 0
+\end{bmatrix}\begin{pmatrix}X\\
+Y\\
+Z\\
+1
+\end{pmatrix}.
+\]
+
+\end_inset
+
+or 
+\begin_inset Formula 
+\[
+\mathbf{x}=P\mathbf{X}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $P$
+\end_inset
+
+ is the 
+\begin_inset Formula $3\times4$
+\end_inset
+
+ camera projection matrix, also written as 
+\begin_inset Formula 
+\[
+P=\text{diag}\left(f,f,1\right)\begin{bmatrix}I & \mathbf{0}\end{bmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above representatio assumes that the origin of coordinates in the image
+ plane is at the principal point, which in practice is often not the case.
+ The transformation matrix may be rewritten as 
+\begin_inset Formula 
+\[
+P=\begin{bmatrix}f &  & p_{x} & 0\\
+ & f & p_{y} & 0\\
+ &  & 1 & 0
+\end{bmatrix}.
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\left(p_{x},p_{y}\right)$
+\end_inset
+
+ is the coordinates of the principal point.
+ The transformation is now 
+\begin_inset Formula 
+\[
+\mathbf{x}=K\begin{bmatrix}I & \mathbf{0}\end{bmatrix}\mathbf{X_{cam}}.
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $K$
+\end_inset
+
+ is called the camera calibration matrix.
+ The camera here is assumed to be located at the origin of a Euclidean coordinat
+e system with the principal axis of the camera pointing straight down the
+ 
+\begin_inset Formula $Z$
+\end_inset
+
+-axis and 
+\begin_inset Formula $\mathbf{X_{cam}}$
+\end_inset
+
+ is expresses in this coordinate system, called the 
+\emph on
+camera coordinate system.
+\end_layout
+
+\begin_layout Subsubsection
+Camera rotation and translation
+\end_layout
+
+\begin_layout Standard
+In general, points in space will be expressed in terms of a different Euclidean
+ coordinate frame other than camera coordinate system, known as the 
+\emph on
+world coordinate frame
+\emph default
+.
+ Suppose 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+ is the homogeneous coordinates of a point, then 
+\begin_inset Formula 
+\[
+\mathbf{X_{cam}}=\begin{bmatrix}R & -R\widetilde{C}\\
+0 & 1
+\end{bmatrix}\mathbf{X}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\widetilde{C}$
+\end_inset
+
+ is the Euclidean coordinates of the camera center in the world coordinate
+ frame and 
+\begin_inset Formula $R$
+\end_inset
+
+ is a 
+\begin_inset Formula $3\times3$
+\end_inset
+
+ rotation matrix representing the orientation of the camera coordinate frame.
+\end_layout
+
+\begin_layout Standard
+The transformation is then rewritten as 
+\begin_inset Formula 
+\[
+\mathbf{x}=KR\begin{bmatrix}I & -\widetilde{C}\end{bmatrix}X.
+\]
+
+\end_inset
+
+Here 
+\begin_inset Formula $K$
+\end_inset
+
+ is the 
+\emph on
+internal camera parameters
+\emph default
+, or the 
+\emph on
+internal orientation.
+ 
+\emph default
+The parameters of 
+\begin_inset Formula $R$
+\end_inset
+
+ and 
+\begin_inset Formula $\widetilde{C}$
+\end_inset
+
+ which relate the camera orientation and position to a world coordinate
+ system are called 
+\emph on
+external parameter
+\emph default
+ or the 
+\emph on
+exterior orientation.
+\end_layout
+
+\begin_layout Standard
+The transformation is often also written as 
+\begin_inset Formula 
+\[
+P=K\begin{bmatrix}R & \mathbf{t}\end{bmatrix}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{t}=-R\widetilde{C}$
+\end_inset
+
+, to represent the world-to-image transformation as 
+\begin_inset Formula $\widetilde{\mathbf{X}}_{\text{cam}}=R\widetilde{\mathbf{X}}+\mathbf{t}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+CCD cameras
+\end_layout
+
+\begin_layout Standard
+In case of CCD cameras, there is the additional possibility of having non-square
+ pixels.
+ This has the extra effect of introducing unequal scale factors in each
+ direction.
+\end_layout
+
+\begin_layout Standard
+Suppose the number of pixels per unit distance in image coordinates are
+ 
+\begin_inset Formula $m_{x}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{y}$
+\end_inset
+
+ in the 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ directions.
+ The pixel coordinates is obtained by multiplying 
+\begin_inset Formula $K$
+\end_inset
+
+ on the left by an extra factor 
+\begin_inset Formula $\text{diag}\left(m_{x},m_{y},1\right)$
+\end_inset
+
+.
+ Thus, the general form of the calibration matrix of a CCD camera is 
+\begin_inset Formula 
+\[
+K=\begin{bmatrix}\alpha_{x} &  & x_{0}\\
+ & \alpha_{y} & y_{0}\\
+ &  & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\alpha_{x}=fm_{x}$
+\end_inset
+
+ and 
+\begin_inset Formula $\alpha_{y}=fm_{y}$
+\end_inset
+
+ and 
+\begin_inset Formula $\left(x_{0},y_{0}\right)=\left(m_{x}p_{x},m_{y}p_{y}\right)$
+\end_inset
+
+ is the principal point in terms of pixel dimensions.
+\end_layout
+
+\begin_layout Standard
+Moreover, a 
+\emph on
+skew 
+\emph default
+parameter 
+\begin_inset Formula $s$
+\end_inset
+
+ is introduced.
+\begin_inset Formula 
+\[
+K=\begin{bmatrix}\alpha_{x} & s & x_{0}\\
+ & \alpha_{y} & y_{0}\\
+ &  & 1
+\end{bmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Combining all those model together, we have a 
+\emph on
+finite projective camera, 
+\begin_inset Formula 
+\[
+P=KR\begin{bmatrix}I & -\widetilde{C}\end{bmatrix},
+\]
+
+\end_inset
+
+
+\emph default
+It has a 
+\begin_inset Formula $11$
+\end_inset
+
+ degrees of freedom, exactly the number of dof of a 
+\begin_inset Formula $3\times4$
+\end_inset
+
+ matrix.
+ 
+\begin_inset Formula $KR$
+\end_inset
+
+ is nonsingular, and can be decomposed using 
+\begin_inset Formula $RQ$
+\end_inset
+
+ matrix decomposition into 
+\begin_inset Formula $K$
+\end_inset
+
+ and 
+\begin_inset Formula $R$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proposition
+The set of camera matrices of finite projective cameras is identical with
+ the set of homogenous 
+\begin_inset Formula $3\times4$
+\end_inset
+
+ matrices for which the left hand 
+\begin_inset Formula $3\times3$
+\end_inset
+
+ submatrix is non-singular.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+General projective cameras
+\end_layout
+
+\begin_layout Standard
+A 
+\emph on
+general projective camera 
+\emph default
+is one represented by an arbitrary homogeneous 
+\begin_inset Formula $3\times4$
+\end_inset
+
+ matrix of rank 
+\begin_inset Formula $3$
+\end_inset
+
+ (so that the range of the transformation is a full plane) and has 
+\begin_inset Formula $11$
+\end_inset
+
+ dof.
+\end_layout
+
+\begin_layout Subsection
+Camera anatomy
+\end_layout
+
+\begin_layout Standard
+A general projective camera may be decomposed into blocks according to 
+\begin_inset Formula 
+\[
+P=\begin{bmatrix}M & p_{4}\end{bmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The camera center is the null space of 
+\begin_inset Formula $P$
+\end_inset
+
+.
+ A finite camera has the center at 
+\begin_inset Formula $\left(\widetilde{C},1\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proposition
+All points on a ray from the camera center are mapped to the same image.
+\end_layout
+
+\begin_layout Proof
+Given the camera center 
+\begin_inset Formula $C$
+\end_inset
+
+ and any point 
+\begin_inset Formula $A$
+\end_inset
+
+, any point on 
+\begin_inset Formula $CA$
+\end_inset
+
+ is represented by 
+\begin_inset Formula 
+\[
+\mathbf{X}=\lambda A+\left(1-\lambda\right)C.
+\]
+
+\end_inset
+
+Apply 
+\begin_inset Formula $P$
+\end_inset
+
+ to both sides, 
+\begin_inset Formula 
+\[
+\mathbf{x}=P\mathbf{X}=\lambda PA.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+With the columns of 
+\begin_inset Formula $P$
+\end_inset
+
+ denoted by 
+\begin_inset Formula $p_{1},p_{2},p_{3},p_{4}$
+\end_inset
+
+, then 
+\begin_inset Formula $p_{1},p_{2},p_{3}$
+\end_inset
+
+ are the vanishing point of the world coordinate 
+\begin_inset Formula $X,Y,Z$
+\end_inset
+
+ axes respectively, 
+\begin_inset Formula $p_{4}$
+\end_inset
+
+ is the image of the world origin.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+The principal plane consists of the set of points 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ which are imaged on the line at infinity of the image.
+ A point lies on the principal plane of the camera iff 
+\begin_inset Formula $p^{3T}\mathbf{x}=0$
+\end_inset
+
+, where 
+\begin_inset Formula $p^{3T}$
+\end_inset
+
+ is the third row vector of 
+\begin_inset Formula $P$
+\end_inset
+
+.
+ In other words, 
+\begin_inset Formula $p^{3}$
+\end_inset
+
+ is the vector representating the principal plane of the camera.
+ The other two axis planes of the camera coordinate frame have similar results.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+Points 
+\begin_inset Formula $D=\left(d^{T},0\right)$
+\end_inset
+
+ on the plane at infinity represent vanishing points, mapping to 
+\begin_inset Formula 
+\[
+\mathbf{x}=PD=\begin{bmatrix}M & p_{4}\end{bmatrix}D=Md.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
