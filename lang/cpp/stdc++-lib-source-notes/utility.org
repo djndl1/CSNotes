@@ -8,6 +8,7 @@
 All functions here are signal-safe.
 
 #+BEGIN_SRC C++
+//
     template<typename _Tp>
         constexpr _Tp&&
         forward(typename std::remove_reference<_Tp>::type& __t) noexcept
@@ -17,6 +18,7 @@ All functions here are signal-safe.
         constexpr _Tp&&
         forward(typename std::remove_reference<_Tp>::type&& __t) noexcept
         {
+
           static_assert(!std::is_lvalue_reference<_Tp>::value, "template argument"
                 " substituting _Tp is an lvalue reference type");
           return static_cast<_Tp&&>(__t);
@@ -38,20 +40,7 @@ if =t= is a lvalue =int=, =T= is deduced to =int&=, then
 rvalue =int=, =T= is deduced to =int=, then =std::forward<int>(t)=
 returns =static_cast<int&&>(t)=.
 
-#+BEGIN_SRC C++
-    template<typename _Tp>
-        constexpr typename std::remove_reference<_Tp>::type&&
-        move(_Tp&& __t) noexcept
-        { return static_cast<typename std::remove_reference<_Tp>::type&&>(__t); }
-#+END_SRC
 
-Given
-
-- a rvalue =5=, =_Tp= is deduced to =int=, returns
-  =static_cast<int&&>(__t)=;
-
-- a lvalue =int b = 5=, =_Tp= is deduced to =int&=, reference-removed to
-  =int=, returns =static_cast<int&&>(__t)=.
 
 =std::move_if_noexcept= is used to move with strong exception-free
 guarantee.
@@ -80,3 +69,43 @@ constructor (move-only type), otherwise obtains an lvalue reference to
 its argument. Note the second argument of =__and_= is with =::type=
 
 TODO
+
+=std::move= does not really move an object. 
+=std::move= is used to indicate that an object t may be "moved from".
+=std::move= produces an xvalue expression that identifies its argument.
+
+#+begin_quote
+
+#+end_quote
+
+#+BEGIN_SRC C++
+    template<typename _Tp>
+        constexpr typename std::remove_reference<_Tp>::type&&
+        move(_Tp&& __t) noexcept
+        { return static_cast<typename std::remove_reference<_Tp>::type&&>(__t); }
+#+END_SRC
+
+Given
+
+- a rvalue =5=, =_Tp= is deduced to =int=, returns
+  =static_cast<int&&>(__t)=;
+
+- a lvalue =int b = 5=, =_Tp= is deduced to =int&=, reference-removed to
+  =int=, returns =static_cast<int&&>(__t)=.
+
+Rvalue references can be used to extend the lifetimes of temporary objects 
+(note, lvalue references to const can extend the lifetimes of temporary 
+objects too, but they are not modifiable through them).
+
+Because rvalue references can bind to xvalues, they can refer to non-temporary objects.
+
+[[http://yacoder.guru/blog/2015/03/14/cpp-curiosities-std-move-that-doesnt-move/][C++ curiosities: std::move that doesn't move]]
+
+1. =move= just returns a special reference;
+
+2. Whoever receives the “special” reference has no obligation to really move the 
+  data out of the referenced location (even though they usually do).
+
+3. Even if the “special” reference is consumed in a real move operation, 
+  in general, there is no guarantee that the object will be reset, 
+  or left in any particular state whatsoever after that.
