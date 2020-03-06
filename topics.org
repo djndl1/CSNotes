@@ -200,3 +200,16 @@ https://sourceware.org/glibc/wiki/GNU\_IFUNC
       :END:
 
 [[https://stackoverflow.com/questions/15857797/bc-dates-in-python][About BC date]]
+* C Metaprogramming
+
+[[https://hero.handmade.network/forums/code-discussion/t/51-how_do_you_do_metaprogramming_in_c][How do you do metaprogramming in C?]]
+
+[[http://250bpm.com/blog:56][Advanced metaprogramming in C]]
+
+[[https://www.chiark.greenend.org.uk/~sgtatham/mp/][Metaprogramming custom control structures in C]]
+
+[[lang/cpp/][C/C++ Preprocessor Metaprogramming]]
+
+[[https://www.embedded.com/template-meta-programming-in-c-vs-opaque-pointer/][Template Meta-programming in C vs opaque pointer]]
+
+[[https://github.com/pfultz2/Cloak/wiki/C-Preprocessor-tricks,-tips,-and-idioms][C Preprocessor tricks, tips, and idioms]]
