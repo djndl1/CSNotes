@@ -1,0 +1,5 @@
+Condition variables provide synchronization primitives used to block a thread until notified by some other
+thread that some condition is met or until a system time is reached.
+
+Condition variables permit concurrent invocation of the =wait=, =wait_for=, =wait_until=, =notify_one= and
+=notify_all= member functions.

@@ -1,0 +1,29 @@
+A mutex object faciliates protections against data races and allows
+safe synchronization of data between execution agents. An execution
+ agent /owns/ a mutex from the time it successfully calls one of
+the lock functions until it calls unlock.
+
+Mutexes can be either recursive or non-recursive, and can grant
+simultaneous ownership to one or many execution agents. The mutex 
+types supplied by the standard library provide exclusive ownership
+ semantics: only one thread may own the mutex at a time. Both 
+recursive and non-recursive mutexes are supplied.
+
+* Mutex Types
+
+- =std::mutex=:
+
+- =std::recursive_mutex=:
+
+- =std::timed_mutex=:
+
+- =std::recursive_timed_mutex=:
+
+* Lock
+
+ A lock is an object that holds a reference to a lockable object and may unlock the lockable object during the
+lock’s destruction (such as when leaving block scope). An execution agent may use a lock to aid in managing
+ownership of a lockable object in an exception safe manner. A lock is said to own a lockable object if it is
+currently managing the ownership of that lockable object for an execution agent. A lock does not
+ manage
+the lifetime of the lockable object it references. 
