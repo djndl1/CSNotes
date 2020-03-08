@@ -16,6 +16,84 @@ Existing DBMSs provide various functions that allow management of a database and
 
 A linked-list system would be very inefficient when storing "sparse" databases where some of the data for any one record could be left empty. The relational model solved this by splitting the data into a series of normalized tables (or relations), with optional elements being moved out of the main table to where they would take up room only if needed. The relational part comes from entities referencing other entities in what is known as one-to-many relationship, like a traditional hierarchical model, and many-to-many relationship, like a navigational (network) model. Thus, a relational model can express both hierarchical and navigational models, as well as its native tabular model, allowing for pure or combined modeling in terms of these three models, as the application requires.  In the relational model, some bit of information was used as a "key", uniquely defining a particular record.
 
+## Basic Concepts
+
+https://www.tutorialspoint.com/dbms/index.htm
+
+- _Database_; _Data Definition Language_; _Data Modification Language_; _Database Management System_, which carries out _Data definition_, _Data Update_, _Data Retrieval_ and _User Administration_.
+
+https://www.tutorialspoint.com/dbms/dbms_overview.htm
+
+(https://www.geeksforgeeks.org/introduction-of-dbms-database-management-system-set-1/)[Intro to DBMS 1]
+
+- why database: queries; data managed in objects and not files; controlling redundancy and inconsistency; efficient memory management and indexing to avoid file scans; concurrency control and transaction management; access control; ease in accessing data (through queries); integrity constraints; security;
+
+https://www.geeksforgeeks.org/need-for-dbms/
+
+https://www.geeksforgeeks.org/introduction-of-dbms-database-management-system-set-1/
+
+https://www.geeksforgeeks.org/disadvantages-of-dbms/
+
+- How DBMS is used; Interfaces
+
+https://www.geeksforgeeks.org/use-of-dbms-in-system-software/
+
+https://www.geeksforgeeks.org/interfaces-in-dbms/
+
+- _ACID_: atomicity, durability, isolation, consistency. To ensure efficient transaction without data corruption.
+
+- Architecture: 3-Tier (Presentation - Application - Database); 2-tier (basically a client-server model);
+
+https://www.tutorialspoint.com/dbms/dbms_architecture.htm
+
+https://www.geeksforgeeks.org/dbms-architecture-2-level-3-level/
+
+- Level: physical; conceptual; external
+
+https://www.geeksforgeeks.org/introduction-of-3-tier-architecture-in-dbms-set-2/
+
+## Data Models
+
+How the logical structure of a database is modeled
+
+https://www.tutorialspoint.com/dbms/dbms_data_models.htm
+
+- _Entity-Relationship Model_: based on the notion of real-world entities and relationships among them
+
+- _Relational Model_: based on first-order predicate logic and defines a table as an n-ary relation
+
+## Database Schema
+
+the skeleton structure that represents the logical view of the entire database
+
+- database schema
+
+- database instance
+
+## Database Independence
+
+https://www.tutorialspoint.com/dbms/dbms_data_independence.htm
+
+- Logical Data Independence
+
+- Physcial Data Independence
+
+## Database Objects
+
+https://www.geeksforgeeks.org/database-objects-in-dbms/
+
+Anything made from _create command_, used to hold and manipulate the data.
+
+- *Table*: basic unit of storage; composed of rows and columns
+
+- *View*: logiclaly represents subsets of data from one or more tables
+
+- *Sequence*: generates primary key values
+
+- *Index*: improves the performance of some queries
+
+- *Synonym*: alternative name for an object
+
 # SQL (Structured Query Language)
 
 SQL accesses and manipulates databases. It executes queries against a database; retrieve data from a database; insert records in a database; update records in a database; delete records in a database; create new database; create new tables in a database; create views in a database; sets permissions on tables, procedures and views.
