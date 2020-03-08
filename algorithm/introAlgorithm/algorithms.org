@@ -1574,6 +1574,82 @@ scanned at most once. Since the sum of the lengths of all the adjacency lists
 is $\Theta(E)$, the total running time of BFS is $O(V+E)$. Breadth-first search
 runs in time linear in the size of the adjacency-list representation of $G$.
 
+**** Shortest-Path Distance
+
+/shortest-path distance/ $\delta (s, v)$: the minumum number of edges in any
+path from vertex $s$ to vertex $v$, if none $\delta (s, v) = \infty$.
+
+- Lemma 1: Let $G=(V,E)$ be a directed or undirected graph, and let $s\in V$ be
+an arbitrary vertex. Then, for any edge $(u,v)\in E$,
+
+$$
+\delta\left(s,v\right)\leq\delta\left(s,u\right)+1
+$$
+
+Proof: consider $u$ is reachable from $s$ and unreachable.
+
+- Lemma 2: Let $G=(V,E)$ be a directed or undirected graph and suppose that BFS
+  is run on $G$ from a given source vertex $s\in V$. Then upon termination, for 
+  each vertex $v\in V$, the value $v, d$ computed by =BFS= satisfies 
+  $v.d \geq \delta (s, v)$.
+
+Proof: the inductive hypothesis is that $v.d \geq \delta (s,v)$ for all $v \in V$
+and use Lemma 1 and that $v.d$ is never modified twice.
+
+- Lemma 3: Suppose that during the execution of =BFS= on a graph $G=(V,E)$, the 
+  queue $Q$ contains the vertices $\left\langle v_{1},v_{2},\dots,v_{r}\right\rangle$
+  where $v_1$ is the head of $Q$ and $v_r$ is the tail. Then $v_{r}.d\leq v_{1}.d+1$
+  for $i = 1, 2,\dots ,r-1$.
+
+Proof: TODO
+
+The $d$ values at the time that vertices are enqueued are monotonically increasing
+over time.
+
+- Corrollary: Suppose that vertices $v_i$ and $v_j$ are enqueued during the execution
+  of =BFS=, and that $v_i$ is enqueued before $v_j$. Then $v_{i}.d \leq v_{j}.d$
+  at the time that $v_{j}$ is enqueued.
+
+Breadth-first search finds shortest-path distance.
+
+- Theorem: Correctness of breadth-first search
+  + Let $G=\left(V,E\right)$ be a directed or undirected graph, and suppose that
+    =BFS= is run on $G$ from a given source vertex $s\in V$. Then, during its
+    execution, BFS discovers every vertex $v \in V$ that is reachable from the 
+    source $s$, and upon termination, $v.d=\delta\left(s,v\right)$ for all $v\in V$.
+    Moreover, for any vertex $v \neq s$ that is reachable from $s$, one of the 
+    shortest paths from $s$ to $v$ is a shortest path from $s$ to =v.pre= followed
+    by the edge =(v.pre, v)=.
+
+Proof: TODO
+
+=BFS= builds a breadth-first tree as it searches the graph.
+
+/predecessor subgraph/: For a graph $G=(V,E)$ with source $s$, the predecessor
+ graph $G_{p} = (V_{p}, E_{p})$ where 
+
+$$
+V_{p}=\left\{ v\in V\colon v.p\neq\text{NIL}\right\} \cup\left\{ s\right\} 
+$$
+
+and
+
+$$
+E_{p}=\left\{ \left(v.p,v\right)\colon v\in V_{p}-\left\{ s\right\} \right\} 
+$$
+
+Lemma: When applied to a directed or undirected graph $G=(V,E)$, procedure =BFS=
+constructs $.pre$ so that the predecessor subgraph $G_p = (V_p, E_p)$ is a 
+breadth-first tree.
+
+*** Depth-first search
+
+Depth-first search explores edges out of the most recently discovered vertex $v$ 
+that still has unexplored edges leaving it. Once all of $v$ 's edge have been 
+explored, the search backtracks to explore edges leaving the vertex from which
+$v$ was discovered. The process continues until all the vertices that are reachable
+from the original source vertex have been discovered.
+
 
 * Shortest Paths
 
@@ -1587,7 +1663,7 @@ every time it solves each subsubproblem.
 
 We typically apply dynamic programming to /optimization problems/.
 
-When developoing a dynamic-programming algorithm, a sequence of four steps are 
+When developing a dynamic-programming algorithm, a sequence of four steps are 
 followed in:
   1. Characterize the structure of an optimal solution
   2. Recursively define the value of an optimal solution
