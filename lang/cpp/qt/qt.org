@@ -18,11 +18,11 @@ The =QObject= class parenting automatically handles object destruction.
 The parent class releases its own memory by recursively iterating 
 through its children and calling their destructor.
 
-** Internationalization and Strings
+* Internationalization and Strings
 
 - =tr()=
 
-** Signal and Slots
+* Signal and Slots
 
 A flexible message-exchange mechanism that is composed of:
 
