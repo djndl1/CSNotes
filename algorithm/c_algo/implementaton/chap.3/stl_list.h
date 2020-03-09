@@ -4,6 +4,7 @@
 #include "utils.h"
 
 #include <string.h>
+#include <stdbool.h>
 
 #define list_type_register(type)                                               \
   struct type##list_node;                                                      \
@@ -39,12 +40,15 @@
   };                                                                           \
                                                                                \
   type##_list_t type##_list_new(void (*elem_dtor)(type *)) {                   \
-    type##_list_node_t *dummy = xmalloc(sizeof(type##_list_node_t));           \
-    dummy->prev = dummy;                                                       \
-    dummy->next = NULL;                                                        \
+    type##_list_node_t *head = xmalloc(sizeof(type##_list_node_t));            \
+    type##_list_node_t *tail = xmalloc(sizeof(type##_list_node_t));            \
+    head->prev = head;                                                         \
+    head->next = tail;                                                         \
+    tail->prev = head;                                                         \
+    tail->next = tail;                                                         \
                                                                                \
-    type##_list_t l = {.head = dummy,                                          \
-                       .tail = dummy,                                          \
+    type##_list_t l = {.head = head,                                           \
+                       .tail = tail,                                           \
                        .sz = 0,                                                \
                        .elem_size = sizeof(type),                              \
                        .elem_dtor = elem_dtor};                                \
@@ -54,15 +58,10 @@
                                                                                \
   void type##_list_delete(type##_list_t *self) {                               \
     if (self->elem_dtor) {                                                     \
-      type##_list_node_t *cur = self->head->next;                              \
-      while (cur != NULL) {                                                    \
-        self->elem_dtor(&cur->data);                                           \
-        type##_list_node_t *n = cur->next;                                     \
-        free(cur);                                                             \
-        cur = n;                                                               \
-      }                                                                        \
+      list_for_each_next(type, it, *self) self->elem_dtor(&(it->data));        \
     }                                                                          \
     free(self->head);                                                          \
+    free(self->tail);                                                          \
     self->sz = self->elem_size = 0;                                            \
     self->elem_dtor = NULL;                                                    \
   }                                                                            \
@@ -82,8 +81,7 @@
     type##_list_node_t *prior = pos->prev;                                     \
     type##_list_node_t *posterior = pos->next;                                 \
     prior->next = posterior;                                                   \
-    if (posterior)                                                             \
-      posterior->prev = prior;                                                 \
+    posterior->prev = prior;                                            \
     if (self->elem_dtor)                                                       \
       self->elem_dtor(&(pos->data));                                           \
     pos->next = pos->prev = NULL;                                              \
@@ -93,25 +91,66 @@
     return posterior;                                                          \
   }                                                                            \
                                                                                \
-        void type##_list_reverse(type##_list_t *self)                         \
-        {                                                                   \
-            if (self->sz <= 1)                                              \
-                return;                                                 \
-            type##_list_node_t *front = self->head->next;               \
-            type##_list_node_t *cur = front;                            \
-            while (cur != NULL) {                                       \
-                type##_list_node_t *posterior = cur->next;              \
-                basic_swap(type##_list_node_t *, front->prev, front->next); \
-                cur = posterior;                                        \
-            }                                                           \
-            front->next = NULL;                                         \
-            self->tail->prev = self->head;                              \
-            self->head->next = self->tail;                              \
-            self->tail = front;                                         \
-        }
-
-#define list_node_init(type, data, prev, next, var)                     \
-  type##_list_node_t var = {.data = data, .prev = prev, .next = next}
+  void type##_list_reverse(type##_list_t *self) {                              \
+    if (self->sz <= 1)                                                         \
+      return;                                                                  \
+    type##_list_node_t *cur = self->head;                                      \
+    while (cur != self->tail) {                                                \
+      type##_list_node_t *n = cur->next;                                       \
+      basic_swap(type##_list_node_t *, cur->next, cur->prev);                  \
+      cur = n;                                                                 \
+    }                                                                          \
+    basic_swap(type##_list_node_t *, cur->next, cur->prev);                    \
+                                                                               \
+    basic_swap(type##_list_node_t *, self->head, self->tail);                  \
+  }                                                                            \
+                                                                               \
+  void type##_list_splice(type##_list_t *self, type##_list_node_t *pos,        \
+                          type##_list_t *other,                         \
+                          type##_list_node_t *first, type##_list_node_t *last) { \
+    if (!other || !first || first == other.head || !pos || (last == first) ||  \
+        other.sz == 0)                                                         \
+      return;                                                                  \
+                                                                               \
+    size_t len = 0;                                                            \
+    bool range_avail = true;                                                   \
+    for (type##_list_node_t *it = first; it != last; it = it->next) {          \
+      if (it == self->tail) {                                                  \
+        range_avail = false;                                                   \
+        len++;                                                                 \
+        break;                                                                 \
+      }                                                                        \
+      len++;                                                                   \
+    }                                                                          \
+    if (!range_avail)                                                   \
+            last = other->tail;                                         \
+    type##_list_node_t *tmp_tail = last->prev;                          \
+                                                                        \
+    type##_list_node_t *cut_other = first->prev;                        \
+    cut_other->next = last;                                             \
+    last->prev = cut_other;                                             \
+    other.sz -= len;                                                    \
+                                                                               \
+    type##_list_node_t *right_cut = pos->next;                          \
+    pos->next = first;                                                  \
+    first->prev = pos;                                                  \
+    tmp_tail->next = right_cut;                                         \
+    right_cut->prev = tmp_tail;                                         \
+    self.sz += len;                                                     \
+  }                                                                     \
+                                                                        \
+  void type##_list_unique(type##_list_t* self, type##_binary_predicate pred) \
+  {                                                                     \
+          type##_list_node_t* cur = self->head->next;                   \
+          while (cur != self->tail) {                                   \
+                  data cur_data = cur->data;                            \
+                                                                        \
+                  while (cur->next != self->tail && pred(cur_data, cur->next->data)) { \
+                          list_erase(type, *self, cur->next);           \
+                  }                                                     \
+                  cur = cur->next;                                      \
+          }                                                             \
+  }
 
 #define list_node_new(type, data, prev, next, var)  \
         type##_list_node_t *var = type##_list_node_new(data, prev, next)
@@ -124,25 +163,40 @@
 #define list_node_prev(node) \
     ((node)->prev)
 
+#define list_node_data(node)                    \
+        ((node)->data)
+
+/**
+ * Internally, `cur` is the pointer to the list node. Since the data
+ * is at the beginning of the node, the `cur` pointer also points to
+ * the data stored in there. Use a cast or `list_node_data` to access
+ * the data
+ */
 #define list_for_each_next(type, cur, list)                 \
-        for (type##_list_node_t *cur = (list).head->next;  \
-             cur != NULL;                                  \
+        for (type##_list_node_t *cur = (list).head->next,;          \
+             cur != (list).tail;                                    \
              cur = cur->next)
 
-#define list_for_each_prev(type, list)              \
-    for (type##_list_node_t *cur = (list).tail;     \
+#define list_for_each_prev(type, cur, list)                \
+    for (type##_list_node_t *cur = (list).tail->prev;     \
          cur != list.head;)                         \
         cur = cur->prev)
 
-#define list_begin(list) \
+#define list_begin(list)                        \
     ((list).head->next)
 
-#define list_end(list) \
+#define list_end(list)                          \
     ((list).tail)
+
+#define list_rbegin(list)                       \
+        ((list).tail->prev)
+
+#define list_rend(list)                                 \
+        ((list).head)
 
 #define list_front(list) ((list).head->next.data)
 
-#define list_back(list) ((list).tail.data)
+#define list_back(list) (((list).tail->prev).data)
 
 #define list_size(list) \
     ((list).sz)
@@ -162,21 +216,11 @@
 #define list_insert(type, list, data, node)      \
     list_ops(type, insert)(&list, node, data)
 
-#define list_push_back(type, list, data)                                       \
-    {                                                                   \
-      list_node_new(type, data, list.tail, NULL, n);                    \
-      list.tail->next = n;                                              \
-      list.tail = n;                                                    \
-      list.sz++;                                                        \
-    }
+#define list_push_back(type, list, data)        \
+          list_ops(type, insert)(&list, (list).tail, data)
 
 #define list_push_front(type, list, data)                                      \
-  {                                                                            \
-    list_node_new(type, data, list.head, list.head->next, n);                  \
-    if (list.head->next)                                                       \
-      list.head->next->prev = n;                                               \
-    list.head->next = n;                                                       \
-  }
+        list_ops(type, insert)(&list, (list).tail->prev, data)
 
 #define list_pop_back(type, list)                                              \
     (void) list_ops(type, erase)(&list, list.tail)
@@ -196,3 +240,7 @@
     basic_swap(type##_list_node_t *, (a).tail, (b).tail);                      \
     basic_swap(size_t, (a).sz, (b).sz);                                 \
   }
+
+#define list_splice(type, list, pos, other, first, last)     \
+        list_ops(type, splice)(&list, pos, &other, first, last)
+
