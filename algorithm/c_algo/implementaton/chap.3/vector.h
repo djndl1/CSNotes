@@ -26,6 +26,19 @@
     void (*elem_dtor)(type *);                                                 \
     size_t elem_size;                                                          \
   };                                                                           \
+                                                                        \
+  type##_vector_t type##_vector_new(size_t size, void (*destr)(type*))    \
+  {                                                                     \
+  type##_vector_t var;                                                  \
+  (var).data = xcalloc(size, sizeof(type));                             \
+                                                                        \
+  (var).sz = size;                                                      \
+  (var).space = size;                                                   \
+  (var).elem_size = sizeof(type);                                       \
+  (var).elem_dtor = destr;                                              \
+                                                                        \
+  return var;                                                           \
+  }                                                                     \
                                                                                \
   void type##_vector_reserve(type##_vector_t *self, size_t new_cap) {          \
     if (self->space >= new_cap)                                                \
@@ -82,12 +95,7 @@
     }
 
 #define vector_init(type, size, destr, var)                             \
-  type##_vector_t var;                                            \
-  (var).data = xcalloc(size, sizeof(type));                                    \
-  (var).sz = size;                                                             \
-  (var).space = size;                                                          \
-  (var).elem_size = sizeof(type);                                              \
-  (var).elem_dtor = destr
+        type##_vector_t var = vector_ops(type, new)(size, destr);
 
 #define vector_delete(type, var)                 \
     {                                            \
