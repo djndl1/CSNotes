@@ -1,0 +1,8 @@
+* NumPy
+
+#+BEGIN_SRC python
+# theano.switch equivalent
+a[a < 0] = 0
+# or most similar one
+np.where(x < 0, 0, x)
+#+END_SRC
