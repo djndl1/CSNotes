@@ -1,0 +1,9 @@
+* Activations
+
+[[https://datascience.stackexchange.com/questions/5706/what-is-the-dying-relu-problem-in-neural-networks][Dying ReLU]] and [[https://stats.stackexchange.com/questions/176794/how-does-rectilinear-activation-function-solve-the-vanishing-gradient-problem-in][why ReLU does not cause a neuron to stop learning]]
+
+[[https://medium.com/@karpathy/yes-you-should-understand-backprop-e2f06eab496b][Backprop]]
+
+* Optimizer
+
+[[https://en.wikipedia.org/wiki/Stochastic_gradient_descent][SGD and its variants]]
