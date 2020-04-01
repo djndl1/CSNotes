@@ -1,0 +1,598 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass book
+\begin_preamble
+% options for packages loaded elsewhere
+
+%
+\usepackage{ifxetex}
+\usepackage{ifluatex}\usepackage{fixltx2e}% provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+ \usepackage{textcomp}% provides euro and other symbols
+\else % if luatex or xelatex
+ \usepackage{unicode-math}
+\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+
+\urlstyle{same}  % don't use monospace font for urls
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+ \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+
+\def\fps@figure{htbp}
+\end_preamble
+\use_default_options false
+\begin_modules
+theorems-ams-chap-bytype
+theorems-ams-extended-chap-bytype
+algorithm2e
+tabs-within-sections
+figs-within-sections
+eqs-within-sections
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding utf8
+\fontencoding T1
+\font_roman "lmodern" "default"
+\font_sans "default" "default"
+\font_typewriter "lmodern" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks false
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks false
+\pdf_backref section
+\pdf_pdfusetitle false
+\papersize default
+\use_geometry false
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Pattern Recognition
+\end_layout
+
+\begin_layout Standard
+by Sergio Theodoridis, Konstantinos Koutroumbas
+\end_layout
+
+\begin_layout Standard
+This note is not intended to be a rigorous mathematical walkthrough, refer
+ to the book for details.
+\end_layout
+
+\begin_layout Paragraph
+A simple task illustrating the process of PR
+\end_layout
+
+\begin_layout Standard
+For a task classify cancer regions, the measurements used for the classification
+ are know as 
+\emph on
+features
+\emph default
+, comprising a 
+\emph on
+feature vector
+\emph default
+.
+\end_layout
+
+\begin_layout Quote
+Keywords: decision line; optimality criterion 
+\end_layout
+
+\begin_layout Itemize
+feature generation stage 
+\end_layout
+
+\begin_layout Itemize
+feature seleciton stage: in practice, a larger than necessary number of
+ feature candidates is generated, and the best of them is adopted.
+ 
+\end_layout
+
+\begin_layout Itemize
+classifier design stage 
+\end_layout
+
+\begin_layout Itemize
+system evaluation stage 
+\end_layout
+
+\begin_layout Quote
+supervised, unsupervised, semi-supervised learning
+\end_layout
+
+\begin_layout Chapter
+Linear Classifier
+\end_layout
+
+\begin_layout Standard
+Read 
+\begin_inset CommandInset href
+LatexCommand href
+name "this"
+target "https://math.stackexchange.com/questions/1210545/distance-from-a-point-to-a-hyperplane"
+literal "false"
+
+\end_inset
+
+and 
+\begin_inset CommandInset href
+LatexCommand href
+name "this"
+target "https://en.wikipedia.org/wiki/Linear_classifier"
+literal "false"
+
+\end_inset
+
+before continuing.
+\end_layout
+
+\begin_layout Standard
+A linear classifier achieves this by making a classification decision based
+ on the value of a linear combination of the characteristics.
+ Affine hyperplanes are used to define decision boundaries in many machine
+ learning algorithms such as linear-combination (oblique) decision trees,
+ and perceptrons.
+\end_layout
+
+\begin_layout Standard
+If the input feature vector to the classifer is a real vector 
+\begin_inset Formula $vec{x}$
+\end_inset
+
+, then the output score is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g\left(x\right)=f\left(\vec{w}\cdot\vec{x}\right)=f\left(\sum_{j}w_{j}x_{j}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The weight vector 
+\begin_inset Formula $\vec{w}$
+\end_inset
+
+ is orthogonal to the decision hyperplane.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $dist=\frac{\left|g\left(x\right)\right|}{\left\lVert w\right\rVert }$
+\end_inset
+
+, fixing 
+\begin_inset Formula $w$
+\end_inset
+
+, then 
+\begin_inset Formula $g(x)$
+\end_inset
+
+ determines the distance of a point from the decision hyperplane.
+\end_layout
+
+\begin_layout Section
+Perceptron algorithm
+\end_layout
+
+\begin_layout Standard
+Assume there exists a hyperplane s.t.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+w^{*T}x & >0\quad\forall x\in w_{1}\\
+w^{*T}x & <0\quad\forall x\in w_{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The perceptron cost
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+J\left(w\right)=\sum_{x\in Y}\left(\delta_{x}w^{T}x\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $y$
+\end_inset
+
+ is the set of all misclassified training vectors and 
+\begin_inset Formula $\delta_{x}$
+\end_inset
+
+ is defined as
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\delta_{x}=\begin{cases}
+-1 & x\in w_{1}\\
+1 & x\in w_{2}
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Apply the gradient descent method, we have
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w\left(t+1\right)=w\left(t\right)-\rho_{t}\sum_{x\in Y}\delta_{x}x
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The online version is more simpler and more popular
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+w\left(t+1\right) & =w\left(t\right)-\delta_{x}\rho x^{\left(t\right)}\text{ }\text{if }\delta_{{x}}w^{{T}}x_{{\left(t\right)}}\geq0\\
+w\left(t+1\right) & =w\left(t\right)\text{ }\text{otherwise}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A basic requirement for the convergence of the perceptron algorithm is the
+ linear separability of the classes.
+ If this is not true, as is usually the case in practice, the perceptron
+ algorithm does not converge.
+ This leads to 
+\emph on
+pocket
+\emph default
+ algorithm.
+\end_layout
+
+\begin_layout Section
+Least squares methods
+\end_layout
+
+\begin_layout Chapter
+Nonlinear Classifiers
+\end_layout
+
+\begin_layout Standard
+A two-layer perceptron neural network transforms the nonlinearly separable
+ problem to a linearly separable one in the first phase.
+ It first maps regions into discrete vertices of a polyhedra.
+ A three-layer perceptron can separate classes resulting from any union
+ of polyhedral regions.
+ The network is constructed in a way that classifies correctly all the availalbe
+ training data, by building it as a succession of linear classifiers.
+ The other direction relieves itself of the correct classification contraint
+ and computes the synaptic weights so as to minimize a preselected cost
+ function.
+\end_layout
+
+\begin_layout Section
+The backpropagation algorithm
+\end_layout
+
+\begin_layout Standard
+This is by far the most popular approach.
+ To overcome the difficulty that the step function prohibits differentiation
+ w.r.t.
+ the unknown parameters (synaptic weights), we replace the step function
+ with a sigmoid function.
+\end_layout
+
+\begin_layout Standard
+Consider a network of 
+\begin_inset Formula $L$
+\end_inset
+
+ layers, with 
+\begin_inset Formula $k_{0}$
+\end_inset
+
+ nodes in the input layer and 
+\begin_inset Formula $k_{r}$
+\end_inset
+
+ neurons in the 
+\begin_inset Formula $r$
+\end_inset
+
+th layer.
+ Assume 
+\begin_inset Formula $N$
+\end_inset
+
+ training pairs are available 
+\begin_inset Formula $\left(\boldsymbol{y}\left(i\right),\boldsymbol{x}\left(i\right) \right),i=1,2,\dots,N$
+\end_inset
+
+.
+ The cost function takes the form 
+\begin_inset Formula 
+\[
+J=\sum_{i=1}^{N}\mathcal{E}\left(i\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathcal{E}$
+\end_inset
+
+ is an appropriately defined function depending on 
+\begin_inset Formula $\boldsymbol{y}\left(i\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\boldsymbol{y}}\left(i\right)$
+\end_inset
+
+, 
+\begin_inset Formula $i=1,2,\dots,N$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Computation of the Gradients
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $y_{k}^{r-1}\left(i\right)$
+\end_inset
+
+ be the output of the 
+\begin_inset Formula $k$
+\end_inset
+
+th neuron, 
+\begin_inset Formula $k=1,2,\dots,k_{r-1}$
+\end_inset
+
+ in the 
+\begin_inset Formula $\left(r-1\right)$
+\end_inset
+
+th layer for the 
+\begin_inset Formula $i$
+\end_inset
+
+th training pair
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $w_{jk}^{r}$
+\end_inset
+
+ the current estimate of the corresponding weight leading to the 
+\begin_inset Formula $j$
+\end_inset
+
+th neuron in the 
+\begin_inset Formula $r$
+\end_inset
+
+th layer with 
+\begin_inset Formula $j=1,2,\dots,k_{r}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The argument of 
+\begin_inset Formula $r$
+\end_inset
+
+th layer acvation function will be 
+\begin_inset Formula 
+\[
+v_{j}^{r}\left(i\right)=\sum_{k=1}^{k_{r-1}}w_{jk}^{r}y_{k}^{r-1}\left(i\right)+w_{j0}^{r}=\sum_{k=0}^{k_{r-1}}w_{jk}^{r}y_{k}^{r-1}\left(i\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $y_{0}^{r}=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+By chain rule
+\begin_inset Formula 
+\[
+\frac{\partial\mathcal{E}\left(i\right)}{\partial\boldsymbol{w}_{j}^{r}}=\frac{\partial\mathcal{E}\left(i\right)}{\partial v_{j}^{r}\left(i\right)}\frac{\partial v_{j}^{r}\left(i\right)}{\partial\boldsymbol{w}_{j}^{r}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\[
+\frac{\partial}{\partial\boldsymbol{w}_{j}^{r}}v_{j}^{r}\left(i\right)=\boldsymbol{y}^{r-1}\left(i\right)=\begin{bmatrix}1\\
+y_{1}^{r-1}\left(i\right)\\
+\vdots\\
+y_{k_{r-1}}^{r-1}\left(i\right)
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+thus 
+\begin_inset Formula 
+\[
+\triangle\boldsymbol{w}_{j}^{r}=-\mu\sum_{i=1}^{N}\frac{\partial\mathcal{E}\left(i\right)}{\partial v_{j}^{r}\left(i\right)}\boldsymbol{y}^{r-1}\left(i\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Algorithm
+The Backpropagation algorithm
+\end_layout
+
+\begin_layout Algorithm
+Initialization: initialize all the weights with small random values from
+ a pseudorandom sequence generator.
+\end_layout
+
+\begin_layout Algorithm
+Forward computation: For each of the training feature, compute all the 
+\begin_inset Formula $v_{j}^{r}\left(i\right)$
+\end_inset
+
+, 
+\begin_inset Formula $y_{j}^{r}\left(i\right)=f\left(v_{j}^{r}\left(i\right)\right),j=1,2,\dots,k_{r},r=1,2,\dots,L$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Algorithm
+Backward computations
+\end_layout
+
+\begin_layout Algorithm
+Update the weights
+\end_layout
+
+\end_body
+\end_document
