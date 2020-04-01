@@ -1,3 +1,7 @@
+* Overview
+
+- independent variables/predictors/features <-> dependent variables/target
+
 * Preprocessing
 
 - Normalization: basically, makes a vector into a unit vector (norm $1$)
@@ -7,3 +11,5 @@ https://en.wikipedia.org/wiki/Normalization_(statistics)
 https://www.jianshu.com/p/9c2b43e71dfe
 
 - standardization: Standard score
+
+
