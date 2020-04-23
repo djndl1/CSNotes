@@ -42,7 +42,7 @@ class conv_layer:
             layer_name = name
     
         n_channels = input_shape[1]
-        self._filter_shape = [n_filters, n_channels] + filter_shape
+        self._filter_shape = [n_filters, n_channels] + list(filter_shape)
 
         self.W = shared_glorot_uniform(self._filter_shape, name=W_name)
         self.b = th.shared(np.asarray(np.random.normal(size=[n_filters, 1, 1]),
@@ -60,11 +60,11 @@ class conv_layer:
                                            input_shape=self._input_shape,
                                            filter_shape=self._filter_shape,
                                            border_mode=self._border_mode)
-        out = self._activation(conv_out + self.b)
+        out = self._activation(conv_out + self.b.dimshuffle('x', 0, 'x', 'x'))
         return out
     
     def weights(self):
-        return [self.W, self.b]
+        return self.W, self.b
     
     @property
     def name(self):
@@ -143,7 +143,7 @@ def momentum_SGD_update(params, g_params, learning_rate, alpha,
     return momentum_sgd
 
 
-def RMSProp_update(params, g_params, learning_rate, forgetting_factor):
+def RMSProp_update(params, g_params, learning_rate, forgetting_factor=0.9):
     '''Root Mean Square Propagation: an adaptive SGD
 
     divide the learning rate for a weight by a running average of the
@@ -167,7 +167,7 @@ def RMSProp_update(params, g_params, learning_rate, forgetting_factor):
     return rmsprop_updates
 
 
-def Adam_update(params, g_params, learning_rate, forget_first, forget_second):
+def Adam_update(params, g_params, learning_rate, forget_first=0.9, forget_second=0.999):
     '''Adaptive Moment Estimation: an update to the RMSProp optimizer
 
     Running averages of both the gradients and the second moments
@@ -184,8 +184,8 @@ def Adam_update(params, g_params, learning_rate, forget_first, forget_second):
         m = th.shared(param.get_value() * 0.0)
         v = th.shared(param.get_value() * 0.0)
 
-        m_update = forget_first*m + (1-forget_first)*gparam
-        v_update = forget_second*v + (1-forget_second)*gparam**2
+        m_update = forget_first*m + (1.-forget_first)*gparam
+        v_update = forget_second*v + (1.-forget_second)*gparam**2
         adam_updates.append((m, m_update))
         adam_updates.append((v, v_update))
 
@@ -221,3 +221,9 @@ def SGD(params, g_params, learning_rate):
         sgd_updates.append((param, param_update))
 
     return sgd_updates
+
+def zero_one_loss(prob, target):
+    return T.sum(T.neq(T.argmax(prob), target))
+
+def neg_MAL(prob, target):
+    return -T.sum(T.log(prob)[T.arange(y.shape[0], y)])
