@@ -24,21 +24,15 @@ The major drawbacks are being slow to train and its large weights.
 
 ## Generic Architecture
 
-- Input: $224 \times 224$ RGB image
+- Input: $224 \times 224$ RGB image, subtracted by the mean RGB value computed on the training set from each pixel.
 
-- Receptive field: $3 \times 3$;
-
-- One linear transformation (followed by non-linearity): increases the non-linearity of the decision function without affecting the receptive fields of the conv. layers.
-
-- Convolution stride: $1$
-
-- Spatial padding: same
+- Convolution stride: $1$; receptive field $3 \times 3$ or $1 \times 1$; Spatial padding: same
 
 - Five MaxPooling over $2 \times 2$ window with stride $2$ following some of the conv layers.
 
 - All hidden layers use ReLU.
 
-- No Local Response Normalization (LRN)
+- No Local Response Normalization (LRN) since it does not increase performance.
 
 A stack of convolutional layers followed by three fully-connected (FC) layers. The final layer is softmax layer.
 
@@ -46,7 +40,7 @@ A stack of three $3 \times 3$ has an effective receptive field of $5 \times 5$ (
 
 Increased depth with small-size filters led to better performance.
 
-A 16 weight-layer example
+A 16 weight-layer example, 130+ million parameters
 
 
 | input (224, 224) RGB image |
@@ -86,15 +80,13 @@ A 16 weight-layer example
 
 - dropout regularization for the first two FC layers (dropout ratio $0.5$);
 
-- Optimizaing the multinomial logistic regression objective using mini-batch gradient descent;
-
 - Learning rate set to $10^{-2}$ initially, and then decreased by a factor of $10$ when the validation set accuracy stopped improving.
 
-- weight initialization is done by pretraining a smaller model.
+- weight initialization is done by first pretraining a smaller model and stracking more layers on top of it to obtain a deeper model.
 
 - Images are cropped into $224 \times 224$ pixels from rescaled training images. The crops underwent random horizontal flipping and random RGB color shift.
 
-- image size can be found by (1) training a model with a smaller input size and training a model with a larger input size, initialized with the smaller one or (2) multi-scale training([Multiscale Methods and Machine Learning](https://www.kdnuggets.com/2018/03/multiscale-methods-machine-learning.html)) by random sampling $S$ from a certain range $[S_{min}, S_{max}]$ so that a single model is trained to recognize objects over a wide range of scales.
+- The proper image size can be found by (1) training a model with a smaller input size and training a model with a larger input size, initialized with the smaller one or (2) multi-scale training([Multiscale Methods and Machine Learning](https://www.kdnuggets.com/2018/03/multiscale-methods-machine-learning.html)) by random sampling $S$ from a certain range $[S_{min}, S_{max}]$ so that a single model is trained to recognize objects over a wide range of scales.
 
 ## Testing
 

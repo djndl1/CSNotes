@@ -1,6 +1,6 @@
 Instead of linear filters followed by a nonlinear activation function, micro neural networks with more complex structures, here a MLP, to abstract the data within the receptive field are used. The GLM is replaced with a micro-network structure which is a general nonlinear function approximator.
 
-The mlpconv maps the input local patch to the output feature vector with a MLP consisting of multiple FC??? layers with nonlinear activation functions.
+The mlpconv maps the input local patch to the output feature vector with a MLP consisting of multiple FC layers with nonlinear activation functions.
 
 The linear convolution is sufficient for abstraction when the instances of the latent concepts are linearly separable. However, representations that achieve good abstraction are generally highly nonlinear functions of the input data. Conventional CNNs use over-complete filters to cover all variations of the latent concepts.
 
@@ -16,7 +16,11 @@ $$
 
 ReLU is used as the activation function in the MLP.
 
-It is equivalent to cascaded cross channel parametric pooling on a normal convlayer. ???
+It is equivalent to cascaded cross channel parametric pooling on a normal convlayer. Similar to an weighted average pooling.
+
+[https://datascience.stackexchange.com/questions/12830/how-are-1x1-convolutions-the-same-as-a-fully-connected-layer][How are 1x1 conv the same as a FC layer]
+
+https://www.quora.com/Is-a-fully-connected-neural-network-conceptually-similar-to-a-1x1-convolutional-neural-network
 
 ## Global Average Pooling
 

@@ -66,12 +66,28 @@ Images patch can have greater variation than the produced activation maps.
 
 - layer 5 shows entire objects with significant pose variation;
 
-The upper layers only develop and stabilize after a considerable number of epochs (40-50). 
+## Feature Evolution during Training
+
+The lower layers of the model can be seen to converge within a few epochs. However, the upper layers only develop develop after a considerable number of epochs (40-50), demonstrating the need to let the models train until fully converged.
+
+## Feature Invariance
 
 Small transformations have a dramatic effect in the first layer of the model, but a lesser impact at the top feature layer. The network output is stable to translations and scalings but not invariant to rotation except for object with rotational symmetry.
 
-The first layer filters are a mix of extremely high and low frequency information. with little coverage of the mid-frequencies. The second layer visualization shows aliasing artifacts caused by teh large stride 4 used in the 1st layer convolutions. To remedy this, the original AlexNet was modified into the architecture above. This improves the classification performance significantly.
+## Feature Localization
 
-By occluding different portions of the input image with a grey square, it is shown that the model is localizing the objects within the scene, as the probability of the correct class drops significantly when the object is occluded.
+By occluding different portions of the input image with a grey square, it is shown that the model is localizing the objects within the scene, as the probability of the correct class drops significantly when the object is occluded. The model is truly identifying the location of the object in the image. The model, while trained for classification, is highly sensitive to local structure in the image and is not just using broad scene context.
 
-By occluding the same part of a dog face and computing a Hamming distance, it is shown that the model does establish some degree of correspondence between different images. That is, these parts effect on the model in a relatively consistent way.
+By occluding the same part of a dog face and computing a difference of the features of the original and the occluded, it is shown that the model does establish some degree of correspondence between different images. That is, these parts effect on the model in a relatively consistent way.
+
+## Model Arch and Size
+
+Removing the fully connected layers (6,7) only gives a slight increase in error. Removing two of the middle convolutional layers also makes a relatively small different to the error rate. However, removing both the middle convolution layers and the fully con- nected layers yields a model with only 4 layers whose performance is dramatically worse. This would sug- gest that the overall depth of the model is important for obtaining good performance. Increasing the size of the middle convolution layers goes give a useful gain in performance.
+
+## Feature Generalization
+
+Using pretrained models to train on on unseen data significantly increases performance.
+
+## Feature Analysis
+
+SVMs after different conv layers give total different performance. As the feature hierarchies become deeper, they learn increasingly powerful features.

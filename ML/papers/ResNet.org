@@ -1,0 +1,108 @@
+He, K., Zhang, X., Ren, S., & Sun, J. (n.d.). Deep Residual Learning for Image Recognition. Retrieved October 31, 2019, from http://image-net.org/challenges/LSVRC/2015/
+
+* Background
+
+Network depth is of crucial importance. Deeper neural networks are difficult to train due to vanishing/exploding gradients.
+With the network increasing, accuracy gets saturated.
+
+* New Solution: Residual Learning
+
+Residual mapping: instead of hoping each few stacked layers directly fit (asymptotically approximate) a desired underlying mappings, these layers fit a residual mapping $F(x) = H(x) -x$ where
+$H(x)$ is the desired underlying mapping. Realized by feed-forward neural networks with shortcut connections. 
+It might be easier to optimize the residual mapping than to optimize the original unreferenced mapping.
+
+Identity shortcut connections add neither extra parameter nor computational complexity.
+If an identity mapping were optimal, it would be easier to push the residual to zero than to fit an identity mapping by a stack of nonlinear layers.
+
+#+BEGIN_SRC 
+x -> Layer -> ReLU -> Layer -> + -> ReLu
+|                              ^
+|______________________________| 
+#+END_SRC
+
+\begin{equation}
+\bm{y}=F\left(\bm{x},\left\{ W_{i}\right\} \right)+W_{s}\bm{x}
+\end{equation}
+
+
+
+If the optimal function is closer to an identity mapping than to a zero mapping, it should be easier for the solver to find the perturbations 
+with reference to an identity mapping, than to learn the function as a new one. ???
+
+** Identity Mapping by Shortcuts
+
+\begin{equation}
+\bm{y}=F\left(\bm{x},\left\{ W_{i}\right\} \right)+\bm{x}
+\end{equation}
+
+If the dimensions of $\bm{x}$ and $F$ must be equal, a linear project $W_{s}$ can be performed by the shortcut. 
+The dimension issue can be addressed by (1) zero padding (2) projection matrix
+
+Non-linearity is performed after the addition.
+
+For both FC-layers and conv layers and $F$ is usually two or three layers. Otherwise it's just a linear mapping.
+
+* Advantage
+
+Deep residual nets are easy to optimize than the counterpart plain nets and enjoy accuracy gains from greatly increased depth.
+the residual learning principle is generic
+
+* Network Architectures
+
+#+caption: ResNet Architecture Example Res34
+| Residual                                             | Identity                                               |
+|------------------------------------------------------+--------------------------------------------------------|
+| $7 \times 7$ conv, 64, /2                            | None                                                   |
+| pool, /2                                             |                                                        |
+| 6 $3\times 3$ conv, 64                               | one identity mapping between every two residual layers |
+| $3 \times 3$ conv, 128, /2 and $3\times 3$ conv, 128 | identity                                               |
+| 6 $3\times 3$ conv 128                               | one identity mapping between every two residual layers |
+| $3 \times 3$ conv, 256, /2 and $3\times 3$ conv, 256 | identity                                               |
+| 10 $3\times 3$ conv 256                              | one identity mapping between every two residual layers |
+| $3 \times 3$ conv, 512, /2 and $3\times 3$ conv, 512 | identity                                               |
+| 4 $3\times 3$ conv 512                               | one identity mapping between every two residual layers |
+| avg pool                                             | None                                                   |
+| fc 1000                                              | None                                                   |
+
+Res50/101/152 uses a deep bottleneck building block, where the $1\times 1$ conv layers reduce and then restores dimensions.
+the parameter-free identity shortcuts are particularly important for the bottleneck architectures.
+
+#+caption: Bottleneck building block
+| Layer        | Params                |
+|--------------+-----------------------|
+| input        | 256 channels          |
+| conv         | $1\times 1$, 64, relu |
+| conv         | $3\times 3$, 64, relu |
+| conv         | $1\times 1$, 256      |
+| add identity |                       |
+| activation   | relu                  |
+
+Res50 (3.8B)/101/152 (11.3B FLOPs) still has lower complexity than VGG-16/19 nets.
+
+* Implementation
+
+1. Resized and cropped into $224\times 224$ with the per-pixel mean subtracted
+
+2. Standard color augmentation is used
+
+3. Btach normalization is done right after each convolution and before activation
+
+4. SGD of batch size 256, learning rate from 0.1 and is reduced by 10 when the error plateau, trained for $60 \times 10^{4}$ iterations, weight decay of 0.0001 and 
+  a momentum of $0.9$
+
+5. 10-crop testing
+
+6. Scores are averaged at multiple scales
+  
+* Experiments
+
+- The author argues that the relatively higher error from a deeper plain CNN is not caused by vanishing gradients and instead by supposedly exponentially low 
+  convergence rates.
+
+- Projection shortcuts are not essential to the degradation problem.
+
+- ResNets have generally smaller responses than their plain counterparts. 
+  the residual functions might be generally closer to zero than the non-residual functions. 
+  We also notice that the deeper ResNet has smaller magni- tudes of responses.
+
+- Extremely deep model of over 1000 layers performed worse than Res101
