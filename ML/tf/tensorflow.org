@@ -348,3 +348,5 @@ the complex models that have multiple inputs, multiple outputs and
 4. Defining the optimizer function
 
 5. Training the model for a number of iterations (epochs)
+
+https://pgaleone.eu/tensorflow/2018/07/28/understanding-tensorflow-tensors-shape-static-dynamic/
