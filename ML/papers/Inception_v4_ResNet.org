@@ -1,0 +1,36 @@
+Szegedy, C., Ioffe, S., Vanhoucke, V., & Alemi, A. A. (2017). Inception-v4, inception-ResNet and the impact of residual connections on learning. 31st AAAI Conference on Artificial Intelligence, AAAI 2017, 4278–4284. https://arxiv.org/abs/1602.07261
+
+* Inception-v4
+
+#+caption: Inception v4 Arch
+| Layer Type                       | Parameter                                                                   |
+|----------------------------------+-----------------------------------------------------------------------------|
+| Input                            | (299, 299, 3)                                                               |
+| Conv                             | 32, (3, 3)/2 valid                                                          |
+| Conv                             | 32, (3, 3), valid                                                           |
+| Conv                             | 32, (3, 3), valid                                                           |
+| Conv                             | 64, (3, 3), same                                                            |
+| maxpool ; Conv                   | (3,3)/2; 96, (3,3)/2                                                        |
+| Concat                           |                                                                             |
+| Conv + Conv; conv+conv+conv+conv | 64 (1, 1), 96 (3, 3) valid; 64 (1, 1), 64 (7, 1), 64 (1, 7), 96 (3, 3)valid |
+| Concat                           |                                                                             |
+| maxpool; conv                    | stride=2; 192 (3, 3)                                                        |
+| concat                           |                                                                             |
+| 4 Inception-A                    |                                                                             |
+| Reduction-A                      |                                                                             |
+| 7 Inception-B                    |                                                                             |
+| Reduction-B                      |                                                                             |
+| 3 Inception-C                    |                                                                             |
+| Average Pooling                  |                                                                             |
+| Dropout                          | keep 0.8                                                                    |
+| Softmax Dense                    |                                                                             |
+
+* Inception-ResNet
+
+** Scaling of the Residuals
+
+If the number of filters exceeded 1000, the residual variants started to exhibit instabilities and the network has just “died” early in the training, 
+meaning that the last layer before the average pooling started to produce only zeros after a few tens of thousands of iterations.
+
+Scaling down the residuals before adding them to the previous layer activation seemed to stabilize the training. The scaling factor is between 0.1 and 0.3.
+
