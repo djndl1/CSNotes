@@ -21,7 +21,7 @@ x -> Layer -> ReLU -> Layer -> + -> ReLu
 #+END_SRC
 
 \begin{equation}
-\bm{y}=F\left(\bm{x},\left\{ W_{i}\right\} \right)+W_{s}\bm{x}
+\mathbf{y}=F\left(\mathbf{x},\left\{ W_{i}\right\} \right)+W_{s}\mathbf{x}
 \end{equation}
 
 
@@ -32,10 +32,10 @@ with reference to an identity mapping, than to learn the function as a new one. 
 ** Identity Mapping by Shortcuts
 
 \begin{equation}
-\bm{y}=F\left(\bm{x},\left\{ W_{i}\right\} \right)+\bm{x}
+\mathbf{y}=F\left(\mathbf{x},\left\{ W_{i}\right\} \right)+\mathbf{x}
 \end{equation}
 
-If the dimensions of $\bm{x}$ and $F$ must be equal, a linear project $W_{s}$ can be performed by the shortcut. 
+If the dimensions of $\mathbf{x}$ and $F$ must be equal, a linear project $W_{s}$ can be performed by the shortcut. 
 The dimension issue can be addressed by (1) zero padding (2) projection matrix
 
 Non-linearity is performed after the addition.
