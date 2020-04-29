@@ -1,0 +1,74 @@
+* Advantages of Smaller CNN Model
+
+- More efficient distributed training
+
+- Less overhead when exporting new models to clients
+
+- Feasible FPGA and embedded deployment
+
+* Related Topics
+
+1. Model Compression
+
+2. CNN Microstructure
+
+3. CNN Macrostrucutre
+
+4. Design Space Exploration
+
+* SqueezeNet
+
+** Design Strategies
+
+1. Replace (3, 3) filters with (1, 1) filters
+
+2. Decrease the number of input channels to (3, 3) filters
+
+3. Downsample late in the networks so  that con layers have large activation maps. 
+  The intuition is that large activation maps can lead to higher classificatin accuracy.
+
+** Fire Module
+
+- squeeze layer: (1, 1) conv filters + relu
+
+- expand layer: (1, 1) and (3, 3) conv filters + relu
+
+The squeeze layer should have fewer filters than the expand layer does
+
+** Macroarchitecture
+
+#+caption: SqueezeNet 1.1
+| Layer Type    | Params                 |
+|---------------+------------------------|
+| Conv          | 96, (3, 3)/2           |
+| maxpool       | (3, 3)/2               |
+| fire2-squeeze | 16 (1, 1)              |
+| fire2-expand  | 64 (1, 1); 64 (3, 3)   |
+| fire3-squeeze | 16 (1, 1)              |
+| fire3-expand  | 64 (1, 1); 64 (3, 3)   |
+| maxpool       | (3, 3)/2               |
+| fire4-squeeze | 32 (1, 1)              |
+| fire4-expand  | 128 (1, 1); 128 (3, 3) |
+| fire5-squeeze | 32 (1, 1)              |
+| fire5-expand  | 128 (1, 1); 128 (3, 3) |
+| maxpool       | (3, 3)/2               |
+| fire6-squeeze | 48 (1, 1)              |
+| fire6-expand  | 192 (1, 1); 192 (3, 3) |
+| fire7-squeeze | 48 (1, 1)              |
+| fire7-expand  | 192 (1, 1); 192 (3, 3) |
+| fire8-squeeze | 64 (1, 1)              |
+| fire8-expand  | 256 (1, 1); 256 (3, 3) |
+| fire9-squeeze  | 64 (1, 1)              |
+| fire9-expand  | 256 (1, 1); 256 (3, 3) |
+| dropout       | 0.5                    |
+| conv          | n_classes (1, 1)       |
+| global average pooling |                        |
+
+
+* Other Details
+
+- Dropout 0.5 after fire9
+
+- lr = 0.04
+
+- Conv layer with multiple filter resolutions are implemented by concatenating the outputs of parallel conv layers.
