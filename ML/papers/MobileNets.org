@@ -1,0 +1,48 @@
+* Background
+
+Few researches focus on reducing model sizes and speed.
+
+- depthwise separable ocnvolutions
+
+- shrinking, factorizing or compressing pretrained networks
+
+* Architecture
+
+** Depthwise Separable Convolution
+
+A standard convolution is factorized into a depthwise convolution and  a (1, 1) convolution called a pointwise convolution convolution called a pointwise convolution.
+This factorization has the effect of drastically reducing computtion and model size.
+MobileNets use both batchnorm and ReLU for both layers.
+
+MobileNets uses (3, 3) depthwise separable convolutions which uses between 8 to 9 times less computatin than standard convolution at only a small reduction in accuracy.
+
+The reduction is $\frac{1}{N}+\frac{1}{D_{K}^{2}}$ where $D_K$ is the kernel size and $N$ is the number of filters.
+
+Pointwise convolution does not require im2col. A direct GEMM would do.
+
+** Structure and Training
+
+(1, 1) convolutions consumes over 90% of the computation resource.
+
+- RMSprop
+
+- no label smoothing
+
+- almost no weight decay on the depthwise filters
+
+- width multiplier $\alpha$ can be configured for each conv layer to reduce the input and output channels.
+
+- resolution multiplier $\rho$: applied to the input image
+
+** Experiments
+
+- Depthwise separable convolutions compared to full convolutions only reduces accuracy by 1%
+
+- Making MobileNets thinner is better than making them shallower
+
+- MobileNet is nearly as accurate as VGG16 while being 32 times smaller and 27 times less compute intensive.
+  It is more accurate than GoogleNet while being smaller and more than 2.5 times less computation.
+
+- With width multiplier of 0.5, and reduced resolution $160 \times 160$, MobileNet is better than SqueezeNet and about the same size and 
+  22x less computation.
+

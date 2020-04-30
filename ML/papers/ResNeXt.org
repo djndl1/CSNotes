@@ -1,0 +1,44 @@
+* Background
+
+The Inception models share a common property: split-transform-merge strategy
+
+The realization of Inception models has been accompanied with a series of complicating factors, the filter numbers and sizes 
+are tailored for each individual transformation, and the modules are customized stage by stage
+
+* Method
+
+** Template
+
+- A stack of residual blocks with the same topology
+
+- If producing spatial maps of the same size ,the blocks share the same hyperparameters (width and filter sizes)
+
+- each time when the spatial map is downsampled by a factor of 2, the width of the blocks is multiplied by a factor of 2
+
+** Splitting - Transforming - aggregating
+
+The aggregation can be defined as 
+
+$$
+F\left(\mathbf{x}\right)=\sum_{i=1}^{C}T_{i}\left(\mathbf{x}\right)
+$$
+
+where $C$ is called /cardinality/, which is an essential dimension and can be moreeffective than the dimensions of width and depth.
+
+with shortcut connection, this becomes
+
+$$
+F\left(\mathbf{x}\right)= x + \sum_{i=1}^{C}T_{i}\left(\mathbf{x}\right)
+$$
+
+https://blog.yani.io/filter-group-tutorial/
+
+- block type 1: [256-d in, (1, 1), 128 filters] -> [(3, 3) 128 filters, group = 32] -> [128, (1, 1), 256]
+
+* Implementation Details
+
+- the shortcuts are identity connections except for those increasing dimensions which are projections
+
+- Downsampling is done by stride-2 convolutions in the (3, 3) layer of the first block in each stage
+
+- SGD: lr = 0.1, divided by 10 for three times, momentum 0.9; weight decay 0.0001
