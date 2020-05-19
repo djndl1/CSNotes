@@ -72,12 +72,12 @@ def build_ResNeXt50(n_classes):
             model.add(ResNeXtBlock(256))
 
         model.add(ResNeXtBlock(512, cross=True))
-        for _ in range(4): # 6
+        for _ in range(3): # 6
             model.add(ResNeXtBlock(512))
 
-        model.add(ResNeXtBlock(512, cross=True))
+        model.add(ResNeXtBlock(1024, cross=True))
         for _ in range(1): # 2
-            model.add(ResNeXtBlock(512))
+            model.add(ResNeXtBlock(1024))
 
         model.add(gluon.nn.GlobalAvgPool2D())
         model.add(gluon.nn.Dense(n_classes))
@@ -99,10 +99,8 @@ def evaluate(data_iterator, net, ctx):
 def train_ResNeXt(net, lr, input_shape, batch_size, train_path, test_path, epoch, ctx):
     train_data, val_data = prepare_data(train_path, test_path, input_shape, batch_size)
 
-    resnext.summary(nd.zeros(shape=(1, 3) + input_shape, ctx=ctx))
-    resnext.hybridize()
     lr_sched = mx.lr_scheduler.FactorScheduler(step=1000, factor=0.94, base_lr=1)
-    optim = mx.optimizer.SGD(learning_rate=lr, momentum=0.9, wd=1e-4, lr_scheduler=lr_sched)
+    optim = mx.optimizer.SGD(learning_rate=lr, momentum=0.9, wd=1e-3, lr_scheduler=lr_sched)
     trainer = gluon.Trainer(net.collect_params(), optim)
 
     loss_fn = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -182,8 +180,8 @@ def prepare_data(train_data_path, test_data_path, pic_size, batch_size):
     test_datasets = gluon.data.vision.ImageFolderDataset(test_data_path)
     test_datasets = test_datasets.transform_first(test_data_transformer)
 
-    train_data_iter = gluon.data.DataLoader(train_datasets, batch_size, shuffle=True, num_workers=4)
-    test_data_iter = gluon.data.DataLoader(test_datasets, batch_size, shuffle=True, num_workers=4)
+    train_data_iter = gluon.data.DataLoader(train_datasets, batch_size, shuffle=True, num_workers=2)
+    test_data_iter = gluon.data.DataLoader(test_datasets, batch_size, shuffle=True, num_workers=2)
 
     return train_data_iter, test_data_iter
 
@@ -195,6 +193,8 @@ def cmd_parser():
     parser.add_argument('-c', action='store_true', 
             help='continue to train the model with specified parameters')
     parser.add_argument('--param_path', nargs='?', help='parameter file path')
+    parser.add_argument('--model_path', nargs='?', help='model file path')
+    parser.add_argument('--lr', type=float , nargs='?', help='learning rate')
 
     parser.add_argument('--train_path', nargs=1, help="train data path")
     parser.add_argument('--val_path', nargs=1, help="validation data path")
@@ -208,7 +208,6 @@ if __name__ == "__main__":
     train_path = args.train_path
     test_path = args.val_path
 
-    resnext = build_ResNeXt50(256)
 
     if args.gpu:
         ctx = mx.gpu()
@@ -217,10 +216,14 @@ if __name__ == "__main__":
 
     if args.c:
         param_path = args.param_path
-        resnext.load_parameter(param_path)
+        model_path = args.model_path
+        resnext = gluon.nn.SymbolBlock.imports(model_path, ['data'], param_path, ctx=ctx)
     else:
+        resnext = build_ResNeXt50(256)
         resnext.initialize(mx.init.Xavier(magnitude=2.41), ctx=ctx)
+        resnext.summary(nd.zeros(shape=(1, 3) + input_shape, ctx=ctx))
+        resnext.hybridize()
     
-    net = train_ResNeXt(resnext, 0.1, (72, 72), 32, str(train_path[0]), str(test_path[0]), 80, ctx)
+    net = train_ResNeXt(resnext, args.lr, (80, 80), 36, str(train_path[0]), str(test_path[0]), 60, ctx)
 
     net.export("resnet", epoch=80)
