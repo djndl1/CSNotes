@@ -47,22 +47,22 @@ def wide_residual_block(filters, kernels, strides, regularizer, width_factor=2, 
     def resblock(x):
         res_out = x
 
-        res_out = keras.layers.BatchNormalization()(x)
-        res_out = keras.layers.Activation('relu')(res_out)
         res_out = keras.layers.Conv2D(filters[0] * width_factor, kernels[0], strides, padding='same',
                                       kernel_regularizer=regularizer, bias_regularizer=regularizer)(res_out)
+        res_out = keras.layers.BatchNormalization()(res_out)
+        res_out = keras.layers.Activation('relu')(res_out)
 
         res_out = keras.layers.Dropout(0.4)(res_out)
 
-        res_out = keras.layers.BatchNormalization()(res_out)
-        res_out = keras.layers.Activation('relu')(res_out)
         res_out = keras.layers.Conv2D(filters[1] * width_factor, kernels[1], strides=(1, 1), padding='same',
                                       kernel_regularizer=regularizer, bias_regularizer=regularizer)(res_out)
+        res_out = keras.layers.BatchNormalization()(res_out)
+        res_out = keras.layers.Activation('relu')(res_out)
 
         if cross:
-            shortcut = keras.layers.BatchNormalization()(x)
             shortcut = keras.layers.Conv2D(filters[1] * width_factor, (1, 1), strides=strides, padding='same',
                                            kernel_regularizer=regularizer, bias_regularizer=regularizer)(shortcut)
+            shortcut = keras.layers.BatchNormalization()(x)
         else:
             shortcut = x
 

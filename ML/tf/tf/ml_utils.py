@@ -235,3 +235,12 @@ def generic_conv_block(x, filters, kernels, strides, activations='relu', padding
                                 bias_regularizer=bias_regularizers[i])(out)
 
     return out
+
+
+def uniform_label_smoothing(onehot_label, weight):
+    smoothed = onehot_label
+    n_classes = smoothed.shape[1]
+    smoothed *= 1.0 - weight
+    smoothed += 1.0 / n_classes * weight
+
+    return smoothed

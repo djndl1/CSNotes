@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
 #%% 
-from tensorflow import keras
-import tensorflow as tf
+import keras
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import preprocessing as skpreprocessing, metrics as skmetrics
-from tensorflow.keras.applications import imagenet_utils
+from keras.applications import imagenet_utils
 
 
 # %% Loading Caltech 256
@@ -25,12 +23,12 @@ picgen = keras.preprocessing.image.ImageDataGenerator(
 )
 
 train_gen = picgen.flow_from_directory(caltech256_data,
-                                       target_size=(64, 64),
+                                       target_size=(112, 112),
                                        batch_size=32,
                                        subset='training'
                                        )
 val_gen = picgen.flow_from_directory(caltech256_data,
-                                     target_size=(64, 64),
+                                     target_size=(112, 112),
                                      batch_size=32,
                                      subset='validation')
 # %% See what we have
@@ -49,56 +47,76 @@ def Inception_block(filters, reductions, regularizer=None):
     assert len(filters) == 3
 
     def inception(x):
-        path_1 = keras.layers.Conv2D(filters[0], (1, 1), padding='same',
+        path_1 = keras.layers.Conv2D(filters[0], (1, 1), padding='same', activation='relu',
                                      kernel_regularizer=regularizer,
                                      bias_regularizer=regularizer)(x)
 
-        path_2 = keras.layers.Conv2D(reductions[0], (1, 1), padding='same',
+        path_2 = keras.layers.Conv2D(reductions[0], (1, 1), padding='same', activation='relu',
                                      kernel_regularizer=regularizer,
                                      bias_regularizer=regularizer)(x)
-        path_2 = keras.layers.Conv2D(filters[1], (3, 3), padding='same',
+        path_2 = keras.layers.Conv2D(filters[1], (3, 3), padding='same', activation='relu',
                                      kernel_regularizer=regularizer,
                                      bias_regularizer=regularizer)(path_2)
 
-        path_3 = keras.layers.Conv2D(reductions[1], (1, 1), padding='same',
+        path_3 = keras.layers.Conv2D(reductions[1], (1, 1), padding='same', activation='relu',
                                      kernel_regularizer=regularizer,
                                      bias_regularizer=regularizer)(x)
-        path_3 = keras.layers.Conv2D(filters[2], (5, 5), padding='same',
+        path_3 = keras.layers.Conv2D(filters[2], (5, 5), padding='same', activation='relu',
                                      kernel_regularizer=regularizer,
                                      bias_regularizer=regularizer)(path_3)
 
         path_4 = keras.layers.MaxPool2D((3, 3), strides=1, padding='same')(x)
-        path_4 = keras.layers.Conv2D(reductions[2], (1, 1), padding='same',
+        path_4 = keras.layers.Conv2D(reductions[2], (1, 1), padding='same', activation='relu',
                                      kernel_regularizer=regularizer,
                                      bias_regularizer=regularizer)(path_4)
 
-        out = keras.layers.Concatenate(-1)([path_1, path_2, path_3, path_4])
+        out = keras.layers.Concatenate(1)([path_1, path_2, path_3, path_4])
 
         return out
 
     return inception
 
 
+
+def auxiliary_classifier(x):
+    out = x
+    out = keras.layers.AveragePooling2D((5, 5), strides=3, padding='same')(out)
+    out = keras.layers.Conv2D(128, (1, 1), activation='relu', padding='same')(out)
+    out = keras.layers.Flatten()(out)
+    out = keras.layers.Dense(1024, activation='relu')(out)
+    out = keras.layers.Dropout(0.7)(out)
+    out = keras.layers.Dense(n_classes, activation='softmax')(out)
+    return out
 #%%
+
+def multiple_outputs(generator):
+    while True:
+        gnext = generator.next()
+        yield gnext[0], [gnext[1], gnext[1], gnext[1]]
+#%%
+
 input = keras.layers.Input(shape=input_shape)
 
-conved = keras.layers.Conv2D(64, (7, 7), (2, 2), 'same')(input)
+conved = keras.layers.Conv2D(64, (7, 7), strides=(2, 2), padding='same', activation='relu')(input)
 conved = keras.layers.MaxPool2D((3, 3), strides=2, padding='same')(conved)
 
-conved = keras.layers.Conv2D(192, (3, 3), (1, 1), 'same')(conved)
+conved = keras.layers.Conv2D(192, (3, 3), strides=(1, 1), padding='same', activation='relu')(conved)
 conved = keras.layers.MaxPool2D((3, 3), strides=2, padding='same')(conved)
 
 conved = Inception_block([64, 128, 32], [96, 16, 32])(conved)
 conved = Inception_block([128, 192, 96], [128, 32, 64])(conved)
 conved = keras.layers.MaxPool2D((3, 3), strides=2, padding='same')(conved)
 
-conved = Inception_block([192, 208, 48], [96, 16, 64])(conved)
+#conved = Inception_block([192, 208, 48], [96, 16, 64])(conved)
 
 y1 = auxiliary_classifier(conved)
 
 conved = Inception_block([160, 224, 64], [112, 24, 64])(conved)
 conved = Inception_block([128, 256, 64], [128, 24, 64])(conved)
 conved = Inception_block([112, 288, 64], [144, 32, 64])(conved)
+
+y2 = auxiliary_classifier(conved)
+
 conved = Inception_block([256, 320, 128], [160, 32, 128])(conved)
 conved = keras.layers.MaxPool2D((3, 3), strides=2, padding='same')(conved)
 
@@ -111,34 +129,36 @@ avg = keras.layers.Dense(n_classes)(avg)
 
 scores = keras.layers.Activation('softmax')(avg)
 
-GoogLeNet = keras.Model(inputs=input, outputs=scores)
+GoogLeNet = keras.Model(inputs=input, outputs=[scores, y1, y2])
 
 GoogLeNet.summary()
 
 
 # %%
 chkpt = keras.callbacks.ModelCheckpoint('GoogLeNet.h5', period=2, save_best_only=True)
-lrreduce = keras.callbacks.ReduceLROnPlateau(patience=5)
-tfbord = keras.callbacks.TensorBoard(log_dir='GoogLeNet_logs')
+lrreduce = keras.callbacks.ReduceLROnPlateau(patience=2, factor=0.9)
 
-callbacks = [chkpt, lrreduce, tfbord]
-sgd = keras.optimizers.SGD(lr=0.005, momentum=0.9)
-GoogLeNet.compile(loss='categorical_crossentropy',
-                optimizer=sgd,
+callbacks = [chkpt, lrreduce]
+lrs = [0.01]
+sgd = [keras.optimizers.SGD(lr=lr, momentum=0.9) for lr in lrs]
+import pandas as pd
+
+for opt, lr in zip(sgd, lrs):
+    GoogLeNet.compile(loss='categorical_crossentropy',
+                optimizer=opt,
                 metrics=['acc'])
-
+    
+    hist = GoogLeNet.fit_generator(multiple_outputs(train_gen), epochs=20, validation_data=multiple_outputs(val_gen), validation_steps=len(val_gen),
+        steps_per_epoch=len(train_gen), callbacks=callbacks)
+    hist_df = pd.DataFrame(hist.history)
+    with open('GoogLeNet_hist' + str(lr) + '.csv', mode='w') as f:
+        hist_df.to_csv(f)
 #%%
 import os
-if os.path.isfile('./GoogLeNet.h5'):
-    GoogLeNet = keras.models.load_model('GoogLeNet.h5')
+#if os.path.isfile('./GoogLeNet.h5'):
+#    GoogLeNet = keras.models.load_model('GoogLeNet.h5')
 # %%
-from keras.backend.tensorflow_backend import set_session
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
 
-config.gpu_options.per_process_gpu_memory_fraction=0.8
-set_session(tf.Session(config=config))
-
-GoogLeNet.fit(x=train_gen, epochs=70, validation_data=val_gen, validation_steps=1, callbacks=callbacks)
 
 # %%
+

@@ -1,0 +1,24 @@
+Sermanet, P., Eigen, D., Zhang, X., Mathieu, M., Fergus, R., & LeCun, Y. (2013). OverFeat: Integrated Recognition, Localization and Detection using Convolutional Networks. http://arxiv.org/abs/1312.6229
+
+The main point is to show that training a convolutional network to simultaneously classify, locate and detect objects in images can boost the classification accuracy and
+the detection and localization accuracy of all tasks.
+
+combining many localization predictions, detection can be performed without training on background samples and 
+that it is possible to avoid the time-consuming and complicated bootstrapping training passes
+Not training on background also lets the network focus solely on positive classes for higher accuracy.
+
+** Model Design and Training
+
+- 5 random crops of size (221, 221)
+
+- lr: 0.05; decreased by a factor of 0.5 after 30, 50, 60, 70, 80 epochs; momentum 0.6; L2 weight decay 1e-5
+
+- dropout 0.5 in FC layers
+
+The architecture is basically an AlexNet.
+
+* Multiscale Classification
+
+* Localization
+
+The Classifier layer is replaced by a regression network.
