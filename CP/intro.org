@@ -1,0 +1,153 @@
+The core directive in competitive programming is to solve well-known CS
+problems as quickly as possible. The true end goal of competitive
+programming is to produce all-rounder computer scientists/programmers
+who are much readier to produce better software and to face harder CS
+research problems in the future.
+
+- Type Code Faster
+
+- Quickly Identify Problem Types, common types including:
+    + Ad Hoc
+    + Complete Search (Iterative/Recursive)
+    + Divide and Conquer
+    + Greedy
+    + Dynamic Programming
+    + Graph
+    + Mathematics
+    + String Processing
+    + Computational Geometry
+    + Some Harder/Rare Problems
+
+- Do Algorithm Analysis: pick the simplest solution that works. By
+  analyzing the complexity of the algorithm with the given input bound
+  and the stated time/memory limit, one can better decide whether to
+  attempt to implement the algorithm, attempt to improve the algorithm
+  first, or switch to other problems. Refrain from coding until you are
+  sure that the algorithm is both correct and fast enough.
+
+- Languages: C++ with its built-in STL. Java has powerful built-in
+  libraries and APIs. Mastering and understanding the full capacity of a
+  programming language is important.
+
+- Master the art of testing code: design good, comprehensive and tricky
+  test cases. Use =diff= to check the code's output against the sample
+  output. Include tricky corner cases. Increase the input size
+  incrementally up to the maximum input bounds stated in the problem
+  descriptor.
+
+- Practice: UVa Online Judge; ACM ICPC Live Archive; The USA Computing
+  Olympiad; The Sphere Online Judge
+
+A programming contest problem usually contains:
+
+- background story/problem description. Contestants should be able to
+  filter out unimportant details and focus on the essential ones.
+
+- input and output description: how the input is formatted and how to
+  format the output.
+
+- sample input and sample output: usually only trivial test cases, for
+  contestants to check their basic understanding of the problem and to
+  verify if their code can parse the given input using the given input
+  format.
+
+* Data Structures and Libraries
+
+Using an appropriate efficient data structure for a problem may be the 
+difference between passing or exceeding the problem's time limit.
+
+** Linear Data Structures with Built-in Libraries
+
+- /static arrays/: as the maximum input size is usually mentioned in the 
+  problem statement, the array size can be declared to be the maximum
+  inut size with a small extra buffer (sentinel) for safety.
+
+- /dynamically-resizable array/ (C++ =std::vector=, Java =ArrayList=): 
+  It is better to use a =vector= in place of an array if the size of the
+  sequence of elements is unknown at compile-time. Usually, we initialize
+  the size (=reserve()= or =resize()=) with the estimated size of the
+  collection for better performance. Common used operations include 
+  =push_back()=, =at()=, =[]=, =assign=, =clear=, =erase= and iterators
+  for traversing the contents of =vectors=
+
+$O(n^2)$ comparison-based sorting algorithms are usually avoided. 
+$O(n\log n)$ such as merge/heap/quick sort are the default choice, available
+in C++ as =partial_sort= or =stable_sort= or =Collections.sort= in Java.
+Special purpose sorting algorithms: $O(n)$ Counting/Radix/Bucket Sort are
+rarely used but good to know.
+
+/Linear search/ should be avoided whenever possible. /Binary search/: use
+=lower_bound=, =upper_bound= or =binary_search= or Java =Collections.binarySearch=.
+It is necessary to sort the array at least once before executing binary search.
+Using hashing to search is rarely used.
+
+- /array of booleans/: C++ STL =bitset=, Java =BitSet=
+
+- /bitmask/: lightweight, small sets of booleans, implemented using integers.
+  The operations can be defined as preprocessor macros. Representation:
+  A 32 or 64 bit /signed/ integer =S=.
+    1. To set on the j-th item (0-based indexing) of the set, use ~S |= (1 << j)~
+    2. To check if the j-th item of the set is on, use ~T = S & (1 << j)~.
+    3. To clear the j-th bit, use ~S &= ~(1 << j)~
+    4. To flip the j-th item of the set: ~S ^= (1 << j)~
+    5. To get the value of the least significant bit that is on from the right:
+       ~T = (S & (-S))~
+    6. To turn on all bits in a set of size =n=: ~S = (1 << n) - 1~ (be careful with overflow)
+
+- /Linked List/: C++ STL =list=, Java =LinkedList=, usually avoided in 
+  typical contest problems.
+
+- /Stack/: C++ STL =stack=, Java =Stack=. Used as part of algorithms that
+  solve certain problems.
+
+- /Queue/: C++ STL =queue=, Java =Queue=. Used in algorithms like Breadth
+  First Search.
+
+- /Double-ended Queue/ (Deque): C++ STL =deque=, Java =Deque=. Supports
+  fast $O(1)$ insertions and deletions at both ends.
+
+** Non-Linear Data Structures with Built-in Libraries
+
+- /Balanced Binary Search Tree/: C++ STL =map=, =set=; Java =TreeMap=, =TreeSet=
+  =search(key)=, =insert(key)=, =findMin()=, =findMax()=, =delete(key)=,
+  =sucessor(key)= takes $O(\log n)$. The implementation of an AVL tree or 
+  a Red-Black tree is a tedious task. The STL versions are usually implemented
+  as a RB tree. For most problems, =map= should be used (=set= is only
+  useful for efficiently determining the existence of a certain key)
+
+- /Heap/: C++ STL =priority_queue=, Java =PriorityQueue=.
+  There is no notion of a search in the heap. The heap allows for the 
+  fast extraction of the maximum element and insertion of new items, both
+  of which are easily achieved by in $O(\log n)$. This DS can be used to
+  implement =partial_sort=
+
+- /Hash Table/: C++ STL =unordered_map=; Java =HashMap=, =HashSet=, =HashTable=
+  not recommended unless absolutely necessary.
+  + /Direct Addressing Tables/ (DAT): the keys are themselves indices; commonly used
+
+** Data Structures with Our Own Libraries
+
+Contestants should prepare bug-free implementations of these data structures.
+
+- /graph/: $G = (V, E)$, a set of vertices and edges. There are three basic ways
+  to represent a graph $G$ with $V$ vertices and $E$ edges:
+  + /The adjacency matrix/, in the form of a 2D array. Adjacency matrix cannot
+    be used to store multigraph. An adjacency matrix is a good choice if the
+    connectivity between two vertices in a small dense graph is frequently 
+    required. Usually infeasible to use when $V >= 1000$. It takes $O(V)$ to
+    enumerate the list of neighbors of a vertex $v$.
+  + /The adjacency list/: usually in the form of a vector of vectors of pairs.
+    The first choice of graph representation.
+    =vector<vii> AdjList; typedef pair<int, int> ii; typedef vector<ii> vii=;
+    Each pair contains the index of the neighboring vertex and the weight of 
+    the edge. Unweighted graph can have 0 or 1 weight value or simply drop the
+    weight attribute. The space complexity of adjacency list is $O(V+E)$. 
+    Adjacency list can be used to store multigraph. Enumerating the list of 
+    neighbors of a vertex $v$ can be efficient.
+  + /The Edge List/: a list of all $E$ edges, usually in the form of a vector of
+    triples. =vector< pair<int, ii> > EdgeList=. Storing graph information in 
+    edge list complicates many graph algorithms that require the enumeration of
+    edges incident to a vertex.
+
+/implicit graph/:Some graphs do not have to be stored in a graph data structure or explicitly 
+generated for the graph to be traversed or operated on.

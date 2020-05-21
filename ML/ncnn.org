@@ -1,0 +1,115 @@
+# Internal Structures
+
+#+BEGIN_SRC shell
+.
+├── allocator.cpp
+├── allocator.h
+├── benchmark.cpp
+├── benchmark.h
+├── blob.cpp
+├── blob.h
+├── CMakeLists.txt
+├── command.cpp
+├── command.h
+├── convert_ycbcr.comp
+├── cpu.cpp
+├── cpu.h
+├── datareader.cpp
+├── datareader.h
+├── gpu.cpp
+├── gpu.h
+├── layer
+├── layer.cpp
+├── layer.h
+├── layer_declaration.h.in
+├── layer_registry.h.in
+├── layer_shader_registry.h.in
+├── layer_shader_spv_data.h.in
+├── layer_type.h
+├── layer_type_enum.h.in
+├── mat.cpp
+├── mat.h
+├── mat_pixel.cpp
+├── mat_pixel_android.cpp
+├── mat_pixel_resize.cpp
+├── mat_pixel_rotate.cpp
+├── modelbin.cpp
+├── modelbin.h
+├── net.cpp
+├── net.h
+├── opencv.cpp
+├── opencv.h
+├── option.cpp
+├── option.h
+├── paramdict.cpp
+├── paramdict.h
+├── pipeline.cpp
+├── pipeline.h
+└── platform.h.in
+#+END_SRC
+
+** =ncnn_SRCS=: the core
+
+- =platform.h.in=: platform-dependent configuration and interface; =Mutex=, =MutexLockGuard=, =ConditionVariable=, =Thread=
+  +  
+
+- =allocator.h=, =allocator.cpp=: =Allocator= interface, locked =PoolAllocator= implementation, =UnlockedPoolAllocator= implementation; No work needed.
+  + =NCNN_XADD= might not be a thread-safe version.
+
+- =blob.h=, =blob.cpp=: don't know what this is. 
+  + macro: =NCNN_STRING=
+
+- =command.h=, =command.cpp=: don't know what "command" is this. For GPU vulkan API only.
+  + no work needed.
+  + discarded
+
+- =cpu.h=, =cpu.cpp=: CPU-related information query functions, 
+  + no work needed.
+
+- =datareader.h=, =datareader.cpp=: data read wrapper, reads or scans parameters and model data. =DataReader= interface, =DataReaderFromStdio=, =DataReaderFromMemory=
+  implementations
+  + macro: =NCNN_STRING=;
+  + macro: =NCNN_STDIO=; 
+
+- =gpu.h=, =gpu.cpp=: GPU support
+  + no work needed
+  + discarded
+
+- =layer.h=, =layer.cpp=: network layer;
+  + needs =layer_registry.h=, 
+  + needs =layer_declaration.h=
+
+- =modelbin.h=, =modelbin.cpp=: Seems binary-model related classes.  =ModelBin= interface, =ModelBinFromMatArray=, =ModelBinFromDataReader= implementations
+  + no work needed
+
+- =net.h=, =net.cpp=: network class =Net=, class =Extractor= (idk what it is)
+  + macro: =NCNN_STRING=
+  + macro: =NCNN_STDIO=
+  + needs =convolution.h=, =convolutiondepthwise.h=, =relu.h=
+
+- =opencv.h=, =opencv.cpp=: OpenCV structure emulation
+  + no work needed
+  + discarded
+
+- =option.h=, =option.cpp=: option constant
+  + no work needed
+
+- =mat.h=, =mat.cpp=: A matrix class;
+  + might need macro: =NCNN_PIXEL=
+  + might need macro: =NCNN_PIXEL_ROTATE=
+
+- =mat_pixel.cpp=: 
+  + needs macro =NCNN_PIXEL=
+
+- =mat_pixel_rotate=: pixel rotation, too weeby.
+  + needs macro =NCNN_PIXEL_ROTATE=
+
+- =mat_pixel_resize=: pixel resize
+  + needs macro =NCNN_PIXEL=
+
+- =paramdict.h=, =paramdict.cpp=: A parameter dictionary class =ParamDict=
+  + no work needed
+
+- =pipeline.h=, =pipeline.cpp=: for vulkan
+  + no work needed
+  + discarded

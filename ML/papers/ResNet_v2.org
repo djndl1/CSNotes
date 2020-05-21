@@ -1,0 +1,64 @@
+He, K., Zhang, X., Ren, S., & Sun, J. (2016). Identity mappings in deep residual networks. Lecture Notes in Computer Science (Including Subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics), 9908 LNCS, 630–645. https://doi.org/10.1007/978-3-319-46493-0_38
+
+A direct connection is created between units to allow signal to propagate from one unit to any other units in both forward and backward passes.
+The operation inside the residual path is reordered =BN -> ReLU -> weight -> BN -> ReLU -> weight=. The ReLU after the addition is removed.
+
+#+begin src
+                  +--------+    +------+       +-------+     +-------+   +--------+   +---------+
+             +---->   BN   +--->+ ReLU +------>+ weight+---->+  BN   +---> ReLU   +---> weight  +-----------+
+             |    +--------+    +------+       +-------+     +-------+   +--------+   +---------+           |
+             |                                                                                              |
+             |                                                                                              |
+             |                                                                                              v
+X_l          |                                                                                          +---+---+   X_l+1
+   +---------+------------------------------------------------------------------------------------------>  Add  +---->
+                                                                                                        +-------+
+#+end src
+
+$$
+x_{L}=x_{l}+\sum_{i=l}^{L-1}F(x_{i},W_{i})
+$$
+
+$$
+\frac{\partial L}{\partial\mathbf{x}_{l}}=\frac{\partial L}{\partial\mathbf{x}_{L}}\left(1+\frac{\partial}{\partial\mathbf{x}_{L}}\sum_{i=l}^{L-1}F\left(\mathbf{x}_{i},W_{i}\right)\right)
+$$
+
+1. The feature $x_L$ of any deep unit can be represented as the feature $x_l$ of any shallower unit $l$ plus a residual function.
+
+2. The feature $x_L$ of any deep unit $L$ is the summation of the outputs of all preceding residual functions.
+
+3. The gradient of a layer does not vanish even when the weights are arbitrarily small.
+
+* Experiments on Shortcut Mapping
+
+1. Constant Scaling;
+
+2. Exclusive Gating
+
+3. Shortcut-only gating
+
+4. Conv Shortcut
+
+5. Dropout Shortcut
+
+Basically, all of them hamper information propagation, leading to optimization problems.
+
+* Experiments on Activation
+
+Simply put the after-addition ReLU back into the residual block does not result in better performance. The forward signal is monotonically increasing (ReLU results in nonnegative result in the shortcut path),
+which may impact the representational ability. The idea is to reorder the operations so that ReLU only affects the residual path.
+
+pre-activation is twofold. 
+
+- First, the optimization is further eased (comparing with the baseline ResNet) because f is an identity mapping. 
+Without ReLU, there are no truncation on the identity path.
+
+- Second, using BN as pre-activation improves regularization of the models. The inputs to all weight layers have been normalized.
+
+* Implementation Details
+
+- lr = 0.1, divided by 10 at 30 and 60 epochs; weight decay 0.0001; momentum 0.9
+
+- the first activation is put after the first standalone conv layer before splitting into two paths.
+
+- the last res unit has an extra activation after addition.

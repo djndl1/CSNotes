@@ -1,0 +1,58 @@
+Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., & Wojna, Z. (2016). Rethinking the Inception Architecture for Computer Vision. Proceedings of the IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 2016-Decem, 2818–2826. https://doi.org/10.1109/CVPR.2016.308
+
+* Background
+
+1. The complexity of the Inception architecture makes it more difficult to make changes to the network.
+
+2. There's no clear description about the contributing factors that lead to the various design decisions of the GoogLeNet.
+
+* General Design Principles
+
+1. avoid representational bottlenecks, especially early in the network. In general the representation
+   size should gently decrease from the inputs to the outputs before reaching the final represen- tation used for the task at hand.
+
+2. Higher dimensional representations are easier to process locally within a network. 
+  Increasing the activations per tile in a convolutional network allows for more disentangled features.
+   The resulting networks will train faster.
+
+3. Spatial aggregation can be done over lower dimensional embeddings without much or any loss in representational power.
+
+4. Balance the width and depth of the network. Optimal performance of the network can be reached by balancing the number
+   of filters per stage and the depth of the network.
+
+* Factorizing Convolutions 
+
+1. Factorization into smaller convolutions
+
+2. spatial factorization into asymmetric convolutions,
+   typically good results with medium grid-size 
+  (for $m \times m$ feature maps where $m$ ranges between 12 and 20)
+
+* Utility of Auxiliary Classifiers
+
+The auxiliary classifiers probably act as regularizers.
+
+* Efficient Grid Size Reduction
+
+The traditional way is to increase the filter number before pooling, which results in expensive computation before pooling.
+
+One way is to use parallel stride 2 blocks, convolutional and pooling.
+
+* Label Smoothing
+
+Add a noise distribution noise to ground truth labels. $u(k)$ = 1/1000, weight factor 0.1
+
+$$
+H\left(q^{\prime},p\right)=-\sum_{k=1}^{K}\log p\left(k\right)q^{\prime}\left(k\right)=\left(1-\epsilon\right)H\left(q,p\right)+\epsilon H\left(u,p\right)
+$$
+
+where the noise distribution is the uniform distribution $u(k) = 1/K$. 
+
+The exact interpretation of the above equations requires a little optimization analysis.
+But the penal term tend to cause the predicted distribution to sparse.
+
+* Training
+
+- RMSProp, decay = 0.9, $\epsilon = 1.0$, learning rate 0.045 decayed every two epoch by 0.94.
+
+- Gradient clip with threshold 2.0

@@ -1,0 +1,9 @@
+* Terminology
+
+- Primary Key: a unique, identifying value with which only one row is associated
+
+- Foreign key: a link between two tables
+
+- Composite/compound key: a key that refers to multiple columns
+
+- Row/tuple/record/entry

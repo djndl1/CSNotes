@@ -1,0 +1,70 @@
+* Preprocessing
+
+[[https://www.jeremyjordan.me/imbalanced-data/][Imbalanced Data]]
+
+* Math, Ops
+
+[[https://towardsdatascience.com/types-of-convolutions-in-deep-learning-717013397f4d][Types of Convolution]]
+
+[[https://ikhlestov.github.io/pages/machine-learning/convolutions-types/][Convolution Types]]
+
+* Representation
+
+[[https://dsp.stackexchange.com/questions/47726/what-exactly-is-sparse-representation][What is Sparse Representatin]]
+
+* Activations
+
+[[https://datascience.stackexchange.com/questions/5706/what-is-the-dying-relu-problem-in-neural-networks][Dying ReLU]] and [[https://stats.stackexchange.com/questions/176794/how-does-rectilinear-activation-function-solve-the-vanishing-gradient-problem-in][why ReLU does not cause a neuron to stop learning]]
+
+[[https://medium.com/@karpathy/yes-you-should-understand-backprop-e2f06eab496b][Backprop]]
+
+* Optimization
+
+[[https://en.wikipedia.org/wiki/Stochastic_gradient_descent][SGD and its variants]]
+
+[[https://towardsdatascience.com/adam-latest-trends-in-deep-learning-optimization-6be9a291375c][Adam The Trend]]
+
+[[https://ruder.io/optimizing-gradient-descent/][Optimizing Gradient Descent: An Overview of Gradient Descent Optimization Algorithms]]
+
+** Exploding Gradients
+
+[[https://machinelearningmastery.com/exploding-gradients-in-neural-networks/][Exploding Gradients Intro]]: large error gradients result in large updates in NN, which
+makes the model unstable
+
+Symptoms:
+  1. unable to get traction on the  training data (e.g. poor loss)
+  2. unstable, resulting in large changes in loss from update to update
+  3. NaN loss
+  4. weights go very large
+  5. NaN weights
+  6. error gradient values are consistently above 1.0 for each node and layer
+
+Solution:
+  1. [[https://machinelearningmastery.com/how-to-avoid-exploding-gradients-in-neural-networks-with-gradient-clipping/][Gradient Clipping]] (forcing the gradient values elementwise to a specific range, 
+     which only addresses the numerical stability),
+     training is not very sensitive to this hyperparameter.
+  2. Gradient rescaling
+  2. smaller learning rate
+  3. scaled target variables
+  4. standard loss function
+
+* Numerical Issues
+
+[[https://stackoverflow.com/questions/42599498/numercially-stable-softmax][Numerically stable softmax]]
+
+* Metrics
+
+[[https://towardsdatascience.com/breaking-down-mean-average-precision-map-ae462f623a52][mAP]]
+
+
+
+
+
+* Time Series
+
+[[https://machinelearningmastery.com/time-series-forecasting-supervised-learning/][Time Series Forcasting As Supervised Learning]]
+
+[[https://machinelearningmastery.com/convert-time-series-supervised-learning-problem-python/][Convert a Time Series to Supervised Learning Problem in Python]]
+* Architectures
+
+[[https://towardsdatascience.com/illustrated-10-cnn-architectures-95d78ace614d][Illustrated 10 CNN Architectures]]

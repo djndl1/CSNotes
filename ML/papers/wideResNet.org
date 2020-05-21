@@ -1,0 +1,54 @@
+* Main Idea
+
+the main power of residual networks is in residual blocks, 
+and not in extreme depth as claimed earlier. 
+Also, wide residual networks are several times faster to train.
+
+The widening of ResNet blocks (if done properly) provides a much more effective way of improving performance
+ of residual networks compared to increasing their depth.
+
+Dropout should be inserted between convolutional layers. 
+
+* WRN
+
+#+caption: Wide Residual Network
+| Group Name | output size   | block size = B(3, 3) |
+|------------+---------------+--------------------|
+| conv1      | $32\times 32$ | $[3 \times 3, 16]$ |
+| conv2      | $32\times 32$ | block type 1       |
+| conv3      | $16\times 16$ | block type 2       |
+| conv3      | $8 \times 8$  | block type 3       |
+| avg-pool   | $1\times 1$   |   $[8 \times 8]$    |
+
+
+where $k$ is the width factor, $N$ is the number of blocks in group.
+
+block type 1
+\begin{equation}
+\begin{bmatrix}3\times3 & 16\times k\\
+3\times3 & 16\times k
+\end{bmatrix}\times N
+\end{equation}
+
+block type 2 and block type 2 has base kernel numbers of 32 and 64 respectively.
+
+- The order inside a residual block is =BN-ReLU-Conv=.
+
+- A BN layer inside a resblock between conv layers and after ReLU
+   to provide a regularization effect 
+
+* Experiments
+
+- B(3, 3) turned out to be the best.
+
+- B(3, 3, 3) and B(3, 3, 3, 3) had the worst performance. 
+
+- widening consistently improves performance across residual networks of different depth
+
+- wide networks can successfully learn with a 2 or more times larger number of parameters than thin ones
+
+* Implementation Details
+
+- SGD with nesterov; lr 0.1; weight decay 0.0005; dampening 0; momentum 0.9
+
+- batch size 128

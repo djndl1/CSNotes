@@ -1,0 +1,22 @@
+Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., & Chen, L. C. (2018). MobileNetV2: Inverted Residuals and Linear Bottlenecks. Proceedings of the IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 4510–4520. https://doi.org/10.1109/CVPR.2018.00474
+
+A novel layer module: the inverted residual with linear bottleneck
+this convolutional module is particularly suit- able for mobile designs, 
+because it allows to significantly reduce the memory footprint needed during inference by never fully materializing large intermediate tensors.
+
+* Preliminaries, discussion and intuition
+
+- Depthwise separable convolutions are a drop-in replacement for standard convolutional layers.
+
+- linear bottleneck
+
+- inverted residuals: since the expansion layer acts merely as an implementationdetail that accomplishes a non-linear transformation of the tensor,
+  shortcuts are used directly between bottlenecks
+
+  ???
+
+* Model Architecture
+
+* Training
+
+- RMSProp: decay 0.9, momentum 0.9; weight decay = 0.00004; lr = 0.045; batch size = 96

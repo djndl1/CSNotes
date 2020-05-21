@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/images"/>
+    <qresource prefix="/">
+        <file>../../../FOSS/Hands-On-GUI-Programming-with-CPP-and-Qt5/Chapter02/login_bg.png</file>
+    </qresource>
+</RCC>

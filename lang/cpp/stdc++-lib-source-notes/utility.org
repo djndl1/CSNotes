@@ -1,0 +1,191 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setupb
+
+* Forward/move helpers
+  :PROPERTIES:
+  :CUSTOM_ID: forwardmove-helpers
+  :END:
+
+All functions here are signal-safe.
+
+#+BEGIN_SRC C++
+//
+    template<typename _Tp>
+        constexpr _Tp&&
+        forward(typename std::remove_reference<_Tp>::type& __t) noexcept
+        { return static_cast<_Tp&&>(__t); }
+        
+    template<typename _Tp>
+        constexpr _Tp&&
+        forward(typename std::remove_reference<_Tp>::type&& __t) noexcept
+        {
+
+          static_assert(!std::is_lvalue_reference<_Tp>::value, "template argument"
+                " substituting _Tp is an lvalue reference type");
+          return static_cast<_Tp&&>(__t);
+        }
+#+END_SRC
+
+When in a perfect forwarding scenario,
+
+#+BEGIN_SRC C++
+    template <typename T>
+    void f(T&& t)
+    {
+        g(std::forward<T>(t));
+    }
+#+END_SRC
+
+if =t= is a lvalue =int=, =T= is deduced to =int&=, then
+=std::forward<int&>(t)= returns =static_cast<int&>(t)=. If =t= is a
+rvalue =int=, =T= is deduced to =int=, then =std::forward<int>(t)=
+returns =static_cast<int&&>(t)=.
+
+
+The compiler can find out whether move semantics should be used in trivial case, 
+the programmer must specify if not obvious.
+
+=std::move= does not really move an object. 
+=std::move= is used to indicate that an object t may be "moved from".
+=std::move= produces an xvalue expression that identifies its argument.
+=std::move= means to call move semantics if provided, and copy semantics otherwise.
+
+Return values should not be =move()= and is not necessary either.  
+
+After a move, the objects moved from are in a /valid but unspecified/ state.
+For STL containers, it is guaranteed that containers where the value was 
+moved from are emtpy afterwards.
+
+#+begin_quote
+
+#+end_quote
+
+#+BEGIN_SRC C++
+    template<typename _Tp>
+        constexpr typename std::remove_reference<_Tp>::type&&
+        move(_Tp&& __t) noexcept
+        { return static_cast<typename std::remove_reference<_Tp>::type&&>(__t); }
+#+END_SRC
+
+Given
+
+- a rvalue =5=, =_Tp= is deduced to =int=, returns
+  =static_cast<int&&>(__t)=;
+
+- a lvalue =int b = 5=, =_Tp= is deduced to =int&=, reference-removed to
+  =int=, returns =static_cast<int&&>(__t)=.
+
+Rvalue references can be used to extend the lifetimes of temporary objects 
+(note, lvalue references to const can extend the lifetimes of temporary 
+objects too, but they are not modifiable through them).
+
+Because rvalue references can bind to xvalues, they can refer to non-temporary objects.
+
+[[http://yacoder.guru/blog/2015/03/14/cpp-curiosities-std-move-that-doesnt-move/][C++ curiosities: std::move that doesn't move]]
+
+1. =move= just returns a special reference;
+
+2. Whoever receives the “special” reference has no obligation to really move the 
+  data out of the referenced location (even though they usually do).
+
+3. Even if the “special” reference is consumed in a real move operation, 
+  in general, there is no guarantee that the object will be reset, 
+  or left in any particular state whatsoever after that.
+
+#+BEGIN_SRC C++
+#include <utility>
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+struct A {
+    int _a;
+    A(int a)
+        : _a { a }
+    {
+        cout << " constructed " << '\n';
+    }
+    A(const A& other)
+        : _a { other._a }
+    {
+        cout << "copy constructed" << '\n';
+    }
+    A(A&& other)
+        : _a { other._a }
+    {
+        cout << "move constructed" << '\n';
+    }
+};
+
+void f1(A a)
+{
+    cout << "in f1" << ' ' << addressof(a) << '\n';
+}
+
+void f2(A&& a) { cout << "in f2" << ' ' << addressof(a) << '\n'; }
+
+int main(int argc, char* argv[])
+{
+    A b { 1 };
+
+    cout << "addressof(b) = " << addressof(b) << '\n';
+     f1(b);
+    f1(move(b));
+
+    A c {2};
+    cout << "addressof(c) = " << addressof(c) << '\n';
+    //f2(c);
+    f2(move(c));
+
+
+    return 0;
+}
+#+END_SRC
+
+#+BEGIN_SRC shell
+ constructed 
+addressof(b) = 0x7ffd3a7830f4
+copy constructed
+in f1 0x7ffd3a7830f8
+move constructed
+in f1 0x7ffd3a7830fc
+ constructed 
+addressof(c) = 0x7ffd3a7830f0
+in f2 0x7ffd3a7830f0
+#+END_SRC
+
+ It is obvious the rvalue reference here is just a reference.
+
+=std::move_if_noexcept= is used to move with strong exception-free
+guarantee.
+
+#+BEGIN_SRC C++
+    template<typename _B1, typename _B2>
+        struct __and_<_B1, _B2>
+        : public conditional<_B1::value, _B2, _B1>::type
+        { };    
+
+     template<typename _Tp>
+        struct __move_if_noexcept_cond
+        : public __and_<__not_<is_nothrow_move_constructible<_Tp>>,
+                        is_copy_constructible<_Tp>>::type { };
+                        
+    template<typename _Tp>
+        constexpr typename
+        conditional<__move_if_noexcept_cond<_Tp>::value, const _Tp&, _Tp&&>::type
+        move_if_noexcept(_Tp& __x) noexcept
+        { return std::move(__x); } 
+#+END_SRC
+
+[[https://www.codesynthesis.com/~boris/blog/2012/07/24/const-rvalue-references/][const rvalue reference]]
+
+[[https://stackoverflow.com/questions/24824432/what-is-use-of-the-ref-qualifier-const][what is the use of the ref qualifier const]]
+
+=move_if_noexcept= obtains an rvalue reference to its argument if its
+move constructor does not throw exceptions or if there is no copy
+constructor (move-only type), otherwise obtains an lvalue reference to
+its argument. Note the second argument of =__and_= is with =::type=
+
+TODO
+
+

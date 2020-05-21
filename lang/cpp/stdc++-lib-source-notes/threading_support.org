@@ -1,0 +1,97 @@
+https://bitbashing.io/embedded-cpp.html
+
+* Requirements
+
+1. =native_handle_type=, =native_handle= are implementation-defined.
+
+2. /execution agent/: an entity such as a thread that may perform work in parallel
+with other execution agents.
+
+* =<thread>=
+
+Threads are intended to map one-to-one with operating system threads. 
+
+*** Class =thread=
+
+The class =thread= provides a mechanism to create a new thread of execution to 
+join with a thread, and to perform other operations that manage and query the
+state of a thread. 
+
+No two =thread= objects simultaneously represent the same thread of execution.
+ A thread of execution is /detached/ when no thread object represents that
+ thread. Objects of =thread= can be in a state that does not represent a thread 
+of execution. A =thread= object does not represent a thread of execution after
+default construction, after being moved from, or after a successful call to 
+=detach= or =join=.
+
+** Constructor
+
+*** libstdc++ implementation
+
+#+BEGIN_SRC C++
+//template <class F, class ...Args> explicit thread(F&& f, Args&&... args);
+#+END_SRC
+
+#+BEGIN_SRC C++
+// Simplified version of std::bind for internal use, without support for
+  // unbound arguments, placeholders or nested bind expressions.
+  template<typename _Callable, typename... _Args>
+    typename _Bind_simple_helper<_Callable, _Args...>::__type
+    __bind_simple(_Callable&& __callable, _Args&&... __args)
+    {
+      typedef _Bind_simple_helper<_Callable, _Args...> __helper_type;
+      typedef typename __helper_type::__maybe_type __maybe_type;
+      typedef typename __helper_type::__type __result_type;
+      return __result_type(
+          __maybe_type::__do_wrap( std::forward<_Callable>(__callable)),
+          std::forward<_Args>(__args)...);
+    }
+
+template<typename _Callable>
+      shared_ptr<_Impl<_Callable>>
+      _M_make_routine(_Callable&& __f)
+      {
+	// Create and allocate full data structure, not base.
+	return std::make_shared<_Impl<_Callable>>(std::forward<_Callable>(__f));
+      }
+  };
+
+template<typename _Callable>
+      struct _Impl : public _Impl_base
+      {
+	_Callable		_M_func;
+
+	_Impl(_Callable&& __f) : _M_func(std::forward<_Callable>(__f))
+	{ }
+
+	void
+	_M_run() { _M_func(); }
+      };
+
+// Simple base type that the templatized, derived class containing
+    // an arbitrary functor can be converted to and called.
+    struct _Impl_base
+    {
+      __shared_base_type	_M_this_ptr;
+
+      inline virtual ~_Impl_base();
+
+      virtual void _M_run() = 0;
+    };
+#+END_SRC
+
+#+BEGIN_SRC C++
+void
+  thread::_M_start_thread(__shared_base_type __b, void (*)())
+  {
+    auto ptr = __b.get();
+    ptr->_M_this_ptr = std::move(__b);
+    int __e = __gthread_create(&_M_id._M_thread,
+			       &execute_native_thread_routine, ptr);
+    if (__e)
+    {
+      ptr->_M_this_ptr.reset();
+      __throw_system_error(__e);
+    }
+  }  
+#+END_SRC

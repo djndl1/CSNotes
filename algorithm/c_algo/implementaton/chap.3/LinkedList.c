@@ -2,110 +2,201 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "../lib/xmalloc.h"
+#include "../lib/errc.h"
+
+struct List {
+        node_t dummy_head;
+        node_t tail;
+        size_t size;
+};
 
 struct Node {
-        ElementType Element;
-        Position    Next;
+        void*    element;
+        destructor_t element_destructor;
+
+        node_t    next;
 };
 
 
-
-
-List MakeEmpty(List L)
+node_t node_new(size_t sz, destructor_t destr)
 {
-        L = xmalloc(sizeof(struct Node));
-        L->Next = NULL;
-        L->Element = 0;
-
-        return L;
-}
-
-bool isEmpty(List L)
-{
-        return L->Next == NULL;
-}
-
-bool isLast(List L, Position P)
-{
-        return P->Next == NULL;
-}
-
-Position find(List L, ElementType X)
-{
-        Position P = L->Next;
-
-        while (P != NULL && P->Element != X)
-                P = P->Next;
-
-        return P;
-}
-
-void delete(List L, ElementType X)
-{
-        Position P, tempCell;
-
-        P = findPrevious(L, X);
-
-        if ( !isLast(L, P)) {
-                tempCell = P->Next;
-                P->Next = tempCell->Next;
-                free(tempCell);
+        node_t n = xmalloc(sizeof(struct Node));
+        if (sz) {
+                void *elm = xmalloc(sz);
+                n->element = elm;
+                n->element_destructor = destr;
+        } else {
+                n->element = NULL;
+                n->element_destructor = NULL;
         }
+        n->next = NULL;
+
+        return n;
 }
 
-Position findPrevious(List L, ElementType X)
+node_t node_copy_new(const void* elem, size_t sz, destructor_t destr)
 {
-        Position P;
+        if (!elem)
+                return NULL;
+        node_t n = xmalloc(sizeof(struct Node));
+        n->element = xmemdup(elem, sz);
+        n->element_destructor = destr;
+        n->next = NULL;
 
-        P = L;
-        while (P->Next != NULL && P->Next->Element != X)
-                P = P->Next;
-
-        return P;
+        return n;
 }
 
-void insert(List L, ElementType X, Position P)
+void node_destroy(node_t self)
 {
-        Position tempCell;
-
-        tempCell = xmalloc(sizeof(struct Node));
-        tempCell->Element = X;
-        tempCell->Next = P->Next;
-        P->Next = tempCell;
+        if (!self)
+                return;
+        if (self->element && self->element_destructor)
+                self->element_destructor(self->element);
+        free(self->element);
+        free(self);
 }
 
-void deleteList(List L)
+void* node_retrieve(node_t self)
 {
-        Position tmp;
+        return self ? self->element : NULL;
+}
 
-        Position P = L->Next;
-        while (P != NULL) {
-                tmp = P;
-                P = P->Next;
-                free(tmp);
+list_t list_new()
+{
+        list_t l = xmalloc(sizeof(struct List));
+        node_t dummy = node_new(0, NULL);
+        l->tail = l->dummy_head = dummy;
+        l->size = 0;
+
+        return l;
+}
+
+void list_destroy(list_t self)
+{
+        if (!self)
+                return;
+
+        node_t cur = self->dummy_head;
+        while (cur) {
+                node_t tmp = cur->next;
+                NODE_DESTROY(cur);
+                cur = tmp;
+        }
+        free(self);
+}
+
+bool list_is_empty(list_t self)
+{
+        if (!self)
+                return true;
+        return (self->tail == self->dummy_head);
+}
+
+node_t list_find(list_t self,
+                 const void* elem, comparator_t comp_func)
+{
+        if (!self || list_is_empty(self))
+                return NULL;
+
+        for (node_t cur = self->dummy_head->next;
+             cur != NULL;
+             cur = cur->next) {
+                if (comp_func(cur->element, elem) == 0)
+                        return cur;
+        }
+        return NULL;
+}
+
+node_t list_index(list_t self, size_t ind)
+{
+        if (!self || list_is_empty(self) || ind >= self->size)
+                return NULL;
+
+        node_t cur = self->dummy_head->next;
+        for (size_t i = 0; i < ind; i++) {
+                cur = cur->next;
         }
 
-        free(L);
+        return cur;
 }
 
-Position Header(List L)
+int list_insert(list_t self,
+                const void* element, size_t sz, destructor_t destr,
+                size_t pos)
 {
-        return L;
+        if (!self || !element || !sz)
+                return null_pointer_error;
+        if (pos > self->size)
+                return out_of_range;
+        node_t new_node = node_copy_new(element, sz, destr);
+        node_t prev_node = list_index(self, pos);
+        new_node->next = prev_node->next;
+        prev_node->next = new_node;
+
+        if (pos == self->size)
+                self->tail = new_node;
+        self->size++;
+
+        return no_error;
 }
 
-Position First(List L)
+int list_append(list_t self,
+                const void* element, size_t sz, destructor_t destr)
 {
-        return L->Next;
+        if (!self || !element || !sz)
+                return null_pointer_error;
+
+        node_t new_node = node_copy_new(element, sz, destr);
+        self->tail->next = new_node;
+
+        self->tail = new_node;
+        self->size++;
+
+        return no_error;
 }
 
-Position next(Position P)
+int list_remove(list_t self, size_t pos)
 {
-        return P->Next;
+        if (!self)
+                return null_pointer_error;
+        if (pos >= self->size)
+                return out_of_range;
+
+        if (pos == 0) {
+                node_t first = self->dummy_head->next;
+                self->dummy_head->next = first->next;
+
+                if (first == self->tail)
+                        self->tail = self->dummy_head;
+
+                node_destroy(first);
+                goto update;
+        }
+
+        node_t prev_node = list_index(self, pos-1);
+        node_t del_node = prev_node->next;
+        prev_node->next = del_node->next;
+        if (del_node == self->tail)
+                self->tail = prev_node;
+        node_destroy(del_node);
+
+update:
+        self->size--;
+
+        return no_error;
 }
 
-ElementType retrieve(Position P)
+void list_for_each(list_t self, node_func func)
 {
-        return P->Element;
+        if (!self || list_is_empty(self))
+                return;
+
+        for (node_t cur = self->dummy_head->next;
+             cur != NULL;
+             cur = cur->next)
+                func(cur);
 }
+

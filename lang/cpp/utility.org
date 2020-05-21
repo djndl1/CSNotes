@@ -1,0 +1,24 @@
+* Reference wrappers =std::reference_wrapper=
+
+Primarily used to feed references to function templates that take 
+their parameter by value.
+
+* Function Type Wrappers =std::function=
+
+to use callable objects as first-class objects.
+
+* Auxiliary Functions
+
+** Processing the Mininum and Maximum
+
+- =min= / =max=, 
+
+- =minmax= returns both minumum and maximum.
+
+** =std::swap=
+
+- An overload for arrays is provided.
+
+** =std::rel_pos=
+
+deprecated in C++20 in favor of three-way comparison operator.

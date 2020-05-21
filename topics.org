@@ -1,0 +1,215 @@
+* C++11 Topics
+
+[[http://thbecker.net/articles/rvalue_references/section_01.html][C++ Rvalue References Explained]]
+
+
+
+* C++/Java inheritance
+     :PROPERTIES:
+     :CUSTOM_ID: cjava-inheritance
+     :END:
+
+[[https://stackoverflow.com/questions/860339/difference-between-private-public-and-protected-inheritance][How
+does C++ inherits]]
+
+[[https://stackoverflow.com/questions/4716040/do-subclasses-inherit-private-fields][Do
+subclass inherit private fields]]
+
+* C/C++ function inlining
+     :PROPERTIES:
+     :CUSTOM_ID: cc-function-inlining
+     :END:
+
+--------------
+
+[[https://stackoverflow.com/questions/51533082/clarification-over-internal-linkage-of-inline-functions-in-c][clarification over internal linkage of inline functions in C]]: Basic reading about
+inline linkage
+
+[[https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_71/rzarg/inline_linkage.htm][Inline Linkage]] : see the C++ part only
+
+[[file:Cpp/C/Cnotes/Inline%20functions%20in%20C%20_%20Oracle%20Darryl%20Gove's%20Blog.pdf][Inline functions in C]]
+
+[[https://stackoverflow.com/questions/7762731/whats-the-difference-between-static-and-static-inline-function][What's the difference between "static" and "static inline" function?]]
+
+[[][Myth and reality about =inline= in C99 by Jens Gusedt]]
+
+[[https://isocpp.org/wiki/faq/inline-functions][FAQ about C++ inline functions]]
+
+[[https://stackoverflow.com/questions/5057021/why-are-c-inline-functions-in-the-header][Why are C++ inline functions in the header]]
+
+[[https://stackoverflow.com/questions/29796264/is-there-still-a-use-for-inline][Linkage of C++ inline functions]]
+
+[[https://stackoverflow.com/questions/1759300/when-should-i-write-the-keyword-inline-for-a-function-method][Whento use =inline= in C++]] See the second answer that features three examples
+
+* Linkage related, template
+      :PROPERTIES:
+      :CUSTOM_ID: linkage-related-template
+      :END:
+
+[[https://gcc.gnu.org/onlinedocs/gcc/Template-Instantiation.html][Template instantiation]]
+
+--------------
+
+* C++ coding style
+     :PROPERTIES:
+     :CUSTOM_ID: c-coding-style
+     :END:
+
+--------------
+
+[[https://stackoverflow.com/questions/2596449/including-includes-in-header-file-vs-source-file][includes in header files and source files]]
+
+[[https://spin.atomicobject.com/2013/12/23/c-return-multiple-values/][Comparing the Cost of Different Multiple-return Techniques in C]]
+
+https://stackoverflow.com/questions/6357038/is-multiplication-and-division-using-shift-operators-in-c-actually-faster
+
+--------------
+
+* C Error Handling
+     :PROPERTIES:
+     :CUSTOM_ID: c-error-handling
+     :END:
+
+https://www.reddit.com/r/cpp/comments/4hw6ku/a\_result\_type\_for\_nonthrowing\_c\_code/
+
+https://channel9.msdn.com/Shows/Going+Deep/C-and-Beyond-2012-Andrei-Alexandrescu-Systematic-Error-Handling-in-C
+
+https://github.com/ptal/expected
+
+https://github.com/oktal/result
+
+https://softwareengineering.stackexchange.com/questions/289576/rust-style-error-handling-in-c
+
+* About ABI and binary objects
+     :PROPERTIES:
+     :CUSTOM_ID: about-abi-and-binary-objects
+     :END:
+
+--------------
+
+[[file:Cpp/C/Cnotes/Loading%20the%20C%20runtime%20on%20Linux%20-%20Stack%20Overflow.html][Basic ABI about Unix-like systems]]
+
+[[file:///home/djn/Documents/doc_sync/Cpp/C/Cnotes/api%20-%20What%20is%20an%20application%20binary%20interface%20(ABI)_%20-%20Stack%20Overflow.html][What is ABI]]
+
+[[https://stackoverflow.com/questions/3784389/difference-between-api-and-abi/3784724#comment39838598_3784724][Difference between API and ABI]]
+
+[[https://en.wikipedia.org/wiki/Executable_and_Linkable_Format][Executable and Linkable Format on Wiki]]
+
+[[http://en.wikipedia.org/wiki/Portable_Executable][PE format on Wiki]]
+
+[[https://gustedt.wordpress.com/2017/08/08/cross-language-interfaces-between-c-and-c/][Interface
+between C and C++]]
+
+[[file:Cpp/C/Cnotes/How_to_write_shared_libraries.pdf][How to Write
+Shared Libraries]]
+
+https://autotools.io/libtool/version.html
+
+https://fedoramagazine.org/gcc-5-in-fedora-whats-an-abi-and-what-happens-when-we-change-it/
+
+https://en.wikipedia.org/wiki/Remote\_procedure\_call
+
+https://community.kde.org/Policies/Binary\_Compatibility\_Issues\_With\_C%2B%2B
+
+--------------
+
+* Libc and other things
+     :PROPERTIES:
+     :CUSTOM_ID: libc-and-other-things
+     :END:
+
+--------------
+
+[[file:Cpp/C/Cnotes/ubuntu%20-%20Failed%20to%20call%20standard%20math%20function%20inside%20debugger_%20-%20Stack%20Overflow.html][Strange C indirect math function]]
+
+https://sourceware.org/glibc/wiki/GNU\_IFUNC
+
+--------------
+
+* Compiling, debugging
+     :PROPERTIES:
+     :CUSTOM_ID: compiling-debugging
+     :END:
+
+--------------
+
+[[https://stackoverflow.com/questions/1778538/how-many-gcc-optimization-levels-are-there][GCC optimization levels]]
+
+[[https://stackoverflow.com/questions/2709998/crt0-o-and-crt1-o-whats-the-difference][C runtime]]
+
+[[https://en.wikipedia.org/wiki/Crt0][crt0]]
+
+[[https://www.embecosm.com/appnotes/ean9/html/ch05s02.html][The C Runtime Initialization]]
+
+[[https://wiki.osdev.org/Creating_a_C_Library#Program_Initialization][ProgramInitialization]]
+
+[[http://dbp-consulting.com/tutorials/debugging/linuxProgramStartup.html][Linux x86 Program Start Up]]
+
+[[https://blogs.oracle.com/linux/hello-from-a-libc-free-world-part-1-v2][Hello from a libc-free world part 1]]
+
+[[https://blogs.oracle.com/linux/hello-from-a-libc-free-world-part-2-v2][Hello from a libc-free world part 2]]
+
+[[https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc/][Recommendation compiler and linker flags for GCC]]
+
+--------------
+
+* JPEG
+     :PROPERTIES:
+     :CUSTOM_ID: jpeg
+     :END:
+
+--------------
+
+[[https://github.com/thorfdbg/libjpeg][libjpeg]]
+
+[[https://github.com/mozilla/mozjpeg][mozjpeg]]
+
+[[https://libjpeg-turbo.org][libjpeg-turbo]]
+
+[[http://libjpeg.sourceforge.net][libjpeg]]
+
+--------------
+
+* Shell Programming
+     :PROPERTIES:
+     :CUSTOM_ID: shell-programming
+     :END:
+
+--------------
+
+[[https://unix.stackexchange.com/questions/155551/how-to-debug-a-bash-script][Bash debugging]]
+
+--------------
+
+* Python
+     :PROPERTIES:
+     :CUSTOM_ID: python
+     :END:
+
+--------------
+
+[[https://lerner.co.il/2014/10/14/python-attributes/][Attributes]]
+
+[[https://stackoverflow.com/questions/9575409/calling-parent-class-init-with-multiple-inheritance-whats-the-right-way][Super and multiple inheritance]] and [[https://stackoverflow.com/questions/3277367/how-does-pythons-super-work-with-multiple-inheritance][Also]]
+
+[[https://rhettinger.wordpress.com/2011/05/26/super-considered-super/][Super considered super]]
+
+* Application topics
+      :PROPERTIES:
+      :CUSTOM_ID: application-topics
+      :END:
+
+[[https://stackoverflow.com/questions/15857797/bc-dates-in-python][About BC date]]
+* C Metaprogramming
+
+[[https://hero.handmade.network/forums/code-discussion/t/51-how_do_you_do_metaprogramming_in_c][How do you do metaprogramming in C?]]
+
+[[http://250bpm.com/blog:56][Advanced metaprogramming in C]]
+
+[[https://www.chiark.greenend.org.uk/~sgtatham/mp/][Metaprogramming custom control structures in C]]
+
+[[lang/cpp/][C/C++ Preprocessor Metaprogramming]]
+
+[[https://www.embedded.com/template-meta-programming-in-c-vs-opaque-pointer/][Template Meta-programming in C vs opaque pointer]]
+
+[[https://github.com/pfultz2/Cloak/wiki/C-Preprocessor-tricks,-tips,-and-idioms][C Preprocessor tricks, tips, and idioms]]

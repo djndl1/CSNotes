@@ -1,0 +1,1673 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+
+* Chap.1 Introduction
+
+/DIP/: improvement of pictorial information for human interpretation;
+  processing of image data for storage, transmission and representation for 
+  autonomous machine perception.
+
+Source: the entire EM spectrum, ranging from gamma to radio waves.
+
+No general agreement regarding where image processing stops and other related
+such as image analysis and computer vision starts. However:
+  + low level: image preprocessing, denoising, contrast enhancement, image sharpening
+  + mid-level: segmentation, description, classification of individual objects 
+    (attributes from images)
+  + high-level: Making sense of an ensemble of recognized objects
+  
+*** Origin
+
+picture transmission back in the 1920s; digital computer; space program;
+Computerized tomography
+
+From the 1960s
+
+*** 1.4 Fundamental Steps
+
+- /image acquisition/
+
+- /image enhancement/: manipulating an image so that the result is more suitable
+  than the original for a specific application. No general theory of image 
+  enhancement. The viewer is the ultimate judge of how well a particular method
+  works.
+
+- /image restoration/: improving the appearance of an image. Based on mathematical
+  or probabilistic models of image degradation.
+
+- /Color image processing/
+
+- /Wavelet/: foundation for representing images in various degrees of resolution
+
+- /compression/: reducing the storage required to save an image.
+
+- /morphological processing/: extracting image components that are useful in
+  the representation and description of shape.
+
+- /segmentation/: partition an image into its constituent prats or objects.
+
+- /representation and description/: boundary/region representation; description (feature selection)
+
+- /recognition/: assigns a label to an object based on its descriptors.
+
+All these processing rely on knowledge about a problem domain.
+
+* Basics
+
+** Visual Perception
+
+TODO
+
+** Light and Electromagnetic Spectrum
+
+$c = \lambda \nu$ (wavelength times frequency)
+
+the energy $E = h\nu$ where $h$ is the Planck's constant. Higher-frequency (shorter wavelength) 
+electromagnetic phenomena carry more energy per photon. 
+
+- monochromatic light: the only attribute is /intensity/ or /gray level/
+
+** Image Sensing and Acquisition
+
+Illumination sources including not only visible light; scene being imaged,
+
+- principal sensor arrangement: 
+  + single
+  + line: air-borne sensors, medical machine
+  + array: digital camera
+
+** Sampling and Quantization
+
+- Sampling: sample the coordinates
+
+- Quantization: sample the amptitude
+
+- matrix representation, with the origin at the top left, the coordinates is
+  in the form of $(row, col)$, forming the /spatial domain/.
+
+- dynamic range: the ratio of the maximum intensity to the minimum values 
+  spanned by the gray scale
+
+- contrast: the difference in intensity between the highest and lowest intensity levels
+
+- spatial resolution: line pairs per unit distance; dots per unit distance
+
+- intensity resolution: in terms of /bits/. 8 bits as the most common number
+
+- image interpolation: resampling, the process of using known data to estimate values 
+  at unknown locations. /nearest neightbor interpolation/, /bilinear interpolation/
+  $v(x,y) = ax + by + cxy + d$, where the coefficients are determined from the four
+  nearest known points, /bicubic interpolation/
+
+** Basic Relationships between Pixels
+
+- 4-neighbors: $N_{4}(p)$
+
+- 8-neighbors: $N_{8}(p)$ and $N_{D}(p)$ 
+
+- /adjacency/: not just in terms of location but also in the same gray-scale set.
+  + 4-adjacency, 8-adjacency, m-adjacency
+
+- /path/: a path of adjacent pixels
+
+- /connected/: there exists a path between two pixels.
+
+- /connected component/: the set of connected pixels of a pixel $p$ in $S$
+
+- /connected set/: The set $S$ has only one connected component. /region/
+
+- /foreground///background/:  in terms of regions and their complement
+
+- /boundary/ (contour, border): in terms of adjacency, in contrast to /edge/
+
+- /distance/: $D_{4}$ (city block distance), $D_{8}$
+
+** Mathematical Tools
+
+array, matrix; linear, nonlinear; arithmetic ops; set operations; 
+
+- spatial operations
+  + single pixel: $s=T(z)$
+  + neighborhood ops
+  + geometric spatial transformations $(x, y) = T{(v, w)}$, especially /affine transform/. 
+    used in image registration (aligning two or more images of the same scene
+
+- image transform $T(u, v) = \sum_{x=0}^{M-1} \sum_{y=0}^{N-1} f(x, y)r(x,y,u,v)$ (linear) 
+  where $r$ is called the /forward transformation kernel/.
+
+- probabilistic methods: intensity values are treated as random quantities.
+  $p(z_{k}) = \frac{n_{k}}{M N}$, the probability of intensity level $z_k$ in an image.
+
+* Chap.3 Intensity Transformations and Spatial Filtering
+  :PROPERTIES:
+  :CUSTOM_ID: chap.3-intensity-transformations-and-spatial-filtering
+  :END:
+
+ *spatial domain*: the image plane itself\\
+ *transform domain*: transforming an image into the transform
+domain doing the processing there and bring the results back into the
+spatial domain, e.g. /frequency domain/
+
+ Two principal categories of /spatial processing/:
+
+1. *intensity transformation*: operate on single pixels
+2. *spatial filtering*: performs operations by working in a neighborhood
+   of every pixel in an image
+
+** 3.1 Background
+   :PROPERTIES:
+   :CUSTOM_ID: background
+   :END:
+
+$$
+g=T[f]
+$$
+
+where $f$ is the input image, $g$ is the output and $T$ is an operatior
+on $f$
+
+e.g. averaging out the intensities of all pixels in a neighborhood,
+called /spatial filtering/, with which operation called /spatial filter/
+, a.k.a. /spatial mask/, /kernel/, /template/, /window/. It's a
+/neighborhood processing/
+
+ Let the window shrink to one pixel and this becomes /point
+processing/.
+
+ *Enhancement*: the process of manipulating an image so that the
+result is more suitable than the original for a specific application,
+implying it's problem-oriented. No general theory.
+
+** 3.2 Some Basic Intenisty Transformation Fucntions
+   :PROPERTIES:
+   :CUSTOM_ID: some-basic-intenisty-transformation-fucntions
+   :END:
+
+$$
+s=T(r)
+$$
+
+Three basic types:
+
+1. Linear (negative and identity)
+2. Logarithmic (log and inverse-log)
+3. Power-law (nth power and nth root)
+
+****** Image Negatives
+       :PROPERTIES:
+       :CUSTOM_ID: image-negatives
+       :END:
+
+$$
+s=L-1-r
+$$
+
+Particularly suited for enhancing white or gray detail embedded in dark
+regions, especially when the black areas are dominant in size.
+
+****** Log Transformations
+       :PROPERTIES:
+       :CUSTOM_ID: log-transformations
+       :END:
+
+$$
+s=c\;log(1+r)
+$$
+
+where $c$ is a constant and $r\geq0$. It maps a narrow range of low
+intensity values in the input into a wider range of output levels, and
+the opposite is true of higher values of input levels. Use this to
+expand the values of dark pixels in an image while compressing the
+higher level values. The opposite is true of the inverse log. E.g.
+processing Fourier spectra.
+
+****** Power-Law(Gamma) Transformation
+       :PROPERTIES:
+       :CUSTOM_ID: power-lawgamma-transformation
+       :END:
+
+$$
+s=cr^{\gamma}
+$$
+
+where $c$ and $\gamma$ are postive constants
+
+Sometimes also written as $$
+s=c(r+\epsilon)^{\gamma}
+$$ Varying $\gamma$ gives different transformation.
+
+Applications: *Gamma correction*: the process to correct power-law
+response phenomena. e.g. CRT gamma correction ​ *General-purpose
+contrast manipulation*
+
+****** Piecewise-Linear Transformation Functions
+       :PROPERTIES:
+       :CUSTOM_ID: piecewise-linear-transformation-functions
+       :END:
+
+ A complementary approach to the methods above, and it can be
+arbitrarily complex.
+
+*Contrast stretching*; expands the range of intensity levels in an image
+so that it spans the full intensity range of the recording medium or
+display device.
+
+ if $r_1=s_1\quad\quad s_2=r_2$, it becomes a thresholding
+function
+
+*Intensity-level slicing*: highlighting a specific range of intenisties
+in an image. This produces a binary image and is useful for studying the
+shape of the flow of the contrast medium.
+
+*Bit-plane slicing*: highlighting certain bits of the intensities of a
+byte. The higer order bit planes contain a significant amount of the
+visually significant data, the lower-order planes contribute to more
+subtle intensity details. Decomposing an image into its bit planes is
+useful for analyzing the relative importance of each bit in the image, a
+process that aids in determining the adequacy of the number of bits used
+to quantize the image. Also useful for iamge compression, in which fewer
+tan all planes are used in reconstructing an image.
+
+** 3.3 Histogram Processing
+   :PROPERTIES:
+   :CUSTOM_ID: histogram-processing
+   :END:
+
+ *Histogram*: a digital image with intensity levels in the range
+$[0,L-1]$ is a discrete function $h(r_k)=n_k$, where $r_k$ is the kth
+intensity value and $n_k$ is the number of pixels in the image with
+intensity $r_k$. Commonly normailzed by the total number of pixels $MN$,
+i.e. $p(r_k)=n_k/MN$ ,which is an estimate of the probability of
+occurrence of intensity level in an image.
+
+  Basis for numerous spatial domain processing techniques.
+  For image enhancement   the information inherent in
+histograms is useful in other image processing applicaitons, e.g. image
+compression.
+
+Dark, light, low contrast and high contrast on their histograms
+
+****** Histogram Equalization
+       :PROPERTIES:
+       :CUSTOM_ID: histogram-equalization
+       :END:
+
+*PDF*, *CDF* $$
+s=T(r)\quad0\leq r\leq L-1
+$$ Assume that:
+
+1. $T(r)$ is a monotonically increasing function sometimes strictly
+   monotinically increasing
+2. $T(r)$ is surjective
+
+Since CDF satisfies condtion 1 and 2, we have $$
+s=T(r)=(L-1)\int\limits^{r}_0 p_r(w)dw
+$$ which, by simple calculus, is proved to give rise to the result
+below: $$
+p_s(s)=\dfrac{1}{L-1}\quad0\leq s\leq L-1
+$$ That is, given any $p_r(r)$, $p_s(s)$ always is uniform, independent
+of $r$.
+
+ For the discrete counterpart $$
+p_r(r_k)=\dfrac{n_k}{MN}\quad k=0,1,2,...,L-1\\
+s=T(r_k)=(L-1)\sum\limits^k_{j=0}p_r(r_j)\\
+\qquad\qquad\quad\quad=\dfrac{L-1}{MN}\sum\limits^k_{j=0}n_j\quad k=0,1,2,...,L-1\\
+s \; needs\ to\ be\ rounded\ to\ the\ nearest\ integer
+$$  $Eq. (10)$ is called *histogram equalization* or *histogram
+linearization*. Though it cannot be proved in general that discrete
+histogram equalization. It has the general tendency to spread the
+histogram of the input image so that the intensity levels of the
+equalized image space wider range of the intensity scale. The net result
+is /contrast enhancement/.
+
+****** Histogram Matching/specification
+       :PROPERTIES:
+       :CUSTOM_ID: histogram-matchingspecification
+       :END:
+
+$\quad\quad$ It is useful sometimes to be ablle to specify the shape of
+the histogram that we wish the processed image to have, not always a
+uniform one.
+
+$\quad\quad$ Either in continuous cases or in discrete cases, histogram
+mathcing is achieved through an imtermediate stage of histogram
+equalization. That is, given the input $(r, p_r)$ and the specified
+output $(z,p_r)$, we obtain the mapping from $r$ to $z$ by equalize
+their corresponding histogram equalized results.
+
+#+BEGIN_QUOTE
+
+  1. Conpute the corresponding histogram-equalized results of $r$ and
+     $z$ , denoted by $s_k$ and $G(z_q)$, discretize them
+
+  2. For $k=1,...L-1$
+
+  ​ Find the closest $G(z_q)$ to $s_k$ ​ Map this $k$ to this $q$ ​ if
+  there are more than one $q$ ​ choose the smallest one
+
+  3. The mapping from $r_k$ to $z_q$ is thus obtained
+#+END_QUOTE
+
+$\quad\quad$ Histogram specification is, for the most part, a trial and
+error process, and there are no rules for specifying histograms and one
+must resort to analysis on a case-by-case basis for any given
+enhancement task.
+
+****** Local Histogram Processing
+       :PROPERTIES:
+       :CUSTOM_ID: local-histogram-processing
+       :END:
+
+$\quad\quad$ It is necessary to enhance details over small /areas/ in an
+iamge. The solution is to devise transformation functions based on the
+intensity distribution in a neighborhood of every pixel in the image
+
+$\quad\quad$ The histogram is computed over a neighborhood while the
+transformation is done only at the center.
+
+****** Using Histogram Statistics for Image Enhancement
+       :PROPERTIES:
+       :CUSTOM_ID: using-histogram-statistics-for-image-enhancement
+       :END:
+
+/mean/, /moment/, /variance/ obtained from the histogram /sample mean/,
+/sample variance/ obtained directly from the image
+
+Mean: intensity Variance; contrast global and local
+
+$\quad\quad$ Using the local mean and variance can develop simple yet
+powerful enhancement techniques based on statistical measures that have
+a close, predictable correspondence with image appearance.
+
+$\quad\quad$ A contrast enhancing application
+
+** 3.4 Fundamentals of Spatial Filtering
+   :PROPERTIES:
+   :CUSTOM_ID: fundamentals-of-spatial-filtering
+   :END:
+
+$\quad\quad$ /Filter/, though borrowed from frequency domain processing,
+here used for /spatial filters/, a.k.a /spatial masks, kernels,
+templates, windows/.
+
+****** Mechanics
+       :PROPERTIES:
+       :CUSTOM_ID: mechanics
+       :END:
+
+$\quad\quad$ A /spatial filter/ consists of a /neighborhood/ and a
+/predefined operation/ that is performed on the image pixels encompassed
+by the neighborhood. It is seldom the case that filtered pixels replace
+the values of the corresponding location in the original image.
+
+Linear spatial filter
+$g(x,y)=\sum\limits^a_{s=-a}\sum\limits^b_{t=-b}w(s,t)f(x+s,y+t)$
+
+****** Spatial Correlation and Convolution
+       :PROPERTIES:
+       :CUSTOM_ID: spatial-correlation-and-convolution
+       :END:
+
+Correlation: $+$, Convolution: $-$
+
+First $f$ with enough 0s on either side to allow each pixel in $w$ to
+visit every pixel in $f$.
+
+Filter $w(s,t)$ , function $m\times n\ image\ f(x,y)$ $$
+w(x,y)*f(x,y)=\sum\limits^a_{s=-a}\sum\limits^{b}_{t=-b}w(s,t)f(x\pm s,y\pm t)
+$$ $a=(m-1)/2,\ b=(n-1)/2$
+
+Correlation is convolution with its filter rotated by 180 degrees.
+/Convolution filter, convolution mask/ or /convolution kernel/ are used
+to denote a spatial filter and not necessarily that the filter will be
+used for true convolution.
+
+****** Vector Representation of Linear Filtering
+       :PROPERTIES:
+       :CUSTOM_ID: vector-representation-of-linear-filtering
+       :END:
+
+$\quad\quad$ The characteristic response $R$ of a mask in a neighborhood
+$$
+R = w_1 z_1 + w_2 z_2 + ... + w_{mn}z_{mn}
+=\sum\limits^{mn}_{k=1}w_kz_k=w^Tz
+$$
+
+****** Generating Spatial Filter Masks
+       :PROPERTIES:
+       :CUSTOM_ID: generating-spatial-filter-masks
+       :END:
+
+$\quad\quad$ Generating an $m\times n$ linear spatial filter: $mn$ mask
+coefficients.\\
+$\quad\quad$ Generating a nonlinear filter: the size of a neighborhood
+and the operations to be performed on the image pixels contained in the
+neighborhood
+
+** 3.5 Smoothing Spatial Filters
+   :PROPERTIES:
+   :CUSTOM_ID: smoothing-spatial-filters
+   :END:
+
+$\quad\quad$ For /blurring/ and for /noise reduction/
+
+Blurring: removal of small details, bridging of small gaps\\
+Noise reduction: blurring with a linear filter and also by nonlinear
+filtering
+
+*Averaging Filter*(lowpass filter)
+
+/Box filter/: a spatial averaging filter with all coefficients being
+equal /Weighted average/
+
+****** Order-Statistic (Nonlinear) Filters
+       :PROPERTIES:
+       :CUSTOM_ID: order-statistic-nonlinear-filters
+       :END:
+
+*Order-statistic filters*: nonlinear spatial filters whose response is
+based on ordering (ranking) the pixels contained in the iamge area
+encompassed by the filter and then replacing the value of the center
+pixel with the value determined by the ranking result.\\
+e.g. /median filter/, which provides excellent noise reduction
+capabilities, particularly effective in dealing with /impulse noise
+(salt-and-pepper, giving white and black appearance)./\\
+​ /min filter/ ​ /max filter/
+
+** 3.6 Sharpening Spatial Filters
+   :PROPERTIES:
+   :CUSTOM_ID: sharpening-spatial-filters
+   :END:
+
+$\quad\quad$The principal objective of sharpening is to highlight
+transitions in intensity, which employs spatial differentiation.
+
+****** Foundation
+       :PROPERTIES:
+       :CUSTOM_ID: foundation
+       :END:
+
+Derivative $$
+\dfrac{\partial f}{\partial x}=f(x+1)-f(x) \\
+\dfrac{\partial^2 f}{\partial x^2}=f(x+1)+f(x-1)-2f(x)
+$$ $\quad\quad$Edges in digital images often are ramp-like transitions
+in intensity, in which case the first derivative would result in thick
+edges and the second derivative would produce a double edge one pixel
+thick, which enhances fine detail much better than the first derivative
+and much easier to implement.
+
+****** Using the Second Derivative for Image Sharpening - the Laplacian
+       :PROPERTIES:
+       :CUSTOM_ID: using-the-second-derivative-for-image-sharpening---the-laplacian
+       :END:
+
+The Laplacian, which is isotropic (rotation invariate), is the
+divergence of the gradient. $$
+\bigtriangledown^2f=\dfrac{\partial^2f}{\partial x^2}+\dfrac{\partial^2f}{\partial y^2}\\
+\dfrac{\partial^2f}{\partial x^2}=f(x+1,y)+f(x-1,y)-2f(x,y)\\
+\dfrac{\partial^2f}{\partial y^2}=f(x,y+1)+f(x,y-1)-2f(x,y)\\
+\bigtriangledown^2f=f(x+1,y)+f(x-1,y)+f(x,y+1)+f(x,y-1)-4f(x,y)
+$$ The diagonal directions can be incorporated by adding two more terms.
+
+The basic way in which we use the Laplacian for image sharpening is $$
+g(x,y)=f(x,y)+c[\bigtriangledown^2 f(x,y)]\\
+\text{where $c=\pm1$}
+$$ $\quad\quad$A typical way to scale a Laplacian image is to add to it
+its minimum value to bring the new minimum to zero and then scale the
+result to the full $[0,L-1]$. The grayish appearance is typical of
+Laplacian images that have been scaled properly.
+
+****** Unsharp Masking and Highboost Filtering
+       :PROPERTIES:
+       :CUSTOM_ID: unsharp-masking-and-highboost-filtering
+       :END:
+
+*Unsharp masking*: subtracting an unsharp (smoothed) version of an image
+from the original image.
+
+1. Blur the original
+2. Subtract the blurred iamge from the original, resulting in /mask/
+3. Add the mask to the original
+
+$$
+g(x,y)=f(x,y)-k\ g_{mask}(x,y)
+$$
+
+$k=1$: unsharp masking\\
+$k>1$: highboost filtering
+
+****** Using First-Order Derivatives for Image Sharpening - The Gradient
+       :PROPERTIES:
+       :CUSTOM_ID: using-first-order-derivatives-for-image-sharpening---the-gradient
+       :END:
+
+$$
+\bigtriangledown f = \dfrac{\partial f}{\partial x}\vec{i}+ \dfrac{\partial f}{\partial y}\vec{j}\\
+M(x,y)=\sqrt{g_x^2+g_y^2}\approx |g_x|+|g_y|
+$$
+
+The partial derivatives is not isotropic, but the magnitude is.
+
+Two appoximations to the gradient:
+
+1. Roberts cross-gradient operator
+
+2. Sobel operator
+
+** 3.7 Combining Spatial Enhancement Methods
+   :PROPERTIES:
+   :CUSTOM_ID: combining-spatial-enhancement-methods
+   :END:
+
+$\quad\quad$Objective: enhance a image by sharpening and bringing out
+more of the detail
+
+$\quad\quad$Utilize the Laplacian to highlight fine and the gradient to
+enhance prominent edges.
+
+$\quad\quad$Median filtering is a nonlinear process capable of removing
+image features. A smoothed version of the gradient would be an
+alternative. The idea is to smooth the gradient and multiply it by the
+Laplacian image.
+
+$\quad\quad$Increase the dynamic range of the sharpened image. Histogram
+equalization is not likely to work well on images that have dark
+intensity distribututions. Here a power-law transformation would be
+better.
+
+** 3.8 Using Fuzzy Techniques for Intensity Transformations and Spatial
+Filtering
+   :PROPERTIES:
+   :CUSTOM_ID: using-fuzzy-techniques-for-intensity-transformations-and-spatial-filtering
+   :END:
+
+* Chap.4 Filtering in the Frequency Domain
+  :PROPERTIES:
+  :CUSTOM_ID: chap.4-filtering-in-the-frequency-domain
+  :END:
+
+The proposing of Fourier Transform\\
+The advent of digital computers and the invention of Fast Fourier
+Transform
+
+*** Fundamentals
+    :PROPERTIES:
+    :CUSTOM_ID: fundamentals
+    :END:
+
+****** *Fourier series*
+       :PROPERTIES:
+       :CUSTOM_ID: fourier-series
+       :END:
+
+$$
+f(t)=\sum\limits^{\infin}_{n=-\infin}c_ne^{j\frac{2\pi n}{T}t}
+$$
+
+where
+$c_n=\dfrac{1}{T}\int\limits^{T/2}_{-T/2}f(t)e^{-j\frac{2\pi n}{T}t}dt\qquad for\ n=0,\pm1,\pm2,...$
+
+$\quad\quad$ *Impulse* $$
+\delta(0)=
+\begin{cases}
+\infin & \text{if   $t=0$}\\
+0 & \text{if $t\neq0$}
+\end{cases}
+$$ constrained by $$
+\int\limits^{\infin}_{-\infin}\delta{(t)dt}=1
+$$ has the /sifting property/: $$
+\int\limits^{\infin}_{-\infin}f(t)\delta(t-t_0)dt=f(t_0)
+$$ and its discrete counterpart, /unit discrete impulse/: $$
+\delta(x)=\begin{cases}
+1 & \quad x=0\\
+0 & \quad x\neq 0
+\end{cases}\\
+\sum\limits^{\infin}_{x=-\infin}\delta(x)=1
+$$ Sifting property: $$
+\sum\limits^{\infin}_{x=-\infin}f(x)\delta(x-x_0)=f(x_0)\\
+$$ $\quad\quad$ *Impulse train* $$
+s_{\Delta T}(t)=\sum\limits^{\infin}_{n=-\infin}\delta(t-n\Delta T)
+$$
+
+****** *Fourier Transform of Functions of One Continuous Variable*
+       :PROPERTIES:
+       :CUSTOM_ID: fourier-transform-of-functions-of-one-continuous-variable
+       :END:
+
+$$
+F(\mu)=\mathcal{F}\{f(t)\}=\int^{\infin}_{-\infin}f(t)e^{-j2\pi \mu t}dt
+$$
+
+*Inverse Fourier transform* $$
+f(t)=\mathcal{F(\mu)}=\int\limits^{\infin}_{-\infin}F(\mu)e^{j2\pi \mu t}d\mu
+$$ *Convolution* $$
+f(t)*h(t)=\int^{\infin}_{-\infin}f(\tau)h(t-\tau)d\tau\\
+\mathcal{F}\{f(t)*h(t)\}=H(\mu)F(\mu)
+$$
+
+****** Sampling and the Fourier Transform of Sampled Functions
+       :PROPERTIES:
+       :CUSTOM_ID: sampling-and-the-fourier-transform-of-sampled-functions
+       :END:
+
+$$
+\tilde{f}(t)=f(t)s_{\Delta T}(t)=\sum\limits^{\infin}_{n=-\infin}f(t)\delta(t-\Delta T)
+$$
+
+With its FT: $$
+\tilde{F}(\mu)=\mathcal{F}\{\tilde{f}(t)\}=F(\mu)*S(\mu)=\dfrac{1}{\Delta T}\sum\limits^{\infin}_{n=-\infin}F(\mu - \dfrac{n}{\Delta T})
+$$ which is an infinite periodic sequence of copies of $F(\mu)$
+
+****** *Sampling Theorem*
+       :PROPERTIES:
+       :CUSTOM_ID: sampling-theorem
+       :END:
+
+$$
+\dfrac{1}{\Delta T}>2\mu_{max}\quad \text{Nyquist Rate}
+$$
+
+$\quad\quad$Except for some special cases, aliasing is always present in
+sampled signals, even if the original sampled function is band-limited,
+infinite frequency components are introduced the moment we limit the
+duration of the function. No function of finite duration can be
+band-limited. Conversely, a function that is band-limited must extend
+from $-\infin$ to $\infin$.
+
+$\quad\quad$The effects of aliasing can be reduced by smoothing the
+input funcition to attenuate its higher frequencies, called
+/anti-aliasing/.
+
+****** Function Reconstruction from Sampled Data
+       :PROPERTIES:
+       :CUSTOM_ID: function-reconstruction-from-sampled-data
+       :END:
+
+$\quad\quad$Reconstruction of a function from a set of its samples
+reduces in practice to interpolating between the samples.
+
+Using a low-pass filter $H(\mu)$ $$
+f(t)=\sum\limits^{\infin}_{n=-\infin}f(n\Delta T)\ sinc[(t-n\Delta T)/n\Delta T]
+$$ where $sinc(x)=\dfrac{sin(x)}{x}$, gives a perfect reconstruction.
+
+*** 4.4 The Discrete Fourier Transform (DFT) of One Variable
+    :PROPERTIES:
+    :CUSTOM_ID: the-discrete-fourier-transform-dft-of-one-variable
+    :END:
+
+$\quad\quad$ The Fourier(DTFT) of a sampled function $f_n$ is continuous
+and infinitely periodic with period $1/\Delta T$, all we need to
+characterize is one period, and sampling one period is the basis for the
+DFT. $$
+F_m=\sum\limits^{M-1}_{n=0}f_ne^{-j2\pi mn/M}\quad m=0,1,2,...,M-1
+\\f_n=\dfrac{1}{M}\sum\limits^{M-1}_{m=0}F_m e^{j2\pi mn/M}\quad n=0,1,2,...,M-1
+$$ [[https://en.wikipedia.org/wiki/Discrete_Fourier_transform][Discrete
+Fourier Transform on Wiki]]\\
+[[https://en.wikipedia.org/wiki/Discrete-time_Fourier_transform][Discrete-time
+Fourier Transform on Wiki]]
+
+$\quad\quad$ It completely describes the
+[[https://en.wikipedia.org/wiki/Discrete-time_Fourier_transform][discrete-time
+Fourier transform]] (DTFT) of an /N/-periodic sequence, which comprises
+only discrete frequency components.
+([[https://en.wikipedia.org/wiki/Discrete-time_Fourier_transform#Periodic_data][Using
+the DTFT with periodic data]])
+
+$\quad\quad$ Both the forward and inverse discrete transforms are
+infinitely periodic with period $M$.
+
+The discrete equivalent of convolution $$
+f(x)*h(x)=\sum\limits^{\infin}_{m=-\infin}f(m)h(x-m)
+$$ for $x=0,1,2,...,M-1$, is periodic (/circular convolution/) with
+period $M$, thus given as one period $$
+f(x)*h(x)=\sum\limits^{M-1}_{m=0}f(m)h(x-m)
+$$ Given sampling interval $\Delta T$ and $M$ samples $$
+T=M\Delta T\\
+\Delta u = \dfrac{1}{M\Delta T}=\dfrac{1}{T}\quad \text{Resolution on frequency domain}\\
+\Omega=M\Delta u=\dfrac{1}{\Delta T}\quad \text{Entire Frequency range}
+$$
+
+*** 4.5 Extension to Functions of Two Variables
+    :PROPERTIES:
+    :CUSTOM_ID: extension-to-functions-of-two-variables
+    :END:
+
+****** The 2-D Impulse and Its Sifting Property
+       :PROPERTIES:
+       :CUSTOM_ID: the-2-d-impulse-and-its-sifting-property
+       :END:
+
+2-D Continuous variables $t,z$ $$
+\delta(t,z)=\begin{cases}
+\infin & \text{    if $t=z=0$}
+\\0 & \text{    otherwise}
+\end{cases}
+\\ \int^{\infin}_{-\infin} \int^{\infin}_{-\infin}\delta(t,z)dtdz=1\\
+\int^{\infin}_{-\infin} \int^{\infin}_{-\infin}f(t,z)\delta(t-t_0,z-z_0)dtdz=f(t_0,z_0)
+$$ 2-D Discrete variables $x,y$ $$
+\delta(x,y)=\begin{cases}
+1 & \text{    if $x=y=0$}
+\\0 & \text{    otherwise}
+\end{cases}
+\\ \sum\limits^{\infin}_{x=-\infin} \sum\limits^{\infin}_{y=-\infin}\delta(x,y)=1\\
+\sum\limits^{\infin}_{x=-\infin} \sum\limits^{\infin}_{y=-\infin}f(x,y)\delta(x-x_0,y-y_0)dtdz=f(x_0,y_0)
+$$
+
+****** The 2-D Continuous Fourier Transform Pair
+       :PROPERTIES:
+       :CUSTOM_ID: the-2-d-continuous-fourier-transform-pair
+       :END:
+
+$$
+F(u,v)= \int^{\infin}_{-\infin} \int^{\infin}_{-\infin}f(t,z)e^{-j2\pi(\mu t + \nu z)}dtdz\\
+f(t,z)= \int^{\infin}_{-\infin} \int^{\infin}_{-\infin}F(\mu,\nu)e^{j2\pi (\mu t+\nu z)}d\mu d\nu
+$$
+
+****** 2-D Sampling Theorem
+       :PROPERTIES:
+       :CUSTOM_ID: d-sampling-theorem
+       :END:
+
+$$
+\dfrac{1}{\Delta T}>2\mu_{max}\\
+\dfrac{1}{\Delta Z}>2\nu_{max}
+$$
+
+****** Aliasing
+       :PROPERTIES:
+       :CUSTOM_ID: aliasing
+       :END:
+
+/Spatial aliasing/: undersampling\\
+/Temporal aliasing/: wagon wheel effect
+
+Anti-aliasing filtering has to be done at the "front-end", before thei
+mage is sampled.
+
+****** Image Interpolation and resampling
+       :PROPERTIES:
+       :CUSTOM_ID: image-interpolation-and-resampling
+       :END:
+
+$\quad\quad$One of the most common applications of 2-D interpolation in
+image processing is in image resizing.\\
+Zooming: over-sampling\\
+Shrinking: under-sampling
+
+$\quad\quad$ nearest neighbor interpolation with over-sampling: zooming
+by /pixel replication/;
+
+$\quad\quad$ Image shrinking: under-sampling is achieved by row-column
+deletion. To reduce aliasing, it is a good idea to blur an image
+slightly before shrinking it. An alterante technique is to
+/super-sample/ the original scene and then reduce its size by row and
+column deletion, which yields sharper results than with smoothing.
+
+*Moiré Effect*
+
+****** The 2-D Discrete Fourier Transform and Its Inverse
+       :PROPERTIES:
+       :CUSTOM_ID: the-2-d-discrete-fourier-transform-and-its-inverse
+       :END:
+
+$$
+F(u,v)=\sum\limits^{M-1}_{x=0}\sum\limits^{N-1}_{y=0}f(x,y)e^{-j2\pi (ux/M+vy/N)}
+\\f(x,y)=\dfrac{1}{MN}\sum\limits^{M-1}_{u=0}\sum\limits^{N-1}_{v=0}F(u,v)e^{j2\pi(ux/M+vy/N)}
+$$
+
+*Properties* $$
+\Delta u=\dfrac{1}{M\Delta T}\\
+\Delta v = \dfrac{1}{N\Delta Z}
+$$ /Translation and rotation/ $$
+f(x,y)e^{j2\pi (u_0 x/M+v_0 y/N)}\leftrightarrow F(u-u_0,v-v_0)\\
+f(x-x_0,y-y_0)\leftrightarrow F(u,v)e^{-j2\pi(x_0u/M+y_0v/N)}\\
+f(r,\theta + \theta_0)\leftrightarrow F(\omega,\phi + \theta_0)
+$$ /Periodicity/ $$
+F(u,v)=F(u+k_1 M,v+k_2 N)\\
+f(x,y)=f(x+k_1 M,y+k_2 N)\\
+f(x,y)(-1)^{x+y}\leftrightarrow F(u-M/2,v-N/2)
+$$
+
+$$
+\sum\limits^{M-1}_{x=0}\sum\limits^{N-1}_{y=0}w_e(x,y)w_o(x,y)=0
+$$
+
+For any two discrete even and odd functions $w_e\text{ and }w_0$
+
+#+CAPTION: 52379666335
+[[file:1523796663357.png]]
+
+****** Fourier Spectrum and Phase Angle
+       :PROPERTIES:
+       :CUSTOM_ID: fourier-spectrum-and-phase-angle
+       :END:
+
+Magnitude: Fourier (frequency) spectrum\\
+Power spectrum: $P(u,v)=|F(u,v)|^2$
+
+Magnitude, phase angle and power spectrum are arrays of size
+$M\times N$. $$
+|F(0,0)|=MN|\bar{f}(x,y)|\text{    where $\bar{f}$ is the average of f}\\
+\text{$F(0,0)$ sometimes is called the }\textit{dc component}
+$$ In general, visual analysis of phase angle images yields little
+intuitive information, however, it is a measure of displacement of the
+various sinusoids with respect to their origin. The phase is important
+in determining shape characteristics.
+
+****** The 2-D Convolution Theorem
+       :PROPERTIES:
+       :CUSTOM_ID: the-2-d-convolution-theorem
+       :END:
+
+$$
+f(x,y)*h(x,y)=\sum\limits^{M-1}_{m=0}\sum\limits^{N-1}_{n=0}f(m,n)h(x-m,y-n)
+$$
+
+gives one period of the convolution, and the following convolution
+theorem $$
+f(x,y)*h(x,y)\leftrightarrow F(u,v)H(u,v)\\
+f(x,y)h(x,y)\leftrightarrow F(u,v)*H(u,v)
+$$ The first equaiton is the basis for all the filtering techiniques
+discussed here.
+
+$\quad\quad$If we elect to compute the spatial convolution using the
+IDFT of the product of the two transforms, then the periodicity issues
+must be taken into account. But /wraparound error/ is introduced.
+
+/Zero padding/: by appending to each period enough zeros, the result
+would be a correct periodic convolution. $$ f\_p(x,y)=
+\begin{cases}f(x,y) & 0\leq x\leq A-1 \text{ and }0\leq y\leq B-1\\
+0 & A\leq x \leq P \text{ or }B\leq y \leq Q \end{cases}
+\
+
+h\_p(x,y)=
+\begin{cases}f(x,y) & 0\leq x\leq C-1 \text{ and }0\leq y\leq D-1\\
+0 & C\leq x \leq P \text{ or }D\leq y \leq Q \end{cases}
+\ \text{with } P\geq A+C-1\Q\geq B+D-1 $$
+
+#+CAPTION: 52380227082
+[[file:1523802270827.png]]
+
+#+CAPTION: 52380228456
+[[file:1523802284560.png]]
+
+#+CAPTION: 52380230712
+[[file:1523802307121.png]]
+
+#+CAPTION: 52380232075
+[[file:1523802320753.png]]
+
+*** 4.7 The Basics of Filtering in the Frequency Domain
+    :PROPERTIES:
+    :CUSTOM_ID: the-basics-of-filtering-in-the-frequency-domain
+    :END:
+
+Intuitive relations between the image domain and the frequency domain.
+
+****** Fundamentals
+       :PROPERTIES:
+       :CUSTOM_ID: fundamentals-1
+       :END:
+
+$$
+\text{Given $f(x,y)$ of size $M\times N$}\\
+g(x,y)=\mathcal{F^{-1}}[H(u,v)F(u,v)]=\mathcal{F^{-1}}[H(u,v)R(u,v)+jH(u,v)I(u,v)]
+$$
+
+where $H(u,v)$ is a filter transfer function.
+
+e.g. $H(u,v)=0\ for\ u=v=0\$otherwise $1$ reduces the average intensity
+Lowpass filter blurs an image while a highpass filter enhance sharp
+detail.
+
+The issue on zero padding in the spatial domain\\
+$\quad\quad$We cannot work with an infinite number of components, we
+cannot use an ideal frequency domain filter and simultaneously use zero
+padding to avoid wraparound error. One approach is to zero-pad images
+and then create filters in the frequency domain to be of the same size
+as the padded images.
+
+$\quad\quad$Here we consider only /zero-phase-shift/ filters. Even small
+changes in the phase angle can have dramtic effects on the filtered
+output.
+
+*Summary*
+
+1. Given an input $f(x,y)$ of size $M\times N$ and the padding
+   parameters $P$ and $Q$. Typically $P=2M$ and $Q=2N$. Form a padded
+   image and multiply $(-1)^{x+y}$ to center its transform, compute its
+   DFT.
+
+2. Generate a real, symmetric filter function $H(u,v)$ of size
+   $P\times Q$ with centered at $(P/2, Q/2)$. Form the product
+   $G(i,k)=H(i,k)F(i,k)$.
+
+3. Obtain the porcessed image\\
+   $$
+   g_p (x,y)=\{real[\mathcal{F}^{-1}[G(u,v)]]\}(-1)^{x+y}
+   $$ where the real part is selected to ignore parasitic complex
+   components resulting from computational inaccuracies.
+
+4. Extract the original region.
+
+****** Correspondence Between Filtering in the Spatial and Frequency
+Domains
+       :PROPERTIES:
+       :CUSTOM_ID: correspondence-between-filtering-in-the-spatial-and-frequency-domains
+       :END:
+
+$$
+h(x,y)\leftrightarrow H(u,v)
+$$
+
+$h(x,y)$ is sometiems referred as the /impulse response/. Since all
+quantities in a discrete implementation are finite, such filters are
+called /finite impulse response (FIR)/ filters.
+
+$\quad\quad$Spatial convolution in terms of the convolution theorem and
+the DFT implies convolving periodic functions, involving functions of
+the same size.
+
+$\quad\quad$In practice, we prefer to implement convolution filtering
+with small filter masks because of speed and ease of implementation. But
+we can specify a filter in the frequency domain, compute its IDFT, and
+use the resulting full-size spatial filter as a guide for constructing
+smaller spatial filter masks. The other way around, a small spatial
+filter is given and its full-size frequency domain representation is
+obtained to analyze the behavior of the small spatial filters in the
+frequency domain.
+
+$\quad\quad$The forward way: design a spatial filter by analyze a
+frequency filter\\
+An example of Gaussian filter, a lowpass filter and a highpass filter
+obtained through difference of two Gaussian filter.
+
+$\quad\quad$The backward way: start with a spatial mask and generate its
+corresponding filter in the frequency domain.
+
+*** 4.8 Image Smoothing Using Frequency Domain Filters
+    :PROPERTIES:
+    :CUSTOM_ID: image-smoothing-using-frequency-domain-filters
+    :END:
+
+$\quad\quad$Smoothing is achieved by high-frequency attenuation (lowpass
+filtering).
+
+****** Ideal Lowpass Filters
+       :PROPERTIES:
+       :CUSTOM_ID: ideal-lowpass-filters
+       :END:
+
+$\quad\quad$A cylinder centered at $(M/2,P/2)$.
+
+/Cut-off frequency/: determined by the power encircled by the cylinder
+w.r.t. the whole power spectrum.
+
+****** Butterworth Lowpass Filter
+       :PROPERTIES:
+       :CUSTOM_ID: butterworth-lowpass-filter
+       :END:
+
+$$
+H(u,v)=\dfrac{1}{1+\big(D(u,v)/D_0\big)^{2n}}
+$$
+
+where $D_0$ is the distance at which cutoff frequency ($H(D_0)=0.5$) is
+from the origin. The higher the order is, the more significant the
+"ringing" (waving) in the spatial domain. BLPFs of order 2 are a good
+compromise between effective lowpass filterign and acceptable ringing.
+
+****** Gaussian Lowpass Filters
+       :PROPERTIES:
+       :CUSTOM_ID: gaussian-lowpass-filters
+       :END:
+
+$$
+H(u,v)=e^{-D^2(u,v)/2D_0^2}
+$$
+
+where $D(u,v)$ is a distance function. The inverse Fourier transform of
+the GLPFs is Gaussian too, which has no "ringing".
+
+$\quad\quad$Lowpass filtering in Character Recognition preprocessing.
+
+*** 4.9 Image Sharpening Using Frequency Domain Filters
+    :PROPERTIES:
+    :CUSTOM_ID: image-sharpening-using-frequency-domain-filters
+    :END:
+
+$\quad\quad$A highpass filter is obtained from a given lowpass filter
+using the equation $$
+H_{HP}(u,v)=1-H_{LP}(u,v)
+$$
+
+****** Ideal Highpass Filters
+       :PROPERTIES:
+       :CUSTOM_ID: ideal-highpass-filters
+       :END:
+
+****** Butterworth Highpass Filters
+       :PROPERTIES:
+       :CUSTOM_ID: butterworth-highpass-filters
+       :END:
+
+$$
+H(u,v)=\dfrac{1}{1+\big(D_0/D(u,v)\big)^{2n}}
+$$
+
+****** Gaussian Highpass Filters
+       :PROPERTIES:
+       :CUSTOM_ID: gaussian-highpass-filters
+       :END:
+
+$$
+H(u,v)=1-e^{-D^2(u,v)/2D_0^2}
+$$
+
+****** The Laplacian in the Frequency Domain
+       :PROPERTIES:
+       :CUSTOM_ID: the-laplacian-in-the-frequency-domain
+       :END:
+
+$$
+H(u,v)=-4\pi^2(u^2+v^2)\\
+H(u,v)=-4\pi^2D^2(u,v)
+$$
+
+****** Unsharp Masking, Highboost Filtering, and High-Frequency-Emphasis
+Filtering
+       :PROPERTIES:
+       :CUSTOM_ID: unsharp-masking-highboost-filtering-and-high-frequency-emphasis-filtering
+       :END:
+
+$$
+g_{mask}(x,y)=f(x,y)-f_{LP}(x,y)\\
+f_{LP}(x,y)=\mathcal{F}^{-1}\Big(H_{LP}(u,v)F(u,v)\Big)
+$$
+
+*High-frequency-emphasis filter*:
+$g(x,y)=\mathcal{F}^{-1}\Bigg(\Big[k_1+k_2*H_{HP}(u,v)\Big]F(u,v)\Bigg)$
+
+where $k\_1\geq 0 $ gives controls of the offset from the origin and
+$k_2$ controls the contribution of high frequencies.
+
+****** Homomorphic Filtering
+       :PROPERTIES:
+       :CUSTOM_ID: homomorphic-filtering
+       :END:
+
+#+CAPTION: 52438912215
+[[file:1524389122153.png]]
+
+The /illumination/ component is characterized by slow spatial variations
+while the /reflectance/ component tends to vary abruptly, particularly
+at the junctions of dissimilar objects.
+
+*** 4.10 Selective Filtering
+    :PROPERTIES:
+    :CUSTOM_ID: selective-filtering
+    :END:
+
+****** Bandreject and Bandpass Filters (A cirle, a sphere)
+       :PROPERTIES:
+       :CUSTOM_ID: bandreject-and-bandpass-filters-a-cirle-a-sphere
+       :END:
+
+$$
+H_{BP}(u,v)=1-H_{BR}(u,v)
+$$
+
+#+CAPTION: 52438958813
+[[file:1524389588133.png]]
+
+****** Notch Filters (small regions in the frequency domain)
+       :PROPERTIES:
+       :CUSTOM_ID: notch-filters-small-regions-in-the-frequency-domain
+       :END:
+
+$$
+H_{NR}(u,v)=\prod\limits^{Q}_{k=1}H_k(u,v)H_{-k}(u,v)
+$$
+
+where $H_k(u,v)$ and $H_{-k}(u,v)$ are highpass filters whose centers
+are at $(u_k,v_k)$ and $(-u_k, -v_k)$ respectively. $$
+H_{NP}(u,v)=1-H_{NR}(u,v)
+$$
+
+* Chap.5 Image Restoration and Reconstruction
+  :PROPERTIES:
+  :CUSTOM_ID: chap.5-image-restoration-and-reconstruction
+  :END:
+
+$\quad\quad$The principal goal of restoration techniques is to improve
+an image in some predefined sense. Image enhancement is largely a
+subjective process, while restoration attempts to recover an image that
+has been degraded by using a priori knowledge of the degradation
+phenomenon, that is, oriented toward modeling the degradation and
+applying the inverse process in order to recover the original image.
+
+*A Model of the Image Degradation/Restoration Process* $$
+g(x,y)=h(x,y)*f(x,y)+\eta(x,y)\\
+G(u,v)=H(u,v)F(u,v)+N(u,v)
+$$
+
+** 5.2 Noise Model
+   :PROPERTIES:
+   :CUSTOM_ID: noise-model
+   :END:
+
+Arising during image acquisition and or transmission.
+
+****** Spatial and Frequency Properties of Noise
+       :PROPERTIES:
+       :CUSTOM_ID: spatial-and-frequency-properties-of-noise
+       :END:
+
+/White noise/: constant Fourier spectrum
+
+$\quad\quad$In the discussion below we consider the noise uncorrelated
+w.r.t the image itself, independent of its spatial coordinates, though
+this is not always the case in reality.
+
+****** Some Important Noise Probability Density Functions
+       :PROPERTIES:
+       :CUSTOM_ID: some-important-noise-probability-density-functions
+       :END:
+
+*Gaussian Noise* $$
+p(z)=\dfrac{1}{\sqrt{2 \pi} \sigma}e^{-(z-\bar{z})^2/2\sigma^2}
+$$ where $z$ represents intensity. $70\%$ in
+$(\bar{z}-\sigma,\bar{z}+\sigma)$ and $95\%$ in
+$(\bar{z}-2\sigma,\bar{z}+2\sigma)$
+
+*Rayleigh noise* $$
+p(z)=\begin{cases}\dfrac{2}{b}(z-a)e^{-(z-a)^2/b}&\text{for }\ z\geq a\\0 & \text{for} \ \ z<a\end{cases}
+$$ mean and variance given by $$
+\bar{z}=a+\sqrt{\pi b/4}\\
+\sigma^2=\dfrac{b(4-\pi)}{4}
+$$ Skewed to the right, quite useful for approximating skewed
+histograms.
+
+*Erlang noise* $$
+p(z)=\begin{cases}\dfrac{a^b z^{b-1}}{(b-1)!}e^{-az}&for\ z\geq 0\\
+0&for\ z<0\end{cases}
+$$ Mean $\bar{z}=\dfrac{b}{a}$ and variance $\sigma^2=\dfrac{b}{a^2}$
+
+Referred as the /gamma density/ only when the denominator is the /gamma
+function/ [[https://en.wikipedia.org/wiki/Gamma_function][Gamma
+Funciton]]\\
+[[https://en.wikipedia.org/wiki/Factorial#Extension_of_factorial_to_non-integer_values_of_argument][Gamma
+Function and Factorial]]\\
+[[https://en.wikipedia.org/wiki/Gamma_distribution][Gamma distribution]]
+
+*Exponential noise* $$
+p(z)=\begin{cases}ae^{-az} & for\ z\geq 0\\0 & for\ z<0 \end{cases}
+$$ where $a>0$
+
+mean $\bar{z}=\dfrac{1}{a}$ and variance $\sigma^2=\dfrac{1}{a^2}$
+
+A special case of the Erlang with $b=1$
+
+*Uniform noise*
+
+*Impulse (salt-and-pepper) noise*
+
+/bipolar impulse/ $$
+p(z)=\begin{cases}P_a & for\ z=a\\P_b & for\ z=b\\ 0 & otherwise\end{cases}
+$$ if either of $P_a, P_b$ is zero, the impulse noise is called
+/unipolar/
+
+If neigther is zero and especially approximately equal,
+/salt-and-pepper/ , /data-drop-out/ or /spike/.
+
+$a$ and $b$ are usually assumed to be saturated values, either black or
+white.
+
+#+CAPTION: 52404431917
+[[file:1524044319176.png]]
+
+****** Periodic Noise
+       :PROPERTIES:
+       :CUSTOM_ID: periodic-noise
+       :END:
+
+Arising typically from electrical or electromechanical interference
+during image acquisition and can be reduced significantly via frequency
+domain filtering.
+
+****** Estimation of Noise Parameters
+       :PROPERTIES:
+       :CUSTOM_ID: estimation-of-noise-parameters
+       :END:
+
+If the imaging system is available, one simple way to study the
+characteristics of system noise is to capture a set of images of "flat"
+environments. It is possible to estimate the parameters of the PDF from
+small patches of reasonably constant background intensity.
+
+** 5.3 Restoration in the Presence of Noise Only - Spatial Filtering
+   :PROPERTIES:
+   :CUSTOM_ID: restoration-in-the-presence-of-noise-only---spatial-filtering
+   :END:
+
+$\quad\quad$It is usually possible to estimate noise from the spectrum.
+
+$\quad\quad$Spatial filtering is the method of choice in situations when
+only addtive random noise is present.
+
+****** Mean Filters
+       :PROPERTIES:
+       :CUSTOM_ID: mean-filters
+       :END:
+
+*Arithmetic mean filter* $$
+\hat{f}(x,y)=\dfrac{1}{mn}\sum\limits_{(s,t)\in S_{xy}}g(s,t)
+$$ *Geometric mean filter* $$
+\hat{f}(x,y)=\Bigg(\prod\limits_{(s,t)\in S_{xy}}g(s,t)\Bigg)^{\frac{1}{mn}}
+$$ It tends to lose less image detail compared to the arithmetic mean
+filter.
+
+*Harmonic mean filter* $$
+\hat{f}(x,y)=\dfrac{mn}{\sum\limits_{(s,t)\in S_{xy}}\frac{1}{g(s,t)}}
+$$ Works well for salt noise and other types like Gaussian noise, but
+fails for pepper noise.
+
+*Contraharmonic mean filter* $$
+\hat{f}(x,y)=\dfrac{\sum\limits_{(s,t)\in S_{xy}}g(s,t)^{Q+1}}{\sum\limits_{(s,t)\in S_{xy}}g(s,t)^{Q}}
+$$ where $Q$ is called the order of the filter. Well suited for reducing
+or virtually eliminating the effects of salt-and-pepper noise.
+
+For positive Q, it eleminates pepper noise.\\
+For negative Q, salt noise.\\
+It cannot do both simultaneously.
+
+It reduces to arithmetic filter if $Q=0$ and to the harmonic mean filter
+if $Q=-1$
+
+$\quad\quad$In general, the arithmetic and geometric mean filters
+(particularly the latter) are well suited for random noise like Gaussian
+or uniform. The contraharmonic is well suited for impulse noise.
+
+****** Order-Statistic Filters
+       :PROPERTIES:
+       :CUSTOM_ID: order-statistic-filters
+       :END:
+
+*Median Filter* $$
+f(x,y)=\underset{(s,t)\in S_{xy}}{median}\{g(s,t)\}
+$$ Best-known order-statistic filter, particularly effective in the
+presence of both bopolar and unipolar impulse noise. It can be used
+repeatedly (Note that it could blur the image).
+
+*Max and min filters*
+
+/Max/: useful for finding the brightest points, reducing pepper noise.\\
+/Min/: darkest points, reducing salt noise.
+
+*Midpoint filter* $$
+\hat{f}(x,y)=\dfrac{1}{2}\Bigg(\underset{(s,t)\in S_{xy}}{max}\{g(s,t)\}+\underset{(s,t)\in S_{xy}}{min}\{g(s,t)\}\Bigg)
+$$
+
+Works best for randomly distributed noise like Gaussian or uniform.
+
+*Alpha-trimmed mean filter* $$
+\hat{f}(x,y)=\dfrac{1}{mn-d}\sum\limits_{(s,t)\in S_{xy}}g_r(s,t)
+$$ where $g_r(s,t)$ represents the remaining pixels after deleting the
+lowest $d/2$ and the highest $d/2$ pixels, and $d$ ranges from $0$ to
+$mn-1$. When $d=mn-1$, the filter becomes a median filter. Useful in
+situations involving multiple types of noise, such as a combination of
+salt-and-pepper and Gaussian noise.
+
+****** Adaptive Filters
+       :PROPERTIES:
+       :CUSTOM_ID: adaptive-filters
+       :END:
+
+*Adaptive, local noise reduction filter*
+
+Mean and variance are reasonable parameters on which to base an adaptive
+fitler because they are quantities closely related to the appearance of
+an image.
+
+Four parameters to be considered
+
+1. $g(x,y)$ the value of the noisy image at $(x,y)$
+2. $\sigma^2_{\eta}$ the variance of the noise
+3. $m_L$ the local mean of the neighborhood
+4. $\sigma_L^2$ the local variance
+
+Behavior of the filter
+
+1. If $\sigma_\eta^2=0$, zero-noise case in which $g(x,y)=f(x,y)$
+2. If $\sigma_L^2 \gg \sigma_\eta^2$, this is typically associated with
+   edges that should be preserved.
+3. If the two variances are equal, local area has the same properties as
+   the overall image, and local noise is to be reduced simply by
+   averaging.
+
+Result: $$
+\hat{f}(x,y)=g(x,y)-\dfrac{\sigma_\eta^2}{\sigma^2_L}\Big(g(x,y)-m_L\Big)
+$$ Set the ratio to $1$ if the condition $\sigma_\eta^2>\sigma_L^2$
+
+*Adaptive median filter*
+
+$\quad\quad$The adaptive median filtering can handle impulse noise with
+large spatial densities and preserve detail while smoothing nonimpulse
+noise. $$
+z:\text{intensity value in the neighborhood $S_{xy}$}, \ z_{min},\ z_{max},\ z_{med},\ z_{xy}, \\S_{max}\text{: maximum allowed size of $S_{xy}$}
+$$ /Algorithm/:\\
+​ Stage A: $A1 = z_{med}-z_{min}$\\
+​ $A2 = z_{med}-z_{max}$\\
+​ If $A1>0$ AND $A2<0$, go to stage B\\
+​ Else increase $S_{xy}$\\
+​ If $S_{xy}\leq S_{max}$ repeat stage A\\
+​ Else output $z_{med}$
+
+​ Stage B: $B1=z_{xy}-z_{min}$\\
+​ $B2=z_{xy}-z_{max}$\\
+​ If $B1>0$ AND $B2<0$, output $z_{xy}$\\
+​ Else output $z_{med}$
+
+It removes salt-and-pepper noise, provides smoothing of other noise that
+may not be impulsive and to reduce distortion.
+
+$z_{min}$ and $z_{max}$ are considered statistically the impulse noise
+value. Stage A Line 3 and Stage B check if the respective values are
+impulses. The smaller the $P_a$ or $P_b$, the larger $S_{max}$ is
+allowed to be.
+
+** 5.4 Periodic Noise Reduction by Frequency Domain Filtering
+   :PROPERTIES:
+   :CUSTOM_ID: periodic-noise-reduction-by-frequency-domain-filtering
+   :END:
+
+$\quad\quad$Periodic noise appears as concentrated bursts of energy in
+the FT, at locations corresponding to the frequencies of the periodic
+interference. The approach is to use a selective filter to isolate the
+noise.
+
+****** Bandreject Filters
+       :PROPERTIES:
+       :CUSTOM_ID: bandreject-filters
+       :END:
+
+****** Bandpass Filters
+       :PROPERTIES:
+       :CUSTOM_ID: bandpass-filters
+       :END:
+
+Useful because it simplifies analysis of the noise, reasonably
+independent of image content.
+
+****** Notch filters
+       :PROPERTIES:
+       :CUSTOM_ID: notch-filters
+       :END:
+
+****** Optimum Notch Filtering
+       :PROPERTIES:
+       :CUSTOM_ID: optimum-notch-filtering
+       :END:
+
+$\quad\quad$The interference components generally are not
+single-frequency bursts. Instead they tend to have broad skirts that
+carry information about the interference pattern.
+
+$\quad\quad$The first step is to extract the principal frequency
+components of the interference pattern by $N(u,v)=H_{NP}(u,v)G(u,v)$ and
+obtain its spatial expression
+$\eta(x,y)=\mathcal{F}^{-1}\{H_{NP}(u,v)G(u,v)\}$.
+
+$\quad\quad$The estimate of $f(x,y)$:
+$\hat{f}(x,y)=g(x,y)-w(x,y)\eta(x,y)$, the function $\eta(x,y)$ called
+/weighting/ or /modulation/ function. The objective of the procedure is
+to select this funciton so that the result is optimized in some
+meaningful way.
+
+$\quad\quad$If we choose to mimimize the variance of the estimate
+$\hat{f}(x,y)$ over a specified neighborhood, we have the following
+result. $$
+w(x,y)=\dfrac{\overline{g(x,y)\eta(x,y)}-\bar{g}(x,y)\bar{\eta}(x,y)}{\bar{\eta^2}(x,y)-\bar{\eta}^2(x,y)}
+$$ $w(x,y)$ is assumed to be constant in a neighborhood.
+
+** 5.5 Linear, Position-Invariant Degradations
+   :PROPERTIES:
+   :CUSTOM_ID: linear-position-invariant-degradations
+   :END:
+
+$$
+g(x,y)=H[f(x,y)]+\eta(x,y)\\
+\quad\quad\quad\text{Linearity:  } H[af_1(x,y)+bf_2(x,y)]=aH[f_1(x,y)]+bH[f_2(x,y)]\\
+\text{Position invariant: } H[f(x-\alpha, y-\beta)]=g(x-\alpha, y-\beta)
+$$
+
+$$
+\qquad \qquad \quad g(x,y)=\int^{\infin}_{-\infin}\int^{\infin}_{-\infin}f(\alpha,\beta)h(x,\alpha,y,\beta)d\alpha d\beta\ +\ \eta(x,y)\\
+ = h(x,y)*f(x,y) + \eta(x,y)\\
+ G(u,v)=H(u,v)F(u,v)+N(u,v)
+$$
+
+where $h(x,\alpha,y,\beta)$ is the /impulse response/ of $H$. Assume $H$
+is position-invariant, it becomes $h(x-\alpha, y-\beta)$.
+
+$\quad\quad$The term /image deconvolution/ is used to signify /linear
+image restoration/, and the filters in the process are called
+/deconvolution filters/.
+
+** 5.6 Estimating the Degradation Function
+   :PROPERTIES:
+   :CUSTOM_ID: estimating-the-degradation-function
+   :END:
+
+$\quad\quad$The process of restoring an image by using a degradation
+function that has been estimated in some way sometimes is called /blind
+convolution/, since the true degradation function is seldom known
+completely.
+
+****** Estimation by Image Observation
+       :PROPERTIES:
+       :CUSTOM_ID: estimation-by-image-observation
+       :END:
+
+$\quad\quad$A laborious process used only in very specific circumstances
+such as, for example restoring an old photograph of historical value.
+
+****** Estimation by Experimentation
+       :PROPERTIES:
+       :CUSTOM_ID: estimation-by-experimentation
+       :END:
+
+$\quad\quad$If equipment similar to the equipment used to acquire the
+degraded image is available, it is possible in principle to obtain an
+accurate estimate of the degradation. The idea is to obtain the impulse
+response of the degradation by imaging an impulse (small dot of light)
+using the same system settings.
+
+****** Estimation by Modeling
+       :PROPERTIES:
+       :CUSTOM_ID: estimation-by-modeling
+       :END:
+
+$\quad\quad$Take into account environmental conditions that cause
+degradations.
+
+E.g. The Gaussian lowpass filter is used sometimes to model mild,
+uniform blurring.
+
+Another major approach in modeling is to derive a mathematical model
+starting from basic principles.
+
+E.g. An example of blurring due to continuous exposure.
+
+** 5.7 Inverse Filtering
+   :PROPERTIES:
+   :CUSTOM_ID: inverse-filtering
+   :END:
+
+$$
+\hat{F}(u,v)=F(u,v)+\dfrac{N(u,v)}{H(u,v)}
+$$
+
+Even if we know the degradation function we cannot recover the
+undegraded image exactly becuase $N(u,v)$ is not known. If the
+degradation function has zero or very small values, then the ratio
+$N(u,v)/H(u,v)$ could easily dominate the estimate $\hat{F}(u,v)$. One
+apporach to avoid the zero or small-value problem is to limit the filter
+frequencies to values near the origin, assuming $H(u,v)$ has the
+hightest value at the origin.
+
+** 5.8 Minimum Mean Square Error (Wiener) Filtering
+   :PROPERTIES:
+   :CUSTOM_ID: minimum-mean-square-error-wiener-filtering
+   :END:
+
+$\quad\quad$ Wiener Filtering takes into account the noise. The methdo
+is founded on considering images and noise as random variables and the
+objective is to find an estimate that minimizes
+$e^2=E\{(f-\hat{f})^2\}$, and it yields the following result: $$
+\hat{F}(u,v)=\Bigg[\dfrac{1}{H(u,v)}\dfrac{|H(u,v)|^2}{|H(u,v)|^2+S_\eta(u,v)/S_f(u,v)}\Bigg]G(u,v)
+$$ where $S_\eta(u,v)=|N(u,v)|^2=$ power spectrum of the noise\\
+​ $S_f(u,v)=|F(u,v)|^2=$ power spectrum of the undegraded image
+
+This "two S's" term can be measured by /signal-to-noise ratio/
+$SNR=\dfrac{\sum\limits^{M-1}_{u=0}\sum\limits^{N-1}_{v=0}|F(u,v)|^2}{\sum\limits^{M-1}_{u=0}\sum\limits^{N-1}_{v=0}|N(u,v)|^2}$
+
+The noise term may be replaced with
+$MSE=\dfrac{1}{MN}\sum\limits^{M-1}_{x=0}\sum\limits^{N-1}_{y=0}\big[f(x,y)-\hat{f}(x,y)\big]^2$
+
+The power spectrum of the undegraded image seldom is known. An approach
+frequently used is to approximate by a constant $K$. $$
+\hat{F}(u,v)=\Bigg[\dfrac{1}{H(u,v)}\dfrac{|H(u,v)|^2}{|H(u,v)|^2+K}\Bigg]G(u,v)
+$$
+
+** 5.9 Constrained Least Squares Filtering
+   :PROPERTIES:
+   :CUSTOM_ID: constrained-least-squares-filtering
+   :END:
+
+$\quad\quad$A constant estimate of the ratio of the power spectra for
+Wiener filters is not always a suitable solution. The method here
+requires knowledge of only the /mean/ and /variance/ of the noise, which
+are usually calculated easily from the degraded image. Wiener filter is
+optimal in an average sense, but not for each image. $$
+g=Hf+\eta
+$$ Optimization problem $$
+C=\sum\limits^{M-1}_{x=0}\sum\limits^{N-1}_{y=0}\big[\triangledown^2f(x,y)\big]^2
+$$ subject to the constraint $$
+||g-H\hat{f}||^2=||\eta||^2
+$$ solution given by $$
+\hat{F}(u,v)=\Bigg[\dfrac{H^*(u,v)}{|H(u,v)|^2+\gamma|P(u,v)|^2}\Bigg]G(u,v)
+$$ where $\gamma$ is a parameter that must be adjusted to satisfy
+Eq.(86), and $P(u,v)$ is the FT of the Laplacian operator.
+
+$\quad\quad$To determine the best $\gamma$, define a residual vector $$
+\vec{r}=\vec{g}-H\vec{\hat{f}}=\vec{\eta}
+$$ The objective function $\phi(r)=||r||^2$ is a monotonically
+increasing function of $\gamma$. We want to adjust $\gamma$ so that
+$||r||^2=||\eta||^2\pm a$, where $a$ is an accuracy factor. This
+optimization can be solved iteratively. Given an initial $\gamma_{0}$,
+using Eq.(87) and (89) to compute the current $r$. $$
+||r||^2=\sum\limits^{M-1}_{x=0}\sum\limits^{N-1}_{y=0}r^2(x,y)
+$$ where $r(x,y)=\mathcal{F}^{-1}[R(u,v)]$ and
+$R(u,v)=G(u,v)-H(u,v)\hat{F}(u,v)$.
+
+Since $$
+\sigma^2_\eta=\dfrac{1}{MN}\sum\limits^{M-1}_{x=0}\sum\limits^{N-1}_{y=0}\big[\eta(x,y)-m_\eta \big]^2
+$$ Expand Eq.(88) and we have $$
+||\eta||^2=MN[\sigma_\eta^2+m^2_\eta]
+$$
+
+** 5.10 Geometric Mean Filter
+   :PROPERTIES:
+   :CUSTOM_ID: geometric-mean-filter
+   :END:
+
+$\quad\quad$A generalization of Wiener filter, called /geometric mean
+filter/: $$
+\hat{F}(u,v)=\Bigg[\dfrac{H^*(u,v)}{|H*(u,v)|^2}\Bigg]^\alpha\Bigg[\dfrac{H^*(u,v)}{|H(u,v)|^2+\beta\big[\frac{S_\eta(u,v)}{S_f(u,v)}]}\Bigg]^{1-\alpha}G(u,v)
+$$ $\alpha=1$: inverse filter\\
+$\alpha =0​$: parametric Wiener filter\\
+$\alpha=1/2$ and $\beta=1$: spectrum equailzaition filter.
+
+** 5.11 Image Reconstruction from Projections
+   :PROPERTIES:
+   :CUSTOM_ID: image-reconstruction-from-projections
+   :END:
+
+\indHow the shape of a 2-D object is reconstructed from 1-D projections
+from different angles and the principle of CT.
+
+#### Projections and the Radon Transform
+
+[[https://en.wikipedia.org/wiki/Line_(geometry)#In_normal_form][Hesse
+normal representation of a straight line]]
+
+*Radon transform*: $$
+g(\rho,\theta)=\int^{\infin}_{-\infin}\int^{\infin}_{-\infin}f(x,y)\delta(x\ cos\theta +y\ sin\theta -\rho)dxdy
+$$ The raysum, which is a line integral. The cornerstone of
+reconstruction from projections.
+
+Discrete version: $$
+g(\rho,\theta)=\sum\limits^{M-1}_{x=0}\sum\limits^{N-1}_{y=0}f(x,y)\delta(x\ cos\theta + y\ sin\theta -\rho)
+$$ /Sinogram/: with $\rho$ and $\theta$ as rectilinear coordinates. A
+sinogram contains the data necessary to reconstruct $f(x,y)$.
+
+*Backprojection*: $$
+f_\theta(x,y)=g(x\ cos\theta + y\ sin\theta, \theta)
+$$
+
+$$
+f(x,y)=\int^{\pi}_{0}f_\theta(x,y)d\theta
+$$ Discrete version: $$
+f(x,y)=\sum\limits^{\pi}_{\theta=0}f_\theta(x,y)
+$$ A back-projected image is sometimes referred to as a /laminogram/. It
+is understood implicitly that a laminogram is only an approximation to
+the image from which the projections were generated.
+
+**** The Fourier-Slice Theorem
+     :PROPERTIES:
+     :CUSTOM_ID: the-fourier-slice-theorem
+     :END:
+
+The 1-D Fourier transform of a projection (through parallel beams)
+w.r.t. $$
+G(w,\theta)=F(\omega\ cos\theta, \omega\ sin\theta)
+$$ where $F(u,v)$ denotes the 2-D Fourier transform of $f(x,y)$
+
+**** Reconstruction Using Parallel-Beam Filtered Backprojections
+     :PROPERTIES:
+     :CUSTOM_ID: reconstruction-using-parallel-beam-filtered-backprojections
+     :END:
+
+$$
+f(x,y)=\int^{\pi}_{0}\Bigg[\int^\infin_{-\infin}|\omega|G(\omega,\theta)e^{j2\pi\omega\rho}d\omega\Bigg]_{\rho=xcos\theta+ysin\theta}d\theta
+$$
+
+The inner expression is in the form of an inverse 1-D Fourier transform.
+$|\omega|$ is a ramp filter. Though not integrable, $|\omega|$ can be
+handled by methods such as /generalized delta functions/. In practice,
+the approach is to window the ramp so it becomes zero outside a certain
+inverval. A /Hamming windows/ can be used to reduce the ringing of the
+ramp but blurs the image.
+
+\indThe complete back-projected image $f(x,y)$ is obtaiend as follows
+(filtered backprojection):
+
+1. Compute $G(\omega, \theta)$
+2. Multiply by the filter function
+3. Obtain the inverse 1-D FT
+4. Integrate them all
+
+The inner expression
+$F^{-1}[|\omega|G(\omega, \theta)]=F^{-1}[|\omega|]*g(\omega,\theta)$.
+In practical CT implementations, convolution generally turns out to be
+more efficient computationally.
+
+**** Reconstruction Using Fan-Beam Filtered Backprojections
+     :PROPERTIES:
+     :CUSTOM_ID: reconstruction-using-fan-beam-filtered-backprojections
+     :END:
+
+/Backprojection/: $$
+\begin{align}f(r,\phi)&=\dfrac{1}{2}\int^{2\pi}_{0}\int^{\alpha_m}_{-\alpha_m}p(\alpha,\beta)s[r\ cos(\beta+\alpha-\phi)-D\ sin\alpha]D\ cos\alpha\ d\alpha d\beta\\&=\dfrac{1}{2}\int^{2\pi}_{0}\int^{\alpha_m}_{-\alpha_m}p(\alpha,\beta)s[Rsin(\alpha'-\alpha)]D\ cos\alpha\ d\alpha d\beta
+\end{align}
+$$

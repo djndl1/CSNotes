@@ -1,0 +1,81 @@
+* Qt language quirks
+
+- =foreach=: no longer needed after C++11
+
+* Basic Qt Widgets
+
+Layouts and spacers are not something that can be directly observed 
+but they can affect the positions and orientations of widgets. 
+Qt programs don't typically lay elements out using the fixed position 
+because layouts allow dialogs and windows to be dynamically resized 
+in a sensible manner while handling a varying length of text 
+when localized in different languages.
+
+It is pretty common for a constructor to take a =parent= parameter.
+ Defining a parent-child relationship between windows, layouts and 
+other UI widgets makes memory management of an application easier.
+The =QObject= class parenting automatically handles object destruction.
+The parent class releases its own memory by recursively iterating 
+through its children and calling their destructor.
+
+* Internationalization and Strings
+
+- =tr()=
+
+* Signal and Slots
+
+A flexible message-exchange mechanism that is composed of:
+
+- =signal=: a message sent by an object
+
+- =slot=: a function that will be called when this signal is triggered
+
+- The =connect= function specifies which =signal= is linked to which =slot=.
+
+A slot remains an ordinary function. A single signal can be linked to 
+different slots. A single slot can be called by different linked signals. 
+A connection can be made between a signal and a slot from different objects,
+ and even between objects living inside different threads.
+
+To be able to connect a =signal= to a =slot=, their methods' signatures must
+match. The count, order and type of arguments must be identical.
+
+#+BEGIN_SRC C++
+connect(sender, &Sender::signalName,  
+    receiver, &Receiver::slotName);   
+
+connect(ui->addTaskButton, &QPushButton::clicked,
+        QApplication::instance(), &QApplication::quit);
+#+END_SRC
+
+It is possible to connect a signal to another signal. The second signal will be 
+emitted when the fist one is triggered.
+
+To add a slot, use the =slots= keyword.
+
+#+BEGIN_SRC C++
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+
+public slots:
+    void addTask();
+
+private:
+    Ui::MainWindow *ui;
+};
+
+
+void MainWindow::addTask()
+{
+    qDebug() << "User clicked on the button";
+    return;
+}
+#+END_SRC
+
+Qt allows signal relaying by connecting a signal to another signal if their 
+signatures match. 

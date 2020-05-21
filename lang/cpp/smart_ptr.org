@@ -1,0 +1,242 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+
+One reason to use pointers is to have reference semantics outside the usual boundaries 
+of scope. A smart pointer knows whether it is the last pointer to an object and delete
+an associated object only when the last owner get destroyed.
+
+For any smart pointers, there should never be multiple smart created directly out of the 
+same ordinary pointer. 
+
+In general, smart pointers are not thread safe.
+
+* Shared Ownership
+
+Multiple smart pointers can refer to the same object so that the object
+and its associated resources get released whenever the last reference to
+it gets destroyed.
+
+To avoid data races, use techniques such as mutexes or locks. 
+=shared_ptr= has =atomic= specialization to allow uses to manipulate 
+atomically.
+
+** =shared_ptr=
+
+- Use =make_shared= and =allocate_shared()= to avoid unnecessary allocations.
+
+- To work with arrays, use something like
+
+#+BEGIN_SRC C++
+  std::shared_ptr<int> p(new int[10], [] (int* p) { delete[]; });
+  std::shared_ptr<int> p(new int[10], std::default_delete<int[]>());
+#+END_SRC
+
+- custom deleter:
+
+#+BEGIN_SRC C++
+#include <memory>
+#include <fstream>
+#include <cstdio>
+#include <string>
+
+class FileDeleter {
+private:
+    std::string filename;
+public:
+    FileDeleter(const std::string& fn) : filename{fn} { }
+    void operator()(std::ofstream* sp) {
+        sp->close();
+        std::remove(filename.c_str());
+    }
+};
+
+int main(int argc, char *argv[])
+{
+    std::shared_ptr<std::ofstream> fp(new std::ofstream("tmpfile.txt"),
+                                      FileDeleter("tmpfile.txt"));
+    return 0;
+}
+#+END_SRC
+
+- /alias constructor/: one object owns another. the programmer has to ensure that the lifetimes of both objects
+match.
+
+#+BEGIN_SRC C++
+struct X {
+  int a;
+};
+shared_ptr<X> px(new X);
+shared_ptr<int> pi(px, &px->a); // owns a and X
+#+END_SRC
+
+
+
+- Always ensure only one group of shared pointers owns an object:
+
+#+BEGIN_SRC C++
+int* p = new int;
+shared_ptr<int> sp1(p);
+shared_ptr<int> sp2(p);
+#+END_SRC
+
+A not so obvious one
+
+#+BEGIN_SRC C++
+shared_ptr<Person> mom(new Person(name+"’s mom"));
+shared_ptr<Person> dad(new Person(name+"’s dad"));
+shared_ptr<Person> kid(new Person(name));
+kid->setParentsAndTheirKids(mom,dad);
+
+class Person {
+public:
+  ...
+    void setParentsAndTheirKids (shared_ptr<Person> m = nullptr,
+    shared_ptr<Person> f = nullptr) {
+        mother = m;
+        father = f;
+        if (m != nullptr) {
+        m->kids.push_back(shared_ptr<Person>(this)); // ERROR, a new group
+    }
+        if (f != nullptr) {
+            f->kids.push_back(shared_ptr<Person>(this)); // ERROR
+        }
+    }
+      ...
+};
+
+#+END_SRC
+
+For this reason,  always directly initialize a smart pointer the moment
+ the object is created with its associated resource.
+
+#+BEGIN_SRC C++
+shared_ptr<int> sp1(new int);
+shared_ptr<int> sp2(sp1);
+#+END_SRC
+
+Another way is to derive the pointed-to class from =std::enable_shared_from_this=.
+Doing this will allows a derived member =shared_from_this()= to create a
+correct =shared_ptr=.
+
+
+
+** =weak_ptr=
+
+Use cases:
+
+1. cyclic reference;
+
+2. share but not own
+
+=weak_ptr= requires a =shared_ptr= to get created. To access the resource
+pointed to, a =shared_ptr= must be created out of =weak_ptr=, through =.lock()=.
+To check whether the resource is still available, use =.expired()=, =.use_count()=, 
+
+
+* Exclusive ownership =unique_ptr=
+
+Only one smart pointer can refer to a certain object at a time. 
+Especially useful for avoiding resource leaks (forgetting to release 
+or an exception).
+
+Without smart pointers, there would be =try= and =catch= everywhere.
+
+- No pointer arithmetic (a source of trouble) for =unique_ptr=.
+
+- =operator bool= available 
+
+- It is up to the programmer to ensure that no two unique pointers
+  are initialized by the same pointer.
+
+Functions can use =unique_ptr= to transfer ownership to other functions:
+  1. A function can behave as a sink of data. This happens if a =unique_ptr= is passed as an argument
+     to the function by rvalue reference created with =std::move()=.
+  2. A function can behave as a source of data. When a =unique_ptr= is returned, ownership of
+    the returned value gets transferred to the calling context.
+
+#+BEGIN_SRC C++
+void sink(std::unique_ptr<ClassA> up) 
+// do not add &&, we need only the wrapped raw pointer
+ // sink() gets ownership
+{
+...
+}
+std::unique_ptr<ClassA> up(new ClassA);
+...
+sink(std::move(up));
+ // up loses ownership
+
+std::unique_ptr<ClassA> source()
+{
+  std::unique_ptr<ClassA> ptr(new ClassA); // ptr owns the new object
+  ...
+  return ptr;
+ // transfer ownership to calling function
+}
+#+END_SRC
+
+- With =unique_ptr= as a class member, =delete= inside destructors is not needed, 
+  also, exceptions during initialization will not cause leaks.
+
+- the C++ standard library provides a partial specialization of class =unique_ptr= for
+  arrays, which calls =delete[]= for the referenced object when the pointer loses the ownership to it.
+  =operator[]= is provided to access one of the objects inside the referenced array instead of =*=.
+
+#+BEGIN_SRC C++
+std::unique_ptr<std::string[]> up(new std::string[10]); 
+#+END_SRC
+
+- An example for custom deleter
+
+#+BEGIN_SRC C++
+  class DirCloser {
+    public:
+        void oprator()(DIR* dp) 
+        {
+          if (closedir(dp) != 0)
+              std::cerr << "closedir() failed" >> std::endl;
+        }
+  };
+
+unique_ptr<DIR, DirCloser> pDir(opendir("."));
+#+END_SRC
+
+
+
+=unique_ptr::pointer= may not be the type as =T*=, in which case =T= is more of a tag. The advantage
+of this is that a =unique_ptr= can hold other smart pointers.
+
+** =auto_ptr=
+
+=auto_ptr= (designed for exclusive ownership): cannot be used with an
+array, it's like
+
+#+BEGIN_SRC C++
+char *array = new char[10];
+...
+delete array // single-object delete
+#+END_SRC
+
+It's meant to prevent leaks in the present of exception. Also, since 
+=auto_ptr= implements unique ownership, never use a container of =auto_ptr=
+objects.
+
+- no deleter semantics.
+
+#+BEGIN_SRC C++
+template <typename T>
+void bad_print(std::auto_ptr<T> p)
+// p gets ownership of passed argument
+{
+    // does p own an object ?
+    if (p.get() == NULL) {
+        std::cout << "NULL";
+    } else {
+        std::cout << *p;
+    }
+}
+#+END_SRC
+
+which is not possible with =unique_ptr= since ownership transfer is done
+
+through move semantics (move semantics doesn't mean rvalue reference must
+be used).

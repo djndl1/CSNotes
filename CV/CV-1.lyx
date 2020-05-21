@@ -1,0 +1,799 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding auto
+\fontencoding default
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 0
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Computer Vision
+\end_layout
+
+\begin_layout Standard
+Reference:
+\end_layout
+
+\begin_layout Standard
+[1]Computer Vision: Algorithms and Applications.
+ Chap.
+ 1-4, 6, 11, 14
+\end_layout
+
+\begin_layout Standard
+[2]Computer Vsion: A Modern Approach
+\end_layout
+
+\begin_layout Standard
+Vision is an inverse probelem in which we seek to recover some unknowns
+ given insufficient information to fully specify the solution, resorting
+ to physics-based and probabilistic models to disambiguate between potential
+ problems.
+\end_layout
+
+\begin_layout Quote
+\begin_inset CommandInset href
+LatexCommand href
+name "forward and inverse modelling"
+target "https://astronomy.stackexchange.com/questions/19687/what-does-forward-modeling-mean"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In computer vision, we do the inverse modelling, i.e., to describe the world
+ that we see in one or more images and to reconstruct its properties.
+\end_layout
+
+\begin_layout Quote
+cognitive: logic proving and planning 
+\emph on
+versus
+\emph default
+ perceptual 
+\end_layout
+
+\begin_layout Standard
+It is better to think back from the problem at hand to suitable techniques
+ rather than to grab the first technique that you may have heard of.
+ This kind of working back from problems to solutions is typical of an 
+\series bold
+engineering
+\series default
+ approach to the study of vision.
+\end_layout
+
+\begin_layout Subsection
+A history
+\end_layout
+
+\begin_layout Itemize
+1970s: trying to recover the 3D structure of the world - 
+\begin_inset Quotes eld
+\end_inset
+
+blocks world
+\begin_inset Quotes erd
+\end_inset
+
+ from edge detection, generalized cylinders, pictorial structures for elastic
+ arrangements of parts; qualitative approach to understanding intensities
+ and shading variations and explaining them by the effects of image formation
+ phenomena - intrisic images; many feature-based stereo correspondence algorithm
+s; intensity-based optical flow algorithm 
+\end_layout
+
+\begin_layout Quote
+Description of a visual information processing system - Computational theory:
+ the goal and constraints - Representations and algorithms - Hardware implementa
+tion 
+\end_layout
+
+\begin_layout Itemize
+1980s: more sophisticated mathematical techniques.
+ Image pyramids for image blending and coarse-to-fine correspondence search;
+ scale space processing; wavelets; a wide variety of shape-from-X techniques;
+ better edge and contour detection.
+ the unification of stereo, flow, shape-from-X and edge detection; Markov
+ Random Field; Kalman filter; 
+\end_layout
+
+\begin_layout Itemize
+1990s: 
+\emph on
+projective reconstructions
+\emph default
+, which did not require knowledge of camera calibration.
+ factorization techniques.
+ Physics-based vision.
+ Dense stereo correspondence algorithm.
+ 
+\emph on
+Graph cut
+\emph default
+ for global optitimazation.
+ 
+\emph on
+multi-view steroe algorithms
+\emph default
+ for producing complete 3D surfaces.
+ 
+\emph on
+Active contours
+\emph default
+; 
+\emph on
+particle filters
+\emph default
+; 
+\emph on
+level sets
+\emph default
+.
+ 
+\emph on
+minimum energy
+\emph default
+ and 
+\emph on
+minumu description length
+\emph default
+, 
+\emph on
+normalized cuts
+\emph default
+ and 
+\emph on
+mean shift
+\emph default
+.
+ 
+\emph on
+Statistical learning
+\emph default
+.
+ 
+\emph on
+Image morphing
+\emph default
+, 
+\emph on
+view interpolation
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+200s: 
+\emph on
+Image stitching
+\emph default
+, 
+\emph on
+high dynamic range image capture
+\emph default
+, 
+\emph on
+exposure bracketing
+\emph default
+, 
+\emph on
+tone mapping
+\emph default
+, 
+\emph on
+texture synthesis
+\emph default
+, 
+\begin_inset Quotes eld
+\end_inset
+
+constrellation model
+\begin_inset Quotes erd
+\end_inset
+
+.
+ More efficient algorithms for complex global optimization problems.
+ The application of sophisticaed 
+\emph on
+machine learning
+\emph default
+ techniques to computer vision problem.
+\end_layout
+
+\begin_layout Subsection
+Image Formation
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "https://www.tomdalling.com/blog/modern-opengl/explaining-homogenous-coordinates-and-projective-geometry/"
+target "https://www.tomdalling.com/blog/modern-opengl/explaining-homogenous-coordinates-and-projective-geometry/"
+literal "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Interactive Guide to Homogeneous Coordinates"
+target "http://wordsandbuttons.online/interactive_guide_to_homogeneous_coordinates.html"
+literal "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Programmer Guide to Homogeneous Coordinates"
+target "https://hackernoon.com/programmers-guide-to-homogeneous-coordinates-73cbfd2bcc65"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The smaller 
+\begin_inset Formula $w_{h}$
+\end_inset
+
+ gets, the further the point in Cartesian coordinates “travels” from the
+ null.
+ Intuition tells that the point with its wh = 0 should be further from the
+ beginning of the coordinates than every other point with 
+\begin_inset Formula $w_{h}\neq0$
+\end_inset
+
+.
+ All the points in the Euclidean space can have their third coordinate infinitel
+y small, so this point should be somewhere other than in Euclidean space.
+ Homogeneous coordinates denote points not only in Euclidean (or, more generally
+, affine space) but in the 
+\begin_inset CommandInset href
+LatexCommand href
+name "projective space"
+target "https://en.wikipedia.org/wiki/Projective_space"
+literal "false"
+
+\end_inset
+
+ that includes and expands the affine one.
+\end_layout
+
+\begin_layout Subsubsection
+Geometric primitives and transformation
+\end_layout
+
+\begin_layout Quote
+perspective: an approximate representation on a flat surface, of an image
+ as it is seen by the eye.
+ The two most characteristic features of perspective are that objects appear
+ smaller as their distance from the observer increases; and that they are
+ subject to 
+\emph on
+foreshortening
+\emph default
+, meaning that an objects's dimension along the line of sight appear shorter
+ than its dimensions across the line of sight.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Quote
+Perspective projection is a linear projection where three dimensional objects
+ are projected on a 
+\emph on
+picture plane
+\emph default
+.
+\end_layout
+
+\begin_layout Paragraph
+Geometric primitives
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+2D points
+\series default
+: a pair of values 
+\begin_inset Formula $\mathrm{x}=(x,y)\in R^{2}$
+\end_inset
+
+ or 
+\emph on
+homogeneous coordinates
+\emph default
+, 
+\begin_inset Formula $\mathrm{x^{~}}=(\tilde{x},\tilde{y},\tilde{w})\in P^{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Quote
+\begin_inset Formula $P^{2}=R^{3}-(0,0,0)$
+\end_inset
+
+ is called the 2D 
+\emph on
+projective space
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+and can be converted back into an 
+\emph on
+inhomogeneous vector
+\emph default
+ 
+\begin_inset Formula $\mathrm{x}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathrm{x^{~}}=w^{~}(x,y,1)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mathrm{\bar{x}}=(x,y,1)$
+\end_inset
+
+ is called 
+\emph on
+augmented vector
+\emph default
+.
+ Homogeneous points whose last element 
+\begin_inset Formula $\tilde{w}=0$
+\end_inset
+
+ are called 
+\emph on
+ideal points
+\emph default
+ or 
+\emph on
+points at infinity
+\emph default
+ and do not have an equivalent inhomogeneous representation.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+2D lines
+\series default
+ can also be represented using homogeneous coordinates 
+\begin_inset Formula $\tilde{l}=(a,b,c)$
+\end_inset
+
+.
+ The corresponding 
+\emph on
+line equation
+\emph default
+ is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\bar{x}\cdot\tilde{l}=ax+by+c=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Quote
+line at infinity: 
+\begin_inset Formula $\bar{l}=(0,0,1)$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+The line equation can also be normalized or using 
+\emph on
+polar coordinates
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+When using homogeneous coordinates, the intersection of twe lines is obtained
+ by their cross product.
+ Similarly, the line joining two points can also be obtained by the cross
+ product of the two points.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+2D conics
+\series default
+ can be written using a 
+\emph on
+quadric
+\emph default
+ equation.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+3D points
+\series default
+ have similar representation to 2D points.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+3D planes
+\series default
+ have similar representation to 2D lines.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+3D lines
+\series default
+ Given two points 
+\begin_inset Formula $(p,q)$
+\end_inset
+
+ Any other point on the line can be exporesses as a linear combination of
+ these two points.
+ In homogeneous coordinates, the line can be written as
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{r}=\mu\bar{p}+\lambda\bar{q}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Quote
+Degree of freedom: the DoF of a system is the number of parameters of the
+ system that may vary independently 
+\end_layout
+
+\begin_layout Standard
+An adequate model of 3D lines can be obtained by estimating their direction
+ and some point within the visible portion of the line or by using the two
+ endpoints.
+\end_layout
+
+\begin_layout Paragraph
+Transformations
+\end_layout
+
+\begin_layout Standard
+See P33-P42 in [1], See also 
+\begin_inset CommandInset href
+LatexCommand href
+name "2D transformation"
+target "https://www.tutorialspoint.com/computer_graphics/2d_transformation.htm"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Any equation where an augmented vector appear on both sides, it can always
+ be replaced with a full homogeneous vector.
+\end_layout
+
+\begin_layout Standard
+The rotation+translation is also known as 
+\emph on
+2D rigid body motion
+\emph default
+ or the 
+\emph on
+2D Euclidean transformation
+\emph default
+, the transformation matrix is obtained through polar coordiantes and trigonomet
+ry.
+\end_layout
+
+\begin_layout Quote
+Non-technically, Affine Transformations are translations, dilations/expansions/c
+ontractions, rotations, reflections, shears and combinations thereof.
+\end_layout
+
+\begin_layout Quote
+\begin_inset CommandInset href
+LatexCommand href
+name "homography"
+target "https://en.wikipedia.org/wiki/Homography"
+literal "false"
+
+\end_inset
+
+: the relation between two figures (as two representations of the same thing
+ in different perspective) such that for every point, line, or angle in
+ one there is a corresponding point, line, or angle in the other.
+ 
+\end_layout
+
+\begin_layout Standard
+The easiest wayt to think of these transformations is as a set of matrices
+ operating on 2D homogeneous coordinate vectors.
+\end_layout
+
+\begin_layout Quote
+\begin_inset CommandInset href
+LatexCommand href
+name "covector"
+target "https://en.wikipedia.org/wiki/Linear_form"
+literal "false"
+
+\end_inset
+
+: is a linear map from a vector space to its field of scalars.
+\end_layout
+
+\begin_layout Subparagraph
+3D rotations
+\end_layout
+
+\begin_layout Standard
+The biggest difference between 2D and 3D coordinate transformations is that
+ the parameterization of the 3D rotation matrix 
+\begin_inset Formula $R$
+\end_inset
+
+ is not as straightforward but several posssibilities exist.
+\end_layout
+
+\begin_layout Quote
+intrisic rotations: Intrinsic rotations are elemental rotations that occur
+ about the axes of a coordinate system XYZ attached to a moving body.
+ Therefore, they change their orientation after each elemental rotation.
+\end_layout
+
+\begin_layout Quote
+extrinsic rotations: Extrinsic rotations are elemental rotations that occur
+ about the axes of the fixed coordinate system xyz.
+ The XYZ system rotates, while xyz is fixed.
+\end_layout
+
+\begin_layout Quote
+\begin_inset CommandInset href
+LatexCommand href
+name "Euler angles"
+target "https://en.wikipedia.org/wiki/Euler_angles"
+literal "false"
+
+\end_inset
+
+: three angles introduced by Leonhard Euler to describe the orientation
+ of a rigid body w.r.t.
+ a fixed coordinate system.
+ Any orientation can be achieved by composing three elemental rotations,
+ i.e.
+\begin_inset space ~
+\end_inset
+
+rotations about the axes of a coordinate system.
+ Euler angles can be defined by three of these rotations.
+\end_layout
+
+\begin_layout Quote
+\begin_inset CommandInset href
+LatexCommand href
+name "Tait-Bryan angles"
+target "https://en.wikipedia.org/wiki/Euler_angles\\#TaitâBryan_angles"
+literal "false"
+
+\end_inset
+
+: Normally used for aerospace applications.
+ The Tait-Bryan angles represent rotations about three distinct axes.
+\end_layout
+
+\begin_layout Quote
+\begin_inset CommandInset href
+LatexCommand href
+name "Aircraft principal axes"
+target "https://en.wikipedia.org/wiki/Aircraft_principal_axes"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Quote
+The location and orientation together fully describe how the object is placed
+ in space.
+ Euler's rotation theorem shows that in three dimensions any orientation
+ can be reached with a single rotation around a fixed axis.
+ This gives one common way of representing the orientation using an axis–angle
+ representation.
+ Other widely used methods include rotation quaternions, Euler angles, or
+ rotation matrices.
+\end_layout
+
+\begin_layout Subsection
+3D to 2D projections
+\end_layout
+
+\begin_layout Standard
+There are two graphical projection categories
+\end_layout
+
+\begin_layout Itemize
+parallel projection 
+\end_layout
+
+\begin_layout Itemize
+perspective projection 
+\end_layout
+
+\begin_layout Standard
+each with its own protocol
+\end_layout
+
+\begin_layout Standard
+Read 
+\begin_inset CommandInset href
+LatexCommand href
+name "this"
+target "https://en.wikipedia.org/wiki/3D_projection"
+literal "false"
+
+\end_inset
+
+and P42-P45 before continuing
+\end_layout
+
+\begin_layout Standard
+Objects drawn with parallel projection do not appear larger or smaller as
+ they extend closer to or away from the viewer.
+ It is not how our eyes or photography normally work.
+ It can easily result in sitautions where depth and altitude are difficult
+ to gauge.
+\end_layout
+
+\begin_layout Standard
+In perspective projection, parallel lines appear to intersect in the projected
+ image, converge towards a single point (
+\emph on
+vanishing point
+\emph default
+).
+ Perspective projection is usually categorized into one-point, two-point
+ and three-point perspective, depending on the orientation of the projection
+ plane towards the axes of the depicted object.
+ The vanishing points of all horizontal lines lie on the horizon line
+\end_layout
+
+\begin_layout Subsubsection
+Camera Models
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "Programmer Guide to Linear Systems"
+target "https://hackernoon.com/programmers-guide-to-linear-systems-4581e40fe6ad"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

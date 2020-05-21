@@ -1,0 +1,211 @@
+- Robot: a machine with /sensors/, /actuators/ (motors) and a computing unit that 
+  behaves based on user controls or it can make its own decisions based on sensors
+  inuts.
+
+The main components of any robot are the actuators and the sensors. Actuators are
+controlled by motor controllers and interface with a microcontroller/PLC. Some
+acutuators are directly controlled through a PC's USB. Sensors also interface with
+a microcontroller or PC.
+
+Some features are needed for programming a robot:
+
+1. threading: to work with different sensors and actuators in different threads.
+
+2. high-level object-oriented programming
+
+3. low-level device control
+
+4. ease of prototyping
+
+5. interprocess communication: different programs for different tasks need to
+  communicate with eachother to exchange data.
+
+6. performance
+
+7. community support
+
+* ROS
+
+The ROS framework provides the following capabilities:
+
+1. message passing interface between processes
+
+2. operating system-like features: ROS is a meta operating system that provides
+  some operating system functionalities including multithreading, low-level device
+  control, package management and hardware abstraction.
+
+3. high-level programming language support and tools: C++, Python and Lisp.
+
+4. third-party libraries: integrated with OpenCV and PCL.
+
+5. off-the-shelf algorithms: popular robotics algorithms such as PID, SLAM and 
+  path planners. These algorithms reduce development time for prototyping a robot.
+
+6. extensive tools and simulators: rviz for visualization with cameras, laser 
+  scanners, inertial measurement units and so forth; Gazebo for robot simulations.
+
+Basically, ROS is a framework to communicate between two programs or processes.
+
+[[http://wiki.ros.org/ROS/Concepts][Concepts]]
+
+#+BEGIN_SRC 
+                    +----------+
+         +----------+          +------+
+         |          |ROS Master|      |
+         |          |          |      |
+         |          +----------+      |
+         |                            |
+  Client |                            | Service
+
++--------++        Service Name       +-----------+
+|         |     +----------------+    |           |
+| Node 1  +---->+Service Message +---->   Node 2  |
+|         |     |     Data       |    |           |
++---+-----+     +----------------+    +-----+-----+
+    |                                       ^
+    |                                       |
+    |              Topic Name               |
+    |      +--------------------------+     |
+    +----->+    Topic Message Data    +-----+
+           +--------------------------+  
+#+END_SRC
+
+[[https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern][Publish-subscribe pattern]]
+
+A node communicate to the ROS master. The /publisher node/ sends all its
+ information to the  ROS master, including the type of data it sends
+ or receives. The /subscriber node/ receives the formation from the ROS master.
+The ROS master has all the publisher and subscriber information running on 
+computers. 
+
+The ROS nodes can send different types of data to each other, including primitive
+data types, in the form of /ROS messages/, through a message bus called /ROS topics/.
+Each topics has a name. When a ROS node publishes a topic, it sends a ROS topic
+with a ROS message, and it has data with the message type.
+
+** File System
+
+The ROS file system include /packages/, /meta packages/, /package manifests/,
+/repositories/, /message types/ and /services types/.
+
+- /packages/: /atomic units/ of ROS software. All source code, data files, 
+  build files, dependencies and other files are organized in packages.
+
+- /meta package/: a set of similar packages for a specific application.
+
+- /package manifest/: an XML file inside a ROS package, which includes all the
+  primary information of a ROS package.
+
+- /repository/: a collection of ROS packages that share a common version control
+  system.
+
+- /message type description/: the definition of a new ROS message type.
+
+- /service type definition/: service definition
+
+#+BEGIN_SRC 
+  
+#+END_SRC
+
+** Computation Concepts
+
+- /ROS node/: process that use ROS APIs to perform computation
+
+- /ROS master/: an intermediate program that connects ROS nodes
+
+- /ROS parameter server/: a program that normally runs along with the ROS master
+  that store various parameters or values. All the nodes can access it.
+
+- /ROS topics/: named buses in which ROS nodes can send a message.
+
+- /ROS message/
+
+- /ROS service/: request/reply mechanism. A service call is a function which can
+  call whenever a client node sends a request. The node who create a service call
+  is called /Server node/ and who call the service is a /client node/.
+
+** Community
+- ROS distribution: a collection of versioned packages
+
+- ROS wiki
+
+- ROS answers: similar to stackoverflow
+
+- ROS discourse: a forum
+
+* Programming With ROS
+
+** Catkin Workspace
+
+- =src=: ROS packages only build and create an executable when it is in the =src=
+  folder.
+
+- =build=: build files and intermediate CMake files
+
+- =devel=: the target executable and environment shell scripts
+
+An =install= folder is created and the targets are copied there.
+
+** Creating an ROS Package
+
+#+BEGIN_SRC 
+catkin_create_pkg ros_package_name package_dependencies  
+#+END_SRC
+
+#+BEGIN_SRC 
+├── CMakeLists.txt      
+├── include            # 
+│  └── hello_world     # headers
+├── package.xml        # package dependencies, information
+└── src                # source code, normally C++ files, Python should be in `scripts`
+
+#+END_SRC
+
+** Client Libraries
+
+A collection of code with functions to implement ROS concepts.
+
+- Initialization (mandatory): =ros::init()= or =rospy.init_node()=
+
+- Logging: =ROS_INFO= ... or =rospy.loginfo()=
+
+- Node Handle: use =ros::NodeHandle= to start the ROS node.
+
+* Robotics Project Using ROS
+
+** Differential Drive
+
+- /wheel encoders/: count each revolution of the wheel and calculates the velocity
+  and thereby the displacement and orientation of the robot.
+
+The position and orientation of a robot can be represented as $(x,y,z)$ and 
+(roll, pitch, yaw). For a robot on a 2D plane, only $(x,y, \theta)$  need to be 
+considered, where $\theta$ is the yaw.
+
+** Building Hardware
+
+- /chassis/
+
+- /motor driver/: adjust the speed of the motor by feeding a pulse-width modulated
+  signal.
+
+- /magnetic quadrature encoder/: measure the distance that each of the robot's
+  wheels traverses
+
+- /microcontroller board/: Arduino is enough
+
+- /Bluetooth breakout/: communicates with the PC
+
+- /ultrasonic sensor/: obstacle detection; has a transmitter and a receiver,
+  counting distance is based on the time between transmitting and receiving.
+
+** Creating a 3D ROS Model Using URDF
+
+- /URDF (Unified Robot Description Format)/: all the information on robot 3D
+  models, robot joints, links, robot sensors, actuators, controllers etc.
+
+The URDF is basically an XML file that has XML tags to represent a
+joint and a link.
+
+- =<link>=: definition of the robot link, which contains =<inertial>=, =<visual>= 
+  (a primitive shape or a 3D mesh file), =<collision>= parameters.

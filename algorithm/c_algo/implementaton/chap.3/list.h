@@ -1,36 +1,49 @@
 #pragma once
 
 #include <stdbool.h>
-
-#define elmType int
-
-typedef elmType  ElementType;
+#include <stdio.h>
 
 struct Node;
-typedef struct Node *pNode;
-typedef pNode List;
-typedef pNode Position;
+struct List;
+typedef struct Node *node_t;
+typedef struct List *list_t;
+typedef void (*destructor_t)(void*);
+typedef int (*comparator_t)(const void*, const void*);
+typedef void (*node_func)(node_t);
 
-List makeEmpty(List L);
+/**
+ * Create a node with its element of size `sz`
+ */
+node_t node_new(size_t sz, destructor_t destr);
 
-bool isEmpty(List L);
+#define NODE_NEW(type, destr) \
+    node_new(sizeof(type), destr)
 
-bool isLast(List L, Position P);
+/**
+ * Create a node with element having the same content as elem
+ */
+node_t node_copy_new(const void *elem, size_t sz, destructor_t destr);
 
-Position find(List L, ElementType X);
+#define NODE_COPY_NEW(handle, type, destr)    \
+    node_copy_new(handle, sizeof(type), destr)
 
-void delete(List L, ElementType X);
+/**
+ * Destroy a node and all its resource
+ */
+void node_destroy(node_t self);
 
-Position findPrevious(List L, ElementType X);
+#define NODE_DESTROY(handle) \
+    node_destroy(handle)
 
-void insert(List L, ElementType X, Position P);
+/**
+ * Retrieve the element inside a node
+ */
+void *node_retrieve(node_t self);
 
-void deleteList(List L);
+#define NODE_RETRIEVE(handle) \
+    node_retrieve(handle)
 
-Position Header(List L);
-
-Position First(List L);
-
-Position next(Position P);
-
-ElementType retrieve(Position P);
+/**
+ * Create an empty list
+ */
+list_t list_new();

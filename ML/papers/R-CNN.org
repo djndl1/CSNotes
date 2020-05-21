@@ -1,0 +1,40 @@
+[[https://towardsdatascience.com/r-cnn-3a9beddfd55a][R-CNN]]
+
+* Problem Formulation
+
+object detection: Locating objects in an image
+
+/sliding window/, the brute-force way: go over the whole image with different sized rectangles 
+  and get a giant number of small images to look at.
+
+* Region Proposals: Smartly Choosing Small Images
+
+- [[https://www.learnopencv.com/selective-search-for-object-detection-cpp-python/][selective search]] is used to generate region proposals.
+
+- The R-CNN is agnostic to the region proposal method.
+
+* CNN
+
+- AlexNet is used as a feature extractor. 
+
+- The AlexNet was trained before on a classification task.
+
+- The last softmax layer was removed after training. 
+
+- Region proposals are resized before feeding into the AlexNet.
+
+* SVM as the Classifier
+
+- One SVM for each object class. For one feature vector input there is $n$ output confidence score
+  , where $n$ is the number of different objects.
+
+- SVMs are trained on feature vectors created by the AlexNet, which means the SVMs are trained after
+  the CNN.
+
+* Rejecting a proposal
+
+[[][greedy non-maximum suppression]]: reject a region if it has an IOU overlap with a higher scoring 
+selected region. This step is done for each object class independently. After this, only regions with
+score higher than $0.5$ is used.
+
+* Bounding Box Regressor (not a fundamental building block)

@@ -1,0 +1,352 @@
+
+#+begin_quote
+TensorFlow is an open source library for numerical computation using data flow graphs.
+#+end_quote
+
+* 101 Basics TensorFlow Core
+
+TF has multiple APIs, divided into lower and higher level:
+
+- lower-level library: /TensorFlow Core/, offers complete control on how to use
+  and implement the library in the models.
+
+- higher-level libraries: easier to learn and implement in the models. 
+  + /TF Estimators/
+  + /TFLearn/
+  + /TFSlim/
+  + /Sonnet/
+  + /Keras/
+
+Two sessions: =Session()= and =InteractiveSession()= (creates a default session)
+
+** Data Model (tensors)
+
+Comprises of tensors, the basic data units in a TF program.
+
+*** Tensors
+
+The basic elements of computation and a fundamental data structure in TF. The only
+data structure to learn to use TF.
+
+- /Rank/: the number of dimensions of a tensor
+
+- /Shape/: the size in each dimension
+
+Tensors have their data types.
+
+Python objects and NumPy arrays can be converted to a tensor using =tf.convert_to_tensor()=
+
+#+BEGIN_SRC python
+# tf.convert_to_tensor(value, dtype=None, name=None, preferred_dtype=None)
+tf_t = tf.convert_to_tensor(5.0, dtype=tf.float64)
+nparr = np.array([1, 2, 3, 4, 5, 6])
+
+tf_arr = tf.convert_to_tensor(nparr, dtype=tf.float64)
+
+print(tfs.run(tf_arr))
+
+#[1. 2. 3. 4. 5. 6.]
+#+END_SRC
+
+Tensors can generated from library functions:
+
+#+BEGIN_SRC python
+tf.zeros(shape, dtype, name)
+tf.zeros_like(tensor, dtype, name, optimize)
+tf.ones(shape, dtype, name)
+tf.ones_like(...)
+tf.fill(dims, value, name=None)
+
+# all ranges are end-included
+tf.lin_space(start, stop, num, name) # [start, stop]
+tf.range(start=0, limit) # a 1-D tensor
+
+# from random distribution
+# The distribution generated are affected by the graph-level or the
+# operation-level seed, set by tf.set_random_seed or directly given 
+tf.random_normal(shape, mean, stddev, dtype, seed, name)
+tf.truncated_normal() # the values returned are always at a distance less than two stddev from the mean
+tf.random_uniform()
+tf.random_gamma
+#+END_SRC
+
+
+*** Constants
+
+Created using =tf.constant(val, dtype, shape, name, verify_shape=False)= 
+function.
+
+In order to print the values of constants, execute them in a session.
+
+#+BEGIN_SRC python
+  print(tfs.run([c1, c2, c3]))
+// [5, 6.0, 7.0]
+#+END_SRC
+
+*** Operations
+
+An operation is defined by passing values and assigning the output to
+ another tensor.
+
+- /arithmetic operations/: =tf.add=, =tf.subtract=, =tf.multiply= ...
+
+- /basic math operations/
+
+- /Matrix math operations/
+
+- /tensor math operations/: =tf.tensordot=
+
+- /complex number operations/
+
+- /string operations/
+
+*** Placeholders
+
+The Placeholders create tensors whose values can be provided at runtime.
+
+#+BEGIN_SRC python
+  tf.placeholder(dtype, shape=None, name=None)
+#+END_SRC
+
+#+BEGIN_SRC python
+          p1 = tf.placeholder(tf.float32)
+          p2 = tf.placeholder(tf.float32)
+          op4 = p1 * p2
+          print(tfs.run([op4], {p1: 2.0, p2: 3.0}))
+          print(tfs.run([op4], {p1: [1,2,3,4], p2: [5,6,7,8]}))
+
+          #[array([ 5., 12., 21., 32.], dtype=float32)]
+#+END_SRC
+
+*** Variables
+
+To hold the values of parameters in a memory location that can be updated at 
+runtime, that memory location is identified by /variables/ in TF.
+
+#+caption: Difference between =tf.Variable= and =tf.placeholder=
+| =tf.placeholder=                                  | =tf.Variable=                      |
+| defines input data that does not change over time | values that are modified over time |
+| does not need an initial value upon definition    | needs an initial value on definition |
+|---------------------------------------------------+------------------------------------|
+
+#+BEGIN_SRC python
+w = tf.Variable([.3], tf.float32)
+b = tf.Variable([-0.3], tf.float32)
+x = tf.placeholder(tf.float32)
+y = w*x+b
+
+tf.global_variables_initializer().run()
+
+print(tfs.run(y, {x: [1, 2, 3, 4 ,5]}))
+
+[0.         0.3        0.6        0.90000004 1.2       ]
+#+END_SRC
+
+Variables have to be initialized before using.
+
+#+BEGIN_SRC python
+tfs.run(w.initializer)
+tfs.run(tf.global_variables_initializer) # a convenience function
+tf.variables_initializer() # init a set of vars
+#+END_SRC
+
+Initializers can be a tensor or list of values or some builtin initializers
+
+#+BEGIN_SRC python
+tf.constant_initializer
+tf.random_normal_initializer
+tf.truncated_normal_initializer
+tf.random_uniform_initializer
+tf.uniform_unit_scaling_initializer
+tf.zeros_initializer
+tf.ones_initializer
+tf.orthogonal_initializer
+#+END_SRC
+
+
+A formerly defined variable is retrieved using =tf.get_variable()=, which returns
+the variable if available, otherwise create one.
+
+#+BEGIN_SRC python
+# global retrieval across machines; `tf.get_local_variable` for local variables
+w = tf.get_variable(name='w', dtype=tf.float32, initializer=[.3])
+b = tf.get_variable(name='b', dtype=tf.float32, initializer=[-0.3])
+#+END_SRC
+
+
+*** Programming Model (computation graphs)
+
+Data flow graphs or computation graphs. A TF program creates builds one or more
+TF computation graphs. TF programs builds the computation graph and then run it.
+TF comes with a default graph =tf.get_default_graph()=.
+
+A computation graph is made up of /nodes/ and /edges/
+
+- /node/: an operation 
+
+- /edge/: a tensor that gets transferred between the nodes
+
+#+BEGIN_SRC python
+# build a graph
+w = tf.Variable([.3], tf.float32)
+b = tf.Variable([-0.3], tf.float32)
+x = tf.placeholder(tf.float32)
+y = w * x + b
+output = 0
+
+# run the graph
+with tf.Session() as tfs:
+    tf.global_variables_initializer().run()
+    output = tfs.run(y, {x: [1, 2, 3, 4]})
+print("output = ", output)
+#+END_SRC
+
+
+*** Execution Model
+
+Firing the nodes of a computation graph in a sequence of dependence. The execution
+starts by running the nodes that are directly connected to inputs and only depend
+on inputs being present.
+
+- /lazy loading/: The nodes are executed in the order of dependency. 
+  A node is not executed unless either the node itself or another node
+   depending on it is not requested for execution.
+
+=tf.Graph.control_dependencies()= can controls the order in which the nodes are executed.
+
+=tf.python.client.device_lib.list_local_devices()= returns a list of compute devices.
+
+=tf.configProto()=, =config.log_device_placement=True= enables the logging of variable placement.
+
+By default, TF creates the vars and ops nodes on a device of the highest performance.
+=tf.device()= specifies the placement (a device name or a function name which 
+determines the device to place on)
+
+- /simple placement/: TF follows the following rule to place variables on the devices
+
+#+begin_quote
+If the graph was previously run,
+  then the node is left on the device where it was placed earlier
+Else If the tf.device() block is used,
+  then the node is placed on the specified device
+Else If the GPU is present
+  then the node is placed on the first available GPU
+Else If the GPU is not present
+  then the node is placed on the CPU
+#+end_quote
+
+=config.allow_soft_placement = True= allow the operations to be placed on the CPU
+if the GPU device result in an error.
+
+- /kernel/: implementation for an operation.
+
+Creating and executing multiple graphs is not recommended. Data can not be directly
+pass between graphs. The recommended approach is to have multiple subgraphs in a single graph.
+
+*** Memory Handling
+
+- =CUDA_VISIBLE_DEVICES=: use only a certain GPU
+
+- =config.gpu_options.per_process_gpu_memory_fraction = 0.5=: allocate
+   50% of the memory of all the GPU devices
+
+- =config.gpu_options.allow_growth = True=: only allows for the allocated memory to grow
+
+** TensorBoard
+
+Visualizes computation graph structure, providing statistical analysis and plots
+the values captured as summaries during the execution of computation graphs.
+
+TensorBoard works by reading log files generated by TensorFlow. The general workflow
+is:
+
+1. Create the computational graph as usual
+
+2. Create summary nodes. Attach summary operations from the =tf.summary=
+  package to the nodes that output the values that needs collecting and analyzing.
+
+3. Run the summary nodes along with running the model nodes.
+
+4. Write the event logs to disk by passing the =Summary= protobuf object to a 
+  =tf.summary.FileWriter=.
+
+5. start the tensorboard and analyze the visualized data.
+
+* High-Level Libraries for TF
+
+** TF Estimators - previously TF Learn
+
+modelled after scikit-learn, every estimator object (model) provides =.fit()=,
+ =.evaluate()=, =.predict()= and =.export()=.
+
+Using the Estimator API instead of building everything in core TensorFlow
+ has the benefit of not worrying about graphs, sessions, initializing 
+variables or other low-level details. 
+
+Typical workflow:
+
+1. find a suitable pre-built estimator
+
+2. write the function to import the dataset
+
+3. define the columns in data that contain features
+
+4. train the estimator
+
+5. use the estimator to predict
+
+** TF Slim
+
+a lightweight library built on top of TF Core for defining and training models.
+
+** TFLearn
+
+A separate library built on top of TF Core
+
+** PrettyTensor
+
+A thin wrapper around TF.
+
+** Sonnet
+
+Sonnet intends to cleanly separate the configuration of modules and the connection
+of objects to computation graphs from objects.
+
+* Keras 101
+
+included in TF Core =tf.keras=
+
+Use the sequential API for simple models
+built from simple layers and the functional API for 
+complex models involving branches and sharing of layers
+. The functional API makes it easier to build
+the complex models that have multiple inputs, multiple outputs and
+ shared layers.
+
+** Workflow
+
+1. create the model
+
+2. create and add layers to the model
+
+3. compile the model
+
+4. train the model
+
+5. use the model for prediction or evaluation
+
+* Classical Machine Learning
+
+** Build a regression model
+
+1. Defining the inputs, parameters and other variables
+
+2. Defining the model
+
+3. Defining the loss function
+
+4. Defining the optimizer function
+
+5. Training the model for a number of iterations (epochs)
+
+https://pgaleone.eu/tensorflow/2018/07/28/understanding-tensorflow-tensors-shape-static-dynamic/

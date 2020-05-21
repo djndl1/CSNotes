@@ -1,0 +1,5889 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass book
+\use_default_options true
+\begin_modules
+eqs-within-sections
+figs-within-sections
+algorithm2e
+theorems-ams-chap-bytype
+theorems-ams-extended-chap-bytype
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding utf8
+\fontencoding T1
+\font_roman "tgtermes" "default"
+\font_sans "tgheros" "default"
+\font_typewriter "tgcursor" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command makeindex
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen true
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks false
+\pdf_backref section
+\pdf_pdfusetitle false
+\papersize a4paper
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 3cm
+\topmargin 3cm
+\rightmargin 3cm
+\bottommargin 3cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 2
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+Introduction 
+\end_layout
+
+\begin_layout Standard
+The problem of searching for patterns in data is a fundamental one and has
+ a long and successful history.
+ The field of pattern recognition is concerned with the automatic discovery
+ of regularities in data through the use of computer algorithms and with
+ the use of these regularities to take actions such as classifying the data
+ into different categories.
+\end_layout
+
+\begin_layout Standard
+training set: 
+\begin_inset Formula $\left\{ x_{1},...,x_{N}\right\} $
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+target vector: 
+\begin_inset Formula $t$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+result expressed as a function 
+\begin_inset Formula $y(x)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+learning = training 
+\end_layout
+
+\begin_layout Description
+generalization the ability to categorize correctly new examples that differ
+ from those used for training
+\end_layout
+
+\begin_layout Description
+preprocession to make problem easier to solve, to speed up computation,
+ feature extraction, dimensionality reduction
+\end_layout
+
+\begin_layout Description
+supervised
+\begin_inset space ~
+\end_inset
+
+learning classification regression
+\end_layout
+
+\begin_layout Description
+unsupervised
+\begin_inset space ~
+\end_inset
+
+learning input vectors 
+\begin_inset Formula $x$
+\end_inset
+
+ without any corresponding target values
+\end_layout
+
+\begin_layout Description
+clustering to discover groups of similar examples within the data 
+\end_layout
+
+\begin_layout Description
+density
+\begin_inset space ~
+\end_inset
+
+estimation to determine the distribution of data within the input space
+ 
+\end_layout
+
+\begin_layout Description
+visualization to project the data from a high-dimensional space down to
+ two or three dimensions
+\end_layout
+
+\begin_layout Description
+reinforcement
+\begin_inset space ~
+\end_inset
+
+learning finding suitable actions to take in a given situation in order
+ to maximize a reward by a process of trial and error 
+\end_layout
+
+\begin_layout Section
+the example of polynomial curve fitting
+\end_layout
+
+\begin_layout Standard
+The problem of model comparison and model selection arises is an important
+ concept.
+ To determine a suitable value for the model complexity, we can separate
+ a 
+\emph on
+validation set, 
+\emph default
+also called a 
+\emph on
+hold-out
+\emph default
+ set, used to optimize the model complexity.
+\end_layout
+
+\begin_layout Standard
+the over-fitting problem become less severe as the size of the data set
+ increases.
+ Another way to say this is that the larger the data set, the more complex
+ (in other words more flexible) the model that we can afford to fit to the
+ data.
+ The least squares approach to finding the model parameters represents a
+ specific case of maximum likelihood and the overfitting problem can be
+ understood as a general property of maximum likelihood.
+ By adopting a Bayesian approach, the overfitting problem can be avoided.
+\end_layout
+
+\begin_layout Standard
+One technique that is often used to control the overfitting phenomenon is
+ that of regularization, which involves adding a penalty term to the error
+ function, also known as 
+\emph on
+shrinkage
+\emph default
+ in statistics, 
+\emph on
+weight decay
+\emph default
+ in the context of neural networks.
+\end_layout
+
+\begin_layout Section
+Probability Theory
+\end_layout
+
+\begin_layout Standard
+Uncertainty is a key concept in the field of pattern recognition.
+ It arises both through noise on measurements as well as though the finite
+ size of data sets.
+\end_layout
+
+\begin_layout Description
+Probability
+\begin_inset space ~
+\end_inset
+
+theory a consistent framework for the quantification and manipulation of
+ uncertainty
+\end_layout
+
+\begin_layout Subsection
+Bayesian probabilities
+\end_layout
+
+\begin_layout Standard
+Bayesian methods are characterized by concepts and procedures as follows:
+\end_layout
+
+\begin_layout Standard
+The use of random variables, or more generally unknown quantities, to model
+ all sources of uncertainty in statistical models including uncertainty
+ resulting from lack of information (see also aleatoric and epistemic uncertaint
+y).
+ The need to determine the prior probability distribution taking into account
+ the available (prior) information.
+ The sequential use of Bayes' formula: when more data become available,
+ calculate the posterior distribution using Bayes' formula; subsequently,
+ the posterior distribution becomes the next prior.
+ While for the frequentist a hypothesis is a proposition (which must be
+ either true or false), so that the frequentist probability of a hypothesis
+ is either 0 or 1, in Bayesian statistics the probability that can be assigned
+ to a hypothesis can also be in a range from 0 to 1 if the truth value is
+ uncertain.
+\end_layout
+
+\begin_layout Standard
+Consider an uncertain event.
+ Our assessment of the problem will affect the actions we take.
+ We quantify our expression of uncertainty and make precise revisions of
+ uncertainty in light of new evidence as well as subsequently to be able
+ to take optimal actions or decisions as a consequence.
+ One advantage of the Bayesian viewpoint is that the inclusion of prior
+ knowledge arises naturally.
+ There is no unique frequentist and Bayesian viewpoint.
+ One common critism of the Bayesian approach is that the prior distribution
+ is often selected on the basis of mathematical convenience rather than
+ as a reflection of any prior beliefs.
+ Bayesian methods based on poor choices of prior can give poor results with
+ high confidence.
+ The dramatic improvements in the speed and memory capacity of computers,
+ opened the door to the practical use of Bayesian techniques in an impressive
+ range of problem domains.
+\end_layout
+
+\begin_layout Example*
+Reconsider the curve fitting problem.
+ Assume the corresponding value of 
+\begin_inset Formula $t$
+\end_inset
+
+ has a Gaussian distribution 
+\begin_inset Formula 
+\[
+p\left(t|x,\mathbf{w},\beta\right)=\mathcal{N}\left(t|y\left(x,\mathbf{w}\right),\beta^{-1}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $y\left(x,\mathbf{w}\right)$
+\end_inset
+
+ is the polynomial curve.
+ MAL with a training data set 
+\begin_inset Formula $\left\{ \mathbf{x},\mathbf{t}\right\} $
+\end_inset
+
+, we gain the same result as the minimal square method.
+\end_layout
+
+\begin_layout Example*
+A more Bayesian approach would involve a prior distribution of 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+p\left(\mathbf{w}|\alpha\right)=\mathcal{N}\left(\mathbf{w}|0,\alpha^{-1}I\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is a 
+\emph on
+hyperparameter 
+\emph default
+which controls the parameter of the model,
+\emph on
+ 
+\emph default
+then 
+\begin_inset Formula 
+\[
+p\left(\mathbf{w}|\mathbf{x},\mathbf{t},\alpha,\beta\right)\propto p\left(\mathbf{t}|\mathbf{x},\mathbf{w},\beta\right)p\left(\mathbf{w}|\alpha\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Example*
+By maximizing the posterior distribution (MAP), we obtain the regularized
+ sum-of-squares error function.
+\end_layout
+
+\begin_layout Example*
+A full Bayesian treatment would be 
+\begin_inset Formula 
+\[
+p\left(t|x,\mathbf{x},\mathbf{t}\right)=\int p\left(t|x,\mathbf{w}\right)p\left(\mathbf{w}|\mathbf{x},\mathbf{t}\right)d\mathbf{w}
+\]
+
+\end_inset
+
+By making the two distributions Gaussian, the left side 11222predictive
+ distribution can be analytically determined.
+ The resulting distribution is dependent on the sample to predictive 
+\begin_inset Formula $x$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Model Selection
+\end_layout
+
+\begin_layout Paragraph
+To determine the parameters of the model so that the best predictive performance
+ can be achieved
+\end_layout
+
+\begin_layout Standard
+If data is plentiful, then one approach is simply to use some of the available
+ data to train a range of models, or a given model with a range of values
+ for its complexity parameters, and then to compare them on independent
+ data, sometimes called a 
+\emph on
+validation set
+\emph default
+, and select the one having the best predictive performance.
+\end_layout
+
+\begin_layout Standard
+If the model design is iterated many times using a limited size data set,
+ then some over fitting to the validation data can occur and so it may be
+ necessary to keep aside a third 
+\emph on
+test set
+\emph default
+ on which the performance of the selected model is finally evaluated.
+\end_layout
+
+\begin_layout Standard
+In case of insufficient data, 
+\emph on
+
+\begin_inset CommandInset href
+LatexCommand href
+name "cross-validation"
+target "https://en.wikipedia.org/wiki/Cross-validation_(statistics)#k-fold_cross-validation"
+literal "false"
+
+\end_inset
+
+ 
+\emph default
+is one solution
+\emph on
+.
+\end_layout
+
+\begin_layout Section
+The Curse of Dimensionality 
+\end_layout
+
+\begin_layout Standard
+Think about what a general 
+\begin_inset Formula $M$
+\end_inset
+
+-order polynomial with 
+\begin_inset Formula $D$
+\end_inset
+
+ variables would look like: the number of coefficients is proportional to
+ 
+\begin_inset Formula $D^{M}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The problem of the volume of the surface between 
+\begin_inset Formula $r=1$
+\end_inset
+
+ and 
+\begin_inset Formula $r=1-\epsilon$
+\end_inset
+
+ shows that our geometrical intuitions formed in a space of three dimensions,
+ can fail badly in a space of higher dimensionality.
+ In spaces of high dimensionality, most of the volume of a sphere is concentrate
+d in a thin shell near the surface.
+ In a high-dimensional space, most the probability mass of a Gaussian is
+ located 
+\begin_inset CommandInset href
+LatexCommand href
+name "within a thin shell at a specific radius"
+target "https://research.wmz.ninja/articles/2018/03/the-counterintuitive-behavior-of-high-dimensional-gaussian-distributions.html"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Dimensionality characteristics of real data
+\end_layout
+
+\begin_layout Enumerate
+confined to a region of the space having lower effective dimensionality
+\end_layout
+
+\begin_layout Enumerate
+having smoothness properties so that small changes in the input variables
+ will produce small changes in the target variables, local-interpolation-like
+ techniques are used to make predictions.
+\end_layout
+
+\begin_layout Section
+Decision Theory
+\end_layout
+
+\begin_layout Description
+Decision
+\begin_inset space ~
+\end_inset
+
+theory: to exploit this probabilistic representation in order to make prediction
+s that are optimal according to appropriate criteria.
+\end_layout
+
+\begin_layout Subsection
+Minimizing the misclassification rate
+\end_layout
+
+\begin_layout Standard
+Consider a two-class problem
+\begin_inset Formula 
+\begin{align*}
+p\left(\text{mistake}\right) & =p\left(\mathbf{x}\in R_{1},C_{2}\right)+p\left(\mathbf{x}\in R_{2},C_{1}\right)\\
+ & =\int_{R_{1}}p\left(\mathbf{x},C_{2}\right)d\mathbf{x}+\int_{R_{2}}p\left(\mathbf{x},C_{1}\right)d\mathbf{x}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The minimum probability of making a mistake is obtained if each value of
+ 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ is assigned to the class for which the posterior probability 
+\begin_inset Formula $p\left(C_{k}|x\right)$
+\end_inset
+
+ is largest.
+\end_layout
+
+\begin_layout Subsection
+Minimizing the expected loss
+\end_layout
+
+\begin_layout Standard
+Instead of just consider the posterior probability, we consider a 
+\emph on
+cost function.
+
+\emph default
+ The optimal solution is the one which minimizes the loss function
+\begin_inset Formula 
+\[
+E\left[L\right]=\sum_{k}\sum_{j}\int_{R_{j}}L_{kj}p\left(\mathbf{x},C_{k}\right)d\mathbf{x}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Reject options
+\end_layout
+
+\begin_layout Standard
+In some applications, it will be appropriate to avoid making decisions on
+ the difficult cases where we are uncertain about class membership.
+ This is known as the 
+\emph on
+reject option
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
+Inference and decision
+\end_layout
+
+\begin_layout Standard
+Inference and decision can be solved together by simply learning a function
+ that maps inputs 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ directly into decisions (
+\emph on
+discriminant functions
+\emph default
+).
+\end_layout
+
+\begin_layout Itemize
+Given an observable variable 
+\begin_inset Formula $X$
+\end_inset
+
+ and a target variable 
+\begin_inset Formula $Y$
+\end_inset
+
+, a
+\emph on
+ generative model is a statistical model 
+\emph default
+of the joint probability distribution on 
+\begin_inset Formula $X\times Y$
+\end_inset
+
+, 
+\begin_inset Formula $P\left(X,Y\right)$
+\end_inset
+
+, sometimes also defined as 
+\begin_inset Formula $P\left(X|Y\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+A discriminative model is a model of the conditional probability of the
+ target 
+\begin_inset Formula $Y$
+\end_inset
+
+, given an observation 
+\begin_inset Formula $x$
+\end_inset
+
+, symbolically 
+\begin_inset Formula $P\left(Y|X=x\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+Classifiers computed without using a probability models are also referred
+ to loosely as 
+\begin_inset Quotes eld
+\end_inset
+
+discriminative
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Two definitions of generative models are closely related, separated only
+ by 
+\begin_inset Formula $P\left(X,Y\right)=P\left(X|Y\right)P\left(Y\right)$
+\end_inset
+
+.
+ Generative and discriminative models can be transformed into each other.
+\end_layout
+
+\begin_layout Standard
+There are many powerful reasons for wanting to compute the posterior probabiliti
+es:
+\end_layout
+
+\begin_layout Description
+Minimizing
+\begin_inset space ~
+\end_inset
+
+risk If we know the posterior probabilities, we can trivially revise the
+ minimum risk decision criterion.
+\end_layout
+
+\begin_layout Description
+Reject
+\begin_inset space ~
+\end_inset
+
+option Posterior probabilities allow us to determine a rejection criterion
+ that will minimize the misclassification rate.
+\end_layout
+
+\begin_layout Description
+Combining
+\begin_inset space ~
+\end_inset
+
+models
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider a regression problem.
+ We intend to minimize the average or expected loss 
+\begin_inset Formula 
+\[
+E\left[L\right]=\int\int L\left(t,y\left(x\right)\right)p\left(\mathbf{x},t\right)d\mathbf{x}dt.
+\]
+
+\end_inset
+
+Suppose the loss function is 
+\begin_inset Formula $L\left(t,y\left(\mathbf{x}\right)\right)=\left\{ y\left(\mathbf{x}\right)-t\right\} ^{2}$
+\end_inset
+
+.
+ The original average loss can be written as 
+\begin_inset Formula 
+\[
+E\left[L\right]=\int\left\{ y\left(\mathbf{x}\right)-E\left[t|\mathbf{x}\right]\right\} ^{2}p\left(\mathbf{x}\right)d\mathbf{x}+\int\left\{ E\left[t|\mathbf{x}\right]-t\right\} ^{2}p\left(\mathbf{x}\right)d\mathbf{x}.
+\]
+
+\end_inset
+
+where the second term is the variance of 
+\begin_inset Formula $t$
+\end_inset
+
+, the intrinsic variability of the target data can be regarded as noise,
+ the irreducible minimum value of the loss function.
+ The three approaches hold for regressions problems except for the former
+ two need an additional step
+\begin_inset Formula $y\left(x\right)=\int tp\left(t|\mathbf{x}\right)dt$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Information theory
+\end_layout
+
+\begin_layout Standard
+Consider a discrete random variable 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ The amount of information of 
+\begin_inset Formula $x$
+\end_inset
+
+ can be viewed as the 
+\begin_inset Quotes eld
+\end_inset
+
+degree of surprise
+\begin_inset Quotes erd
+\end_inset
+
+ on learning the value of 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ Define 
+\begin_inset Formula 
+\[
+h\left(x\right)=-\log_{2}p\left(x\right)
+\]
+
+\end_inset
+
+where the negative sign ensures that information is nonnegative.
+ Low probability events correspond to high information content.
+\end_layout
+
+\begin_layout Definition
+entropy
+\end_layout
+
+\begin_layout Definition
+The average amount of information of a random variable is given by
+\begin_inset Formula 
+\[
+H\left[x\right]=-\sum_{x}p\left(x\right)\log_{2}p\left(x\right).
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proposition
+noiseless coding theorem
+\end_layout
+
+\begin_layout Proposition
+The entropy is a lower bound on the number of bits needed to transmit the
+ state of a random variable.
+\end_layout
+
+\begin_layout Chapter
+2.
+ Probability Distribution
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Density estimation
+\end_layout
+
+\begin_layout Standard
+Data points are independent and identically distributed.
+ There are infinitely many probability distributions that could have given
+ rise to the observed finite data set.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Parametric
+\series default
+ and 
+\series bold
+non-parametric
+\series default
+ approaches.
+\end_layout
+
+\begin_layout Section
+2.1 Binary Variables 
+\end_layout
+
+\begin_layout Standard
+Given 
+\begin_inset Formula $x\in\left\{ 0,1\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $0\leq\mu\leq1$
+\end_inset
+
+, the one-coin-tossing distribution, i.e.
+ the Bernoulli distribution
+\begin_inset Formula 
+\begin{equation}
+\text{\text{Bern}\left(x|\mu\right) \ensuremath{=\mu^{x}\left(1-\mu\right){}^{1-x}}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+whose 
+\begin_inset Formula $\mu_{ML}=\dfrac{1}{N}\sum\limits _{n=1}^{N}x_{n}=\dfrac{m}{N}$
+\end_inset
+
+, 
+\begin_inset Formula $m$
+\end_inset
+
+ is the number of observations.
+ 
+\end_layout
+
+\begin_layout Standard
+Suppose we toss this coin 
+\begin_inset Formula $N$
+\end_inset
+
+ times, the number of heads is 
+\begin_inset Formula $m$
+\end_inset
+
+, the distribution of 
+\begin_inset Formula $m$
+\end_inset
+
+ will be
+\begin_inset Formula 
+\begin{equation}
+\text{Bin}\left(m|N,\mu\right)=\dbinom{N}{m}\mu^{m}\left(1-\mu\right){}^{N-m}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If we obtain 
+\begin_inset Formula $m=N$
+\end_inset
+
+ in an experiment, the estimation will be unreasonable for the both distribution
+s.
+\end_layout
+
+\begin_layout Subsection
+2.1.1 The beta distribution 
+\end_layout
+
+\begin_layout Standard
+To solve the problem of the unreasonble estimation (overfitting) when 
+\begin_inset Formula $m=N$
+\end_inset
+
+, we introduce a prior to be proportional to powers of 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $1-\mu$
+\end_inset
+
+, which results the same functional form of the posterior as the prior (
+\shape italic
+conjugacy
+\shape default
+), this prior we choose is 
+\shape italic
+beta
+\shape default
+ distribution:
+\begin_inset Formula 
+\begin{equation}
+\text{Beta}\left(\mu|a,b\right)=\frac{\Gamma\left(a+b\right)}{\Gamma\left(a\right)\Gamma\left(b\right)}\mu^{a-1}\left(1-\mu\right){}^{b-1}
+\end{equation}
+
+\end_inset
+
+where the gamma function 
+\begin_inset Formula 
+\begin{equation}
+\Gamma\left(z\right)=\int_{0}^{\infty}x^{z-1}e^{-x}dx
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The parameters 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ control the distribution of the parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+, thus called 
+\shape italic
+hyperparameters.
+\end_layout
+
+\begin_layout Standard
+Multiplying (0.1) by (0.2) yields the posterior 
+\begin_inset Formula 
+\[
+p\left(\mu|m,l,a,b\right)\propto\dbinom{l+m}{m}\mu^{m+a-1}\left(1-\mu\right){}^{l+b-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $l=N-m$
+\end_inset
+
+, taking the same form as the prior.
+ The parameter estimation now depends both its own (prior) distribution
+ and the data observed, and this gives rise to sequential learning, by updating
+ 
+\begin_inset Formula $\mu$
+\end_inset
+
+ repeatedly with 
+\begin_inset Formula $l$
+\end_inset
+
+ and 
+\begin_inset Formula $m$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In Bayesian learning, as we observe more and more data, the uncertainty
+ represented by the posterior distribution will steadily decrese.
+\end_layout
+
+\begin_layout Standard
+Given a parameter 
+\begin_inset Formula $\theta$
+\end_inset
+
+ for which we have observed a data set 
+\begin_inset Formula $D$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+E_{\theta}(\theta) & =E_{D}\underbrace{\left[E_{\theta}\left[\theta|D\right]\right]}_{\text{posterior mean}}\\
+\text{var}_{\theta}[\theta] & =E_{D}\left[\text{var}_{\theta}\left[\theta|D\right]\right]+\text{var}_{D}\left[E_{\theta}\left[\theta|D\right]\right]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+On average, the expectation of the prior expectation becomes more stable
+ and the posterior variance of 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is smaller than the prior (less uncertainty).
+\end_layout
+
+\begin_layout Section
+2.2 Multinomial Variables
+\end_layout
+
+\begin_layout Standard
+The probability of 
+\begin_inset Formula $x_{k}=1$
+\end_inset
+
+ is denoted by the parameter 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+, then the distribution
+\begin_inset Formula 
+\begin{equation}
+p\left(x|\mu\right)=\prod_{k=1}^{K}\mu_{k}^{x_{k}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mathrm{x}=\left(\dots,x_{k},\dots\right){}^{T}$
+\end_inset
+
+and 
+\begin_inset Formula $\mu=\left(\mu_{1},\dots,\mu_{K}\right){}^{T}$
+\end_inset
+
+ and 
+\begin_inset Formula $\sum\limits _{k}\mu_{_{k}}=1,\sum\limits _{k}x_{k}=1,\mathbb{E}\left[\mathrm{x}|\mu\right]=\sum\limits _{x}p\left(\mathrm{x}|\mu\right)\mathrm{x}=\mu$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Given a data set 
+\begin_inset Formula $D$
+\end_inset
+
+ of 
+\begin_inset Formula $N$
+\end_inset
+
+ observations, to use KKT conditions to maximize its MAL
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\sum_{k=1}^{K}m_{k}\ln\mu_{k}+\lambda\left(\sum_{k=1}^{K}\mu_{k}-1\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $m_{k}$
+\end_inset
+
+is the number of occurrence of 
+\begin_inset Formula $x_{k}=1$
+\end_inset
+
+, yields 
+\begin_inset Formula $\mu_{k}^{ML}=\dfrac{m_{k}}{N}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The joint distribution of 
+\begin_inset Formula $m_{1},\dots,m_{K}$
+\end_inset
+
+ conditioned on the parameters 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and the total number of observations 
+\begin_inset Formula $N$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\text{Mult}\left(m_{1},\dots,m_{k}|\mu,N\right) & =\frac{N!}{m_{1}!m_{2}!\dots m_{k}!}\prod_{k=1}^{K}\mu_{k}^{m_{k}}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+subject to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\prod_{k=1}^{K}m_{k}=N
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+2.2.1 The Dirichlet distribution
+\end_layout
+
+\begin_layout Standard
+A family of prior distribution for the parameters 
+\begin_inset Formula $\left\{ \mu_{k}\right\} $
+\end_inset
+
+ of the multinomial distribution, the 
+\shape italic
+dirichlet distribution
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\text{Dir}(\mu|\alpha)=\frac{\Gamma\left(\sum_{k}\alpha_{k}\right)}{\Gamma\left(\alpha_{1}\right)\dots\Gamma\left(\alpha_{K}\right)}\prod_{k=1}^{K}\mu_{k}^{\alpha_{k}-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Multiply (0.7) by (0.6)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+p\left(\mu|D,\alpha\right) & \propto\prod_{k=1}^{K}\mu_{k}^{\alpha_{k}+m_{k}+1}\\
+p\left(\mu|D,\alpha\right) & =\text{Dir}\left(\mu|\alpha+m\right)=\frac{\Gamma\left(N+\sum_{k}\alpha_{k}\right)}{\Gamma\left(\alpha_{1}+m_{1}\right)\dots\Gamma\left(\alpha_{K}+m_{k}\right)}\prod_{k=1}^{K}\mu_{k}^{\alpha_{k}+m_{k}-1}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+2.3 The Gaussian Distribution
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+N\left(x|\mu,\sigma^{2}\right)=\dfrac{1}{\left(2\pi\right){}^{D/2}}\dfrac{1}{\left|\Sigma\right|{}^{1/2}}\exp\left\{ -\dfrac{1}{2}\left(x-\mu\right){}^{T}\Sigma^{-1}\left(x-\mu\right)\right\} 
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Mahalanobis distance
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\begin_inset Formula $\left(x-\mu\right){}^{T}\Sigma^{-1}\left(x-\mu\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+2.3.1 Conditional and Marginal Gaussian distributions
+\end_layout
+
+\begin_layout Standard
+An important property of the multivariate Gaussian distribution is that
+ if two sets of variables are jointly Gaussian, then the conditional distributio
+n of one set conditoned on the other is again Gaussian.
+ Similarly, the marginal distribution of either set is also Gaussian.
+\end_layout
+
+\begin_layout Subsection
+2.3.3 Bayes' theorem for Gaussian variables
+\end_layout
+
+\begin_layout Standard
+Given a marginal Gaussian distribution 
+\begin_inset Formula $p\left(x\right)$
+\end_inset
+
+ for 
+\begin_inset Formula $x$
+\end_inset
+
+ and a condition Gaussian distribution 
+\begin_inset Formula $p\left(y|x\right)$
+\end_inset
+
+ for 
+\begin_inset Formula $y$
+\end_inset
+
+ given 
+\begin_inset Formula $x$
+\end_inset
+
+, the marginal distribution of 
+\begin_inset Formula $y$
+\end_inset
+
+ and the conditional distribution of 
+\begin_inset Formula $x$
+\end_inset
+
+ given 
+\begin_inset Formula $y$
+\end_inset
+
+ are also Gaussian.
+\end_layout
+
+\begin_layout Subsection
+2.3.4 Maximum likelihood for the Gaussian
+\end_layout
+
+\begin_layout Standard
+Given a data set 
+\begin_inset Formula $X=\left(x_{1},...,x_{N}\right){}^{T}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\ln p\left(X|\mu,\Sigma\right)=-\dfrac{ND}{2}\ln\left(2\pi\right)-\dfrac{N}{2}\ln\left|\Sigma\right|-\dfrac{1}{2}\sum_{n=1}^{N}(x_{n}-\mu)^{T}\Sigma^{-1}(x_{n}-\mu)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Take the derivative w.r.t.
+ 
+\begin_inset Formula $\mu$
+\end_inset
+
+and set it to zero
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{ML}=\dfrac{1}{N}\sum_{n=1}^{N}x_{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the covariance (Magnus and Neudecker (1999))
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Sigma_{ML}=\dfrac{1}{N}\sum_{n=1}^{N}(x_{n}-\mu_{ML})(x_{n}-\mu_{ML})^{T}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which is biased.
+\end_layout
+
+\begin_layout Subsection
+2.3.5 Sequential estimation
+\end_layout
+
+\begin_layout Standard
+Robbins-Monro algorithm (Robbins and Monro,1951; Fukunaga,1990)
+\end_layout
+
+\begin_layout Subsection
+2.3.6 Bayesian inference for the Gaussian
+\end_layout
+
+\begin_layout Paragraph
+Given variance 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+ and a set of 
+\begin_inset Formula $N$
+\end_inset
+
+ observations 
+\begin_inset Formula $X=\left\{ x_{1},\dots,x_{N}\right\} $
+\end_inset
+
+, the mean 
+\begin_inset Formula $\mu$
+\end_inset
+
+ to be inferred
+\end_layout
+
+\begin_layout Standard
+Take the prior distribution to be 
+\begin_inset Formula 
+\begin{equation}
+p\left(\mu\right)=\mathcal{N}\left(\mu|\mu_{0},\sigma_{0}^{2}\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The posterior distribution becomes
+\begin_inset Formula 
+\begin{equation}
+p\left(\mu|\mathrm{X}\right)=\mathcal{N}\left(\mu|\mu_{N},\sigma_{N}^{2}\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where
+\begin_inset Formula 
+\begin{align}
+\mu_{N} & =\frac{\sigma^{2}}{N\sigma_{0}^{2}+\sigma^{2}}\mu_{0}+\frac{N\sigma_{0}^{2}}{N\sigma_{0}^{2}+\sigma^{2}}\mu_{ML}\\
+\frac{1}{\sigma_{N}^{2}} & =\frac{1}{\sigma_{0}^{2}}+\frac{N}{\sigma^{2}}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note how the paramter change as 
+\begin_inset Formula $N\rightarrow0/\infty,\sigma_{0}^{2}\rightarrow\infty$
+\end_inset
+
+: the precision increases and the posterior distribution becomes infintely
+ peaked around the MAL solution.
+\end_layout
+
+\begin_layout Subparagraph
+Sequential learning 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p\left(\mu|D_{N}\right)\propto\underbrace{\left[p\left(\mu\right)\prod_{n=1}^{N-1}p\left(\mathrm{x_{n}|\mu}\right)\right]}_{p\left(\mu|D_{N-1}\right)}p\left(\mathrm{x_{N}|\mu}\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Given variance 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and a set of 
+\begin_inset Formula $N$
+\end_inset
+
+ observations 
+\begin_inset Formula $X=\left\{ x_{1},\dots,x_{N}\right\} $
+\end_inset
+
+, the mean 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+ or 
+\begin_inset Formula $\lambda\equiv\dfrac{1}{\sigma^{2}}$
+\end_inset
+
+ to be inferred
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+\begin_inset CommandInset href
+LatexCommand href
+name "Gamma distribution"
+target "https://en.wikipedia.org/wiki/Gamma_distribution"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The likelihood
+\begin_inset Formula 
+\begin{equation}
+p\left(\mathrm{X|\lambda}\right)\propto\lambda^{N/2}\exp\left\{ -\frac{\lambda}{2}\sum_{n=1}^{N}\left(x_{n}-\mu\right)^{2}\right\} 
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The prior is a 
+\emph on
+gamma
+\emph default
+ distribution
+\begin_inset Formula 
+\begin{equation}
+\text{Gam}\left(\lambda|a,b\right)=\frac{1}{\Gamma\left(a\right)}b^{a}\lambda^{a-1}\exp\left(-b\lambda\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The posterior 
+\begin_inset Formula 
+\begin{equation}
+p\left(\lambda|\mathrm{X}\right)\propto\text{Gam}\left(\lambda|a_{N},b_{N}\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where
+\begin_inset Formula 
+\begin{align}
+a_{N} & =a_{0}+\frac{N}{2}\\
+b_{N} & =b_{0}+\frac{N}{2}\sigma_{ML}^{2}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Another prior distribution 
+\emph on
+can be inverse gamma
+\end_layout
+
+\begin_layout Paragraph
+Consider the case where both parameters are unknown
+\end_layout
+
+\begin_layout Standard
+The likelihood can be written as
+\begin_inset Formula 
+\begin{equation}
+p\left(\mu,\lambda\right)=\mathcal{N}\left(\mu|\mu_{0},\left(\beta\lambda\right)^{-1}\right)\text{Gam}\left(\lambda|a,b\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mu_{0}=c/\beta,a=1+\beta/2,b=d-c^{2}/2\beta$
+\end_inset
+
+.
+ This distribution is called the 
+\emph on
+normal-gamma
+\emph default
+ or 
+\emph on
+Gaussian-gamma
+\emph default
+ distribution.
+\end_layout
+
+\begin_layout Paragraph
+In the case the multivariate Gaussian distribution
+\end_layout
+
+\begin_layout Standard
+For known mean and unknown precision matrix, the conjugata prior is the
+ 
+\emph on
+Wishart 
+\emph default
+distribution.
+ If both are unknown, this goes to the 
+\emph on
+normal-Wishart
+\emph default
+ or 
+\emph on
+Gaussian-Wishart
+\emph default
+ distribution.
+\end_layout
+
+\begin_layout Subsection
+2.3.9 Mixtures of Gaussians
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Mixture distributions
+\emph default
+: probabilistic models formed by taking linear combinations of more basic
+ distributions.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+mixture of Gaussians
+\emph default
+: 
+\begin_inset Formula 
+\begin{equation}
+p\left(x\right)=\sum_{k=1}^{K}\pi_{k}N\left(x|\mu_{k},\Sigma_{k}\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where each Gaussian density is called a 
+\emph on
+component 
+\emph default
+which has its own mean and covariance, and 
+\begin_inset Formula $\pi_{k}$
+\end_inset
+
+'s are called 
+\emph on
+mixing coefficients 
+\emph default
+with 
+\begin_inset Formula 
+\begin{align}
+\sum_{k=1}^{K}\pi_{k} & =1\\
+0\leq\pi_{k} & \leq1
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From the sum and product rules
+\begin_inset Formula 
+\begin{equation}
+p\left(x\right)=\sum_{k=1}^{K}p\left(k\right)p\left(x|k\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+equivalent the definition.
+ The posterior distribution 
+\begin_inset Formula $p\left(x|k\right)$
+\end_inset
+
+ are called 
+\emph on
+responsibilities
+\emph default
+ and from the Bayes' theorem
+\begin_inset Formula 
+\[
+p\left(x|k\right)=\frac{\pi_{k}N\left(x|\mu_{k},\Sigma_{k}\right)}{\sum_{l}\pi_{l}N\left(x|\mu_{l},\Sigma_{l}\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The MAL for mixture Gaussians has no closed-form analytical solution.
+ iterative numerical optimzation techniques may be used or 
+\emph on
+expectation maximization.
+\end_layout
+
+\begin_layout Section
+2.4 The Expoential Family
+\end_layout
+
+\begin_layout Standard
+The exponential family of distributions over 
+\begin_inset Formula $x$
+\end_inset
+
+, given parameters 
+\begin_inset Formula $\eta$
+\end_inset
+
+, is defined to be the set of distributions of the form
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(x|\eta)=h\left(x\right)g\left(\eta\right)\exp\left\{ \eta^{T}u(x)\right\} 
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\eta$
+\end_inset
+
+ are called the 
+\emph on
+natural parameters.
+ 
+\emph default
+Since the distribution is normalized 
+\begin_inset Formula 
+\begin{equation}
+g\left(\eta\right)\int h\left(x\right)\exp\left\{ \eta^{T}u(x)\right\} dx=1
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the Bernoulli distribution
+\begin_inset Formula 
+\begin{equation}
+p(x|\eta)=\text{sigmoid}\left(-\eta\right)\exp\left(\eta x\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\eta=\ln\dfrac{\mu}{1-\mu}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the multinomial distribution
+\begin_inset Formula 
+\begin{equation}
+p\left(x|\eta\right)=\exp\left(\eta^{T}x\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\eta_{k}=\ln\mu_{k}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Or 
+\begin_inset Formula 
+\begin{equation}
+p(x|\eta)=\left(1+\sum_{k=1}^{M-1}\exp\left(\eta_{k}\right)\right)^{-1}\exp\left(\eta^{T}x\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mu_{k}=\dfrac{\exp\left(\eta_{k}\right)}{1+\sum_{j}\exp\left(\eta_{j}\right)}$
+\end_inset
+
+, called 
+\emph on
+softmax 
+\emph default
+or 
+\emph on
+normalized exponential.
+\end_layout
+
+\begin_layout Subsection
+2.4.1 Maximum likelihood and sufficient statistics
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+\begin_inset CommandInset href
+LatexCommand href
+name "Sufficient statistics"
+target "https://en.wikipedia.org/wiki/Sufficient_statistic"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Take the gradient of both sides of the integrated exponential distribution
+\begin_inset Formula 
+\[
+-\triangledown\ln g\left(\eta\right)=\mathbb{E}\left[u\left(x\right)\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+By MAL
+\begin_inset Formula 
+\[
+-\triangledown\ln g\left(\eta\right)=\frac{1}{N}\sum_{n=1}^{N}u\left(x_{n}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+2.4.1 Conjugate priors
+\end_layout
+
+\begin_layout Standard
+For any member of the exponential family, there exists a conjugate prior
+ 
+\begin_inset Formula 
+\[
+p\left(\eta|\chi,\nu\right)=f\left(\chi,\nu\right)g\left(\eta\right)^{\nu}\exp\left\{ \nu\eta^{T}\chi\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $f\left(\chi,\nu\right)$
+\end_inset
+
+ is a normalization coefficients.
+\end_layout
+
+\begin_layout Standard
+The posterior distribution becomes
+\begin_inset Formula 
+\[
+p\left(\eta|X,\chi,\nu\right)\propto g\left(\eta\right)^{\nu+N}\exp\left\{ \eta^{T}\left(\sum_{n=1}^{N}u\left(x_{n}\right)+\nu\chi\right)\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+taking the same form, confirming conjugacy.
+\end_layout
+
+\begin_layout Section
+2.5 Nonparametric Methods
+\end_layout
+
+\begin_layout Standard
+An important limitation of the 
+\emph on
+parametric 
+\emph default
+approach to density estimation is that the chosen density might be a poor
+ model of the distribution that generates the data, which can result in
+ poor predictive performance.
+ The nonparametric Bayesian methods are attracting increasing interest.
+\end_layout
+
+\begin_layout Paragraph
+The histogram density models
+\begin_inset Formula 
+\[
+p_{i}=\frac{n_{i}}{N\Delta_{i}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\Delta_{i}$
+\end_inset
+
+ is the width of the 
+\begin_inset Formula $i$
+\end_inset
+
+th bin.
+\end_layout
+
+\begin_layout Standard
+The widths of bins, and the choice of edge location for the bins affect
+ a histogram density model.
+ Also it suffers from the 
+\emph on
+curse of dimension
+\emph default
+, a total number of 
+\begin_inset Formula $M^{D}$
+\end_inset
+
+ bins in a 
+\begin_inset Formula $D$
+\end_inset
+
+-dimensional space with each variable divided into 
+\begin_inset Formula $M$
+\end_inset
+
+ bins.
+\end_layout
+
+\begin_layout Subsection
+2.5.2 Nearest-neighbor methods
+\end_layout
+
+\begin_layout Standard
+We consider a fixed value of 
+\begin_inset Formula $K$
+\end_inset
+
+ in a neighborhood, and use the data to find an appropriate value for 
+\begin_inset Formula $V$
+\end_inset
+
+ (volume of the neighborhood).
+ Center a small sphere at the point 
+\begin_inset Formula $x$
+\end_inset
+
+ at which the density 
+\begin_inset Formula $p\left(x\right)$
+\end_inset
+
+ is estimated.
+ Let the radius of the sphere to grow until contains precisely 
+\begin_inset Formula $K$
+\end_inset
+
+ data points.
+ Then
+\begin_inset Formula 
+\[
+p\left(x\right)=\frac{K}{NV}
+\]
+
+\end_inset
+
+ The value of 
+\begin_inset Formula $K$
+\end_inset
+
+ governs the degree of smoothing and there is an optimum choice for 
+\begin_inset Formula $K$
+\end_inset
+
+ that is neither too large nor too small.
+\end_layout
+
+\begin_layout Paragraph
+KNN for classification
+\end_layout
+
+\begin_layout Standard
+We apply the estimate the density of each class in the neighborhood obtained
+ and make use of Bayes' theorem.
+\end_layout
+
+\begin_layout Standard
+A data set comprising 
+\begin_inset Formula $N_{k}$
+\end_inset
+
+ points in class 
+\begin_inset Formula $C_{k}$
+\end_inset
+
+ with 
+\begin_inset Formula $N$
+\end_inset
+
+ points in total.
+ For a new point 
+\begin_inset Formula $x$
+\end_inset
+
+, draw a sphere contered at it containing exactly 
+\begin_inset Formula $K$
+\end_inset
+
+ points irrespective of their class, then
+\begin_inset Formula 
+\begin{align*}
+p\left(x|C_{k}\right) & =\frac{K_{k}}{N_{k}V}\\
+p\left(x\right) & =\frac{K}{NV}\\
+p\left(C_{k}\right) & =\frac{N_{k}}{N}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Through the Bayes' theorem
+\begin_inset Formula 
+\[
+p\left(C_{k}|x\right)=\frac{p\left(x|C_{k}\right)p\left(C_{k}\right)}{p\left(x\right)}=\frac{K_{k}}{K}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To minimize the probability of misclassification, 
+\begin_inset Formula $x$
+\end_inset
+
+ is assigned to the class having the largest posterior porbability.
+\end_layout
+
+\begin_layout Standard
+The particular case of 
+\begin_inset Formula $K=1$
+\end_inset
+
+ is called the 
+\emph on
+nearest-neighbor
+\emph default
+ rule.
+\end_layout
+
+\begin_layout Chapter
+Linear Models for Regression
+\end_layout
+
+\begin_layout Standard
+The goal of regression is to predict the value of one or more continuous
+ 
+\emph on
+target
+\emph default
+ variables 
+\begin_inset Formula $t$
+\end_inset
+
+ given the value of a 
+\begin_inset Formula $D$
+\end_inset
+
+-dimensional vector 
+\begin_inset Formula $\mathrm{x}$
+\end_inset
+
+ 
+\emph on
+input
+\emph default
+ variables.
+\end_layout
+
+\begin_layout Section
+Linear Basis Function Models
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+y(x,w)= & w_{0}+\sum\limits _{j=1}^{M-1}w_{j}\phi_{j}(x)\\
+= & w^{T}\phi(x)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\phi_{j}(\mathrm{x})$
+\end_inset
+
+ are known as 
+\emph on
+basis functions
+\emph default
+, and 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ 
+\emph on
+bias
+\emph default
+ parameter
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $w=(w_{0},...,w_{M-1})^{T}$
+\end_inset
+
+ and 
+\begin_inset Formula $\phi=(\phi_{0},...,\phi_{M-1})^{T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+By using nonlinear basis functions, we allow the function 
+\begin_inset Formula $y(x,w)$
+\end_inset
+
+ to be a non-linear function of the input vector 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ Thus the equation above is called a 
+\emph on
+linear model
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Choices for the basis functions
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Gaussian
+\emph default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\phi_{j}(x)=\exp\Bigg\{-\dfrac{(x-\mu_{j})^{2}}{2s^{2}}\Bigg\}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mu_{j}$
+\end_inset
+
+ govern the locations of the basis functions in input space.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Sigmoidal basis function
+\emph default
+:
+\begin_inset Formula 
+\[
+\phi_{j}(x)=\sigma(\dfrac{x-\mu_{j}}{s}):\sigma(a)=\dfrac{1}{1+\exp(-a)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and 
+\begin_inset Formula $tanh(a)=2\sigma(a)-1$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+the Fourier basis
+\emph default
+: Each basis function represents a specific frequency and has infinite spatial
+ extent.
+\end_layout
+
+\begin_layout Paragraph
+Maximum Likelihood and least squares
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+\begin_inset CommandInset href
+LatexCommand href
+name "Mode"
+target "https://en.wikipedia.org/wiki/Mode_(statistics)"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Assume 
+\begin_inset Formula $p(t,|X,w,\beta)=\mathcal{N}(t|y,\beta^{-1})$
+\end_inset
+
+, where 
+\begin_inset Formula $t=y\left(w,x\right)+\epsilon$
+\end_inset
+
+ and 
+\begin_inset Formula $y=w^{T}\phi(x)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\ln p(t|w,\beta)= & \sum_{n=1}^{N}\ln N\left(t_{n}|w^{T}\phi\left(x_{n}\right),\beta^{-1}\right)\\
+= & \dfrac{N}{2}\ln\beta-\dfrac{N}{2}\ln(2\pi)-\beta E_{D}(w)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mathrm{t}$
+\end_inset
+
+ is the column vector of targets and 
+\begin_inset Formula $E_{D}(w)=\dfrac{1}{2}\sum\limits _{n=1}^{N}\left\{ t_{n}-w^{T}\phi(x_{n})\right\} {}^{2}$
+\end_inset
+
+.
+ It is easy to see that maximization of the likelihood function under a
+ conditional Gaussian noise distribution for a linear model is equivalent
+ to minimizing a sum-of-squares error function.
+ Take the gradient and set it to zero:
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula $y=Ax\rightarrow\triangledown y=x$
+\end_inset
+
+, 
+\begin_inset Formula $W=x^{T}Ax\rightarrow\triangledown W=2x^{T}A$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w_{ML}=(\Phi^{T}\Phi)^{-1}\Phi^{T}\mathrm{t}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\emph on
+design matrix
+\emph default
+ 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ is given by 
+\begin_inset Formula $\Phi_{nj}=\phi_{j}(x_{n})$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Take the derivative w.r.t.
+ 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w_{0}=\bar{t}-\sum\limits _{j=1}^{N}w_{j}\bar{\phi}_{j}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\bar{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bar{\phi_{j}}$
+\end_inset
+
+ are the arithmetic mean of their elements.
+\end_layout
+
+\begin_layout Standard
+Maximize the log likehood w.r.t.
+ the noise precision parameter 
+\begin_inset Formula $\beta$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\dfrac{1}{\beta_{ML}}=\dfrac{1}{N}\sum\limits _{n=1}^{N}[t_{n}-w_{ML}^{T}\phi(x_{n})]^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The least-squares regression function (Euclidean distance) is obtained by
+ finding the orthogonal projection of the data vector 
+\begin_inset Formula $t$
+\end_inset
+
+ onto the subspace spanned by the basis functions 
+\begin_inset Formula $\phi_{j}(x)$
+\end_inset
+
+ in which each basis function is viewed as a vector 
+\begin_inset Formula $\phi_{j}$
+\end_inset
+
+ of length 
+\emph on
+N
+\emph default
+ with elements 
+\begin_inset Formula $\phi_{j}(x_{n})$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Sequential learning (online algorithms)
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Stochastic graidient descent (sequential gradient descent)
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+\begin_inset CommandInset href
+LatexCommand href
+name "Gradient descent"
+target "https://en.wikipedia.org/wiki/Gradient_descent"
+literal "false"
+
+\end_inset
+
+
+\emph default
+, see the description.
+\end_layout
+
+\begin_layout Standard
+Given an error function 
+\begin_inset Formula $E=\sum_{n}E_{n}$
+\end_inset
+
+ , a sum over data points, after presentation of pattern 
+\begin_inset Formula $n$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w^{(t+1)}=w^{(t)}-\eta\triangledown E_{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $t$
+\end_inset
+
+ is the iteration number and 
+\begin_inset Formula $\eta$
+\end_inset
+
+ is a 
+\emph on
+learning rate
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+LMS (least-mean-squares) algorithm
+\end_layout
+
+\begin_layout Standard
+For the case of the sum-of-squares error function:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\triangledown E_{n}=(t_{n}-w^{(t)T}\phi_{n})\phi_{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Regularized least squares
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+E(x)=E_{D}+\lambda E_{W}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In general 
+\begin_inset Formula $E_{W}=\dfrac{\lambda}{2}\sum\limits _{j=1}^{M}|w_{j}|^{q}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $q=1$
+\end_inset
+
+: (lasso) if is large enough, some of the coefficients are driven to zero
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset Formula $q=2$
+\end_inset
+
+: 
+\begin_inset Formula $E_{w}(q=2)$
+\end_inset
+
+ is known in ML as 
+\emph on
+weight decay
+\emph default
+, because in sequential learning algorithms, it encourages weight values
+ to decay towards zero.
+ In statistics, it is an example of a 
+\emph on
+parameter shrinkage
+\emph default
+ method.
+ 
+\begin_inset Formula $w=(\lambda I+\Phi^{T}\Phi)^{-1}\Phi^{T}t$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename 1524666731026.png
+	lyxscale 50
+	scale 35
+	rotateOrigin center
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+Think about this figure in a Langrange-multipliers way.
+\end_layout
+
+\begin_layout Paragraph
+Multiple outputs
+\end_layout
+
+\begin_layout Standard
+Of course we can decouple into multiple independent regression problems,
+ however there is an approach using the same set of basis functions so that
+ y
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+y(x,w)=W^{T}\phi(x)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(\mathrm{t}|x,W,\beta)=\mathcal{N}(\mathrm{t}|W^{T}\phi(x),\beta^{-1}I)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which yields
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+W_{ML}=\Phi^{\dagger}T
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the case of arbitrary covariance matrices, see MAL of multi-variate
+ Gaussian distribution.
+\end_layout
+
+\begin_layout Section
+3.2 The Bias-Variance Decomposition
+\end_layout
+
+\begin_layout Chapter
+Linear Models for Classification
+\end_layout
+
+\begin_layout Standard
+The goal in classification is to take an input vector 
+\begin_inset Formula $\mathrm{x}$
+\end_inset
+
+ and to assign it to one of 
+\begin_inset Formula $K$
+\end_inset
+
+ discrete classes 
+\begin_inset Formula $\mathcal{C}_{k}$
+\end_inset
+
+ where 
+\begin_inset Formula $k=1,\dots,K$
+\end_inset
+
+.
+ The input space is divided into 
+\emph on
+decision regions
+\emph default
+ whose boundaries are called 
+\emph on
+decision boundaries
+\emph default
+ or 
+\emph on
+decision surfaces
+\emph default
+.
+ Data sets whose classes can be separated exactly by linear decision surfaces
+ are said to be 
+\emph on
+linearly separable.
+ 
+\emph default
+For probabilistic models, the most convenient is 1-of-
+\begin_inset Formula $K$
+\end_inset
+
+ coding scheme.
+\end_layout
+
+\begin_layout Standard
+There are three distinct approaches to the classification problem: the simplest
+ constructs a 
+\emph on
+discriminant function 
+\emph default
+that directly assigns each vector 
+\begin_inset Formula $\mathrm{x}$
+\end_inset
+
+ to a specfic class.
+ A more powerful approach models the conditional probability 
+\begin_inset Formula $p\left(\mathcal{C}_{k}|\mathrm{x}\right)$
+\end_inset
+
+ in an inference stage and then uses this distribution to make optimal decisions.
+ One way to the model is to model directly, the other is to adopt a generative
+ approach, i.e., to model the class-conditional densities 
+\begin_inset Formula $p\left(x|C_{k}\right)$
+\end_inset
+
+ and the prior probabilities 
+\begin_inset Formula $p\left(C_{k}\right)$
+\end_inset
+
+ for the classes and use Bayes' theorem
+\begin_inset Formula 
+\[
+p\left(C_{k}|x\right)=\frac{p\left(x|C_{k}\right)p\left(C_{k}\right)}{p\left(x\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Generalized Linear Models
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+y\left(x\right)=f\left(w^{T}x+w_{0}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $f\left(\cdot\right)$
+\end_inset
+
+ is an nonlinear 
+\emph on
+activation function
+\emph default
+ whereas its inverse is called a 
+\emph on
+link function
+\emph default
+.
+\end_layout
+
+\begin_layout Section
+Discriminant Functions
+\end_layout
+
+\begin_layout Subsection
+Two classes
+\end_layout
+
+\begin_layout Standard
+A linear dicriminant function
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+y\left(x\right)=w^{T}x+w_{0}=\tilde{w}^{T}\tilde{x}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\tilde{x}=\left(x_{0},\mathrm{x}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{w}=\left(w_{0},\mathrm{w}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $y\left(x\right)\geq0,$
+\end_inset
+
+then 
+\begin_inset Formula $x\in C_{1}$
+\end_inset
+
+ otherwise 
+\begin_inset Formula $x\in C_{2}$
+\end_inset
+
+.
+ The decision boundary is defined by 
+\begin_inset Formula $y\left(x\right)=0$
+\end_inset
+
+, a 
+\begin_inset Formula $\left(D-1\right)$
+\end_inset
+
+-dimensional hyperplane within the 
+\begin_inset Formula $D$
+\end_inset
+
+-dimensional input space.
+ The 
+\emph on
+weight vector 
+\emph default
+
+\begin_inset Formula $w$
+\end_inset
+
+ is orthogonal to the hyperplane.
+ 
+\end_layout
+
+\begin_layout Standard
+Set 
+\begin_inset Formula $x=0$
+\end_inset
+
+, we have
+\begin_inset Formula 
+\[
+\frac{w^{T}x}{\left\Vert w\right\Vert }=-\frac{w_{0}}{\left\Vert w\right\Vert }
+\]
+
+\end_inset
+
+ Thus 
+\begin_inset Formula $w_{0}$
+\end_inset
+
+ determines the location of the decision surface.
+\end_layout
+
+\begin_layout Subsection
+Multiple classes
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $K$
+\end_inset
+
+-classes
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+One-versus-the-rest:
+\emph default
+ the use of 
+\begin_inset Formula $K-1$
+\end_inset
+
+ classifers each of which solves a two-class problem of separating points
+ in a particular class 
+\begin_inset Formula $C_{k}$
+\end_inset
+
+ from points not in that class.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+One-versus-one: 
+\emph default
+introduces 
+\begin_inset Formula $K\left(K-1\right)/2$
+\end_inset
+
+ binary discriminant functions, one for every possible pair of classes.
+\end_layout
+
+\begin_layout Standard
+The above two approaches run into the problem of ambiguous regions.
+\end_layout
+
+\begin_layout Standard
+To avoid the difficulty, consider a single 
+\begin_inset Formula $K$
+\end_inset
+
+-class discriminant comprising 
+\begin_inset Formula $K$
+\end_inset
+
+ linear functions of the form
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+y_{k}\left(\text{x}\right)=\text{w}_{k}^{T}\text{x}+w_{k0}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and then assign a point 
+\begin_inset Formula $x$
+\end_inset
+
+ to class 
+\begin_inset Formula $C_{k}$
+\end_inset
+
+ if 
+\begin_inset Formula $y_{k}\left(x\right)>y_{j}\left(x\right)$
+\end_inset
+
+ for all 
+\begin_inset Formula $j\neq k.$
+\end_inset
+
+ The decision boundary between 
+\begin_inset Formula $C_{k}$
+\end_inset
+
+ and 
+\begin_inset Formula $C_{j}$
+\end_inset
+
+ is given by 
+\begin_inset Formula $y_{k}\left(x\right)=y_{j}\left(x\right)$
+\end_inset
+
+.
+ The decison regions of such a discriminant can be proved singly connected
+ and convex.
+\end_layout
+
+\begin_layout Subsection
+Least squares for classification
+\end_layout
+
+\begin_layout Standard
+One justification for using least squares in a general classfication problem
+ with 
+\begin_inset Formula $K$
+\end_inset
+
+ classes, with a 1-of-
+\begin_inset Formula $K$
+\end_inset
+
+ binary coding scheme for the target vector 
+\begin_inset Formula $t$
+\end_inset
+
+, is that it approximates the conditional expectation 
+\begin_inset Formula $E\left[t|x\right]$
+\end_inset
+
+ of the target values given the input vector.
+ For binary coding scheme, this conditional expectation expectation is given
+ by the vector of posterior class probabilities which, unfortuately, give
+ poor approximation.
+\end_layout
+
+\begin_layout Standard
+Each class 
+\begin_inset Formula $C_{k}$
+\end_inset
+
+ is described by its own linear model so that 
+\begin_inset Formula 
+\[
+y_{k}\left(x\right)=w_{k}^{T}x+w_{k0}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $k=1,\dots,K$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathrm{y}\left(\mathrm{x}\right)=\tilde{\mathrm{W}}^{T}\tilde{\mathrm{x}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\tilde{\mathrm{W}}_{\cdot,k}=\left(w_{k0},\mathrm{w}_{k}^{T}\right)^{T}$
+\end_inset
+
+and 
+\begin_inset Formula $\tilde{\mathrm{x}}=\left(1,\mathrm{\mathrm{x}^{T}}\right)^{T}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider a training data set 
+\begin_inset Formula $\left\{ x_{n},t_{n}\right\} $
+\end_inset
+
+ where 
+\begin_inset Formula $n=1,\dots,N$
+\end_inset
+
+, target matrix 
+\begin_inset Formula $T_{n,\cdot}=t_{n}^{T}$
+\end_inset
+
+, matrix 
+\begin_inset Formula $\tilde{\mathrm{X}}_{n,\cdot}=\tilde{\text{x}}_{n}^{T}$
+\end_inset
+
+.
+ The sum-of-squares error function can be written as 
+\begin_inset Formula 
+\[
+E_{D}\left(\tilde{\mathrm{W}}\right)=\frac{1}{2}\text{Tr}\left\{ \left(\tilde{\mathrm{X}}\tilde{\mathrm{W}}-T\right)^{T}\left(\tilde{\mathrm{X}}\tilde{\mathrm{W}}-T\right)\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Minimizing it, we obtain the solution for the coefficients
+\begin_inset Formula 
+\[
+\tilde{\mathrm{W}}=\left(\tilde{\mathrm{X}}^{T}\tilde{\mathrm{X}}\right)^{-1}\tilde{\mathrm{X}}^{T}T
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If we use a 
+\begin_inset Formula $1$
+\end_inset
+
+-of-
+\begin_inset Formula $K$
+\end_inset
+
+ coding scheme for 
+\begin_inset Formula $K$
+\end_inset
+
+ classes, the elements of 
+\begin_inset Formula $y\left(x\right)$
+\end_inset
+
+ will sum to 1 for any value of 
+\begin_inset Formula $x$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The least-squares solutions lack robustness to outliers.
+ The failure of least squares results from the assumption of the target
+ being Gaussian, while in a classification problem this is not the case.
+\end_layout
+
+\begin_layout Subsection
+Fisher's linear discriminant
+\end_layout
+
+\begin_layout Standard
+One way to view a linear classification model is in terms of dimensionality
+ reduction.
+ Consider first the case of two classes, and suppose we project 
+\begin_inset Formula $D$
+\end_inset
+
+-dimensional input vector 
+\begin_inset Formula $x$
+\end_inset
+
+ to one dimension using
+\begin_inset Formula 
+\[
+y=\text{w}^{T}\text{x}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The idea proposed by Fisher is to maximize a function that will give a large
+ separation between the projected class means while also giving a small
+ variance within each class, thereby minimizing the class overlap.
+ Define the mean and variance of each class
+\begin_inset Formula 
+\begin{align*}
+m_{1} & =\frac{1}{N_{1}}\sum_{n\in C_{1}}x_{n}\quad m_{2}=\frac{1}{N_{2}}\sum_{n\in C_{2}}x_{n}\\
+s_{k}^{2} & =\sum_{n\in C_{k}}\left(y_{n}-w^{T}m_{k}\right)^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $y_{n}=w^{T}x_{n}$
+\end_inset
+
+.
+ The Fisher criterion is defined by
+\begin_inset Formula 
+\[
+J\left(w\right)=\frac{w^{T}(m_{2}-m_{1})}{s_{1}^{2}+s_{2}^{2}}=\frac{w^{T}S_{B}w}{w^{T}S_{W}w}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $S_{B}=\left(m_{2}-m_{1}\right)(m_{2}-m_{1})^{T},$
+\end_inset
+
+ and 
+\begin_inset Formula $S_{W}=\sum_{j}\sum_{n\in C_{j}}\left(x_{n}-m_{j}\right)\left(x_{n}-m_{j}\right)^{T}$
+\end_inset
+
+, Differentiate 
+\begin_inset Formula $J\left(w\right)$
+\end_inset
+
+ w.r.t.
+ 
+\begin_inset Formula $w$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\left(w^{T}S_{B}w\right)S_{W}w=\left(w^{T}S_{W}w\right)S_{B}w
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Ignore the magnitude of 
+\begin_inset Formula $w$
+\end_inset
+
+, then 
+\begin_inset Formula 
+\[
+w\propto S_{W}^{-1}(m_{2}-m_{1})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Known as 
+\emph on
+Fishers's linear discriminant,
+\emph default
+ not strictly a discriminant though.
+ The projected data can subsequently be used to construct a discriminant
+ by choosing a threshold 
+\begin_inset Formula $y_{0}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Probabilistic Generative Models
+\end_layout
+
+\begin_layout Standard
+We model the class-conditional densities 
+\begin_inset Formula $p\left(x|C_{k}\right)$
+\end_inset
+
+ as well as the class prior 
+\begin_inset Formula $p\left(C_{k}\right)$
+\end_inset
+
+, and then use them to compute the posterior probabilities 
+\begin_inset Formula $p\left(C_{k}|x\right)$
+\end_inset
+
+ through Bayes' theorem.
+\end_layout
+
+\begin_layout Paragraph
+The case of two classes
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+\begin_inset CommandInset href
+LatexCommand href
+name "Logistic function"
+target "https://en.wikipedia.org/wiki/Logistic_function#Mathematical_properties"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+p\left(C_{1}|x\right) & =\frac{p\left(x|C_{1}\right)p\left(C_{1}\right)}{p\left(x|C_{1}\right)p\left(C_{1}\right)+p\left(x|C_{2}\right)p\left(C_{2}\right)}\\
+ & =\frac{1}{1+\exp\left(-a\right)}=\text{sigmoid}\left(a\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula 
+\[
+a=\ln\frac{p\left(x|C_{1}\right)p\left(C_{1}\right)}{p\left(x|C_{2}\right)p\left(C_{2}\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+The case of 
+\begin_inset Formula $K>2$
+\end_inset
+
+ classes
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+\begin_inset CommandInset href
+LatexCommand href
+name "Softmax function"
+target "https://en.wikipedia.org/wiki/Softmax_function"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+p\left(C_{k}|x\right) & =\frac{p\left(x|C_{1}\right)p\left(C_{1}\right)}{\sum_{j}p\left(x|C_{j}\right)p\left(C_{j}\right)}\\
+ & =\underbrace{\frac{\exp\left(a_{k}\right)}{\sum_{j}\exp\left(a_{j}\right)}}_{\text{softmax}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula 
+\[
+a_{k}=\ln p\left(x|C_{k}\right)p\left(C_{k}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Continuous inputs
+\end_layout
+
+\begin_layout Standard
+Assume the class-conditional probabilities are all Gaussian
+\begin_inset Formula 
+\[
+p\left(x|C_{k}\right)=N\left(x|\mu_{k},\Sigma\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider the case of two-classes, the posterior becomes
+\begin_inset Formula 
+\[
+p\left(C_{1}|x\right)=\sigma\left(w^{T}x+w_{0}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where
+\begin_inset Formula 
+\begin{align*}
+w & =\Sigma^{-1}\left(\mu_{1}-\mu_{2}\right)\\
+w_{0} & =-\frac{1}{2}\mu_{1}\Sigma^{-1}\mu_{1}+\frac{1}{2}\mu_{2}\Sigma^{-1}\mu_{2}+\ln\frac{p\left(C_{1}\right)}{p\left(C_{2}\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And in the case of 
+\begin_inset Formula $K$
+\end_inset
+
+ classes
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+a_{k}(x)=w_{k}^{T}x+w_{k0}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+w_{k} & =\Sigma^{-1}\mu_{k}\\
+w_{k0} & =-\frac{1}{2}\mu_{k}^{T}\Sigma^{-1}\mu_{k}+\ln p\left(C_{k}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the 
+\begin_inset Formula $a_{k}$
+\end_inset
+
+ here is not directly obtain from the second equation rather than the posterior
+ equation, thus the quadratic forms are cancelled.
+\end_layout
+
+\begin_layout Standard
+If weach class-conditional density 
+\begin_inset Formula $p\left(x|C_{k}\right)$
+\end_inset
+
+ has its own covariance matrix, the cancellations no longer occurs, giving
+ rise to a 
+\emph on
+quadratic discriminant.
+\end_layout
+
+\begin_layout Subsection
+Maximum likelihood solution
+\end_layout
+
+\begin_layout Standard
+Here we maximize the likehood of the posterior.
+ Consider the case of two classes where the targets are scalars, either
+ 1 or 0.
+ Denoting the prior 
+\begin_inset Formula $p\left(C_{1}\right)=\pi$
+\end_inset
+
+ and 
+\begin_inset Formula $p\left(C_{2}\right)=1-\pi$
+\end_inset
+
+, the likelihood function is given by 
+\begin_inset Formula 
+\[
+p\left(\mathrm{t}|\pi,\mu_{1},\mu_{2},\Sigma\right)=\prod_{n=1}^{N}\left[\pi N\left(\mathrm{\mathrm{x}_{n}|\mu_{1},\Sigma}\right)\right]^{t_{n}}\left[\left(1-\pi\right)N\left(\mathrm{\mathrm{x}_{n}|\mu_{2},\Sigma}\right)\right]^{1-t_{n}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mathrm{t}=\left(t_{1},\dots,t_{N}\right)^{T}.$
+\end_inset
+
+ Since both Gaussians do not contain 
+\begin_inset Formula $\pi$
+\end_inset
+
+, it is easy to maximize w.r.t.
+ 
+\begin_inset Formula $\pi$
+\end_inset
+
+ which yields
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\pi=\frac{N_{1}}{N_{1}+N_{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+w.r.t.
+ 
+\begin_inset Formula $\mu_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu_{2}$
+\end_inset
+
+, we have
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\mu_{1} & =\frac{1}{N_{1}}\sum_{n=1}^{N}t_{n}x_{n}\\
+\mu_{2} & =\frac{1}{N_{2}}\sum_{n=1}^{N}\left(1-t_{n}\right)x_{n}
+\end{align*}
+
+\end_inset
+
+ which are the arithmetic mean of their respective class.
+\end_layout
+
+\begin_layout Standard
+w.r.t.
+ 
+\begin_inset Formula 
+\[
+\Sigma=S=\frac{N_{1}}{N}S_{1}+\frac{N_{2}}{N}S_{2}
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $S_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $S_{2}$
+\end_inset
+
+ are the MAL estimate of covariance matrix of the corresponding class.
+\end_layout
+
+\begin_layout Subsection
+The Naive Bayes' Classifier
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://en.wikipedia.org/wiki/Naive_Bayes_classifier#Probabilistic_model
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Probabilistic Discriminative Models
+\end_layout
+
+\begin_layout Standard
+The indirect approach to finding the parameters of a generalized linear
+ model, by fitting class-conditional densities and class priors separately
+ and then applying Bayes' theorem, represents an example of 
+\emph on
+
+\begin_inset CommandInset href
+LatexCommand href
+name "generative modelling"
+target "https://en.wikipedia.org/wiki/Generative_model"
+literal "false"
+
+\end_inset
+
+.
+
+\emph default
+ In the direct approach, we are maximizing a likelihood function defined
+ through the conditional distribution 
+\begin_inset Formula $p\left(C_{k}|x\right)$
+\end_inset
+
+, which is a form of 
+\emph on
+
+\begin_inset CommandInset href
+LatexCommand href
+name "discriminative"
+target "https://en.wikipedia.org/wiki/Discriminative_model"
+literal "false"
+
+\end_inset
+
+ 
+\emph default
+training.
+\end_layout
+
+\begin_layout Subsection
+Logistic regression
+\end_layout
+
+\begin_layout Standard
+This is a model for classification rather than regression.
+\end_layout
+
+\begin_layout Standard
+The posterior probability of class 
+\begin_inset Formula $C_{1}$
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+p\left(C_{1}|\phi\right)=y\left(\phi\right)=\sigma\left(w^{T}\phi\right)
+\]
+
+\end_inset
+
+ with 
+\begin_inset Formula $p\left(C_{2}|\phi\right)=1-p\left(C_{1}|\phi\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For an 
+\begin_inset Formula $M$
+\end_inset
+
+-dimensional feature space 
+\begin_inset Formula $\phi$
+\end_inset
+
+, this model has 
+\begin_inset Formula $M$
+\end_inset
+
+ adjustable parameters, in contrast with Gaussian MAL, which has a total
+ of 
+\begin_inset Formula $M\left(M+5\right)/2+1$
+\end_inset
+
+.
+ For large values of 
+\begin_inset Formula $M$
+\end_inset
+
+, there is a clear advantage in working with the logistic regression model
+ directly.
+\end_layout
+
+\begin_layout Paragraph
+MAL
+\end_layout
+
+\begin_layout Standard
+For a data set 
+\begin_inset Formula $\left\{ \phi_{n},t_{n}\right\} $
+\end_inset
+
+, where 
+\begin_inset Formula $t_{n}\in\left\{ 0,1\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\phi_{n}=\phi\left(x_{n}\right)$
+\end_inset
+
+, with 
+\begin_inset Formula $n=1,\dots,N$
+\end_inset
+
+.
+ The likelihood function
+\begin_inset Formula 
+\[
+p\left(\mathrm{t}|w\right)=\prod_{n=1}^{N}y_{n}^{t_{n}}(1-y_{n})^{1-t_{n}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mathrm{t}=\left(t_{1},\dots,t_{N}\right)^{T}$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{n}=p\left(C_{1}|\phi_{n}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Our goal is to minimize the 
+\emph on
+cross-entropy 
+\emph default
+error function
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+E\left(w\right)=-\ln p\left(t|w\right)=-\sum_{n=1}^{N}\left\{ t_{n}\ln y_{n}+\left(1-t_{n}\right)\ln\left(1-y_{n}\right)\right\} 
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $y_{n}=\sigma\left(w^{T}\phi_{n}\right)$
+\end_inset
+
+.
+ Taking the gradient of 
+\begin_inset Formula $E\left(w\right)$
+\end_inset
+
+ w.r.t.
+ 
+\begin_inset Formula $w$
+\end_inset
+
+, we obtain 
+\begin_inset Formula 
+\[
+\triangledown E\left(w\right)=\sum_{n=1}^{N}\left(y_{n}-t_{n}\right)\phi_{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This takes the same form as the gradient of the sum-of-squares error function
+ for the linear regression model.
+\end_layout
+
+\begin_layout Standard
+This gradient expression gives a sequential algorithm in which patterns
+ are presented, i.e.
+ 
+\begin_inset Formula 
+\[
+w^{\left(k\right)}=w^{\left(k-1\right)}-\eta\left(k\right)\sum_{n=1}^{N}\left[y_{n}-t_{n}\right]\phi_{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+MAL can exhibit severe overfitting for data sets that are linearly separable.
+ When 
+\begin_inset Formula $\sigma=0.5$
+\end_inset
+
+, the logistic sigmoid function becomes infinitely steep in feature space,
+ corresponding to a Heaviside step function, so that every training point
+ from each class 
+\begin_inset Formula $k$
+\end_inset
+
+ is assigned a posterior probability 
+\begin_inset Formula $p\left(C_{k}|x\right)=1$
+\end_inset
+
+.
+ There is a continuum of such solutions because any separating hyperplane
+ will give rise to the same posterior probabilities at the training data
+ points, in which case MAL provides no way to favor one over another, depending
+ on the choice of optimization algorithm and the parameter initialization.The
+ singularity can be avoided by inclusion of a prior and finding a MAP solution
+ for 
+\begin_inset Formula $w$
+\end_inset
+
+, or equivalently by adding a regularization term to the error function.
+ 
+\end_layout
+
+\begin_layout Chapter
+6.
+ Kernel Method
+\end_layout
+
+\begin_layout Standard
+There is a class of pattern recognition techniques in which the training
+ data points, or a subset of them are kept and used also during the prediction
+ phase such as KNN or the Parzen probability density model.
+ These are 
+\emph on
+memory-based methods, 
+\emph default
+typically requiring a a metric that measures the similarity of any two vectors
+ in input spaces, fast at training but slow at making predictions.
+ Many linear parametric models can be recast into an equivalent 
+\begin_inset Quotes eld
+\end_inset
+
+dual representation
+\begin_inset Quotes erd
+\end_inset
+
+ in which the predictions are also based on linear combinations of a kernel
+ function evaluated at the training data points.
+\end_layout
+
+\begin_layout Paragraph
+The Concept of Kernel Function
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+k(x,x')=\phi(x)^{T}\phi(x')
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which is a symmetric function 
+\begin_inset Formula $k(x,x')=k(x',x)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This allows us to build interesting extensions of many well-known algorithms
+ by making use of the 
+\emph on
+kernel trick
+\emph default
+(
+\emph on
+kernel substituion
+\emph default
+), i.e.
+ if we have an algorithm formulated in such a way that the input vector
+ 
+\begin_inset Formula $x$
+\end_inset
+
+ enters only in the form of 
+\begin_inset CommandInset href
+LatexCommand href
+name "scalar products"
+target "https://en.wikipedia.org/wiki/Dot_product"
+literal "false"
+
+\end_inset
+
+, then scalar product can be replaced with some other choice of kernel.
+\end_layout
+
+\begin_layout Standard
+Application Examples:
+\end_layout
+
+\begin_layout Enumerate
+Nonlinear variant of PCA 
+\end_layout
+
+\begin_layout Enumerate
+nearest -neighbor classifiers and the kernel Fisher discriminant 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Stationary kernel
+\emph default
+: 
+\begin_inset Formula $k(x,x')=k(x-x')$
+\end_inset
+
+, which is invariant to translations in input space
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+homogeneous kernel
+\emph default
+(a.k.a 
+\emph on
+radial basis function
+\emph default
+): 
+\begin_inset Formula $k(x,x')=k(\parallel x-x'\parallel)$
+\end_inset
+
+ , which depend only on magnitude of the distance.
+\end_layout
+
+\begin_layout Section
+6.1 Dual Representations
+\end_layout
+
+\begin_layout Standard
+Many linear models for regression and classification can be reformulated
+ in terms of a dual representation in which the kernel function arises naturally.
+\end_layout
+
+\begin_layout Standard
+Consider the case of 
+\emph on
+weight decay, 
+\emph default
+a regularized sum-of-squares error function
+\begin_inset Formula 
+\[
+J\left(w\right)=\frac{1}{2}\sum_{n=1}^{N}\left\{ w^{T}\phi\left(x_{n}\right)-t_{n}\right\} ^{2}+\frac{\lambda}{2}w^{T}w
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Take the gradient w.r.t.
+ 
+\begin_inset Formula $w$
+\end_inset
+
+, but do not compute its closed from 
+\begin_inset Formula 
+\[
+w=\Phi^{T}a
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ is the design matrix, 
+\begin_inset Formula $a=-\frac{1}{\lambda}\left\{ w^{T}\phi\left(x_{n}\right)-t_{n}\right\} $
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Substitute them back into 
+\begin_inset Formula $J\left(w\right)$
+\end_inset
+
+, which gives a 
+\emph on
+dual representation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+J\left(a\right)=\frac{1}{2}a^{T}\Phi\Phi^{T}\Phi\Phi^{T}a-a^{T}\Phi\Phi^{T}t+\frac{1}{2}t^{T}t+\frac{\lambda}{2}a^{T}\Phi\Phi^{T}a
+\]
+
+\end_inset
+
+ define the symmetric 
+\emph on
+Gram 
+\emph default
+matrix 
+\begin_inset Formula $K=\Phi\Phi^{T}$
+\end_inset
+
+whose element 
+\begin_inset Formula 
+\[
+K_{n,m}=\phi\left(x_{n}\right)^{T}\phi\left(x_{m}\right)=k\left(x_{n},x_{m}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+substituting it back into 
+\begin_inset Formula $J\left(a\right)$
+\end_inset
+
+, taking the gradient w.r.t.
+ 
+\begin_inset Formula $a$
+\end_inset
+
+ and setting it to zero, the solution for 
+\begin_inset Formula $a$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\[
+a=\left(K+\lambda I_{N}\right)^{-1}t
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The linear regression model becomes
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+y\left(x\right)=w^{T}\phi\left(x\right)=a^{T}\Phi\phi\left(x\right)=\begin{bmatrix}k\left(x_{1},x\right)\\
+\vdots\\
+k\left(x_{n},x\right)\\
+\vdots\\
+k\left(x_{N},x\right)
+\end{bmatrix}^{T}\left(K+\lambda I_{N}\right)^{-1}t
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note in this equation, there is a kernel function 
+\begin_inset Formula $K$
+\end_inset
+
+ to be found, and training data 
+\begin_inset Formula $t$
+\end_inset
+
+ and 
+\begin_inset Formula $x_{n}$
+\end_inset
+
+(lying inside 
+\begin_inset Formula $k\left(x_{n},x\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $K$
+\end_inset
+
+) still in use, although not very useful here due to the huge dimension
+ of 
+\begin_inset Formula $K$
+\end_inset
+
+.
+ The advantage is that we can therefore work directly in terms of kernels
+ and avoid the explicit introduction of the feature vector 
+\begin_inset Formula $\phi(x)$
+\end_inset
+
+ , which allows us implicitly to use feature spaces of high, even infinite
+ dimensionality.
+ The exisitence of a dual representation based on the Gram matrix is a property
+ of many linear models, including the perceptron.
+\end_layout
+
+\begin_layout Section
+6.2 Contructing Kernels
+\end_layout
+
+\begin_layout Standard
+A kernel can be built by using either 
+\begin_inset Formula $\phi(x)$
+\end_inset
+
+ or directly.
+\end_layout
+
+\begin_layout Standard
+To simply test whether a function is a valid kernel, we have:
+\end_layout
+
+\begin_layout Standard
+Give a set 
+\begin_inset Formula $\{x_{n}\}$
+\end_inset
+
+ and a kernel-to-be function 
+\begin_inset Formula $k(x,x')$
+\end_inset
+
+ is valid if and only if the Gram matrix 
+\begin_inset Formula $K$
+\end_inset
+
+, whose elements are given by 
+\begin_inset Formula $k(x_{n},x_{m})$
+\end_inset
+
+ is positive semidefinite.
+\end_layout
+
+\begin_layout Standard
+Techiniques for Contructing New Kernels by valid kernels See P.
+ 296 PRML by Bishop
+\end_layout
+
+\begin_layout Standard
+E.g.
+\end_layout
+
+\begin_layout Enumerate
+Gaussian Kenel: 
+\begin_inset Formula $k\left(x,x'\right)=\exp\left(-\left\Vert x-x'\right\Vert ^{2}/2\sigma^{2}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Polynomial kernel: 
+\begin_inset Formula $k(x,x')=(x^{T}x'+c)^{M}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+An important contribution to arise from the kernel viewpoint has been the
+ extension to inputs that are symbolic, rather than simply vectors of real
+ numbers.
+ Kernel functions can be defined over objects as diverse as graphs, sets,
+ strings, and text documents.
+\end_layout
+
+\begin_layout Paragraph
+Building Kernels from a probabilistic generative model
+\end_layout
+
+\begin_layout Standard
+Consider a set of probability densities 
+\begin_inset Formula $\left\{ p\left(x|i\right)\right\} $
+\end_inset
+
+ , 
+\begin_inset Formula $k_{i}\left(x,x'\right)=p\left(x|i\right)p\left(x'|i\right)$
+\end_inset
+
+ is a kernel and 
+\begin_inset Formula 
+\[
+k\left(x,x'\right)=\sum_{i}p\left(i\right)k_{i}\left(x,x'\right)=\sum_{i}p\left(x|i\right)p\left(x'|i\right)p\left(i\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+is also a kernel, equivalent to a mixture distribution in which the components
+ factorize, with the index 
+\begin_inset Formula $i$
+\end_inset
+
+ playing the role of a 
+\emph on
+latent variable.
+\end_layout
+
+\begin_layout Standard
+Taking the limit of an infinite sum, 
+\begin_inset Formula 
+\[
+k\left(x,x'\right)=\int p\left(x|z\right)p\left(x'|z\right)p\left(z\right)dz
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+is also a kernel.
+\end_layout
+
+\begin_layout Enumerate
+hidden Markov model 
+\end_layout
+
+\begin_layout Enumerate
+Fisher kernel 
+\end_layout
+
+\begin_layout Enumerate
+Sigmoidal kernel 
+\begin_inset Formula 
+\[
+k\left(x,x'\right)=\tanh\left(ax^{T}x'+b\right)
+\]
+
+\end_inset
+
+whose Gram matrix in general is not p.s.d but useful in practice.
+\end_layout
+
+\begin_layout Chapter
+7.
+ Sparse Kernel marchines
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "Lagrange Multiplier on Wiki"
+target "https://en.wikipedia.org/wiki/Lagrange_multiplier#Single_constraint"
+literal "true"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "KKT Conditions on Wiki"
+target "https://en.wikipedia.org/wiki/Karush–Kuhn–Tucker_conditions"
+literal "true"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+One of the significant limitations of many such algorithms is that the kernel
+ function 
+\begin_inset Formula $k(x_{n},x_{m})$
+\end_inset
+
+ must be evaluated for all possible pairs 
+\begin_inset Formula $x_{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $x_{n}$
+\end_inset
+
+ of training points, which can be computationally infeasible during training
+ and can lead to excessive computation times when making predictions for
+ new data points.
+\end_layout
+
+\begin_layout Standard
+Here we discuss about kernel-based algorithms that have 
+\emph on
+sparse solutions, 
+\emph default
+so that predictions for new inputs depend only on the kernel function evaluated
+ at a 
+\series bold
+subset 
+\series default
+of the training data points.
+\end_layout
+
+\begin_layout Section
+7.1 Maximum Margin Classifiers (SVM)
+\end_layout
+
+\begin_layout Standard
+The SVM is a decision machine and so does not provide posterior probabilities.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Margin
+\emph default
+: the smallest distance between the decision boundary and any of the samples
+ 
+\end_layout
+
+\begin_layout Standard
+Consider the two-class classification problem using linear models of the
+ form
+\begin_inset Formula 
+\[
+y\left(x\right)=w^{T}\phi\left(x\right)+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The training data set comprises 
+\begin_inset Formula $N$
+\end_inset
+
+ input vectors 
+\begin_inset Formula $x_{1},\dots,x_{N}$
+\end_inset
+
+, with the corresponding target values 
+\begin_inset Formula $t_{n}\in\left\{ -1,1\right\} $
+\end_inset
+
+, and new data points are classified according the 
+\series bold
+sign 
+\series default
+of 
+\begin_inset Formula $y\left(x_{n}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Given a decision boundary hyperplane 
+\begin_inset Formula $y(x)=0$
+\end_inset
+
+, the margin is given by 
+\begin_inset Formula $|y(x)|/\left\Vert w\right\Vert $
+\end_inset
+
+, Futhermore,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+t_{n}y(x_{n})=\left\Vert y(x_{n})\right\Vert >0\qquad\text{for\ all\ correctly\ classified\ n}
+\]
+
+\end_inset
+
+ thus we have
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\text{Distance}=\dfrac{t_{n}y(x_{n})}{\left\Vert w\right\Vert }=\dfrac{t_{n}(w^{T}\phi(x_{n})+b)}{\left\Vert w\right\Vert }
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And our optimization problem becomes:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\underset{w,b}{\text{arg max}}\text{ Margin}=\underset{w,b}{\text{arg \text{max}}}\left\{ \underset{n}{\text{min}}\left[\dfrac{1}{\left\Vert w\right\Vert }t_{n}\left(w^{T}\phi(x_{n})+b\right)\right]\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Still not concise enough, take out 
+\begin_inset Formula $1/\left\Vert w\right\Vert $
+\end_inset
+
+ outside the optimization over 
+\begin_inset Formula $n$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\text{Suppose}\ y=\kappa,\text{\ then\ we\ can\ let\ }b=b/\kappa,\ w=w/\kappa,\ \text{then}\ y=1\text{ for the point closest to the surface}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The distance is still the same
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\text{Margin}=\dfrac{1}{\left\Vert w\right\Vert }
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And all points satisfy
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+t_{n}(w^{T}\phi(x_{n})+b)\geq1\quad n=1,...,N
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus we have a quadratic programming problem
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\underset{w,b}{\text{arg}\text{min}}\dfrac{1}{2}\left\Vert w\right\Vert ^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Constrained by the inequalities above
+\end_layout
+
+\begin_layout Standard
+Lagrange function
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+L(w,b,a)=\dfrac{1}{2}\left\Vert w\right\Vert ^{2}-\sum\limits _{n=1}^{N}a_{n}\left[t_{n}(w^{T}\phi(x_{n})+b)-1\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+By introducing Lagrange multipliers and using KKT-Conditions, minimizing
+ w.r.t.
+ 
+\begin_inset Formula $w$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\triangledown_{w}L=0:w & =\sum\limits _{n=1}^{N}a_{n}t_{n}\phi(x_{n})\\
+\triangledown_{b}L=0:\sum\limits _{n=1}^{N}a_{n}t_{n} & =0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Substitute the result above back into the Lagrange function, the 
+\begin_inset CommandInset href
+LatexCommand href
+name "dual representation"
+target "https://en.wikipedia.org/wiki/Duality_(optimization)#The_strong_Lagrangian_principle:_Lagrange_duality"
+literal "false"
+
+\end_inset
+
+ is obtained
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\underset{a}{\text{arg}\text{max }}L_{D}(a) & =\sum\limits _{n=1}^{N}a_{n}-\dfrac{1}{2}\sum\limits _{n=1}^{N}\sum\limits _{m=1}^{N}a_{m}a_{n}t_{m}t_{n}k(x_{n},x_{m})
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula 
+\[
+k(x_{n},x_{m})=\phi(x_{n})^{T}\phi(x_{m}),\ \text{a\ kernel\ function}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Constrained by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+a_{n} & \geq0,\qquad n=1,...,N\\
+\sum\limits _{n=1}^{N}a_{n}t_{n} & =0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+our classifier becomes
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+y(x)=\sum\limits _{n=1}^{N}a_{n}t_{n}k(x,x_{n})+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now here we have a new problem, to solve this optimization problem
+\end_layout
+
+\begin_layout Subsection*
+SMO Algorithm
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "The Proof of SMO"
+target "http://www.cnblogs.com/jerrylead/archive/2011/03/18/1988419.html"
+literal "true"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From our very beginning of the optimzation problem, we have 
+\emph on
+dual feasibility
+\emph default
+ and 
+\emph on
+complementary slackness
+\emph default
+ as well as 
+\emph on
+primal feasibility
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+a_{n} & \geq0\\
+a_{n}\left[t_{n}y(x_{n})-1\right] & =0\\
+t_{n}y(x_{n})-1 & \geq0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note is from Problem 
+\begin_inset Formula $(7)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Either 
+\begin_inset Formula $a_{n}=0$
+\end_inset
+
+ or 
+\begin_inset Formula $t_{n}y(x_{n})-1=0$
+\end_inset
+
+, the former will drive the corresponding data point out of our optimization
+ problem, and the latter makes the point so-called 
+\emph on
+support vectors
+\emph default
+, which are the only points retained after training.
+\end_layout
+
+\begin_layout Standard
+Combine the complementary slackness and , by multiplying 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+ at both sides, we can solve 
+\begin_inset Formula $b$
+\end_inset
+
+, but we would prefer to average over all support vectors and that gives
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+b & =\dfrac{1}{N_{S}}\sum\limits _{n\in\text{SV}}(t_{n}-\sum\limits _{m\in\text{SV}}a_{m}t_{m}k(x_{n},x_{m}))\\
+\text{SV} & =\text{the\ set\ of\ Support\ Vectors}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SVM (Maximum margin classifier) in terms of the minization of an error function
+\begin_inset Formula 
+\[
+\sum_{n=1}^{N}E_{\infty}\left(y\left(x_{n}\right)t_{n}-1\right)+\lambda\left\Vert w\right\Vert ^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $E_{\infty}\left(z\right)$
+\end_inset
+
+ is a function that is zero if 
+\begin_inset Formula $z\geq0$
+\end_inset
+
+ and 
+\begin_inset Formula $\infty$
+\end_inset
+
+ otherwise and ensures that the constraints 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $t_{n}y(x_{n})-1\geq0$
+\end_inset
+
+ are satisfied.
+\end_layout
+
+\begin_layout Subsection
+7.1.1 Overlapping class distributions
+\end_layout
+
+\begin_layout Standard
+The error function form of hard SVM gives infinite error if a data point
+ was misclassified.
+ We modify this approach so that data points are allowed to be on the wrong
+ side of the margin boundary, but with a penalty that increases with the
+ distance from the boundary.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Slack variables 
+\begin_inset Formula $\left\{ \xi_{n}\right\} $
+\end_inset
+
+ 
+\emph default
+for 
+\begin_inset Formula $n=1,\dots,N$
+\end_inset
+
+, defined by
+\begin_inset Formula 
+\begin{align*}
+\xi_{n} & =0\text{ for data points on or inside the correct margin boundary.}\\
+\xi_{n} & =\left|t_{n}-y\left(x_{n}\right)\right|,\text{ for other points}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+thus
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\xi_{n}=0$
+\end_inset
+
+ for points on or inside the correct margin boundary;
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\xi_{n}=1$
+\end_inset
+
+ if the point is on the decision surface; 
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $0<\xi_{n}<1$
+\end_inset
+
+: inside the margin but not misclassified;
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\xi_{n}>1$
+\end_inset
+
+ are misclassified (
+\begin_inset Formula $y\left(x_{n}\right)<0,t_{n}=1$
+\end_inset
+
+ or 
+\begin_inset Formula $y\left(x_{n}\right)>0,t_{n}=-1$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+which gives rise to a 
+\emph on
+soft margin.
+
+\emph default
+ The penalty for misclassification increases linearly with 
+\begin_inset Formula $\xi$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\underset{w,b,\xi_{n}}{\text{arg min }}C\sum_{n=1}^{N}\xi_{n}+\frac{1}{2}\left\Vert w\right\Vert ^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+subject to
+\begin_inset Formula 
+\begin{align*}
+t_{n}y\left(x_{n}\right) & \geq1-\xi_{n}\text{ for }n=1,\dots,N\\
+\xi_{n} & \geq0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $C>0$
+\end_inset
+
+ controls the trade-off between minimizing training errors and controlling
+ model complexity.
+ In the limit 
+\begin_inset Formula $C\rightarrow\infty$
+\end_inset
+
+, this becomes the hard margin.
+\end_layout
+
+\begin_layout Standard
+there exist KKT multipliers 
+\begin_inset Formula $a_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu_{n}$
+\end_inset
+
+ s.t.
+\end_layout
+
+\begin_layout Standard
+1.
+ Primary feasibility
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+1-\xi_{n}^{*}-t_{n}y\left(x_{n}\right) & \leq0\\
+-\xi_{n}^{*} & \leq0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+2.
+ Dual feasibility
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+a_{n} & \geq0\\
+\mu_{n} & \geq0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+3.
+ Complementary slackness
+\begin_inset Formula 
+\begin{align*}
+a_{n}\left(1-\xi_{n}^{*}-t_{n}y\left(x_{n}\right)\right) & =0\\
+\mu_{n}\xi_{n}^{*} & =0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+4.
+ Stationarity
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\text{w.r.t }w & :w^{*}=\sum_{n=1}^{N}a_{n}t_{n}\phi\left(x_{n}\right)\\
+\text{w.r.t }b & \sum_{n=1}^{N}a_{n}t_{n}=0\\
+\text{w.r.t }\xi_{n} & C=a_{n}+\mu_{n}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Use the conditions above to eliminate 
+\begin_inset Formula $w$
+\end_inset
+
+, 
+\begin_inset Formula $b$
+\end_inset
+
+ and 
+\begin_inset Formula $\xi_{n}$
+\end_inset
+
+in the original Lagrangian, yielding
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{L}\left(a\right)=\sum_{n=1}^{N}a_{n}-\frac{1}{2}\sum_{n=1}^{N}\sum_{m=1}^{N}a_{m}a_{n}t_{m}t_{n}k\left(x_{n},x_{m}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+subject to 
+\begin_inset Formula 
+\begin{align*}
+0\leq a_{n} & \leq C\\
+\sum_{n=1}^{N}a_{n}t_{n} & =0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+for 
+\begin_inset Formula $n=1,\dots,N$
+\end_inset
+
+ to be maximized.
+\end_layout
+
+\begin_layout Standard
+Still, our classifier becomes
+\begin_inset Formula 
+\[
+y(x)=\sum\limits _{n=1}^{N}a_{n}t_{n}k(x,x_{n})+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+If 
+\begin_inset Formula $a_{n}=0$
+\end_inset
+
+, this point does not contribute to the predictive model, inside the correct
+ margin.
+\end_layout
+
+\begin_layout Enumerate
+If 
+\begin_inset Formula $a_{n}<C$
+\end_inset
+
+, then 
+\begin_inset Formula $\mu_{n}>0\rightarrow\xi_{n}=0$
+\end_inset
+
+ , this point is on the correct margin.
+\end_layout
+
+\begin_layout Enumerate
+If 
+\begin_inset Formula $a_{n}=C$
+\end_inset
+
+, then either correctly classified if 
+\begin_inset Formula $\xi_{n}\leq1$
+\end_inset
+
+ or misclassified if 
+\begin_inset Formula $\xi_{n}>1$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Again, 
+\begin_inset Formula 
+\[
+b=\frac{1}{N_{M}}\sum_{n\in M}\left(t_{n}-\sum_{m\in S}a_{m}t_{m}k\left(x_{n},x_{m}\right)\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $M=\left\{ \text{data points }i|0<a_{i}<C\right\} $
+\end_inset
+
+ and S is the set of support vectors.
+\end_layout
+
+\begin_layout Standard
+An alternative equivalent formulation of the SVM, known as 
+\begin_inset Formula $\nu$
+\end_inset
+
+-SVM, has been proposed.
+ This approach has the advantage that the parameter 
+\begin_inset Formula $\nu$
+\end_inset
+
+, can be interpreted as both an upper bound on the fraction of 
+\emph on
+margin errors, 
+\emph default
+and a lower bound on the fraction of support vectors.
+\end_layout
+
+\begin_layout Standard
+On optimize the quadratic programming problem ,there are 
+\emph on
+chunking, decomposition methods,
+\emph default
+ and the most popular approach, 
+\emph on
+sequential minimal optimization 
+\emph default
+(
+\emph on
+SMO).
+\end_layout
+
+\begin_layout Subsection
+7.1.2 Relation to logistic regression
+\end_layout
+
+\begin_layout Subsection
+7.1.4 SVMs for Regression 
+\end_layout
+
+\begin_layout Standard
+A regularized error function 
+\begin_inset Formula 
+\[
+\frac{1}{2}\sum_{n=1}^{N}\left\{ y_{n}-t_{n}\right\} ^{2}+\frac{\lambda}{2}\left\Vert w\right\Vert ^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+is replaced by an 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+-
+\emph on
+insensitive error function 
+\emph default
+to obtain sparse solutions, yielding
+\begin_inset Formula 
+\[
+C\sum_{n=1}^{N}E_{\epsilon}\left(y\left(x_{n}\right)-t_{n}\right)+\frac{1}{2}\left\Vert w\right\Vert ^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where, for example
+\begin_inset Formula 
+\[
+E_{\epsilon}\left(y\left(x_{n}\right)-t_{n}\right)=\begin{cases}
+0, & \text{if }\left|y\left(x\right)-t\right|<\epsilon\\
+\left|y\left(x\right)-t\right|-\epsilon & \text{otherwise}
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Two slack variables are introduced for each data point
+\begin_inset Formula 
+\[
+\xi_{n}\geq0\quad\hat{\xi}_{n}\geq0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and 
+\begin_inset Formula 
+\begin{align*}
+\xi_{n} & >0\thinspace\text{for \ensuremath{t_{n}-y\left(x_{n}\right)>\epsilon}}\\
+\hat{\xi_{n}} & >0\thinspace\text{for \ensuremath{t_{n}-y\left(x_{n}\right)<-\epsilon}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+then the corresponding conditions are 
+\begin_inset Formula 
+\begin{align*}
+t_{n} & \leq y\left(x_{n}\right)+\epsilon+\xi_{n}\\
+t_{n} & \geq y\left(x_{n}\right)-\epsilon-\hat{\xi}_{n}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The error function for support vector regression can be written as 
+\begin_inset Formula 
+\[
+C\sum_{n=1}^{N}\left(\xi_{n}+\hat{\xi}_{n}\right)+\frac{1}{2}\left\Vert w\right\Vert ^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+the Lagrangian function is 
+\begin_inset Formula 
+\[
+L=C\sum_{n=1}^{N}\left(\xi_{n}+\hat{\xi}_{n}\right)+\frac{1}{2}\left\Vert w\right\Vert ^{2}-\sum_{n=1}^{N}\left(\mu_{n}\xi_{n}+\hat{\mu}_{n}\hat{\xi}_{n}\right)-\sum_{n=1}^{N}a_{n}\left(\epsilon+\xi_{n}+y_{n}-t_{n}\right)-\sum_{n=1}^{n}\hat{a}_{n}\left(\epsilon+\hat{\xi}_{n}-y_{n}+t_{n}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Stationarity
+\begin_inset Formula 
+\begin{align*}
+\text{w.r.t }w & \rightarrow w=\sum_{n=1}^{N}\left(a_{n}-\hat{a}_{n}\right)\phi\left(x_{n}\right)\\
+\text{w.r.t }b & \rightarrow\sum_{n=1}^{N}\left(a_{n}-\hat{a}_{n}\right)=0\\
+\text{w.r.t }\xi_{n} & \rightarrow a_{n}+\mu_{n}=C\\
+\text{w.r.t }\hat{\xi}_{n} & \rightarrow\hat{a}_{n}+\hat{\mu}_{n}=C
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Substitute them back into the Lagrangian function
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{L}\left(a,\hat{a}\right)=-\frac{1}{2}\sum_{n=1}^{N}\sum_{m=1}^{N}\left(a_{n}-\hat{a}_{n}\right)\left(a_{m}-\hat{a}_{m}\right)k\left(\text{x}_{n},\mathrm{x}_{m}\right)-\epsilon\sum_{n=1}^{N}\left(a_{n}+\hat{a}_{n}\right)+\sum_{n=1}^{N}\left(a_{n}-\hat{a}_{n}\right)t_{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and now 
+\begin_inset Formula 
+\begin{align*}
+0 & \leq a_{n}\leq C\\
+0 & \leq\hat{a}_{n}\leq C
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and the linear model now becomes
+\begin_inset Formula 
+\[
+y\left(x\right)=\sum_{n=1}^{N}\left(a_{n}-\hat{a}_{n}\right)k\left(x,x_{n}\right)+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Complementary slackness
+\begin_inset Formula 
+\begin{align*}
+a_{n}\left(\epsilon+\xi_{n}+y_{n}-t_{n}\right) & =0\\
+\hat{a}_{n}\left(\epsilon+\hat{\xi}_{n}-y_{n}+t_{n}\right) & =0\\
+\left(C-a_{n}\right)\xi_{n} & =0\\
+\left(C-\hat{a}_{n}\right)\hat{\xi}_{n} & =0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+implies that 
+\begin_inset Formula $a_{n}$
+\end_inset
+
+ can only be nonzero if the data point lies on or above the upper boundary
+ of the 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+-tube, similar for 
+\begin_inset Formula $\hat{a}_{n}$
+\end_inset
+
+.
+ The support vectors are those data points that lie on or outside the 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+-tube.
+\end_layout
+
+\begin_layout Chapter
+9.
+ Mixture Models and EM
+\end_layout
+
+\begin_layout Standard
+The introduction of latent variables allows complicated distribution to
+ be formed from simpler components.
+\end_layout
+
+\begin_layout Standard
+Gaussian mixture models are widely used in data mining, pattern recognition,
+ machine learning and statistical analysis.
+ Their paramerters are usually determined by MAL, typically using the EM
+ algorithm.
+\end_layout
+
+\begin_layout Section
+9.1 K-means Clustering
+\end_layout
+
+\begin_layout Standard
+Given a data set 
+\begin_inset Formula $\left\{ x_{1},\dots,x_{N}\right\} $
+\end_inset
+
+ of 
+\begin_inset Formula $N$
+\end_inset
+
+ observations of a random 
+\begin_inset Formula $D$
+\end_inset
+
+-dimensional Euclidean variable 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ We introduce a binary indicator variables 
+\begin_inset Formula $r_{nk}\in\left\{ 0,1\right\} ,$
+\end_inset
+
+for 
+\begin_inset Formula $k=1,\dots,K.$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+r_{nk}=\begin{cases}
+1 & x_{n}\in C_{k}\\
+0 & x_{n}\notin C_{k}
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+i.e.
+ the 1-of-K coding scheme.
+ 
+\end_layout
+
+\begin_layout Standard
+Define an objective function called 
+\emph on
+distortion measure
+\emph default
+
+\begin_inset Formula 
+\[
+J=\sum_{n=1}^{N}\sum_{k=1}^{K}r_{nk}\left\Vert x_{n}-\mu_{k}\right\Vert ^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+ represents the center of cluster 
+\begin_inset Formula $K$
+\end_inset
+
+ (not necessarily the mean).
+\end_layout
+
+\begin_layout Standard
+Our goal is to find values for the 
+\begin_inset Formula $\left\{ r_{nk}\right\} $
+\end_inset
+
+ and the 
+\begin_inset Formula $\left\{ \mu_{k}\right\} $
+\end_inset
+
+ so as to minimize 
+\begin_inset Formula $J$
+\end_inset
+
+.
+ This is done by the EM algorithm.
+\end_layout
+
+\begin_layout Standard
+First initialize 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+, minimize 
+\begin_inset Formula $J$
+\end_inset
+
+ w.r.t.
+ 
+\begin_inset Formula $r_{nk}$
+\end_inset
+
+, keeping 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+ fixed (Expectation), then minimize 
+\begin_inset Formula $J$
+\end_inset
+
+ w.r.t.
+ 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+, keeping 
+\begin_inset Formula $r_{nk}$
+\end_inset
+
+ fixed (maximization), until convergence.
+\end_layout
+
+\begin_layout Paragraph
+Expectation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $J$
+\end_inset
+
+ is a linear function of 
+\begin_inset Formula $r_{nk}$
+\end_inset
+
+, giving a closed form solution.
+ The terms involving different 
+\begin_inset Formula $n$
+\end_inset
+
+ are independent and we can optimize for each 
+\begin_inset Formula $n$
+\end_inset
+
+ separately, which is obviously done by choosing
+\begin_inset Formula 
+\begin{align*}
+r_{nk} & =\begin{cases}
+1 & \text{if \ensuremath{k}=\text{arg min}_{j}\left\Vert x_{n}-\mu_{j}\right\Vert ^{2}}\\
+0 & \text{otherwise}
+\end{cases}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Maximization
+\end_layout
+
+\begin_layout Standard
+The objective 
+\begin_inset Formula $J$
+\end_inset
+
+ is a quadratic function of 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+, which can be minimized by setting its derivative w.r.t.
+ 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+ to zero 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{k}=\frac{\sum_{n}r_{nk}x_{n}}{\sum_{n}r_{nk}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Because each phase reduces the value of 
+\begin_inset Formula $J$
+\end_inset
+
+, convergence of the algorithm is assured.
+ It is also worth noting that the K-means algorithm itself is often used
+ to initialize the parameters in a Gaussian mixture model before applying
+ the EM algorithm.
+ A direct implementation of the K-means algorithm as discussed here can
+ be relatively slow, because in each E step it is necessary to compute the
+ Euclidean dis- tance between every prototype vector and every data point.
+ Various schemes have been proposed for speeding up the K-means algorithm.
+\end_layout
+
+\begin_layout Paragraph
+Online stochastic algorithm
+\end_layout
+
+\begin_layout Standard
+Apply the Robbins-Monro procedure
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{k}^{\text{new }}=\mu_{k}^{\text{old }}+\eta_{n}\left(x_{n}-\mu_{k}^{\text{old }}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+A generalization of the similarity measure
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{J}=\sum_{n=1}^{N}\sum_{k=1}^{K}r_{nk}\mathcal{V}\left(x_{n},\mu_{k}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which gives rise to 
+\emph on
+K-medoids 
+\emph default
+algorithm.
+\end_layout
+
+\begin_layout Standard
+One notable feature of the K-means algorithm is that at each iteration,
+ every data point is assigned uniquely to one, and only one, of the clusters.
+ Whereas some data points will be much closer to a particular centre 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+ than to any other centre, there may be other data points that lie roughly
+ midway between cluster centres.
+\end_layout
+
+\begin_layout Section
+9.2 Mixtures of Gaussians
+\end_layout
+
+\begin_layout Standard
+A linear superposition of Gaussians
+\begin_inset Formula 
+\[
+p\left(x\right)=\sum_{k=1}^{N}\pi_{k}N\left(x|\mu_{k},\Sigma_{k}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Define a 
+\begin_inset Formula $K$
+\end_inset
+
+-dimensional binary random variable 
+\begin_inset Formula $\text{z}$
+\end_inset
+
+ haing a 1-of-
+\begin_inset Formula $K$
+\end_inset
+
+ representation satisfying 
+\begin_inset Formula $z_{k}\in\left\{ 0,1\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\sum_{k}z_{k}=1$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p\left(z_{k}=1\right)=\pi_{k}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $0\leq\pi_{k}\leq1$
+\end_inset
+
+ and 
+\begin_inset Formula $\sum_{k=1}^{K}\pi_{k}=1$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p\left(z\right)=\prod_{k=1}^{K}\pi_{k}^{z_{k}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $p\left(x|z_{k}=1\right)=N\left(x|_{k},\Sigma_{k}\right)$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+p\left(\mathrm{x}|\mathrm{z}\right)=\prod_{k=1}^{K}N\left(\mathrm{x}|\mu_{k},\Sigma_{k}\right)^{z_{k}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+thus
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p\left(x\right)=\sum_{z}p\left(z\right)p\left(x|z\right)=\sum_{k=1}^{K}\pi_{k}N\left(x|\mu_{k},\Sigma_{k}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It follows that every observed data point 
+\begin_inset Formula $\mathrm{x_{n}}$
+\end_inset
+
+ has a corresponding latent variable 
+\begin_inset Formula $\mathrm{z_{n}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\gamma\left(z_{k}\right)\equiv p\left(z_{k}=1|x\right) & =\frac{p\left(z_{k}=1\right)p\left(\mathrm{x}|z_{k}=1\right)}{\sum_{j=1}^{K}p\left(z_{j}=1\right)p\left(\mathrm{x}|z_{j}=1\right)}\\
+ & =\frac{\pi_{k}N\left(x|\mu_{k},\Sigma_{k}\right)}{\sum_{j=1}^{K}\pi_{j}N\left(x|\mu_{j},\Sigma_{j}\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+viewed as the 
+\emph on
+responsibility 
+\emph default
+that component 
+\begin_inset Formula $k$
+\end_inset
+
+ takes for explaining the observation 
+\begin_inset Formula $\mathrm{x}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+9.2.1 Maximum likelihood
+\end_layout
+
+\begin_layout Standard
+Data matrx 
+\begin_inset Formula $\mathrm{X}^{N\times D}$
+\end_inset
+
+ and latent variable matrix 
+\begin_inset Formula $\mathrm{Z}^{N\times D}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If we assume that the data points are drawn independently from the distribution,
+ then we can express the Gaussian mixture model for this i.i.d.
+ data set, the log-likelihood function is given by
+\begin_inset Formula 
+\[
+\ln p\left(\mathrm{X}|\pi,\mu,\Sigma\right)=\sum_{n=1}^{N}\ln\left\{ \sum_{k=1}^{K}\pi_{k}N\left(x_{n}|\mu_{k},\Sigma_{k}\right)\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+9.2.2 EM for Gaussian mixtures
+\end_layout
+
+\begin_layout Standard
+An elegant and powerful method for finding maximum likelihood solutions
+ for models with latent variables is called the 
+\emph on
+expectation-maximization 
+\emph default
+algorithm.
+ Setting the derivatives of the likelihood function above w.r.t.
+ 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+ to zero, we obtain
+\begin_inset Formula 
+\[
+0=-\sum_{n=1}^{N}\underbrace{\frac{\pi_{k}N\left(x|\mu_{k},\Sigma_{k}\right)}{\sum_{j=1}^{K}\pi_{j}N\left(x|\mu_{j},\Sigma_{j}\right)}}_{\gamma\left(z_{nk}\right)}\Sigma_{k}\left(x_{n}-\mu_{k}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Rearrange 
+\begin_inset Formula 
+\[
+\mu_{k}=\frac{1}{N_{k}}\sum_{n=1}^{N}\gamma\left(z_{nk}\right)\mathrm{x}_{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where
+\begin_inset Formula 
+\[
+N_{k}=\sum_{n=1}^{N}\gamma\left(z_{nk}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+w.r.t.
+\begin_inset Formula 
+\[
+\Sigma_{k}=\frac{1}{N_{k}}\sum_{n=1}^{N}\gamma\left(z_{nk}\right)\left(x_{n}-\mu_{k}\right)\left(x_{n}-\mu_{k}\right)^{T}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finally, we maximize the likelihood function subject to 
+\begin_inset Formula $\sum_{k=1}^{K}\pi_{k}=1$
+\end_inset
+
+ w.r.t.
+ 
+\begin_inset Formula $\pi_{k}$
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+\ln p\left(\mathrm{X}|\pi,\mu,\Sigma\right)+\lambda\left(\sum_{k=1}^{K}\pi_{k}-1\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+giving 
+\begin_inset Formula $\lambda=-N$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\pi_{k}=\frac{N_{k}}{N}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+These results are not closed-form, but the EM algorithm do find a solution
+ to the MAL problem.
+ In the E step, we use these parameters to compute the posterior probabilities
+ or responsibilities.
+ In the M step, re-estimate the means, covariance and mixing coefficients
+ using the above results.
+\end_layout
+
+\begin_layout Standard
+Note that the EM algorithm takes many more iterations to reach (approximate)
+ convergence compared with the K-means algorithm, and that each cycle requires
+ significantly more computation.
+ It is therefore common to run the K-means algo- rithm in order to find
+ a suitable initialization for a Gaussian mixture model that is subsequently
+ adapted using EM.
+\end_layout
+
+\begin_layout Chapter
+14.
+ Combining Models
+\end_layout
+
+\begin_layout Standard
+It is often found that improved performance can be obtained by combining
+ multiple models together in some way, instead of just using a single model
+ in isolation.
+ Training 
+\begin_inset Formula $L$
+\end_inset
+
+ different models and then making predictions using the average of the predictio
+ns made by each model is an example.
+ Such combinations of models are called 
+\emph on
+committees
+\emph default
+.
+ One important variant of the committee method is 
+\emph on
+boosting, 
+\emph default
+involving training multiple models in sequence in which the error function
+ used to train a particular model depends on the performance of the previous
+ models.
+ An alternative form of model combination is to select one of the models
+ to make the prediction, and different models become responsible for making
+ predictions in different regions of input space.
+ One widely used framework of this kind is known as 
+\emph on
+decision tree
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
+14.4 Tree-based Models
+\end_layout
+
+\begin_layout Standard
+There are various simple, but widely used, models that work by partitioning
+ the input space into cuboid regions, whose edges are aligned with the axes,
+ and then assigning a simple model to each region.
+ They can be viewed as a model combination method in which only one model
+ is responsible for making predictions at any given point in input space.
+ The process of selecting a specific model, given a new input x, can be
+ described by a sequential decision making process corresponding to the
+ traversal of a binary tree.
+\end_layout
+
+\begin_layout Standard
+Here a particular tree-based framework 
+\emph on
+classification and regression trees
+\emph default
+ or 
+\emph on
+CART 
+\emph default
+is discussed.
+ In order to learn such a model from a training set, the structure of the
+ tree must be determined, including which input variable is chosen at each
+ node to form the split criterion as well as the value of the threshold
+ parameter 
+\begin_inset Formula $\theta_{i}$
+\end_inset
+
+ for the split and, of course, the predictive variable within each region.
+\end_layout
+
+\end_body
+\end_document

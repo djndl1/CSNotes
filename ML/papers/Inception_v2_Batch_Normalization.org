@@ -1,0 +1,97 @@
+Ioffe, S., & Szegedy, C. (2015). Batch normalization: Accelerating deep network training by reducing internal covariate shift. 32nd International Conference on Machine Learning, ICML 2015, 1, 448–456. https://arxiv.org/abs/1502.03167
+
+* internal covariate shift
+
+- /Internal Covariate Shift/: the change in the distribution of network activations due to the change in network parameters during training.
+
+The distribution of the input of a minibatch is supposed to represent that of the whole training set. It is advantageous of the distribution of the input to
+remain fixed over time.
+
+However, change in the distributions of layers' input during training causes the layers to continuously adapt to the new distribution. 
+As parameters change during training, the output of a layer continues to change distribution-wise. This could cause vanishing gradient.
+The saturation problem can be addressed by ReLU, careful initialization and small learning rates. If the distribution of nonlinearity inputs
+remains more stable during training, then the optimizer would be less likely to get stuck in the saturated regime.
+
+* Whitening Normalization
+
+It has been long known that the network training converges faster 
+if its inputs are whitened – i.e., linearly transformed to have zero means and unit variances, and decorrelated.
+
+The gradient descent optimization does not take into account the fact that the normalization takes place. The change of parameters might not be 
+reflected in the traditional normalization.
+
+Whitening the layer input is expensive, as it requires computing the covariance matrix and its inverse square root.
+
+* Batch Normalization
+
+Each scalar feature is normalized independently.
+To make sure that the transformation inserted in the network can represent the identity transform,
+two parameters $\gamma$ and $\beta$ are introduced.
+
+- Input: values of $x$ over a minibatch $B$, parameters to be learned: $\gamma$, $\beta$
+
+- Output: 
+
+$$ { y_{i}= \text{BN}_{\gamma , \beta} (x_{i})} $$
+   here $x$ is a scalar,
+
+\begin{aligned}
+
+\mu_{B} & \leftarrow\frac{1}{m}\sum_{i=1}^{m}x_{i} \\
+\sigma_{B}^{2} & \leftarrow\frac{1}{m}\sum_{i=1}^{m}\left(x_{i}-\mu_{B}\right)^{2} \\
+
+\hat{x}_{i} & \leftarrow\frac{x_{i}-\mu_{B}}{\sqrt{\sigma_{B}^{2}+\epsilon}}\\
+
+y_{i} & \leftarrow\gamma\hat{x}_{i}+\beta
+
+\end{aligned}
+
+For convolutional layers, the batch set $B$ consists of $m$ feature maps of size $p\times q$,
+Each feature map has its own parameters. This way different elements of the same feature map
+are normalized in the same way.
+
+https://stackoverflow.com/questions/38553927/batch-normalization-in-convolutional-neural-network
+
+BN transform is a differentiable transformations. It is neither necessary nor desirable during inference. 
+During training, replace the BN transform with 
+
+$$
+y=\frac{\gamma}{\sqrt{\text{var}\left[x\right]+\epsilon}}x+\left(\beta-\frac{\gamma E\left[x\right]}{\text{var}\left[x\right]+\epsilon}\right)
+$$
+
+where $E[x] = E_{B}[\mu_{B}]$ and $\text{var}[x]=\frac{m}{m-1} E_{B}[\sigma^2_{B}]$. This equation is the normalization for the whole population.
+
+1. Batch Normalization regularizes the model since a training example is seen in conjunction with other examples. Dropout may be discarded.
+
+2. Batch Normalization enables higher learning rates. 
+  It prevents small changes to the parameters from amplifying into larger and suboptimal changes in activations in gradients.
+  BN makes training more resilient to the parameter scale.
+
+
+\begin{equation*}
+
+\text{BN}\left(Wu\right)  = \text{BN}\left(\left(aW\right)u\right) 
+
+\dfrac{\partial\text{BN}\left(\left(aW\right)u\right)}{\partial u}  = \dfrac{\partial\text{BN}\left(\left(W\right)u\right)}{\partial u} 
+
+\dfrac{\partial\text{BN}\left(\left(aW\right)u\right)}{\partial\left(aW\Right)} = \dfrac{1}{a}\frac{\partial\text{BN}\left(\left(W\right)u\right)}{\partial W}
+
+\end{equation*}
+
+
+* Experiments
+
+- BN layer
+
+- $5 \times 5$ conv layer s are replaced by two consecutive layers of $3\times 3$ convolutions with up to 128 filters.
+
+- minibatch size $32$
+
+To accelerating BN networks, learning rates are increased and decayed exponentially, dropout is removed, L2 weight decay is reduced by a factor of 5
+
+1. By only using Batch Normalization (BN-Baseline), the accuracy of Inception is matched in less than half the number of training steps.
+
+2. distributions in the batch-normalized network are much more stable as training pro- gresses, which aids the training.
+
+3. the reduction in internal covariate shift allows deep networks with Batch Normalization 
+   to be trained when sigmoid is used as the nonlinearity, despite the well-known difficulty of training such networks.
