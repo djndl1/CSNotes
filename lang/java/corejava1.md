@@ -376,7 +376,7 @@ It is possible to extend interfaces to allow for multiple chains of interfaces t
 
 ```java
 public interface Moveable {
-    void move(doube x, double y);
+    void move(double x, double y);
 }
 
 public interface Powered extends Moveable {
