@@ -1,8 +1,0 @@
-
-
-(dap-register-debug-template "GDB::Run"
-  (list :type "gdb"
-        :request "launch"
-        :name "GDB::Run"
-        :target "./a.out"
-        :cwd "/home/djn-pc/Downloads/Documents/CSNotes/CP/code/intro/"))
