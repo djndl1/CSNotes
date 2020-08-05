@@ -4,7 +4,7 @@
 
 With .NET Core, all assemblies have a `.dll` extension even if they are Console programs.
 
-In C#, it is frequently followed that the filename follows the name of the class, but this is not required. It is possible to have two classes in one file and have a single class span multiple files (_parital class_).
+In C#, it is frequently followed that the filename follows the name of the class, but this is not required. It is possible to have two classes in one file and have a single class span multiple files (_partial class_).
 
 ## Syntax Fundamentals
 
