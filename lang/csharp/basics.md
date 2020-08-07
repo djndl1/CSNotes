@@ -173,7 +173,8 @@ CIL code includes metadata about the types and files included in a program.
 
 - the manifest information containing data about the program itself.
 
-It represents a core component of the CLI implementation. It provides the representation and the behavior information about a type and includes location information about which assembly contains a particular type definition. It serves a key role in saving data from the compiler and making it accessible at execution time to debuggers and the runtime.
+It represents a core componen
+t of the CLI implementation. It provides the representation and the behavior information about a type and includes location information about which assembly contains a particular type definition. It serves a key role in saving data from the compiler and making it accessible at execution time to debuggers and the runtime.
 
 All header information about a library and its dependencies is found in a portion of the metadata known as the _manifest_. Metadata is available at execution time by a mechanism known as _reflection_. 
 
@@ -249,7 +250,7 @@ System.Console.WriteLine($"0x{42:X}");
 
 ## String Type
 
-- `string`: `@` verbatim string (raw string except for `"`), `$` string interpolation (both can be combined together). String interpolation is a shorthand for invoking the `string.Format()` method. Strings are immutable.
+- `string`: `@` verbatim string (raw string except for `"`), `$` string interpolation (both can be combined together). The both can be combined. String interpolation is a shorthand for invoking the `string.Format()` method. Strings are immutable.
 
 ```csharp
 System.Console.WriteLine(@"\nThis is not escaped!");
