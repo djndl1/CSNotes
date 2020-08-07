@@ -99,3 +99,51 @@ WHERE
 GROUP BY
    ROLLUP(salesman_id, customer_id);
 ```
+
+- `UNION`/`UNION ALL`: the latter retains duplicates.
+
+- `ANY (subquery)`/`SOME`: evalutes to false if the subquery returns no rows
+
+- cascade delete is done when the foreign key of the table is constrained by delete cascade.
+
+- `TRUNCATE TABLE` is used to delete all rows in a large table.
+
+- To check whether a column exists in a table, query teh data from `user_tab_cols` view.
+
+```sql
+SELECT
+    COUNT(*)
+FROM
+    user_tab_cols
+WHERE
+    column_name = 'FIRST_NAME'
+    AND table_name = 'MEMBERS';
+```
+
+- For virtual columns, only metadata is stored. The values are always in sync with the source columns. However, their values are calculated t runtime. Virtual columns are supported only inlational heap tables. To query the names of virtual columns in a table.
+
+```sql
+SELECT 
+    column_name, 
+    virtual_column,
+    data_default
+FROM 
+    all_tab_cols
+WHERE owner = 'OT' 
+AND table_name = 'PARTS';
+```
+
+- Query unused columns from `DBA_UNUSED_COL_TABS`.
+
+- check non null by querying `user_constraints`. Before adding `Not Null` constraint, make sure that the existing data violates the constraint.
+
+```sql
+UPDATE
+    surcharges
+SET
+    amount = 0
+WHERE
+    amount IS NULL;
+```
+
+- Pay attention to date format `nls_date_format`, `nls_date_language`,
