@@ -4,3 +4,4 @@ a.out
 *.ccls-cache
 *.o
 *.html
+*.exe
