@@ -319,6 +319,7 @@ if (double.TryParse(input, out double number))
         $"input was parsed successfully to {number}."); }
 else
 {
+
     // Note: number scope is here too (although not assigned)
     System.Console.WriteLine(
         "The text entered was not a valid number.");
@@ -379,7 +380,7 @@ var countryInfo = (country, capital, gdpPerCapita);
 
 `System.ValueType` is the underlying implementation for the tuple syntax. The custom names are known by the compiler through the scope where these names are declared. The compiler looks at the item names within the tuple declaration and leverages those to allow code that uses those names within the scope. For all types that are part of the API (such as the return type), the compiler adds item names to the metadata of the member in the form of attributes.
 
-Tuples have more than seven parameter takes a subtuple for the rest of the parameters. `System.valueTTuple.Create()` was used before C# 7.0 tuple syntax.
+Tuples have more than seven parameter takes a subtuple for the rest of the parameters. `System.valueTuple.Create()` was used before C# 7.0 tuple syntax.
 
 ### Arrays
 
@@ -396,7 +397,7 @@ int[,] cellsTwo = int[3,3];
 
 ```
 
-- `deefault`: explicit default of any data type
+- `default`: explicit default of any data type
 
 ```csharp
 int count = default(int)
