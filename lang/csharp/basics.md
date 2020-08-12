@@ -397,7 +397,8 @@ int[,] cellsTwo = int[3,3];
 
 ```
 
-- `default`: explicit default of any data type
+- `d
+efault`: explicit default of any data type
 
 ```csharp
 int count = default(int)
@@ -651,6 +652,7 @@ class ConvertToPhoneNumber
 }
 ```
 
+- (C# 7.2) `in` keyword, readonly ref parameter and it must be initialized.
 
 - (C#7.0) Support for returning a reference to a variable.
 
@@ -677,7 +679,7 @@ Only the following can be returned from a reference-returning function:
 
 - references to fields or array elements;
 
- `ref` locals are initialized to refer to a particular variable, and can’t be modified to refer to a different variable. When declaring a reference local variable, initialization is required.
+ `ref` locals are initialized to refer to a particular variable, and can’t be modified to refer to a different variable. When declaring a reference local variable, initialization is required. `ref` locals are typicall used to refer to values returned by `return ref`.
  
  ```csharp
  ref int rbyref(ref int c)
