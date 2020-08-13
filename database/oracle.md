@@ -147,3 +147,39 @@ WHERE
 ```
 
 - Pay attention to date format `nls_date_format`, `nls_date_language`,
+
+# OracleDB administration
+
+## Architecture
+
+_database instance_: the combination of memory and processes that are a part of running installation.
+
+_database_: a set of files that store data. An instance can mount only one database at a single point time. Multiple can access the same database (like in a clustering environment)
+
+### Physical storage structures
+
+1. data files
+
+2. control files: metadata that describes the physical structure of the database including the database name and the locations.
+
+3. online redo log files: two or more. Made up of redo entries that record all changes made to the data.
+
+### Logical Storage Structures
+
+1. data/logical blocks: a number of bytes on the disk.
+
+2. extents: a specific number of logically contiguous data blocks.
+
+3. segments: a set of extents allocated for storing database objects.
+
+4. tablespaces: logical container for a segment. Each tablespace consists of one or more datafiles.
+
+### Database Instance
+
+1. Systme Global Area: a shared memory structure allocated when running, containing data and control information
+
+2. Program Global Area: private memory area for each session.
+
+### Background processes
+
+PMON, SMON, BSWn, CKPT, LGWR, ARCn, MMON, MMAN, LREG.
