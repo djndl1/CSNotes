@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 
 ## _namespaces_
 
+
 NT namespaces and Win32 namespaces. The NT namespace was designed to be the lowest level namespace on which other subsystem and namespaces could exist.
 
 The `\\.\` prefix is used to access the Win32 Device Namespaces.
@@ -37,6 +38,22 @@ Under the NT namespace, `Global??` is the Win32 namespace.
 
 # Opening, Reading, Writing and Closing
 
-[CreateFile]((https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew)
+[CreateFile](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew)
 
+[CloseHandle](https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle): close nearly all handle objects.
 
+[ReadFile](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile): 
+
+[WriteFile](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile):
+
+## Generic Characters for handling Unicode
+
+```c
+TCHAR
+LPTSTR
+LPCTSTR
+```
+
+Define `UNICODE` and `_UNICODE_` before `<windows.h>`to get unicode support.
+
+Use the collection of generic C library string and character I/O functions in `<tchar.h>`.
