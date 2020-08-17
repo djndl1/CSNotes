@@ -77,8 +77,66 @@ Various multimedia resource and strings. String resources are embedded in `Resou
 
 `Size` (`struct Size` and `Location` properties (in `struct Point`).  `PointF` is for drawing.
 
-`StartPosition`, 
+`Size` represents the size of the entire window.`ClientSize` is the area for which the form is responsible. `.SetClientSizeCore()`
+
+`.DesktopBounds` rectangle relative to the desktop for top-level windows. `.Bounds`: a rectangle of the form relative to the screen. `ClientRectangle`: a rectangle describing the client area of the form.
+
+To translate these different points and rectangles, use `PointtoScreen`, `PointToClient`, `RectangleToScreen`, `RectangleToPoint`.
+
+- `.StartPosition`: initial location of a form
+
+`.MinimumSize`, `.MaximumSize` properties for a form. `WindowState` for maximizing, minimizing or normalizing the window.
 
 Resize, SizeChanged, ResizeBegin, ResizeEnd events;
 
 Normal windows are drawn lowest z-order to highest.
+
+
+## Form Adornments
+
+About titlebars, minimizebox, maximizebox, icon, helpbbutton.
+
+## Form Transparency
+
+mostly a parlor trick.
+
+
+## Menus
+
+- `MenuStrip`
+
+- `ContextMenuStrip`: like the one that pops out when you click a text box.
+
+## Toolbar
+
+- `ToolStrip`
+
+## Statusbar
+
+`Statustrip`: items include `ToolStripStatusLabel`, `ToolStripProgressBar`, `ToolStripStatusLabel`, `ToolStripSplitButton`
+
+## Multiple Document Interface (MDI)
+
+MDI App contains a set of related window in a single frame. An MDI item has a parent `.IsMdiContainer` and a child `.MdiParent`.
+
+## Visual Inheritance
+
+for reuse
+
+# Dialogs
+
+A form that pops up in response to a user request for service. Modeless dialogs don't stop users from interacting with the rest of the app. Most XxxDialog components in WinForms support only modal activation using `ShowDialog`.
+
+Some common dialogs:
+
+- `ColorDialog`: pick a color exposed by the color property of type Systme.Drawing.Color.
+
+- `FolderBrowserDialog`: pick a folder
+
+- `FontDialog`
+
+- `OpenFileDialog`
+
+- `SaveFileDialog`
+
+- `PageSetupDialog`, `PrintDialog`, `PrintPreviewDialog`.
