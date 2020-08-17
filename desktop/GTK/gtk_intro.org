@@ -1,0 +1,62 @@
+* Hello World
+
+#+include: "gtk_c/helloworld.c" src C
+
+=gtk_init()= to initialize GTK, before any other GTK+ function, not needed when using `GtkApplication`. Use `gtk_init_check()` if a textual interface is available.
+
+Control of the application is managed by signals, timeout functions and various other callback functions once `gtk_main()` is called.
+
+** Hierarchy
+
+#+BEGIN_SRC 
++--------------+
+|   GObject    |
++------|-------+
+       |
+       v
++------|----------+
+|GInitiallyUnowned|
++------|----------+
+       |
+       v
++------|-------+
+|  GtkObject   |
++------|-------+
+       |
+       v
++------|-------+
+|  GtkWidget   |
++------|-------+
+       |
+       v
++------|-------+
+| GtkContainer |
++------|-------+
+       |
+       v
++------|-------+
+|   GtkBin     |
++--------------+
+      +
+      |
+      v
++-----|-----+
+| GtkWindow |
++-----------+  
+#+END_SRC
+
+- `GObject`: allow objects derived from it to be constructed, destroyed, referenced and unreferenced. It also provides the signal system and object property functions. cast macro `G_OBJECT()`.
+
+- `GInitiallyUnowned`: floating reference
+
+- `GtkObject`: cast macro `GTK_OBJECT()`
+
+- `GtkWidget`: abstract base class for all GTK widgets. The standard practice is to store all widgets in `GtkWidget`. `GTK_WIDGET`.
+
+- `GtkContainer`: abstract class used to contain one or more widgets. `GTK_CONTAINER`
+
+- `GtkBin`: abstract class that contains only one child. `GTK_BIN`.
+
+- `GtkWindow`: standard window object.
+
+
