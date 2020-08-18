@@ -57,3 +57,29 @@ LPCTSTR
 Define `UNICODE` and `_UNICODE_` before `<windows.h>`to get unicode support.
 
 Use the collection of generic C library string and character I/O functions in `<tchar.h>`.
+
+`GetLastError` (set by `SetLastError`) rather than `errno` ensures that system errors are unique to the threads. `FormatMessage` turns the message number into a meaning message.
+
+A Windows process has three standard devices:
+
+```c
+HANDLE WINAPI GetStdHandle(
+  _In_ DWORD nStdHandle
+);
+
+// for redirection
+BOOL WINAPI SetStdHandle(
+  _In_ DWORD  nStdHandle,
+  _In_ HANDLE hHandle
+);
+```
+
+There are two reserved pathnames `CONIN$` and `CONOUT$` for console input and output. Use `CreateFile` on them.
+
+# File Management
+
+```c
+BOOL DeleteFile(
+  LPCSTR lpFileName
+);
+```
