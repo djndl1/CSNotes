@@ -1,0 +1,5 @@
+-I/usr/include/wine/wine/windows/
+-I/usr/include/wine/wine/msvcrt/
+-DUNICODE
+-D_UNICODE
+-fshort-wchar
