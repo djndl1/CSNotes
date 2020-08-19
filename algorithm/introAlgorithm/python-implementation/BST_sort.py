@@ -133,18 +133,15 @@ class TreeNode:
             y.left.parent = y
 
     def subtree_inorder_traversal_recursive(self):
-        if self:
-            if self.left:
-                lt = self.left.subtree_inorder_traversal_recursive()
-            else:
-                lt = []
-            lt.append(self.key)
-            if self.right:
-                rt = self.right.subtree_inorder_traversal_recursive()
-            else:
-                rt = []
+        if self.left:
+            lt = self.left.subtree_inorder_traversal_recursive()
+        else:
+            lt = []
+        lt.append(self.key)
+        if self.right:
+            rt = self.right.subtree_inorder_traversal_recursive()
             lt.extend(rt)
-            return lt
+        return lt
 
     def subtree_inorder_traversal_iterative(self):
         stack = []
@@ -165,16 +162,15 @@ class TreeNode:
         return keys
 
     def subtree_preorder_traversal_recursive(self):
-        if self:
-            keys = []
-            keys.append(self.key)
-            if self.left:
-                lt = self.left.subtree_preorder_traversal_recursive()
-                keys.extend(lt)
-            if self.right:
-                rt = self.right.subtree_preorder_traversal_recursive()
-                keys.extend(rt)
-            return keys
+        keys = []
+        keys.append(self.key)
+        if self.left:
+            lt = self.left.subtree_preorder_traversal_recursive()
+            keys.extend(lt)
+        if self.right:
+            rt = self.right.subtree_preorder_traversal_recursive()
+            keys.extend(rt)
+        return keys
 
     def subtree_preorder_traversal_iterative(self):
         stack = []
@@ -192,17 +188,16 @@ class TreeNode:
         return keys
 
     def subtree_postorder_traversal_recursive(self):
-        if self:
-            keys = []
-            if self.left:
-                lt = self.left.subtree_postorder_traversal_recursive()
-                keys.extend(lt)
-            if self.right:
-                rt = self.right.subtree_postorder_traversal_recursive()
-                keys.extend(rt)
-            keys.append(self.key)
+        keys = []
+        if self.left:
+            lt = self.left.subtree_postorder_traversal_recursive()
+            keys.extend(lt)
+        if self.right:
+            rt = self.right.subtree_postorder_traversal_recursive()
+            keys.extend(rt)
+        keys.append(self.key)
 
-            return keys
+        return keys
 
     def subtree_postorder_traversal_iterative(self):
         keys = []
@@ -210,7 +205,6 @@ class TreeNode:
         stack = []
         stack.append(curr)
         pass
-        
 
     def subtree_getlevel_recursive(self, level):
         if level == 1:
