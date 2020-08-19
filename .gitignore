@@ -6,3 +6,10 @@ a.out
 *.html
 *.exe
 *build*
+__pycache__
+.ipynb_checkpoints
+.vscode
+.ipynb_checkpoints/*
+*.params
+*.log
+*.swp
