@@ -1,0 +1,15 @@
+ ROS has a standard meta package for designing and creating robot models called
+=robot_model=.
+
+- =urdf=: Unified Robot Description Format, an XML file representing a robot model
+  A robot model, sensors and a working environment can be defin ed using URDF, and 
+  parsed using URDF parsers. The robot will have rigid links and will be connected
+  using joints. Flexible links can't be represented using URDF.
+
+URDF can represent the kinematic and dynamic description of the robot, the 
+visual representation of the robot and the collision model of the robot.
+
+- =link= tag: a single link of a robot, including the size, shape, the color and
+  it even imports a 3D mesh to represe t the robot link.
+
+- =joint=: represents a robot joint.  the movement and its velocity.
