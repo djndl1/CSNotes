@@ -1,0 +1,21 @@
+One way to lower the latency and enabling multitasking.
+
+* Basics
+
+/task/: =Task<T>= class, a unit of potentially high-latency work that produces  
+a resultant task value or desired side effect.
+
+/thread pool/: a collection of threads, along with logic for determining how to assign
+work to those threads.
+
+** Problems
+
+non-atomic operations; race conditions; complex memory models; deadlocks;
+
+1. monitoring an asynchronous operation state for completion;
+
+2. thread pooling;
+
+3. avoiding deadlocks;
+
+4. providing atomicity across operations and synchronizing data access;
