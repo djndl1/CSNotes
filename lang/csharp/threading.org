@@ -138,9 +138,9 @@ public class Program
       // Wait for the user's input
       Console.ReadLine();
 
-      cancellationTokenSource.Cancel();  
+      cancellationTokenSource.Cancel();// task is probably already running 
       Console.WriteLine(stars);
-      task.Wait(); // it's conceptually canceled without throwing TaskCanceledException
+      task.Wait(); 
       Console.WriteLine();
   }
 
@@ -164,12 +164,22 @@ The task is not rudely cancelled immediately but given some time to continue its
 operation before it finds out it has been cancelled and ends the task gracefully
 without aborting or exiting.
 
+
+The task acknowledged cancellation by throwing an
+=OperationCanceledException= with its own =CancellationToken= while the token
+ was in signaled state, or the task's =CancellationToken= was already signaled
+ before the task started executing.
+
+About [[https://docs.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads][Cancellation]].
+
 ** Start New Tasks
 
 =Task.Run()= should be used by default unless it proves insufficient.
  =Task.Factory.StartNew()= is for more options. Only in rare cases should creation
 be separated from scheduling, calling =Start()= after constructor initialization.
 For a long-running task, call =StartNew()= with =TaskCreationOptions.LongRunning=.
+
+It is possible to run a task synchronously using =Task.RunSynchronously()=
 
 ** Tasks Are Disposable
 
@@ -190,3 +200,22 @@ Some use cases:
 
 Thread pools have the assumption that tasks are processor-bound and low-latency.
 =ThreadPool= can be deprecated entirely in favor of the TPL.
+
+** =Thread=
+
+Constructed with a =ThreadStart= (and =ParameterizedThreadStart=) delegate (not required for static methods).
+and then call =.Start()=. The current thread is retrieved by the =CurrentThread= static property.
+
+Background threads do not keep a process running if all foreground threads have terminated, once 
+all foreground threads have been stopped, the runtime stops all background thrads and shuts down.
+The main thread and all explicitly constructed =Thread= objects are in the foreground.
+Thread pool threads and all threads that enter the managed execution environment from unmanaged code
+are background threads. =IsBackground= sets a thread to the background.
+
+Each thread has a =CurrentCulture= that supports culture-sensitive operations such as 
+parsing and formatting, string comparison and sorting, and also controls the writing system
+and calendar used by a thread.
+
+A thread has a name, a hash code (uniquely identifying a thread), a thread ID (doesn't necessarily fixed on an OS thread),
+current state, scheduling priority level, =IsThreadPoolThread=, =IsBackground=.
+
