@@ -19,3 +19,174 @@ non-atomic operations; race conditions; complex memory models; deadlocks;
 3. avoiding deadlocks;
 
 4. providing atomicity across operations and synchronizing data access;
+
+* TPL (Task Parallel Library)
+
+Instead of creating a OS thread, the TPL typically requests a worker thread fro the 
+thread pool. A task scheduler might use many different strategies to fulfill the purpose.
+
+/task/: an object that encapsulates work that executes asynchronously. uniquely
+ identified by the =Id= property. =AsyncState= can be used to associated additional
+data with a task. The =IsCompleted= and =Status= properties are for querying the task's state.
+
+
+Polling a worker for result is dangerous since the scheduler might decide 
+the task be carried out on the calling thread.
+
+=.ContinueWith()= sets a continuation for the current task. Several options exist 
+for tweaking the behavior, like starting only when the antecedent is cancelled/throwing 
+an unhandled exception/has run to completion, which can be used as an event listener.
+
+#+begin_src java
+     Task taskA = Task.Run( () =>
+               Console.WriteLine("Starting..."))
+          .ContinueWith(antecedent =>
+               Console.WriteLine("Continuing A..."));
+      Task taskB = taskA.ContinueWith( antecedent =>
+          Console.WriteLine("Continuing B..."));
+      Task taskC = taskA.ContinueWith( antecedent =>
+          Console.WriteLine("Continuing C..."));
+      Task.WaitAll(taskB, taskC);
+      Console.WriteLine("Finished!");
+#+end_src 
+
+Waiting on cancelled task or faulted task will result in an exception. The proper
+way to do this is to =.WaitAny=, which will throw an =AggregatedException= that
+then needs to be handled.
+
+#+begin_src java
+Task<string> task = Task.Run<string>(
+              () => PiCalculator.Calculate(10));
+
+      Task faultedTask = task.ContinueWith(
+          (antecedentTask) =>
+          {
+              Trace.Assert(antecedentTask.IsFaulted);
+              Console.WriteLine(
+                  "Task State: Faulted");
+          },
+          TaskContinuationOptions.OnlyOnFaulted);
+
+      Task canceledTask = task.ContinueWith(
+          (antecedentTask) =>
+          {
+              Trace.Assert(antecedentTask.IsCanceled);
+              Console.WriteLine(
+                  "Task State: Canceled");
+          },
+          TaskContinuationOptions.OnlyOnCanceled);
+
+      Task completedTask = task.ContinueWith(
+          (antecedentTask) =>
+          {
+              Trace.Assert(antecedentTask.IsCompleted);
+              Console.WriteLine(
+                  "Task State: Completed");
+          },  TaskContinuationOptions.
+                  OnlyOnRanToCompletion);
+
+      completedTask.WaitAny(completedTask, canceledTask, faultedTask);
+#+end_src
+
+Generally, unhandled exceptions on any thread are treated as fatal. All exceptions
+on all threads must be caught. For unhandled task in an asynchronous running task,
+the task scheduler inserts a catchall exception handler around the delegate .
+
+#+begin_src java
+        var task = Task.Run(()  =>
+        {
+            throw new InvalidOperationException();
+        });
+
+        try 
+        {
+            task.Wait();
+        }
+        catch (AggregateException e)
+        {
+            e.Handle(eachException => // handle them altogether
+            {
+                Console.WriteLine($"Error: {eachException.Message}");
+                return true;
+            });
+        }
+#+end_src
+
+** Cooperative Cancellation by the TPL
+
+A task that supports cancellation monitors a =CancellationToken= object by
+periodically polling it to see if a cancellation request has been issued.
+
+#+begin_src java
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using AddisonWesley.Michaelis.EssentialCSharp.Shared;
+
+public class Program
+{
+  public static void Main()
+  {
+      string stars = "*".PadRight(Console.WindowWidth-1, '*');
+      Console.WriteLine("Push ENTER to exit.");
+      CancellationTokenSource cancellationTokenSource=
+          new CancellationTokenSource();
+      
+      Task task = Task.Run(
+          () => WritePi(cancellationTokenSource.Token), 
+                        cancellationTokenSource.Token);
+      // Wait for the user's input
+      Console.ReadLine();
+
+      cancellationTokenSource.Cancel();  
+      Console.WriteLine(stars);
+      task.Wait(); // it's conceptually canceled without throwing TaskCanceledException
+      Console.WriteLine();
+  }
+
+   private static void WritePi(
+      CancellationToken cancellationToken)
+  {
+      const int batchSize = 1;
+      string piSection = string.Empty;
+      int i = 0;
+      while(!cancellationToken.IsCancellationRequested || i == int.MaxValue)
+      {
+          piSection = PiCalculator.Calculate(
+              batchSize, (i++) * batchSize);
+          Console.Write(piSection);
+      }
+  }
+}
+#+end_src
+
+The task is not rudely cancelled immediately but given some time to continue its
+operation before it finds out it has been cancelled and ends the task gracefully
+without aborting or exiting.
+
+** Start New Tasks
+
+=Task.Run()= should be used by default unless it proves insufficient.
+ =Task.Factory.StartNew()= is for more options. Only in rare cases should creation
+be separated from scheduling, calling =Start()= after constructor initialization.
+For a long-running task, call =StartNew()= with =TaskCreationOptions.LongRunning=.
+
+** Tasks Are Disposable
+
+Task may allocate a =WaitHandle= when waiting for it to complete. The =WaitHandle=
+is typically disposed by a finalizer invocation when the program exits.
+
+* Low-level System.Threading
+
+=Thread= and =ThreadPool=
+
+Putting a thread to sleep is a bad programming practice because the whole point
+ of allocating an expensive resource like a thread is to get work out of that resource.
+Some use cases:
+
+1. sleep for zero delay to indicate a yielding.
+
+2. simulate a high-latency task without actually computing in test code.
+
+Thread pools have the assumption that tasks are processor-bound and low-latency.
+=ThreadPool= can be deprecated entirely in favor of the TPL.
