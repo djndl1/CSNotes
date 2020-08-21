@@ -38,11 +38,11 @@ class Coordinate
 ```
 
 
-Value types are meant to be immutable. In scenarios where modification is desirable, create a new instance. It's a value after all. Favor read-only, automatically implemented properties over fields within structs starting with C# 6.0. All value types are implcitly sealed. All non-enum value types derive from `System.ValueType`. Value types can implement interfaces. The default implementation for `GetHashCode()` and `Equals()` have some different behavior that need to be handled.
+Value types are meant to be immutable (use `readonly` to make it so). In scenarios where modification is desirable, create a new instance. It's a value after all. Favor read-only, automatically implemented properties over fields within structs starting with C# 6.0. All value types are implcitly sealed. All non-enum value types derive from `System.ValueType`. Value types can implement interfaces. The default implementation for `GetHashCode()` and `Equals()` have some different behavior that need to be handled.
 
 All value types are implicitly sealed. Value types can implement interfaces.
 
-Invoking `new` with a value type causes the runtiem to create a new instance on the temporary storage pool, initialize all of its fields to their default values and call the constructor by passing the temporary storage location as a `ref` variable as `this`, resulting in the value being stored in the temporary storage location. Structs are copied by value. They do not have referential identity as reference types do. No part of the runtime tracks how many copies of a given value type exist at any moment.
+Invoking `new` with a value type causes the runtime to create a new instance on the temporary storage pool (i.e. the stack, perhaps actually in the registers ), initialize all of its fields to their default values and call the constructor by passing the temporary storage location as a `ref` variable as `this`, resulting in the value being stored in the temporary storage location. Structs are copied by value. They do not have referential identity as reference types do. No part of the runtime tracks how many copies of a given value type exist at any moment.
 
 - `default`: `default(int)` and `new int()` produce the same value.
 
