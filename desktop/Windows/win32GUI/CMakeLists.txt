@@ -1,0 +1,42 @@
+cmake_minimum_required(VERSION 3.14)
+project(win32GUI)
+
+set(CMAKE_C_COMPILER wingcc)
+set(CMAKE_CXX_COMPILER wing++)
+
+
+include_directories(./include)
+
+add_definitions(-DUNICODE -D_UNICODE)
+add_compile_options(-municode -std=c18)
+add_link_options(-municode)
+
+if (CONSOLE_APP)
+add_executable(tconsole src/wconsole.c)
+add_executable(screesize src/screensize.c)
+add_executable(lock src/lockworkstation.c)
+add_executable(computerName src/computerName.c)
+add_executable(userName src/username.c)
+add_executable(cwd src/cwd.c)
+add_executable(MemoryStatus src/MemoryStatus.c)
+add_executable(DriveStr src/Drivename.c)
+add_executable(DiskSpace src/DiskSpace.c)
+add_executable(CPUSpeed src/CPUSpeed.c)
+add_executable(LocalTime src/LocalTime.c)
+add_executable(TimeZone src/TimeZone.c)
+
+  if(${CMAKE_C_COMPILER} EQUAL mingcc)
+    add_executable(winver src/winver.c)
+  endif()
+endif()
+
+add_compile_options(-mwindows)
+add_link_options(-mwindows)
+
+add_executable(wmmsg src/winmain_ex.c)
+add_executable(SimpleWindow src/SimpleWindow.c)
+add_executable(MsgBox src/MessageBox.c)
+add_executable(WindowCentering src/WindowCentering.c)
+add_executable(HotKey 	src/Hotkey.c)
+add_executable(MoreWin src/MoreWindows.c)
+
