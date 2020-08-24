@@ -1,3 +1,19 @@
+# Relational Database
+
+Typically  A DBMS has kernel code (manages memory and storage for the DBMS), repository of metadata (_data dictionary_) and query language. A relational database has structures, operaitons and integrity rules.
+
+
+[_relation_](https://en.wikipedia.org/wiki/Relation_(database)): a set of tuples.
+
+An RDBMS distinguishes between logical operations and physical operations (how things should be done by the RDBMS).
+
+_Schema_: a collection of logical data structures (schema objects). A database user owns a database schema: _tables_, _indexes_.
+
+Oracle database can store program units written in Java in addition to PL/SQL.
+
+_transaction_: logical atomic unit of work that contains one or more SQL statements. It eithre all succeeds or fails as a whole.
+Concurrent access is done by using locks. Oracle enforces statement-level read consistency.
+
 # Basics
 
 - `DUAL` table: used for queries that do not require any table, probably not even accessed.
@@ -156,6 +172,26 @@ _database instance_: the combination of memory and processes that are a part of 
 
 _database_: a set of files that store data. An instance can mount only one database at a single point time. Multiple can access the same database (like in a clustering environment)
 
+Multitenant architecture; CDB; PDB; The application model might include definitions of tables, views, user accounts, and PL/SQL packages that are common to a set of PDBs. An _application container_ functions as an application-specific CDB within a CDB. 
+
+Sharding Architecture; horizontal partitioning of data across multiple Oracle databases. In a sharding architecture, each database is hosted on a dedicated server with its own local resources - CPU, memory, flash, or disk. Each database in such configuration is called a shard. All of the shards together make up a single logical database, which is referred to as a sharded database.
+ 
+## Application Architecture
+
+- Client-Server
+
+- Multitier archtecture: the application server can serve as an interface between clients and multiple databases and provides an additional level of security.
+
+- Simple Oracle Document Access
+
+## Oracle Net Services Architecture
+
+_Oracle Net Listener_: a process that runs on the database or elsewhere in the network. Sharding Architecture; horizontal partitioning of data across multiple Oracle databases. In a sharding architecture, each database is hosted on a dedicated server with its own local resources - CPU, memory, flash, or disk. Each database in such configuration is called a shard. All of the shards together make up a single logical database, which is referred to as a sharded database.
+
+- dedicated server architecture
+
+- shared server architecture: a pool of shared server processes for multiple sessions. A client process communicates with a dispatcher.
+
 ### Physical storage structures
 
 1. data files
@@ -176,10 +212,11 @@ _database_: a set of files that store data. An instance can mount only one datab
 
 ### Database Instance
 
-1. Systme Global Area: a shared memory structure allocated when running, containing data and control information
+1. Systme Global Area: a shared memory structure allocated when running, containing data and control information, shared by the multiple independent processes such pmon, smon, mmon, lgwr etc. 
 
 2. Program Global Area: private memory area for each session.
 
 ### Background processes
 
 PMON, SMON, BSWn, CKPT, LGWR, ARCn, MMON, MMAN, LREG.
+
