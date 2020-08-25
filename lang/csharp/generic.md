@@ -46,13 +46,13 @@ Covariance TODO
 
 # Internals
 
-The implementation of generics is different for value-based type parameters than for generics with reference type parameters. When a generic type is first constructed with a value type as a type parameter, the runtime creates a specialized generic type with the supplied type parameter(s) placed appropriately in the CIL. Generics work slightly differently for reference types. The first time a generic type is constructed with a reference type, the runtime creates a specialized generic type with `object` references substituted for type parameters in the CIL, not a specialized generic type based on the type argument. Each subsequent time a constructed type is instantiated with a reference type parameter, the runtime reuses the previously generated version of the generic type, even if the reference type is different from the first reference type. To still gain the advantage of type safety, for each object reference substituted in place of the type parameter, an area of memory for an Order type is specifically allocated and the pointer is set to that memory reference.
+The implementation of generics is different for value-based type parameters than for generics with reference type parameters. When a generic type is first constructed with a value type as a type parameter, the runtime creates a specialized generic type with the supplied type parameter(s) placed appropriately in the CIL (like in C++).
+
+Generics work slightly differently for reference types. The first time a generic type is constructed with a reference type, the runtime creates a specialized generic type with `object` references substituted for type parameters in the CIL, not a specialized generic type based on the type argument. Each subsequent time a constructed type is instantiated with a reference type parameter, the runtime reuses the previously generated version of the generic type, even if the reference type is different from the first reference type. To still gain the advantage of type safety, for each object reference substituted in place of the type parameter, an area of memory for an Order type is specifically allocated and the pointer is set to that memory reference.
 
 Beyond the inclusion of the arity and type parameter in the class header and the type parameter denoted with exclamation points in code, there is little difference between the CIL generated for a generic class and the CIL generated for a nongeneric class.
 
 
 https://stackoverflow.com/questions/31876372/what-is-reification
-
-http://microsoftdev.blogspot.com/2007/07/how-generics-work.html
 
 https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java#Type_erasure_versus_reified_generics
