@@ -468,3 +468,24 @@ A second interface can be created to extend an old one to prevent code breakage.
 Interfaces with no members at all, inherited or otherwise, are sometimes used to represent information about a type. This is generally considered to be an abuse of the interface mechanism; interfaces should be used to represent which functions a type can perform, not to indicate facts about particular types. Instead of marker interfaces, use attributes for this purpose.
 
 
+## Indexers
+
+Indexers allow instances of a class or struct to be indexed just like arrays. The compiler will generate an `Item` property (not directly accessible), and the appropriate accessor methods. Indexers are most frequently implemented in types whose primary purpose is to encapsulate an internal collection or array.
+
+```csharp
+class SampleCollection<T>
+{
+   // Declare an array to store the data elements.
+   private T[] arr = new T[100];
+
+   // Define the indexer to allow client code to use [] notation.
+   public T this[int i]
+   {
+      get { return arr[i]; }
+      set { arr[i] = value; }
+   }
+}
+
+```
+
+C# doesn't limit the indexer parameter type to integer.
