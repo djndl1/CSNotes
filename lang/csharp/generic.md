@@ -42,7 +42,52 @@ Delegate types, array types, and enumerated types may not be used as class type 
 
 For generic methods, the compiler can infer the type parameters from the formal parameters passed to the method. Contradictory inferred types result in a common type, instead of an error.
 
-Covariance TODO
+# Variance (category theory)
+
+_Covariance_:  uppose two types X and Y have a special relationship—namely, that every value of the type X may be converted to the type Y. If the types I<X> and I<Y> always also have that same special relationship, we say, “I<T> is covariant in T.”
+
+- `out`: a type is only used as the return type of a method or read-only property. Indicates that a generic interface is intended to be covariant in one of its type parameters.
+
+```csharp
+Pair<Contact> contacts =
+          new Pair<Contact>(
+              new Contact("Princess Buttercupt"),
+              new Contact("Inigo Montoya") );
+      IReadOnlyPair<PdaItem> pair = contacts;
+      PdaItem pdaItem1 = pair.First;
+      PdaItem pdaItem2 = pair.Second;
+      // read-only to prevent another pdaItem type from being assigned to pdaItem1 
+```
+
+Only generic interfaces and generic delegates may be covariant.the varying type arguments of both the source and target generic types must be reference types. The compiler must be able to verify that the annotated type parameters are used in only "output" parameters.
+
+ _Contravariance_: suppose two types X and Y are related such that every value of the type X may be converted to the type Y. If the types I<X> and I<Y> always have that same special relationship “backward”—that is, every value of the type I<Y> can be converted to the type I<X>—we say, “I<T> is contravariant in T.”
+ e.g. an apple is a fruit, a comparator that compares two fruits can also compare two apples, i.e. comp<fruit> is a comp<apple> but not the inverse.
+
+`in`: only as a formal parameter or writeable property type.  This instructs the compiler to check that T never appears on a property getter or as the return type of a method, thereby enabling contravariant conversions for this interface.
+
+```csharp
+      ICompareThings<Fruit> fc = new FruitComparer();
+      Apple apple1 = new Apple();
+      Apple apple2 = new Apple();
+      Orange orange = new Orange();
+      // A fruit comparer can compare apples and oranges:
+      bool b1 = fc.FirstIsBetter(apple1, orange);
+      // or apples and apples:
+      bool b2 = fc.FirstIsBetter(apple1, apple2);
+      // This is legal because the interface is
+      // contravariant
+      ICompareThings<Apple> ac = fc;
+      // This is really a fruit comparer, so it can
+      // still compare two apples
+      bool b3 = ac.FirstIsBetter(apple1, apple2);
+```
+
+Say comp<fruit> returns a `fruit`, but a `fruit` isn't necessarily an `apple`, thus allowing `out` would violate type safety. 
+
+ The compiler will check the validity of the covariance and contravariance type parameter modifiers throughout the source.
+
+C# support array covariance, though not type-safe.  Every array is convertible to the read-only (and therefore safely covariant) interface IEnumerable<T>; that is, IEnumerable<Fruit> fruits = new Apple[10] is both safe and legal because there is no way to insert an Orange into the array if all you have is the read-only interface.
 
 # Internals
 
