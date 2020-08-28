@@ -250,4 +250,62 @@ Some of the colors already have a well-known name. The `KnownColor` enumeration 
 
 - TextureBrush: constructed with an image such as a bitmap. By default it is used repreated to tile the space inside the shape being drawn.
 
-- Hatch Brushes
+- Hatch Brushes: fill space using one of several builtin two-color patterns, where the two colors are used to draw the foreground and the background of the pattern.
+
+- Linear gradient brushes: 
+
+```csharp
+Rectangle area = new Rectangle(x, y, width, height);
+Color startColor = Color.DarkBlue;
+Color endColor = Color.White;
+using (Brush brush = new LinearGradientBrush(area, startColor, endColor, 45.0f))
+{
+    //
+}
+```
+
+- path gradient brushes
+
+## `System.Drawing.Pen`
+
+used to frame shapes. A pen has _width_, _color or _brush_, _start_ and _end_ cap styles and a _dash_ style/pattern (-.-.-).
+
+
+## Shape, ...
+
+TODO
+
+# Drawing Text
+
+typeface: Arial, font style: Bold
+
+point: 1/72 inch no matter what device it's drawn on.
+
+DPI: dot per inch
+
+design units: 
+
+`System.Drawing.Font`; `System.Drawing.FontFamily`. Also there is the `System.Drawing.Text.GenericFontFamilies` enum.
+
+`System.Drawing.SystemFonts`: same for all specific Windows UI items.
+
+`.DrawString()`, `System.Drawing.StringFormat`
+
+TODO
+
+# Components
+
+a class of `System.ComponentModel.IComponenet`. Components are reusable, cofigurable classes. they do not provide native support for user interaction via a form. Intrisic support for UI interaction is provided by controls.
+
+Custom components are a great way to package reusable Windows Form code that typically doesn't have a UI or handle user input. 
+
+Creating a custom component is much like creating a standard class, except that components come with built-in resource management and are the cornerstone of the Windows Forms design-time experience.
+
+e.g. Timer, `OpenFileDialog`, `ErrorProvider`, `Tooltip`
+
+## Custom Components
+
+TODO
+
+# Controls
+
