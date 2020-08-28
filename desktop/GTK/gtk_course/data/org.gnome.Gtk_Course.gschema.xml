@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gtk_course">
+	<schema id="org.gnome.Gtk_Course" path="/org/gnome/Gtk_Course/">
+	</schema>
+</schemalist>

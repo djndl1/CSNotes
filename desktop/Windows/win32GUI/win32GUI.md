@@ -147,3 +147,11 @@ _messsage_ = event, stored in a message queue. `GetMessage()`, `DispatchMessage`
 `RegisterClassW` Register a window before creating one. `CreateWindowW`;
 Every window has an associated window procedure. It is a function that receives messages.
 
+## Dialog
+
+A dialog is only a special kind of a window, created as a normal window with some specific flags.
+
+```c
+CreateWindowExW(WS_EX_DLGMODALFRAME | WS_EX_TOPMOST,  L"DialogClass", L"Dialog Box", WS_VISIBLE | WS_SYSMENU | WS_CAPTION , 100, 100, 200, 150, 
+    NULL, NULL, ghInstance,  NULL);
+```

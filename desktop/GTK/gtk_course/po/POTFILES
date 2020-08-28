@@ -1,0 +1,7 @@
+data/org.gnome.Gtk_Course.desktop.in
+data/org.gnome.Gtk_Course.appdata.xml.in
+data/org.gnome.Gtk_Course.gschema.xml
+src/window.ui
+src/main.vala
+src/window.vala
+

@@ -29,7 +29,7 @@ LRESULT CALLBACK WndProc(HWND win, UINT msg, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(win, msg, wParam, lParam);
 }
 
-int wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
              LPWSTR lpCmdLine, int nShowCmd)
 {
   WNDCLASSEX wc = {.cbSize = sizeof(WNDCLASSEX),

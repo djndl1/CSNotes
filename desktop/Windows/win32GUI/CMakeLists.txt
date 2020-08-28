@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.12)
 project(win32GUI)
 
 set(CMAKE_C_COMPILER wingcc)
 set(CMAKE_CXX_COMPILER wing++)
-
+#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(./include)
 
@@ -39,4 +39,6 @@ add_executable(MsgBox src/MessageBox.c)
 add_executable(WindowCentering src/WindowCentering.c)
 add_executable(HotKey 	src/Hotkey.c)
 add_executable(MoreWin src/MoreWindows.c)
-
+add_executable(ModeLess src/ModelessDialog.c)
+add_executable(ColorDialog src/ColorDialog.c)
+add_executable(FileDialog src/FileDialog.c)

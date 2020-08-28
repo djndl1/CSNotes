@@ -13,7 +13,6 @@ LRESULT CALLBACK PanelProc(HWND hwnd, UINT msg,
     switch(msg) {
   
         case WM_LBUTTONUP:
-    
             MessageBeep(MB_OK);
             break;    
     }
@@ -26,6 +25,7 @@ void RegisterRedPanelClass(void) {
     HBRUSH hbrush = CreateSolidBrush(RGB(255, 0, 0));
 
     WNDCLASSW rwc = {0};
+
     
     rwc.lpszClassName = L"RedPanelClass";
     rwc.hbrBackground = hbrush;
