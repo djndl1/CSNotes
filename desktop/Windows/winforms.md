@@ -309,3 +309,15 @@ TODO
 
 # Controls
 
+Reusable class whose main purpose is to interact with users on behalf of a container (a form or a container control). A control is derived from `System.ConponenetModel.Component`.
+
+`Application.EnableVisualStyles()` enables themed rendering.
+
+Tool strips offer additional rendering modes that can override the current theme using special rendering classes.
+
+Some controls (_owner-drwan controls_) provides events that allow a control's onwer to take over the drawing from the control. The `ControlPaint` helper class which has static members for drawing common control.
+
+The most popular form of UI reuse for a control is simple containment. `System.Windows.Forms.UserControl` is a way to contain a set of other controls for reuse as a set, producing a kind of subform.
+
+# Resource
+
