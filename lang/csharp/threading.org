@@ -37,7 +37,7 @@ the task be carried out on the calling thread.
 for tweaking the behavior, like starting only when the antecedent is cancelled/throwing 
 an unhandled exception/has run to completion, which can be used as an event listener.
 
-#+begin_src java
+#+begin_src csharp
      Task taskA = Task.Run( () =>
                Console.WriteLine("Starting..."))
           .ContinueWith(antecedent =>
@@ -54,7 +54,7 @@ Waiting on cancelled task or faulted task will result in an exception. The prope
 way to do this is to =.WaitAny=, which will throw an =AggregatedException= that
 then needs to be handled.
 
-#+begin_src java
+#+begin_src csharp
 Task<string> task = Task.Run<string>(
               () => PiCalculator.Calculate(10));
 
@@ -92,7 +92,7 @@ Generally, unhandled exceptions on any thread are treated as fatal. All exceptio
 on all threads must be caught. For unhandled task in an asynchronous running task,
 the task scheduler inserts a catchall exception handler around the delegate .
 
-#+begin_src java
+#+begin_src csharp
         var task = Task.Run(()  =>
         {
             throw new InvalidOperationException();
@@ -117,7 +117,7 @@ the task scheduler inserts a catchall exception handler around the delegate .
 A task that supports cancellation monitors a =CancellationToken= object by
 periodically polling it to see if a cancellation request has been issued.
 
-#+begin_src java
+#+begin_src csharp
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -219,3 +219,188 @@ and calendar used by a thread.
 A thread has a name, a hash code (uniquely identifying a thread), a thread ID (doesn't necessarily fixed on an OS thread),
 current state, scheduling priority level, =IsThreadPoolThread=, =IsBackground=.
 
+
+* Task-Based Asynchronous Pattern
+
+the primitive version:
+
+
+#+BEGIN_SRC csharp
+using System;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
+using System.Runtime.ExceptionServices;
+
+public class Program
+{
+  public const string DefaultUrl =
+      "https://IntelliTect.com";
+
+  public static void Main(string[] args)
+  {
+      if (args.Length == 0)
+      {
+          Console.WriteLine("ERROR: No findText argument specified.");
+          return;
+      }
+      string findText = args[0];
+
+      string url = DefaultUrl;
+      if (args.Length > 1)
+      {
+          url = args[1];
+          // Ignore additional parameters
+      }
+      Console.Write(
+          $"Searching for '{findText}' at URL '{url}'.");
+
+      using WebClient webClient = new WebClient();
+      Console.Write("\nDownloading...");
+      Task task = webClient.DownloadDataTaskAsync(url)
+          .ContinueWith(antecedent =>
+          {
+              byte[] downloadData = antecedent.Result;
+              Console.Write("\nSearching...");
+              return CountOccurrencesAsync(
+                  downloadData, findText);
+          })
+          .Unwrap()
+          .ContinueWith(antecedent =>
+          {
+              int textOccurrenceCount = antecedent.Result;
+              Console.WriteLine(
+                  @$"{Environment.NewLine}'{findText}' appears {
+                      textOccurrenceCount} times at URL '{url}'.");
+          });
+      try
+      {
+          while(!task.Wait(100))
+          {
+              Console.Write(".");
+          }
+      }
+      catch(AggregateException exception)
+      {
+          exception = exception.Flatten();
+          try
+          {
+              exception.Handle(innerException =>
+              {
+                  // Rethrowing rather than using
+                  // if condition on the type
+                  ExceptionDispatchInfo.Capture(
+                      innerException)
+                      .Throw();
+                  return true;
+              });
+          }
+          catch(WebException)
+          {
+              // ...
+          }
+          catch(IOException )
+          {
+              // ...
+          }
+          catch(NotSupportedException )
+          {
+              // ...
+          }
+      }
+  }
+
+  private static Task<int> CountOccurrencesAsync(
+        byte[] downloadData, string findText)
+  {
+      // ...
+  }
+}
+#+END_SRC
+
+The `async`/`await` version
+
+#+BEGIN_SRC csharp
+using System;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
+
+public class Program
+{
+  public const string DefaultUrl =
+      "https://IntelliTect.com";
+
+  public static async Task Main(string[] args)
+  {
+      if (args.Length == 0)
+      {
+          Console.WriteLine("ERROR: No findText argument specified.");
+          return;
+      }
+      string findText = args[0];
+
+      string url = DefaultUrl;
+      if (args.Length > 1)
+      {
+          url = args[1];
+          // Ignore additional parameters
+      }
+      Console.Write(
+          $"Searching for '{findText}' at URL '{url}'.");
+
+      using WebClient webClient = new WebClient();
+      Task<byte[]> taskDownload =
+          webClient.DownloadDataTaskAsync(url);
+
+      Console.WriteLine("Downloading...");
+      byte[] downloadData = await taskDownload;
+      Task<int> taskSearch = CountOccurrencesAsync(
+          downloadData, findText);
+
+      Console.WriteLine("Searching...");
+      int textOccurrenceCount = await taskSearch;
+
+      Console.WriteLine(
+          @$"{Environment.NewLine}'{findText}' appears {
+              textOccurrenceCount} times at URL '{url}'.");
+  }
+
+  private static async Task<int> CountOccurrencesAsync(
+      byte[] downloadData, string findText)
+  {
+      int textOccurrenceCount = 0;
+
+      using MemoryStream stream = new MemoryStream(downloadData);
+      using StreamReader reader = new StreamReader(stream);
+
+      int findIndex = 0;
+      int length = 0;
+      do
+      {
+          char[] data = new char[reader.BaseStream.Length];
+          length = await reader.ReadAsync(data);
+          for (int i = 0; i < length; i++)
+          {
+              if (findText[findIndex] == data[i])
+              {
+                  findIndex++;
+                  if (findIndex == findText.Length)
+                  {
+                      // Text was found
+                      textOccurrenceCount++;
+                      findIndex = 0;
+                  }
+              }
+              else
+              {
+                  findIndex = 0;
+              }
+          }
+      }
+      while (length != 0);
+
+      return textOccurrenceCount;
+  }
+}
+#+END_SRC
