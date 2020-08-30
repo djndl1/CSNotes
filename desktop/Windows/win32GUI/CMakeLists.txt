@@ -41,4 +41,7 @@ add_executable(HotKey 	src/Hotkey.c)
 add_executable(MoreWin src/MoreWindows.c)
 add_executable(ModeLess src/ModelessDialog.c)
 add_executable(ColorDialog src/ColorDialog.c)
+add_executable(MenuWin src/MenuWindow.c)
 add_executable(FileDialog src/FileDialog.c)
+
+add_executable(StaticText src/StaticText.c)
