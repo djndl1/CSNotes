@@ -244,10 +244,69 @@ Use the _extra class memory_ to store any info pertaining to the class.
  
  TODO subclassing
  
- # Message and Messge Queues
+# Message and Messge Queues
  
- Event-driven apps do not make explicit function calls to obtain input. They wait for the system to pass input to them. The system passes all input for an application to the various windows in the application. Each window has a function, called a window procedure, that the system calls whenever it has input for the window. The window procedure processes the input and returns control to the system. 
+ Event-driven apps do not make explicit function calls to obtain input. They wait for the system to pass input to them. The system passes all input for an application to the various windows in the application. Each window has a function, called a window procedure, that the system calls whenever it has input for the window. The window procedure processes the input and returns control to the system.
  
  If a top-level window stops responding to messages for more than several seconds, the system considers the window to be not responding.
  
+ Messages are generatedd by bot hthe system and applications. The system generates messages at each input event as well as in response to changes in the system brought about by an application. Application can generate messages to direct its own windows to perform tasks or to communicate with windows in other applications.
  
+ A message is sent to a window procedure with _window handle_, _message identifier_ (a named constant that idntifies the purpose of a message) and two _message parameters_. The meaning and value of the mssage parameters depend on the messsage.
+ 
+## Types
+ 
+ - _system-defined messages_: messages for mouse and keyboard input, menu and dialog box input, window creation and management, and _Dynamic Data Exchange_.
+ 
+ - application-defined messages: used by its windows or to communicate with windows in other processes. `RegisterWindowMessage`
+ 
+## Routing
+
+- message queue: primarily the result of user input. The system maintains a single system message queue and one thread-specific message queue for each GUI thread. `WM_PAINT`, `WM_TIMER`, `WM_QUIT` are not always added to the end of the queue. The system has some special treatment for them (multiple `WM_PAINT` might be merged into one to lower the overhead). `GetMessage` removes a message from the queue, `DispatchMessage` passes the first four part of a message to the window procedure. `GetMessageTime`, `GetMessagePos`. A thread can use the WaitMessage function to yield control to other threads when it has no messages in its message queue. The function suspends the thread and does not return until a new message is placed in the thread's message queue. `PostMessage`, `PostThreadMessage`-
+
+- nonqueued messages: sent immediately to the destination window procedure, bypassing the system message queue and thread message queue. `BroadcastSystemMesssage`; `BroadcastSystemMessageEx`; `SendMessage`; `SendMessasgeTimeout`; `SendNotifyMessage`
+
+## Message Handling
+
+A single-threaded application usually uses a message loop in its `WinMain` function to remove and send messages to the appropriate window procedures for processing. Applications with multiple threads can include a message loop in each thread that creates a window. 
+ 
+```c
+MSG msg;
+BOOL bRet;
+
+while( (bRet = GetMessage( &msg, NULL, 0, 0 )) != 0) // WM_QUIT returns 0
+{ 
+    if (bRet == -1)
+    {
+        // handle the error and possibly exit
+    }
+    else
+    {
+        TranslateMessage(&msg); 
+        DispatchMessage(&msg); 
+    }
+}
+```
+
+A window procedure does not usually ignore a message. If it does not process a message, it must send the message back to the system for default processing. The window procedure does this by calling the DefWindowProc function, which performs a default action and returns a message result. The window procedure must then return this value as its own message result. Most window procedures process just a few messages and pass the others on to the system by calling DefWindowProc.
+
+## Posting and Sending Messages
+
+An application typically posts a message to notify a specific window to perform a task. `PostMessage` creates an `MSG` structure for the message and copies the message to the message queue. The application's message loop eventually retrieves the message and dispatches it to the appropriate window procedure.
+
+# Menu
+
+Only  an overlapped or pop-up window can contain a menu bar. Each menu must have an owner window. The system sends messages to a menu's owner window when the user selects the menu or chooses an item for the menu.
+
+- _context menu_ (_shortcut menu_): typicall associate a shortcut menu with a portion of a window, such as the client area , or within a specific object.
+
+- _window menu_(_system_ menu or _control_ menu): a pop-up menu defined and manaaged by the OS, opend by clicking the app icon on the title bar or by right-clicking anywhere on the title bar.
+    
+- _access key_: an underlined letter in the text of a menu item .
+
+- _menu shortcut key_: the menu does not have to be active for the shortcut key to work.
+
+Most applications create using menu-template resources. `LoadMenu`, `SetMenu`
+
+
+Each menu item has an identifier, a position value; `WM_COMMAND`, `WM_SYSCOMMAND`
