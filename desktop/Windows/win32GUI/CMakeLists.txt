@@ -1,14 +1,23 @@
 cmake_minimum_required(VERSION 3.12)
 project(win32GUI)
 
-set(CMAKE_C_COMPILER wingcc)
-set(CMAKE_CXX_COMPILER wing++)
+if (CROSS_MINGW)
+    set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc)
+    set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)
+elseif (WINELIB)
+    set(CMAKE_C_COMPILER winegcc)
+    set(CMAKE_CXX_COMPILER wineg++)
+    add_compile_options(-mno-cygwin)
+    add_link_options(-mno-cygwin)
+endif()
+
+set(CMAKE_C_STANDARD 11)
 #set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(./include)
 
 add_definitions(-DUNICODE -D_UNICODE)
-add_compile_options(-municode -std=c18)
+add_compile_options(-municode)
 add_link_options(-municode)
 
 if (CONSOLE_APP)
