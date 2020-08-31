@@ -321,3 +321,41 @@ The most popular form of UI reuse for a control is simple containment. `System.W
 
 # Resource
 
+When a file is marked as an Embedded Resource, it becomes embedded in the assembly’s set of manifest resources. The manifest of an assembly is composed of a set of metadata that describes part of the assembly. Part of that metadata is the name and data associated with each embedded resource. Manifest resources serve as the needed foundation for strongly typed resources. Manifest resources are embedded with no type information.
+
+## Strongly Typed Resources
+
+Application resouces files `.resx` meploy ResX to persist resource type information. Building the project causes the `.resx` data to be embedded as _nested resources_, which are resources grouped into a named container `.resources`.
+
+Either read the `.resx` directly (`ResXResourceReader`) or use the compiled `.resouces` files (`ResourceReader`). However, neither supports random access. Resource Manager is recommended.
+
+`ResXFileCodeGenerator` automatically generates a storngly typed resource classes, does pretty much the same work as a programmer would do.
+
+There are also default project resources and automatically associated resources
+
+## Resource Localization
+
+.NET supports application-sepcific localization via culture-specific resource assemblies deployed in satellite assemblies (separate assembies that can be found near the location of the main assembly). The resource embedded in the main assembly are considered _culture neutral_. Culture-specific resources are embedded into a project on a per-form basis, with each form being responsible for one or more sets of culture- and language-specific localized data sets
+
+# Applications
+
+`System.Windows.Forms.Application` provides various static methods and properties to manage an application.
+
+## App Lifetime
+
+To fully initialize a WinForms app and start it routing WinFroms events, invoke `Application.Run`
+
+- without arguments if other means have already been used to show an initial UI; the application runs until explicity told to stop (call `Application.Exit()`), even when all its forms are closed. Typically, this is done only when the app needs a secondary UI thread.
+
+- on the main form. It shows the main form and doesn't return until the main form closes.
+
+- on an `ApplicationContext`, useful if a custom context is needed. `ApplicationContext` detects main form closure and exits the application as appropriate. Some of the methods (`OnMainFormClosed`) can be overriden to modify the application behavior. 
+
+## Application Events
+
+During the lifetime of an application, several key application events `Idle`, `ThreadExit` (UI thread exits), `ApplicationExit` (when the last UI thread goes away) are fired by the `Application` object. These are commonly added inside the `Main` function.
+
+To replace the WinForms unhandled-exception dialog, use an exception handler to `Application.ThreadException`.
+
+## Single-Instance Application
+
