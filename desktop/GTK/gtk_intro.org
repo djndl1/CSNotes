@@ -2,9 +2,9 @@
 
 #+include: "gtk_c/helloworld.c" src C
 
-=gtk_init()= to initialize GTK, before any other GTK+ function, not needed when using `GtkApplication`. Use `gtk_init_check()` if a textual interface is available.
+=gtk_init()= to initialize GTK, before any other GTK+ function, not needed when using =GtkApplication=. Use =gtk_init_check()= if a textual interface is available.
 
-Control of the application is managed by signals, timeout functions and various other callback functions once `gtk_main()` is called.
+Control of the application is managed by signals, timeout functions and various other callback functions once =gtk_main()= is called.
 
 ** Hierarchy
 
@@ -36,8 +36,7 @@ Control of the application is managed by signals, timeout functions and various 
        v
 +------|-------+
 |   GtkBin     |
-+--------------+
-      +
++-----|--------+
       |
       v
 +-----|-----+
@@ -45,18 +44,16 @@ Control of the application is managed by signals, timeout functions and various 
 +-----------+  
 #+END_SRC
 
-- `GObject`: allow objects derived from it to be constructed, destroyed, referenced and unreferenced. It also provides the signal system and object property functions. cast macro `G_OBJECT()`.
+- =GObject=: allow objects derived from it to be constructed, destroyed, referenced and unreferenced. It also provides the signal system and object property functions. cast macro =G_OBJECT()=.
 
-- `GInitiallyUnowned`: floating reference
+- =GInitiallyUnowned=: floating reference
 
-- `GtkObject`: cast macro `GTK_OBJECT()`
+- =GtkObject=: cast macro =GTK_OBJECT()=
 
-- `GtkWidget`: abstract base class for all GTK widgets. The standard practice is to store all widgets in `GtkWidget`. `GTK_WIDGET`.
+- =GtkWidget=: abstract base class for all GTK widgets. The standard practice is to store all widgets in =GtkWidget=. =GTK_WIDGET=.
 
-- `GtkContainer`: abstract class used to contain one or more widgets. `GTK_CONTAINER`
+- =GtkContainer=: abstract class used to contain one or more widgets. =GTK_CONTAINER=
 
-- `GtkBin`: abstract class that contains only one child. `GTK_BIN`.
+- =GtkBin=: abstract class that contains only one child. =GTK_BIN=.
 
-- `GtkWindow`: standard window object.
-
-
+- =GtkWindow=: standard window object.
