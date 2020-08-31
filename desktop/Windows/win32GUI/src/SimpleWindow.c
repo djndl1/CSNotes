@@ -35,7 +35,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
         WNDCLASSEX wc = {
                 .cbSize = sizeof(WNDCLASSEX),
-                .style = WS_OVERLAPPEDWINDOW | WS_VSCROLL | WS_HSCROLL,
+                .style = CS_VREDRAW | CS_HREDRAW,
                 .lpfnWndProc = WndProc,
                 .cbClsExtra = 0,
                 .cbWndExtra = 0,
@@ -49,7 +49,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         };
         RegisterClassEx(&wc);
         HWND mywindow = CreateWindowEx(0, wc.lpszClassName, L"Window",
-                                       wc.style, CW_USEDEFAULT, CW_USEDEFAULT,
+                                       WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
                                        CW_USEDEFAULT, CW_USEDEFAULT,
                                        NULL, NULL, hInstance, NULL);
         ShowWindow(mywindow, SW_SHOWDEFAULT);

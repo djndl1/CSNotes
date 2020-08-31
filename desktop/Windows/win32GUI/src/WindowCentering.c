@@ -33,7 +33,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
              LPWSTR lpCmdLine, int nShowCmd)
 {
   WNDCLASSEX wc = {.cbSize = sizeof(WNDCLASSEX),
-                   .style = WS_OVERLAPPEDWINDOW,
+                   .style = CS_VREDRAW | CS_HREDRAW,
                    .lpszClassName = L"Center",
                    .cbClsExtra = 0,
                    .cbWndExtra = 0,
@@ -46,7 +46,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    .hIconSm = LoadCursor(hInstance, IDI_APPLICATION)};
   RegisterClassEx(&wc);
   HWND CenterWin =
-      CreateWindowEx(0, wc.lpszClassName, L"CenterWindow", wc.style,
+      CreateWindowEx(0, wc.lpszClassName, L"CenterWindow", WS_OVERLAPPEDWINDOW,
                      100, 100, 250, 250, NULL, NULL, hInstance, NULL);
   ShowWindow(CenterWin, SW_SHOWDEFAULT);
   UpdateWindow(CenterWin);

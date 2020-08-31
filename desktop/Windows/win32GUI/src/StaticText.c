@@ -25,9 +25,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_CREATE:
                 GetClientRect(hwnd, &clientArea);
                 
-                CreateWindowEx(0, L"Static", testText, WS_CHILD | WS_VISIBLE,
+                HWND edit = CreateWindowEx(0, L"Static", testText, WS_CHILD | WS_VISIBLE,
                                0, 0, clientArea.right, clientArea.bottom,
                                hwnd, NULL, NULL, NULL);
+		ShowWindow(edit, SW_NORMAL);
                 break;
         case WM_DESTROY:
                 PostQuitMessage(0);
@@ -42,13 +43,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
         WNDCLASSEX wc = {
                 .cbSize = sizeof(WNDCLASSEX),
-                .style = WS_OVERLAPPEDWINDOW | WS_VSCROLL | WS_HSCROLL,
+                .style = CS_VREDRAW | CS_HREDRAW,
                 .lpfnWndProc = WndProc,
                 .cbClsExtra = 0,
                 .cbWndExtra = 0,
                 .hInstance = hInstance,
                 .hCursor = LoadCursor(NULL, IDC_ARROW),
-                .hbrBackground = GetSysColorBrush(COLOR_WINDOW),
+                .hbrBackground = GetSysColorBrush(COLOR_3DFACE),
                 .lpszClassName = L"myWindow",
                 .lpszMenuName = NULL,
                 .hIcon = LoadCursor(hInstance, IDI_APPLICATION),
@@ -56,7 +57,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         };
         RegisterClassEx(&wc);
         HWND mywindow = CreateWindowEx(0, wc.lpszClassName, L"Window",
-                                       wc.style, CW_USEDEFAULT, CW_USEDEFAULT,
+                                       WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
                                        CW_USEDEFAULT, CW_USEDEFAULT,
                                        NULL, NULL, hInstance, NULL);
         ShowWindow(mywindow, SW_SHOWDEFAULT);
