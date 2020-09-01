@@ -25,17 +25,20 @@ int main(int argc, char *argv[])
         // often used to label other widgets, but also to create large blocks of
         // uneditable, formatted or wrapped text
         GtkWidget *label = gtk_label_new("Hello World");
-        gtk_label_set_selectable(GTK_LABEL(label), TRUE); // so that the text can be selected
+        gtk_label_set_selectable(GTK_LABEL(label), TRUE);
+        // so that the text can be selected
+        // error messages shoudl be set as selectable
 
         // add the label as a child widget of the window
         gtk_container_add(GTK_CONTAINER(window), label);
 
         // GTK queues the widget until all preprocessing is complete before it
         // is drawn onto the screen. Not drawn if the parent is not drawn.
-        // The children will be drawn. 
+        // The children will be drawn.
+        // the function recursively draws the window, its children and so on
         gtk_widget_show_all(window);
 
-        // enter the main loop
+        // enter the main loop and start processing events
         gtk_main();
         return 0;
 }
