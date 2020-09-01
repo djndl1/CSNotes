@@ -6,6 +6,10 @@
 
 Control of the application is managed by signals, timeout functions and various other callback functions once =gtk_main()= is called.
 
+=GTK_WINDOW_TOPLEVEL= and =GTK_WINDOW_POPUP= are the only two elements available in the `GtkWindowType` enumerations. A pop-up window has no border or minimize/maximize button, nor can it be resized. The window manager does not know about them.
+
+
+
 ** Hierarchy
 
 #+BEGIN_SRC 
@@ -57,3 +61,94 @@ Control of the application is managed by signals, timeout functions and various 
 - =GtkBin=: abstract class that contains only one child. =GTK_BIN=.
 
 - =GtkWindow=: standard window object.
+
+** Signals and Callbacks
+
+/signal/: a notification to the application that the users has performed some action. The callback function will be called when the action has occurred and the signal is emitted or when the signal is explicitly emitted.
+
+=g_signal_connect()=
+
+The generic form of callback function is like
+
+#+BEGIN_SRC c
+static void callback_function(GtkWidget *widget,
+    ... /* other possbile arguments */,
+    gpointer data);
+#+END_SRC
+
+=g_signal_emit_by_name()=, =g_signal_emit()= (used with a signal identifier) can be used to emit signals. =g_signal_stop_emission_by_name()= 
+
+/Events/ are special tpes of signals that are emitted by the X Window system. They are initially emitted by the X Window System and then sent from the WM to the application to be interpreted by =GLib=. =delete-event= signal is emitted when the user tries to close the window. Connecting events to a callback is done in the same manner with =g_signal_connect= but with a different callback
+
+#+BEGIN_SRC c
+static gboolean callback_function(GtkWidget *widget, GdkEvent *event, gpointer data);
+#+END_SRC
+
+the returned value indicates whether the event has been handled. There is no need to connect to it unless the default is overriden. `GdkEventType` enumeration provides a list of available event types that can be used to determine the type of event that has occurred. If more specific type info is known, the argument types can be declared otherwise:
+
+#+BEGIN_SRC c
+static key_press(GtkWidget *widget, GdkEventKey *event, gpointer data);
+#+END_SRC
+
+** =GtkWidget= Functions
+
+- =gtk_widget_destroy()=: drop the reference count on the widget and all of its children recursively. The widget along with all its children will be destroyed and all memory freed. Generally only called on top-level widgets such as dialog windows and quit menu item.
+
+- =gtk_widget_set_size_request()=: set the minimum size of a widget. It is best to allow GTK to choose the size of widgets and windows in most cases.
+
+- =gtk_widget_grab_focus()=: force a widget to grab keyboard focus if the widget can handle keyboard interaction.
+
+- =gtk_widget_set_sensitive()=: toggle a widget and all its children.
+
+** =GtkWindow= Functions
+
+- =gtk_window_set_resizable()=: all windows are set as resizable by default, desirable in most apps. The ability to resize is controlled by the WM, so this setting may not be honored in all cases.
+
+- =gtk_window_set_default_size()=: ignored if the window is larger than specified or the larger size request has been made. It only sets the initial size and does not prevent the user from resizing the window as they want.
+
+- =gtk_window_move()=: may be ignored by the WM.
+
+- =gtk_window_set_gravity()=: change the origin of coordinate.
+
+- =gtk_window_set_transient_for()=: 
+
+- =gtk_window_set_icon_from_file()=  
+
+** Processing Pending Events
+
+#+BEGIN_SRC c
+// update the UI while doing some time intensive computation
+while (gtk_events_pending())
+    gtk_main_iteration(); // runs a single iteration of the mainloop
+#+END_SRC
+
+** =GtkButton=
+
+/accelerator key/: a key or set of keys that can be used to activate a predefined action.
+
+A special type of container that turns its child into a clickable entity, only capable of holding one child. Almost always used with =clicked= signal. Generally used with a label =gtk_button_new_with_label()=; =gtk_button_new_with_mnemonic=
+
+** Widget Properties
+
+GObject provides a property system. Every class derived from the =GObject= class can install any number of properties. Use =g_object_get()= to retrieve the current value of a property.
+
+#+BEGIN_SRC c
+g_object_get(button, "relief", &value, NULL);
+g_object_set(button, "relief", GTK_RELIEF_NORMAL, NULL);
+
+// monitor a specific property;
+g_signal_connect(G_OBJECT(button), "notify::relief",
+                 G_CALLBACK(property_changed), NULL);
+
+static void property_changed(GObject *button,
+                             GParamSpec *property,
+                             gpointer data)
+#+END_SRC
+
+Every =GObject= has a table that associates a list of strings to a list of points, which allows data to be added to an object so that they can be easily accessed.
+
+#+BEGIN_SRC c
+void g_object_set_data(GOject *object,
+                       const gchar *key,
+                       gpointer data);
+#+END_SRC
