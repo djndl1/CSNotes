@@ -84,7 +84,7 @@ static void callback_function(GtkWidget *widget,
 static gboolean callback_function(GtkWidget *widget, GdkEvent *event, gpointer data);
 #+END_SRC
 
-the returned value indicates whether the event has been handled. There is no need to connect to it unless the default is overriden. `GdkEventType` enumeration provides a list of available event types that can be used to determine the type of event that has occurred. If more specific type info is known, the argument types can be declared otherwise:
+the returned value indicates whether the event has been handled. There is no need to connect to it unless the default is overriden. =GdkEventType= enumeration provides a list of available event types that can be used to determine the type of event that has occurred. If more specific type info is known, the argument types can be declared otherwise:
 
 #+BEGIN_SRC c
 static key_press(GtkWidget *widget, GdkEventKey *event, gpointer data);
