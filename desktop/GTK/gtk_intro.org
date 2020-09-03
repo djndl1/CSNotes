@@ -152,3 +152,43 @@ void g_object_set_data(GOject *object,
                        const gchar *key,
                        gpointer data);
 #+END_SRC
+
+* Container
+
+The main purpose of a container class is to allow a parent widget to contain one or more children.
+
+** Decorator Containers
+
+Widgets that derived from =GtkBin= since they add some type of functionality to the child widget. The actual purpose of =GtkBin= is to provide an instantiable widget from which all subclasses that only require one child widget can be derived. It provides only one function:
+
+#+BEGIN_SRC c
+GtkWidget *gtk_bin_get_child(GtkBin *bin);
+#+END_SRC
+
+e.g. =GtkWindow=, =GtkFrame= (which draws a frame around its child); =GtkButton=; =GtkExpander=. Widgets that derive from =GtkBin= include windows, alignments, frames, buttons, items, combo boxes, event boxes, expanders, handle boxes, scrolled windows and tool items.
+
+** Layout Containers
+
+Widgets that are used to arrange multiple widgets, derived directly from =GtkContainer=, including boxes, fixed containers, paned widgets, icon views, layouts, menu shells, notebooks, sockets, tables, text views, toolbars, and tree views.
+
+** Resizing
+
+A recursive process of communication between the widget, its ancestors and its children.
+
+- /size requisition/: the desired size of the child. The top-level asks its children for their preferred sizes and the children ask their children and so on until the last child is reached. The last child decides what size it wants to be based on the space it needs to be shown correctly on the screen and any size requests from the programmer. The child passes a size to its ancestors until the top-level widget receives the amound of space needed based on its children's requisitions. Each widget stores its size preferences as width and height values in a =GtkRequisition= object. This request does not have to be honored by the parent widget.
+
+- /size allocation/: the top-level widget begins to resize itself if resizable. It will then pass the amount of available space to its child widget until all widgets have resized themselves. Size allocations for every widget are stored in =GtkAllocation= structure fo reach child, which is passed to child widgets for resizing with =gtk_widget_size_allocate()=. Once a widget has been given a size allocation by its parent, the widget has no choice but to redraw itself with the new size. In most cases =gtk_widget_set_size_request()= is best to use for resizing widgets.
+
+** Container Signals
+
+- =add=: a child widget was added or packed into the container.
+
+- =check_resize=: the container is checking whether it needs to resize for its children before taking further action.
+
+- =remove=: a child has been removed from the container
+
+- =set_focus_child=: a child of the container has received focus from the WM.
+
+** Horizontal and Vertical Boxes
+
+=GtkBox=: an abstract container widget that allows multiple children to be packed into one-dimensional rectangular area.
