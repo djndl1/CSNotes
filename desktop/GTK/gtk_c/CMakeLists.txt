@@ -19,3 +19,5 @@ link_libraries(${GLIB2_LIBRARIES})
 
 add_executable(helloworld_gtk helloworld.c)
 add_executable(button_gtk button.c)
+add_executable(exercise2.2 exercise2.2.c)
+add_executable(gtkbox gtkbox.c)
