@@ -359,3 +359,28 @@ To replace the WinForms unhandled-exception dialog, use an exception handler to 
 
 ## Single-Instance Application
 
+# Settings
+
+Most real-world applications rely on information forom the environment around them.
+
+## Compile-Time Settings
+
+- _Assembly Information_: some of them are available from the `Application` class.
+
+## Run-Time Settings
+
+The `Application` class exposes several run-time environment settings. More environment settings re in `System.Environment`. Runtime access to shell settings is exposed by `System.Windows.Form.SystemInformation`; sysinfo about the screen is in `Systme.Windows.Forms.Screen`. `Microsoft.Win32.SystemEvents`
+
+## Application, User and Roaming-User settings
+
+_setting_: name, type, value and scope (whether a setting is an application or user seting)
+
+_setting file_: `Settings.setings`
+
+_application configuration file_: `app.config`. The `ConfigurationManager` class and the classes in `System.Configuration` wra the config file into a settings-oriented abstraction.
+
+- _user configuration file_: `user.config`. Unmodified user settings are copied fro mthe dfeaults locatd in `app.exe.config`
+
+## Strongly Typed Settings
+
+Every setting file added to a project is used to generate an additonal strongly typed settings class. `ApplicationSettingsbase` 
