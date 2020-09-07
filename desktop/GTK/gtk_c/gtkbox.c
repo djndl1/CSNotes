@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     for (int i = 0; i < 4; i++ ) {
         GtkWidget *button = gtk_button_new_with_label(names[i]);
-        gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, TRUE, 5);
+        gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
         g_signal_connect_swapped(G_OBJECT(button), "clicked",
             G_CALLBACK(gtk_widget_destroy), button);
     }
