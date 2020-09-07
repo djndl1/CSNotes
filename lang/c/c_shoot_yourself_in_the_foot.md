@@ -1,0 +1,1 @@
+- casting a `GtkButton` to a callback resulted in a segfault.
