@@ -211,4 +211,37 @@ A recursive process of communication between the widget, its ancestors and its c
 
 ** Event Boxes
 
-=GtkEventBox= catchs events for the child widget by providing a GDK window for the object.
+=GtkEventBox= catches events for the child widget by providing a GDK window for the object.
+
+* Basic Widgets
+
+A widget can become disabled or inactive, managed by the =sensitive= property and =gtk_widget_set_sensitive=. There are other widget flags provided by =GtkWidgetFlags= enumeration, which can be set with =GTK_WIDGET_SET_FLAGS()= or disabled with =GTK_WIDGET_UNSET_FLAGS()=.
+
+- stock items: pairs of images and strings that accommodate often-used menu items and buttons. =gtk_button_new_from_stock()=.
+
+  #+BEGIN_SRC C
+button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
+g_signal_connect_swapped(G_OBJECT(button), "clicked",
+                         G_CALLBACK(gtk_widget_destroy), (gpointer) window);
+  #+END_SRC
+
+- =GtkToggleButton=: holds its active and inactive state after it is clicked.
+
+- =GtkCheckButton=: places a discrete toggle next to the display text, derived from =GtkToggleButton=.
+
+- =GtkRadioButton=: derived from =GtkCheckButton=. Toggles that are generally grouped together. In a group, when one radio button is selected, all others will be deselected. The group forbids selecting multiple radio buttons at once. There is no way provided by GTK to deselect a radio button.
+
+- =GtkEntry=: a single line, free-form text entry and can be used for text entry, password entry and even number selections. Invisibility character is shown instead of password content in password mode. Text does not always have to be editable in an entry.
+
+- =GtkSpinButton=: a number select widget that is capable of handling integer, float. Derived from =GtkEntry=. =GtkAdjustment= is used alongside =GtkSpinButton=, as well as multiple widgets derived from =GtkRange=. Once added to a widget, memory management of the adjustment is handled by the widget.
+
+- =GtkScale=: provides a a horizontal or vertical slider that can choose an integer or a float, used when the user is restricted from entering values.
+
+
+** Additional Buttons
+
+- =GtkColorButton=: allow users to select a specific color in a six-digit hexadecimal vlaues or the RGB value.
+
+- =GtkFileChooserButton=: an easy method to ask users to choose a file or a folder, which implements =GtkFileChooser= interface. A =GtkFileChooserDialog= is opened that allows the user to browse and select one file or one folder.
+
+- =GtkFontButtons=
