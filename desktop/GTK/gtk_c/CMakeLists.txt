@@ -27,3 +27,6 @@ add_executable(gtkfixed fixed.c)
 add_executable(gtkexpander expander.c)
 add_executable(gtknotebook notebook.c)
 add_executable(exercise3.1 exercise3.1.c)
+
+add_executable(gtkradiobutton radiobuttons.c)
+add_executable(gtkentry entry.c)
