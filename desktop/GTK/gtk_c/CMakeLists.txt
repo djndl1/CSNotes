@@ -30,3 +30,5 @@ add_executable(exercise3.1 exercise3.1.c)
 
 add_executable(gtkradiobutton radiobuttons.c)
 add_executable(gtkentry entry.c)
+add_executable(gtkdialog SimpleDialog.c)
+add_executable(gtkmsg MessageDialog.c)

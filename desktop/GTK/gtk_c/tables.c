@@ -10,10 +10,11 @@ int main(int argc, char *argv[])
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Panes");
     gtk_container_set_border_width(GTK_CONTAINER(window), 5);
-    gtk_widget_set_size_request(window, 300, 400);
+//    gtk_widget_set_size_request(window, 300, 400);
     g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(destroy_app), NULL);
     
     GtkWidget *table = gtk_grid_new();
+    gtk_grid_set_row_homogeneous(GTK_GRID(table), TRUE);
     
     GtkWidget *label1 = gtk_label_new("Enter the following info...");
     GtkWidget *label2 = gtk_label_new("Name: ");

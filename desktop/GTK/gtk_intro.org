@@ -240,8 +240,44 @@ g_signal_connect_swapped(G_OBJECT(button), "clicked",
 
 ** Additional Buttons
 
-- =GtkColorButton=: allow users to select a specific color in a six-digit hexadecimal vlaues or the RGB value.
+- =GtkColorButton=: allow users to select a specific color in a six-digit hexadecimal values or the RGB value.
 
 - =GtkFileChooserButton=: an easy method to ask users to choose a file or a folder, which implements =GtkFileChooser= interface. A =GtkFileChooserDialog= is opened that allows the user to browse and select one file or one folder.
 
 - =GtkFontButtons=
+
+* Dialogs
+
+A special type of =GtkWindow= that is used to supplement the top-level window. It can be used to give the user a message, retrieve information from the user or provide some other transient type of action.
+
+A dialog widget has a horizontal separator, which divides the widget into the /action area/ (=GtkHButtonBox=) that contains a collection of buttons and the top main part, which is a =GtkVBox=.
+
+#+include: "gtk_c/SimpleDialog.c" src C
+
+** Built-in Dialogs
+
+- =GtkMessageDialog=: give one of four types of informational messages: general information, error messages, warnings and questions.
+
+#+include "gtk_c/MessageDialog.c" src C
+
+- =GtkAboutDialog=
+
+=GdkPixBuf= a class that contains information about an image in memory. It can be used to build images manually by placing shapes or pixels or to load a prebuilt image from a file.
+
+GLib provides a standard method for error propagation =GError= structure.
+
+#+BEGIN_SRC c
+struct GError {
+  GQuark       domain; // a group that encompasses similar types, resolved at runtime
+  gint         code; // an error code that falls under the domain
+  gchar       *message;
+};
+#+END_SRC
+
+Use =g_clear_error()= to reset the =GError= values to their initial states before reuse.
+
+- =GtkFileChooserDialog= uses =GtkFileChooserWidget= to choose a file or folder.
+
+- =GtkColorSelectionDialog=: a dialog containing a =GtkColorSelection= widget.
+
+- =GtkFontSelectionDialog=
