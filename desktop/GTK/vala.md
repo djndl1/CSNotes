@@ -1,6 +1,10 @@
 # Basics
 
+- basic types have `to_string()` and `parse(string str)` methods.
+
 - All classes are subclasses of `GLib.Object`.
+
+- non-specified fields in `struct` are zero-initialized and constructed with `new`.
 
 - `unichar`: 32-bit unicode
 
@@ -17,14 +21,13 @@ string s = @"$a * $b = $(a * b)";  // => "6 * 7 = 42"
 
 - All class types are reference types, regardless of whether they are descended from `GLib.Object` or not. Objects are ref-counted
 
-- `var` type inferencing is available.
+- `var` type inference is available.
 
 - `??`: null coalescing 
 
-- `in`: works on arrays, strings, collections or any other  type that has an appropriate `contain()` method.
+- `in`: works on arrays, strings, collections or any other type that has an appropriate `contain()` method.
 
-- Operators/functions/methods cannot be overloaded. Choose slightly different names to avoid a name clash. However
-, default argument is supported.
+- Operators/functions/methods cannot be overloaded. Choose slightly different names to avoid a name clash. However , default argument is supported. Index access are mapped to`get`/`set` methods. `[start:end]` is mapped to `slice(long start, long end)`. `in` is mapped to `contains()`; `foreach/in` loop is mapped to `iterator()`
 
 - no fallthrough between cases. Each non-empty case must end with a `break`, `return` or `throw`.
 
@@ -35,6 +38,26 @@ string s = @"$a * $b = $(a * b)";  // => "6 * 7 = 42"
 - `using` namespace is supported. `global::` namespace is there.
 
 - Vala support _named constructors_ with different names. Constructor dispatch is supported. Destructors are there if needed.
+
+# Structured Error Handling
+
+For recoverable errors.
+
+Related errors are grouped into error domains. Vala error domains do not form a class hierarchy.
+
+```c
+public errordomain MathError 
+{
+    DIVISION_BY_ZERO,
+    OVERFLOW,
+    //...
+}
+```
+
+# Method Contracts
+
+Vala has basic support for contract-based programming. Every method can specify a boolean expression that it `requires` to be true (a precondition checked at runtime) before the control flow enters the code block. If evaluated to `false`, a critical warning is emitted that usually leads to program termination. Postconditions are specified using the `ensures` keyword.
+
 
 # Signal
 
@@ -97,3 +120,10 @@ Foo foo = (Foo) Object.new(t);
 # Generics
 
 Vala includes a runtime generics system. Vala's is similar to the system used by Java. There is no restriction on what type may be used in generic.
+
+
+# Files
+
+- `.vapi`: interface file
+
+- `.deps`: depedency specification for interface files
