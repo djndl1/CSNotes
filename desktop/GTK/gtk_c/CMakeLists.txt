@@ -32,3 +32,5 @@ add_executable(gtkradiobutton radiobuttons.c)
 add_executable(gtkentry entry.c)
 add_executable(gtkdialog SimpleDialog.c)
 add_executable(gtkmsg MessageDialog.c)
+
+add_executable(gtimeout timeouts.c)

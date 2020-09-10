@@ -281,3 +281,90 @@ Use =g_clear_error()= to reset the =GError= values to their initial states befor
 - =GtkColorSelectionDialog=: a dialog containing a =GtkColorSelection= widget.
 
 - =GtkFontSelectionDialog=
+
+- =GtkAssistant=: A dialog with multiple pages. A page has a type. The first page should always be =GTK_ASSISTANT_PAGE_INTRO=. =GtkAssistant= is not derived from =GtkDialog=.
+
+- =GtkProgressBar=:
+
+* GLib
+
+A general-purpose lbirary that provides many kinds of utility functions, data types and wrappers functions.
+
+** Message Logging
+
+Any type of textual message can be conveyed using =g_log()=. Unless creating a library, use =G_LOG_DOMAIN= as the domain. =g_messsage()=, =g_warning()=, =g_critical()=, =g_error()= and =g_debug()= for the sake of convenience, emitted under the =G_LOG_DOMAIN=. Some types of messages can be set fatal using =g_log_set_always_fatal=. By default, only =G_LOG_LEVEL_ERROR= messages are fatal.
+
+** Memory Management
+
+The advantage of using memory slices is that they avoid memory waste and fix scalability and performance problems that plagued memory chunks, achieved by using slab allocation. One constraint of memory slices is that the size of the object must be the same size when it was allocated and when it is freed.
+
+Large blocks of memory is allocated using =malloc()=. Use slice allocators for a single object of any size greater than two pointers or allocate multiple objects.
+
+#+include "gtk_c/slice.c" src C
+
+Use =g_try_malloc()= if the app can recover from an unsuccessful memory allocation. Never use =g_free()= on a chunk of memory that was allocated with memory slices.
+
+=g_mem_profile()= provides a simple way to output a summary of memory usage within the app.
+
+** Utilities
+
+=g_get_current_dir()=, =g_get_home_dir()=, =g_get_host_name()=, =g_get_real_name()=; =g_get_tmp_dir()=; =g_get_user_name()=; =g_setenv()=; =g_getenv()=; =g_unsetenv()=
+
+=GTimer= keeps time in microsecond.
+
+** File Manipulation
+
+#+BEGIN_SRC C
+#include <glib.h>
+
+gchar *filename, *content;
+gsize bytes;
+GError *error = NULL;
+
+filename = g_build_filename(g_get_home_dir(), "temp", NULL);
+g_file_set_contents(filename, "Hello World", 1 &error);
+handle_error(error);
+
+if (!g_file_test(filename, G_FILE_TEST_EXISTS))
+    g_error("Error: File does not exist!");
+
+g_file_get_contents(filename, &content, &bytes, &error);
+handle_error(error);
+g_print("%s\n", content);
+
+g_free(content);
+g_free(filename);
+#+END_SRC
+
+#+BEGIN_SRC C
+GDir *dir = g_dir_open(g_get_home_dir(), 0, NULL);
+
+if (!g_file_test(g_get_home_dir(), G_FILE_TEST_IS_DIR))
+    g_error(...)
+
+const gchar *file;
+while ((file = g_dir_read_name(dir)))
+    g_print("%s\n", file);
+
+g_dir_close(dir);
+#+END_SRC
+
+=g_rename()=; =g_remove()=; =g_rmdir()=; =g_mkdir()=; =g_chdir()=; =g_chmod()=
+
+
+** The Main Loop
+
+TODO
+
+
+** Timeouts Functions
+
+Methods that are called at certain interval time until =FALSE= is returned.
+
+#+include "gtk_c/timeouts.c" src
+
+** Idle Functions
+
+A function that will be called when there are no events pending
+
+=g_idle_add()=, =g_idle_add_full()=
