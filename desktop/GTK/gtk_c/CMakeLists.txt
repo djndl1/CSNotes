@@ -34,3 +34,10 @@ add_executable(gtkdialog SimpleDialog.c)
 add_executable(gtkmsg MessageDialog.c)
 
 add_executable(gtimeout timeouts.c)
+
+add_executable(exercise6.1 exercise6.1.c)
+add_executable(exercise6.2 exercise6.2.c)
+
+add_executable(scrolledwindow scrolledwindows.c)
+add_executable(textview textview2.c)
+add_executable(iterator iterator.c)
