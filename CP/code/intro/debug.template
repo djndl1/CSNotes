@@ -1,7 +1,0 @@
-(dap-register-debug-template "GDB::Run a.out"
-  (list :type "gdb"
-        :request "launch"
-        :name "GDB::Run"
-        :terminal "x-terminal-emulator"
-        :target "./a.out"
-        :cwd "${workspaceRoot}"))

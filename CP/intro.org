@@ -33,7 +33,8 @@ research problems in the future.
   test cases. Use =diff= to check the code's output against the sample
   output. Include tricky corner cases. Increase the input size
   incrementally up to the maximum input bounds stated in the problem
-  descriptor.
+  descriptor. Use two identical sample test cases to test whether any variable
+  is not reset.
 
 - Practice: UVa Online Judge; ACM ICPC Live Archive; The USA Computing
   Olympiad; The Sphere Online Judge

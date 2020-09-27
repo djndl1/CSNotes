@@ -6,27 +6,24 @@ int main(int argc, char *argv[])
 
     scanf("%d", &cases);
     while (cases--) {
-        int W, y1, y2, prev_diff;
+        int col_count;
+        scanf("%d", &col_count);
+
         bool result = true;
-        scanf("%d", &W);
-        scanf("%d %d", &y1, &y2);
-        prev_diff = y1 - y2;
-        while (--W) {
-            scanf("%d %d", &y1, &y2);
-            if (prev_diff != y1 - y2) {
-                printf("no\n");
-                if (cases != 0)
-                    putchar('\n');
-                result = false;
-                break;
+
+        int northmost, southmost;
+        int diff = -1;
+        while (col_count--) {
+            scanf("%d%d", &northmost, &southmost);
+            if (result) {
+                if (diff == -1)
+                    diff = northmost - southmost;
+                else if (diff != (northmost - southmost))
+                    result = false;
             }
-            prev_diff = y1 - y2;
         }
-        if (not result)
-            continue;
-        else {
-          printf("yes\n");
-          if (cases != 0)
+        printf(result ? "yes\n" : "no\n");
+        if (cases != 0) {
             putchar('\n');
         }
     }

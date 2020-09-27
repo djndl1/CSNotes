@@ -5,7 +5,6 @@ class OneTwoThreeFive {
     public static void main(String[] args) {
         int n;
         var in = new Scanner(System.in);
-
         n = in.nextInt();
         var persons = new ArrayList<Person>();
         
