@@ -5,6 +5,7 @@ a.out
 *.o
 *.html
 *.exe
+*.elf
 *build*
 __pycache__
 .ipynb_checkpoints
