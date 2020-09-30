@@ -368,3 +368,51 @@ Methods that are called at certain interval time until =FALSE= is returned.
 A function that will be called when there are no events pending
 
 =g_idle_add()=, =g_idle_add_full()=
+
+** Data Types
+
+- `GString`: `g_string_printf()` constructs the content of a `GString` using a `sprintf` style format.
+
+```c
+typedef struct {
+    gchar *str;
+    gsize len;
+    gsize allocated_len
+} GString;
+```
+
+- `GTree`: a balanced binary tree
+
+** Input-Output Channels
+
+`GIOChannel`: handle files, pipes and sockets
+
+
+* Chap.7 The Text View Widget
+
+- =GtkScrolledWindow=: use two scrollbars to allow a widget to take up more space than is visible on the screen. Associated with =GtkAdjustment= object, used to track the current position and range of a scrollbar, not directly accessed, though.
+
+- =GtkViewport=: adaptor class for widgets that do not support scrolling.
+
+Read the official doc /text widget conceptual overview/.
+
+- =GtkTextBuffer=: represents the text being edited. Each buffer can be displayed by any number of views. At least one line (which may be empty). The last line in a buffer never ends in a line separator.
+
+- =GtkTextView=: a widget which can display a =GtkTextBuffer=.
+
+- =GtkTextTag=: marks text. An attribute (anonymous or named) that can be applied to some range of text. Each tag is stored in a =GtkTextTagTable=.
+
+- =GtkTextTagTable= defines a set of tags that can be used together. Each buffer has /one/ tag table associated with it; only tags from that tag table can be used with the buffer. A single tag table can be shared between multiple buffers.
+
+Text in GTK is in UTF-8. One character can be encoded as multiple bytes:
+  + /offset/: character counts
+  + /indexes/: byte counts
+
+#+include "src/textview2.c" src C
+
+- =GtkTextIter=: a position between two characters in a buffer for text manipulation, a struct designed to be allocated on the stack, copiable by value. Whenever the buffer is modified in a way that affects the number of characters in the buffer, all outstanding iterators become invalid.
+
+- =GtkTextMark=: an invisible cursor or insertion point which can be used to preserve a position. =insert= and =selection_bound= are builtin marks for =GtkTextBuffer=. Has a gravity set to the right of pointed character.
+
+An iterator pointing to a text mark can be retrieved with =gtk_text_buffer_get_iter_at_mark()=.
+

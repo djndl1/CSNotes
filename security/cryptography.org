@@ -1,0 +1,19 @@
+#+title: Introduction to Cryptography
+
+* Basic Principles
+
+- /encryption/: converting data in some some unreadable form
+
+- /authentication/: to ensure that the message was originated form the originator claimed in the message. This is done by making the sender do something that only they can do.
+
+- /integrity/: the message received by the receiver are not altered anywhere on the communication path.
+
+- /non-repudiation/:
+
+* Types of Cryptography
+
+- secret key cryptography/symmetric encryption
+
+- public key cryptography/asymmetric encryption: each party has a private key and a public key. The private is secret while the public key is shared with all those whom to communicate with. The public key is for encryption and the private key is for decryption.
+
+- hash function can be used to check the integrity of the message.

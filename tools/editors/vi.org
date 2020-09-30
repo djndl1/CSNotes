@@ -1,6 +1,6 @@
 * Basic Operations
 
-- ~ZZ~/~:wq~ 
+- ~ZZ~ / ~:wq~
 
 - ~:e!~: returns to the last saved version of the file
 
@@ -34,31 +34,31 @@
 
 - ~J~: join
 
-- ~-~/~+~: to the first char of the previous/next line
+- ~-~ / ~+~: to the first char of the previous/next line
 
-- ~^f~/~^b~: scroll up/down a screen
+- ~^f~ / ~^b~: scroll up/down a screen
 
-- ~^d~/~^u~: scroll up/down half screen
+- ~^d~ / ~^u~: scroll up/down half screen
 
-- ~^e~/~^y~: scroll up/down one line
+- ~^e~ / ~^y~: scroll up/down one line
 
-- ~zENTER~/~z.~/~z-~: move current line to top/center/bottom of screen and scroll
+- ~zENTER~ / ~z.~ / ~z-~: move current line to top/center/bottom of screen and scroll
 
-- ~H~/~M~/~L~: move home/middle/last line on screen
+- ~H~ / ~M~ / ~L~: move home/middle/last line on screen
 
 - ~n|~: move to column n
 
-- ~(~/~)~, ~{~/~}~, ~[[~/~]]~: move to beginning of current/next sentence/paragraph/section
+- ~(~ / ~)~, ~{~ / ~}~, ~[[~ / ~]]~: move to beginning of current/next sentence/paragraph/section
 
 - Commands that change text can be combined with ~/~ and ~?~
 
-- ~f~/~F~/~t~/~T~/~;~/~,~
+- ~f~ / ~F~ / ~t~ / ~T~ / ~;~ /~,~
 
-- ~G~/~``~: go to/back
+- ~G~ / ~``~: go to/back
 
 * Advanced Operations
 
-~y~/~d~ can be used with a-z named buffers that are specifically available for copying and moving text. A-Z appends text to these buffers.
+~y~ / ~d~ can be used with a-z named buffers that are specifically available for copying and moving text. A-Z appends text to these buffers.
 
 #+begin_src
 "dyy
@@ -68,7 +68,7 @@
 "ap
 #+end_src
 
-- ~mx~/~'x~/~`x~/~``~
+- ~mx~ / ~'x~ / ~`x~ / ~``~
 
 * Basic Concepts
 
@@ -93,7 +93,7 @@ A command without a line number is assumed to affect the current line.
 
 - ~co~: copy lines
 
-- ~g!~/~v~: the opposite of ~g~
+- ~g!~ / ~v~: the opposite of ~g~
 
 - ~|~: command separator
 
@@ -151,8 +151,7 @@ slashes can be replaced by colons as delimiters.
 :s/thier/~/
 #+end_src
 
-- ~\u~/~\l~: causes the next character in the replacement string to be changed to uppercase or lowercase. ~\U~\~\L~\~\e~\~\E~: all following characters are converted to 
-uppercase or lowercase until the end of the replacement string or until ~\e~/~\E~.
+- ~\u~ / ~\l~: causes the next character in the replacement string to be changed to uppercase or lowercase. ~\U~ \ ~\L~ \ ~\e~ \ ~\E~: all following characters are converted to uppercase or lowercase until the end of the replacement string or until ~\e~ / ~\E~.
 
 #+begin_src 
 :%s/yes, doctor/\uyes, \udoctor/
@@ -228,7 +227,7 @@ uppercase or lowercase until the end of the replacement string or until ~\e~/~\E
 
 - ~-E~: improved ex mode, with extended regex
 
-- ~-F~/~-A~: Farsi or Arabic mode
+- ~-F~ / ~-A~: Farsi or Arabic mode
 
 - ~view~: vim in read-only mode
 
@@ -255,7 +254,7 @@ uppercase or lowercase until the end of the replacement string or until ~\e~/~\E
 
 - ~:new~, ~Ctrl-Wn~
 
-- ~:vnew~/~:vsplit~, ~Ctrl-Wv~
+- ~:vnew~ / ~:vsplit~, ~Ctrl-Wv~
 
 - ~Ctrl-W~ + ~h,j,k,l~, ~t~ (top), ~b~ (bottom), ~p~ (previous)
 
@@ -266,6 +265,8 @@ uppercase or lowercase until the end of the replacement string or until ~\e~/~\E
 - ~Ctrl-W~ + ~+, -~: increase/decrease the current windows, ~=~: resize all windows to equal size. + ~<, >~: decrease/increase, + ~|~: resizes the current window to the widest size possible
 
 - ~Ctrl-W~ + ~q~: quit a window; + ~c~: close the current window
+
+- ~Ctrl-W~ + ~o~: maximize a window
 
 * Vimscripts
 
