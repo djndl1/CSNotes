@@ -58,5 +58,7 @@ int main()
                RFP, optim_prop_name);
 
         RFP++;
+
+        free(props);
     }
 }
