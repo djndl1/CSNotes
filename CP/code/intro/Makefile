@@ -10,19 +10,25 @@ EXE = 1-2-3.1.exe \
       uva_11799.exe \
       uva_11942.exe
 
-ELF = uva_11799.elf \
-      uva_11942.elf
+CC_ELF = uva_11799.cc.elf \
+      uva_11942.cc.elf \
+	    uva_12468.cc.elf \
+			uva_12554.cc.elf \
+			uva_573.cc.elf \
+			uva_661.cc.elf \
+			uva_10141.cc.elf
 
-all: $(EXE) $(ELF)
+all: $(EXE) $(CC_ELF)
 
 %.exe: %.cs
 	$(CSC) $< $(CSHARP_FLAGS) -out:$@
 
-%.elf: %.cc
+%.cc.elf: %.cc
 	$(CXX) $< $(CFLAGS) $(LDFLAGS) -o $@
 
 .PHONY:
 clean:
 	@echo "Cleaning"
-	@rm -v $(EXE) $(ELF)
+	@rm -v $(EXE) $(CC_ELF)
 	@rm -v *.mdb
+	@rm -v *.class
