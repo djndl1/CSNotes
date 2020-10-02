@@ -24,15 +24,20 @@ CC_ELF = uva_11799.celf \
 
 all: $(EXE) $(CC_ELF)
 
+csharp: $(EXE)
+
+cimpl: $(CC_ELF)
+
 %.exe: %.cs
 	$(CSC) $< $(CSHARP_FLAGS) -out:$@
 
 %.celf: %.cc
 	$(CXX) $< $(CFLAGS) $(LDFLAGS) -o $@
 
-.PHONY:
+.PHONY: clean
 clean:
 	@echo "Cleaning"
-	@rm -v $(EXE) $(CC_ELF)
-	@rm -v *.mdb
-	@rm -v *.class
+	-rm -f $(EXE) $(CC_ELF)
+	-rm -f *.mdb
+	-rm -f *.class
+	-rm -f a.out
