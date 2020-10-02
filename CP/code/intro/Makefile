@@ -10,20 +10,24 @@ EXE = 1-2-3.1.exe \
       uva_11799.exe \
       uva_11942.exe
 
-CC_ELF = uva_11799.cc.elf \
-      uva_11942.cc.elf \
-	    uva_12468.cc.elf \
-			uva_12554.cc.elf \
-			uva_573.cc.elf \
-			uva_661.cc.elf \
-			uva_10141.cc.elf
+CC_ELF = uva_11799.celf \
+      uva_11942.celf \
+	    uva_12468.celf \
+			uva_12554.celf \
+			uva_573.celf \
+			uva_661.celf \
+			uva_10141.celf \
+			uva10324.celf \
+			uva119.celf \
+			uva10424.celf \
+			uva394.celf
 
 all: $(EXE) $(CC_ELF)
 
 %.exe: %.cs
 	$(CSC) $< $(CSHARP_FLAGS) -out:$@
 
-%.cc.elf: %.cc
+%.celf: %.cc
 	$(CXX) $< $(CFLAGS) $(LDFLAGS) -o $@
 
 .PHONY:
