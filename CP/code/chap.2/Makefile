@@ -6,23 +6,14 @@ CXX=/usr/bin/g++
 CFLAGS=-g -std=c++11
 LDFLAGS=-lm -DONLINE_JUDGE
 
-EXE = 1-2-3.1.exe \
-      uva_11799.exe \
-      uva_11942.exe
+EXE = uva11222.exe \
+	  uva11988.exe \
+	  uva146.exe
 
-CC_ELF = uva_11799.celf \
-      uva_11942.celf \
-	    uva_12468.celf \
-			uva_12554.celf \
-			uva_573.celf \
-			uva_661.celf \
-			uva_10141.celf \
-			uva10324.celf \
-			uva119.celf \
-			uva10424.celf \
-			uva394.celf \
-			uva467.celf \
-			uva482.celf
+CC_ELF = uva11222.celf \
+		 uva11988.celf \
+		 uva514.celf \
+		 uva146.celf
 
 all: $(EXE) $(CC_ELF)
 
