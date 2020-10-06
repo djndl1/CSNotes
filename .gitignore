@@ -1,12 +1,14 @@
 a.out
 *ipch
 *.class
+*res*
 *.ccls-cache
 *.o
 *.html
 *.exe
 *elf
 *.celf
+**/.gdb_history
 *.relf
 *.elf
 *.mdb
