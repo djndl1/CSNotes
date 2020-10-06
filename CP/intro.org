@@ -1,3 +1,5 @@
+* Introduction
+
 The core directive in competitive programming is to solve well-known CS
 problems as quickly as possible. The true end goal of competitive
 programming is to produce all-rounder computer scientists/programmers
@@ -63,7 +65,7 @@ difference between passing or exceeding the problem's time limit.
   problem statement, the array size can be declared to be the maximum
   inut size with a small extra buffer (sentinel) for safety.
 
-- /dynamically-resizable array/ (C++ =std::vector=, Java =ArrayList=): 
+- /dynamically-resizable array/ (C++ =std::vector=, Java =ArrayList=, C# =List=):
   It is better to use a =vector= in place of an array if the size of the
   sequence of elements is unknown at compile-time. Usually, we initialize
   the size (=reserve()= or =resize()=) with the estimated size of the
@@ -73,12 +75,12 @@ difference between passing or exceeding the problem's time limit.
 
 $O(n^2)$ comparison-based sorting algorithms are usually avoided. 
 $O(n\log n)$ such as merge/heap/quick sort are the default choice, available
-in C++ as =partial_sort= or =stable_sort= or =Collections.sort= in Java.
+in C++ as =partial_sort= or =stable_sort= (C# =OrderBy=) or =Collections.sort= in Java.
 Special purpose sorting algorithms: $O(n)$ Counting/Radix/Bucket Sort are
 rarely used but good to know.
 
 /Linear search/ should be avoided whenever possible. /Binary search/: use
-=lower_bound=, =upper_bound= or =binary_search= or Java =Collections.binarySearch=.
+=lower_bound=, =upper_bound= or =binary_search= or Java =Collections.binarySearch= (C# =List<T>.BinarySearch()=).
 It is necessary to sort the array at least once before executing binary search.
 Using hashing to search is rarely used.
 
