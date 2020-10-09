@@ -13,7 +13,8 @@ EXE = uva11222.exe \
 CC_ELF = uva11222.celf \
 		 uva11988.celf \
 		 uva514.celf \
-		 uva146.celf
+		 uva146.celf \
+		 uva10107.celf
 
 all: $(EXE) $(CC_ELF)
 
