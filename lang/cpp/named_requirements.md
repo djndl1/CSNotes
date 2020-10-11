@@ -55,7 +55,7 @@ A class does not have to implement a move constructor to satisfy this type requi
 
 # Iterator
 
-- `LegacyIterator`: an abstraction of pointers, `CopyCOnstructible`, `CopyAssignable`, `Destructible`, `Swappable` and has `*r`, `++r`  for a lvalue of the type
+- `LegacyIterator`: an abstraction of pointers, `CopyConstructible`, `CopyAssignable`, `Destructible`, `Swappable` and has `*r`, `++r`  for a lvalue of the type
 
 - `LegacyInputIterator`: can read from the pointed-to element, but once it has been incremented, all copies of its previous value may be invalidated. `LegacyIterator`, `EqualityComparable`, has `i != j`, `*i`, `i->m`, `++i`, `(void)i++`, `*i++`
 
