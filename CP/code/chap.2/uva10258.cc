@@ -131,8 +131,8 @@ vector<contestant> summarize_submissions(const vector<submission>& subs)
     vector<contestant> teams{};
     teams.reserve(subs.size());
     for (auto& sub : subs) {
-       auto res = find_if(teams.begin(), teams.begin(),
-                           [&sub](const vector<contestant>::value_type& team) {
+       auto res = find_if(teams.begin(), teams.end(),
+                           [&sub](const contestant& team) {
                                return team.contestant_number == sub.contestant_number;
                            });
         if (res == teams.end()) {
@@ -169,10 +169,10 @@ int main()
             istringstream parser(temp);
 
             submission sm{};
-            parser >> sm.contestant_number;
-            parser >> sm.problem_number;
-            parser >> sm.time;
-            parser >> sm.result;
+            parser >> sm.contestant_number
+                   >> sm.problem_number
+                   >> sm.time
+                   >> sm.result;
 
             judge_queue.push_back(sm);
         }
