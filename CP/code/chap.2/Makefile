@@ -1,6 +1,6 @@
-CSC=mcs
+CSC=csc
 MONO=mono
-CSHARP_FLAGS = -debug -sdk:4.7.2-api -langversion:7 -optimize
+CSHARP_FLAGS=-debug -langversion:8
 
 JAVAC=javac8
 JAVA_FLAGS=-g
@@ -12,7 +12,8 @@ LDFLAGS=-lm -DONLINE_JUDGE
 DOTNET_EXE = uva11222.exe \
 	  uva11988.exe \
 	  uva146.exe \
-	  uva10107.exe
+	  uva10107.exe \
+	  uva10258.exe
 
 CC_ELF = uva11222.celf \
 		 uva11988.celf \
@@ -44,6 +45,6 @@ java: $(JAVA)
 clean:
 	@echo "Cleaning"
 	-rm -f $(DOTNET_EXE) $(CC_ELF) $(JAVA)
-	-rm -f *.mdb
+	-rm -f *.mdb *.pdb
 	-rm -f *.class
 	-rm -f a.out

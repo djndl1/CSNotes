@@ -14,7 +14,7 @@ class UVA11799
         while (T-- > 0) 
         {
             temp = Console.ReadLine();
-            var ints = temp.Split(new string[] {" "}, 
+            var ints = temp.Split(" ", 
                                  StringSplitOptions.RemoveEmptyEntries)
                             .Select((si) => int.Parse(si)).ToList();
             ints.RemoveAt(0);

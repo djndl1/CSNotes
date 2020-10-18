@@ -1,6 +1,6 @@
-CSC=mcs
+CSC=csc
 MONO=mono
-CSHARP_FLAGS = -debug -sdk:4.7.2-api -langversion:7
+CSHARP_FLAGS = -debug -langversion:8
 
 CXX=/usr/bin/g++
 CFLAGS=-g -std=c++11
@@ -41,5 +41,6 @@ clean:
 	@echo "Cleaning"
 	-rm -f $(EXE) $(CC_ELF)
 	-rm -f *.mdb
+	-rm -f *.pdb
 	-rm -f *.class
 	-rm -f a.out
