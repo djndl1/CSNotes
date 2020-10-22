@@ -6,6 +6,7 @@
 
 #include "sort.h"
 #include "merge_sort.hh"
+#include "quick_sort.hpp"
 
 using std::is_sorted;
 using std::vector;
@@ -120,6 +121,33 @@ TEST_F(TestSort, MergeHandleTemplateRegularInput) {
     merge_sort(vec.begin(), vec.end());
     ASSERT_TRUE(is_sorted(vec.begin(), vec.begin()));
   }
+}
+
+TEST_F(TestSort, QuickSortSingleInput)
+{
+    for (int i = 0; i < vec_num; i++) {
+        auto vec = GenerateRandomVector(1, 0, limit);
+        quick_sort(vec.begin(), vec.end(), std::less<int>());
+        ASSERT_TRUE(is_sorted(vec.begin(), vec.begin()));
+    }
+}
+
+TEST_F(TestSort, QuickSortHandleRegularInput)
+{
+    for (auto len : lens) {
+        auto vec = GenerateRandomVector(len, 0, limit);
+        quick_sort(vec.begin(), vec.end(), std::less<int>());
+        ASSERT_TRUE(is_sorted(vec.begin(), vec.begin()));
+    }
+}
+
+TEST_F(TestSort, QuickSortNonIncreasingInput)
+{
+    for (auto len : lens) {
+        auto vec = GenerateRandomVector(len, 0, limit);
+        quick_sort(vec.begin(), vec.end(), std::greater<int>());
+        ASSERT_TRUE(is_sorted(vec.begin(), vec.begin(), std::greater<int>()));
+    }
 }
 
 int main(int argc, char** argv)
