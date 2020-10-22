@@ -1,4 +1,4 @@
-#+SETUPFILE: /home/djn/Notes/CSNotes/tools/org-html-themes/setup/theme-readtheorg.setup
+#+SETUPFILE: ./setup/theme-readtheorg-local.setup
 
 * Introduction
 
@@ -93,8 +93,7 @@ Algorithims are at the core of most technologies used in contemporary computers.
 
 3. Variables are local to the given procedure.
 
-4. Compound data are organized into *objects*, which are composed of attributes, ~A.length~. 
-A variable representing an array or object represents a pointer/reference to the data representing the array or object. Null pointer is denoted as ~NIL~.
+4. Compound data are organized into *objects*, which are composed of attributes, ~A.length~. A variable representing an array or object represents a pointer/reference to the data representing the array or object. Null pointer is denoted as ~NIL~.
 
 5. Parameters are passed by value in nature.
 
