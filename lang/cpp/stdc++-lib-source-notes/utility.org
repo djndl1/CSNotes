@@ -1,9 +1,11 @@
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setupb
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
 
 * Forward/move helpers
   :PROPERTIES:
   :CUSTOM_ID: forwardmove-helpers
   :END:
+
+** How =std::forward= works
 
 All functions here are signal-safe.
 
@@ -40,24 +42,36 @@ if =t= is a lvalue =int=, =T= is deduced to =int&=, then
 rvalue =int=, =T= is deduced to =int=, then =std::forward<int>(t)=
 returns =static_cast<int&&>(t)=.
 
+** How =std::move= works
+
+*** About its behavior
 
 The compiler can find out whether move semantics should be used in trivial case, 
 the programmer must specify if not obvious.
 
-=std::move= does not really move an object. 
-=std::move= is used to indicate that an object t may be "moved from".
 =std::move= produces an xvalue expression that identifies its argument.
-=std::move= means to call move semantics if provided, and copy semantics otherwise.
+=std::move= does not really move an object and is used to indicate
+that an object may be "moved from" so that move semantics is called
+if provided, and copy semantics otherwise.
+
+[[http://yacoder.guru/blog/2015/03/14/cpp-curiosities-std-move-that-doesnt-move/][C++ curiosities: std::move that doesn't move]]
+
+1. =move= just returns a special reference;
+
+2. Whoever receives the “special” reference has no obligation to really move the
+  data out of the referenced location (even though they usually do).
+
+3. Even if the “special” reference is consumed in a real move operation,
+  in general, there is no guarantee that the object will be reset,
+  or left in any particular state whatsoever after that.
 
 Return values should not be =move()= and is not necessary either.  
 
 After a move, the objects moved from are in a /valid but unspecified/ state.
 For STL containers, it is guaranteed that containers where the value was 
-moved from are emtpy afterwards.
+moved from are empty afterwards.
 
-#+begin_quote
-
-#+end_quote
+*** Source Code
 
 #+BEGIN_SRC C++
     template<typename _Tp>
@@ -74,22 +88,14 @@ Given
 - a lvalue =int b = 5=, =_Tp= is deduced to =int&=, reference-removed to
   =int=, returns =static_cast<int&&>(__t)=.
 
+
+
 Rvalue references can be used to extend the lifetimes of temporary objects 
 (note, lvalue references to const can extend the lifetimes of temporary 
 objects too, but they are not modifiable through them).
 
 Because rvalue references can bind to xvalues, they can refer to non-temporary objects.
 
-[[http://yacoder.guru/blog/2015/03/14/cpp-curiosities-std-move-that-doesnt-move/][C++ curiosities: std::move that doesn't move]]
-
-1. =move= just returns a special reference;
-
-2. Whoever receives the “special” reference has no obligation to really move the 
-  data out of the referenced location (even though they usually do).
-
-3. Even if the “special” reference is consumed in a real move operation, 
-  in general, there is no guarantee that the object will be reset, 
-  or left in any particular state whatsoever after that.
 
 #+BEGIN_SRC C++
 #include <utility>
