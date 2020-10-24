@@ -71,7 +71,7 @@ they do as direct use of built-in types, or even faster.
 
 The use of "naked" unions is best minimized. (C++-17)The standard
 library type, =variant= can be used to eliminate most direct uses of
-unions.
+unions (this is a variant type, not for type punning).
 
 Enumerations are used to represent small sets of integer values. They
 are used to make code more readable and less error-prone than it would
