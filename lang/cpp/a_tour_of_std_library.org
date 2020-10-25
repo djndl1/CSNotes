@@ -439,7 +439,7 @@ TODO
    :CUSTOM_ID: parallel-algorithms
    :END:
 
-TODO (not yet fully available)
+The standard library offers support for parallel execution and vectorized execution (SIMD) for computations in =<execution>=. Whether it is worthwhile to parallelize and/or vectorize depends on the algorithm, the number of elements in the sequence, the hardware, and the utilization of that hardware by programs running on it. Consequently, the execution policy indicators are just hints. A compiler and/or run-time scheduler will decide how much concurrency to use.
 
 * Utilities
   :PROPERTIES:
