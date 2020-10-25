@@ -1,5 +1,7 @@
 #+SETUPFILE: /home/djn/Notes/CSNotes/tools/org-html-themes/setup/theme-readtheorg.setup
 
+#+AUTHOR: djn\_dl
+
 * Library Overview
   :PROPERTIES:
   :CUSTOM_ID: library-overview
@@ -154,12 +156,18 @@ be read using formatted input operations by putting it into an
                                         // Target is defaulted to string; Source is deduced to double
 #+END_SRC
 
+call =ios_base::sync_with_stdio(false)= if C-style IO is not used.
+
 ** File System
    :PROPERTIES:
    :CUSTOM_ID: file-system
    :END:
 
-TODO
+ =<filesystem>= can portably
+
+1. express file system paths and navigate through a file system
+
+2. examine file types and the permissions associated with them.
 
 * Containers
   :PROPERTIES:
