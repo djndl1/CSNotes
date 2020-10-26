@@ -259,6 +259,16 @@ pcube = plot(cube, (x, 0, 20), color='yellow',
 pexpon + pfact + pcube
 #+END_SRC
 
+** Approaches to Designing Algorithms
+
+- /incremental approach/: e.g. insertion sort
+
+- /divide and conquer/: break the problem into several subproblems that are similar to the original problem but smaller in size. This involves three steps at each level of recursion:
+    + /divide/ the problem into a numberr of subproblems that are smaller instances of the same problem.
+    + /conquer/ the subproblems by solving them recursively. Solve the problem in a straightforward manner if the size is small enough.
+    + /combine/ the solutions to the subproblems into the solution for the original problem.
+
+
 * Data Structures
 
 /Sets/ are as fundamental to computer science as they are to mathematics. The sets
