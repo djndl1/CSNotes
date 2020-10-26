@@ -42,9 +42,24 @@ def binary_insertion_sort(arr, comp=operator.le):
         if insert_ind < j:
             arr[insert_ind+1:j+1] = arr[insert_ind:j]
             arr[insert_ind] = key
-            # don't know which one is faster
-            #del arr[j]
-            #arr.insert(insert_ind, key)
-            
+           
     return arr
 
+def insertion_sort_recursive(arr, comp=operator.le):
+    if len(arr) < 2:
+        return arr;
+
+    __insertion_sort_recursive(arr, len(arr)-1, comp)
+    return arr
+
+def __insertion_sort_recursive(arr, upper_bound, comp):
+    if upper_bound < 1:
+        return;
+
+    __insertion_sort_recursive(arr, upper_bound-1, comp)
+    temp = arr[upper_bound]
+    i = upper_bound - 1;
+    while comp(temp, arr[i]) and i >= 0:
+        i -= 1
+    arr[i+2:upper_bound+1] = arr[i+1:upper_bound]
+    arr[i+1] = temp

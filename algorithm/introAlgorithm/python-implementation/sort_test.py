@@ -166,6 +166,9 @@ if __name__ == '__main__':
         sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
                                                           insertion_sort.binary_insertion_sort,
                                                           operator.le))
+        sorted_suite.addTest(ParametrizedTestCase.parametrize(TestSortingInteger,
+                                                          insertion_sort.insertion_sort_recursive,
+                                                          operator.le))
     if args.merge_sort or args.all:
         sorted_suite.addTests([TestMerge('test_merge_empty'),
                                TestMerge('test_merge_equal'),
