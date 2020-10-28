@@ -1,0 +1,5 @@
+* Ranges, Views and Span
+
+[From STL to Ranges: Using Ranges Effectively][https://www.youtube.com/watch?v=vJ290qlAbbw]
+
+[Span][https://brevzin.github.io/c++/2018/12/03/span-best-span/]
