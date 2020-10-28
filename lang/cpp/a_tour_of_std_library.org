@@ -612,7 +612,10 @@ handling subtleties to do with lvalue and rvalue.
    :CUSTOM_ID: c20-stdspan
    :END:
 
-TODO
+A key source of range errors is that people pass pointers and then rely on convention to know the number of elements pointed to.
+=std::span= describers an object that can refer to a contiguous sequence of objects
+with the first element of the sequence at position zero. (rust slice??) A =span= does not own the characters it points to; it resembles a =string_view= and an STL pair of iterators. Creating a =span= directly from an array is safe.
+
 
 ** Specialized Containers
    :PROPERTIES:
@@ -656,6 +659,8 @@ thus avoid disasters of wrong offsets caused by wrong type information.
     bitset<9> bs2 {0b1'1000'1111};
 #+END_SRC
 
+- =vector<bool>=: a sequence of bits compactly stored in a specialization of =vector=
+
 - =pair<T,U>=: two elements of types T and U
 
 - =tuple<T...>=: a sequence of an arbitrary number of elements of
@@ -674,7 +679,44 @@ thus avoid disasters of wrong offsets caused by wrong type information.
    :CUSTOM_ID: c17-alternatives
    :END:
 
-TODO
+- =variant<A,B,C>= is often safer and more convenient alternative to explictly using a =union=
+
+#+BEGIN_SRC c++
+// rust Result
+variant<string, int> compose_message(istream& s)
+    {
+        string mess;
+        //...
+        if (no_problems)
+            return mess;
+        else
+            return errnum;
+    }
+
+auto m = compose_message(cin);
+if (holds_alternative<string>(m))
+    cout << m.get<string>();
+else
+    int err = m.get<int>();
+
+#+END_SRC
+
+- =optional<A>=: a special kind of =variant=, op as a generalization of the idea of an =A*= either pointing to an object or being =nullptr=. Trying to access an =optional= that does not hold a value results in undefined behavior: an exception is not thrown. =optional= is not guaranteed type safe.
+
+#+BEGIN_SRC C++
+optional<string> compose_message(istream& s)
+{
+     string mess;
+
+     // ... read from s and compose message ...
+
+     if (no_problems)
+           return mess;
+     return {};     // the empty optional
+}
+#+END_SRC
+
+- =any<>=: an unconstrained version of =variant=
 
 ** Allocators
    :PROPERTIES:
