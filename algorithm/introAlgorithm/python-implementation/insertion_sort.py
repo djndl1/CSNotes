@@ -63,3 +63,20 @@ def __insertion_sort_recursive(arr, upper_bound, comp):
         i -= 1
     arr[i+2:upper_bound+1] = arr[i+1:upper_bound]
     arr[i+1] = temp
+
+def __insert_into(item, arr, comp=operator.le):
+    if not arr:
+        return [item]
+
+    if comp(item, arr[0]):
+        return [item] + arr
+    else:
+        return arr[:1] + __insert_into(item, arr[1:])
+
+
+def insertion_sort_functional(arr, comp=operator.le):
+    if len(arr) < 2:
+        return list(arr)
+
+    cdr = insertion_sort_functional(list(arr[1:]), comp)
+    return __insert_into(arr[0], cdr)
