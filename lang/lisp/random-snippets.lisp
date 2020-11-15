@@ -66,3 +66,15 @@
 
 (defun showdots (lst)
   (showdots-impl "" lst 0))
+
+(defun most (fn lst)
+  (if (null lst)
+      (values nil nil)
+      (let* ((wins (car lst))
+             (max (funcall fn wins)))
+        (dolist (obj (cdr lst))
+          (let ((score (funcall fn obj)))
+            (when (> score max)
+              (setf wins obj
+                    max score))))
+        (values wins max))))
