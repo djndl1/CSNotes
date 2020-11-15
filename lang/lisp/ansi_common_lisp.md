@@ -38,74 +38,6 @@ The function `listp` returns true if its arguments is a list. Clisp predicates o
 
 - `(and ...)`, `(or ...)`: evaluate as many as they need to in order to decide what to return. They are macros. 
 
-## Functions
-
-`(defun name (list-of-parameters) (body-of-function))`
-
-```lisp
-(defun our-third (x)
-    "docstring here"
-    (car (cdr (cdr x))))
-    
-(defun hello (name &optional age gender &key happy))
-```
-
-It is possible to return multiple values from a function.
-
-Lisp makes no distinction between a program, a procedure and a function. Functions do for everything. Use `load` to load a lisp program.
-
-```lisp
-(defun fun (a b c)
-  (values a b c))
-
-(multiple-value-bind (res1 res2 res3) (fun 1 2 3)
-  (format t "~a ~a ~a~&" res1 res2 res3))
-
-(multiple-value-list (fun 1 2 3))
-
-(nth-value 0 (values 1 2 3))
-```
-
-CL has different namespaces for functions and variables. A symbol can be bound to a value (`boundp`, `symbol-value`) or a function (`fboundp`, `symbol-function`). If a symbol is evaluated, it's treated as a variable in that its value cell is returned. 
-
-## Recursion
-
-```lisp
-(defun our-member (obj lst)
-    (if (null lst)
-        nil
-        (if (eql obj (car lst))
-            lst
-            (our-member obj (cdr lst)))))
-             
-(defun find-nil (x)
-  (and (not (null x))
-       (or (null (car x))
-           (find-nil (cdr x)))))
-
-(defun find-list (lst)
-  (and (not (null lst))
-       (or (listp (car lst))
-           (find-list (cdr lst)))))
-           
-(defun my-position (elt lst)
-  (if (null lst)
-      nil
-      (if (eql (car lst) elt)
-          0
-          (let ((z (my-position elt (cdr lst))))
-            (and z (+ z 1))))))
-
-(defun linear-search-recursive (item lst)
-  (if (null lst)
-      -1
-      (if (eql item (car lst))
-          0
-          (let ((i (linear-search-recursive item (cdr lst))))
-            (if (eql i -1)
-                -1
-                (+ 1 i))))))
-```
 
 ## Input and Output
 
@@ -137,186 +69,9 @@ The most general assignment operator is `setf`. `setf` creates a global variable
 (setf (car x) 'n)
 ```
 
-## Functional Programming
-
-It would inconvenient to do without side-effects entirely.
-
-## Iteration
-
-When we want to do something repeatedly, it is sometimes more natural to use iteration than recursion.
-
-The `do` macro is the fundamental iteration operator.
-
-```lisp
-(defun show-squares (start end)
-  (do ((i start (+ i 1)))
-      ((> i end) 'done)
-
-(format t "~A ~A~%" i (* i i))))
-
-(show-squares 1 5)
-```
-
-The above iteration has a recursive version
-
-```lisp
-(defun show-squares-recursive (i end)
-  (if (> i end)
-      'done
-      (progn
-        (format t "~A ~A~%" i (* i i))
-        (show-squares (+ i 1) end))))
-
-(show-squares-recursive 1 5)
-```
-
-To iterate through the elements of a list, use `dolist`:
-
-```lisp
-(defun our-length (lst)
-  (let ((len 0))
-    (dolist (obj lst)
-      (setf len (+ len 1))) ;such an assignment is not unacceptable
-    len))
-
-(our-length '(1 2 3 4 5))
-```
-
-A recursive version
-
-```lisp
-(defun our-length-recursive (lst)
-  (if (null lst)
-      0
-      (+ 1 (our-length-recursive (cdr lst)))))
-
-(our-length-recursive '(1 2 3 4 5 6))
-```
-
-```lisp
-(loop for x in '(1 2 3)
-      do (print x))
-(loop for x in '(1 2 3)
-      collect (* x 10))
-(loop for x on '(1 2 3)
-      do (print x))
-(loop for x across #(1 2 3)
-      do (print x))
-(loop for x in '(a b c)
-      for y across #(1 2 3)
-      collect (list x y))
-(loop (print "hello"))
-(loop for i in '(1 2 3 4)
-      when (> i 3)
-        return i)
-(loop repeat 10
-      do (format t "Hello!~%"))
-(loop repeat 10 collect (random 10))
-(loop for x from 1 to 3
-      collect (loop for y from 1 to x
-                    collect y))
-(loop for x from 1 to 3
-      for y = (* x 10)
-      with z = x
-      collect (list x y z))
-(loop for x in '(a b c d e)
-      for y from 1
-
-      when (> y 1)
-        do (format t ", ")
-      do (format t "~A" x))
-(loop for i from 0 to 10
-      do (print i))
-(loop for i from 0 below 10
-      do (print i))
-(loop for i from 10 downto 0
-      do (print i))
-(loop for i from 10 above 0
-      do (print i))
-(loop repeat 10
-      for x = (random 100)
-      if (evenp x)
-        collect x into evens
-      else
-        collect x into odds
-      finally (return (values evens odds))
-      )
-(loop for x in '(1 2 3 4 5)
-      until (> x 3)
-      collect x)
-(loop for x in '(1 2 3 4 5)
-      while (< x 3)
-      collect x)
-(loop named loop-1
-      for x from 0 to 20 by 2
-      do (loop for y from 0 to 100 by (1+ (random 3))
-               when (< x y)
-                 do (return-from loop-1 (values x y))))
-(loop for x in '(1 2 3 2)
-      thereis (numberp x))
-(loop for i from 1 to 3 count (oddp i))
-(loop for i from 1 to 3 sum i)
-(loop for i from 1 to 3
-      sum (* i i) into total
-      do (print i)
-      finally (print total))
-(loop for i from 1 to 3 maximize (mod i 3))
-(loop for (a b) in '((x 1) (y 2) (z 3))
-      collect (list b a))
-(loop for (x . y) in '((1 . a) (2 . b) (3 . c))
-      collect y)
-(loop for (x . nil) in '((1 . a) (2 . b) (3 . c))
-      collect x)
-(loop for rest on '(a 2 b 2 c 3) by #'cddr
-      collect rest)
-(loop for (key value) on '(a 2 b 2 c 3) by #'cddr
-      collect (list key (* 2 value)))
-
-
-(mapcar (lambda (it) (+ it 10)) '(1 2 3 4 5))
-(mapcar #'list
-        '(a b c)
-        '(1 2 3))
-(mapcan #'list
-        '(a b c)
-        '(1 2 3))
-
-;; Generic for lists and vectors
-(map 'list (lambda (it) (+ it 10)) '(1 2 3 4 5))
-(map 'vector (lambda (it) (+ it 10)) #(1 2 3 4 5))
-(map 'string (lambda (it) (code-char it)) '#(97 98 99))
-
-
-(dotimes (n 10)
-  (print n))
-(dotimes (i 10)
-  (if (> i 3)
-      (return)
-      (print i)))
-
-(dolist (item '(1 2 3))
-  (print item))
-```
-
-## Functions as Objects (First-Class Functions)
-
-`function` returns a function object given the name of the function. Just as `'` is an abbreviation for `(quote ...)`, `#'` (_sharp quote_) is for `(function ...)`.
-
-```lisp
-(apply #'+ '(1 2 3))
-(funcall #'+ 1 2 3)
-```
-
-lambda expression: 
-
-```lisp
-(lambda (x y)
-    (+ x y))
-```
-
-In common lisp, values or objects have types, not variables. This approach is called _manifest typing_. An object always has more than one type. The builtin Common lisp types form a hierarchy of subtypes and supertypes.
-
 # Lists
+
+https://stackoverflow.com/questions/134887/when-to-use-or-quote-in-lisp
 
 Lisp has outgrown "LISt Processor". Common Lisp is a general-purpose programming language with a wide variety of data structures.
 
@@ -337,7 +92,7 @@ a `cons` is a pair of pointers; the first one is the `car` and the second is the
     (not (consp x)))
 ```
 
-Every value in Lisp is conceptuall ya pointer. When a value to a variable or store it in a data structure what gets stored is actually a pointer to the value. For efficiency, a small integer may be handled directly.
+Every value in Lisp is conceptuall a pointer. When a value to a variable or store it in a data structure what gets stored is actually a pointer to the value. For efficiency, a small integer may be handled directly.
 
 ## Equality
 
@@ -377,40 +132,7 @@ Conses can be considered as binary trees. CL has several built-in functions for 
 ```
 
 
-Lists are a good way to represent small sets. `member`, `member-if`, `adjoin`, `intersection`, `union`, `set-difference`
 
-```lisp
-(defun our-member-if (fn lst)
-  (and (consp lst)
-       (if (funcall fn (car lst))
-       
-           lst
-           (our-member-if fn (cdr lst)))))
-```
-
-```lisp
-(defun new-union (x y)
-  (let ((new-lst x))
-    (if (null y)
-        new-lst
-        (if (member (car y) x)
-             (new-union new-lst (cdr y))
-             (new-union (append new-lst (list (car y))) (cdr y))))))
-```
-
-Another way to think of a list is as a series of objects in a particular order. In CL, sequences include both lists and vectors. `length`
-
-To copy part of a sequence, we use `subseq`. `reverse` returns a sequence with the same elements as its argument but in reverse order.
-
-`sort` takes a sequence and a comparison function of two arguments. For efficiency reasons, `sort` is allowed to modify the sequence given to it as an argument.
-
-```lisp
-(defun nthmost (n lst)
-  (nth (- n 1)
-       (sort (copy-list lst) #'>)))
-```
-
-`some`, `every`
 
 ## a run-length compression example
 
@@ -467,7 +189,6 @@ The representation of lists as conses makes it natural to use them as pushdown s
         (our-nthcdr (- n 1) (cdr lst))))
 ```
 
-
 ## Equality
 
 `eq` tests if two arguments are the same identical object. 
@@ -480,7 +201,7 @@ The representation of lists as conses makes it natural to use them as pushdown s
 
 ```lisp
 (= 5 5.0) ==> true
-(eql) 5 5.0) ==> false
+(eql 5 5.0) ==> false
 ```
 
 ## Mapping functions
@@ -498,7 +219,74 @@ The representation of lists as conses makes it natural to use them as pushdown s
 
 ```
 
-## Dotted lists
+## Sets
+
+- `(member 'b '(a b c))`: by default uses `eql`
+
+```lisp
+(member '(a) '((a) (z)) :test #'equal)
+(member '(a) '(((a) b) ((c) d)) :key #'car :test #'equal)
+
+
+```
+
+Lists are a good way to represent small sets. `member`, `member-if`, `adjoin` (conditional `cons`), `intersection`, `union`, `set-difference`
+
+```lisp
+(defun our-member-if (fn lst)
+  (and (consp lst)
+       (if (funcall fn (car lst))
+           lst
+           (our-member-if fn (cdr lst)))))
+```
+
+```lisp
+(defun new-union (x y)
+  (let ((new-lst x))
+    (if (null y)
+        new-lst
+        (if (member (car y) x)
+             (new-union new-lst (cdr y))
+             (new-union (append new-lst (list (car y))) (cdr y))))))
+```
+
+
+## Sequences
+
+Another way to think of a list is as a series of objects in a particular order. In CL, sequences include both lists and vectors. `length`
+
+```lisp
+(defun mirror? (s)
+  (let ((len (length s)))
+    (and (evenp len)
+         (let ((mid (/ len 2)))
+               (equal (subseq s 0 mid)
+                      (reverse (subseq s mid)))))))
+```
+
+`sort` takes a sequence and a comparison function of two arguments. For efficiency reasons, `sort` is allowed to modify the sequence given to it as an argument.
+
+```lisp
+(let ((vec #(1 2 3 4)))
+  (print (sort vec #'>))
+  (print vec))
+
+(defun nthmost (n lst)
+  (nth (- n 1)
+       (sort (copy-list lst) #'>)))
+```
+
+`some`, `every`
+
+## Stacks
+
+```lisp
+(setf s '(1 2 3 4))
+(push 1 s)
+(pop s)
+```
+
+## Proper Lists and Dotted lists
 
 A proper list is either `nil` or a cons whose `cdr` is a proper list. dot notation implies a nonproper list (dotted list). In dot notation, the car and cdr of each cons are shown separated by a period.
 
@@ -509,7 +297,8 @@ A proper list is either `nil` or a cons whose `cdr` is a proper list. dot notati
            (proper-list? (cdr x)))))
 ```
 
-## Assoc-lists
+
+## Assoc-lists (a dict)
 
 A list of conses are called an assoc-list or alist. Such a list could represent a set of translations.
 
@@ -520,29 +309,6 @@ A list of conses are called an assoc-list or alist. Such a list could represent 
 (assoc '+ trans)
 ```
 
-```lisp
-;;; simply iterate the list and count every element sequentially
-(defun occurrences-iterative (lst)
-  (let ((occurs '()))
-    (dolist (elm lst)
-      (let ((elm-pair (assoc elm occurs)))
-      (if (null elm-pair)
-          (setf occurs (append occurs (list (cons elm 1))))
-          (rplacd elm-pair (+ (cdr elm-pair) 1))))
-    occurs))
-    
-;;; count (car lst) and (cdr lst) separately
-(defun occurrences-recursive (lst)
-  (let ((elm (car lst)))
-    (if (null elm)
-        nil
-        (let* ((sub-occurs (occurrences-recursive (cdr lst)))
-               (elm-pair (assoc elm sub-occurs)))
-          (if (null elm-pair)
-              (append sub-occurs (list (cons elm 1)))
-              (progn (rplacd elm-pair (+ (cdr elm-pair) 1))
-                     sub-occurs))))))
-```
 
 ### Shortest Path in a Graph
 
@@ -583,10 +349,11 @@ A breadth-first search implementation
 ## Pointers, garbage collection
 
 
-Every value is conceptually a pointer. When a value is assigned to a variable or store it in a data structure, what gets stored is actua
-lly a pointer to the value. When the contents of the data structure or the value of the variable is asked for, Lisp returns what it points to. For efficiency, Lisp sometimes use an immediate representation instead of a pointer.
+Every value is conceptually a pointer. When a value is assigned to a variable or store it in a data structure, what gets stored is actua lly a pointer to the value. When the contents of the data structure or the value of the variable is asked for, Lisp returns what it points to. For efficiency, Lisp sometimes use an immediate representation instead of a pointer.
 
 _Automatic memory management_ is one of Lisp's most valuable features. The Lisp system maintains a segment of memory, _heap_. The function `cons` returns a newly allocated cons. Allocating memory from the heap is sometimes generically known as _consing_. Memory that is no longer needed is called _garbage_, and the scavenging operation is called _garbage collectiion_ or __GC__. Allocating storage and scavenging memory to reclaim it can be expensive compared to the routine operations of a program. It is easy to write programs that cons excessively.
+
+The typical approach to write programs that don't cons at all would be to write the initial version of a program in a purely functional style and using a lot of lists.
 
 # Arrays and vectors
 
@@ -739,11 +506,7 @@ The following function returns the second word.
 
 ```lisp
 (reduce #'fn '(a b c d))
-```
-
-is equivalent to 
-
-```lisp
+;;; is equivalent to
 (fn (fn (fn 'a 'b) 'c ) 'd)
 ```
 
@@ -922,6 +685,18 @@ A BST is either `nil` or a node whose left and right fields are BSTs.
 
 ```
 
+## Hash Tables
+
+Used as a fast set/mapping. The objects stored in a hash table or used as keys can be of any type. To use a hash table as a set, set the value to `t`
+
+```lisp
+(setf fruit (make-hash-table))
+(setf (gethash 'apricot fruit) t)
+(remhash 'apricot fruit)
+```
+
+`maphash`
+
 #### `cond`: a broad `switch-case` without `break`
 
 Returns the value of the form whose test-form evaluates to true.
@@ -994,4 +769,411 @@ An inorder traverse function
       (bst-inorder-traverse fn (node-l bst))
       (funcall fn (node-elt bst))
       (bst-inorder-traverse fn (node-r bst))))
+```
+
+
+# Control: Various Operators that violate the Evaluation Rule
+
+## Creating Blocks of Code
+
+
+```lisp
+;;; evaluated in order and return the last expression, has side effects
+(progn
+  (format t "a")
+  (format t "b")
+  (+ 1 2))
+
+;;; has a name and can be returned from
+(block head
+  (format t "Here we go")
+  (return-from head 'idea)
+  (format t "We'll never see this"))
+
+;;; or named nil
+(block nil
+  (return 27))
+
+;;; with an implicit `block`
+(dolist (x '(a b c d))
+  (format t "~A " x)
+  (if (eql x 'c)
+      (return 'done)))
+
+;;; implicit block foo
+(defun foo ()
+  (return-from foo 27))
+  
+;;; allow goto, hardly used
+(tagbody
+    (setf x 0)
+    top
+    (setf x (+ x 1))
+    (format t "~A " x)
+    (if (< x 10) (go top)))
+```
+
+Nearly all the time `progn` is used 
+
+## Context
+
+`let`, `let*` and `destructuring-bind` create lexical scope.
+
+```lisp
+(let ((x 2) (y 3))
+    (+ 3 5))
+;;; is equivalent to 
+((lambda (x y) (+ x y)) 3 5)
+```
+
+## Conditionals
+
+`if`, `when`, `unless`, all of which conceptually originate from `cond`. 
+
+```lisp
+;;; the conditions are evaluated in order until one of them returns true
+(defun our-member (obj lst)
+  (cond ((atom lst) nil)
+        ((eql (car lst) obj) lst)
+        (t (our-member obj (cdr lst)))))
+
+(defun month-length (mon)
+  (case mon
+    ((jan mar may jul aug oct dec) 31)
+    ((apr jun sept nov) 30)
+    (feb (if (leap-year) 29 28))
+    (otherwise "unknown month")))
+```
+
+## Iteration
+
+When we want to do something repeatedly, it is sometimes more natural to use iteration than recursion.
+
+The `do` macro (and `do*`) is the fundamental iteration operator.
+
+```lisp
+(defun show-squares (start end)
+  (do ((i start (+ i 1)))
+      ((> i end) 'done)
+
+(format t "~A ~A~%" i (* i i))))
+
+(show-squares 1 5)
+```
+
+The above iteration has a recursive version
+
+```lisp
+(defun show-squares-recursive (i end)
+  (if (> i end)
+      'done
+      (progn
+        (format t "~A ~A~%" i (* i i))
+        (show-squares (+ i 1) end))))
+
+(show-squares-recursive 1 5)
+```
+
+To iterate through the elements of a list, use `dolist`:
+
+```lisp
+(defun our-length (lst)
+  (let ((len 0))
+    (dolist (obj lst)
+      (setf len (+ len 1))) ;such an assignment is not unacceptable
+    len))
+
+(our-length '(1 2 3 4 5))
+```
+
+A recursive version
+
+```lisp
+(defun our-length-recursive (lst)
+  (if (null lst)
+      0
+      (+ 1 (our-length-recursive (cdr lst)))))
+
+(our-length-recursive '(1 2 3 4 5 6))
+```
+
+```lisp
+(loop for x in '(1 2 3)
+      do (print x))
+(loop for x in '(1 2 3)
+      collect (* x 10))
+(loop for x on '(1 2 3)
+      do (print x))
+(loop for x across #(1 2 3)
+      do (print x))
+(loop for x in '(a b c)
+      for y across #(1 2 3)
+      collect (list x y))
+(loop (print "hello"))
+(loop for i in '(1 2 3 4)
+      when (> i 3)
+        return i)
+(loop repeat 10
+      do (format t "Hello!~%"))
+(loop repeat 10 collect (random 10))
+(loop for x from 1 to 3
+      collect (loop for y from 1 to x
+                    collect y))
+(loop for x from 1 to 3
+      for y = (* x 10)
+      with z = x
+      collect (list x y z))
+(loop for x in '(a b c d e)
+      for y from 1
+
+      when (> y 1)
+        do (format t ", ")
+      do (format t "~A" x))
+(loop for i from 0 to 10
+      do (print i))
+(loop for i from 0 below 10
+      do (print i))
+(loop for i from 10 downto 0
+      do (print i))
+(loop for i from 10 above 0
+      do (print i))
+(loop repeat 10
+      for x = (random 100)
+      if (evenp x)
+        collect x into evens
+      else
+        collect x into odds
+      finally (return (values evens odds))
+      )
+(loop for x in '(1 2 3 4 5)
+      until (> x 3)
+      collect x)
+(loop for x in '(1 2 3 4 5)
+      while (< x 3)
+      collect x)
+(loop named loop-1
+      for x from 0 to 20 by 2
+      do (loop for y from 0 to 100 by (1+ (random 3))
+               when (< x y)
+                 do (return-from loop-1 (values x y))))
+(loop for x in '(1 2 3 2)
+      thereis (numberp x))
+(loop for i from 1 to 3 count (oddp i))
+(loop for i from 1 to 3 sum i)
+(loop for i from 1 to 3
+      sum (* i i) into total
+      do (print i)
+      finally (print total))
+(loop for i from 1 to 3 maximize (mod i 3))
+(loop for (a b) in '((x 1) (y 2) (z 3))
+      collect (list b a))
+(loop for (x . y) in '((1 . a) (2 . b) (3 . c))
+      collect y)
+(loop for (x . nil) in '((1 . a) (2 . b) (3 . c))
+      collect x)
+(loop for rest on '(a 2 b 2 c 3) by #'cddr
+      collect rest)
+(loop for (key value) on '(a 2 b 2 c 3) by #'cddr
+      collect (list key (* 2 value)))
+
+
+(mapcar (lambda (it) (+ it 10)) '(1 2 3 4 5))
+(mapcar #'list
+        '(a b c)
+        '(1 2 3))
+(mapcan #'list
+        '(a b c)
+        '(1 2 3))
+
+;; Generic for lists and vectors
+(map 'list (lambda (it) (+ it 10)) '(1 2 3 4 5))
+(map 'vector (lambda (it) (+ it 10)) #(1 2 3 4 5))
+(map 'string (lambda (it) (code-char it)) '#(97 98 99))
+
+(dotimes (n 10)
+  (print n))
+(dotimes (i 10)
+  (if (> i 3)
+      (return)
+      (print i)))
+
+(dolist (item '(1 2 3))
+  (print item))
+```
+
+## Multiple Values
+
+An expression can return zero or more values, the maximum number of return values is at least 19. 
+
+```lisp
+(defun fun (a b c)
+  (values a b c))
+
+(multiple-value-bind (res1 res2 res3) (fun 1 2 3)
+  (format t "~a ~a ~a~&" res1 res2 res3))
+
+(multiple-value-list (fun 1 2 3))
+
+(nth-value 0 (values 1 2 3))
+
+;;; if something is expecting only one value, all but the first will be discarded
+(let ((x value 1 2))
+    x)
+;;; or if no value is returned, a nil is returned
+(let ((x (values)))
+    x)
+    
+(multiple-value-call #'+ (values 1 2 3))
+(multiple-value-list (values 'a 'b 'c))
+```
+
+## Aborts: catch and throw
+
+```lisp
+(defun sub ()
+  (throw 'abort 99))
+
+(defun super()
+  (catch 'abort
+    (sub)
+    (format t "We'll never reach here")))
+
+;;; transfer control to the lisp erorr handler
+(progn
+  (error "Oops")
+  (format t "After the error"))
+
+(setf x 1)
+(catch 'abort
+  (unwind-protect ;; try-finally
+       (throw 'abort 99)
+    (setf x 2))) ;  wil be evaluated , a `finally`
+```
+
+# Functions
+
+## Global Functions 
+
+Functions are at the core of Lisp. `fboundp` tells whether there is a function with a given symbol as its name. `symbol-function` returns it.
+
+`(defun name (list-of-parameters) (body-of-function))`
+
+`(defun (setf fname) (val rest-of-params) (body-of-function))`: for `(setf (fname rest-of-params) val)`
+
+```lisp
+(defun our-third (x)
+    "docstring here" ;; a string by itself does not have side-effects, can be retrieved by calling `documentation`
+    (car (cdr (cdr x))))
+    
+(defun hello (name &optional age gender &key happy))
+```
+
+Lisp makes no distinction between a program, a procedure and a function. Functions do for everything. Use `load` to load a lisp program.
+
+
+CL has different namespaces for functions and variables. A symbol can be bound to a value (`boundp`, `symbol-value`) or a function (`fboundp`, `symbol-function`). If a symbol is evaluated, it's treated as a variable in that its value cell is returned. 
+
+## Local Functions 
+
+Local functions are only accessible within a certain context, defined with `labels` (a kind of `let` for functions)
+
+
+```lisp
+(labels ((add10 (x) (+ x 10))
+         (consa (x) (cons 'a x)))
+  (consa (add10 3)))
+
+(labels ((len (lst)
+           (if (null lst)
+               0
+               (+ (len (cdr lst))  1))))
+  (len '(1 2 3 4)))
+
+```
+
+## Parameter List
+
+- `&rest`: variadic parameter list
+
+- `&optional`: optional parameter. Default values are enclosing in a list with the paramter
+
+- `&key`: keyword parameter
+
+```lisp
+(defun our-funcall (fn &rest args)
+  (apply fn args))
+  
+(defun keylist (a &key x y z) ;; unspecified keys default to nil
+  (list a x y z))
+```
+
+## Functional Programming
+
+It would inconvenient to do without side-effects entirely.
+
+
+## Functions as Objects (First-Class Functions)
+
+`function` returns a function object given the name of the function. Just as `'` is an abbreviation for `(quote ...)`, `#'` (_sharp quote_) is for `(function ...)`.
+
+```lisp
+(apply #'+ '(1 2 3))
+(funcall #'+ 1 2 3)
+```
+
+lambda expression: 
+
+```lisp
+(lambda (x y)
+    (+ x y))
+```
+
+In common lisp, values or objects have types, not variables. This approach is called _manifest typing_. An object always has more than one type. The builtin Common lisp types form a hierarchy of subtypes and supertypes.
+
+
+## Compilation
+
+`compiled-function-p`, `compile`, `compile-file`.
+
+The inner functions should also be compiled if the containing function is.
+
+## Recursion
+
+The advantage of recursion is precisely that it lets us view algorithms in a more abstract way.
+
+```lisp
+(defun our-member (obj lst)
+    (if (null lst)
+        nil
+        (if (eql obj (car lst))
+            lst
+            (our-member obj (cdr lst)))))
+             
+(defun find-nil (x)
+  (and (not (null x))
+       (or (null (car x))
+           (find-nil (cdr x)))))
+
+(defun find-list (lst)
+  (and (not (null lst))
+       (or (listp (car lst))
+           (find-list (cdr lst)))))
+           
+(defun my-position (elt lst)
+  (if (null lst)
+      nil
+      (if (eql (car lst) elt)
+          0
+          (let ((z (my-position elt (cdr lst))))
+            (and z (+ z 1))))))
+
+(defun linear-search-recursive (item lst)
+  (if (null lst)
+      -1
+      (if (eql item (car lst))
+          0
+          (let ((i (linear-search-recursive item (cdr lst))))
+            (if (eql i -1)
+                -1
+                (+ 1 i))))))
 ```
