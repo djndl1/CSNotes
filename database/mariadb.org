@@ -7,3 +7,25 @@
 - Composite/compound key: a key that refers to multiple columns
 
 - Row/tuple/record/entry
+
+* Basics
+
+The user name in MariaDB is not a OS user name.
+#+begin_src shell
+mysql -u user_name -p -h host_name -P port_number
+#+end_src
+
+** Getting Data
+
+- =SELECT= statement
+  + use =LIMIT= clause to limit the results
+  + =WHERE=: selectivity
+  + =ORDER BY=: order, goes after =WHERE= and before =LIMIT=
+  + =DISTINCT=: distinctivity flag
+  + =HIGH_PRIORITY=: flag, =SELECT= statement are considered to be of lower priority by default.
+  + =SQL_CALC_FOUND_ROWS=: used with =FOUND_ROWS()=
+
+
+* Minor Details
+
+MariaDB is case-insensitive with regards to reserved words. Database and table names are case-sensitive on Linux as they reference the related directories and files on the filesystem.
