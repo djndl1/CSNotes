@@ -1,0 +1,79 @@
+* Overview
+
+Processes manage, threads run.
+A process has:
+  1. an executable program;
+  2. a private virtual address space;
+  3. an access token (/primary token/), an object that stores the default security context of the process.
+  4. a private handle table to Executive (kernel) objects, such as events, semaphores, and files.
+  5. One or more threads of execution.
+
+32-bit processes on Windows has an address space of 2GB unless the =LARGEADDRESAWARE= flag is specified.
+
+A thread has:
+  1. current access mode, either user or kernel
+  2. execution context, including processor registers
+  3. a call stack
+  4. TLS array
+  5. base priority and a current dynamic priority
+  6. processor affinity (which processors the threqad is allowed to run on)
+  
+
+** General System Architecture
+
+#+BEGIN_SRC 
+                                  +-----------------+       +---------------+     +-----------------+    +------------------+
+                                  | Susbsystem      |       |     System    |     |    Service      |    |        User      |
+                                  |  Process        |       |               |     |   Processes     |    |      Processes   |
+                                  | (CSRSS.exe)     |       |   Processes   |     | (services.exe)  |    |                  |
+                                  +-----------------+       +---------------+     +-----------------+    +------------------+
+                                  a helper to the kernel 
+                                 for managing processes
+                                 under that subsystem
+                                                                     +------------------------------------------------------+
+                                                                     |                    Subsystem DLLs                    | // kernel32.dll, user32.dll, gdi32.dll, advapi32.dll, combase.dll etc. the Windows Subsystem
+                                                                     +------------------------------------------------------+
+
+                                  +-----------------------------------------------------------------------------------------+
+                                  |                                        NTDLL.DLL                                        | // NT Native API, the heap manager, the image loader, and some part of the user-mode threadpool
+                                  +-----------------------------------------------------------------------------------------+
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+                                                               +------------------------------------------------------+
+                                 +------------+                |                                                      |
+                                 |            |                |                    Executive                         | object manager, memory manager, IO manager, plug and plug manager, 
+                                 | Win32k.Sys |                |                                                      | power manager, configuration manager
+                                 |            |                +------------------------------------------------------+
+                                 +------------+
+               kernel-modde part of the Windows Subsystem      +----------------------+     +-------------------------+
+               mainly the GUI and GDI part                     |                      |     |                         |
+                                                               |    Device Drivers    |     |         Kernel          | // thread scheduling, interrupt and exception dispatching,
+                                                               |kernel modules        |     |                         | // kernel primitives (mutex, semaphore etc.)
+                                                               +----------------------+     +-------------------------+
+
+                                         +-------------------------------------------------------------------+
+                                         |                                                                   |
+                                         |                  Hardware Abstraction Layer                       |
+                                         |                                                                   |
+                                         +-------------------------------------------------------------------+
+
+            +---------------------------------------------------------------------------------------------------------------------+
+
+
+                                    +---------------------------------------------------------------------------------+
+                                    |                                                                                 |
+                                    |                             Hyper-V Hypervisor (under hypervior context)        |
+                                    |                                                                                 |
+                                    +---------------------------------------------------------------------------------+
+  
+#+END_SRC
+   
+
+** App Development
+  
+There are two fundamental API:
+1. Windows API: MFC as a wrapper, .NET built upon it.
+2. Component Object Model: ATL, WTL as wrappers. WinRT is built on an enhanced version of COM.
+
+ [[https://docs.microsoft.com/en-us/cpp/code-quality/understanding-sal?view=msvc-160][Source Annotation Language (SAL)]  
