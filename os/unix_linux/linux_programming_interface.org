@@ -14,8 +14,61 @@ static libraries; shared libraries
 
 - system call: a system call is a controlled entry point into the kernel, allowing a process to request that the kernel perform some action on the process's behalf. A syscall changes the processor state from user mode to kernel mode so that the CPU can access protected kernel memory. Each syscall is identified by a unique number. 
 
-The application program makes a syscall by invoking a wrapper function in the C library. The wrapper accepts arguments and puts them in specific registers. The wrapper function puts the system call number into a specific CPU register. The wrapper executes a `trap`/`sysentr`/`syscall` machine instruction. The kernel invokes its `system_call()` routine to handle the trap. It saves arguments from registers onto the kernel stack, checks the validity of the syscall number and invokes the appropriate syscall service routine. After the service routine returns, the return value is then placed on the stack. Returns to the wrapper. Any error value is set on the global variable `errno`.
+The application program makes a syscall by invoking a wrapper function in the C library. The wrapper accepts arguments and puts them in specific registers. The wrapper function puts the system call number into a specific CPU register. The wrapper executes a trap/sysentr/syscall machine instruction. The kernel invokes its =system_call()= routine to handle the trap. It saves arguments from registers onto the kernel stack, checks the validity of the syscall number and invokes the appropriate syscall service routine. After the service routine returns, the return value is then placed on the stack. Returns to the wrapper. Any error value is set on the global variable =errno=.
 
 - library function: a library function is simply one of the multitude of functions that constitutes the standard C library. Many library functions don't make any use of system calls. Often, library functions are designed to provide a more caller-friendly interface than the underlying system call.
 
-Almost every system call and library function returns some type of status value indicating whether the call succeeded or failed.  This status value should always be checked to see whether the call succeeded.
+Almost every system call and library function returns some type of status value indicating whether the call succeeded or failed.  This status value should always be checked to see whether the call succeeded
+
+** Error Handling
+
+Almost every syscall and library function returns some type of status value indicating the call succeeded or failed. This status should always be checked to see whether the call succeeded. A few syscalls like =getpid()= or =_exit()= never fail. Successuful syscalls and library functions never reset =errno= to 0. However, a successful funcall is allowed to set =errno= to a nonzero. The guideline is to always check if the function return value indicates an error and only then examine =errno= to determine the cause of the error. A funcion might not set =errno= itself but its callees do.
+
+#+BEGIN_SRC c
+  void perror(const char *s); 
+  char *strerror(int errnum);
+#+END_SRC
+
+** Portability
+
+1. feature test macros in glibc are not for feature testing but to expose the feature.
+2. When printing system data type values, always use =long= except for =off_t=, which is =long long=.
+
+* Processes
+
+/process/: an instance of an executing program, defined by the kernel, to which system resources are allocated in order to execute the program. A process contains program code and variables used by the code and a range of kernel data structures that maintain information about the state of the process.
+
+/program/: a file containing a range of information that describes how to construct a process at runtime.
+    + binary format identification: COFF, ELF
+    + machine instructions
+    + Data
+    + symbol and relocation tables
+    + shared-library and dynamic-linking information
+    + other information
+
+** PID
+   
+Process ID =pid_t=
+
+=getpid()= and =getppid()=. =pstree= show the process family tree. =/proc/PID/status=
+
+** Memory layout of a process
+   
+section/segment: text segment; initialized data segment; uninitialized data segment; stack; heap (the top end of the heap is called the /program break/).
+
+On most UNIX systems, three symbols =etext=, =edata= and =end= are available for obtaining the addresses of the next byte past of the program text, initialized data segment and the end of the uninitialized data segment.
+
+#+BEGIN_SRC C
+ extern char etext, edata, end; 
+#+END_SRC
+
+** Virtual Memory
+
+Most programs demonstrates spatial and temporal locality, which makes it possible to execute a program while maintaining only part of its address space in RAM. This isolates processes from one another and from the kernel, provides a way to share memory to save memory and for interprocess communication, faster loading and a memory security mechanism.
+
+Kernel stack is a per-process memory regiion maintained in kernel memory that is used as the stack for execution of the functions called internally during the execution of a syscall.
+
+** =argc=, =argv=
+
+=argv[argc]= is =NULL=; =argv[0]= is different when invoking through different links even if the underlying program is the same.
+
