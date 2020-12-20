@@ -77,3 +77,57 @@ There are two fundamental API:
 2. Component Object Model: ATL, WTL as wrappers. WinRT is built on an enhanced version of COM.
 
  [[https://docs.microsoft.com/en-us/cpp/code-quality/understanding-sal?view=msvc-160][Source Annotation Language (SAL)]  
+
+* Objects and Handles
+
+Kernel objects: data structures created and managed by the /Object Manager/.  Kernel objects are refcounted. 
+
+Kernel objects are accessed through handles, which provides abstraction and security and are private to a process.
+Handle values are multiples of 4, zero is never a valid handle value. A handle is logically an index to an array of entries 
+in a handle table maintained by process basis and points to a kernel object residing in system space.
+
+A kernel object has at least:
+  1. Name
+  2. Directory
+  3. handle count
+  4. pointer count (total refcount)
+
+ A common trick to create a single instance program is to use some named kernel object, usually a mutex.
+ 
+Inside the entry pointer to by a handle, there are 
+  1. the actual pointer to the kernel object, 
+  2. inheritance flag: a mechanism that allows sharing an object between cooperating processes
+  3. protect from close flag: prevents the handle from being closed, rarely used
+  4. audit on close flag: an audit entry in the security log should be written when the handle is closed
+  5. access mask, which indicates what can be done with the handle (typically, the creating process has full access to the object, but the opening process might not).
+
+#+BEGIN_SRC C++
+bool KillProcess(DWORD pid)
+{
+    HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    if (!hProcess)
+        return false;
+    BOOL success = ::TerminateProcess(hProcess, 1); // kill the process with some exit code
+
+    ::CloseHandle(hProcess);
+
+    return success != FALSE;
+}
+#+END_SRC
+ 
+Some handles have special values and are not closablei, mostly the current process, the current thread etc.
+
+Windows Implementation Library (WIL) provides a C++ wrapper for these API.
+
+A size member of a structure can be used to maintain version compatibility so that newly-added members are simply ignored.
+
+Some types of objects have string-based names. When a existing named object is =Created=, it's simply opened, in which case =GetLastError= returns =ERROR_ALREADY_EXISTS=. The final name is typically =\Sessions\sessionID\BaseNamedObjects\ObjectName= or even =\Sessions\sessionID\AppContainerNamedObjects\ObjectName=. Object names are session-relative. Non-session relative objects are prepended with =Global\= to be created in session 0.
+
+The  entire Object Manager namespace hierarchy resides within the memory and is viewed with =WinObj=.
+
+Objects can be shared among processes by
+   1. by names
+   2. by handle duplication =DuplicateHandle()=. The tricky part is how the target process knows about the duplicated handle, which requires some other form of IPC.
+   3. by handle inheritance
+
+For security reason, there is a way to create a private object namespace that only the cooperating processes know about.
