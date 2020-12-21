@@ -72,3 +72,36 @@ Kernel stack is a per-process memory regiion maintained in kernel memory that is
 
 =argv[argc]= is =NULL=; =argv[0]= is different when invoking through different links even if the underlying program is the same.
 
+** Environment List
+
+/environment list/: an associated array of strings that can hold arbitrary information. =printenv=
+
+A child process inherits its parent's environment, which can be a primitive form of IPC. 
+ 
+Within a C program, a global =environ= variable points to a NULL-terminated list of pointers to null-terminated strings.
+
+#+BEGIN_SRC C
+  char *getenv(const char *name);
+  int putenv(char *string); // string shouldn't be automatically allocated
+  int setenv(const char *name, const char *value, int overwrite); // allocate memory
+  int unsetenv(const char *name);
+  int clearenv(void); // erase the entire environment, it doesn't knonw the buffer provided to putenv
+#+END_SRC
+ 
+** Nonlocal goto using =setjmp()= and =longjmp()=
+   
+Avoid SJLJ where possible!
+ 
+Useful for bailing out of an error.
+
+Calling =setjmp()= establishes a target for a later jump performed by =longjmp()=. By using different return values, we can distinguish jumps to the same target from different points in the program. The return value is forced not to be zero even if specified so. The =env= jump buffer supplies the glue enabling the jump. The =setjmp()= call saves various information about the current process environment into =env=. The =longjmp()= call must specify the same =env= variable. Thus, =env= is declared globally or less commonly as a function argument.
+
+=env= buffer stores the program stack pointer of the function where =setjmp()= resides (to unwind the stack) and the program counter to continue execution from the location of the initial =setjmp()= call.
+
+Using =setjmp()= inside a complex expression is problematic since it does not have the info to save all registers and temporary stack locations used in an enclosing expression.
+
+Long jump to a returned function is a serious mistake since the original stack frame might be gone.
+
+* Memory Allocation
+  
+
