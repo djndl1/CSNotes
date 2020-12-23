@@ -104,4 +104,82 @@ Long jump to a returned function is a serious mistake since the original stack f
 
 * Memory Allocation
   
+A process may grow and shrink the /program break/ (the current limit of the heap) to allocate memory.
 
+#+BEGIN_SRC C
+       int brk(void *addr);
+       void *sbrk(intptr_t increment);
+#+END_SRC
+
+In general, C uses the =malloc= family of functions to allocate and deallocate memory on the heap. They are standardized, thread safe (mutexes are used internally to protect the memory management data structures). The block of memory returned by =malloc()= is always aligned on a byte boundary suitable for any type of C data structure. =free()= doesn't lower the program break (which is actually impossible if the block is in the middle of the heap) but instead adds the block of memory to a list of free blocks that are recycled by future calls to =malloc()=.
+
+The memory allocated is managed by maintaining a doubly linked list of headers at the beginning of each memory block that contains the length of the block, the two pointers.
+
+The following program depicts the behavior the memory manager of =malloc()= and =free()=.
+
+#+BEGIN_SRC C
+  #include <stdlib.h>
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <assert.h>
+
+  #include <errno.h>
+
+  #define MAX_ALLOCS 100000
+
+  int main(int argc, char *argv[])
+  {
+          char *memptr[MAX_ALLOCS];
+
+          if (argc < 3) {
+                  fprintf(stderr, "%s num-allocs block-size [step [min [max]]]\n", argv[0]);
+                  return 0;
+          }
+          int num_allocs = atoi(argv[1]);
+          int block_size = atoi(argv[2]);
+
+          int free_step = (argc > 3) ? atoi(argv[3]) : 1;
+          int free_min = (argc > 4) ? atoi(argv[4]) : 1;
+          int free_max = (argc > 5) ? atoi(argv[5]) : num_allocs;
+          if (free_max > num_allocs) 
+                free_max = num_allocs;
+
+          void *init_brk = sbrk(0);
+          printf("Initial program break %10p\n", init_brk);
+          printf("Allocating %d*%d bytes\n", num_allocs, block_size);
+
+          for (int j = 0; j < num_allocs; j++) {
+                  memptr[j] = malloc(block_size);
+                  if (memptr[j] == NULL) {
+                          fprintf(stderr, "Failed on malloc()\n");
+                          return ENOMEM;
+                  }
+          }
+
+          void *malloc_brk = sbrk(0);
+          printf("Current program break %10p, %ld KB grown\n", malloc_brk, (malloc_brk - init_brk) / 1024);
+
+          for (int j = free_min; j < free_max; j += free_step)
+                  free(memptr[j]);
+
+          void *free_brk = sbrk(0);
+          printf("After freeing program break %10p, %ld KB shrinked\n", free_brk, (malloc_brk - free_brk) / 1024);
+
+          return EXIT_SUCCESS;
+  }
+
+#+END_SRC
+
+
+glibc provides some tools to debug memory issues.
+1. =mtrace()=, =muntrace()=: turn tracing of memory allocation calls on and off. Calls to =mtrace()= are ignored by set-user-ID and set-group-ID programs.
+2. =-lmcheck=, =mcheck()=, =mprobe()=: perform consistency checks on block of allocated memory.
+3. =MALLOC_CHECK= envvar controls how a program responds to memory allocation.
+
+Other tools include /Electric Fence/, /dmalloc/, /Valgrind/, and /Insure++/.
+
+=mallopt()= and =mallinfo()= are glibc functions for controlling and monitoring =malloc()=
+
+=posix_memalign()=, =aligned_alloc()=,m =memalign()= are for aligned memory allocation.
+
+=alloca()= allocates memory on the stack, present on most UNIX implementations. =alloca()= can be fast since it allocates memory on the stack, which only requires the stack pointer to move a bit. Using =alloca()= might be useful with SJLJ.
