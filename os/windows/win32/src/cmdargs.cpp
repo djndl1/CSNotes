@@ -1,10 +1,13 @@
 #include <windows.h>
 #include <stdio.h>
 #include <wchar.h>
+#include <io.h>
+#include <fcntl.h>
 
 int wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR lpCmdLine, int nCmdShow)
 {
     AllocConsole();
+    _setmode(_fileno(stdout), _O_U16TEXT);
     int count;
     LPWSTR cmdText = GetCommandLine();
     LPWSTR *args = CommandLineToArgvW(cmdText, &count);
@@ -17,7 +20,7 @@ int wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR lpCmdLine, int nCmdShow)
     }
     ::LocalFree(args);
 
-    ::wprintf(L"%ls\n", text);
+    wprintf(L"测试%ls\n", text);
 
     return 0;
 }
