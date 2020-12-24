@@ -183,3 +183,118 @@ Other tools include /Electric Fence/, /dmalloc/, /Valgrind/, and /Insure++/.
 =posix_memalign()=, =aligned_alloc()=,m =memalign()= are for aligned memory allocation.
 
 =alloca()= allocates memory on the stack, present on most UNIX implementations. =alloca()= can be fast since it allocates memory on the stack, which only requires the stack pointer to move a bit. Using =alloca()= might be useful with SJLJ.
+
+* Users and Groups
+  
+#+BEGIN_SRC C
+struct passwd *getpwent(void);
+void setpwent(void);
+void endpwent(void);
+#+END_SRC
+
+  
+** =/etc/passwd=
+   
+1. Login name (username): it is possible to one UID to have multiple login names that associated with different sets of groups.
+2. Encrypted password (shadowed by shadow passwords)
+3. UID
+4. GID: primary group
+5. comment
+6. home directory
+7. login shell
+
+Within a system like NIS (Network Information System) or LDAP (Lightweight Directory Access Protocol), part or all of this information is stored on a remote system.
+
+#+BEGIN_SRC C
+struct passwd *getpwnam(const char *name);
+struct passwd *getpwuid(uid_t uid);
+#+END_SRC
+
+
+** =/etc/shadow=
+   
+Contains encrypted passwords and is readable only the privileged programs.
+
+#+BEGIN_SRC C
+struct spwd *getspnam(const char *name);
+struct spwd *getspent(void);
+void setspent(void);
+void endspent(void);
+#+END_SRC
+ 
+
+** =/etc/group=
+
+- group name
+- encrypted password (not actually useful nowadays)
+- GID
+- user list
+
+#+BEGIN_SRC C
+struct group *getgrnam(const char *name);
+struct group *getgrgid(gid_t gid);
+#+END_SRC
+
+** Authenticating a User
+   
+#+BEGIN_SRC C
+char *crypt(const char *key, const char *salt);
+char *getpass(const char *prompt);
+#+END_SRC
+
+#+BEGIN_SRC C
+ #define _XOPEN_SOURCE
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <pwd.h>
+#include <shadow.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <errno.h>
+
+int main(int argc, char *argv[])
+{
+        long login_name_max = sysconf(_SC_LOGIN_NAME_MAX);
+
+        char *username = malloc(login_name_max + 1);
+        if (username == NULL)
+                return -1;
+
+        printf("Enter User Name:");
+        char *un = fgets(username, login_name_max, stdin);
+        if (un == NULL)
+                goto cleanup;
+
+        size_t name_len = strlen(username);
+        if (username[name_len-1] == '\n')
+                username[name_len-1] = '\0';
+
+        char *passwd_clear = getpass("Enter Password:");
+        if (passwd_clear == NULL)
+                goto cleanup;
+
+        struct spwd *pwd =  getspnam(username);
+        if (pwd == NULL)
+                goto cleanup;
+
+        char *crypted_passwd = crypt(passwd_clear, pwd->sp_pwdp);
+        if (strcmp(crypted_passwd, pwd->sp_pwdp) == 0) {
+                printf("You've logged in but you just can't do anything\n");
+        } else {
+                printf("You are rejected!\n");
+        }
+
+        return 0;
+
+        cleanup:
+                free(username);
+        return -2;
+
+
+}
+ 
+#+END_SRC
