@@ -1,3 +1,5 @@
+Before everything: to correctly output UTF-16 under windows, use =_setmode()=
+
 * Overview
 
 Processes manage, threads run.
@@ -16,7 +18,7 @@ A thread has:
   3. a call stack
   4. TLS array
   5. base priority and a current dynamic priority
-  6. processor affinity (which processors the threqad is allowed to run on)
+  6. processor affinity (which processors the thread is allowed to run on)
   
 
 ** General System Architecture
@@ -131,3 +133,77 @@ Objects can be shared among processes by
    3. by handle inheritance
 
 For security reason, there is a way to create a private object namespace that only the cooperating processes know about.
+* Processes
+  
+** Types
+
+1. Protected Processes: support DRM; no other process (including with adminstrator rights) can read the memory within a protected process address space.
+2. UWP Processes: host the WinRT; execute inside an AppContainer.
+3. Protected Processes Light (PPL): enhanced protected processes.
+4. Minimal Processes: empty address space without the usual images and data structures
+5. Pico Processes: for WSL
+
+** Basic Information
+
+- Name: normally the executable name, not unique. Some processes don't have an executable name at all.
+
+- PID: unique ID, multiple of 4. A combination of the PID and the process start time is truly unique on a certain system.
+
+- status: running; suspended; not responding. UWP is special in that they are suspended when all threads are suspended in the background (such as when minimized). Non-UWP non-GUI processes are always shown with a running status unless all threads are suspended.
+
+- User Name: primary token is attached to the process that holds the security context (the groups, the privileges, etc.)for the process based on the user.
+
+- Session ID: session 0 for system process and services; session 1 and higher are for interactive logins.
+
+- memory: active private set (the RAM used by the process alone)
+
+- base priority/priority class: the base scheduling priority for threads executing in that process
+   + idle (low) = 4
+   + below normal = 6
+   + normal = 8
+   + above normal = 10 
+   + high = 13
+   + real-time 24
+     
+** Process Creation
+
+1. Open Image File
+2. Create and initialize Kernel Process Object
+3. Create and initialize kernel thread object
+4. map image and NTDLL
+5. notify CSRSS of new process and thread
+6. Create PEB (Process Environment Block) and TEB (Thread Environment Block)
+7. load required DLLs: the loader searches among the =KnownDLLs= DLLs, the executable directory, the CWD, the system32/syswow64 directory, the windows directory, the =PATH=.
+8. execute the entry function
+
+https://docs.microsoft.com/en-us/windows/win32/apiindex/windows-apisets
+
+*** The entry point
+
+Windows has four entry point function: =(w)main=, =(w)WinMain=. For the latter the command line is a single string to be parsed by =CommandLineToArgvW()=. A process can get its command line at any time by calling =GetCommandLine()=.
+
+The environment variables can be a third argument for =(w)main=, or call =GetEnvironmentStrings()=, which is a single memory block separated by '\0'. 
+
+#+BEGIN_SRC C
+ SetEnvironmentVariable(); 
+ GetEnvironmentVariable(); 
+ ExpandEnvironmentStrings();
+#+END_SRC
+
+*** =CreateProcess=
+    
+#+BEGIN_SRC C
+ BOOL CreateProcessW(
+  LPCWSTR               lpApplicationName, // executable full path or NULL
+  LPWSTR                lpCommandLine, // args or executable and args, must be non-const for no reason 
+  LPSECURITY_ATTRIBUTES lpProcessAttributes,
+  LPSECURITY_ATTRIBUTES lpThreadAttributes,
+  BOOL                  bInheritHandles, // whether to allow the child to inherit handles
+  DWORD                 dwCreationFlags, // various flags
+  LPVOID                lpEnvironment, // NULL to copy the parent's
+  LPCWSTR               lpCurrentDirectory,  // set the CWD
+  LPSTARTUPINFOW        lpStartupInfo, // at least set the size and zero the structure
+  LPPROCESS_INFORMATION lpProcessInformation // output handles and identifiers for the new process and its primary thread
+);
+#+END_SRC
+
