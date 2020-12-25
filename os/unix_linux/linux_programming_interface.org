@@ -34,6 +34,16 @@ Almost every syscall and library function returns some type of status value indi
 1. feature test macros in glibc are not for feature testing but to expose the feature.
 2. When printing system data type values, always use =long= except for =off_t=, which is =long long=.
 
+* The Universal I/O Model
+  
+Four key syscalls: =open()=, =read()=, =write()=, =close()=
+
+- =open()=: a file can be opened using a particular file descriptor by some tricks.
+
+File holes are allowed on native UNIX file systems and might save disk space.
+
+=ioctl= is a general-purpose mechanism for performing file and device operations that fall outside the universal I/O model.
+
 * Processes
 
 /process/: an instance of an executing program, defined by the kernel, to which system resources are allocated in order to execute the program. A process contains program code and variables used by the code and a range of kernel data structures that maintain information about the state of the process.
@@ -297,4 +307,81 @@ int main(int argc, char *argv[])
 
 }
  
+#+END_SRC
+
+* Process Credentials
+  
+=/etc/PID/status= for real, effective, saved, and filesystem IDs of a process.
+
+#+BEGIN_SRC C
+    // for setting effective IDs
+    int setuid(uid_t uid); // may change real and saved IDs, there are some subtle rules behind this
+    int setgid(gid_t gid);
+
+    int setreuid(uid_t ruid, uid_t euid);
+    int setregid(gid_t rgid, gid_t egid);
+    // nonstandard
+  
+    #define _GNU_SOURCE         /* See feature_test_macros(7) */
+
+    int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
+    int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
+    int setresuid(uid_t ruid, uid_t euid, uid_t suid);
+    int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
+#+END_SRC
+
+
+** Real User ID and Real Group ID
+   
+Identify the User and Group to Which the Process Belongs
+
+#+BEGIN_SRC C
+uid_t getuid(void);
+gid_t getgid(void);
+#+END_SRC
+
+   
+** Effective User ID and Effective Group ID
+   
+Used to determine the permissions granted to a process when it tries to perform various operations: a process whose effective user ID is 0 has all of the privileges of the superuser. Normally, the effective user ID and group ID have the same values as the corresponding real ID. To assume different values, 
+  1. use some syscalls
+  2. execute set-user-ID and set-group-ID programs
+ 
+#+BEGIN_SRC C
+  uid_t geteuid(void);
+  gid_t getegid(void);
+
+  int seteuid(uid_t euid); // perferred for set-UID-root programs to temporarily drop root privilege
+  int setegid(gid_t egid);
+#+END_SRC
+
+
+** Set-User-ID and Set-Group-ID Programs
+   
+A set-user-ID program allows a process to gain privileges by setting the process's effective user ID to the same value as the user ID (owner) of the executable file.
+
+** Saved Set-UID and Saved Set-GID
+   
+Various syscalls calls allow a set-UID program to switch its effective user ID between the values of the real user ID and the saved set-user-ID. A program can temporarily drop and regain whatever privileges are associated with the user (group) ID of the =exec=-ed file. It is a secure programming practice for set-UID and set-GID programs to operate under the unprivileged ID whenever the program doesn't actually need to perform any operations associated with the privileged ID.
+
+** Filesystem UID and Filesystem GID (Mainly for historic reason)
+   
+On Linux, it is the filesystem user and group IDs in conjunction with the supplementary group IDs that are used to determine permissions when performing filesystem operations.
+
+Normally, they are of the same values as the effective IDs. Unless these two syscalls are used.
+
+#+BEGIN_SRC C
+  int setfsuid(uid_t fsuid);
+  int setfsgid(uid_t fsgid);
+#+END_SRC
+ 
+** Supplementary GID
+   
+A new process inherits these IDs from its parent.
+
+#+BEGIN_SRC C
+  int getgroups(int size, gid_t list[]);
+  int setgroups(size_t size, const gid_t *list);
+  int initgroups(const char *user, gid_t group);
+
 #+END_SRC
