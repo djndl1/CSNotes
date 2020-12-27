@@ -40,13 +40,15 @@ VOID GetSystemInfo(LPSYSTEM_INFO lpSystemInfo)
 
 Use C library to allocate heap memory if one heap is sufficient.
 
+Heaps are Windows objects (non-kernel objects): they have handles.
+
 Heap separation has several benefits:
 
-- multithreaded performance
+- multithreaded performance: each thread can have its own heap
 
 - allocation efficiency and low fragmentation, simplifies synchronization
 
-- deallocation efficiency
+- deallocation efficiency: an entire heap can be freed with a single function call
 
 - locality of reference efficiency, reducing page faults
 
@@ -64,7 +66,7 @@ Convenient and efficient in-memory algorithms can process file data. File proces
 
 The OS itself uses memory mapping to implement DLLs and to laod and execute executables.
 
-Create a file mapping object with `CreateFileMapping`. Get a file mapping handle wit h`OpenFileMapping`
+Create a file mapping object with `CreateFileMapping`. Get a file mapping handle with`OpenFileMapping`
 
 TODO
 
