@@ -207,3 +207,8 @@ The environment variables can be a third argument for =(w)main=, or call =GetEnv
 );
 #+END_SRC
 
+** Handle Inheritance
+
+1. inheritance flag
+2. mark a handle inheritable in =SECURITY_ATTRIBUTES= and create it.:w
+3. set an existing handle inheritable through =SetHandleInformation=
