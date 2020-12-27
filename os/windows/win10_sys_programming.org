@@ -207,3 +207,20 @@ The environment variables can be a third argument for =(w)main=, or call =GetEnv
 );
 #+END_SRC
 
+*** UWP Processes
+
+1. Runs in a sandbox /AppContainer/.
+2. Its process' state is managed by the Process Lifetime Manager
+3. Capabilites (access control) are declared
+4. Single instance by default
+
+** Process Termination
+
+A process terminates if
+
+1. all the threads in the process exit or terminate
+2. any thread in the process calls =ExitProcess=
+3. the process is terminated (usually externally but could be because of unhandled exception) with =TerminateProcess=
+
+
+=ExitProcess()= shutdown all other threads in the process, detach all DLLs, and terminates the proce3ss and the calling thread. =TerminateProcess()= does not call =DllMain= for all DLLs so no cleanup for them.
