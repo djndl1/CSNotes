@@ -58,17 +58,14 @@ Destroying a heap eleminate the need to write the data structure traversal code 
 
 `HeapAlloc`; `HeapFree`; `HeapReAlloc`; `HeapSize` (which determines the size of an allocated block)
 
-TODO example
-
 # Memory Mapped Files
 
-Convenient and efficient in-memory algorithms can process file data. File processing is frequently much faster than using File I/O. No need to manage buffers. Multiple processes can share memory by mapping.
+Convenient and efficient in-memory algorithms can process file data even though the file may be much larger than available physical memory. File processing is frequently much faster than using File I/O. No need to manage buffers. Multiple processes can share memory by mapping.
 
 The OS itself uses memory mapping to implement DLLs and to laod and execute executables.
 
-Create a file mapping object with `CreateFileMapping`. Get a file mapping handle with`OpenFileMapping`
+Create a file mapping object with `CreateFileMapping`. Get a file mapping handle with`OpenFileMapping`. Map a file with `MapViewOfFile()` after getting the mapping handle. Close the mapping with `UnmapViewOfFile()`. Flush the dirty pages with `FlushViewOfFile()`.
 
-TODO
 
 # Dynamic Linked Libraries
 
@@ -85,7 +82,7 @@ kernel for additional services. Since DLLs might be used by multiple processes, 
 
 ## Implicit Linking
 
-A `.LIB` (stubs for calling the real subroutines); `DLL` for functions; A DLL file that contains the executable image, placed in the same directory as the application.
+A `.LIB` (stubs for calling the real subroutines) when building the calling program; `DLL` for functions when executing the calling program; A DLL file that contains the executable image, placed in the same directory as the application.
 
 A exported function in DLL must be annotated with `__declspec (dllexport)` (typically used in the form the `MYLIBRARYNAME_EXPORTS` macro )  or use a `.DEF` file.
 
