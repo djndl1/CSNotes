@@ -88,3 +88,25 @@ BOOL SetEnvironmentVariable(LPCTSTR lpName, LPCTSTR lpValue);
 # Process Security
 
 By default, `CreateProcess` gives `PROCESS_ALL_ACCESS` rights. Several other specific rights are available.
+
+
+# Process Execution Times
+
+```c
+BOOL GetProcessTimes(HANDLE hProcess, LPFILETIME lpCreationTime, LPFILETIME lpExitTime, 
+                     LPFILETIME lpKernelTime, LPFILETIME lpUserTime);
+```
+
+# Job Objects
+
+Job objects represent a set of processes that are controlled together. Resource limits can be specified for all the job member processes and accounting information is maintained.
+
+The typical way is:
+
+1. Create a job (`CreateJobObject`) or open a named object (`OpenJobObject`) to get a job handle;
+
+2. add a process to that job (`AssignProcessToJobObject`);
+
+3. Control limits are specified `SetInformationJobObject`; This can be queried through `QueryJobInformationObject`
+
+By default, a new child process created by a process in the job will also belong to the job unless some certain flag is specified when creating the process.
