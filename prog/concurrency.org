@@ -1,0 +1,9 @@
+#+TITLE: Concurrency
+
+Constructs for synchronizing program execution in some concurrent programming languages. An object that acts as a proxy for a result that is initially unknown.
+
+The terms /future/, /promise/, /delay/ and /deferred/ are often usedc interchangeably, although some differences in usage between /future/ and /promise/ are made:
+A future is a read-only placeholder view of a variable, while a /promise/ is a writable, single assignment container which sets the value of the future. Setting the value of a future
+is also called /resolving/, /fulfilling/ or /binding/ it.
+
+https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
