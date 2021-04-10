@@ -15,3 +15,15 @@
 - Use negative array typedef as static assertion.
 
 - offsetof: `((glong) ((guint8*) &((struct_type*) 0)->member))`
+
+# Atomics
+
+The atomic operations are implemented as thin wrappers around GCC instrincs or Windows API. If lock-free operations are not supported by the platform, a pthread mutex is used to simulate atomicity. All the operations act as a full memory barrier (the mutex implementation guarantees so due to [POSIX specification](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_12)).
+https://stackoverflow.com/questions/24137964/does-pthread-mutex-lock-contains-memory-fence-instruction
+An atomic operation ensures the corresponding operation is atomic, not the entire implementation unit.
+
+The `volatile` indicates mutability of a variable, thus prevents some optimization, ensuring that each volatile variable assignment and read has a corresponding memory access.
+
+https://stackoverflow.com/questions/5002046/atomicity-in-c-myth-or-reality
+Some read/write operations are guaranteed to be atomic without any compiler intrinsics.
+The instrincs used in `_get` and `_set` are for hardware memory barrier. 
