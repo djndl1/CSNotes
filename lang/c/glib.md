@@ -27,3 +27,11 @@ The `volatile` indicates mutability of a variable, thus prevents some optimizati
 https://stackoverflow.com/questions/5002046/atomicity-in-c-myth-or-reality
 Some read/write operations are guaranteed to be atomic without any compiler intrinsics.
 The instrincs used in `_get` and `_set` are for hardware memory barrier. 
+
+## Some other stuffs about lockfree programming
+
+[Memory barriers (Linux Documentation)](https://www.kernel.org/doc/Documentation/memory-barriers.txt)
+
+[Acquire and Release Semantics](https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/acquire-and-release-semantics?redirectedfrom=MSDN)
+
+[Memory Barrier A Hardware View For Software Hackers](https://www.researchgate.net/publication/228824849_Memory_Barriers_a_Hardware_View_for_Software_Hackers)
