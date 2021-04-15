@@ -26,3 +26,17 @@ For the global `g_thread_specific_private`, by
 > Although the same key value may be used by different threads, the values bound to the key by `pthread_setspecific()` are maintained on a per-thread basis and persist for the life of the calling thread.
 
 > After a TLS index is allocated, each thread of the process can use it to access its own TLS slot for that index. 
+
+# `GError`
+
+Used to report recoverable runtime errrors.
+
+```c
+struct GError {
+  GQuark       domain;  // the module the error-reporting function is located in
+  gint         code;    // the specific error that occurred
+  gchar       *message; // user-readable error message 
+};
+```
+
+Precondition checks should be done by `g_return_if_*` macros.
