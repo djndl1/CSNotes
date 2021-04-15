@@ -8,6 +8,8 @@ The string-to-int mapping is maintained as a hash table `quark_ht`. The reverse 
 
 Multiple duplicated strings are stored in string blocks if small enough, rather than scattered around.
 
+# Concurrency
+
 ## Threading
 
 public (`GThread`) -> (`GRealThread`) -> (`GThreadPosix`, containg `pthread_t`) 
@@ -27,7 +29,13 @@ For the global `g_thread_specific_private`, by
 
 > After a TLS index is allocated, each thread of the process can use it to access its own TLS slot for that index. 
 
-# `GError`
+## Mutex
+
+On POSIX Systems mutexes are implemented as a thin wrapper around `pthread_mutex_t`, on Win32, it's a simple `SRWLock`.
+
+# Error Handling
+
+## `GError`
 
 Used to report recoverable runtime errrors.
 
