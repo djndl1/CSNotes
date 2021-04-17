@@ -31,7 +31,15 @@ For the global `g_thread_specific_private`, by
 
 ## Mutex
 
-On POSIX Systems mutexes are implemented as a thin wrapper around `pthread_mutex_t`, on Win32, it's a simple `SRWLock`.
+On POSIX Systems mutexes are implemented as a thin wrapper around `pthread_mutex_t` (a normal one or an adaptive NP), on Win32, it's a simple `SRWLock`.
+
+The recursive mutex is implemented on Win32 with `CRITICAL_SECTION`, which is itself an optimized recursive mutex lock, or on POSIX a recursive `pthread_mutex_t`.
+
+`g_*_get_impl` is there to ensure the public API is thread-safe. When GLib type is itself the underlying system handle, no atomicity is required.
+
+## Read-Write Lock
+
+
 
 # Error Handling
 
