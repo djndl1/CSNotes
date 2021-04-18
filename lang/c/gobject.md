@@ -29,16 +29,19 @@ For the global `g_thread_specific_private`, by
 
 > After a TLS index is allocated, each thread of the process can use it to access its own TLS slot for that index. 
 
-## Mutex
+## Mutex Locks
 
 On POSIX Systems mutexes are implemented as a thin wrapper around `pthread_mutex_t` (a normal one or an adaptive NP), on Win32, it's a simple `SRWLock`.
 
-The recursive mutex is implemented on Win32 with `CRITICAL_SECTION`, which is itself an optimized recursive mutex lock, or on POSIX a recursive `pthread_mutex_t`.
-
 `g_*_get_impl` is there to ensure the public API is thread-safe. When GLib type is itself the underlying system handle, no atomicity is required.
 
-## Read-Write Lock
+## Condition Variable
 
+[Futexes Are Tricky](https://www.researchgate.net/publication/228708140_Futexes_Are_Tricky)
+[A Futex Overview and Update](https://lwn.net/Articles/360699/)
+[Condition Variables and Futex](https://www.remlab.net/op/futex-condvar.shtml)
+
+They can be implemented on top of the system API. For linux, futex is used. The `wait` operation simply unlocks the mutex and call into `futex` with the sampled futex value (which is atomically incremented to indicate a condition change when `signal`ed) as the expected value. Futex overflow is not likely to be a problem since there is basically no way `signal` would be called billions times in a row.
 
 
 # Error Handling
