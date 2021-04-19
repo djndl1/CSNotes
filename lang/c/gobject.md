@@ -43,6 +43,64 @@ On POSIX Systems mutexes are implemented as a thin wrapper around `pthread_mutex
 
 They can be implemented on top of the system API. For linux, futex is used. The `wait` operation simply unlocks the mutex and call into `futex` with the sampled futex value (which is atomically incremented to indicate a condition change when `signal`ed) as the expected value. Futex overflow is not likely to be a problem since there is basically no way `signal` would be called billions times in a row.
 
+## Once-Initialization
+
+Implemented without any system initialization API.
+`g_once_cond` is there to indicate the initialization state, `g_once_mutex` for checking and writing the once structure.
+
+```c
+gpointer
+g_once_impl (GOnce       *once,
+	     GThreadFunc  func,
+	     gpointer     arg)
+{
+  g_mutex_lock (&g_once_mutex);
+
+  while (once->status == G_ONCE_STATUS_PROGRESS)
+    g_cond_wait (&g_once_cond, &g_once_mutex);
+
+  if (once->status != G_ONCE_STATUS_READY)
+    {
+      // other threads are blocked on the mutex
+      once->status = G_ONCE_STATUS_PROGRESS;
+      g_mutex_unlock (&g_once_mutex);
+      // we can now safely unlock the mutex since the others will sleep on the condvar
+
+      once->retval = func (arg);
+
+      g_mutex_lock (&g_once_mutex); 
+      // every other thread should be at the three blocking sites above
+      // the extreme case would be that one thread either sleeps on the condvar or 
+      // tries to acquire the lock here
+      // in any case, one thread will acquire the lock at this line
+      once->status = G_ONCE_STATUS_READY;
+      g_cond_broadcast (&g_once_cond);
+    }
+
+  g_mutex_unlock (&g_once_mutex);
+  // Contension for the mutex starts again
+  // 1. joins the initializing threads
+  // 2. wakes on the signal, either blocks again or unlocks to return the retval
+
+  return once->retval;
+}
+```
+
+g_once_init_enter/leave are combined to initialize a zero-value only once. The combined 
+logic is similar to that of `g_once`, with a linked list as the once-structure to indicate the 
+initialization state. The initialization is inside `g_once_init_leave`. This does not, however, prevent a second-time assignment, which could be the same value or a different value.
+
+```c
+static gsize initialization_value = 0;
+
+if (g_once_init_enter (&initialization_value))
+  {
+    gsize setup_value = 42; // initialization code here
+
+    g_once_init_leave (&initialization_value, setup_value);
+  }
+```
+
 
 # Error Handling
 
