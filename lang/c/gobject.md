@@ -101,6 +101,11 @@ if (g_once_init_enter (&initialization_value))
   }
 ```
 
+## Thread Local Storage
+
+`GPrivate` should be statically initialized. 
+
+The Win32 implementation employs double-checked locking to once-initialize the key. A linked list of destructor functions are maintained (which can be access from the thread exit function and cannot be protected by the `CriticalSection` lock) to destruct the object since Win32 does not support destructors for an index. `g_thread_win32_thread_detach()` is called in `DllMain` when the thread detaches.
 
 # Error Handling
 
