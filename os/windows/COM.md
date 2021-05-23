@@ -55,3 +55,5 @@ Resource management of `IUnknown` is straightforward:
 2. Call `Release` prior to overwriting memory location that contains a non-null interface pointer.
 
 3. Redundant calls to `AddRef` and `Release` can be optimized away if there is special knowledge about the relationship between two or even more memory locations.
+
+The return refcount by `AddRef` and `Release` are not thread-safe, only for debugging. `Release` does not nullify the pointer, so the object might still be valid, even if it shouldn't be used.
