@@ -64,3 +64,9 @@ For the client, to reattempt the connection, the portable method is to close the
 No `listen` and `accept`, just `recvfrom` and `sendto`.
 
 `connect` can be used with datagram socket so that the kernel records a particular address as the socket's peer, just to avoid specifying the peer's address every time data are sent.
+
+# Unix Sockets
+
+A socket address takes the form of a pathname. The socket is merely an entry in the file system. The underlying device is not affected. The pathname should better be _absolute_, located in a secure directory, removed after using.
+
+The address structure should be zeroed by `memset` to ensure any nonstandard fields are also properly initialized and also the pathname is null-terminated.
