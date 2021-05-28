@@ -220,3 +220,20 @@ _Oracle Net Listener_: a process that runs on the database or elsewhere in the n
 
 PMON, SMON, BSWn, CKPT, LGWR, ARCn, MMON, MMAN, LREG.
 
+# Data Pump
+
+`expdp`, `impdp`,  the Data Pump API and the Metadata API. All related operations are done on the server side.
+
+Create a directory and grant read write permissions on it to the user before `expdp`.
+
+```sql
+
+CREATE OR REPLACE DIRECTORY test_dir AS '/u01/app/oracle/oradata/';
+GRANT READ, WRITE ON DIRECTORY test_dir TO scott;
+```
+
+```shell
+expdp scott/tiger@db10g schemas=SCOTT directory=TEST_DIR dumpfile=SCOTT.dmp logfile=expdpSCOTT.log
+
+impdp scott/tiger@db10g schemas=SCOTT directory=TEST_DIR dumpfile=SCOTT.dmp logfile=impdpSCOTT.log
+```
