@@ -151,3 +151,49 @@ tion channel between two endpoints
 5. Flow control: prevents a fast sender from overwhelming a slow receiver. Use buffering and sling windows mechanism.
 
 6. Congestion control: slow-start and congestion-avoidance algorithms, preventing a fast sender from overwhelming the network.
+
+# Internet Domain Socket 
+
+Unix domain datagram sockets are reliable, and block if the data queue of the receiver is full while UDP sockets are not reliable and the datagram will be dropped if the receiver's queue is full.
+
+##  Network Byte Order
+
+`htons`, `htonl`, `ntohs`, `ntohl` short for 16-bit and long for 32-bit. Hardcoded C integer must be converted to network byte order before storing into socket address structures.
+
+## Data Representation
+
+The sender must encode data according to a convention while the receiver decodes following the same convention. e.g. XDR, ASN.1-BER, CORBA, XML or simply plain text.
+
+## Internet Socket Address
+
+IPv4 and IPv6 share the same port-number space on the same host.
+
+## Host and Service Conversion Functions
+
+- hostname: the symbolic identifier for a system that is connected to a network.
+
+- serivce name: the symbolic representation of a port number
+
+### Converting IP address between binary and human-readable format
+
+- conversion between different representations of an IP address
+
+```c
+// obsolete
+inet_aton(); 
+inet_ntoa(); 
+
+// modern, support IPv6
+inet_pton();
+inet_ntop();
+
+// obsolete
+gethostbyname();
+getservbyname();
+gethostbyaddr();
+getservbyport();
+
+// modern
+getaddrinfo();
+getnameinfo();
+```
