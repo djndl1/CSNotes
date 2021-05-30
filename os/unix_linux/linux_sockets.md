@@ -197,3 +197,25 @@ getservbyport();
 getaddrinfo();
 getnameinfo();
 ```
+
+# DNS
+
+1. Hostnames are organized into a hierarchical namespace.
+
+2. The domain name of a node (host) consists of all of the names from that node up to the root concatenated together.
+
+```
+ftp.kernel.org.
+```
+
+3. The DNS hierarchy is maintained by a hierarchy of servers.
+
+4. `getaddrinfo` automatically resolves the hostname.
+
+## Recursive and Iterative Resolution Requests
+
+1. Recursive (preferred): the server queries the name on behalf of the client. If the local server does not know it, it asks the root DNS server to query from the local server address that is authorative for the destination.
+
+2. Iterative: 
+
+# Services and `/etc/services`
