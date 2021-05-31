@@ -219,3 +219,7 @@ ftp.kernel.org.
 2. Iterative: 
 
 # Services and `/etc/services`
+
+## Interative Servers
+
+Handles One client at a time, process that requests completely before proceeding to the next client. Suitable only for requests that can be handled quickly.
