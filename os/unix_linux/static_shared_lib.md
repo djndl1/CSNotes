@@ -80,3 +80,67 @@ To solve the library search problem, `ldconfig` creates a cache file of latest m
 2. The required global symbol found in the first library searched is used. 
 
 This might cause a library to use a symbol not in its own scope, to avoid this, use `-Bsymbolic` linker option.
+
+# Dynamic Loading `dlopen` API
+
+- `dlopen`: 
+
+- `dlerror`: return a string description of the error of `dlopen()`
+
+- `dlsym`: obtain the address of the symbol. Call `dlerror` beforehand to clear any error
+
+```c
+*(void **) (&funcp) = dlsym(handle, symbol); // workaround errors of assignment between a function pointer and void *
+```
+
+- `dlclose`: the library unloads itself if the count goes to 0.
+
+- `dladdr()`: return information of an loaded symbol (library path, base address of the lib, neighbor symbol, neighbor value)
+
+# Symbol Visibility
+
+Make visible only those symbols that form part of its specified binary interface.
+
+1. `static`: this also binds all references to the definition of the modified symbol, similar to `-Bsymbolic`
+
+2. `__attribute__ ((visiblity("hidden")))`: visible across the source code of the lib but hidden from outside the lib. It also has similar effects as `-Bsymbolic`
+
+3. Linker version scripts: specifies visibility and also provide multiple v ersion of the same function, used by `glibc` 2.1 and later.
+
+```
+VER_1 {             #  version tag, marking a version node
+    global:
+        vis_f1;
+        vis_f2;
+    local:
+        *;
+}
+```
+
+```shell
+gcc -Wl,--version-script,vis.map
+```
+
+# Initialization and Finalization Functions
+
+Defined using the gcc constructor and destructor attributes
+
+```c
+__attribute__ ((constructor))
+__attribute__ ((destructor))
+
+```
+
+# Preloading Shared Libraries
+
+- `LD_PRELOAD`: space/colon separated names of shared libraries should be loaded before any other shared libraries
+
+- `ld.so.preload` file
+
+setuid and setgid programs ignore `LD_PRELOAD` for security reasons.
+
+# Monitoring the Dynamic Linker `LD_DEBUG`
+
+```shell
+LD_DEBUG=help date
+`_``
