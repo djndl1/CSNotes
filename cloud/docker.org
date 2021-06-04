@@ -1,0 +1,33 @@
+#+TITLE: Docker
+
+* Developer With Docker
+
+Keep the layers as small as possible. It was common to have one dockerfile for development and a slimmed-down one to use for production: build using one container and copy it to another.
+
+Use bash =&&= operator is failure-prone
+
+** Best Practices
+
+1. Start with an appropriate base image for application. =openjdk= for Java app instead of =ubuntu=
+
+2. Use multistage builds.
+
+3. Consider use the production image as the base image for the debug image.
+
+*** Persistence
+
+1. Do not use storage drivers for application data persistence. To gain better performance, use volumes for production and bind mounts, if necessary, for development.
+
+2. Use /secrets/ for senstive application and /configs/ for non-sensitive data such as configuration files.
+
+*** Use CI/CD for testing and deployment.
+
+*** NTP-Sync all containers to the same NTP server.
+
+** Multistage builds
+
+*Use multiple =FROM= statements in the Dockefile*. Each =FROM (AS stage_name)= can use a different base and each of them begins a new stage of the build. Artifacts can be copied from one stage (~COPY --from=stage_name~) to another, leaving behind everything unnecessary in the final image.
+
+The destination stage can be specified during building =docker build --target=, useful for debugging or as a branch of test/debugging.
+
+It's also possible to use an external image as a stage. Multistage builds don't have to be sequential.
