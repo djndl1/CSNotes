@@ -6,6 +6,49 @@ Keep the layers as small as possible. It was common to have one dockerfile for d
 
 Use bash =&&= operator is failure-prone
 
+** Write a Dockerfile
+
+=docker build= builds an image from a Dockerfile and a context (a set of files at a specified location, =.dockerignore=).
+
+#+begin_src shell
+docker build -f dockerfile -t tag
+#+end_src
+
+Each instruction is run independently, causes a new image to be created.
+
+#+begin_src dockerfile
+# direc=[remote image reference]
+# Comment
+FROM ... [AS ...]
+INSTRUCTION arguments
+#+end_src
+
+**** Instructions
+
+1. =FROM=: use =alpine=
+
+2. =LABEL=: a mechanism to applying metadata to docker objects.
+
+3. =RUN=:
+
+4. =CMD=: =CMD ['executable', 'param1', 'param2']= typically given an interactive shell
+
+5. =EXPOSE=: expose ports
+
+6. =ENV=: set envvars
+
+7. =COPY=: copy local files into the container; =ADD=: more features
+
+8. =ENTRYPOINT=: set the image's main command
+
+9. =VOLUME=
+
+10. =USER=: change to a non-root user
+
+11. =WORKDIR=: no more =cd=
+
+12. =ONBUILD=: executes in any child image derived from the current image after the current dockerfile build completes, an instruction passed to the child.
+
 ** Best Practices
 
 1. Start with an appropriate base image for application. =openjdk= for Java app instead of =ubuntu=
@@ -13,6 +56,8 @@ Use bash =&&= operator is failure-prone
 2. Use multistage builds.
 
 3. Consider use the production image as the base image for the debug image.
+
+4. Decouple applications into multiple containers.
 
 *** Persistence
 
