@@ -15,16 +15,42 @@ The user name in MariaDB is not a OS user name.
 mysql -u user_name -p -h host_name -P port_number
 #+end_src
 
+** User Management
+
+*** Creation
+
+1. =CREATE USER= creates a new row in =mysql.user=.
+
+2. ='user_name'@'host_name': if the host name is not provided, it defaults to '%', or a domain name, or IP addresses, a range of IP addresses =base_IP/netmask=. The hostname has to be where the client connect comes from, a local nginx proxy counts as localhost.
+
 ** Getting Data
 
 - =SELECT= statement
   + use =LIMIT= clause to limit the results
-  + =WHERE=: selectivity
+  + =WHERE=: selectivity. It is possible to do tuple comparison.
   + =ORDER BY=: order, goes after =WHERE= and before =LIMIT=
   + =DISTINCT=: distinctivity flag
   + =HIGH_PRIORITY=: flag, =SELECT= statement are considered to be of lower priority by default.
   + =SQL_CALC_FOUND_ROWS=: used with =FOUND_ROWS()=
 
+#+begin_src sql
+select
+    name
+from
+    country_stats
+inner join countries
+    using (country_id)
+where
+    year = 2018 and
+    (population, gdp) > (
+        select
+            avg(population),
+            avg(gdp)
+        from country_stats
+        where year = 2018)
+order by
+    name;
+#+end_src
 
 * Minor Details
 
