@@ -15,6 +15,9 @@ The user name in MariaDB is not a OS user name.
 mysql -u user_name -p -h host_name -P port_number
 #+end_src
 
+** Database Creation
+
+character set, collation.
 ** User Management
 
 *** Creation
