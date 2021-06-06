@@ -15,9 +15,12 @@ The user name in MariaDB is not a OS user name.
 mysql -u user_name -p -h host_name -P port_number
 #+end_src
 
-** Database Creation
+** Schema Management
 
-character set, collation.
+- =create/alter {database | schema }= options: character set, collation, comment. The DDL defintion can be shown using =show create database=
+
+- =SHOW {DATABASES | SCHEMAS} [LIKE 'pattern' | WHERE expr]=
+
 ** User Management
 
 *** Creation
