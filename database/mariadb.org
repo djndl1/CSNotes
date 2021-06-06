@@ -23,6 +23,7 @@ mysql -u user_name -p -h host_name -P port_number
 
 2. ='user_name'@'host_name': if the host name is not provided, it defaults to '%', or a domain name, or IP addresses, a range of IP addresses =base_IP/netmask=. The hostname has to be where the client connect comes from, a local nginx proxy counts as localhost.
 
+
 ** Getting Data
 
 - =SELECT= statement
@@ -89,6 +90,14 @@ insert into contacts
 set first_name = 'Jonathan',
     last_name = 'Van';
  #+end_src
+
+*** Temporary Table
+
+Session-specific tables.
+
+1. The privilege to =create temporary table= in a stored procedure is the creator's if the user does not have the privilege.
+
+2. creating a temporary table does not cause an implicit commit.
 
 ** Some Useful Functions
 
