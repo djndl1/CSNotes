@@ -52,6 +52,31 @@ order by
     name;
 #+end_src
 
+- Common table expression (CTE)
+  + Reference a result set multiple times in the same statement
+  + Use a view without creating one
+  + create a recursive query
+  + simplify a complext query by breaking into multiple simple and logical building blocks
+
+#+begin_src sql
+with largest_economies as (
+	select
+		country_id, gdp
+	from
+		country_stats cs
+	order by
+		gdp desc
+	limit 10
+)
+select
+	name,
+	gdp
+from
+	countries c
+inner join largest_economies
+	using (country_id);
+#+end_src
+
 * Minor Details
 
 MariaDB is case-insensitive with regards to reserved words. Database and table names are case-sensitive on Linux as they reference the related directories and files on the filesystem.
