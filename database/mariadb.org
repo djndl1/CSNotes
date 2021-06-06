@@ -77,6 +77,20 @@ inner join largest_economies
 	using (country_id);
 #+end_src
 
+- `INSERT`:
+
+ #+begin_src sql
+--- default insertion
+insert into contacts(first_name, last_name, phone, contact_group)
+values('Roberto','carlos','(408)-242-3845',default);
+
+--- column specify out of order, specific to the mysql family
+insert into contacts
+set first_name = 'Jonathan',
+    last_name = 'Van';
+ #+end_src
+
+
 * Minor Details
 
 MariaDB is case-insensitive with regards to reserved words. Database and table names are case-sensitive on Linux as they reference the related directories and files on the filesystem.
