@@ -90,6 +90,14 @@ set first_name = 'Jonathan',
     last_name = 'Van';
  #+end_src
 
+** Some Useful Functions
+
+#+begin_src sql
+database(); --- the current database
+schema(); -- your MySQL-ism
+last_inserted_id();
+now();
+#+end_src
 
 * Minor Details
 
