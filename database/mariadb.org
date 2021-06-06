@@ -15,6 +15,14 @@ The user name in MariaDB is not a OS user name.
 mysql -u user_name -p -h host_name -P port_number
 #+end_src
 
+** Initialization and Configuration
+
+**** Use `systemd`
+
+The service is started by `mysqld` not `mysqld_safe`. The startup script has a timeout, when the startup takes too long, systemd kills it. Use a template unit file `mariadb@` to start multiple instances.
+
+https://mariadb.com/kb/en/systemd/#interacting-with-the-mariadb-server-process
+
 ** Schema Management
 
 - =create/alter {database | schema }= options: character set, collation, comment. The DDL defintion can be shown using =show create database=
