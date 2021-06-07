@@ -35,7 +35,7 @@ https://mariadb.com/kb/en/systemd/#interacting-with-the-mariadb-server-process
 
 - =create/alter {database | schema }= options: character set, collation, comment. The DDL defintion can be shown using =show create database=
 
-- =SHOW {DATABASES | SCHEMAS} [LIKE 'pattern' | WHERE expr]=
+- =SHOW {DATABASES | SCHEMAS} [LIKE 'pattern' | WHERE expr]=: =information_schema.schemata=
 
 ** Character Set and Collations
 
