@@ -33,3 +33,19 @@
 5. Oracle Enterprise Manager Database Express
 
 6. SQL Developer
+
+* Installation
+
+- System Identified (SID): unique identifier on the system
+
+- Global database name: =database_name.database_domain=
+
+- Operating System Groups: administrative access to database is granted by membership in certain OS groups.
+
+** Creating A Database
+
+- Fast Recovery Option: LGWR can archive the inactive redo log group to recover all commited transactions, or to keep a standby database current with its original database.
+
+- Connection Mode:
+  + Dedicated Server mode: default. each user process gets a server process. typical for persistent long running requests to the database.
+  + Shared server mode: all client connections share a database-allocated pool of resources.
