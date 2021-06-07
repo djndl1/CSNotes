@@ -37,6 +37,19 @@ https://mariadb.com/kb/en/systemd/#interacting-with-the-mariadb-server-process
 
 - =SHOW {DATABASES | SCHEMAS} [LIKE 'pattern' | WHERE expr]=
 
+** Character Set and Collations
+
+- collation: the rules for comparing and sorting a particular set.A character set can have many collations associated with it, while each collation is only associated with one character set.
+
+#+begin_src sql
+SHOW CHRACTER SET; --- select * from information_schema.CHARACTER_SETS;
+SHOW COLLATION; --- SELECT * from information_schema.COLLATIONS, ci (case-insenstive), cs (case sensitive)
+SET NAMES { 'charset_name' | [COLLATE 'collation_name'] | DEFAULT } --- sets character_set_client, character_set_connection, chracter_set_results
+SET {CHARACTER SET | CHARSET} {charset_name | DEFAULT} --- sets character_set_client, character_set_results, collcation_connection
+#+end_src
+
+Character sets and collations can be set from the server level right down to the column level, as well as for client-server communication.Character sets and collations always cascade down. By default, the character set and collation used for literals is determined by the =character_set_connection= and =collation_connection= system variables.
+
 ** User Management
 
 *** Creation
