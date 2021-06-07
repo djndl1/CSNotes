@@ -50,6 +50,30 @@ SET {CHARACTER SET | CHARSET} {charset_name | DEFAULT} --- sets character_set_cl
 
 Character sets and collations can be set from the server level right down to the column level, as well as for client-server communication.Character sets and collations always cascade down. By default, the character set and collation used for literals is determined by the =character_set_connection= and =collation_connection= system variables.
 
+** Localization and Internationalization
+
+MariaDB stores values internally in UTC, converting them to the required time zone as required.
+
+- =lc-time_names=: sets the language used by the date and time functions =DAYTIME()=, =MONTHNAME()=, =DATE_FORMAT()=
+
+- =lc_messages=: server error messages
+
+- =time_zone=: the primary way to set the time zone
+
+=default_time_zone= is an option in a server option group.
+
+There are some functions and data types affected by the time zone settings.
+
+#+begin_src sql
+    NOW()
+    SYSDATE()
+    CURDATE()
+    CURTIME()
+    UNIX_TIMESTAMP()
+
+    timestamp, datetime
+#+end_src
+
 ** User Management
 
 *** Creation
