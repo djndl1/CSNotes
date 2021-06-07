@@ -1,0 +1,35 @@
+#+TITLE: Oracle_admin
+
+* Common Tasks and Tools
+
+*** Common Tasks
+
+1. Installing/Upgrading software:
+
+2. creating databases
+
+3. Start/stopping the instance
+
+4. Managing the storage structures of the database
+
+5. Managing users and security
+
+6. Managing database objects
+
+7. Backup and recovery
+
+8. Monitoring and tuning the performance
+
+*** Tools
+
+1. Oralce Universal Installer
+
+2. Oracle Database Configuration Assistant
+
+3. Database Upgrade Assistant
+
+4. Net Configuration Assistant
+
+5. Oracle Enterprise Manager Database Express
+
+6. SQL Developer
