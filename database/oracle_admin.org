@@ -88,3 +88,5 @@ alter system set local_listener=alias_or_actual_protocol_address;
 #+begin_src
 alter system set remote_listener=alias_or_actual_protocol_address;
 #+end_src
+
+Remote listener might need to disable VNCR (valid_node_checking_registration) to allow remote registration.
