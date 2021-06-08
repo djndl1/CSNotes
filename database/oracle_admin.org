@@ -90,3 +90,9 @@ alter system set remote_listener=alias_or_actual_protocol_address;
 #+end_src
 
 Remote listener might need to disable VNCR (valid_node_checking_registration) to allow remote registration.
+
+**** Create Service
+
+#+begin_src sql
+dbms_service.create_service
+#+end_src
