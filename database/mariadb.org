@@ -50,6 +50,8 @@ SET {CHARACTER SET | CHARSET} {charset_name | DEFAULT} --- sets character_set_cl
 
 Character sets and collations can be set from the server level right down to the column level, as well as for client-server communication.Character sets and collations always cascade down. By default, the character set and collation used for literals is determined by the =character_set_connection= and =collation_connection= system variables.
 
+Padspace collations treat trailing spaces as insignificant and remove them when comparing.
+
 ** Localization and Internationalization
 
 MariaDB stores values internally in UTC, converting them to the required time zone as required.
@@ -105,6 +107,58 @@ Most numberic types can be defined as =SIGNED= (default), =UNSIGNED= or =ZEROFIL
 - =FLOAT[(M, D)]=, =DOUBLE([M, D]) / =DOUBLE PRECISION= / =REAL=: IEEE 754 standard floating-point
 
 - =BIT[(M)]=: bit field type, default to 1 bit, at most 64 bits, literal value =b'value'=
+
+*** String Types
+
+MariaDB uses double quotes for enclosing strings by default. Use =\= to escape characters.
+
+#+begin_src sql
+[_charset_name]  'string_value' [COLLATE collation_name]
+_utf8 'Foundation' COLLATE utf8_unicode_ci;
+#+end_src
+
+- =[NATIONAL] CHAR[(M)] [CHARACTER SET charset_name] [COLLATE collation_name]=: Fixed-length right-padded string, at most 255 characters (not bytes), default to 0
+
+- =BINARY(M)= / =CHAR BYTE=: fixed binary byte strings, compared based on the numeric value of the bytes.
+
+- =[NATIONAL] VARCHAR[(M)] [CHARACTER SET charset_name] [COLLATE collation_name]=: variable-length right-padded string, at most 65532 characters (not bytes), default to 0. =varchar= can be fully indexed.
+
+- =VARBINARY(M)=: variable byte string, no character set
+
+- =TINYBLOB= (at most 255 bytes), =BLOB= (2^16-1 bytes), =MEDIUMBLOB= (2^24 - 1), =LOGNBLOB= (2^32 - 1)
+
+- =TINYTEXT= (255), =TEXT= (2^16-1), =MEDIUMTEXT= (=LONG=, =LONG VARCHAR=, 2^24-1), =LONGTEXT= (2^32-1)
+
+- =INET6=: IPv6 address
+
+- =JSON=: a =LONGTEXT= type, however a dedicated compact type in MySQL
+
+ #+begin_src sql
+CREATE TABLE t2 (
+  j JSON
+  CHECK (JSON_VALID(j))
+);
+ #+end_src
+
+- =ENUM('value', 'value', ...) [CHARACTER SET charset_name] [COLLATE collation_name]=: NULL and empty strings are possible. Each value is assigned an index number in the order they are defined.
+
+- =SET('value', 'value', ...) [CHARACTER SET charset_name] [COLLATE collation_name]=: NULL and empty strings are possible. Each value is assigned an index number in the order they are defined.
+
+- =ROW (<field name> <data type> [ {, <field name> <data type> }...])=: a data type for stored procedure
+
+*** Date Types
+
+MariaDB date types store no timezone info.
+
+- =YEAR[(4)]=: the range is very limited
+
+- =DATE=: YYYY-MM-DD
+
+- =TIME [(microsecond precision 0-6)]=:
+
+- =DATETIME [(microsecond precision 0-6)]=: no automatic time zone conversions are performed.
+
+- =TIMESTAMP [(microsecond precision 0-6)]=:: generally used to define at which moment in time a row was added or updated, internally as the number of seconds since the UNIX epoch. Can be set to =CURRENT_TIMESTAMP= on creation or update
 
 ** Getting Data
 
