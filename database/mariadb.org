@@ -82,6 +82,29 @@ There are some functions and data types affected by the time zone settings.
 
 2. ='user_name'@'host_name': if the host name is not provided, it defaults to '%', or a domain name, or IP addresses, a range of IP addresses =base_IP/netmask=. The hostname has to be where the client connect comes from, a local nginx proxy counts as localhost.
 
+** Data Types
+
+*** Numeric Types
+
+Most numberic types can be defined as =SIGNED= (default), =UNSIGNED= or =ZEROFILL= (the displayed value of the field is padded to the specified width). Using =ZEROFILL= and a display width has no effect on how the data is stored. It affects only how it is displayed (Useless feature!).
+
+- =TINYINT= / =INT1=: 1 bytes at most
+
+- =BOOL=/=BOOLEAN=: =TINYINT(1)=, nonzero considered true. =TRUE= is 1 and =FALSE= is 0, so =2 = TRUE= yields false, use =2 IS (NOT) TRUE= instead.
+
+- =SMALLINT= / =INT2=: 2 bytes at most
+
+- =MEDIUMINT= / =INT3=: 3 bytes at most
+
+- =INTEGER= / =INT= / =INT4=: 4 bytes at most
+
+- =BIGINT= / =INT8=: 8 bytes at most
+
+- =DECIMAL(M, [D])= / =DEC= / =NUMERIC= / =FIXED= / =NUMBER=: M (65 at most) precision, D (38 at most) fractional digits.
+
+- =FLOAT[(M, D)]=, =DOUBLE([M, D]) / =DOUBLE PRECISION= / =REAL=: IEEE 754 standard floating-point
+
+- =BIT[(M)]=: bit field type, default to 1 bit, at most 64 bits, literal value =b'value'=
 
 ** Getting Data
 
