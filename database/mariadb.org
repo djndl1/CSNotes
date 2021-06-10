@@ -169,7 +169,7 @@ MariaDB date types store no timezone info.
 ** Storage Engine
 
 #+begin_src sql
-select @@global.storage_engine;
+select @@global.storage_engine
 #+end_src
 
 A table can be created with an =engine= option.
@@ -181,6 +181,18 @@ A table can be created with an =engine= option.
 3. MyISAM, Aria: former default engine and its successor. Do not support transactions and foreign keys.
 
 4. MyRocks: Write-optimized and has fast dat aloading and replication.
+
+** Table Management
+
+It is a good practice to define a primary key for every table. MariaDB automatically creates a btree index for the primary key column(s).
+
+- =auto_increment=: a sequence, but not primary key
+
+- =alter table= can specify the location of the new column
+
+- =show tables= might show views and sequences, use =show full tables=
+
+- =truncate table=: deletes all rows from a table, more efficient then delete since it basically drops the table and then recreates it.
 
 ** Getting Data
 
