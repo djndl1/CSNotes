@@ -150,6 +150,12 @@ CREATE TABLE t2 (
 
 MariaDB date types store no timezone info.
 
+#+begin_src sql
+    DATE 'string'
+    TIME 'string'
+    TIMESTAMP 'string'
+#+end_src
+
 - =YEAR[(4)]=: the range is very limited
 
 - =DATE=: YYYY-MM-DD
