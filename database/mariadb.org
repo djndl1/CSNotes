@@ -168,6 +168,10 @@ MariaDB date types store no timezone info.
 
 ** Storage Engine
 
+#+begin_src sql
+select @@global.storage_engine;
+#+end_src
+
 A table can be created with an =engine= option.
 
 1. InnoDB: default high-performance, general-purpose storage engine that supports transactions with savepoints, XA transactions and foreign keys.
