@@ -166,6 +166,18 @@ MariaDB date types store no timezone info.
 
 - =TIMESTAMP [(microsecond precision 0-6)]=:: generally used to define at which moment in time a row was added or updated, internally as the number of seconds since the UNIX epoch. Can be set to =CURRENT_TIMESTAMP= on creation or update
 
+** Storage Engine
+
+A table can be created with an =engine= option.
+
+1. InnoDB: default high-performance, general-purpose storage engine that supports transactions with savepoints, XA transactions and foreign keys.
+
+2. TokuDB: supports factual trees and data compression, suitable for large datasets
+
+3. MyISAM, Aria: former default engine and its successor. Do not support transactions and foreign keys.
+
+4. MyRocks: Write-optimized and has fast dat aloading and replication.
+
 ** Getting Data
 
 - =SELECT= statement
