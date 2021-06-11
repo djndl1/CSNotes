@@ -206,7 +206,30 @@ A foreign key prevents inserting a row into the table without a corresponding ro
 show create view view_name
 #+end_src
 
-** Getting Data
+*** Trigger
+
+Can be executed *before* / *after* =insert=/=update=/=delete=. MariaDB does not support statement-level triggers.
+
+#+begin_src sql
+create trigger trigger_name
+{before | after} {insert | update | delete }
+on table_name for each row
+trigger_body;
+#+end_src
+
+*** Index
+
+Indices are used to quickly find rows of query. Without indexes, the database has to scan the whole table to find the relavant rows for the query.
+The indexed columns are stored in b-tree (ordered) for fast retrieval. Indexing requires more storage space and overhead when writing.
+
+#+begin_src sql
+show indexes from table_name;
+show keys in table_name;
+#+END_SRC
+
+Unique constraints automatically create their unique indexes.
+
+** GETTING Data
 
 - =SELECT= statement
   + use =LIMIT= clause to limit the results
