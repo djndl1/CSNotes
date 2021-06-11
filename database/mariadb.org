@@ -194,6 +194,12 @@ It is a good practice to define a primary key for every table. MariaDB automatic
 
 - =truncate table=: deletes all rows from a table, more efficient then delete since it basically drops the table and then recreates it.
 
+A foreign key prevents inserting a row into the table without a corresponding row in the parent table. The behavior is configurable if a row in the parent table is deleted (=on delete restrict on update cascade=).
+
+- =check=: more general constraint
+
+- =unique=:
+
 ** Getting Data
 
 - =SELECT= statement
