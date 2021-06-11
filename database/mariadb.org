@@ -200,6 +200,12 @@ A foreign key prevents inserting a row into the table without a corresponding ro
 
 - =unique=:
 
+*** View
+
+#+begin_src sql
+show create view view_name
+#+end_src
+
 ** Getting Data
 
 - =SELECT= statement
