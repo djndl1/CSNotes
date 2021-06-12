@@ -1,0 +1,49 @@
+#+TITLE: Sql General
+
+* Background
+
+** Relationnal Model
+
+Data are represented as sets of tables. Redundant data is used to link records in different tables.
+
+Normalization: refining a database design to ensure that each independent piece of information is in only one place
+
+*** Terms
+
+- *Entity*: something of interest to the database user community
+
+- *Result Set*: a nonpersistent table, generally the result of an SQL query
+
+- schema statement, data statement, transaction statement
+
+*** Execution Process
+
+1. Check permissions on the statement and data
+
+2. Check the syntax
+
+3. Query optimizer determines the most effective way to execute the query and picks an *execution plan*
+
+* Query
+
+** Tables
+
+- Permanent Tables (=create table=)
+
+- Derived tables (rows returned by a subquery and held in memory)
+
+- temporary tables (volatile data held in memory)
+
+- Virtual tables (=create view=)
+
+** Recent Learned Syntax
+
+- =order by position_number=
+
+ #+begin_src sql
+select c.first_name, c.last_name,r.rental_date
+from customer c
+inner join rental r
+on c.customer_id = r.customer_id
+ORDER BY 3 asc;
+ #+end_src
