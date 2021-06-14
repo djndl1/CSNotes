@@ -73,7 +73,11 @@ The OPC Server should
 
 1. It is strongly recommended that write requrests to the same device be handled in order by any server implementation.
 
-2. Where a client can both read values explicitly or receive updates via a callback attention must be given to defining exactly when a callback will or will not occur.
+2. Where a client can both read values explicitly or receive updates via a callback attention must begiven to defining exactly when a callback will or will not occur.
+
+***** Programming Practice
+
+See another repo OPCLearning
 
 **** OPC Alarm and Events
 
