@@ -12,7 +12,36 @@ https://www.codeproject.com/Articles/12441/OPC-Technology
 
 4. OPC provides caching
 
+* OPC Classic
+
+** Scope
+
+The specification include a set of custom COM interfaces (and a set of OLE Automation interfaces) for use by client and server writers
+
+1. Online Data Access (OPC DA): reading and writing o f data between an app and a process control device
+
+2. Alarm and Event Handling (OPC A&E): the mechanisms for OPC clients to be notified of the occurrence of specified events and alarm conditions
+
+3. Historical Data Access (OPC HDA): the reading, processing and editing of data of a historian engine
+
+*** OPC Fundamentals
+
+**** OPC DataAccess
+
+- =OPCServer=: maintains information about the server and serves as a container for OPC group objects
+
+- =OPCGroup=: a way for clients to logically orgainize data.
+  + public OPCGroup: for sharing across multiple clients
+  + local OPCGroup: local to a client
+
+- =OPCItem=: connections to data sources within the server, must be in a group, no external interface.
+  + a variant
+  + contains a *Value*, *Quality* and *Time Stamp*
+
+
 * Concepts and Terminology
+
+- *OPC Server*: any server that provides OPC interfaces
 
 - *OPC Address Space*: hierarchical
 
