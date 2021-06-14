@@ -1,0 +1,35 @@
+#+TITLE: Opc
+
+https://www.codeproject.com/Articles/12441/OPC-Technology
+
+* Why OPC
+
+1. Standardized protocol
+
+2. Reduced load on devices
+
+3. Scalability
+
+4. OPC provides caching
+
+* Concepts and Terminology
+
+- *OPC Address Space*: hierarchical
+
+- *OPC Items/Tags*: leaf nodes, sensor attributes
+
+- *folders, subfolders*: can map to some physical configuration or even geographical setup
+
+- *OPC Group*: a set of OPC items: every client can create a logical entity called a group inside a OPC server. A client can maintain multiple groups. Every group has a unique name and has update rate, active flag, deadband, IO mode (sync/async), time bias(local time w.r.t GMT)
+
+OPC provides sync and async reading and writing on hardware devices.
+
+* COM Interfaces & Component Categories
+
+=OPCEnum.exe=: a Windows Service that provides OPC server enumeration. The client application can query available OPC servers on local as well as remote networked machines.
+
+Every OPC Server has to support the following interfaces
+
+1. =IOPCBrowse=: browsing OPC Address Space.
+
+2. =IOPCItemIO=: used for performing OPC Item read and write operations
