@@ -392,6 +392,17 @@ Cells and bands are elements of a grid, inherited from `DataGridViewElement`
 
 - `DataGridViewCell` 
 
+## Two-Way Bindings: Interaction between the data source and the bound controls
+
+- `IBindingList`, `BindingList<T>`: provides members that allow an external class to add new entries in the list, sort the list, search the list and receive notification. New object can be added to the list by setting the `AddingNew` event. Transactional behavior is supported. If an underlying object is modified, it can trigger an event (maybe through `IEditable` interface to ensure transactional behavior) to which the binding list subscribes.
+
+- `IEditableObject`: commit or rollback of changes to an object as a data source. The object must call `BeginEdit()` before modifying itself and call `EndEdit()` to finish modification, `Modified` event can be fired inside `EndEdit()`. `DataGridView` automatically uses this interface.
+
+### Simple Data Binding
+
+Binding single property values to a specific data source, supported by the `Control` class directly. Controls bind to an interim object which would then manage the data.
+
+- `BindingSource`: serves as layer of indirection between controls and data sources.
 
 # Various Controls
 
