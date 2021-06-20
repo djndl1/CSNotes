@@ -101,19 +101,6 @@ About titlebars, minimizebox, maximizebox, icon, helpbbutton.
 mostly a parlor trick.
 
 
-## Menus
-
-- `MenuStrip`
-
-- `ContextMenuStrip`: like the one that pops out when you click a text box.
-
-## Toolbar
-
-- `ToolStrip`
-
-## Statusbar
-
-`Statustrip`: items include `ToolStripStatusLabel`, `ToolStripProgressBar`, `ToolStripStatusLabel`, `ToolStripSplitButton`
 
 ## Multiple Document Interface (MDI)
 
@@ -384,3 +371,44 @@ _application configuration file_: `app.config`. The `ConfigurationManager` class
 ## Strongly Typed Settings
 
 Every setting file added to a project is used to generate an additonal strongly typed settings class. `ApplicationSettingsbase` 
+
+# Data Bindings
+
+## DataGridView
+
+A grid in which data is displayed and represents a specific collection of data. The grid determines the properties of the collection automatically using `System.Reflection`.
+
+### Columns and Rows
+
+If `AutoGenerateColumns` is set to `true`, the columns for the grid are generated whenever the DataSource or DataMember property value changes. Autogeneration can be disabled and the columns can be assigned manually.
+
+Cells and bands are elements of a grid, inherited from `DataGridViewElement`
+
+- `DataGridViewBand`: A linear collection of cells, the base class
+
+- `DataGridViewColumn`: `DataPropertyName` binds the member object's property to a column. Column cells can be buttons, check boxes, comboboxes, clickable links or text boxes, depending on the the actually used derived class.
+
+- `DataGridViewRow`: 
+
+- `DataGridViewCell` 
+
+
+# Various Controls
+
+## ToolStrip
+
+Various bars with items on it.
+
+### Menubar
+
+- `MenuStrip`
+
+- `ContextMenuStrip`: like the one that pops out when you click a text box.
+
+## Toolbar
+
+- `ToolStrip`
+
+## Statusbar
+
+`Statustrip`: items include `ToolStripStatusLabel`, `ToolStripProgressBar`, `ToolStripStatusLabel`, `ToolStripSplitButton`
