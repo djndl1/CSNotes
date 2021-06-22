@@ -36,7 +36,7 @@ Normalization: refining a database design to ensure that each independent piece 
 
 - Virtual tables (=create view=)
 
-** Recent Learned Syntax
+** Obscure Syntax
 
 - =order by position_number=
 
@@ -47,3 +47,11 @@ inner join rental r
 on c.customer_id = r.customer_id
 ORDER BY 3 asc;
  #+end_src
+
+- =REGEXP=: oracle =regexp_like=, MSSQL allows =like= used with regex
+
+- An expression can be (IS) =null=, but can never == NULL=.
+
+- =order by= is directly appended to =union all= without an outer query.
+
+- The intersect operator to have precedence over the other set operators.
