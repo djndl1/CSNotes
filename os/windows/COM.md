@@ -90,3 +90,24 @@ Use atomic operations for `AddRef` and `Release`. Traverse the type hierarchy of
 ## Exceptions
 
 The objects that throw COM exceptions must implement the `ISupportErrorInfo` interface to indicate which interfaces support exceptions. Create an error using `ICreateErrorInfo`, call `SetErrorInfo` to throw it and `GetErrorInfo` to catch and clear it.
+
+# Classes
+
+- *Interfaces*: abstract protocol for communicating with an object
+
+- *Classes* are named (after `CLSID`) implementations that represent concrete instantiable types. `ProgID`s are text-based aliases for `CLSID`, unique only by convention.
+
+```c
+HRESULT CLSIDFromProgID();
+HRESULT ProgIDFromCLSID();;
+```
+
+A class object acts as the metaclass for a given implementation and the methods it implements fill the role of static member functions. Class objects are often used as brokers to create new instances of a class to find existing instances based on some well-known object name.
+
+## Object Activation
+
+*Object Activation*: Clients need a mechanism for finding class objects, which may involve loading a DLL or starting a server process, to bring an object to life.
+
+Object activation is done by sending requests to the COM Service Control Manager, a central rendezvous point for all activation requests, the interface of which, called the COM library, is implemented in `OLE32.DLL` on WinNT.
+
+In-Process COM calls are mostly just virtual calls. Out-of-process COM calls are called upon _proxies_, which translates between method invocations and RPC requests.
