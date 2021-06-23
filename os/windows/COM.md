@@ -82,3 +82,11 @@ Use atomic operations for `AddRef` and `Release`. Traverse the type hierarchy of
 - `string`: pointer to a null-terminated array of characters
 
 - `VARIANT`: a common discriminated union
+
+## Attributes and Properties
+
+- `[propget]`, `[progput]`: `get` `set`
+
+## Exceptions
+
+The objects that throw COM exceptions must implement the `ISupportErrorInfo` interface to indicate which interfaces support exceptions. Create an error using `ICreateErrorInfo`, call `SetErrorInfo` to throw it and `GetErrorInfo` to catch and clear it.
