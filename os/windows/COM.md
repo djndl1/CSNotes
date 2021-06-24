@@ -111,3 +111,7 @@ A class object acts as the metaclass for a given implementation and the methods 
 Object activation is done by sending requests to the COM Service Control Manager, a central rendezvous point for all activation requests, the interface of which, called the COM library, is implemented in `OLE32.DLL` on WinNT.
 
 In-Process COM calls are mostly just virtual calls. Out-of-process COM calls are called upon _proxies_, which translates between method invocations and RPC requests.
+
+### Using SCM
+
+- `CoGetClassObject`: creates a class object, which in turn can be used to create instances of the class, most likely through `IClassFactory`. The function locates t he code associated with the `CLSID`. This function underlies all ofthe instance creation functions.
