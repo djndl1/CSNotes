@@ -24,7 +24,7 @@ Normalization: refining a database design to ensure that each independent piece 
 
 3. Query optimizer determines the most effective way to execute the query and picks an *execution plan*
 
-* Query
+* SQL
 
 ** Tables
 
@@ -36,7 +36,7 @@ Normalization: refining a database design to ensure that each independent piece 
 
 - Virtual tables (=create view=)
 
-** Obscure Syntax
+** Advanced SQL
 
 - =order by position_number=
 
@@ -55,3 +55,19 @@ ORDER BY 3 asc;
 - =order by= is directly appended to =union all= without an outer query.
 
 - The intersect operator to have precedence over the other set operators.
+
+- =rollup=, =cube= (all column combinations): to aggregate over subgroups, groups and the entirety.
+
+- =all=, =any=/=some= with subqueries: comparison and then and/or
+
+When using not in or <> all to compare a value to a set of values, be careful to ensure that the set of values does not contain a null value. Using == any= is equivalent to using the in operator.
+
+- tuple =IN=: without writing multiple subqueries and =IN= clauses
+
+Subqueries are used heavily in update, delete, and insert statements as well, with correlated subqueries appearing frequently in update and delete statements.
+
+- Avoid natural join.
+
+*** Common Table Expressions
+
+Each subquery can refer to any other subquery defined previously
