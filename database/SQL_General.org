@@ -71,3 +71,30 @@ Subqueries are used heavily in update, delete, and insert statements as well, wi
 *** Common Table Expressions
 
 Each subquery can refer to any other subquery defined previously
+
+*** Conditional Logic
+
+#+begin_src sql
+--- Pivot a result set
+SELECT
+  SUM(CASE WHEN monthname(rental_date) = 'May' THEN 1
+        ELSE 0 END) May_rentals,
+  SUM(CASE WHEN monthname(rental_date) = 'June' THEN 1
+        ELSE 0 END) June_rentals,
+  SUM(CASE WHEN monthname(rental_date) = 'July' THEN 1
+        ELSE 0 END) July_rentals
+FROM rental
+WHERE rental_date BETWEEN '2005-05-01' AND '2005-08-01';
+
+--- conditional update
+UPDATE customer
+SET active =
+  CASE
+    WHEN 90 <= (SELECT datediff(now(), max(rental_date))
+                FROM rental r
+                WHERE r.customer_id = customer.customer_id)
+      THEN 0
+    ELSE 1
+  END
+WHERE active = 1;
+#+end_src
