@@ -98,3 +98,21 @@ SET active =
   END
 WHERE active = 1;
 #+end_src
+
+* Transactions
+
+*** Locking
+
+Two strategies employed by different DBs:
+
+- read-write lock
+
+- versioning: the reader is not required to acquire a reader lock, the versioning mechanism ensures that the reader sees a consistent view of the data
+
+*** Lock granularities
+
+- table locks
+
+- page locks
+
+- row locks
