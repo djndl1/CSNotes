@@ -116,3 +116,19 @@ Two strategies employed by different DBs:
 - page locks
 
 - row locks
+
+
+** Transaction Mode
+
+1. Oracle Database: a new transaction begins when a new session begins. Commit or rollback must be explicit.
+
+2. SQL Server/MySQL: default to autocommit mode
+
+#+begin_src sql
+set implicit_transactions on; --- SQL Server
+set autocommit = 0;
+#+end_src
+
+The server might decide to end (either rollback or commit) the transaction prematurely if a deadlock is detected, commit the transaction if an SQL schema statement is issued, or another transaction is started.
+
+Multiple savepoints can be saved within a transaction to avoid a full rollback.
