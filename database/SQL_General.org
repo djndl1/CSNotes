@@ -133,6 +133,30 @@ The server might decide to end (either rollback or commit) the transaction prema
 
 Multiple savepoints can be saved within a transaction to avoid a full rollback.
 
+** View
+
+1. Data security
+
+2. Data Aggregation
+
+3. Hiding Complexity
+
+4. Joining Partitioned Data
+
+*** Updatble Views
+
+1. No aggregate functions
+
+2. No =group by= or =having=
+
+3. No =union=, =union all= or =distinct=
+
+4. =from= at least one table or updatable view
+
+5. =from= only uses inner joins if there are more than one table or view
+
+6. no subqueries in =select= or =from= clause, and any subqueries in the =where= clause do not refer to tables in the =from= clause.
+
 * Partitioning and Sharding
 
 A table with millions of rows makes the following tasks difficult and time-consuming
