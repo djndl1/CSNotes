@@ -132,3 +132,57 @@ set autocommit = 0;
 The server might decide to end (either rollback or commit) the transaction prematurely if a deadlock is detected, commit the transaction if an SQL schema statement is issued, or another transaction is started.
 
 Multiple savepoints can be saved within a transaction to avoid a full rollback.
+
+* Partitioning and Sharding
+
+A table with millions of rows makes the following tasks difficult and time-consuming
+
+1. full table scans when querying
+
+2. index creation/rebuild
+
+3. Data archival/deletion
+
+4. generation of table/index statistics
+
+5. table relocation
+
+6. Database backups
+
+
+** Table Partitioning
+
+Table partitioning allows for flexibility with data storage and administration. Every partition have the same schema definition but holds disjoint data.
+
+1. Partitions may be stored on different tablespace, using different compression schemes.
+
+2. Table statistics can be frozen on some partitions while being periodically refreshed on others.
+
+With /horizontal partitioning/ entires rows are assigned to one partition while in /vertical partitioning/, sets of columns are assigned to different partitions.
+When partitioning horizontally, a column as the /parititon key/ combined with a /partition function/ is used to assign a row to a partitcular partition.
+
+Index can be set to global or local. Global indexes span all partitions of the table, useful for queries which do not specify a value for the partition key.
+
+*** Partition Methods
+
+1. Range Partitioning: typically used on date column
+
+2. List Partitioning: partition key with finite values. The list partitioning does not provide for a spilloverr partition for values not listed.
+
+3. Hash Partitioning: a hashing function is applied to the column value, with a range of a small number of values.
+
+4. Composite Partitioning
+
+** Sharding
+
+Parititon the entire database: new approaches have been proposed to replace this.
+
+* Big Data
+
+Big Data is designed to handle a huge amount of data of various formats arriving at rapid pace.
+
+1. Volume: billions or trillions of data points
+
+2. Variety: data might always be structured: videos, emails, photos, audio files
+
+3. Velocity
