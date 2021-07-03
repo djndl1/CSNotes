@@ -99,6 +99,37 @@ SET active =
 WHERE active = 1;
 #+end_src
 
+* Indexes and Constraints
+
+** Indexes
+
+#+begin_src sql
+create index ...
+drop index ...
+#+end_src
+
+- B-Tree indexes: MySQL, Oracle and MSSQL default to B-Tree indexing. Branch nodes are used for navigating the tree, while leaf nodes hold the actual values and location information.
+
+- Bitmap indexes: for columns of a small number of values (/low-cardinality/), rows with different values are maintained in different bitmaps
+
+- Text indexes: for document search
+
+The more indexes a table has, the more work the server needs to do to keep all schema objects up-to-date, which tends to slow things down. The best strategy is to add an index when a clear need arises.
+
+1. Make sure all primary keys are indexed
+
+2. Build indexes on all columns that are referenced in foreign key constraints
+
+3. Index any column that will frequently be used to retrieve data
+
+** Constraints
+
+1. primary key, foreign key
+
+2. unique constraint
+
+3. check constraints: restrict allowable values for a column
+
 * Transactions
 
 *** Locking
