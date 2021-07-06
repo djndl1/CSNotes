@@ -423,3 +423,11 @@ Various bars with items on it.
 ## Statusbar
 
 `Statustrip`: items include `ToolStripStatusLabel`, `ToolStripProgressBar`, `ToolStripStatusLabel`, `ToolStripSplitButton`
+
+# Multi-Threading
+
+## Modify a control from another thread
+
+1. Use `Control.InvokeRequired`, `Control.Invoke`, `Control.BeginInvoke`, `IsHandledCreated` (better start the background thread after the form is created)
+
+2. `BackgroundWorker`
