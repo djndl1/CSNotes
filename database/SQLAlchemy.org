@@ -26,6 +26,12 @@ The starting point of any SQLAlchemy app. An Engine references both a =Dialect= 
 
 Connections that are being used are not discarded when the engine is discarded or GC-ed. These connections just return to its connection pool, which will be ultimately GC-ed. It is recommended to dispose an =Engine= only after all connections are checked in (back to the pool) or otherwise deassociated from their pool.
 
+=create_mock_engine()= creates a mock engine for echoing DDL. This can be used to get DDL SQL strings.
+
+** =URL= class
+
+Pass this instead of a python string to the database and manually parse or modify the URL string. Create an =URL= class using =URL.create()=
+
 ** =Connection= class
 
 A proxy object for an actual DBAPI connection. Connections are typically pooled for reuse.
