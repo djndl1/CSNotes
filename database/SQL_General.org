@@ -188,6 +188,98 @@ Multiple savepoints can be saved within a transaction to avoid a full rollback.
 
 6. no subqueries in =select= or =from= clause, and any subqueries in the =where= clause do not refer to tables in the =from= clause.
 
+* Metadata
+
+Collectively known as the /data dictionary/ or /system catalog/
+
+1. table name, storage information, storage engine, column names, column data types, default column values,
+
+2. column constraints, primary key columns, primary key name, foreign key name, foreign key columns
+
+3. index names, index types, indexed columns, index column sort order, index storage information
+
+** =information_schema= on MySQL
+
+- =information_schema.tables=: table info
+
+- =information_schema.views=: only views
+
+- =information_schema.columns=: column info for both tables and views
+
+- =information_schema.statistics=: table indexes
+
+- =information_schema.table_constraints=: constraints, foreign key, primary key, unique
+
+and many more
+
+** Dynamic SQL: string SQL
+
+- MySQL: =prepare=, =execute= and =deallocate=
+
+* Analytic/Window Functions
+
+Analytic functions allow calculations to be performed across a set of rows related to the current row. They do not reduce the result set.
+
+#+begin_src sql
+function (expression) OVER (
+  [ PARTITION BY expression_list ]
+  [ ORDER BY order_list [ frame_clause ] ] )
+#+end_src
+
+Within each partition, it is controllable to decide which rows to include in a data window. (frame clause)
+
+#+begin_src sql
+SELECT yearweek(payment_date) payment_week,
+       sum(amount) week_total,
+       sum(sum(amount))
+         over (order by yearweek(payment_date)
+           rows unbounded preceding) rolling_sum
+     FROM payment
+     GROUP BY yearweek(payment_date)
+     ORDER BY 1;
+#+end_src
+
+** Data Window
+
+Grouping rows into windows, which partition the data for use by the analytic function without changing the overall result set
+
+#+begin_src sql
+SELECT quarter(payment_date) quarter,
+       monthname(payment_date) month_nm,
+       sum(amount) monthly_sales,
+       max(sum(amount)) over () max_mnth_sales,
+       max(sum(amount)) over (partition by quarter(payment_date)) max_qrtr_sales
+ FROM payment
+ WHERE year(payment_date) = 2005
+ GROUP BY quarter(payment_date), monthname(payment_date);
+#+end_src
+
+** Ranking
+
+- =row_number=:
+
+- =rank=: gaps in the ranking =1,2,3,3,5=
+
+- =dense_rank=: no gaps in the rankings =1,2,3,3,4=
+
+with =partition_by=, ranking is done within each partition
+
+** Lag and Lead
+
+Retrieve the previous/following rows
+
+#+begin_src sql
+SELECT yearweek(payment_date) payment_week,
+       sum(amount) week_total,
+       lag(sum(amount), 1)
+         over (order by yearweek(payment_date)) prev_wk_tot,
+       lead(sum(amount), 1)
+         over (order by yearweek(payment_date)) next_wk_tot
+     FROM payment
+     GROUP BY yearweek(payment_date)
+     ORDER BY 1;
+#+end_src
+
 * Partitioning and Sharding
 
 A table with millions of rows makes the following tasks difficult and time-consuming
