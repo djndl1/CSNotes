@@ -1,0 +1,62 @@
+#+TITLE: Cte SQL99
+
+* Motivation: why we need CTEs
+
+1. Temporary: easy to keep it up to date
+
+2. Readble: less convoluted than subqueries
+
+3. Write once, used in many places
+
+4. permissions: no need for =create view= permission, just =select=
+
+5. nesting: the previous query can be used in the following query
+
+6. recursion
+
+* Basic CTE
+
+#+begin_src sql
+WITH <cte_name> AS ( --- just a random name
+     <cte_body>     --- a select statement that produce a result
+)
+<cte_query>
+#+end_src
+
+* Non-recursive CTEs
+
+#+begin_src sql
+with commission_year as  (
+     select
+        salesperson_id,
+        emp.name,
+        year(commission_rate) as year,
+        sum(commission_amount) as total
+     from commissions c
+     left join employees emp
+     on c.salesperson_id = emp.id
+     group by salesperson_id, year
+)
+select cur.salesperson_id, cur.name, cur.year, cur.total, prev.year, prev.total
+from commission_year cur,
+     commission_year prev
+where cur.salesperson_id = prev.salesperson_id
+    and cur.year = prev.year + 1
+and cur.total < prev.total;
+
+with commission_year as  (
+     select
+        salesperson_id,
+        emp.name,
+        year(commission_rate) as year,
+        sum(commission_amount) as total
+     from commissions c
+     left join employees emp
+     on c.salesperson_id = emp.id
+     group by salesperson_id, year
+)
+select * from commission_year c1
+where total > (select 0.02 * sum(total) from commission_year c2
+where c2.year = c1.year and c2.year = 2017)
+order by total desc;
+#+end_src
