@@ -163,6 +163,18 @@ type_data_make_W (TypeNode              *node,
 		  const GTypeValueTable *value_table)
 ```
 
+## Use `GObject`
+
+The GObject library contains an implementation for a base fundamental type named `GObject` with
+
+1. refcount memory management
+
+2. ctor/dtor of instances
+
+3. generic per-object properties with setter/getter
+
+4. easy use of signals
+
 
 # Every Basic Type
 
