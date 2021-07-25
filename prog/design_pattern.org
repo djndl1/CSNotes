@@ -1,0 +1,16 @@
+#+TITLE: Design Pattern
+
+* Behavioral Design Pattern
+
+** Command Pattern
+
+The central ideas of this design pattern mirror the semantics of first-class functions and higher-order functions in functional PLs. The invoker object is a higher-order function of which the command object is a first-class argument.
+Using command objects makes it easier to construct general components that need to delegate, sequence or execute method calls without the need to know the class of the method or the method parameters. A class delegates a request to a command object instead of implementing a particular request directly
+
+- An object is used to encapsulae all information needed to perform an action or trigger an event at a later time.
+    + /Command/: contains the receivers and can invokes a method of the receiver, values for paraters of the receiver method are stored in the command.
+    + /Receiver/: executes the methods, also stored in the command object.
+    + /Invoker/: knows nother about a concrete command but only the interface.
+    + /Client/: hold and manage the above three, decides which commands to execute at which points.
+
+Typical example: thread pools => Runnable tasks => threads
