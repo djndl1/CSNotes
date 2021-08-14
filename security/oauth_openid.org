@@ -88,7 +88,25 @@ No client secret should be used. Withou PKCE, the best pratice is to launch an e
 
 In a HTTP =Authorization= header or a post body. The refresh token mechanism asks for a new token without the user's inteference. The refersh token might also fail since the app can be revoked.
 
+* Client ID and Secret
+
+=client_id=: a public identifier, unique across all clients.
+
+=client_secret=: a secret known only to the application and the authorization server. Issue a secret only for web server apps.
+    + Use a cryptographic library to generate a secure value.
+    + The correct way is to store it in a hashed version
+
 * Access Tokens
+
+** How to get an access token
+
+1. authorization code request: the authorization code is returned when authenticating and used to exchange for an access token later
+
+2. password grant: Exchanging the user's username and password for an access token. Third-party apps should never use this grant.
+
+3. client credentials: used when an application request an access token to access their own resources, not on behalf of a user.
+
+A successful response should at least returns the token itself, token type, expiration time, expiration time and optionally refresh token  and scopes.
 
 ** Reference Tokens
 
@@ -106,7 +124,27 @@ The data live inside the token itself
 
 2. Separation of token storage and API resource
 
+With a self-encoded token, the resource server is able to verify the token without interacting with a database or external servers.
+
+** Refresh Tokens
+
+Short-lived tokens without refresh tokens are for more protection against leaked access tokens, to prevent third-party apps from accessing to user's data offline (without user using the app and authorizing).
+
+Use short-lived access tokens and long-lived refresh tokens to avoid leaking access tokens since self-encoded tokens cannot be easily revoked.
+
+Use non-expiring tokens for test, or when a mechanism to revoke access tokens is available.
+
 * OpenID Connect: Add an Authentication Layer
+
+** What is needed
+
+1. an endpoint to return attributes about a user
+
+2. scopes to request identity information from
+
+3. additiona interactive experience
+
+** Core Idea
 
 - ID Token (JWT format): returned along with access token, user info encoded inside
 
@@ -124,3 +162,4 @@ The data live inside the token itself
 
 [[https://www.oauth.com/][OAuth 2.0 Simplified]]
 
+[[https://www.oauth.com/oauth2-servers/tools-and-libraries/][Tools and Libraries]]
