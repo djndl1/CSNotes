@@ -1,0 +1,112 @@
+#+TITLE: OPC UA
+
+* Introduction
+
+** Features
+
+1. Service-Oriented Architecture in a platform-independent manner via Web services or TCP-based protocol.
+
+** OPC Classic
+
+Designed as device driver interface.
+
+*** OPC DA
+
+The main use case is to move realtime data from PLCs, DCSs and other control devics to HMIs and other display clients.
+
+The preferred way for the cyclic reading of data by the client is monitoring the
+value changes in the server. The client defines an update rate on the group con-
+taining the items of interest. The update rate is used in the server to cyclic check
+the values for changes. After each cycle, the server sends only the changed values
+to the client.
+
+*** OPC A&E
+
+Enables the reception of event notification (currence of an event) and alarm notifications (the change of a condition in the process).
+
+*** OPC HDA
+
+Access to data already stored
+
+** Motivation for OPC UA
+
+1. platform-independence and scalability
+
+2. Requirement to expose complex data and complex systems
+
+3. System interface between distributed systems
+
+Modeled into two parts
+
+1. Communication between distributed systems: robustness and fault-tolerance
+
+2. Modeling Data: Common OOP model for all OPC data.
+   Complex data is required to support the description and consistent transport of complex data structures.
+
+** Overview
+
+An OPC Server are now more a provider's interface less a hub, to enable more device-to-device communication through OPC.
+
+#+begin_src
+OPC UA software layers
+
+┌─────────────────────────────────────────────────────┐
+│                                                     │
+│  UA Client - Application that consumes information  │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│              OPC UA Client SDK                      │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│              OPC UA Stack                           │
+└─────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────┐
+│                                                     │
+│                  OPC UA Stack                       │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│               OPC UA Server SDK                     │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│        UA Server - application that provides info   │
+└─────────────────────────────────────────────────────┘
+#+end_src
+
+/UA Stack/: implements different OPC UA transport mappings. The stackis used to invoke UA Services across process or network boundaries.
+
+#+begin_src
+┌───────────────────────────────────────────┐
+│                 API                       │
+├───────────────────────────────────────────┤
+│       Implementation of Bindings          │
+│    ┌──────────────────────────────────────┤
+│    │                                      │
+│    │     Message Serialization            │
+│    │                                      │
+│    ├──────────────────────────────────────┤
+│    │                                      │
+│    │                                      │
+│    │         Message Security             │
+│    │                                      │
+│    ├──────────────────────────────────────┤
+│    │                                      │
+│    │          Message Transport           │
+│    │                                      │
+└────┴──────────────────────────────────────┘
+#+end_src
+
+*** Transport Mechanisms
+
+Defines different mechanisms for different use cases
+
+Optimized binary TCP protocol for high performance intranet communication and mapping to web services, XML and http.
+
+*** Data Modelling
+
+Defines the rules and base building blocks necessary to expose an information model with UA.
