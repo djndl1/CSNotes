@@ -165,6 +165,32 @@ Properties have to be used instead.
 - =Method=: called by a client and returned a result. e.g. open a valve, starting a motor, calculating some simulation results based on input values. Must be referenced by at least =HasComponent= reference.
   + Method has =Argument= arrays in its =Properties=: =InputArguments= and =OutputArguments=.
 
+*** Types for Objects and Variables
+
+OPC UA provides type information not only on data type but on object level as well. (e.g. a type for a specific type of temperature sensor). No type definitions available for =Methods=. =Methods= can be bound to an =ObjectType=, but they are defined by their =BrowseName= and its arguments and thus no type is needed.
+
+**** =ObjectType=
+
+- =IsAbstract=: whether this =ObjectType= is concrete or abstract and therefore cannot directly be used as type definition
+
+An object references its type by =HasTypeDefintion= reference.
+
+Complex =ObjectTypes= are useful in that
+  1. They can be used to easily model object that are displayed in a GUI
+  2. Defined once used everywhere to easily add an Object with certain semantics.
+
+**** =VariableType=
+
+- =Value=: optional. the default value
+
+- =DataType= (=NodeId=):
+
+- =ValueRank= (=Int32=):
+
+- =ArrayDimensions= (=UInt32[]=):
+
+- =IsAbstract= (=Boolean=):
+
 ** References
 
 A =Reference= is like as pointer in a =Node= pointing to another =Node= by storing the =NodeId= of the other =Node=.
