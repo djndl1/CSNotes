@@ -54,3 +54,16 @@ Without a returned handle, an `async void` gives no way to know if it has been c
 
 One of the key advantages of the `async/await` pattern is that it leverages the synchronization context to ensure that continuation work—work that appears after the await statement—will always execute on the same synchronization task that invoked the await statement. This approach is of significant value because it eliminates the need to explicitly switch back to the UI thread to update a control.
 
+
+# Event-Based Asynchronous Patterns
+
+A single async method and a corresponding MethodNameCompleted event. Classes can optionally support cancellation, progress reporting and incremental results for each asynchronous method.
+An asynchronous method may also support multiple pending calls (multiple concurrent invocations), allowing your code to call it any number of times before it completes other pending operations (_multiple-invocation_, which can be queried through an extra parameter`userState`).
+
+# Asynchronous Programming Model
+
+`IAsyncResult` and `BeginOperationName`/`EndOperationName` method pairs
+
+1. `BeginOperationName` starts the async operation and returns an `IAsyncResult` which stores information about an asynchronous operation. It returns control to the calling thread immediately. A callback on completion may be supplied.
+
+2. The `IAsyncResult` is supplied to `EndOperationName`. If the async operations hasn't been completed, the method call blocks.

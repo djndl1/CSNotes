@@ -1,0 +1,177 @@
+#+TITLE: OAuth2 OpenID
+
+
+Some simple security concepts
+
+- /Delegation/: do on behalf of someone else, either with full identity (Authentication/Identity level =sudo=) or asccess control based on permissions and scope.
+
+- /Role-based Access Control/: The permissions to perform certain operations are assigned to specific roles.
+
+- /Two-legged authentication/: only two parties involved in the authentication process
+
+#+begin_quote
+OAuth provides clients a "secure delegated access" to server resources on behalf of a resource owner.
+It specifies a process for resource owners to authorize third-party access to their server resources without providing credentials.
+...
+OAuth essentially allows access tokens to be issued to third-party clients by an authorization server, with the approval of the resource owner. The third party then uses the access token to access the protected resources hosted by the resource server.
+#+end_quote
+
+* problems
+
+**  Delegated Authorization: giving a party access to my data witout giving it my password
+
+- /Authorization code flow/: yelp => google login => goole authorization => redirected back to yelp => yelp exchange an access token with the authorization code on the back channel => yelp accesses google
+
+* Terminology
+
+- /Resource owner/: the user who clicks the authorization button
+
+- /client/: the application that needs authorization to certain resources
+
+- /Authorization Server/: google login
+
+- /Resource Server/: various google services
+
+- /Authorization Grant/: clicking the authorization button
+
+- /Redirect URL/: go back where the authorization is needed
+
+- /Access token/: the client needs this to prove it is authorized
+
+- /Scope/: specifies what resource a client can access
+
+- /Consent/: the authorization process by the user
+
+- /Back Channel/: highly secure communication channel, the access token is sabved in the back channel
+
+- /Front Channel/: less secure communication channel, the authorization code is in the browser
+
+* Creating An App
+
+An application needs to apply for a client id and client secret from the OAuth provider and registers its redirect Https URL and provides a /state/ parameter (used by the app after the user is redirected back).
+
+* OAuth in Apps
+
+** Server-Side Applications (PKCE is now recommended)
+
+- /Authorization code/: a temporary code that the client will exchange for an access token.
+  The access token is never visible to the user since the exchange occurs between the app server and the authorization server.
+
+1. The app directs the user to the authorization server
+
+#+begin_src
+https://authorization-server.com/oauth/authorize
+?client_id=a17c21ed
+&response_type=code
+&state=5ca75bd30   # so that the user state before the authorization can be retrieved later, also a security measure
+&redirect_uri=https%3A%2F%2Fexample-app.com%2Fauth # preregistered
+&scope=photos
+#+end_src
+
+2. The user authenticates and approves the authorization. The authorization code is returned to the app in the query strings
+
+3. the app server exchanges the authorization code for an access token
+
+#+begin_src
+grant_type="authorization_code", code, client_id, client_secret
+#+end_src
+
+** Single-Page Application
+
+The authorization code is exchanged for an access token without using the client secret (the redirect URL implies the identity of the app). The browser makes API requests directly to the service. The app might also use implicit flow, without asking for an authorization code first.
+
+** Mobile and Native Apps
+
+No client secret should be used. Withou PKCE, the best pratice is to launch an external browser to authenticate.
+
+* Make Authenticated Requests
+
+In a HTTP =Authorization= header or a post body. The refresh token mechanism asks for a new token without the user's inteference. The refersh token might also fail since the app can be revoked.
+
+* Client ID and Secret
+
+=client_id=: a public identifier, unique across all clients.
+
+=client_secret=: a secret known only to the application and the authorization server. Issue a secret only for web server apps.
+    + Use a cryptographic library to generate a secure value.
+    + The correct way is to store it in a hashed version
+
+* Access Tokens
+
+** How to get an access token
+
+1. authorization code request: the authorization code is returned when authenticating and used to exchange for an access token later
+
+2. password grant: Exchanging the user's username and password for an access token. Third-party apps should never use this grant.
+
+3. client credentials: used when an application request an access token to access their own resources, not on behalf of a user.
+
+A successful response should at least returns the token itself, token type, expiration time, expiration time and optionally refresh token  and scopes.
+
+** Reference Tokens
+
+The string points to actual user info and authorization info
+
+1. Easy to revoke by deleting from the persistence
+
+2. Requires storage of active tokens
+
+** Self-Encoded (e.g. JWT)
+
+The data live inside the token itself
+
+1. No storage required
+
+2. Separation of token storage and API resource
+
+With a self-encoded token, the resource server is able to verify the token without interacting with a database or external servers.
+
+** Refresh Tokens
+
+Short-lived tokens without refresh tokens are for more protection against leaked access tokens, to prevent third-party apps from accessing to user's data offline (without user using the app and authorizing).
+
+Use short-lived access tokens and long-lived refresh tokens to avoid leaking access tokens since self-encoded tokens cannot be easily revoked.
+
+Use non-expiring tokens for test, or when a mechanism to revoke access tokens is available.
+
+* OpenID Connect: Add an Authentication Layer
+
+** What is needed
+
+1. an endpoint to return attributes about a user
+
+2. scopes to request identity information from
+
+3. additiona interactive experience
+
+** Core Idea
+
+- ID Token (JWT format): returned along with access token, user info encoded inside
+
+- Standardized set of scopes: =openid= scope is requested when going to authentication server
+
+- UserInfo endpoint
+
+- Standardized implementation
+
+* Native Apps
+
+Credentials cannot be stored in the app.
+
+1. Use a system browser to complete the authorization process
+
+2. Use custom URL scheme
+
+** Use PKCE
+
+A code verifier is generated by the client and sent to the authorization server when requesting the authorization code. Later the hashed version (code challenge) is sent to the server as a stand-in for client secret when exchanging for the access token. Since only the client knowns the code verifier, the server can be sure that the client is qualified to be authorized.
+
+* Further Resources
+
+[[https://www.youtube.com/watch?v=996OiexHze0][OAuth 2.0 and OpenID Connect In Plain English]]
+
+[[https://www.youtube.com/watch?v=PfvSD6MmEmQ][Securing Your APIs with OAuth 2.0]]
+
+[[https://www.oauth.com/][OAuth 2.0 Simplified]]
+
+[[https://www.oauth.com/oauth2-servers/tools-and-libraries/][Tools and Libraries]]

@@ -7,3 +7,72 @@ A future is a read-only placeholder view of a variable, while a /promise/ is a w
 is also called /resolving/, /fulfilling/ or /binding/ it.
 
 https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
+
+* Introduction
+
+** Threads in Java
+
+Several system threads are started automatically whenever a Java program is executed.
+
+There are two ways to create a new thread of execution
+
+1. Derive a class from =java.lang.Thread=
+
+2. Implement a =Runnable= and let a =Thread= (which itself is a =Runnable=) run it.
+
+** Threads in Win32
+
+#+begin_src c
+uintptr_t _beginthreadex( // NATIVE CODE
+   void *security,
+   unsigned stack_size,
+   unsigned ( __stdcall *start_address )( void * ),
+   void *arglist,
+   unsigned initflag,
+   unsigned *thrdaddr
+);
+#+end_src
+
+* The Critical Section Problem
+
+#+begin_quote
+A code segment that accesses shared resources and that has to be executed as an atomic action is referred to as a critical section
+#+end_quote
+
+A critical section must be
+
+1. /Mutual exclusion/
+
+2. /bounded waiting/: there is a bound on the number of times that other threads are allowed to enter their critical sections before this thread's request is granted
+
+3. /progress/: only the threads that are executing in their entry- or exit-section can participate in the decision about which thread can enter its critical section next
+   and this decision cannot be postponed indefinitely
+
+** Software Solution to The Two-Thread Critical Section Problem
+
+With two threads T0 and T1, the entry- and exit- sections must satisfy
+
+1. If T1 is in its critical section, T0 must wait in its entry-section
+
+2. If T1 is not its critical section and does not intend to enter, T0 should be able to enter its critical section
+
+3. Only one of the two threads can win when contending to enter the critical section
+
+4. If one of the thread is exiting while the other is waiting at the enter section, the waiting one should be allowed to enter
+
+The enter- and exit- sections needs not be critical sections themselves provided that all assignments
+and expressions involving shared variables are atomic operations.
+
+Consider three important cases while checking a solution on the critical section problem
+
+1. T0 intends to enter while T1 is not in its critical section or in its entry-section, if T0 cannot enter, the progress requirement is violated
+
+2. If T1 is in and T0 is trying to enter, if both can be in their critical sections, the mutual exclusion requirement is violated.
+
+3. Both are trying to enter its critical section
+
+*** Peterson's Algorithm
+
+#+INCLUDE "concurrency/Petersons.cpp" src cpp
+
+One of the feature of the Peterson's algorithm is that it doesn't set any flag after the check and enters the critical section immediately and only after exiting the critical section it toggles off its own intent and let the other in. Once the check in one thread is passed, the check on the other thread automatically fails due to the use of the =turn= variable. The use of intent variables informs the other thread to block. The turn variable breaks the tie if both are trying to enter.

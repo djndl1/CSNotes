@@ -1,3 +1,181 @@
+# Type System
+
+Relies on the threading API, the hashtable 
+
+## `GType`
+
+The `GType` API is the fondation of the GObject system, which provides the facilities for registering and managing all fundamental data types, user-defined object and interface types. Every type has an integer type id of `GType`, which uniquely identifies a type.
+
+Types are divided into _fundamental types_ (top-level types which do not derive from any other type) and _derived types_, with `G_TYPE_FUNDMANETAL_MAX` as the boundary type id.
+
+```c
+struct _GTypeClass
+{
+  GType g_type;
+};
+struct _GTypeInstance
+{
+  GTypeClass *g_class;
+};
+```
+
+The type structure has the type's type id and the instance structure maintains its type info by holding a pointer to its type structure (in C++ jargon, the vtable). Note that `GTypeClass` is not the internal structure of type metadata, not even `GTypeInfo` or `GTypePlugin`, which is merely a function parameter type for the registration of a type.
+
+### Type Maintenance
+
+Basic type metadata is bookkept in a `TypeNode` structure. The type id of a derived static type is the address of its `TypeNode`. This address (type id) is ensured to be aligned at least on a 4-byte boundary due to the alignment requirement of `malloc`, 
+hence `g_assert ((type & TYPE_ID_MASK) == 0)` should never fail. The fundamental types would have its `GTypeFundamentalFlags` prepend to this node structure. The size of the `supers` array is dependent on the type's parents. The memory of these three parts are allocated together.
+
+```c
+struct _GTypeFundamentalInfo
+{
+  GTypeFundamentalFlags  type_flags;
+};
+
+struct _TypeNode
+{
+  guint volatile ref_count;
+#ifdef G_ENABLE_DEBUG
+  guint volatile instance_count;
+#endif
+  GTypePlugin *plugin;
+  guint        n_children; /* writable with lock */
+  guint        n_supers : 8;
+  guint        n_prerequisites : 9;
+  guint        is_classed : 1;
+  guint        is_instantiatable : 1;
+  guint        mutatable_check_cache : 1;	/* combines some common path checks */
+  GType       *children; /* writable with lock */
+  TypeData * volatile data;
+  GQuark       qname; /* the quark of the type name */
+  GData       *global_gdata;
+  union {
+    GAtomicArray iface_entries;		/* for !iface types */
+    GAtomicArray offsets;
+  } _prot;
+  GType       *prerequisites;
+  GType        supers[1]; /* flexible array, self + ancestors + NULL */
+};
+
+/**
+* A variant type storing type data
+*/
+union _TypeData
+{
+  CommonData         common;
+  BoxedData          boxed;
+  IFaceData          iface;
+  ClassData          class;
+  InstanceData       instance;
+};
+```
+
+Static type ids are maintained in a hash table `static_type_nodes_ht`(`<gchar*, GType`>). In addition, fundamental types are also maintained in the `static_fundamental_type_nodes` array , both protected by a read-write lock. 
+
+### Type Registration
+
+1. Type names are required to be longer than three characters, and starts with the ten digits and the twenty-six letters with `-`, `_` and `+` added to the characters available following (hardcoded into the type system of GLib) and not synonymous with those of existing types.
+
+```c
+/**
+* Get the type data node by type id
+*/
+static inline TypeNode*
+lookup_type_node_I (GType utype);
+
+/**
+* check if the given type name is valid and already used 
+*/
+static gboolean
+check_type_name_I (const gchar *type_name)
+```
+
+
+
+2. The given type id is checked to see 
+  + for a fundamental type, if it uses a valid fundamental id, already exists as a fundamental type, is instantiable but not classed (instantiable implies classed)
+  + For a static type, if it exists, is flatly and deeply derivable (multi-level hierarchy). 
+
+```c
+/**
+* Check if the given type is existent, flatly derivable and deeply derivable
+*/
+static gboolean
+check_derivation_I (GType        parent_type,
+		    const gchar *type_name);
+
+/**
+* get type name by type id
+*/
+type_descriptive_name_I (GType type);
+
+/**
+* Get the fundamental type of a give type id (may or may not be a fundamental type)
+*/
+static inline GTypeFundamentalInfo*
+type_node_fundamental_info_I (TypeNode *node)
+```
+
+```c
+/**
+* increment the refcount of the given node and its parent type node
+*/
+static inline void
+type_data_ref_Wm (TypeNode *node);
+```
+
+```c
+/**
+* Make a new fundamental type node
+*/
+static TypeNode*
+type_node_fundamental_new_W (GType                 ftype,
+			     const gchar          *name,
+			     GTypeFundamentalFlags type_flags);
+         
+
+/**
+* Creates a type node whether fundamental, static or dynamic. 
+* Used as the helper function to construct a certain category of type nodes
+*/
+static TypeNode*
+type_node_any_new_W (TypeNode             *pnode,
+		     GType                 ftype,
+		     const gchar          *name,
+		     GTypePlugin          *plugin,
+		     GTypeFundamentalFlags type_flags);
+         
+/**
+* various checks on the type flags and state of a type
+*/
+static gboolean
+check_type_info_I (TypeNode        *pnode,
+		   GType            ftype,
+		   const gchar     *type_name,
+		   const GTypeInfo *info);
+       
+/**
+ * create and populate the TypeData variant
+ */
+static void
+type_data_make_W (TypeNode              *node,
+		  const GTypeInfo       *info,
+		  const GTypeValueTable *value_table)
+```
+
+## Use `GObject`
+
+The GObject library contains an implementation for a base fundamental type named `GObject` with
+
+1. refcount memory management
+
+2. ctor/dtor of instances
+
+3. generic per-object properties with setter/getter
+
+4. easy use of signals
+
+
 # Every Basic Type
 
 ## GQuark
@@ -9,6 +187,8 @@ The string-to-int mapping is maintained as a hash table `quark_ht`. The reverse 
 Multiple duplicated strings are stored in string blocks if small enough, rather than scattered around.
 
 # Concurrency
+
+Independent of the GObject type system, using only some typedefs of `gtypes.h`.
 
 ## Threading
 

@@ -1,0 +1,9 @@
+#+TITLE: Performance Tuning
+
+# .NET Examples
+
+[[https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-6][Performance Improvements in .NET 6]]
+
+[[https://devblogs.microsoft.com/dotnet/file-io-improvements-in-dotnet-6/][File IO improvements in dotnet 6]]
+
+[[https://devblogs.microsoft.com/dotnet/understanding-the-cost-of-csharp-delegates/][Understanding the Cost of C# Delegates]]

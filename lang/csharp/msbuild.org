@@ -1,0 +1,87 @@
+#+TITLE: The Microsoft Build Engine
+
+Msbuild provides an XML schema for a project file that controls how the build platform processes and builds software.
+
+Msbuild uses imported MSBuild XML files with extensions like =.props= and =.targets= to define the standard build logic.
+
+#+begin_src xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <PlatformTarget>x86</PlatformTarget>
+    <AssemblyName>HelloWorld</AssemblyName>
+    <OutputPath>Bin/</OutputPath>
+    <CscPath Condition="$(UseExternalCsc) == On">$(ExternalCscPath)</CscPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CSFile Include="Program.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.dll"/>
+    <Reference Include="System.Core.dll"/>
+    <PackageReference Include="ConsoleTables" Version="2.4.2"/>
+  </ItemGroup>
+
+  <Target Name="Build" Inputs="@(CSFile)" Outputs="$(OutputPath)/$(AssemblyName).exe">
+    <Message Text="TF: '$(TargetFrameworkVersion)' " />
+    <Message Text="Compiling '@(Compile)' " />
+    <MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')"/>
+    <Csc ToolPath="$(CscPath)"
+         Sources="@(CSFile)"
+         References="@(Reference)"
+         OutputAssembly="$(OutputPath)/$(AssemblyName).exe"
+         LangVersion="8.0"/>
+  </Target>
+
+  <Target Name="Clean">
+    <Delete Files="$(OutputPath)/$(AssemblyName).exe" />
+  </Target>
+
+  <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+</Project>
+#+end_src
+
+* Basic Elements
+
+** Properties
+
+#+begin_src xml
+<PropertyGroup>
+  <BuildDir>Build</BuildDir>
+</PropertyGroup>
+#+end_src
+
+key/value pairs that can used to configure builds. =Condition= attribute can be added to a property. Properties can be referenced by using the syntax =$(PropertyName)=.
+
+** Items
+
+#+begin_src xml
+<ItemGroup>
+    <Compile Include = "file1.cs"/>
+    <Compile Include = "file2.cs"/>
+</ItemGroup>
+#+end_src
+
+Items are inputs into build system and typically represent files. Items are grouped into item types based on user-defined item names.
+Item types can be used as parameters for tasks, which use the individual items to perform the steps of the build process. Item types are referenced by =@(ItemType)=
+
+** Tasks
+
+Units of code tghat MSBuild projects use to perform build operations. Tasks can be reused and they can be shared by different developers in different projects.
+The execution logic of a task is written in managed code and mapped t o MSBuild by using =UsingTask= element.
+
+A task is executed by creating an element of the name of the task as a child of a =Target= element.
+
+** Targets
+
+#+begin_src xml
+<Target Name="Compile">
+    <Csc Sources="@(Compile)" />
+</Target>
+#+end_src
+
+Targets group tasks together in a particular order and expose sections of the project file as entry points into the build process.

@@ -8,7 +8,7 @@ Traditionally, C++ libraries have been distributed in source code form and are e
 
 2. Different compiler vendors implement language features in their own ways. e.g. exceptions.
 
-3. C++ has no notion of binary encapsulation. The compilation of C++ requires the client's compiler to have access to all information reguard object layout in order to instantiate an instance of a class or to make nonvirtual method calls, which includes info about the size and order of the the object's privte and protected data members. Versioning on naming causes system bloat. Simply exporting C++ class definitions from DLLs does not provide a reasonable binary component architecture
+3. C++ has no notion of binary encapsulation. The compilation of C++ requires the client's compiler to have access to all the information w.r.t. object layout in order to instantiate an instance of a class or to make nonvirtual method calls, which includes info about the size and order of the the object's privte and protected data members. Versioning on naming causes system bloat. Simply exporting C++ class definitions from DLLs does not provide a reasonable binary component architecture
 
 4. Interface encapsulation does not work at the binary level, especially vtable. (Assuming all compilers on a given platform implement the virtual function call mechanism in the same manner) One way to implement an interface is to use _Pimpl_ (pointer to implementation) as a class member. The C++ interface class should not contain any of the data members that will be used in the implementation of the object. The interface class simply contains an opaque pointer whose type would never be fully defined in the  client's scope. This ensures that the size of the interface class never changes. Forward declaration means the class definition for the implementation is hided from the client's compiler. However, this adds some performance penalty.
 
@@ -49,7 +49,7 @@ interface IThisInterface : IBaseInterface {
 
 UUIDs are the runtime representations of interface names.
 
-`IUnknown` is the root of all COM interfaces. Every other legal COM interface must derive from `IUnknown` directly or indirectly. COM interfaces cannot derive directly from more than one interface.
+`IUnknown` is the root of all COM interfaces. Every other legal COM interface must derive from `IUnknown` directly or indirectly. COM interfaces cannot derive directly from more than one interfac
 
 ## Resource Management
 
@@ -61,14 +61,57 @@ Resource management of `IUnknown` is straightforward:
 
 3. Redundant calls to `AddRef` and `Release` can be optimized away if there is special knowledge about the relationship between two or even more memory locations.
 
-The return refcount by `AddRef` and `Release` are not thread-safe, only for debugging. `Release` does not nullify the pointer, so the object might still be valid, even if it shouldn't be used.
+The return refcount by `AddRef` and `Release` are not thread-safe, only for debugging. `Release` does not nullify the pointer, so the object might still be valid, even if it shouldn't be used. A zero return from `Release` guarantees the object is invalid.
 
 ## `QueryInterface` Type coercion 
 
-`QueryInterface` can only return pointers to the same COM object. `AddRef` and `Release` are opertions on _an interface pointer_. An object may elect to perform per-interface reference counting to allow aggressive reclamation of resources.
+`QueryInterface` can only return pointers to the same COM object. `AddRef` and `Release` are opertions on _an interface pointer_ so that an object may elect to perform per-interface reference counting to allow aggressive reclamation of resources. Use `IID_PPV_ARG(Type, Expr)` to reduce type errors.
 
 ## Implementing `IUnknown`
 
 Use `STDMETHODIMP` and `STDMETHODIMP_` to produce COM-compliant stack frames.
 
 Use atomic operations for `AddRef` and `Release`. Traverse the type hierarchy of the object and use static typecasts to return the correct pointer type for all supported interfaces.
+
+## Data Types
+
+- `OLECHAR`: `wchar_t`
+
+- `BSTR`: length-prefixed `OLECHAR` string
+
+- `string`: pointer to a null-terminated array of characters
+
+- `VARIANT`: a common discriminated union
+
+## Attributes and Properties
+
+- `[propget]`, `[progput]`: `get` `set`
+
+## Exceptions
+
+The objects that throw COM exceptions must implement the `ISupportErrorInfo` interface to indicate which interfaces support exceptions. Create an error using `ICreateErrorInfo`, call `SetErrorInfo` to throw it and `GetErrorInfo` to catch and clear it.
+
+# Classes
+
+- *Interfaces*: abstract protocol for communicating with an object
+
+- *Classes* are named (after `CLSID`) implementations that represent concrete instantiable types. `ProgID`s are text-based aliases for `CLSID`, unique only by convention.
+
+```c
+HRESULT CLSIDFromProgID();
+HRESULT ProgIDFromCLSID();;
+```
+
+A class object acts as the metaclass for a given implementation and the methods it implements fill the role of static member functions. Class objects are often used as brokers to create new instances of a class to find existing instances based on some well-known object name.
+
+## Object Activation
+
+*Object Activation*: Clients need a mechanism for finding class objects, which may involve loading a DLL or starting a server process, to bring an object to life.
+
+Object activation is done by sending requests to the COM Service Control Manager, a central rendezvous point for all activation requests, the interface of which, called the COM library, is implemented in `OLE32.DLL` on WinNT.
+
+In-Process COM calls are mostly just virtual calls. Out-of-process COM calls are called upon _proxies_, which translates between method invocations and RPC requests.
+
+### Using SCM
+
+- `CoGetClassObject`: creates a class object, which in turn can be used to create instances of the class, most likely through `IClassFactory`. The function locates t he code associated with the `CLSID`. This function underlies all ofthe instance creation functions.

@@ -1,0 +1,16 @@
+#+TITLE: Window Functions
+
+Window functions are computed over a range of rows but give results for each row.
+
+#+begin_src sql
+<function_name>([<expression>]) over (
+    [partition by <expression> [{, <expression>} ...]]  --- supported by all Window Functions
+    [order by <expression> [ASC | DESC] [{, <expression>}...]] --- supported by all Window Functions
+    [{ROWS | RANGE} {<frame_start> | <frame_between> }]
+           --- define a frame that is then used by the function to compute a result on the rows in the frame
+           --- the frame moves with the current row, further bounded by the partition section
+           --- the most powerful feature of Window Functions
+)
+...
+[<WINDOW_clause>]
+#+end_src

@@ -1,0 +1,335 @@
+#+TITLE: Sql General
+
+* Background
+
+** Relationnal Model
+
+Data are represented as sets of tables. Redundant data is used to link records in different tables.
+
+Normalization: refining a database design to ensure that each independent piece of information is in only one place
+
+*** Terms
+
+- *Entity*: something of interest to the database user community
+
+- *Result Set*: a nonpersistent table, generally the result of an SQL query
+
+- schema statement, data statement, transaction statement
+
+*** Execution Process
+
+1. Check permissions on the statement and data
+
+2. Check the syntax
+
+3. Query optimizer determines the most effective way to execute the query and picks an *execution plan*
+
+* SQL
+
+** Tables
+
+- Permanent Tables (=create table=)
+
+- Derived tables (rows returned by a subquery and held in memory)
+
+- temporary tables (volatile data held in memory)
+
+- Virtual tables (=create view=)
+
+** Advanced SQL
+
+- =order by position_number=
+
+ #+begin_src sql
+select c.first_name, c.last_name,r.rental_date
+from customer c
+inner join rental r
+on c.customer_id = r.customer_id
+ORDER BY 3 asc;
+ #+end_src
+
+- =REGEXP=: oracle =regexp_like=, MSSQL allows =like= used with regex
+
+- An expression can be (IS) =null=, but can never == NULL=.
+
+- =order by= is directly appended to =union all= without an outer query.
+
+- The intersect operator to have precedence over the other set operators.
+
+- =rollup=, =cube= (all column combinations): to aggregate over subgroups, groups and the entirety.
+
+- =all=, =any=/=some= with subqueries: comparison and then and/or
+
+When using not in or <> all to compare a value to a set of values, be careful to ensure that the set of values does not contain a null value. Using == any= is equivalent to using the in operator.
+
+- tuple =IN=: without writing multiple subqueries and =IN= clauses
+
+Subqueries are used heavily in update, delete, and insert statements as well, with correlated subqueries appearing frequently in update and delete statements.
+
+- Avoid natural join.
+
+*** Common Table Expressions
+
+Each subquery can refer to any other subquery defined previously
+
+*** Conditional Logic
+
+#+begin_src sql
+--- Pivot a result set
+SELECT
+  SUM(CASE WHEN monthname(rental_date) = 'May' THEN 1
+        ELSE 0 END) May_rentals,
+  SUM(CASE WHEN monthname(rental_date) = 'June' THEN 1
+        ELSE 0 END) June_rentals,
+  SUM(CASE WHEN monthname(rental_date) = 'July' THEN 1
+        ELSE 0 END) July_rentals
+FROM rental
+WHERE rental_date BETWEEN '2005-05-01' AND '2005-08-01';
+
+--- conditional update
+UPDATE customer
+SET active =
+  CASE
+    WHEN 90 <= (SELECT datediff(now(), max(rental_date))
+                FROM rental r
+                WHERE r.customer_id = customer.customer_id)
+      THEN 0
+    ELSE 1
+  END
+WHERE active = 1;
+#+end_src
+
+* Indexes and Constraints
+
+** Indexes
+
+#+begin_src sql
+create index ...
+drop index ...
+#+end_src
+
+- B-Tree indexes: MySQL, Oracle and MSSQL default to B-Tree indexing. Branch nodes are used for navigating the tree, while leaf nodes hold the actual values and location information.
+
+- Bitmap indexes: for columns of a small number of values (/low-cardinality/), rows with different values are maintained in different bitmaps
+
+- Text indexes: for document search
+
+The more indexes a table has, the more work the server needs to do to keep all schema objects up-to-date, which tends to slow things down. The best strategy is to add an index when a clear need arises.
+
+1. Make sure all primary keys are indexed
+
+2. Build indexes on all columns that are referenced in foreign key constraints
+
+3. Index any column that will frequently be used to retrieve data
+
+** Constraints
+
+1. primary key, foreign key
+
+2. unique constraint
+
+3. check constraints: restrict allowable values for a column
+
+* Transactions
+
+*** Locking
+
+Two strategies employed by different DBs:
+
+- read-write lock
+
+- versioning: the reader is not required to acquire a reader lock, the versioning mechanism ensures that the reader sees a consistent view of the data
+
+*** Lock granularities
+
+- table locks
+
+- page locks
+
+- row locks
+
+
+** Transaction Mode
+
+1. Oracle Database: a new transaction begins when a new session begins. Commit or rollback must be explicit.
+
+2. SQL Server/MySQL: default to autocommit mode
+
+#+begin_src sql
+set implicit_transactions on; --- SQL Server
+set autocommit = 0;
+#+end_src
+
+The server might decide to end (either rollback or commit) the transaction prematurely if a deadlock is detected, commit the transaction if an SQL schema statement is issued, or another transaction is started.
+
+Multiple savepoints can be saved within a transaction to avoid a full rollback.
+
+** View
+
+1. Data security
+
+2. Data Aggregation
+
+3. Hiding Complexity
+
+4. Joining Partitioned Data
+
+*** Updatble Views
+
+1. No aggregate functions
+
+2. No =group by= or =having=
+
+3. No =union=, =union all= or =distinct=
+
+4. =from= at least one table or updatable view
+
+5. =from= only uses inner joins if there are more than one table or view
+
+6. no subqueries in =select= or =from= clause, and any subqueries in the =where= clause do not refer to tables in the =from= clause.
+
+* Metadata
+
+Collectively known as the /data dictionary/ or /system catalog/
+
+1. table name, storage information, storage engine, column names, column data types, default column values,
+
+2. column constraints, primary key columns, primary key name, foreign key name, foreign key columns
+
+3. index names, index types, indexed columns, index column sort order, index storage information
+
+** =information_schema= on MySQL
+
+- =information_schema.tables=: table info
+
+- =information_schema.views=: only views
+
+- =information_schema.columns=: column info for both tables and views
+
+- =information_schema.statistics=: table indexes
+
+- =information_schema.table_constraints=: constraints, foreign key, primary key, unique
+
+and many more
+
+** Dynamic SQL: string SQL
+
+- MySQL: =prepare=, =execute= and =deallocate=
+
+* Analytic/Window Functions
+
+Analytic functions allow calculations to be performed across a set of rows related to the current row. They do not reduce the result set.
+
+#+begin_src sql
+function (expression) OVER (
+  [ PARTITION BY expression_list ]
+  [ ORDER BY order_list [ frame_clause ] ] )
+#+end_src
+
+Within each partition, it is controllable to decide which rows to include in a data window. (frame clause)
+
+#+begin_src sql
+SELECT yearweek(payment_date) payment_week,
+       sum(amount) week_total,
+       sum(sum(amount))
+         over (order by yearweek(payment_date)
+           rows unbounded preceding) rolling_sum
+     FROM payment
+     GROUP BY yearweek(payment_date)
+     ORDER BY 1;
+#+end_src
+
+** Data Window
+
+Grouping rows into windows, which partition the data for use by the analytic function without changing the overall result set
+
+#+begin_src sql
+SELECT quarter(payment_date) quarter,
+       monthname(payment_date) month_nm,
+       sum(amount) monthly_sales,
+       max(sum(amount)) over () max_mnth_sales,
+       max(sum(amount)) over (partition by quarter(payment_date)) max_qrtr_sales
+ FROM payment
+ WHERE year(payment_date) = 2005
+ GROUP BY quarter(payment_date), monthname(payment_date);
+#+end_src
+
+** Ranking
+
+- =row_number=:
+
+- =rank=: gaps in the ranking =1,2,3,3,5=
+
+- =dense_rank=: no gaps in the rankings =1,2,3,3,4=
+
+with =partition_by=, ranking is done within each partition
+
+** Lag and Lead
+
+Retrieve the previous/following rows
+
+#+begin_src sql
+SELECT yearweek(payment_date) payment_week,
+       sum(amount) week_total,
+       lag(sum(amount), 1)
+         over (order by yearweek(payment_date)) prev_wk_tot,
+       lead(sum(amount), 1)
+         over (order by yearweek(payment_date)) next_wk_tot
+     FROM payment
+     GROUP BY yearweek(payment_date)
+     ORDER BY 1;
+#+end_src
+
+* Partitioning and Sharding
+
+A table with millions of rows makes the following tasks difficult and time-consuming
+
+1. full table scans when querying
+
+2. index creation/rebuild
+
+3. Data archival/deletion
+
+4. generation of table/index statistics
+
+5. table relocation
+
+6. Database backups
+
+
+** Table Partitioning
+
+Table partitioning allows for flexibility with data storage and administration. Every partition have the same schema definition but holds disjoint data.
+
+1. Partitions may be stored on different tablespace, using different compression schemes.
+
+2. Table statistics can be frozen on some partitions while being periodically refreshed on others.
+
+With /horizontal partitioning/ entires rows are assigned to one partition while in /vertical partitioning/, sets of columns are assigned to different partitions.
+When partitioning horizontally, a column as the /parititon key/ combined with a /partition function/ is used to assign a row to a partitcular partition.
+
+Index can be set to global or local. Global indexes span all partitions of the table, useful for queries which do not specify a value for the partition key.
+
+*** Partition Methods
+
+1. Range Partitioning: typically used on date column
+
+2. List Partitioning: partition key with finite values. The list partitioning does not provide for a spilloverr partition for values not listed.
+
+3. Hash Partitioning: a hashing function is applied to the column value, with a range of a small number of values.
+
+4. Composite Partitioning
+
+** Sharding
+
+Parititon the entire database: new approaches have been proposed to replace this.
+
+* Big Data
+
+Big Data is designed to handle a huge amount of data of various formats arriving at rapid pace.
+
+1. Volume: billions or trillions of data points
+
+2. Variety: data might always be structured: videos, emails, photos, audio files
+
+3. Velocity

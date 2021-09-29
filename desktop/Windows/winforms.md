@@ -101,19 +101,6 @@ About titlebars, minimizebox, maximizebox, icon, helpbbutton.
 mostly a parlor trick.
 
 
-## Menus
-
-- `MenuStrip`
-
-- `ContextMenuStrip`: like the one that pops out when you click a text box.
-
-## Toolbar
-
-- `ToolStrip`
-
-## Statusbar
-
-`Statustrip`: items include `ToolStripStatusLabel`, `ToolStripProgressBar`, `ToolStripStatusLabel`, `ToolStripSplitButton`
 
 ## Multiple Document Interface (MDI)
 
@@ -384,3 +371,63 @@ _application configuration file_: `app.config`. The `ConfigurationManager` class
 ## Strongly Typed Settings
 
 Every setting file added to a project is used to generate an additonal strongly typed settings class. `ApplicationSettingsbase` 
+
+# Data Bindings
+
+## DataGridView
+
+A grid in which data is displayed and represents a specific collection of data. The grid determines the properties of the collection automatically using `System.Reflection`.
+
+### Columns and Rows
+
+If `AutoGenerateColumns` is set to `true`, the columns for the grid are generated whenever the DataSource or DataMember property value changes. Autogeneration can be disabled and the columns can be assigned manually.
+
+Cells and bands are elements of a grid, inherited from `DataGridViewElement`
+
+- `DataGridViewBand`: A linear collection of cells, the base class
+
+- `DataGridViewColumn`: `DataPropertyName` binds the member object's property to a column. Column cells can be buttons, check boxes, comboboxes, clickable links or text boxes, depending on the the actually used derived class.
+
+- `DataGridViewRow`: 
+
+- `DataGridViewCell` 
+
+## Two-Way Bindings: Interaction between the data source and the bound controls
+
+- `IBindingList`, `BindingList<T>`: provides members that allow an external class to add new entries in the list, sort the list, search the list and receive notification. New object can be added to the list by setting the `AddingNew` event. Transactional behavior is supported. If an underlying object is modified, it can trigger an event (maybe through `IEditable` interface to ensure transactional behavior) to which the binding list subscribes.
+
+- `IEditableObject`: commit or rollback of changes to an object as a data source. The object must call `BeginEdit()` before modifying itself and call `EndEdit()` to finish modification, `Modified` event can be fired inside `EndEdit()`. `DataGridView` automatically uses this interface.
+
+### Simple Data Binding
+
+Binding single property values to a specific data source, supported by the `Control` class directly. Controls bind to an interim object which would then manage the data.
+
+- `BindingSource`: serves as layer of indirection between controls and data sources.
+
+# Various Controls
+
+## ToolStrip
+
+Various bars with items on it.
+
+### Menubar
+
+- `MenuStrip`
+
+- `ContextMenuStrip`: like the one that pops out when you click a text box.
+
+## Toolbar
+
+- `ToolStrip`
+
+## Statusbar
+
+`Statustrip`: items include `ToolStripStatusLabel`, `ToolStripProgressBar`, `ToolStripStatusLabel`, `ToolStripSplitButton`
+
+# Multi-Threading
+
+## Modify a control from another thread
+
+1. Use `Control.InvokeRequired`, `Control.Invoke`, `Control.BeginInvoke`, `IsHandledCreated` (better start the background thread after the form is created)
+
+2. `BackgroundWorker`

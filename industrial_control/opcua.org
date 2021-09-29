@@ -1,0 +1,236 @@
+#+TITLE: OPC UA
+
+* Introduction
+
+** Features
+
+1. Service-Oriented Architecture in a platform-independent manner via Web services or TCP-based protocol.
+
+** OPC Classic
+
+Designed as device driver interface.
+
+*** OPC DA
+
+The main use case is to move realtime data from PLCs, DCSs and other control devics to HMIs and other display clients.
+
+The preferred way for the cyclic reading of data by the client is monitoring the
+value changes in the server. The client defines an update rate on the group con-
+taining the items of interest. The update rate is used in the server to cyclic check
+the values for changes. After each cycle, the server sends only the changed values
+to the client.
+
+*** OPC A&E
+
+Enables the reception of event notification (currence of an event) and alarm notifications (the change of a condition in the process).
+
+*** OPC HDA
+
+Access to data already stored
+
+** Motivation for OPC UA
+
+1. platform-independence and scalability
+
+2. Requirement to expose complex data and complex systems
+
+3. System interface between distributed systems
+
+Modeled into two parts
+
+1. Communication between distributed systems: robustness and fault-tolerance
+
+2. Modeling Data: Common OOP model for all OPC data.
+   Complex data is required to support the description and consistent transport of complex data structures.
+
+** Overview
+
+An OPC Server are now more a provider's interface less a hub, to enable more device-to-device communication through OPC.
+
+#+begin_src
+OPC UA software layers
+
+┌─────────────────────────────────────────────────────┐
+│                                                     │
+│  UA Client - Application that consumes information  │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│              OPC UA Client SDK                      │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│              OPC UA Stack                           │
+└─────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────┐
+│                                                     │
+│                  OPC UA Stack                       │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│               OPC UA Server SDK                     │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│        UA Server - application that provides info   │
+└─────────────────────────────────────────────────────┘
+#+end_src
+
+/UA Stack/: implements different OPC UA transport mappings. The stackis used to invoke UA Services across process or network boundaries.
+
+#+begin_src
+┌───────────────────────────────────────────┐
+│                 API                       │
+├───────────────────────────────────────────┤
+│       Implementation of Bindings          │
+│    ┌──────────────────────────────────────┤
+│    │                                      │
+│    │     Message Serialization            │
+│    │                                      │
+│    ├──────────────────────────────────────┤
+│    │                                      │
+│    │                                      │
+│    │         Message Security             │
+│    │                                      │
+│    ├──────────────────────────────────────┤
+│    │                                      │
+│    │          Message Transport           │
+│    │                                      │
+└────┴──────────────────────────────────────┘
+#+end_src
+
+*** Transport Mechanisms
+
+Defines different mechanisms for different use cases
+
+Optimized binary TCP protocol for high performance intranet communication and mapping to web services, XML and http.
+
+*** Data Modelling
+
+Defines the rules and base building blocks necessary to expose an information model with UA.
+
+* Information Model
+
+** Base Principle
+
+1. Using OOP including type hierarchies and inheritance.
+
+2. Type information is exposed and can be accessed the same way as instances.
+
+3. Full meshed network of nodes allowing information to be connected in various ways
+
+4. Extensibility regarding the type hierarchies as well as the types of references between nodes
+
+5. No limitations on how to model information in order to allow an appropriate model for the provided data
+
+6. OPC UA information modelling is always done at the server side.
+
+A device can have some configuration parameters (e.g. engineering unit) and some measurement values (temperature)
+that may differ depending on the configuration. An OPC server might run everywhere from the device itself to some DCS.
+The most common use-case of integrating device data is aggregating them in a DCS and providing them
+via the DCS to the client. In that case, a DCS should act as an OPC UA client to receive the data
+and as an OPC UA server to expose the data. Any OPC UA client could access the device data through the DCS without
+loosing any functionality.
+
+** Nodes
+
+Nodes can be of different =NodeClass=. Nodes may represent instances, or types. The attributes of a node depend on its =NodeClass=.
+Some attributes are common to every node:
+
+1. =NodeId=: uniquely identifies a node in a OPC UA server and is used to address the node in the UA services.
+
+2. =NodeClass=: An enumeration idedntifying the node class of a node such as =Object= or =Method=
+
+3. =BrowseName=: not localized
+
+4. =DisplayName=: localized name that can be displayed in a user interface.
+
+5. =Description=: optional. A localized textual description of the node.
+
+6. =WriteMask=: optional, specifies which attributes of the node are writable.
+
+7. =UserWriteMask=: optional: which atrributes of the node can be modified by the user currently connected to the server.
+
+The set of Attributes of a Node is defined by the OPC UA specifications and cannot be extended. If additional information describing a Node is needed,
+Properties have to be used instead.
+
+*** NodeClasses
+
+- =Object=: have variables and methods and can fire events. Used to structure the Address Space. Used to group =Variables=, =Methods= or other =Objects=. =Methods= or =Variables= always belong to an =Object= or an =ObjectType=.
+
+- =Variable=: represent a value. Clients can read the value, subscribe to changes of the value and write the value. e.g. the temperature measured by a sensor or a setpoint to manage some control applications. In general, variables expose any data in the address space that is not captured by =References= or the =Attributes= of the nodes. Variables must be referened by at least one =HasComponent= or =HasProperty= reference from another node.
+
+- =Method=: called by a client and returned a result. e.g. open a valve, starting a motor, calculating some simulation results based on input values. Must be referenced by at least =HasComponent= reference.
+  + Method has =Argument= arrays in its =Properties=: =InputArguments= and =OutputArguments=.
+
+*** Types for Objects and Variables
+
+OPC UA provides type information not only on data type but on object level as well. (e.g. a type for a specific type of temperature sensor). No type definitions available for =Methods=. =Methods= can be bound to an =ObjectType=, but they are defined by their =BrowseName= and its arguments and thus no type is needed.
+
+**** =ObjectType=
+
+- =IsAbstract=: whether this =ObjectType= is concrete or abstract and therefore cannot directly be used as type definition
+
+An object references its type by =HasTypeDefintion= reference.
+
+Complex =ObjectTypes= are useful in that
+  1. They can be used to easily model object that are displayed in a GUI
+  2. Defined once used everywhere to easily add an Object with certain semantics.
+
+**** =VariableType=
+
+- =Value=: optional. the default value
+
+- =DataType= (=NodeId=):
+
+- =ValueRank= (=Int32=):
+
+- =ArrayDimensions= (=UInt32[]=):
+
+- =IsAbstract= (=Boolean=):
+
+** References
+
+A =Reference= is like as pointer in a =Node= pointing to another =Node= by storing the =NodeId= of the other =Node=.
+The type of the =Reference= defines the semantic of the =Reference= (nonsymmetric and symmetric, unidirectional and bidirectional).
+The referenced node may not exist. References cannot be accessed directly but only followed.
+
+=ReferenceType= defines the semantic of a =Reference=. =ReferenceTypes= are exposed as nodes in the address space.
+
+1. =IsAbstract=: whether the =ReferenceType= can be used for =References= or only for organizational purposes in the =ReferenceType= hierarchy.
+
+2. =Symmetric=: if the meaning is the same in forward and inverse direction
+
+3. =InverseName=: optional. The semantic of the =Reference= in the inverse direction.
+
+ReferenceTypes form a hierarchy.
+
+#+begin_src
+                    ┌────────────────┐
+               ┌───►│  References    │◄────────┐
+               │    └────────────────┘         │
+               │                               │
+               │                               │
+   ┌───────────┴──────────────┐  ┌─────────────┴───────────────────┐
+   │  HierarchicalReferences  │  │  NonHierarchicalReferences      │
+   └──────▲───────────────▲───┘  └──────────────────▲──────────────┘
+          │               │                         │
+          │               │                         │
+          │               │                         │
+   ┌──────┴───────┐ ┌─────┴──────┐          ┌───────┴────────┐
+   │  HasChild    │ │ Organizes  │          │HasTypeDefintion│
+   └────▲─────────┘ └─────▲──────┘          └────────────────┘
+        │                 │
+┌───────┴──┐       ┌──────┴────────┐
+│Aggregates│       │  HasSubTypes  │
+└───────▲──┘       └───────────────┘
+        │
+        │
+┌───────┴────┐
+│HasComponent│
+└────────────┘
+#+end_src
+
+- =HasChild= disallows any loop following only subtypes of it, thus defines a nonloopin hierarchy.

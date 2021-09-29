@@ -1,0 +1,7 @@
+#+TITLE: Random Programming Tools
+
+* UUID/GUID
+
+- =uuidgen=, =libuuid=:
+
+- Python =uuid= modules

@@ -15,16 +15,303 @@ The user name in MariaDB is not a OS user name.
 mysql -u user_name -p -h host_name -P port_number
 #+end_src
 
-** Getting Data
+** Initialization and Configuration
+
+**** Setup
+
+MariaDB needs the data in `mysql` database to manage prvileges, roles, plugins and help info. Use =mysql_install_db= to set up the database
+
+#+begin_src shell
+mysql_install_db --user=mysql --basedir=/path/to/basedir --datadir=/path/to/datadir
+#+end_src
+
+**** Use `systemd`
+
+The service is started by `mysqld` not `mysqld_safe`. The startup script has a timeout, when the startup takes too long, systemd kills it. Use a template unit file `mariadb@` to start multiple instances.
+
+https://mariadb.com/kb/en/systemd/#interacting-with-the-mariadb-server-process
+
+** Schema Management
+
+- =create/alter {database | schema }= options: character set, collation, comment. The DDL defintion can be shown using =show create database=
+
+- =SHOW {DATABASES | SCHEMAS} [LIKE 'pattern' | WHERE expr]=: =information_schema.schemata=
+
+** Character Set and Collations
+
+- collation: the rules for comparing and sorting a particular set.A character set can have many collations associated with it, while each collation is only associated with one character set.
+
+#+begin_src sql
+SHOW CHRACTER SET; --- select * from information_schema.CHARACTER_SETS;
+SHOW COLLATION; --- SELECT * from information_schema.COLLATIONS, ci (case-insenstive), cs (case sensitive)
+SET NAMES { 'charset_name' | [COLLATE 'collation_name'] | DEFAULT } --- sets character_set_client, character_set_connection, chracter_set_results
+SET {CHARACTER SET | CHARSET} {charset_name | DEFAULT} --- sets character_set_client, character_set_results, collcation_connection
+#+end_src
+
+Character sets and collations can be set from the server level right down to the column level, as well as for client-server communication.Character sets and collations always cascade down. By default, the character set and collation used for literals is determined by the =character_set_connection= and =collation_connection= system variables.
+
+Padspace collations treat trailing spaces as insignificant and remove them when comparing.
+
+** Localization and Internationalization
+
+MariaDB stores values internally in UTC, converting them to the required time zone as required.
+
+- =lc-time_names=: sets the language used by the date and time functions =DAYTIME()=, =MONTHNAME()=, =DATE_FORMAT()=
+
+- =lc_messages=: server error messages
+
+- =time_zone=: the primary way to set the time zone
+
+=default_time_zone= is an option in a server option group.
+
+There are some functions and data types affected by the time zone settings.
+
+#+begin_src sql
+    NOW()
+    SYSDATE()
+    CURDATE()
+    CURTIME()
+    UNIX_TIMESTAMP()
+
+    timestamp, datetime
+#+end_src
+
+** User Management
+
+*** Creation
+
+1. =CREATE USER= creates a new row in =mysql.user=.
+
+2. ='user_name'@'host_name': if the host name is not provided, it defaults to '%', or a domain name, or IP addresses, a range of IP addresses =base_IP/netmask=. The hostname has to be where the client connect comes from, a local nginx proxy counts as localhost.
+
+** Data Types
+
+*** Numeric Types
+
+Most numberic types can be defined as =SIGNED= (default), =UNSIGNED= or =ZEROFILL= (the displayed value of the field is padded to the specified width). Using =ZEROFILL= and a display width has no effect on how the data is stored. It affects only how it is displayed (Useless feature!).
+
+- =TINYINT= / =INT1=: 1 bytes at most
+
+- =BOOL=/=BOOLEAN=: =TINYINT(1)=, nonzero considered true. =TRUE= is 1 and =FALSE= is 0, so =2 = TRUE= yields false, use =2 IS (NOT) TRUE= instead.
+
+- =SMALLINT= / =INT2=: 2 bytes at most
+
+- =MEDIUMINT= / =INT3=: 3 bytes at most
+
+- =INTEGER= / =INT= / =INT4=: 4 bytes at most
+
+- =BIGINT= / =INT8=: 8 bytes at most
+
+- =DECIMAL(M, [D])= / =DEC= / =NUMERIC= / =FIXED= / =NUMBER=: M (65 at most) precision, D (38 at most) fractional digits.
+
+- =FLOAT[(M, D)]=, =DOUBLE([M, D]) / =DOUBLE PRECISION= / =REAL=: IEEE 754 standard floating-point
+
+- =BIT[(M)]=: bit field type, default to 1 bit, at most 64 bits, literal value =b'value'=
+
+*** String Types
+
+MariaDB uses double quotes for enclosing strings by default. Use =\= to escape characters.
+
+#+begin_src sql
+[_charset_name]  'string_value' [COLLATE collation_name]
+_utf8 'Foundation' COLLATE utf8_unicode_ci;
+#+end_src
+
+- =[NATIONAL] CHAR[(M)] [CHARACTER SET charset_name] [COLLATE collation_name]=: Fixed-length right-padded string, at most 255 characters (not bytes), default to 0
+
+- =BINARY(M)= / =CHAR BYTE=: fixed binary byte strings, compared based on the numeric value of the bytes.
+
+- =[NATIONAL] VARCHAR[(M)] [CHARACTER SET charset_name] [COLLATE collation_name]=: variable-length right-padded string, at most 65532 characters (not bytes), default to 0. =varchar= can be fully indexed.
+
+- =VARBINARY(M)=: variable byte string, no character set
+
+- =TINYBLOB= (at most 255 bytes), =BLOB= (2^16-1 bytes), =MEDIUMBLOB= (2^24 - 1), =LOGNBLOB= (2^32 - 1)
+
+- =TINYTEXT= (255), =TEXT= (2^16-1), =MEDIUMTEXT= (=LONG=, =LONG VARCHAR=, 2^24-1), =LONGTEXT= (2^32-1)
+
+- =INET6=: IPv6 address
+
+- =JSON=: a =LONGTEXT= type, however a dedicated compact type in MySQL
+
+ #+begin_src sql
+CREATE TABLE t2 (
+  j JSON
+  CHECK (JSON_VALID(j))
+);
+ #+end_src
+
+- =ENUM('value', 'value', ...) [CHARACTER SET charset_name] [COLLATE collation_name]=: NULL and empty strings are possible. Each value is assigned an index number in the order they are defined.
+
+- =SET('value', 'value', ...) [CHARACTER SET charset_name] [COLLATE collation_name]=: NULL and empty strings are possible. Each value is assigned an index number in the order they are defined.
+
+- =ROW (<field name> <data type> [ {, <field name> <data type> }...])=: a data type for stored procedure
+
+*** Date Types
+
+MariaDB date types store no timezone info.
+
+#+begin_src sql
+    DATE 'string'
+    TIME 'string'
+    TIMESTAMP 'string'
+#+end_src
+
+- =YEAR[(4)]=: the range is very limited
+
+- =DATE=: YYYY-MM-DD
+
+- =TIME [(microsecond precision 0-6)]=:
+
+- =DATETIME [(microsecond precision 0-6)]=: no automatic time zone conversions are performed.
+
+- =TIMESTAMP [(microsecond precision 0-6)]=:: generally used to define at which moment in time a row was added or updated, internally as the number of seconds since the UNIX epoch. Can be set to =CURRENT_TIMESTAMP= on creation or update
+
+** Storage Engine
+
+#+begin_src sql
+select @@global.storage_engine
+#+end_src
+
+A table can be created with an =engine= option.
+
+1. InnoDB: default high-performance, general-purpose storage engine that supports transactions with savepoints, XA transactions and foreign keys.
+
+2. TokuDB: supports factual trees and data compression, suitable for large datasets
+
+3. MyISAM, Aria: former default engine and its successor. Do not support transactions and foreign keys.
+
+4. MyRocks: Write-optimized and has fast dat aloading and replication.
+
+** Table Management
+
+It is a good practice to define a primary key for every table. MariaDB automatically creates a btree index for the primary key column(s).
+
+- =auto_increment=: a sequence, but not primary key
+
+- =alter table= can specify the location of the new column
+
+- =show tables= might show views and sequences, use =show full tables=
+
+- =truncate table=: deletes all rows from a table, more efficient then delete since it basically drops the table and then recreates it.
+
+A foreign key prevents inserting a row into the table without a corresponding row in the parent table. The behavior is configurable if a row in the parent table is deleted (=on delete restrict on update cascade=).
+
+- =check=: more general constraint
+
+- =unique=:
+
+*** View
+
+#+begin_src sql
+show create view view_name
+#+end_src
+
+*** Trigger
+
+Can be executed *before* / *after* =insert=/=update=/=delete=. MariaDB does not support statement-level triggers.
+
+#+begin_src sql
+create trigger trigger_name
+{before | after} {insert | update | delete }
+on table_name for each row
+trigger_body;
+#+end_src
+
+*** Index
+
+Indices are used to quickly find rows of query. Without indexes, the database has to scan the whole table to find the relavant rows for the query.
+The indexed columns are stored in b-tree (ordered) for fast retrieval. Indexing requires more storage space and overhead when writing.
+
+#+begin_src sql
+show indexes from table_name;
+show keys in table_name;
+#+END_SRC
+
+Unique constraints automatically create their unique indexes.
+
+** GETTING Data
 
 - =SELECT= statement
   + use =LIMIT= clause to limit the results
-  + =WHERE=: selectivity
+  + =WHERE=: selectivity. It is possible to do tuple comparison.
   + =ORDER BY=: order, goes after =WHERE= and before =LIMIT=
   + =DISTINCT=: distinctivity flag
   + =HIGH_PRIORITY=: flag, =SELECT= statement are considered to be of lower priority by default.
   + =SQL_CALC_FOUND_ROWS=: used with =FOUND_ROWS()=
 
+#+begin_src sql
+select
+    name
+from
+    country_stats
+inner join countries
+    using (country_id)
+where
+    year = 2018 and
+    (population, gdp) > (
+        select
+            avg(population),
+            avg(gdp)
+        from country_stats
+        where year = 2018)
+order by
+    name;
+#+end_src
+
+- Common table expression (CTE)
+  + Reference a result set multiple times in the same statement
+  + Use a view without creating one
+  + create a recursive query
+  + simplify a complext query by breaking into multiple simple and logical building blocks
+
+#+begin_src sql
+with largest_economies as (
+	select
+		country_id, gdp
+	from
+		country_stats cs
+	order by
+		gdp desc
+	limit 10
+)
+select
+	name,
+	gdp
+from
+	countries c
+inner join largest_economies
+	using (country_id);
+#+end_src
+
+- `INSERT`:
+
+ #+begin_src sql
+--- default insertion
+insert into contacts(first_name, last_name, phone, contact_group)
+values('Roberto','carlos','(408)-242-3845',default);
+
+--- column specify out of order, specific to the mysql family
+insert into contacts
+set first_name = 'Jonathan',
+    last_name = 'Van';
+ #+end_src
+
+*** Temporary Table
+
+Session-specific tables.
+
+1. The privilege to =create temporary table= in a stored procedure is the creator's if the user does not have the privilege.
+
+2. creating a temporary table does not cause an implicit commit.
+
+** Some Useful Functions
+
+#+begin_src sql
+database(); --- the current database
+schema(); -- your MySQL-ism
+last_inserted_id();
+now();
+#+end_src
 
 * Minor Details
 

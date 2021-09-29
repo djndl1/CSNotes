@@ -1,0 +1,98 @@
+#+TITLE: Oracle_admin
+
+* Common Tasks and Tools
+
+*** Common Tasks
+
+1. Installing/Upgrading software:
+
+2. creating databases
+
+3. Start/stopping the instance
+
+4. Managing the storage structures of the database
+
+5. Managing users and security
+
+6. Managing database objects
+
+7. Backup and recovery
+
+8. Monitoring and tuning the performance
+
+*** Tools
+
+1. Oralce Universal Installer
+
+2. Oracle Database Configuration Assistant
+
+3. Database Upgrade Assistant
+
+4. Net Configuration Assistant
+
+5. Oracle Enterprise Manager Database Express
+
+6. SQL Developer
+
+* Installation
+
+- System Identified (SID): unique identifier on the system
+
+- Global database name: =database_name.database_domain=
+
+- Operating System Groups: administrative access to database is granted by membership in certain OS groups.
+
+** Creating A Database
+
+- Fast Recovery Option: LGWR can archive the inactive redo log group to recover all commited transactions, or to keep a standby database current with its original database.
+
+- Connection Mode:
+  + Dedicated Server mode: default. each user process gets a server process. typical for persistent long running requests to the database.
+  + Shared server mode: all client connections share a database-allocated pool of resources.
+
+* Network Configuration
+
+Oracle Net establishes the connection between the client application and the database over a network and exchanges messages between them using industry standard protocols.
+
+- /Service Name/: a logical representation of a database, presented to clients. A single database can be presented as multiple services.
+
+** Oracle Net Listener
+
+a process that listens for client connection requests and manages the traffic of the requests to the database server.
+
+A listenere is configured with one or more listening protocol addresses, information about supported services and parameters that contril its runtime behavior.
+The Configuration file: =listener.ora= located in the =network/admin= of the Oracle home directory. The default listener listens on the TCP port 1521 and the database registers with the listener at this protocl address.
+
+An oracle database registers within a minute or so of starting up. The service names or the database that they represent can be configured in =listener.ora=. Dynamic registration requires no configuration of =listener.ora=. (Dynamic) Service registration provides a load balancing mechanism and connection-time failover in case one instance is down.
+
+#+begin_src
+lsnrctl status/start/stop
+#+end_src
+
+*** Service Registration
+
+Listener configuration must be set to listen on the ports named in the database initialization file. An listner alias can be configured inside the =tnsnames.ora= on the database host.
+
+**** Local Listener
+
+=LOCAL_LISTENER=
+
+#+begin_src
+alter system set local_listener=alias_or_actual_protocol_address;
+#+end_src
+
+**** Remote Listener
+
+=REMOTE_LISTENER=
+
+#+begin_src
+alter system set remote_listener=alias_or_actual_protocol_address;
+#+end_src
+
+Remote listener might need to disable VNCR (valid_node_checking_registration) to allow remote registration.
+
+**** Create Service
+
+#+begin_src sql
+dbms_service.create_service
+#+end_src
