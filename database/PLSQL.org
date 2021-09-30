@@ -1,0 +1,54 @@
+#+TITLE: Plsql
+
+* Organizing Tables
+
+- Content: anything that is actually related to business
+
+- Codes: for categorization, classification and types
+  + e.g. primary key identifier,
+
+- Intersections: maintain history of relations
+
+* PL/SQL-Specific Types
+
+** =BOOLEAN=
+
+nullable bool
+
+** =PLS_INTEGER=/=BINARY_INTEGER=
+
+Machine-level 32-bit signed integer with overflow check
+
+- =SIMPLE_INTEGER=: non-null subtype without overflow check
+
+** Collection Types
+
+*** Table Types: PL/SQL associative arrays
+
+A set of key-value pairs indexed by =varchar2=, =varchar=, =string=, =long= or =PLS_INTEGER=.
+
+#+BEGIN_SRC sql
+TYPE name_table IS TABLE OF type_Name INDEX BY index_type;
+name_table(idx) := value;
+
+ DECLARE
+    Idx PLS_INTEGER := v.FIRST();
+  BEGIN
+    WHILE Idx IS NOT NULL LOOP
+      DBMS_OUTPUT.PUT_LINE(TO_CHAR(Idx, '999')||LPAD(v(Idx), 7));
+      Idx := v.NEXT(Idx);
+    END LOOP;
+  END;
+#+END_SRC
+
+The sort order of an associative array is affected by NLS parameters
+
+*** Record Types
+
+
+#+BEGIN_SRC sql
+type record_name IS RECORD (
+     field_name  type_name,
+     ...
+);
+#+END_SRC
