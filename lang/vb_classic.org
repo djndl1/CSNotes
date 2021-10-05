@@ -1,0 +1,54 @@
+#+TITLE: Vb Classic
+
+In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rapid Application Development]]
+
+1. Heavily integrated with COM/OLE, (=String= is OLE =BSTR= and arrays are =SAFEARRAY=)
+
+2. Primarily used for Windows GUI apps
+
+3. Use refcount for memory management
+
+4. Compiled to P-code or native code
+
+5. Supported on up to Windows 10
+
+6. Poor support on OOP and limited threading capability
+
+* Language Variants
+
+1. VBA: for application scripting, still COM/OLE based
+
+2. VBScript: COM-based Windows scripting language for automation and web page (succeeded by PowerShell)
+
+3. GAMBAS: a FOSS variant mainly on Linux
+
+
+* Form Lifecycle
+
+1. =Initialize=: variables are initialized
+
+2. =Load=: properties and controls are references. The windows and its child controls are created
+
+3. =Resize=: visible or sized changed
+
+4. =Activate=: ready to accept user input
+
+5. =Deactivate=: end user switches to another form
+
+6. =Paint=: the form refreshes itself
+
+7. =QueryUnload=
+
+8. =Unload=
+
+9. =Terminate=: deallocate the memory for the Form
+
+Forms expose a special property, the =Controls= collection, which contains all the controls that are currently loaded on the form itself.
+
+* Basics
+
+1. =Set= is there only to assign object reference
+
+2. =Variant= can be used as a =Result<T, E>=, returning the result when no error and an error number if needed.
+
+3. =TypeName= returns the name of the type as a =String=
