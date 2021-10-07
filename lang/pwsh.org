@@ -1,0 +1,213 @@
+#+TITLE: Pwsh
+
+* Help
+
+- =Get-Alias=
+
+- =Get-Command= Has some options to query various of a command
+
+- =Get-Help= can be updated
+
+* Basics: Everything in PowerShell is an Object
+
+- =Set-StrictMode=: use this to enforce good
+
+** Automatic Variables
+
+Premade powershell variables
+
+- =$null=, =$true=, =$false=
+
+- =$LASTEXITCODE=
+
+- preference variables: used to configure the default behavior of output streams
+
+** Data types
+
+Basically CLR types.
+
+- =Select-Object=: mostly used with pipelining
+
+- =Get-Member=
+
+**** Arrays and ArrayList
+
+- =@()=, =,,,,=: pwsh treats any comma-separted set of values as an array
+
+- =[]=
+
+- =..= range operator, full closed interval
+
+- ~+=~ and =+= concatenate arrays or add elements (new arrays are created)
+
+  An ArrayList is created by simply casting an array
+
+ #+begin_src shell
+$colorPicker = [System.Collections.ArrayList]@("blue", "white")
+ #+end_src
+
+**** =HashTable=
+
+#+begin_src shell
+$users = @{
+    abertram = "Adam Bertram"
+    raquelcer = "Raquel Cerillo"
+    zheng21 = "Justin Zheng"
+}
+
+$users.abertram
+$users['abertram'"]
+#+end_src
+
+**** Custom Objects =PSCustomObject=
+
+#+begin_src shell
+$users = [PSCustomObject]@{
+    abertram = "Adam Bertram"
+    raquelcer = "Raquel Cerillo"
+    zheng21 = "Justin Zheng"
+}
+#+end_src
+
+* Combining Commands
+
+** Pipelining
+
+**** How parameters are bound when pipelining:
+
+A cmdlet must explicitly build in pipeline support for one or more parameters. =Accept pipeline input?= in the help article describes if this parameter can be bound to pipelined input.
+
+- =ByValue=: by the type of the object passed in, only one parameter can be passed via =ByValue=
+
+- =ByPropertyName=: if the passed object has properties matching certain parameter names
+
+* Control Flows
+
+** Logic Operators
+
+https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comparison_operators?view=powershell-7.1
+
+#+begin_src shell
+if (Test-Connection -ComputerName offlineserver -Quiet -Count 1) {
+
+} elseif {
+}
+   else {
+}
+
+switch (expression) {
+    expressionvalue {
+        # Do something with code here.
+    }
+    expressionvalue {
+    }
+    default {
+        # Stuff to do if no matches were found
+    }
+}
+
+foreach ($server in $servers) {
+    Get-Content -Path "\\$server\c$\App_configuration.txt"
+}
+
+$servers = @('SRV1','SRV2','SRV3','SRV4','SRV5')
+ForEach-Object -InputObject $servers -Process {
+Get-Content -Path "\\$_\c$\App_configuration.txt"
+}
+
+$servers.foreach({Get-Content -Path "\\$_\c$\App_configuration.txt"})
+
+for ($i = 0; $i -lt 10; $i++) {
+        $i
+}
+
+while (Test-Connection -ComputerName $problemServer -Quiet -Count 1) {
+          Get-Content -Path "\\$problemServer\c$\App_configuration.txt"
+          break
+}
+
+do {
+} while (condition)
+
+do {
+} until (condition)
+
+#+end_src
+
+#+RESULTS:
+
+* Error Handling
+
+** Handling Nonterminating Errors
+
+- Set =ErrorAction=: what action to take if the cmdlet encounters a nonterminating error
+
+The best practice is to always set =$ErrorActionPreference= to =Stop= to remove the concept of nonterminating errors altogether. This allows you to catch all types of exceptions, and spare yourself the work of knowing in advance which errors are terminating and which are nonterminating.
+
+** Handling Terminating Errors
+
+#+begin_src shell
+try {
+    # initial code
+} catch {
+    # code that runs if terminating error found
+} finally {
+    # code that runs at the end
+}
+
+#+end_src
+
+* Functions
+
+Verb-Noun naming
+
+#+begin_src shell
+# Advanced functions
+function Install-Software {
+   [CmdletBinding()]
+   param(
+    [Parameter()]
+    [ValidateSet('1','2')]
+    [string]$Version = 2
+
+    [Parameter(Mandatory, ValueFromPipeline)]
+    [string]$ComputerName
+   )
+   process { # where the main code should live
+       Write-Host "I installed software version $Version on $ComputerName. Yippee!"
+   }
+}
+
+#+end_src
+
+* Modules
+
+- System Modules: in =System32\WindowsPowerShell\1.0\Modules=
+
+- All User modules: =Program~\WindowsPowerShell\Modules=
+
+- Current User Module: =Users\UserName\Documents\WindowsPowerShell\Modules=
+
+=PSModulePath= sets the search path of modules
+
+=Import-Module= is used to manually import a module. Modules in search paths are automatically imported the first time its cmdlets are called.
+
+A typical PowerShell module consists of a folder (the module container), =.psm1= file (the module), and a =.psd1= file (the module manifest).
+Any text file with a =.psm1= file extension can be a PowerShell module.
+A module manifest =.psd1= (=New-ModuleManifest=) is an optional but recommended text file written in the form of a PowerShell hashtable. This hashtable contains elements that describe metadata about the module.
+
+Powershell gallery and =PowerShellGet= Module.
+
+* Remoting
+
+=&= executes a scriptblock.
+
+- =Invoke-Command=: a script block or a local script file
+
+- =New-PSSession=: create a session (not immediately interactive), =Enter=PSSession=, =Remove-PSSession=, =disconnect-PSSession=, =connect-PSSession=. A session exists on both sides of the connection.
+
+** Applications
+
+*** Structured Data
+
+1. =ConvertTo-Csv=, =CovertFrom-Csv=, =Import-Csv=, =Export-Csv=
