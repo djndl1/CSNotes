@@ -14,6 +14,8 @@ In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rap
 
 6. Poor support on OOP and limited threading capability
 
+7. It is possible to reference any COM-visible objects in VB6, including those in CLR.
+
 * Language Variants
 
 1. VBA: for application scripting, still COM/OLE based
@@ -21,7 +23,6 @@ In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rap
 2. VBScript: COM-based Windows scripting language for automation and web page (succeeded by PowerShell)
 
 3. GAMBAS: a FOSS variant mainly on Linux
-
 
 * Form Lifecycle
 
@@ -51,4 +52,30 @@ Forms expose a special property, the =Controls= collection, which contains all t
 
 2. =Variant= can be used as a =Result<T, E>=, returning the result when no error and an error number if needed.
 
-3. =TypeName= returns the name of the type as a =String=
+3. =TypeName= returns the name of the type
+
+4. =Dictionary= belongs to an external library: Microsoft Scripting Runtime
+
+* Error Handling
+
+- =On Error Resume Next=: ignore any error
+
+- =On Error Resume=: retry the erring line
+
+- =On Error Goto=: jump to the named label to handle any error
+
+- =On Error Goto 0=: disable any previous =On Error=
+
+If any error inside an event handler goes unhandled, the program terminates.
+
+#+begin_src basic
+Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
+#+end_src
+
+* OOP
+
+- No parameterized constructors, initializer methods and factory methods are used.
+
+- Properties can have arguments
+
+- Public variables have default property implemented by the compiler.
