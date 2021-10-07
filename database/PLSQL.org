@@ -1,5 +1,42 @@
 #+TITLE: Plsql
 
+* Blocks, Functions and Procedures
+
+#+begin_src sql
+DECLARE
+
+BEGIN
+
+EXCEPTION
+
+END;
+/
+#+end_src
+
+** Anonymous Blocks
+
+Not saved in the database and not really used in production.
+
+** Functions
+
+Blocks with =CREATE OR REPLACE FUNCTION Function_name (parameter_list) return return_type as=
+
+** Procedures
+
+Blocks with =CREATE OR REPLACE PROCEDURE procedure_name (parameter_list) as=
+
+** Nested Blocks
+
+PL/SQL blocks can be nested.
+
+** Packages
+
+A library in a database
+
+- Package specification: the interface
+
+- Package body: the implementation
+
 * Organizing Tables
 
 - Content: anything that is actually related to business
