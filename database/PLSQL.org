@@ -92,7 +92,9 @@ type record_name IS RECORD (
 
 * Row Processing
 
-Use =insert... select... where= to avoid duplication and if-then-else clause
+=SELECT= without =into= is not allowed in =PL/SQL=.
+
+1. Use =insert... select... where= to avoid duplication and if-then-else clause
 
 #+begin_src sql
 declare
@@ -159,4 +161,38 @@ begin
   end;
 end;
 /
+#+end_src
+
+2. Use =update ... set () = (select )= to do complext updates.
+
+* Multirow Processing
+
+[[https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/static-sql.html#GUID-A22B737E-68B3-47A5-8EB3-3EDC53D8571D][Cursor Overview]]
+
+[[https://docs.oracle.com/en/database/oracle/oracle-database/19/lnpls/explicit-cursor-declaration-and-definition.html#GUID-38C5DBA3-9DEC-4AF2-9B5E-7B721D11A77C][Explicit Cursor Declaration and Definition]]
+
+A cursor is a pointer to a private SQL area that stores information about processing a specific SELECT or DML statement.  =V$OPEN_CURSOR=
+
+** Implicit Cursors
+
+Constructed and managed by PL/SQL. It closes after the associated statement runs.
+
+*** Implicit Cursor Attribute
+
+An implicit cursor has attributes that return information about the most recently run SELECT or DML statement that is not associated with a named cursor.
+
+#+begin_src sql
+SQL%ISOPEN/FOUND/NOTFOUND/ROWCOUNT/BULK_ROWCOUNT/BULK_EXCEPTION
+#+end_src
+
+** Explicit Cursors (Named Cursors)
+
+1. Declare and define a cursor and associate it with a query
+
+2. open the query (either via the =OPEN= statement or implicitly in a =FOR= loop) and fetch the result and then =CLOSE= it (not needed in a =FOR= loop).
+
+** Simple Static Cursor
+
+#+begin_src sql
+
 #+end_src
