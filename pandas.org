@@ -1,0 +1,70 @@
+#+TITLE: Pandas
+
+* Concepts
+
+A =DataFrame= is a 2-dimensional data structure that can store data of different types (chars, integers, floating points, categorical data and more) in columns.
+    1. Each column in a =DataFrame= is a =Series=. A =Series= has no column labels. A series does have row labels.
+    2. Every row has an index number
+
+* API
+
+** Selections
+
+- =[]= can be used for columns or rows but not both
+
+- =.loc[]=: label based, first select rows and then columns. =.iloc[]= is the version based on positions
+
+- =.assign=: adds new columns to a DF
+
+- =head=: limit
+
+- =nlargest=, =tail=: =limit ... offset 5=
+
+** Filter (Where clause)
+
+- Simply compare a series with a scalar result a boolean index series which be used as index array into the original DF
+
+ #+begin_src python
+is_dinner = tips_csv['time'] == 'Dinner'
+is_bill_greater_than_ten = tips_csv['total_bill'] > 10
+tips_csv(is_dinner | is_bill_greater_than_ten)
+ #+end_src
+
+- Use bitwise logic operator to do logic operations
+
+- NUll checking: =notna()= and =isna=
+
+** GroupBy
+
+- =groupby()=: produces a =DataFrameGroupBy= on which various operations can be done.
+
+- =count()= applies to each columns while =size()= returns group sizes.
+
+#+begin_src python
+tips_csv.groupby(['sex']).size()
+tips_csv.groupby(['day']).agg({'tip': np.mean, 'day': np.size})
+#+end_src
+
+** Join
+
+- =merge=: this function alone can perform all database joins.
+
+ #+begin_src python
+pd.merge(df1, df2, on='key') # an inner-join by default on 'key'
+pd.merge(df1, df2, on='key', how='right')
+ #+end_src
+
+- =concat=: concat along a particular axis, can be used for union
+
+ #+begin_src python
+pd.concat([df1, df2]).drop_duplicates()
+ #+end_src
+
+
+** Deletion
+
+Reassignment what remains
+
+** Updating
+
+- =.loc= with assignment
