@@ -1,10 +1,5 @@
 #+TITLE: Pandas
 
-* Concepts
-
-A =DataFrame= is a 2-dimensional data structure that can store data of different types (chars, integers, floating points, categorical data and more) in columns.
-    1. Each column in a =DataFrame= is a =Series=. A =Series= has no column labels. A series does have row labels.
-    2. Every row has an index number
 
 * API
 
@@ -68,3 +63,23 @@ Reassignment what remains
 ** Updating
 
 - =.loc= with assignment
+
+* [[https://pandas.pydata.org/docs/user_guide/dsintro.html][Data Structures]]
+
+** =Series=
+
+one-dimensional ndarray with hashable /index/ label axis, a valid argument to most NumPy functions, and actually implemented on top of Numpy array, slicing and indexing is valid operations on =Series=.
+
+=Series= is also dict-like. =Series= automatically align the data based on label when Numpy operations are applied. Operations between unaligned  =Series= will have the union of the indexes involved, with the difference part being =Nan=
+
+** =DataFrame=
+
+A =DataFrame= is a 2-dimensional data structure that can store data of different types (chars, integers, floating points, categorical data and more) in columns.
+    1. Each column in a =DataFrame= is a =Series=. A =Series= has no column labels. A series does have row labels.
+    2. Every row has an index number
+
+A SQL table, a spreadsheet, a dict (indexed by columns) of =Series= objects, or a list of dicts (each representing a row or a column). Multiple indexes on row or column is possible by passing a tuples dictionary.
+
+Columns can be deleted or popped like with a dict =del df['two']=. =DataFrame= behaves like dict. Its indexes are primarily the column labels.
+
+Data operations between DataFrame objects automatically align on both the columns and the index (row labels).
