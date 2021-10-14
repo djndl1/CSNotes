@@ -83,3 +83,11 @@ A SQL table, a spreadsheet, a dict (indexed by columns) of =Series= objects, or 
 Columns can be deleted or popped like with a dict =del df['two']=. =DataFrame= behaves like dict. Its indexes are primarily the column labels.
 
 Data operations between DataFrame objects automatically align on both the columns and the index (row labels).
+
+** Essential Operations
+
+- ndFrames may have =Nan=, use =.equals()= for comparison.
+
+- =.combine_first()=, =.combine()=: combine two ndFrames into one
+
+- =value_count()=: histogram, =cut()= and =qcut= prior
