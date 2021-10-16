@@ -78,7 +78,7 @@ A =DataFrame= is a 2-dimensional data structure that can store data of different
     1. Each column in a =DataFrame= is a =Series=. A =Series= has no column labels. A series does have row labels.
     2. Every row has an index number
 
-A SQL table, a spreadsheet, a dict (indexed by columns) of =Series= objects, or a list of dicts (each representing a row or a column). Multiple indexes on row or column is possible by passing a tuples dictionary.
+A SQL table, a spreadsheet, a dict (indexed by columns) of =Series= objects, or a list of dicts (each representing a row or a column). Multiple indexes on row or column is possible by pasing a tuples dictionary.
 
 Columns can be deleted or popped like with a dict =del df['two']=. =DataFrame= behaves like dict. Its indexes are primarily the column labels.
 
@@ -91,3 +91,7 @@ Data operations between DataFrame objects automatically align on both the column
 - =.combine_first()=, =.combine()=: combine two ndFrames into one
 
 - =value_count()=: histogram, =cut()= and =qcut= prior
+
+- Functions operating on a ndFrame can be used with a =.pipe()=.
+
+- =.apply()= applies functions to rows or columns. For aggregation specifically, use =.aggregate= (=.agg=), and =.transform()= for returning an object indexed the same as the original. =applymap= (=DataFrame=) and =map= (=Series=) apply any Python functions to ndFrames elementwise.
