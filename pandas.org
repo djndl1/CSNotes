@@ -95,3 +95,15 @@ Data operations between DataFrame objects automatically align on both the column
 - Functions operating on a ndFrame can be used with a =.pipe()=.
 
 - =.apply()= applies functions to rows or columns. For aggregation specifically, use =.aggregate= (=.agg=), and =.transform()= for returning an object indexed the same as the original. =applymap= (=DataFrame=) and =map= (=Series=) apply any Python functions to ndFrames elementwise.
+
+- To deal with data alignment, use =.reindex()= (basis of all index functions) to conform the data to match a given set of labels (row labels or column labels) along a particular axis. =.align= is the fastest way to simulatenously align two objects. =.drop()= removes certain labels. =.rename()= relabels axes based on some mapping.
+
+- Series and Index are equipped with a set of string processing methods that make it easy to operate on each element of the array.
+
+- Sorting: =sort_index()= (sort by index levels), =sort_values()= (sort by  row or column values), =nsmallest=, =nlargest=
+
+*** Iteration
+
+Iterating through pandas objects is generall slow! Modifying something during iterating over might not work at all.
+
+- =itemrows()=, =itertuples()=, =items()=
