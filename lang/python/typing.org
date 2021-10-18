@@ -1,0 +1,16 @@
+#+TITLE: Typing
+
+- /PEP 484/: make static typing possible
+
+- [[https://en.wikipedia.org/wiki/Protocol_(object-oriented_programming)][Protocol]]: methods can be regarded as types of messages and arguments were variable content fields. Exceptions are error specification. In this way, OOP interfaces are regarded as communication protocols between objects.
+  + [[https://docs.python.org/3/c-api/abstract.html][Abstract Object Layer]]: some Python protocol specification.
+
+#+begin_quote
+a common means for discrete objects to communicate with each other.
+#+end_quote
+
+- /Duck Typing/: no more [[https://en.wikipedia.org/wiki/Protocol_(object-oriented_programming)][protocol]] (duck typing can do more, making existing code suitable for another "interface") or inheritance (based on typing), just check the presence of some method or attribute. Duck typing is dynamic and determines type compatibility by only that part of a type's structure that is accessed during run time.
+
+#+begin_quote
+In duck typing, an object's suitability is determined by the presence of certain methods and properties, rather than the type of the object itself.
+#+end_quote
