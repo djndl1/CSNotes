@@ -58,11 +58,35 @@ Machine-level 32-bit signed integer with overflow check
 
 - =SIMPLE_INTEGER=: non-null subtype without overflow check
 
-** Collection Types
+** Composite Types
 
-*** Table Types: PL/SQL associative arrays
+*** Collection Types
 
-A set of key-value pairs indexed by =varchar2=, =varchar=, =string=, =long= or =PLS_INTEGER=.
+**** Table Types: PL/SQL associative arrays
+
+A set of key-value pairs indexed by =varchar2=, =varchar=, =long= or =PLS_INTEGER=.
+
+#+begin_src sql
+set serveroutput on;
+
+declare
+    type t_varchar_array is table of varchar(100) index by PLS_INTEGER;
+    type t_varchar_vararr is varray(100) of varchar2(100);
+    arr t_varchar_array;
+    varr t_varchar_vararr;
+begin
+    arr := t_varchar_array(1 =>'abc',2 => 'cde'); -- qualified expressions
+    for idx in arr.FIRST..arr.LAST loop
+        dbms_output.put_line(arr(idx));
+    end loop;
+
+    varr := t_varchar_vararr('abc', 'dafdsa'); -- collection constructor
+    for idx in varr.FIRST..varr.LAST loop
+        dbms_output.put_line(varr(idx));
+    end loop;
+end;
+/
+#+end_src
 
 #+BEGIN_SRC sql
 TYPE name_table IS TABLE OF type_Name INDEX BY index_type;
@@ -79,6 +103,16 @@ name_table(idx) := value;
 #+END_SRC
 
 The sort order of an associative array is affected by NLS parameters
+
+**** Associative Arrays
+
+Has a fixed declared maximum size.
+
+**** Nested Tables
+
+A column type that stores an unspecified number of rows in no particular order. Conceptually, a nested table is a one-dimensional array with an arbitrary number of elements. The size of a nested table can increase dynamically. A nested table can become sparse.
+
+A nested table type is a valid table column type, although its actual data are stored elsewhere. Nested table data is stored in a separate store table, a system-generated database table.
 
 *** Record Types
 
@@ -172,6 +206,8 @@ end;
 [[https://docs.oracle.com/en/database/oracle/oracle-database/19/lnpls/explicit-cursor-declaration-and-definition.html#GUID-38C5DBA3-9DEC-4AF2-9B5E-7B721D11A77C][Explicit Cursor Declaration and Definition]]
 
 A cursor is a pointer to a private SQL area that stores information about processing a specific SELECT or DML statement.  =V$OPEN_CURSOR=
+
+Cursor is more like a C# =IEnumerable= and than a =IEnumerator=
 
 ** Implicit Cursors
 
