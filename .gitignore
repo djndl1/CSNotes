@@ -13,7 +13,7 @@ a.out
 *.elf
 *.mdb
 *.pdb
-*build*
+**/build/*
 __pycache__
 .ipynb_checkpoints
 .vscode
