@@ -1,0 +1,26 @@
+#+TITLE: Window Command Line
+
+[[https://devblogs.microsoft.com/commandline/windows-command-line-backgrounder/][Windows Command-Line]]
+
+#+begin_src
+      Terminal                                             Computer
+┌────────┬────────┬──────┐                  ┌─────────┬───────────┬───────────────┐
+│        │ Input  │      │                  │         │           │               │
+│     ◄──┼───◄────┼───   │◄──────┐ ┌────────►         │   Input   │               │
+│ Output │ Buffer │      │       │ │        │    ─────┼──►Buffer──┼──►            │
+│        │        │ IO   │       │ │        │ IO HW   │           │     App       │
+│        ├────────┤ HW   │       │ │        │         ├───────────┤               │
+│        │ Output │      │       │ │        │         │           │    Shell      │
+│ Device │ Buffer │      │       └─┼────────┤◄────────┼─┐ Output  │               │
+│        │   ▲────┼──►   ├─────────┘        │         │ │ Buffer◄─┼─              │
+│        │   │    │      │                  │         │           │               │
+│        │   │    │      │                  │         │           │               │
+└────────┴───┼────┴──────┘                  └─────────┴───────────┴───────────────┘
+             │
+             │
+         Input Device
+#+end_src
+
+Each stage of the system simply passes streams of character.
+
+Modern computers employ high-speed in-memory Pseudo Teletype (PTY) as the terminal.
