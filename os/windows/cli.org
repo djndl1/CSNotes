@@ -61,3 +61,54 @@ On Unixes, users launch a terminal and the terminal launches a predefined shell 
 2. Many newer Unicode features are not supported.
 
 3. Using GDI, the Console can't draw many complex glyphs.
+
+* Pseudo Teletype (PTY)
+
+PCs were replacing hardware terminals in the 80s. A Pty comes between the terminal app and the cli app/shell. Data is always sent/received asynchronously. The slave pty on the CLI app side emulates the behavior of a physical terminal device and converts comamnd characters into POSIX signals.
+
+However, Windows was lacking a PTY infrastructure.
+
+
+** ConPTY: the Windows Pseudo Console
+
+- /ConPTY API/: The new Win32 ConPTY API provides a mechanism that is similar to the POSIX PTY model, but in a Windows-relevant manner
+
+- /VT Renderer/: correctly renders UTF-8 encoded output text/VT.
+
+- /VT Interactivity/: receives and converts UTF-8 text/VT into input records.
+
+
+** ConHost: How it worked and how it still should
+
+1. the user input is converted into =KEY_EVENT_RECORD= and =MOUSE_EVENT_RECORD= and stored in the input buffer.
+
+2. The input buffer is drained one record at a time and performs the requested input action.
+
+3. The Console renders the output buffer's changed regions to the display.
+
+  #+begin_quote
+When a Command-Line app calls Windows Console APIs, the API calls are serialized into IOCTL messages and sent via the ConDrv driver. ConDrv then delivers the IOCTL messages to the attached Console, which decodes and executes the requested API call. Return/output values are serialized back into an IOCTL message and sent back to the app via ConDrv.
+  #+end_quote
+
+** The New Model
+
+#+begin_src
+┌──────────────────┐              ┌─────────────────────────────────────┬────────┬──────┐   ┌──────────┐
+│                  │              │                       ConHost       │        │      │   │          │
+│                  │        stdin │                                     │        │      │   │          │
+│            stdout├──────────────►  VT Interactivity──►  Input Buffer  │        │      │   │          │
+│                  │              │                                     │ Console│ API  │   │          │
+│ ConPTY-Enabled   │    UTF-8     │                                     │        │      │   │ CLI Apps │
+│    Console       │    Text/VT   │ ConPTY                              │   API  │      │   │          │
+│                  │              │                                     │        │Server│   │          │
+│            stdin ◄──────────────┤  VT Renderer ◄─────  Output Buffer  │        │      │   │          │
+│                  │       stdout │                                     │        │      │   │          │
+└──────────────────┘              └─────────────────────────────────────┴────────┘▲─────┘   └──────┬───┘
+                                                                                  │                │
+                                                                                  │                │
+                                                                                  │ ┌────────┐     │
+                                                                                  └─┤ ConDrv │◄────┘
+                                                                                    └────────┘
+#+end_src
+
+Now Conhost can exposes itself as a PTY, outputs and receives UTF-8 text/VT. Mainly, the frontend was separated from the ConHost and the backend with CLI apps is still intact. With the ConPTY infrastructure, a SSHD easily communicates with the ConHost via ConPTY. Without ConPTY, a SSHD has to use a offscreen console as an intermediate.
