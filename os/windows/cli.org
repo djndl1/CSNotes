@@ -24,3 +24,40 @@
 Each stage of the system simply passes streams of character.
 
 Modern computers employ high-speed in-memory Pseudo Teletype (PTY) as the terminal.
+
+CMD, NT and PowerShell => The Unix Subsystems of NT => WSL and the new windows console
+
+* Revonation of the Windows Console
+
+The console was lacking many features such as the ability to parse and render ANSI/VT sequences for rendering rich, colorful text and text-based UI's.
+
+1. Internal code was refactored and simplified in C++.
+
+2. Comprehensive support for ANSI/VT sequnces to accurately render rich text output from unixes.
+
+3. Support 24-bit colors.
+
+* The Windows Console
+
+1. Handle User Input: accept keyboard/mouse/touch/pen input, translates input into characters or ANSI/VT sequences and sends them to the connected app/shell.
+
+2. Handle App Output: accepts text output from a connected app/shell, updates the disaply as required based on the app output.
+
+* Inside the Windows Console
+
+** In Windows 7
+1. =conhost.exe=: User-mode windows consoel UX and CLI plumbing. Converts IOCTL messages into Win32 Console API calls and sends text records from Console to CLI apps. Parse VT sequences and generates equivalent API calls. Implements I/O Buffering.
+
+2. =condrv.sys=: a Windows kernel driver providing communication infrastructure between conhost and one or more CLI shells/apps/tools. IOCTL messages are used between CLI apps and the Console.
+
+Everything revolves around the Object concept and API calls. However, not only cross-platform interop becomes a problem, Remoting Windows CLI is difficult with the API-based approach. In constrast, character streams make it much easier.
+
+On Unixes, users launch a terminal and the terminal launches a predefined shell and communicates with the shell/app via a Psuedo TTy. On Windows, users launch the CLI app and attach the app/shell to either the current Console and a new one. They sound similar but on Windows, =ConHost.exe= is mandated as THE Console app, and CLI apps connect to it via IOCTL messages through the driver, not via text streams. 3rd-party consoles have to launch a offscreen conhost just as an intermediate buffer(?) just to communicate with the CLI app.
+
+** About Unicode Support
+
+1. Not every Console APIs supports UTF-16.
+
+2. Many newer Unicode features are not supported.
+
+3. Using GDI, the Console can't draw many complex glyphs.
