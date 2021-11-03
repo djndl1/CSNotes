@@ -112,3 +112,7 @@ When a Command-Line app calls Windows Console APIs, the API calls are serialized
 #+end_src
 
 Now Conhost can exposes itself as a PTY, outputs and receives UTF-8 text/VT. Mainly, the frontend was separated from the ConHost and the backend with CLI apps is still intact. With the ConPTY infrastructure, a SSHD easily communicates with the ConHost via ConPTY. Without ConPTY, a SSHD has to use a offscreen console as an intermediate.
+
+* Tips
+
+1. Currently, running as an elevated user when sshing into a Windows machine requires first sshing into itself and then remoting into itself.
