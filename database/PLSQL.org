@@ -232,3 +232,17 @@ SQL%ISOPEN/FOUND/NOTFOUND/ROWCOUNT/BULK_ROWCOUNT/BULK_EXCEPTION
 #+begin_src sql
 
 #+end_src
+
+** Bulk Collect
+
+#+begin_src sql
+FETCH <cursor_name> BULK COLLECT INTO <collection_name> LIMIT <limit>;
+
+SELECT ... BULK COLLECT INTO <collection_name> FROM ...
+#+end_src
+
+- for an assoc-array, there's no need to allocate memory before being bulk collected into.
+
+* Object-Relational SQL
+
+Doesn't seem to be useful for app code since support UDT by client drivers is scarece.
