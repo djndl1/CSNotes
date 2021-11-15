@@ -18,7 +18,11 @@ int main(int argc, char *argv[])
             printf("Case %d: 0 0\n", cas);
             if (wall_cnt == 1)
             {
-                ::scanf("%d", &wall_height_prior);
+                ::scanf("%d\n", &wall_height_prior);
+            }
+            else
+            {
+                getchar();
             }
             continue;
         }
