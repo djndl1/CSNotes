@@ -26,9 +26,11 @@ CC_ELF = uva_11799.celf \
 			uva394.celf \
 			uva467.celf \
 			uva482.celf \
-			uva11764.celf
+			uva11764.celf \
+			uva12503.celf
 
-VALA_ELF = uva11764.velf
+VALA_ELF = uva11764.velf \
+			uva12503.velf
 
 all: $(EXE) $(CC_ELF) $(VALA_ELF)
 
