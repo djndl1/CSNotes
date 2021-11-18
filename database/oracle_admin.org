@@ -81,6 +81,8 @@ Listener configuration must be set to listen on the ports named in the database 
 alter system set local_listener=alias_or_actual_protocol_address;
 #+end_src
 
+Beware of the default value of `local_listener`, this might cause the database to fail to find the listener.
+
 **** Remote Listener
 
 =REMOTE_LISTENER=
