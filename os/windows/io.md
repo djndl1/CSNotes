@@ -83,3 +83,11 @@ BOOL DeleteFile(
   LPCSTR lpFileName
 );
 ```
+
+# Console and unicode
+
+http://archives.miloush.net/michkap/archive/2010/10/07/10072032.html
+
+http://illegalargumentexception.blogspot.com/2009/04/i18n-unicode-at-windows-command-prompt.html
+
+http://illegalargumentexception.blogspot.com/2009/04/java-unicode-on-windows-command-line.html
