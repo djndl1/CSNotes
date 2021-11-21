@@ -91,3 +91,120 @@ http://archives.miloush.net/michkap/archive/2010/10/07/10072032.html
 http://illegalargumentexception.blogspot.com/2009/04/i18n-unicode-at-windows-command-prompt.html
 
 http://illegalargumentexception.blogspot.com/2009/04/java-unicode-on-windows-command-line.html
+
+https://alfps.wordpress.com/2011/11/22/unicode-part-1-windows-console-io-approaches/
+
+https://devblogs.microsoft.com/cppblog/new-options-for-managing-character-sets-in-the-microsoft-cc-compiler/
+
+MSVC internally use UTF-8 for string literals. For unprefixed string literals, MSVC would treat them based current on the current code page.
+
+Normal strings are output as they are in execution charset (GCC or MSVC). Execution character sets affect normal byte strings only.
+
+For wide strings, `wprintf` would first convert them based on the set code page and then output them into stdout.
+
+The following code should have the commented standard-conformant result.
+
+```cpp
+  setlocale(LC_ALL, "my_system_locale");
+	printf("printf-s-1 %s\n", Test1); // Correct
+	printf("printf-s-2 %s\n", Test2); // -N
+
+	printf("printf-ls-1 %ls\n", Test1); // empty and no newline
+	printf("printf-ls-2 %ls\n", Test2); // correct
+
+  // For MSVC, these two lines should be the same as the last two
+	wprintf(L"wprintf-s-1 %s\n", Test1); // correct output
+	wprintf(L"wprintf-s-2 %s\n", Test2); // -N
+
+	wprintf(L"wprintf-ls-1 %ls\n", Test1); // garbage output
+	wprintf(L"wprintf-ls-2 %ls\n", Test2); // correct
+```
+
+GCC-MSVCRT cannot output wide strings in any meaningful way due to a [bug][https://yongweiwu.wordpress.com/2016/05/27/msvcrt-dll-console-io-bug/] in MSVCRT6, with or without `setlocale`, using `%ls` or `%s` on wide strings or normal strings.
+
+```cpp
+printf-s-1 ?D??
+printf-s-2 -N?e
+printf-ls-2
+wprintf-s-1 ?D??
+wprintf-s-2 -N?e
+wprintf-ls-1
+wprintf-ls-2
+```
+
+However, with some perl redirection, GCC-MSVCRT6 works somewhat better, with or without `setlocale`. Seems MSVCRT6 does some translation when outputing to the console.
+
+```shell
+printf-s-1 中文 
+printf-s-2 -N噀 
+printf-ls-2
+wprintf-s-1 中文
+wprintf-s-2 -N噀 # actually a UTF-16 "中文"
+wprintf-ls-1
+wprintf-ls-2
+```
+
+Even so, it still has some problems with `wprintf`
+
+ GCC-UCRT shows similar behavior to MSVC in that with `setlocale`, wide strings are output as a converted MBCS and question marks without `setlocale`.
+```shell
+printf-s-1 中文
+printf-s-2 -N噀
+printf-ls-2 中文
+wprintf-s-1 中文
+wprintf-s-2 -N噀
+wprintf-ls-1 ??
+wprintf-ls-2 中文
+```
+
+and MSVC 19.30.30705 gives the following output
+
+```shell
+printf-s-1 中文
+printf-s-2 -N噀
+printf-ls-2 中文
+wprintf-s-1 ??
+wprintf-s-2 中文
+wprintf-ls-1 ??
+wprintf-ls-2 中文
+```
+
+Without setting the locale, these are the results
+
+- GCC-MSVCRT
+
+```shell
+printf-s-1 中文
+printf-s-2 -N噀
+printf-ls-2
+wprintf-s-1 中文
+wprintf-s-2 -N噀
+wprintf-ls-1
+wprintf-ls-2
+```
+
+- GCC-UCRT64
+
+```shell
+printf-s-1 中文
+printf-s-2 -N噀
+printf-ls-2
+wprintf-s-1 中文
+wprintf-s-2 -N噀 
+wprintf-ls-1 ??
+wprintf-ls-2 ??
+```
+
+- MSVC 19.30.30705
+
+```shell
+printf-s-1 中文
+printf-s-2 -N噀
+printf-ls-2 wprintf-s-1 ??
+wprintf-s-2 ??
+wprintf-ls-1 ??
+wprintf-ls-2 ??
+```
+
+`std::cout` and `std::wcout` works in a similar way to `printf("%s")` and `wprintf("%ls")`.
+
