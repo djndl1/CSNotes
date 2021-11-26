@@ -1,5 +1,68 @@
 #+TITLE: Pwsh
 
+* What Pwsh is, what it can do
+
+1. a CLI interpreter, a scripting langguage, a shell
+
+2. Object-based, well integrated with Windows's API-based system
+
+** Simple Examples To show what it can do
+
+*** Pipelining
+
+#+begin_src powershell
+$total = 0
+Get-ChildItem | ForEach-Object($total += $_.length)
+
+Get-ChildItem | Sort-Object -Property Length | Select-Object -First 1
+#+end_src
+
+*** Control-Flow
+
+#+begin_src powershell
+foreach ( $i in 1..10 ) { if ($i % 2) { "$i is odd" } }
+# or
+1..10 | foreach { if ($_ % 2) { "$_ is odd " } }
+#+end_src
+
+*** Functions and Scripts
+
+*** Remote Administration
+
+Core: =Invoke-Command= invokes a block of pwsh script on one or more local/remote computers.
+
+** Core Concepts
+
+Based KornShell POSIX shell and aligned with C#
+
+- Case-Insensitive but Case-Sensitive Code easy to read
+
+*** Commands and cmdlets
+
+The common pwsh format:
+
+#+begin_src powershell
+command -SwitchParameter -ParameterWithArgument arg1 PositionalArgument
+#+end_src
+
+- Pwsh has a smart parameter binder system, which can identify arguments by types, or convert if necessary. Pwsh respect POSIX end-of-parameter =--=
+
+**** Categories
+
+1. /Cmdlets/: implemented by a .NET class derived from =Cmdlet=, specific to the Pwsh environment, in the form of a DLL library.
+
+2. /Functions/
+
+3. /Scripts/: code inside a text file
+
+4. /Native commands/
+
+5. /Device State Configuration/: a configuration management platform in Windows PowerShell
+
+*** Aliases and Elastic Syntax
+
+Various command aliases can be defined (no arguments though). Parameters can also have aliases, defined by their authors.
+
 * Help
 
 - =Get-Alias=
@@ -10,7 +73,7 @@
 
 * Basics: Everything in PowerShell is an Object
 
-- =Set-StrictMode=: use this to enforce good
+- =Set-StrictMode=: use this to enforce good practice
 
 ** Automatic Variables
 
@@ -211,3 +274,9 @@ Powershell gallery and =PowerShellGet= Module.
 *** Structured Data
 
 1. =ConvertTo-Csv=, =CovertFrom-Csv=, =Import-Csv=, =Export-Csv=
+
+* Style and Best Practice
+
+** Style
+
+1. Use aliases for interactive input and full names for scripting
