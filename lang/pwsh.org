@@ -118,7 +118,76 @@ Several =Out-*= cmdlets are responsible for finding the correct formatter for ob
 
 - =Get-Help= can be updated
 
-* Types
+* Type System
+
+* Providers and its use: COM and CIM
+
+A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
+
+- =Get-PSProvider=, =Get-PSDrive=
+
+A provider provides the core activities groped by =Item=, =ChildItem=, =ItemProperty=, =Content=, =Location=, =Path= =PSDrive= and =PSProvider=.
+(help =aoubt_Core_Commands= and =about_providers=). Each provider has at least one drive (=PSDrive=) associated with it.
+
+PSDrives can also be accessed directly by using namespace of =PSProvider=
+
+#+begin_src powershell
+cd FileSystem::\\localhost\c$ # same as "cd C:\"
+#+end_src
+
+** FileSystem
+
+- Hidden files are not displayed by default and a =-Force= parameter is required.
+
+- =-LiteralPath= parameter suppresses pattern-matching and related special characters.
+
+** The Registry
+
+The Registry is mounted as several PSDrives. Under them there are items (keys), their properties and child items (subkeys)
+
+
+** COM
+
+Pwsh can load COM with its own adaption layer without the use of .NET/COM interop. =-Switch= enforces this by throwing an error if .NET one is loaded.
+
+COM objects are located in a GUID, not a friendlier alias =ProgID= (=<Program>.<Component>.<Version>=) exists for use.
+
+#+begin_src powershell
+$shell = New-Object -ComObject Shell.Application
+$shell.Explore('C:\Temp') # this opens up the file explorer and navigates to C:\Temp
+#+end_src
+
+There are some problems with Pwsh's support for COM. Many COM components are 32-bit and a 32-bit pwsh must be launched to use them. Also, some COM objects have different .NET wrappers, giving them different interfaces.
+
+** CIM
+
+Provides a common definition of management information for systems, networks, applications and services.
+
+All CIM classes are identified by a path of =\\computer\namespace\namespace:class=. The default namespace is =root\cimv2=.
+
+- =Get-CimClass=: retrieves class structures of specified CIM classes, also for retrieving available CIM classes.
+
+- =Get-CimInstance=: With =-ComputerName=, it retrives data from a remote computer. =-Filter= and WQL query is available for filtering and other use.
+
+- =New-CimInstance=: ??. Instances are then deleted by =Remove-CimInstance=
+
+- =Set-CimInstance=: modify a property value on a CIM instance.
+
+  CIM classes have methods to call.
+
+ =-Invoke-CimMethod=
+
+#+begin_src powershell
+<# This starts a new calculator #>
+Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine = 'calc.exe'}
+#+end_src
+
+*** CIM Remoting
+
+Create a session (=New-CimSession=) and pass it to =Get-CimInstance=
+
+Some of the pwsh cmdlets are actually implemented as a wrapper around CIM classes, which accepts a =-CimSession= parameter.
+
 
 * Basics: Everything in PowerShell is an Object
 
