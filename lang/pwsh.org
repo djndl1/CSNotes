@@ -63,7 +63,54 @@ command -SwitchParameter -ParameterWithArgument arg1 PositionalArgument
 
 Various command aliases can be defined (no arguments though). Parameters can also have aliases, defined by their authors.
 
-* Help
+*** Quoting
+
+Unlike bash, pwsh escapes using =`= instead of =\=
+
+*** Command-Mode and Expression-Mode
+
+In expression mode, strings must be quoted, numbers are always numbers.
+In command mode, everything except numbers is treated as strings unless they start with =$=, =@=, ='=, ="=.
+
+*** Statement Termination
+
+A newline can end a syntatically complete statement. If not complete, the newline is treated like any other whitespace. =`=  continues a non-extensible line. Strings are not terminated by a newline character.
+
+** Pipeline
+
+Unlike most shells where separate processes are used for elements in the pipeline, in pwsh, pipelining is implemented in a way similar to a real production line, in which one output object by the last command is immediately pushed to the next command, without waiting for to the entire process to finish.
+
+*** Parameter Binding
+
+**** How parameters are bound when pipelining:
+
+The binding process is controlled by declaration information on the command itself: the type, the optional/mandatory and the pipeline attribute. There is an involved algorithm under the hood to make the binding do what the user wants.
+
+A cmdlet must explicitly build in pipeline support for one or more parameters. =Accept pipeline input?= in the help article describes if this parameter can be bound to pipelined input.
+
+- =ByValue=: by the type of the object passed in, only one parameter can be passed via =ByValue=
+
+- =ByPropertyName=: if the passed object has properties matching certain parameter names
+
+** Display Formatting
+
+Formatting is managed by pwsh with an XML database, detailing how each object should be formatted on screen. A list of =Format-*= commands are at users' disposal.
+
+- =Format-Table= and =Format-List= are most used.
+
+- =Format-Wide= shows some concise info
+
+- =Format-Custom= display objects while preserving its basic structure
+
+Several =Out-*= cmdlets are responsible for finding the correct formatter for objects and output them in different ways (not just to terminals).
+
+- =Out-File=: sending output to a file, also used by IO redirection
+
+- =Out-String=: output as a string (or a stream of strings)
+
+- =Out-GridView=: a new grid window
+
+** Help
 
 - =Get-Alias=
 
@@ -71,9 +118,10 @@ Various command aliases can be defined (no arguments though). Parameters can als
 
 - =Get-Help= can be updated
 
+* Types
+
 * Basics: Everything in PowerShell is an Object
 
-- =Set-StrictMode=: use this to enforce good practice
 
 ** Automatic Variables
 
@@ -132,17 +180,6 @@ $users = [PSCustomObject]@{
 }
 #+end_src
 
-* Combining Commands
-
-** Pipelining
-
-**** How parameters are bound when pipelining:
-
-A cmdlet must explicitly build in pipeline support for one or more parameters. =Accept pipeline input?= in the help article describes if this parameter can be bound to pipelined input.
-
-- =ByValue=: by the type of the object passed in, only one parameter can be passed via =ByValue=
-
-- =ByPropertyName=: if the passed object has properties matching certain parameter names
 
 * Control Flows
 
@@ -280,3 +317,5 @@ Powershell gallery and =PowerShellGet= Module.
 ** Style
 
 1. Use aliases for interactive input and full names for scripting
+
+- =Set-StrictMode=: use this to enforce good practice
