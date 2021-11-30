@@ -227,6 +227,22 @@ Join the lements of a collection into a single string or split strings into a co
 
 =-split= accepts a complex scriptblock.
 
+*** Logical and bitwise operators
+
+- =-and=, =-or=, =-not=, =-xor=
+
+- =-band=, =-bxor=, =-bnot=, =-shl=, =-shr=
+
+*** =.where()= and =.foreach()= methods
+
+#+begin_src shell
+(Get-Process).where({$_.handles -gt 1000})
+($data).ForEach({$_ * 2})
+$data.ForEach([double]) | Get-Member
+(Get-Process).foreach('Name')
+#+end_src
+
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
