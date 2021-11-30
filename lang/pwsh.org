@@ -10,7 +10,7 @@
 
 *** Pipelining
 
-#+begin_src powershell
+#+begin_src shell
 $total = 0
 Get-ChildItem | ForEach-Object($total += $_.length)
 
@@ -19,7 +19,7 @@ Get-ChildItem | Sort-Object -Property Length | Select-Object -First 1
 
 *** Control-Flow
 
-#+begin_src powershell
+#+begin_src shell
 foreach ( $i in 1..10 ) { if ($i % 2) { "$i is odd" } }
 # or
 1..10 | foreach { if ($_ % 2) { "$_ is odd " } }
@@ -41,7 +41,7 @@ Based KornShell POSIX shell and aligned with C#
 
 The common pwsh format:
 
-#+begin_src powershell
+#+begin_src shell
 command -SwitchParameter -ParameterWithArgument arg1 PositionalArgument
 #+end_src
 
@@ -120,6 +120,113 @@ Several =Out-*= cmdlets are responsible for finding the correct formatter for ob
 
 * Type System
 
+Dynamic-typed with intuitive conversion
+
+** Members
+
+- /Synthetic/: a pwsh layer member extension to an object. A pwsh object can be even made purely out of synthetic members with no "native" properties at all.
+
+- /Native/: members defined by the object's type in NET/COM/CIM etc.
+
+- /Fallback/: defined by the pwsh itself.
+
+** Basic Types and Literals
+
+- /String/: .NET string. Here strings (more like a multiline string literal)
+
+- Numeral: pwsh supports multiplier suffix (=KB=, =MB=, =GB=, =TB=)
+
+- =HashTable= (=System.Collections.HashTable=): =@{ name1 = vallue2; ... }=. Key can be accessed like a member =htbl.name1=, or in batch =htbl[keys]=. =foreach= in pwsh does not consider =HashTable= to be a collection type, =.GetEnumerator()= must be explicitly used. Ordered =System.Collections.Specialized.OrderedDictionary= is also available =[ordered]@{ ... }=
+
+- =Array=: there is no array literal in pwsh, =A,B,C,D= is a sequence. Any object is a pseudo-array and has a =.Count= property. Pipeline output is collected into an array. Arrays are weakly typed and thus polymorphic by default.
+
+ #+begin_src shell
+(, 1) # singleton
+@() # empty array
+ #+end_src
+
+- /Type Literal/: =[TypeName]=. This is not a mere type cast but also a data conversion or used to invoke a static method. Pwsh searches type names first in the type alias table, then check the full name and finally try to append a =System=.
+
+#+begin_src shell
+[char[]] '123'
+[int[]] '123'
+[System.Collections.Generic.List[int]]
+[String]::Join(' + ', @(1, 2, 3))
+[int[]] [char[]] 'Hello world'
+#+end_src
+
+*** Type Conversion Algorithm
+
+* Operators and Expressions
+
+** Arithmetic
+
+- =+=: addition, string concatenation, collection join
+
+- =*=: multiplication, string multiplication,
+
+** Assignment
+
+Assignment in Pwsh is also a value expression
+
+#+begin_src shell
+$a, $b, $c = 1, 2, 3, 4
+$a, $b = $b, $a
+
+$data = cat -Path .\csv.csv | foreach {
+    $e = @{}
+    $e.level, [int] $e.lower, [int] $e.upper = -split $_
+    $e
+}
+#+end_src
+
+** Comparison
+
+**** =-gt=, =-ge=, =-le= =-lt= =-eq= =-ne= and their case-sensitive (=-ceq=) and case-insensitive (=-ieq=) version. (All shell languages have been using =<= and =>= for IO redirection).
+
+The behavior of the comparison operators is significantly affected by the type of left operand (e.g. type conversion).
+
+If the operands are not strings and numbers, the .NET comparison mechanisms are used
+
+1. =IComparable= interfaces
+
+2. =.Equals()= method
+
+3. Convert the right operand into the type of the left
+
+Basic comparison involving a collection and a scalar is a filter operation.
+
+#+begin_src shell
+1,2,3,4,5,6 -gt 2 # any numbers greater than 2
+#+end_src
+
+**** =-contains=, =-notcontains=, =-in=, =-notin= and their friends.
+
+** Pattern Matching and Text Manipulation
+
+These operators also have case-sensitive and case-insensitive versions.
+
+- =-like=, =-notlike=: wildcard matching
+
+- =-match=, =-notmatch=: regex matching. =$matches= is set and represents the matched part.
+
+- =-replace=: regex substitution
+
+- =ireplace=: deletion of the regex matched
+
+** =-split= and =-join=
+
+Join the lements of a collection into a single string or split strings into a collection of substrings
+
+#+begin_src shell
+1,2,3 -join '+'
+
+'a:b:c:d:e' -split ':'
+'a:b:c:d:e' -split ':',3
+#+end_src
+
+=-split= accepts a complex scriptblock.
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
@@ -131,7 +238,7 @@ A provider provides the core activities groped by =Item=, =ChildItem=, =ItemProp
 
 PSDrives can also be accessed directly by using namespace of =PSProvider=
 
-#+begin_src powershell
+#+begin_src shell
 cd FileSystem::\\localhost\c$ # same as "cd C:\"
 #+end_src
 
@@ -152,7 +259,7 @@ Pwsh can load COM with its own adaption layer without the use of .NET/COM intero
 
 COM objects are located in a GUID, not a friendlier alias =ProgID= (=<Program>.<Component>.<Version>=) exists for use.
 
-#+begin_src powershell
+#+begin_src shell
 $shell = New-Object -ComObject Shell.Application
 $shell.Explore('C:\Temp') # this opens up the file explorer and navigates to C:\Temp
 #+end_src
@@ -177,7 +284,7 @@ All CIM classes are identified by a path of =\\computer\namespace\namespace:clas
 
  =-Invoke-CimMethod=
 
-#+begin_src powershell
+#+begin_src shell
 <# This starts a new calculator #>
 Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine = 'calc.exe'}
 #+end_src
