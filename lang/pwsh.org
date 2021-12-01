@@ -138,7 +138,7 @@ Dynamic-typed with intuitive conversion
 
 - =HashTable= (=System.Collections.HashTable=): =@{ name1 = vallue2; ... }=. Key can be accessed like a member =htbl.name1=, or in batch =htbl[keys]=. =foreach= in pwsh does not consider =HashTable= to be a collection type, =.GetEnumerator()= must be explicitly used. Ordered =System.Collections.Specialized.OrderedDictionary= is also available =[ordered]@{ ... }=
 
-- =Array=: there is no array literal in pwsh, =A,B,C,D= is a sequence. Any object is a pseudo-array and has a =.Count= property. Pipeline output is collected into an array. Arrays are weakly typed and thus polymorphic by default.
+- =Array=: there is no array literal in pwsh, =A,B,C,D= is not an array literal but a sequence of expressions (comma expressions). Any object is a pseudo-array and has a =.Count= property. Pipeline output is collected into an array. Arrays are weakly typed and thus polymorphic by default.
 
  #+begin_src shell
 (, 1) # singleton
@@ -242,6 +242,40 @@ $data.ForEach([double]) | Get-Member
 (Get-Process).foreach('Name')
 #+end_src
 
+** Type Operators
+
+- =-is=, =-isnot=, =-as=: the type operand can be a type literal or a string. =-as= is more aggressive in pwsh than in C#.
+
+** Unary Operators
+
+- =-not=, =-=, =+=, =++=, =--=, =,= (one-element array)
+
+- =[type]=: the output of an expression can be discarded by casting it to =[void]=.
+
+** Grouping and Subexpressions
+
+- parenthesis grouping: =(Get-ChildItem).Count=. Pipelines are allowed.
+
+- subexpression =$(statementList)= group collections of statements. subexpression voids voidable expressions =$($a++)= returns nothing.
+
+- array subexpression =@(...)=: groups collections of statements and returns the result as an array. This is convenient since it does not wrap an array with another array but wraps a single element with an array.
+
+ #+begin_src shell
+@(dir c:\; dir d:\) # a shorthand for [object[]] $(...)
+ #+end_src
+
+** Range Operator and Index Operator
+
+- =valueExpression..valueExpression=: high precendence than all binary operators
+
+- =arr.[idx]=: supports negative indices and slicing
+
+ #+begin_src shell
+(1,2,3)[-1]
+(1,2,3,4,5)[-1,-2]
+(1,2,3,4,5)[0..2]
+$2d[ (0,0) , (1,0) ] # $2d[0,0] and $2d[1,0]
+ #+end_src
 
 * Providers and its use: COM and CIM
 
