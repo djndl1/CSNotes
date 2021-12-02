@@ -145,7 +145,7 @@ Dynamic-typed with intuitive conversion
 @() # empty array
  #+end_src
 
-- /Type Literal/: =[TypeName]=. This is not a mere type cast but also a data conversion or used to invoke a static method. Pwsh searches type names first in the type alias table, then check the full name and finally try to append a =System=.
+- /Type Literal/: =[TypeName]=. This is not a mere type cast but also a data conversion or used to invoke a static method. Pwsh searches type names first in the type alias table, then check the full name and finally try to append a =System=. A type literal itself returns a type object.
 
 #+begin_src shell
 [char[]] '123'
@@ -276,6 +276,29 @@ $data.ForEach([double]) | Get-Member
 (1,2,3,4,5)[0..2]
 $2d[ (0,0) , (1,0) ] # $2d[0,0] and $2d[1,0]
  #+end_src
+
+**  Fallback dot operator
+
+If the object itself doesn’t have a property and that object is a collection, PowerShell will check the contained objects to see if that member exists and return a collection of those values.
+
+#+begin_src shell
+$names = ( $obj | Get-Member -Type property l*).name
+#+end_src
+
+** using namespace and assembly
+
+- =Add-Type=
+
+#+begin_src shell
+using asssembly Oracle.ManagedDataAccess
+using namespace Oracle.ManagedDataAccess.Client
+#+end_src
+
+** Dynamic method invocation
+
+#+begin_src shell
+[math]::$methodName.Invoke(2,3)
+#+end_src
 
 * Providers and its use: COM and CIM
 
