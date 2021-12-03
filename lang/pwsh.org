@@ -300,6 +300,82 @@ using namespace Oracle.ManagedDataAccess.Client
 [math]::$methodName.Invoke(2,3)
 #+end_src
 
+** Format Operator
+
+A shorthand for =System.String.Format=
+
+** Redirection Operations
+
+Available output streams are much more than POSIX shell. Input redirection is not available in pwsh.
+
+- =*=: all output
+
+- =1=: success output
+
+- =2=: errors
+
+- =3=: warnings
+
+- =4=: verbose output
+
+- =5=: debug output
+
+- =6=: info messages
+
+#+begin_src shell
+ > outputFile
+ >> outputFile
+ 2> errorFile
+ 2>> errorFile
+ 2>&1
+ 2> $null
+
+ # under the covers
+ | out-fiel -path outputFile
+#+end_src
+
+** Variables
+
+Reside inside the =variable= PSDrive.
+
+#+begin_src shell
+Test-Path -Path variable:variableName
+
+[int] $var = -2
+
+# Pwsh supports attribute-constrained variables
+[ValidateLength(0, 5)] [string] $cv = ''
+
+${this is a variable name}
+$_this_is_also_a_varname
+
+# a global variable
+$global:MyGlobalName = 123
+$env:envvar
+
+# the variable notation can even access files, not implemented in Registry though
+${C:\Users\020959\source\repos\SqlTemp\out.txt} = 123
+#+end_src
+
+*** Variable cmdlets
+
+#+begin_src shell
+Import-Csv myVars.csv | foreach { Set-Variable -Name $_.Name -Value $_.Value }
+Get-Variable -ValueOnly pwd
+Remove-Variable myvar
+Set-Variable -Option Constant -Name myconst -Value myvalue # set constant
+#+end_src
+
+pwsh has something similar to Python's =*args=
+
+#+begin_src shell
+function s {
+    param ($x, $y, $z)
+    ...
+}
+s @list
+#+end_src
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
