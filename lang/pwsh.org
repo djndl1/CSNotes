@@ -376,6 +376,51 @@ function s {
 s @list
 #+end_src
 
+* Flow Control
+
+** Conditional
+
+={}= is not to leave out. Although not a FP language, it is possible to assign the result of a if subexpression to a variable
+
+#+begin_src shell
+$result = $(if ((Test-Path -Path Variable:result)) { 6 })
+
+if (boolean expression1) {
+       ...
+} elseif (boolean expression2) {
+       ...
+} else {
+       ...
+}
+#+end_src
+
+** Looping
+
+#+begin_src shell
+while () { stmts }
+do { stmts } while ()
+do { stmts } until ()
+for ( ; ; ) { stmts }
+foreach ($var in <pipeline>) { stmts }
+#+end_src
+
+Subexpressions are a blessing!
+
+#+begin_src shell
+for ($($result=@(); $i=0); $i -lt 5; $i++) { $result += $i }
+
+for ($($i = 3; $j = 3); ($i -lt 10) -and ($j -lt 10); $($i++, $j++)) { '{0} {1}' -f $i,$j }
+
+# there is a special loop variable
+foreach ($i in 1..10)
+{ [void] $foreach.MoveNext(); $i + $foreach.Current }
+
+# strings and hashtables are not treated as an IEnumerable
+foreach ($i in "hi") {$i }
+#+end_src
+
+** =Switch=: pattern matching, branching and iteration
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
