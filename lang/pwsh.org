@@ -421,6 +421,48 @@ foreach ($i in "hi") {$i }
 
 ** =Switch=: pattern matching, branching and iteration
 
+#+begin_src shell
+# basic usage
+$a = switch (1) { 1 { 'one' } }
+
+# pattern matching
+switch -wildcard ('abc') { a* { 'astar' } *c {'starc' + "$_" } } # $_ is matched original object
+switch -regex ('abc') { '(^a)(.*$)' { $matches } }
+
+# conditional branching
+switch (8) {
+ { $_ -gt 3 } { 'greater than three' }
+ {$_ -gt 7 } { 'greater than 7' }
+ }
+
+# loop, like a foreach with conditional if inside
+switch (1,2,3,4,5,6) {
+    { $_ % 2 } { "Odd $_"; continue }
+            4 { 'Four' }
+    default { "Even $_" }
+}
+
+switch -wildcard (Get-ChildItem c:\windows) {
+    ,*.dll {$dll++}
+    ,*.txt {$txt++}
+    ,*.log {$log++}
+}
+
+switch -regex -file $env:TEMP\files.txt { # regex-match files.txt line by line
+'\.log$' {$lg++}
+'\.tmp$' {$tm++}
+'\.cvr$' {$cr++}
+}
+
+switch ($options){
+    '-a' { $a=$true }
+    '-b' { [void] $switch.MoveNext(); $b= $switch.Current } # swtich loop enumerator
+    '-c' { $c=$true }
+    '-d' { $d=$true }
+}
+
+#+end_src
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
