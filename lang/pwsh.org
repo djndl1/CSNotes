@@ -463,6 +463,43 @@ switch ($options){
 
 #+end_src
 
+** Flow Control cmdlet
+
+*** =ForEach-Object=
+
+Mapping
+
+#+begin_src shell
+# - | ForEach-Object <scriptBlocK>
+ Get-ChildItem *.txt | foreach-object {$_.length} # %{$_.Length}
+
+# - | ForEach-Object -Begin <> -Process <> -End <>
+Get-Process | %{$t = 0}{ $t += 1 }{$t}
+
+# Like all cmdlets, output of collections gets unravelled
+1,(2,3) | % {$_} # Length of 3
+$b = (1, (2,3)) | %{ ,$_ } # length of 2
+
+# - | ForEach-Object <operational statement>
+Get-Process | ForEach-Object ProcessName
+'test', 'strings' | foreach ToUpper
+#+end_src
+
+*** =Where-Object=
+
+Filtering
+
+#+begin_src shell
+1..10|?{!($_-band 1)}
+
+
+Get-Process | where {$_.Handles -gt 1000}
+
+# allowed but not recommended
+Get-Process | where -Property Handles -Value 1000 –gt
+Get-Process | where Handles 1000 -gt
+#+end_src
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
