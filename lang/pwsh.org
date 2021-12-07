@@ -497,8 +497,48 @@ Get-Process | where {$_.Handles -gt 1000}
 
 # allowed but not recommended
 Get-Process | where -Property Handles -Value 1000 –gt
-Get-Process | where Handles 1000 -gt
+
 #+end_src
+
+
+* Functions
+
+** Simple Functions (like a bash function)
+
+#+begin_src shell
+function <name> { <statement list> } # $args separated by $OFS
+
+function ql { $args }
+function qs { "$args" }
+
+function <name> (paramList) { <statements> }
+function <name> { param <paraList> <statements> }
+
+function subtract ($minuend, $subtrahend) { $minuend - $subtrahend }
+subtract 10 12 # as a cmdlet without parentheses not a method
+subtract -minuend 10 -subtrahend 12
+ubtract -minuend 10  12
+subtract -subtrahend 12  10
+
+function nadd ([int] $augend = 0, [int] $addend = 1) { $augend + $addend}
+function nadd ([int] $augend ) { ($args | ForEach-Object { $augend += $_ }); $augend } # extra arguments are saved to $args
+
+function bar ([switch] $x) { "x is $x"; foo -s: $x } # switch parameter is a boolean and can be passed
+#+end_src
+
+*** Parameter Binding to named and position parameters
+
+1. Any named parameters are bound and then removed from the list of parameters still to be bound
+
+2. Any remaining parameters are bound by position
+
+
+To mix and match, always put the
+parameters that you want to specify by name at the end of the parameter list;
+
+*** Return and Output
+
+There is no return value since pwsh is a shell. A function just emits output. Unused expressions or return value from methods will be output (Be caution when using .NET methods). The =return= value is mainly used to exit early.
 
 * Providers and its use: COM and CIM
 
