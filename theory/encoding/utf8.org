@@ -1,0 +1,17 @@
+#+TITLE: Utf8
+
+* Prerequisites
+
+** Endianness
+
+Normally this refers to byte endianness, but information can be stored in small or large groups of binary bits. So endianness might refer to endianess of bits (bit numbering, typically used in low-level transmission protocol), octets, hextets, words, etc. The most common positional notation used in mathematics is digit-big-endian: =123456=, with the most significant digit at the first place.
+
+In computing, endianness refers to the ordering of a sequence of storage cells (usually in octets) that represents a primitive data type that can be manipulated by a single hardware instruction. Typically, the first storage cell would be at the lower address of memory. The relation between "significance" of a storage cell in the data and its order determines the endianness.
+
+- /big-endianness/: decreasing numeric significance with increasing memory addresses (or increasing time)
+
+- /little-endianness/: increasing numeric significance with increasing memory addresses (or increasing time)
+
+Some architectures uses different byte endianness for integers and floating-point numbers. Some even has different endianness conventions for words and bytes inside a double-precision number.
+
+Side note: in C, the index of an array member increases with its pointer (virtual memory address).
