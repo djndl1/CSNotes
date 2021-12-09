@@ -506,6 +506,8 @@ Get-Process | where -Property Handles -Value 1000 –gt
 
 * Functions
 
+Functions reside in =Function:/=, which can be removed from the current session by =Remove-Item=
+
 ** Simple Functions (like a bash function)
 
 #+begin_src shell
@@ -542,6 +544,28 @@ parameters that you want to specify by name at the end of the parameter list;
 *** Return and Output
 
 There is no return value since pwsh is a shell. A function just emits output. Unused expressions or return value from methods will be output (Be caution when using .NET methods). The =return= value is mainly used to exit early.
+
+*** Simple Functions and Pipeline
+
+#+begin_src shell
+<# special enumerator variable $input, produced by the prior cmdlet
+   this is not streaming processing
+#>
+function sum {
+    $total = 0
+    foreach ($n in $input) {
+        $total += $n
+    }
+    $total
+}
+
+# cmdlet-like pipeline function
+function sum {
+    begin { $total = 0; }
+    process { $total += $_ }
+    end { $total }
+}
+#+end_src
 
 * Providers and its use: COM and CIM
 
