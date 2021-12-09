@@ -567,6 +567,23 @@ function sum {
 }
 #+end_src
 
+*** Variable Scoping in Functions
+
+Pwsh uses /hygienic dynamic scoping/, with which an inner variable shadows an outer variable. Unix shells all use dynamic scoping since unix shells are process-based: a child will inevitably inherit its parent's exported variables.
+
+#+begin_src shell
+$x = 7
+function one { "x is $x"}
+function two { $x = 22; one}
+
+one # 7
+two # 22
+one # 7
+
+# to use the global x
+function one {"x is $global:x"}
+#+end_src
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
