@@ -17,3 +17,13 @@ Some architectures uses different byte endianness for integers and floating-poin
 Side note: in C, the index of an array member increases with its pointer (virtual memory address).
 
 * UTF-8
+
+The one-byte part are the same as US-ASCII.
+
+The multibyte-byte parts starts with a header byte and several continuation bytes with =10= as their markers. There are three types of bytes: leading bytes (starts with several =1= and then a =0=), continuation bytes (starts with =10=) and ascii bytes (starts with a =0=)
+
+#+begin_src python
+A # 0_1100001
+α # 110_01110 10_110001
+中 # 1110_0100 10_111000 10_101101
+#+end_src
