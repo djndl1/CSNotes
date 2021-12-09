@@ -1,4 +1,4 @@
-#+TITLE: Utf8
+#+TITLE: Unicode
 
 * Prerequisites
 
@@ -15,3 +15,5 @@ In computing, endianness refers to the ordering of a sequence of storage cells (
 Some architectures uses different byte endianness for integers and floating-point numbers. Some even has different endianness conventions for words and bytes inside a double-precision number.
 
 Side note: in C, the index of an array member increases with its pointer (virtual memory address).
+
+* UTF-8
