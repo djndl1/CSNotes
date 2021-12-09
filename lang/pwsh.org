@@ -294,10 +294,13 @@ using asssembly Oracle.ManagedDataAccess
 using namespace Oracle.ManagedDataAccess.Client
 #+end_src
 
-** Dynamic method invocation
+** Dynamic method/property invocation
 
 #+begin_src shell
 [math]::$methodName.Invoke(2,3)
+
+$l = 'Length'
+(1,2,3).$l # (1,2,3).Length
 #+end_src
 
 ** Format Operator
