@@ -16,6 +16,22 @@ Some architectures uses different byte endianness for integers and floating-poin
 
 Side note: in C, the index of an array member increases with its pointer (virtual memory address).
 
+** Character Encodings
+
+The process of /assigning numbers (code points) to graphical characters/. All these code points make up a /code space/, /code page/ (originally coded in graphics hardware in IBM PC) or a /character map/.
+
+- /character/:  a minimal unit of text with semantic value
+
+- /character set/: a collection of characters that might be used by multiple languages
+
+- /coded character set/: a character set in which each character corresponds to a unique number
+
+- /code point/: any allowed value in a coded character set, consisting of one or more code units.
+
+- /code space/: a set of code points
+
+- /code unit/ or /code value/: a bit sequence to encode each character of a repertoire (the abstract set of characters of concern) within a given encoding form.
+
 * UTF-8
 
 The one-byte part are the same as US-ASCII.
