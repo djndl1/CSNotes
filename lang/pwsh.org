@@ -584,6 +584,52 @@ one # 7
 function one {"x is $global:x"}
 #+end_src
 
+** Advanced Functions
+
+#+begin_src shell
+# Advanced functions
+function Install-Software {
+   [CmdletBinding()]
+   param(
+    [Parameter()]
+    [ValidateSet('1','2')]
+    [string]$Version = 2
+
+    [Parameter(Mandatory, ValueFromPipeline)]
+    [string]$ComputerName
+   )
+   process { # where the main code should live
+       Write-Host "I installed software version $Version on $ComputerName. Yippee!"
+   }
+}
+
+#+end_src
+
+** Scripts
+
+The /execution policy/ of Pwsh by default prevents users from running scripts. For Windows Servers 2012 and above, =RemoteSigned= is the default execution policy which allows the user to run a local script. If administrator privilege is not available, use =-Scope Process= with =Set-ExecutionPolicy= to set just for the current session.
+
+Argument passing is the same as passing them to basic functions (=$args=), or using the =param()= statement as the first executable line of a script. Exit a script by calling =exit=
+
+A script forms a script variable scope which can be referenced by =scriptname:variablename=.
+
+To reference a script, =. script.ps1= just like any other POSIX shells (a module is recommended for authoring a script library though). Like most shells, Pwsh searches scripts using =$PATH=
+
+By default pwsh uses =-Command= if command arguments are provided. Use =-File= to execute a script to avoid whitespace-related problems. There is some difference between the two.
+
+#+begin_src shell
+powershell -Command ./myscripts.ps1 # starts a pwsh and execute a script
+powershell -File ./myscript.ps1 # starts a pwsh and run everything inside the script
+#+end_src
+
+*** Calling Operator and dot-sourcing
+
+Different when calling functions and scripts, same for cmdlets and external programs.
+
+- =&=, the calling operator: scripts and functions are executed in a child scope (just like a POSIX shell would start a new process)
+
+- =.=, the dot-source operator: executes scritps and functions in the current scope. Typically used to modify the caller's scope by adding functions, aliases and possibly variables for later use
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
@@ -714,61 +760,6 @@ $users = [PSCustomObject]@{
 #+end_src
 
 
-* Control Flows
-
-** Logic Operators
-
-https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comparison_operators?view=powershell-7.1
-
-#+begin_src shell
-if (Test-Connection -ComputerName offlineserver -Quiet -Count 1) {
-
-} elseif {
-}
-   else {
-}
-
-switch (expression) {
-    expressionvalue {
-        # Do something with code here.
-    }
-    expressionvalue {
-    }
-    default {
-        # Stuff to do if no matches were found
-    }
-}
-
-foreach ($server in $servers) {
-    Get-Content -Path "\\$server\c$\App_configuration.txt"
-}
-
-$servers = @('SRV1','SRV2','SRV3','SRV4','SRV5')
-ForEach-Object -InputObject $servers -Process {
-Get-Content -Path "\\$_\c$\App_configuration.txt"
-}
-
-$servers.foreach({Get-Content -Path "\\$_\c$\App_configuration.txt"})
-
-for ($i = 0; $i -lt 10; $i++) {
-        $i
-}
-
-while (Test-Connection -ComputerName $problemServer -Quiet -Count 1) {
-          Get-Content -Path "\\$problemServer\c$\App_configuration.txt"
-          break
-}
-
-do {
-} while (condition)
-
-do {
-} until (condition)
-
-#+end_src
-
-#+RESULTS:
-
 * Error Handling
 
 ** Handling Nonterminating Errors
@@ -786,29 +777,6 @@ try {
     # code that runs if terminating error found
 } finally {
     # code that runs at the end
-}
-
-#+end_src
-
-* Functions
-
-Verb-Noun naming
-
-#+begin_src shell
-# Advanced functions
-function Install-Software {
-   [CmdletBinding()]
-   param(
-    [Parameter()]
-    [ValidateSet('1','2')]
-    [string]$Version = 2
-
-    [Parameter(Mandatory, ValueFromPipeline)]
-    [string]$ComputerName
-   )
-   process { # where the main code should live
-       Write-Host "I installed software version $Version on $ComputerName. Yippee!"
-   }
 }
 
 #+end_src
