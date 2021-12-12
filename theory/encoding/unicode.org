@@ -32,6 +32,22 @@ The process of /assigning numbers (code points) to graphical characters/. All th
 
 - /code unit/ or /code value/: a bit sequence to encode each character of a repertoire (the abstract set of characters of concern) within a given encoding form.
 
+* Unicode
+
+A standard for the consistent encoding, representation, and handling of text expressed in most of the world's writing systems. Maintained by the Unicode Consortium.
+
+Unicode can be implemented by different character encodings: UTF-8, UTF-16, UTF-32 and even GB18030.
+
+** Issues
+
+- Han Unification, alternative CJK encoding, Unicode variation sequences.
+
+- Combining characters are often not rendered correctly.
+
+* ISO 10464 (UCS)
+
+A standard set of character originally defined by ISO, later synchronized with Unicode, currently a subset of Unicode.
+
 * UTF-16
 
 The original Unicode encoding scheme (UCS-2) was not sufficient and UCS-4 was too space-inefficent.
@@ -44,7 +60,7 @@ U+10437
 1. subtracting 0x10000 leaves 0x0437
 2. right shift by 10 and add 0xD800 = 0xD801 (high surrogate)
 3. take the lower 10 bits and add 0xDC00 = 0xDC37
-#+
+#+end_quote
 
 * UTF-8
 
