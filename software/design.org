@@ -9,7 +9,7 @@ This is done by define a separate mediator object that encapsulates the interact
 objects and the objects delegate the interaction to the mediator.
 
 #+begin_src csharp
-// a wikipedia example, a chatroom broadcast
+// a wikipedia example
 public delegate void MessageReceivedEventHandler(string message, string sender);
 
 public class Mediator
@@ -51,3 +51,19 @@ public class Person
     }
 }
 #+end_src
+
+** Specification Pattern
+
+A unit of /business logic/ inherits its functionality from an abstract aggregate /specification/ class, which is chained with other specifications. This encapsulates some piece of domain knowledge into a single specification and reuse it in different parts of the code base.
+
+Generic specifications are a bad practice. If a specification allows you to indicate an arbitrary condition, it becomes just a container for the information which is passed to it by its client and doesn’t solve the underlying problem of domain knowledge encapsulation. Such specifications simply don’t contain any knowledge themselves.
+
+https://enterprisecraftsmanship.com/posts/specification-pattern-c-implementation/
+
+*** Main Use
+
+- Looking up data in the database: finding records that match the specification
+
+- Validating objects in the memory: checking that an object fits the spec
+
+- Creating a new instance that matches the criteria.
