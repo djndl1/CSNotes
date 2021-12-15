@@ -1,0 +1,13 @@
+#+TITLE: Ansi_iso_modern_sql
+
+# SQL92
+
+# SQL99
+
+- Nested tables, arrays
+
+- recursive query
+
+# SQL16
+
+- SQL now understands JSON. SQL/JSON path query language

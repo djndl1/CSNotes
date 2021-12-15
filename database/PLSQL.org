@@ -232,3 +232,85 @@ SQL%ISOPEN/FOUND/NOTFOUND/ROWCOUNT/BULK_ROWCOUNT/BULK_EXCEPTION
 #+begin_src sql
 
 #+end_src
+
+** Bulk Collect
+
+#+begin_src sql
+FETCH <cursor_name> BULK COLLECT INTO <collection_name> LIMIT <limit>;
+
+SELECT ... BULK COLLECT INTO <collection_name> FROM ...
+#+end_src
+
+- for an assoc-array, there's no need to allocate memory before being bulk collected into.
+
+* Object-Relational SQL
+
+Doesn't seem to be useful for app code since support for UDT by client drivers is scarece.
+
+* Troubleshooting
+
+** Prevent Implicit Data Conversion
+
+- Use anchors in variable declaration
+
+- Use data type prefixes for variables
+
+- explicit conversion and catch potential exceptions:
+  + =to_char()=
+  + =to_date()=
+  + =to_number()=
+
+** Prepare for Rrrors
+
+- Use exception blocking around certain code
+
+- Almost never use =WHEN OTHERS THEN NULL= in an exception-handling section.
+
+- Never handle exceptions in a table package’s methods or a type’s methods.
+
+- output error or success using =DBMS_OUTPUT.put_line()=
+
+- =pragma autonomous transaction= to log data migration or data processing
+
+** After the error has occurred
+
+- Use output message to pinpoint the error spot
+
+- =raise_application_error()= to send a meaningful error number and message to the presentation layer.
+
+** As the error happens
+
+Use =pragma autonomous transaction= to insert and commit messsages into a logging table without committing PL/SQL program's own transaction context.
+
+| Attribute         | description                     |
+|-------------------+---------------------------------|
+| id                | primary key                     |
+| text              | logged message                  |
+| unique_session_id | from the calling PL/SQL program |
+| insert_user       | the user who runs the program   |
+| insert_date       | (default to sysdate)            |
+
+#+begin_src sql
+create table DEBUG (
+    id int generated always as identity primary key,
+    text varchar2(1024),
+    session_id varchar2(100),
+    insert_user varchar2(30) default sys_context('userenv', 'session_user'),
+    insert_date date default sysdate
+);
+
+create or replace PROCEDURE log_debug(
+         aiv_program_unit in varchar2,
+         aiv_text in varchar2)
+is
+        pragma autonomous_transaction;
+        v_text varchar2(256);
+        v_sess_id varhchar(100);
+begin
+         v_text := substrb(aiv_program_unit||': '||aiv_text, 1, 256);
+     n_sess_id :=dbms_session.unique_session_id;
+         insert into DEBUG (text, session_id)
+         values (v_text, v_sess_id);
+         commit;
+end log_debug;
+#+end_src

@@ -1,0 +1,94 @@
+#+TITLE: Unicode
+
+* Prerequisites
+
+** Endianness
+
+Normally this refers to byte endianness, but information can be stored in small or large groups of binary bits. So endianness might refer to endianess of bits (bit numbering, typically used in low-level transmission protocol), octets, hextets, words, etc. The most common positional notation used in mathematics is digit-big-endian: =123456=, with the most significant digit at the first place.
+
+In computing, endianness refers to the ordering of a sequence of storage cells (usually in octets) that represents a primitive data type that can be manipulated by a single hardware instruction. Typically, the first storage cell would be at the lower address of memory. The relation between "significance" of a storage cell in the data and its order determines the endianness.
+
+- /big-endianness/: decreasing numeric significance with increasing memory addresses (or increasing time)
+
+- /little-endianness/: increasing numeric significance with increasing memory addresses (or increasing time)
+
+Some architectures uses different byte endianness for integers and floating-point numbers. Some even has different endianness conventions for words and bytes inside a double-precision number.
+
+Side note: in C, the index of an array member increases with its pointer (virtual memory address).
+
+** Character Encodings
+
+The process of /assigning numbers (code points) to graphical characters/. All these code points make up a /code space/, /code page/ (originally coded in graphics hardware in IBM PC) or a /character map/.
+
+- /character/:  a minimal unit of text with semantic value
+
+- /character set/: a collection of characters that might be used by multiple languages
+
+- /coded character set/: a character set in which each character corresponds to a unique number
+
+- /code point/: any allowed value in a coded character set, consisting of one or more code units.
+
+- /code space/: a set of code points
+
+- /code unit/ or /code value/: a bit sequence to encode each character of a repertoire (the abstract set of characters of concern) within a given encoding form.
+
+* Unicode
+
+A standard for the consistent encoding, representation, and handling of text expressed in most of the world's writing systems. Maintained by the Unicode Consortium.
+
+Unicode can be implemented by different character encodings: UTF-8, UTF-16, UTF-32 and even GB18030.
+
+** Issues
+
+- Han Unification, alternative CJK encoding, Unicode variation sequences.
+
+- Combining characters are often not rendered correctly.
+
+* ISO 10464 (UCS)
+
+A standard set of character originally defined by ISO, later synchronized with Unicode, currently a subset of Unicode.
+
+* UTF-16
+
+The original Unicode encoding scheme (UCS-2) was not sufficient and UCS-4 was too space-inefficent.
+
+BMP code points can be directly encoded with 2 bytes. Supplementary planes are encoded as two 1-bite code units called /surrogate pair/, following a certain algorithm (which requires subtraction, bit-shift and addition).
+
+#+begin_quote
+U+10437
+
+1. subtracting 0x10000 leaves 0x0437
+2. right shift by 10 and add 0xD800 = 0xD801 (high surrogate)
+3. take the lower 10 bits and add 0xDC00 = 0xDC37
+#+end_quote
+
+* UTF-8
+
+The one-byte part are the same as US-ASCII.
+
+The multibyte-byte parts starts with a header byte and several continuation bytes with =10= as their markers. There are three types of bytes: leading bytes (starts with several =1= and then a =0=), continuation bytes (starts with =10=) and ascii bytes (starts with a =0=)
+
+#+begin_src python
+A # 0_1100001
+α # 110_01110 10_110001
+中 # 1110_0100 10_111000 10_101101
+#+end_src
+
+** Advantages
+
+- Backward compatibility with ASCII and thus related technology. ASCII-related algorithms can be easily applied to UTF-8 (character searching in UTF-8 is just a word-searching of the ASCII version)
+
+- Fallback and auto-detection: it can efficiently detect some error values and successful in the majority of cases.
+
+- Prefix Code: the leading byte can indicate the length of the encoded character.
+
+- Self Synchronization: easy to find and synchronize with the start of a character byte sequence
+
+- Ignore UTF-16 byte order mark
+
+- No special locale and language settings needed
+
+** Disadvantages
+
+- Less space efficient than specilized local encodings.
+
