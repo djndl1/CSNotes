@@ -1,6 +1,116 @@
 #+TITLE: Pwsh
 
-* Help
+* What Pwsh is, what it can do
+
+1. a CLI interpreter, a scripting langguage, a shell
+
+2. Object-based, well integrated with Windows's API-based system
+
+** Simple Examples To show what it can do
+
+*** Pipelining
+
+#+begin_src shell
+$total = 0
+Get-ChildItem | ForEach-Object($total += $_.length)
+
+Get-ChildItem | Sort-Object -Property Length | Select-Object -First 1
+#+end_src
+
+*** Control-Flow
+
+#+begin_src shell
+foreach ( $i in 1..10 ) { if ($i % 2) { "$i is odd" } }
+# or
+1..10 | foreach { if ($_ % 2) { "$_ is odd " } }
+#+end_src
+
+*** Functions and Scripts
+
+*** Remote Administration
+
+Core: =Invoke-Command= invokes a block of pwsh script on one or more local/remote computers.
+
+** Core Concepts
+
+Based KornShell POSIX shell and aligned with C#
+
+- Case-Insensitive but Case-Sensitive Code easy to read
+
+*** Commands and cmdlets
+
+The common pwsh format:
+
+#+begin_src shell
+command -SwitchParameter -ParameterWithArgument arg1 PositionalArgument
+#+end_src
+
+- Pwsh has a smart parameter binder system, which can identify arguments by types, or convert if necessary. Pwsh respect POSIX end-of-parameter =--=
+
+**** Categories
+
+1. /Cmdlets/: implemented by a .NET class derived from =Cmdlet=, specific to the Pwsh environment, in the form of a DLL library.
+
+2. /Functions/
+
+3. /Scripts/: code inside a text file
+
+4. /Native commands/
+
+5. /Device State Configuration/: a configuration management platform in Windows PowerShell
+
+*** Aliases and Elastic Syntax
+
+Various command aliases can be defined (no arguments though). Parameters can also have aliases, defined by their authors.
+
+*** Quoting
+
+Unlike bash, pwsh escapes using =`= instead of =\=
+
+*** Command-Mode and Expression-Mode
+
+In expression mode, strings must be quoted, numbers are always numbers.
+In command mode, everything except numbers is treated as strings unless they start with =$=, =@=, ='=, ="=.
+
+*** Statement Termination
+
+A newline can end a syntatically complete statement. If not complete, the newline is treated like any other whitespace. =`=  continues a non-extensible line. Strings are not terminated by a newline character.
+
+** Pipeline
+
+Unlike most shells where separate processes are used for elements in the pipeline, in pwsh, pipelining is implemented in a way similar to a real production line, in which one output object by the last command is immediately pushed to the next command, without waiting for to the entire process to finish.
+
+*** Parameter Binding
+
+**** How parameters are bound when pipelining:
+
+The binding process is controlled by declaration information on the command itself: the type, the optional/mandatory and the pipeline attribute. There is an involved algorithm under the hood to make the binding do what the user wants.
+
+A cmdlet must explicitly build in pipeline support for one or more parameters. =Accept pipeline input?= in the help article describes if this parameter can be bound to pipelined input.
+
+- =ByValue=: by the type of the object passed in, only one parameter can be passed via =ByValue=
+
+- =ByPropertyName=: if the passed object has properties matching certain parameter names
+
+** Display Formatting
+
+Formatting is managed by pwsh with an XML database, detailing how each object should be formatted on screen. A list of =Format-*= commands are at users' disposal.
+
+- =Format-Table= and =Format-List= are most used.
+
+- =Format-Wide= shows some concise info
+
+- =Format-Custom= display objects while preserving its basic structure
+
+Several =Out-*= cmdlets are responsible for finding the correct formatter for objects and output them in different ways (not just to terminals).
+
+- =Out-File=: sending output to a file, also used by IO redirection
+
+- =Out-String=: output as a string (or a stream of strings)
+
+- =Out-GridView=: a new grid window
+
+** Help
 
 - =Get-Alias=
 
@@ -8,9 +118,621 @@
 
 - =Get-Help= can be updated
 
+* Type System
+
+Dynamic-typed with intuitive conversion
+
+** Members
+
+- /Synthetic/: a pwsh layer member extension to an object. A pwsh object can be even made purely out of synthetic members with no "native" properties at all.
+
+- /Native/: members defined by the object's type in NET/COM/CIM etc.
+
+- /Fallback/: defined by the pwsh itself.
+
+** Basic Types and Literals
+
+- /String/: .NET string. Here strings (more like a multiline string literal)
+
+- Numeral: pwsh supports multiplier suffix (=KB=, =MB=, =GB=, =TB=)
+
+- =HashTable= (=System.Collections.HashTable=): =@{ name1 = vallue2; ... }=. Key can be accessed like a member =htbl.name1=, or in batch =htbl[keys]=. =foreach= in pwsh does not consider =HashTable= to be a collection type, =.GetEnumerator()= must be explicitly used. Ordered =System.Collections.Specialized.OrderedDictionary= is also available =[ordered]@{ ... }=
+
+- =Array=: there is no array literal in pwsh, =A,B,C,D= is not an array literal but a sequence of expressions (comma expressions). Any object is a pseudo-array and has a =.Count= property. Pipeline output is collected into an array. Arrays are weakly typed and thus polymorphic by default.
+
+ #+begin_src shell
+(, 1) # singleton
+@() # empty array
+ #+end_src
+
+- /Type Literal/: =[TypeName]=. This is not a mere type cast but also a data conversion or used to invoke a static method. Pwsh searches type names first in the type alias table, then check the full name and finally try to append a =System=. A type literal itself returns a type object.
+
+#+begin_src shell
+[char[]] '123'
+[int[]] '123'
+[System.Collections.Generic.List[int]]
+[String]::Join(' + ', @(1, 2, 3))
+[int[]] [char[]] 'Hello world'
+#+end_src
+
+*** Type Conversion Algorithm
+
+* Operators and Expressions
+
+** Arithmetic
+
+- =+=: addition, string concatenation, collection join
+
+- =*=: multiplication, string multiplication,
+
+** Assignment
+
+Assignment in Pwsh is also a value expression
+
+#+begin_src shell
+$a, $b, $c = 1, 2, 3, 4
+$a, $b = $b, $a
+
+$data = cat -Path .\csv.csv | foreach {
+    $e = @{}
+    $e.level, [int] $e.lower, [int] $e.upper = -split $_
+    $e
+}
+#+end_src
+
+** Comparison
+
+**** =-gt=, =-ge=, =-le= =-lt= =-eq= =-ne= and their case-sensitive (=-ceq=) and case-insensitive (=-ieq=) version. (All shell languages have been using =<= and =>= for IO redirection).
+
+The behavior of the comparison operators is significantly affected by the type of left operand (e.g. type conversion).
+
+If the operands are not strings and numbers, the .NET comparison mechanisms are used
+
+1. =IComparable= interfaces
+
+2. =.Equals()= method
+
+3. Convert the right operand into the type of the left
+
+Basic comparison involving a collection and a scalar is a filter operation.
+
+#+begin_src shell
+1,2,3,4,5,6 -gt 2 # any numbers greater than 2
+#+end_src
+
+**** =-contains=, =-notcontains=, =-in=, =-notin= and their friends.
+
+** Pattern Matching and Text Manipulation
+
+These operators also have case-sensitive and case-insensitive versions.
+
+- =-like=, =-notlike=: wildcard matching
+
+- =-match=, =-notmatch=: regex matching. =$matches= is set and represents the matched part.
+
+- =-replace=: regex substitution
+
+- =ireplace=: deletion of the regex matched
+
+** =-split= and =-join=
+
+Join the lements of a collection into a single string or split strings into a collection of substrings
+
+#+begin_src shell
+1,2,3 -join '+'
+
+'a:b:c:d:e' -split ':'
+'a:b:c:d:e' -split ':',3
+#+end_src
+
+=-split= accepts a complex scriptblock.
+
+*** Logical and bitwise operators
+
+- =-and=, =-or=, =-not=, =-xor=
+
+- =-band=, =-bxor=, =-bnot=, =-shl=, =-shr=
+
+*** =.where()= and =.foreach()= methods
+
+#+begin_src shell
+(Get-Process).where({$_.handles -gt 1000})
+($data).ForEach({$_ * 2})
+$data.ForEach([double]) | Get-Member
+(Get-Process).foreach('Name')
+#+end_src
+
+** Type Operators
+
+- =-is=, =-isnot=, =-as=: the type operand can be a type literal or a string. =-as= is more aggressive in pwsh than in C#.
+
+** Unary Operators
+
+- =-not=, =-=, =+=, =++=, =--=, =,= (one-element array)
+
+- =[type]=: the output of an expression can be discarded by casting it to =[void]=.
+
+** Grouping and Subexpressions
+
+- parenthesis grouping: =(Get-ChildItem).Count=. Pipelines are allowed.
+
+- subexpression =$(statementList)= group collections of statements. subexpression voids voidable expressions =$($a++)= returns nothing.
+
+- array subexpression =@(...)=: groups collections of statements and returns the result as an array. This is convenient since it does not wrap an array with another array but wraps a single element with an array.
+
+ #+begin_src shell
+@(dir c:\; dir d:\) # a shorthand for [object[]] $(...)
+ #+end_src
+
+** Range Operator and Index Operator
+
+- =valueExpression..valueExpression=: high precendence than all binary operators
+
+- =arr.[idx]=: supports negative indices and slicing
+
+ #+begin_src shell
+(1,2,3)[-1]
+(1,2,3,4,5)[-1,-2]
+(1,2,3,4,5)[0..2]
+$2d[ (0,0) , (1,0) ] # $2d[0,0] and $2d[1,0]
+ #+end_src
+
+**  Fallback dot operator
+
+If the object itself doesn’t have a property and that object is a collection, PowerShell will check the contained objects to see if that member exists and return a collection of those values.
+
+#+begin_src shell
+$names = ( $obj | Get-Member -Type property l*).name
+#+end_src
+
+** using namespace and assembly
+
+- =Add-Type=
+
+#+begin_src shell
+using asssembly Oracle.ManagedDataAccess
+using namespace Oracle.ManagedDataAccess.Client
+#+end_src
+
+** Dynamic method/property invocation
+
+#+begin_src shell
+[math]::$methodName.Invoke(2,3)
+
+$l = 'Length'
+(1,2,3).$l # (1,2,3).Length
+#+end_src
+
+** Format Operator
+
+A shorthand for =System.String.Format=
+
+** Redirection Operations
+
+Available output streams are much more than POSIX shell. Input redirection is not available in pwsh.
+
+- =*=: all output
+
+- =1=: success output
+
+- =2=: errors
+
+- =3=: warnings
+
+- =4=: verbose output
+
+- =5=: debug output
+
+- =6=: info messages
+
+#+begin_src shell
+ > outputFile
+ >> outputFile
+ 2> errorFile
+ 2>> errorFile
+ 2>&1
+ 2> $null
+
+ # under the covers
+ | out-fiel -path outputFile
+#+end_src
+
+** Variables
+
+Reside inside the =variable= PSDrive.
+
+#+begin_src shell
+Test-Path -Path variable:variableName
+
+[int] $var = -2
+
+# Pwsh supports attribute-constrained variables
+[ValidateLength(0, 5)] [string] $cv = ''
+
+${this is a variable name}
+$_this_is_also_a_varname
+
+# a global variable
+$global:MyGlobalName = 123
+$env:envvar
+
+# the variable notation can even access files, not implemented in Registry though
+${C:\Users\020959\source\repos\SqlTemp\out.txt} = 123
+#+end_src
+
+*** Variable cmdlets
+
+#+begin_src shell
+Import-Csv myVars.csv | foreach { Set-Variable -Name $_.Name -Value $_.Value }
+Get-Variable -ValueOnly pwd
+Remove-Variable myvar
+Set-Variable -Option Constant -Name myconst -Value myvalue # set constant
+#+end_src
+
+pwsh has something similar to Python's =*args=
+
+#+begin_src shell
+function s {
+    param ($x, $y, $z)
+    ...
+}
+s @list
+#+end_src
+
+* Flow Control
+
+** Conditional
+
+={}= is not to leave out. Although not a FP language, it is possible to assign the result of a if subexpression to a variable
+
+#+begin_src shell
+$result = $(if ((Test-Path -Path Variable:result)) { 6 })
+
+if (boolean expression1) {
+       ...
+} elseif (boolean expression2) {
+       ...
+} else {
+       ...
+}
+#+end_src
+
+** Looping
+
+#+begin_src shell
+while () { stmts }
+do { stmts } while ()
+do { stmts } until ()
+for ( ; ; ) { stmts }
+foreach ($var in <pipeline>) { stmts }
+#+end_src
+
+Subexpressions are a blessing!
+
+#+begin_src shell
+for ($($result=@(); $i=0); $i -lt 5; $i++) { $result += $i }
+
+for ($($i = 3; $j = 3); ($i -lt 10) -and ($j -lt 10); $($i++, $j++)) { '{0} {1}' -f $i,$j }
+
+# there is a special loop variable
+foreach ($i in 1..10)
+{ [void] $foreach.MoveNext(); $i + $foreach.Current }
+
+# strings and hashtables are not treated as an IEnumerable
+foreach ($i in "hi") {$i }
+#+end_src
+
+** =Switch=: pattern matching, branching and iteration
+
+#+begin_src shell
+# basic usage
+$a = switch (1) { 1 { 'one' } }
+
+# pattern matching
+switch -wildcard ('abc') { a* { 'astar' } *c {'starc' + "$_" } } # $_ is matched original object
+switch -regex ('abc') { '(^a)(.*$)' { $matches } }
+
+# conditional branching
+switch (8) {
+ { $_ -gt 3 } { 'greater than three' }
+ {$_ -gt 7 } { 'greater than 7' }
+ }
+
+# loop, like a foreach with conditional if inside
+switch (1,2,3,4,5,6) {
+    { $_ % 2 } { "Odd $_"; continue }
+            4 { 'Four' }
+    default { "Even $_" }
+}
+
+switch -wildcard (Get-ChildItem c:\windows) {
+    ,*.dll {$dll++}
+    ,*.txt {$txt++}
+    ,*.log {$log++}
+}
+
+switch -regex -file $env:TEMP\files.txt { # regex-match files.txt line by line
+'\.log$' {$lg++}
+'\.tmp$' {$tm++}
+'\.cvr$' {$cr++}
+}
+
+switch ($options){
+    '-a' { $a=$true }
+    '-b' { [void] $switch.MoveNext(); $b= $switch.Current } # swtich loop enumerator
+    '-c' { $c=$true }
+    '-d' { $d=$true }
+}
+
+#+end_src
+
+** Flow Control cmdlet
+
+*** =ForEach-Object=
+
+Mapping
+
+#+begin_src shell
+# - | ForEach-Object <scriptBlocK>
+ Get-ChildItem *.txt | foreach-object {$_.length} # %{$_.Length}
+
+# - | ForEach-Object -Begin <> -Process <> -End <>
+Get-Process | %{$t = 0}{ $t += 1 }{$t}
+
+# Like all cmdlets, output of collections gets unravelled
+1,(2,3) | % {$_} # Length of 3
+$b = (1, (2,3)) | %{ ,$_ } # length of 2
+
+# - | ForEach-Object <operational statement>
+Get-Process | ForEach-Object ProcessName
+'test', 'strings' | foreach ToUpper
+#+end_src
+
+*** =Where-Object=
+
+Filtering
+
+#+begin_src shell
+1..10|?{!($_-band 1)}
+
+
+Get-Process | where {$_.Handles -gt 1000}
+
+# allowed but not recommended
+Get-Process | where -Property Handles -Value 1000 –gt
+
+#+end_src
+
+
+* Functions
+
+Functions reside in =Function:/=, which can be removed from the current session by =Remove-Item=
+
+** Simple Functions (like a bash function)
+
+#+begin_src shell
+function <name> { <statement list> } # $args separated by $OFS
+
+function ql { $args }
+function qs { "$args" }
+
+function <name> (paramList) { <statements> }
+function <name> { param <paraList> <statements> }
+
+function subtract ($minuend, $subtrahend) { $minuend - $subtrahend }
+subtract 10 12 # as a cmdlet without parentheses not a method
+subtract -minuend 10 -subtrahend 12
+ubtract -minuend 10  12
+subtract -subtrahend 12  10
+
+function nadd ([int] $augend = 0, [int] $addend = 1) { $augend + $addend}
+function nadd ([int] $augend ) { ($args | ForEach-Object { $augend += $_ }); $augend } # extra arguments are saved to $args
+
+function bar ([switch] $x) { "x is $x"; foo -s: $x } # switch parameter is a boolean and can be passed
+#+end_src
+
+*** Parameter Binding to named and position parameters
+
+1. Any named parameters are bound and then removed from the list of parameters still to be bound
+
+2. Any remaining parameters are bound by position
+
+
+To mix and match, always put the
+parameters that you want to specify by name at the end of the parameter list;
+
+*** Return and Output
+
+There is no return value since pwsh is a shell. A function just emits output. Unused expressions or return value from methods will be output (Be caution when using .NET methods). The =return= value is mainly used to exit early.
+
+*** Simple Functions and Pipeline
+
+#+begin_src shell
+<# special enumerator variable $input, produced by the prior cmdlet
+   this is not streaming processing
+#>
+function sum {
+    $total = 0
+    foreach ($n in $input) {
+        $total += $n
+    }
+    $total
+}
+
+# cmdlet-like pipeline function
+function sum {
+    begin { $total = 0; }
+    process { $total += $_ }
+    end { $total }
+}
+#+end_src
+
+*** Variable Scoping in Functions
+
+Pwsh uses /hygienic dynamic scoping/, with which an inner variable shadows an outer variable. Unix shells all use dynamic scoping since unix shells are process-based: a child will inevitably inherit its parent's exported variables.
+
+#+begin_src shell
+$x = 7
+function one { "x is $x"}
+function two { $x = 22; one}
+
+one # 7
+two # 22
+one # 7
+
+# to use the global x
+function one {"x is $global:x"}
+#+end_src
+
+** Advanced Functions
+
+#+begin_src shell
+# Advanced functions
+function Install-Software {
+   [CmdletBinding()]
+   param(
+    [Parameter()]
+    [ValidateSet('1','2')]
+    [string]$Version = 2
+
+    [Parameter(Mandatory, ValueFromPipeline)]
+    [string]$ComputerName
+   )
+   process { # where the main code should live
+       Write-Host "I installed software version $Version on $ComputerName. Yippee!"
+   }
+}
+
+#+end_src
+
+** Scripts
+
+The /execution policy/ of Pwsh by default prevents users from running scripts. For Windows Servers 2012 and above, =RemoteSigned= is the default execution policy which allows the user to run a local script. If administrator privilege is not available, use =-Scope Process= with =Set-ExecutionPolicy= to set just for the current session.
+
+Argument passing is the same as passing them to basic functions (=$args=), or using the =param()= statement as the first executable line of a script. Exit a script by calling =exit=
+
+A script forms a script variable scope which can be referenced by =scriptname:variablename=.
+
+To reference a script, =. script.ps1= just like any other POSIX shells (a module is recommended for authoring a script library though). Like most shells, Pwsh searches scripts using =$PATH=
+
+By default pwsh uses =-Command= if command arguments are provided. Use =-File= to execute a script to avoid whitespace-related problems. There is some difference between the two.
+
+#+begin_src shell
+powershell -Command ./myscripts.ps1 # starts a pwsh and execute a script
+powershell -File ./myscript.ps1 # starts a pwsh and run everything inside the script
+#+end_src
+
+*** Calling Operator and dot-sourcing
+
+Different when calling functions and scripts, same for cmdlets and external programs.
+
+- =&=, the calling operator: scripts and functions are executed in a child scope (just like a POSIX shell would start a new process)
+
+- =.=, the dot-source operator: executes scritps and functions in the current scope. Typically used to modify the caller's scope by adding functions, aliases and possibly variables for later use
+
+*** Advanced Functions and Scripts
+
+Cmdlets that are written as a Pwsh function (with =cmdletBinding= attribute). Parameter validation is automatically done by using metadata.
+
+#+begin_src shell
+function <name> {
+    [CmdletBinding(<options>)] # explicitly declares an advanced function
+    [OutputType(<type and parameterSet>)]
+    param (
+        [Paramter(ParameterSet="set1", Position=0, Mandatory=$true)] # inplicitly declares an advacned function
+        [int]
+        $p1 = <InitializationExpression1>,
+        [Paramter(ParameterSet="set2", Position=0, Mandatory=$true)]
+        [int]
+        $p2 = <InitializationExpression2>
+    )
+
+    <statement1>
+    <statement2>
+}
+#+end_src
+
+**** =CmdletBinding=
+
+***** =ConfirmImpact=
+
+Display a confirm prompt if the value is equal to or greater than  the =$ConfirmPreference= variable.
+
+***** =SupportsPaging=
+
+Adds three parameters (=-Skip=, =-First=, =-IncludeTotalCount=) to support paging. These parameters can be obtained through =$PSCmdlet.PagingParameters=.
+
+* Providers and its use: COM and CIM
+
+A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
+
+- =Get-PSProvider=, =Get-PSDrive=
+
+A provider provides the core activities groped by =Item=, =ChildItem=, =ItemProperty=, =Content=, =Location=, =Path= =PSDrive= and =PSProvider=.
+(help =aoubt_Core_Commands= and =about_providers=). Each provider has at least one drive (=PSDrive=) associated with it.
+
+PSDrives can also be accessed directly by using namespace of =PSProvider=
+
+#+begin_src shell
+cd FileSystem::\\localhost\c$ # same as "cd C:\"
+#+end_src
+
+** FileSystem
+
+- Hidden files are not displayed by default and a =-Force= parameter is required.
+
+- =-LiteralPath= parameter suppresses pattern-matching and related special characters.
+
+** The Registry
+
+The Registry is mounted as several PSDrives. Under them there are items (keys), their properties and child items (subkeys)
+
+
+** COM
+
+Pwsh can load COM with its own adaption layer without the use of .NET/COM interop. =-Switch= enforces this by throwing an error if .NET one is loaded.
+
+COM objects are located in a GUID, not a friendlier alias =ProgID= (=<Program>.<Component>.<Version>=) exists for use.
+
+#+begin_src shell
+$shell = New-Object -ComObject Shell.Application
+$shell.Explore('C:\Temp') # this opens up the file explorer and navigates to C:\Temp
+#+end_src
+
+There are some problems with Pwsh's support for COM. Many COM components are 32-bit and a 32-bit pwsh must be launched to use them. Also, some COM objects have different .NET wrappers, giving them different interfaces.
+
+** CIM
+
+Provides a common definition of management information for systems, networks, applications and services.
+
+All CIM classes are identified by a path of =\\computer\namespace\namespace:class=. The default namespace is =root\cimv2=.
+
+- =Get-CimClass=: retrieves class structures of specified CIM classes, also for retrieving available CIM classes.
+
+- =Get-CimInstance=: With =-ComputerName=, it retrives data from a remote computer. =-Filter= and WQL query is available for filtering and other use.
+
+- =New-CimInstance=: ??. Instances are then deleted by =Remove-CimInstance=
+
+- =Set-CimInstance=: modify a property value on a CIM instance.
+
+  CIM classes have methods to call.
+
+ =-Invoke-CimMethod=
+
+#+begin_src shell
+<# This starts a new calculator #>
+Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine = 'calc.exe'}
+#+end_src
+
+*** CIM Remoting
+
+Create a session (=New-CimSession=) and pass it to =Get-CimInstance=
+
+Some of the pwsh cmdlets are actually implemented as a wrapper around CIM classes, which accepts a =-CimSession= parameter.
+
+
 * Basics: Everything in PowerShell is an Object
 
-- =Set-StrictMode=: use this to enforce good
 
 ** Automatic Variables
 
@@ -69,72 +791,6 @@ $users = [PSCustomObject]@{
 }
 #+end_src
 
-* Combining Commands
-
-** Pipelining
-
-**** How parameters are bound when pipelining:
-
-A cmdlet must explicitly build in pipeline support for one or more parameters. =Accept pipeline input?= in the help article describes if this parameter can be bound to pipelined input.
-
-- =ByValue=: by the type of the object passed in, only one parameter can be passed via =ByValue=
-
-- =ByPropertyName=: if the passed object has properties matching certain parameter names
-
-* Control Flows
-
-** Logic Operators
-
-https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comparison_operators?view=powershell-7.1
-
-#+begin_src shell
-if (Test-Connection -ComputerName offlineserver -Quiet -Count 1) {
-
-} elseif {
-}
-   else {
-}
-
-switch (expression) {
-    expressionvalue {
-        # Do something with code here.
-    }
-    expressionvalue {
-    }
-    default {
-        # Stuff to do if no matches were found
-    }
-}
-
-foreach ($server in $servers) {
-    Get-Content -Path "\\$server\c$\App_configuration.txt"
-}
-
-$servers = @('SRV1','SRV2','SRV3','SRV4','SRV5')
-ForEach-Object -InputObject $servers -Process {
-Get-Content -Path "\\$_\c$\App_configuration.txt"
-}
-
-$servers.foreach({Get-Content -Path "\\$_\c$\App_configuration.txt"})
-
-for ($i = 0; $i -lt 10; $i++) {
-        $i
-}
-
-while (Test-Connection -ComputerName $problemServer -Quiet -Count 1) {
-          Get-Content -Path "\\$problemServer\c$\App_configuration.txt"
-          break
-}
-
-do {
-} while (condition)
-
-do {
-} until (condition)
-
-#+end_src
-
-#+RESULTS:
 
 * Error Handling
 
@@ -153,29 +809,6 @@ try {
     # code that runs if terminating error found
 } finally {
     # code that runs at the end
-}
-
-#+end_src
-
-* Functions
-
-Verb-Noun naming
-
-#+begin_src shell
-# Advanced functions
-function Install-Software {
-   [CmdletBinding()]
-   param(
-    [Parameter()]
-    [ValidateSet('1','2')]
-    [string]$Version = 2
-
-    [Parameter(Mandatory, ValueFromPipeline)]
-    [string]$ComputerName
-   )
-   process { # where the main code should live
-       Write-Host "I installed software version $Version on $ComputerName. Yippee!"
-   }
 }
 
 #+end_src
@@ -211,3 +844,11 @@ Powershell gallery and =PowerShellGet= Module.
 *** Structured Data
 
 1. =ConvertTo-Csv=, =CovertFrom-Csv=, =Import-Csv=, =Export-Csv=
+
+* Style and Best Practice
+
+** Style
+
+1. Use aliases for interactive input and full names for scripting
+
+- =Set-StrictMode=: use this to enforce good practice

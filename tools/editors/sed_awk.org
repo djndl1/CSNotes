@@ -92,3 +92,13 @@ Awk provides arrays for storing groups of related values.
   # Erasing the second field
   { $2 = ""; print }
 #+end_src
+
+
+* =cut=
+
+Used to cut parts of a line by byte position, character and delimiter or cut data from CSV. =-c= doesn't really work on GNU =cut=
+
+#+begin_src bash
+echo 'abc' | cut -b 1,3 # ac
+ip -4 a | grep 'inet' | awk '{ print $2 }' | cut -d '/' -f 1
+#+end_src
