@@ -630,6 +630,38 @@ Different when calling functions and scripts, same for cmdlets and external prog
 
 - =.=, the dot-source operator: executes scritps and functions in the current scope. Typically used to modify the caller's scope by adding functions, aliases and possibly variables for later use
 
+*** Advanced Functions and Scripts
+
+Cmdlets that are written as a Pwsh function (with =cmdletBinding= attribute). Parameter validation is automatically done by using metadata.
+
+#+begin_src shell
+function <name> {
+    [CmdletBinding(<options>)] # explicitly declares an advanced function
+    [OutputType(<type and parameterSet>)]
+    param (
+        [Paramter(ParameterSet="set1", Position=0, Mandatory=$true)] # inplicitly declares an advacned function
+        [int]
+        $p1 = <InitializationExpression1>,
+        [Paramter(ParameterSet="set2", Position=0, Mandatory=$true)]
+        [int]
+        $p2 = <InitializationExpression2>
+    )
+
+    <statement1>
+    <statement2>
+}
+#+end_src
+
+**** =CmdletBinding=
+
+***** =ConfirmImpact=
+
+Display a confirm prompt if the value is equal to or greater than  the =$ConfirmPreference= variable.
+
+***** =SupportsPaging=
+
+Adds three parameters (=-Skip=, =-First=, =-IncludeTotalCount=) to support paging. These parameters can be obtained through =$PSCmdlet.PagingParameters=.
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
