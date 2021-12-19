@@ -51,53 +51,19 @@ HTML5 supports audio and video, drawing two-dimensional shapes and animate them,
 
 # Elements
 
+[Content Models](https://html.spec.whatwg.org/#content-models)
+
 Element categories determine the rules of containership.
-
-- _Meta Category_: All the elements allowed in the `head` container.
-
-- _Flow Category_: plain text and all the elements that are allowed ina web page `body` container.
-
-- _Phrasing Category_: inline
-
-- _Embedded Category_: elements that refer to a resource that's separate from the current web page
-
-- _Interactive Category_: elements that are intended for user interaction
-
-- _Heading Category_: elements that define a header for a group of related content
-
-- _Sectioning Category_: elements that define a group of related content
 
 For each element, HTML5 provides a typical default display properties. By Default, browsers collapse whitespaces (display with only one whitespace character, usually a blank space).
 
-`<pre></pre>` preformatted text element for text that needs to have its whitespace preserved.
-
-`<q></q>`: inline quote
-
-`<cite>`: citation
-
-`dfn`: defining instance: rendered with italics
-
-`abbr`: an abbreviation or acronym: a tooltip might pop up
-
-`time`: indicte that its text represents a date or time
-
-`code`: its enclosed text is programming code
-
-`kbd`: keyborad input for a program
-
-`samp`: output for a program
-
-`var`: a math or programming variable
-
-`<br>`, `<wbr>` (for a long sequence of nonblank characters that forms a pattern or code of some sort)
-
-`sub`, `sup`, `s`, `mark`, `small, 
-
-- strong` (strong importance), `em` (emphatic stress), `b`, `u`, `i`: develpers very often use them only for their appearance (which is not encouraged). The latter three are legacy.
-
-`span`: its presentation characteristics are given to it explicitly by CSS. Use `span` to replace `b`, `u`, `i`
-
 ## _block elements_
 
-Non-standard category, an element in the flow category that is not an element in the phrasing category. A block element expands to fill the width of its container. A block element spans the width of the nonmargin part of its enclosing container.
+Non-standard category, an element in the flow category that is not an element in the phrasing category. A block element spans the width of the nonmargin part of its enclosing container, whereas a __phrasing element_'s width matches the width of the element's contents.
 
+
+## Display Properties
+
+"Typical default display properties" are defined by W3C and recommended for browers.
+
+Avoid using `b`, `u`, `i`.
