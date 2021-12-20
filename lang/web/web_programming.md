@@ -67,3 +67,26 @@ Non-standard category, an element in the flow category that is not an element in
 "Typical default display properties" are defined by W3C and recommended for browers.
 
 Avoid using `b`, `u`, `i`.
+
+# CSS
+
+- Cascading: each stage/place has its own set of rules, and each set of rules is referred to as a style sheet. CSS rule application has levels of priority: from local, to head section, to external files, to user settings and of the lowest, the browser's native default settings.
+
+CSS rules are applied to elements within a web page. _Selectors_ are used to determine to which elements CSS rules are applied.
+
+- _type selector_: `hr { width: 50% }`, set the width of every `hr`.
+
+- _universal selector_: `* { text-align: center; }`, every element that has the `text-align` property.
+
+- _class selector_: `.red { background-color: tomato }`, select elemetns that have a particular value for their `class` attribute. Class selectors can be combined with element type or universal selectors: `element-type.class-value { property1: value; property2: value; }`
+
+- _ID selectors_: unique id within a particular web page `#id-value { property1: value; property2: value; }`
+
+
+```css
+selectors(s) { property1: value; property2: value; }
+```
+
+## Partial Styling
+
+Use `span` (nonblock) or `div`(block element) and specify their classes so that selectors can match them. More local CSS rules take precedence over the more global CSS rule (principle of locality).
