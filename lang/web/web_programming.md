@@ -87,6 +87,20 @@ CSS rules are applied to elements within a web page. _Selectors_ are used to det
 selectors(s) { property1: value; property2: value; }
 ```
 
+CSS can be directly written inside of the `style` attribute of any element (avoid using it to separate presentation from content).
+
+The recommended way is to use external CSS files.
+
+```html
+<link ref="stylesheet" href="name-of-external-file"> <!-- in the header -->
+```
+
 ## Partial Styling
 
 Use `span` (nonblock) or `div`(block element) and specify their classes so that selectors can match them. More local CSS rules take precedence over the more global CSS rule (principle of locality).
+
+## CSS Properties
+
+- Color properties: `color`, `background-color`
+
+- Font propertiese: `font-style` (normal/slant/oblique), `font-variant` (normal/small-caps), `font-weight` (normal/bold/bolder/lighter/...), `font-size` (xx-small/.../large/larger/1em), `font-family` (Courier/Prestige/..., use generic names as fallbacks)
