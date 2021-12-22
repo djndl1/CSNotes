@@ -43,9 +43,23 @@ Modeled into two parts
 2. Modeling Data: Common OOP model for all OPC data.
    Complex data is required to support the description and consistent transport of complex data structures.
 
-** Overview
+** Overview (OPC 10000-1)
 
-An OPC Server are now more a provider's interface less a hub, to enable more device-to-device communication through OPC.
+OPC UA is applicable to components in all industrial domains, from sensors to actuators, MES and ERP. It defines several models to allow information exchange between these components:
+
+- information model to represent structure, behavior and semantics: a consistent /AddressSpace/ that exposes various services (DA, AE, history, type definitions) with an integrated security model. Various relationships between objects are available to make information presented in various ways.
+  + Security model: security measures can be selected and configured to meet the needs of a given installation.
+  + AddressSpace model: the set of information objects (/Node/ typed by /NodeClass/, in terms of /variables/, /events/ and /methods/ as in OOP language such as C#) exposed to clients by a server. The AddressSpace is structured hierarchically but nodes can also be accessed via /References/ from other nodes thus making the /AddressSpace/ a interrelated network of /Nodes/.
+  + Services: organized into logical groups called /Service Sets/.
+
+- message model to interact between applications
+
+- communication model to transfer the data between end-points: OPC UA can work on a variety of communication protocols (raw TCP, HTTPS, WebSockets) and data encodings (XML, Binary, JSON) and works in both the Client-Server model and the PubSub model. Logical connections are organized into /Sessions/, which is independent of physical connections and are terminated on request of peers or on inactivity.
+  + In the PubSub model, peers may communicate asynchronously/in a connectionless manner/without knowing each other. The PubSub model can even be used with UDP.
+
+- conformance model to guarantee interoperability
+
+An OPC Server is now more a provider's interface less a hub, to enable more device-to-device communication through OPC.
 
 #+begin_src
 OPC UA software layers
