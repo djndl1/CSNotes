@@ -686,6 +686,34 @@ function Stop-ProcessUsingWMI {
 }
 #+end_src
 
+***** =OutputType=
+
+A type hint
+
+#+begin_src shell
+function Test-OutputType {
+    [CmdletBinding(DefaultParameterSetName = '1nt')]
+    [OutputType('asInt', [int])]
+    [OutputType('asString', [string])]
+    [OutputType('asDouble', ([double], [single]))]
+    [OutputType('lie', [int])]
+    param (
+        [parameter(ParameterSetName='asInt')] [switch] $asInt,
+        [parameter(ParameterSetName='asString')] [switch] $asString,
+        [parameter(ParameterSetName='asDouble')] [switch] $asDouble,
+        [parameter(ParameterSetName='lie')] [switch] $lie
+    )
+    Write-Host "Parameter set: $($PSCmdlet.ParameterSetName)"
+    switch ($PSCmdlet.ParameterSetName) {
+        'asInt' { 1 ; break }
+        'asString' { '1' ; break }
+        'asDouble' { 1.0 ; break }
+        'lie' { 'Hello there'; break } }
+}
+
+(Get-Command Test-OutputType).OutputType
+#+end_src
+
 * Providers and its use: COM and CIM
 
 A PowerShell provider is a software component used to produce a filesystem-like named-drive experience for other data stores such as the registry.
