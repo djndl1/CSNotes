@@ -1,0 +1,33 @@
+#+TITLE: Wcf
+
+* Prerequisite
+
+https://www.karllhughes.com/posts/plumbing
+
+https://dzone.com/articles/being-joe-software-plumber
+
+** Service Orientation
+
+*** OOP
+
+Source code reusability of C++ was not enough and OOP programming alone couples the application with the language that is used. Everything was incorporated into a single process, which imnpedes security, scalability, availability, throughput and robustness. There is no native remote call in C++ to support distribution.
+
+*** Component Orientation
+
+Libraries which culminated in Component Object Model, which provided interchangeable, interoperable binary components. The components are discovered and loaded at runtime. The client and server agrees only on a contract. COM enables cross-language interoperability. The basic unit of reuse is the interface.
+
+**** Problems
+
+- Coupled to the technology that is used to implement component mechanism.
+
+- Concurrency: a component might or might not be used concurrently.
+
+- Transactions: the app itself must coordinate the atomic transaction
+
+- Communication Protocols: prescribed by the underlying technology
+
+- Communication Patterns: Async/Sync
+
+- Versioning: DLL hell
+
+- Security: Components may need to authenticate and authorize their callers.
