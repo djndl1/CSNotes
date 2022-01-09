@@ -71,3 +71,93 @@ A /Service/ is a unit of functionality exposed to the world over standard plumbi
 - Responsive
 
 - Disciplined: should not block the client.
+
+* WCF Essentials
+
+A runtime environment to expose CLR types as services and consume other services as CLR types.
+
+Unlike DCOM and .NET Remoting, which tries to make a remote object a local one, WCF tries to make every service a remote one: all interactions are done via a proxy, requiring the same configuration and hosting.
+
+** Addressing
+
+#+begin_src
+# [transport]://[machine or domain][:optional port]/[optional URI]
+
+http://localhost:8001
+http://localhost:8001/MyService
+net.tcp://localhost:8002/MyService
+net.pipe://localhost/MyPipe
+net.msmq://localhost/private/MyQueue
+net.msmq://localhost/MyQueue
+ws://localhost/MyService
+soap.udp://localhost:8081/MyService
+#+end_src
+
+** Contracts
+
+Platform-neutral and standard way of describing what the service does.
+
+*** Service Contracts
+
+what operations the client can perform on the service. =ServiceContract= maps a CLR interface or a class to a technology-neutral service contract. =OperationContract= opts in a method of that interface as a logical function of the service.
+
+- The =Namespace= property should be provided to avoid collision.
+
+#+begin_src csharp
+[ServiceContract]
+interface IMyContract
+{
+    [OperationContract]
+    string MyMethod();
+}
+
+// Only the default constructor is used by WCF
+class MyService : IMyContract
+{
+    public string MyMethod()
+    {
+        return "Hello WCF";
+    }
+}
+#+end_src
+
+*** Data Contracts
+
+Explicitly opt in custom types.
+
+*** Fault Contracts
+
+Define errors and how the service handles and propagates errors to its clients.
+
+*** Message Contracts
+
+ Allo the service to interact directly with message. Not the usual case for common WCF applications.
+
+** Hosting
+
+*** IIS Hosting
+
+Http-only. Services are  described by generated =.svc= files or in the =web.config= file.
+
+*** WAS Hosting
+
+A general purpose hsoting engine that supports any transport protocols, unlike IIS.
+
+*** Self-Hosting
+
+Any processes and any WCF transport protocols. The host process must explicitly register the service types at runtime and open the host for client calls. Each =ServiceHost= is associated with a particular service type. Multiple base addresses can be passed into the hosting instances instead of using the configuration file.
+
+An opened host loads the WCF runtime and launches worker threads to monitor incoming requests.
+
+#+begin_src csharp
+public class ServiceHost<T> : ServiceHost
+{
+    public ServiceHost() : base(typeof(T))
+    {}
+    public ServiceHost(params string[] baseAddresses) : base(typeof(T),
+                                                             baseAddresses.Select(address=>new Uri(address)).ToArray())
+                                                             {}
+    public ServiceHost(params Uri[] baseAddresses) : base(typeof(T),baseAddresses)
+    {}
+}
+#+end_src
