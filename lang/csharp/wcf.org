@@ -16,7 +16,7 @@ Source code reusability of C++ was not enough and OOP programming alone couples 
 
 Libraries which culminated in Component Object Model, which provided interchangeable, interoperable binary components. The components are discovered and loaded at runtime. The client and server agrees only on a contract. COM enables cross-language interoperability. The basic unit of reuse is the interface.
 
-**** Problems
+**** Plumbing Problems
 
 - Coupled to the technology that is used to implement component mechanism.
 
@@ -31,3 +31,43 @@ Libraries which culminated in Component Object Model, which provided interchange
 - Versioning: DLL hell
 
 - Security: Components may need to authenticate and authorize their callers.
+
+**** Service Orientation
+
+Business coupling is good, plumbing coupling is bad. Standardized message exchange decouples plumbing technology.
+
+A /Service/ is a unit of functionality exposed to the world over standard plumbing. A SOA (Service Oriented Application) is an aggregate of such /services/.
+
+***** Tenets
+
+- Service boundaries are explicit in that only those opted-in should be exposed. (information hiding and encapsulation)
+
+- Service are autonomous, independent of other services and any client.
+
+- Opted-ins of a service should be type-neutral. The service should only expose logical operations.
+
+- Services are compatible based on policy.
+
+***** Practical Principles
+
+- Secure communication, authentication and authorize.
+
+- Services leave the system in a consistent state
+
+- Services are thread-safe: the service must be able to sustain concrrent access from multiple clients.
+
+- Services are reliable: the client will always know whether the service received the message.
+
+- Services are robust: isolate its faults to prevent them from taking itself or other services down.
+
+***** Optional Principles
+
+- Interoperable from any client.
+
+- Scale-invariable: the same code can be used regardless of the number of clients and the load on the service.
+
+- Always available
+
+- Responsive
+
+- Disciplined: should not block the client.
