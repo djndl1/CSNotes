@@ -58,3 +58,67 @@ Security roles, based on which access permissions are granted to clients. Roles 
 - Endpoint: the URL used to connect to the server.
 
 There are some predefined well-known roles.
+
+* NodeClass
+
+Three types of /NodeClasses/, all derived from the /Base NodeClass/.
+
+- instance type defintions
+
+- type defintion types
+
+- data type definitions
+
+** Base NodeClass
+
+- /NodeId/: unambiguously identifies a node. A server persists the /NodeId/ of a /Node/
+
+- /NodeClass/: identifies the /NodeClass/ of a /Node/
+
+- /BrowseName/, /DisplayName/, /Description/, /WriteMask/... and other optional attributes
+
+** ReferenceType NodeClass
+
+Instances of /ReferenceType/ Nodes.
+
+** View NodeClass
+
+** Object NodeClass
+
+Represents systems, system components, real-world objects and software objects.
+
+- /EventNotifier/
+
+- /HasComponent/: defines the /DataVariables/, /Objects/ and /Methods/ of an /Object/
+
+*** ObjectType NodeClass
+
+provides definitions for /Objects/
+
+** Variables NodeClass
+
+Used to represent values, simple or complex. Variables are always defined as /Properties/ or /DataVariables/ of other Nodes in the /AddressSpace/ and never defined by themselved.
+
+- /Value/:
+
+- /Datatype/
+
+- /ValueRank/
+
+*** VariableType NodeClass
+
+** Method NodeClass
+
+- /Executable/:
+
+- /UserExecutable/
+
+** DataTypes
+
+Their DataTypeId are often known to both Clients and Servers.
+
+Data types are used to describe the structure of the Value Attribute of Variables and their VariableTypes.
+
+*** DataType NodeClass
+
+Describes the syntax of a /Variable/ /Value/
