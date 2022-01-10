@@ -654,6 +654,8 @@ function <name> {
 
 **** =CmdletBinding=
 
+=$PSCmdlet= provides various utility methods for script authors to implement cmdlet-like functions/script.
+
 ***** =ConfirmImpact=
 
 Display a confirm prompt if the value is equal to or greater than  the =$ConfirmPreference= variable.
@@ -661,6 +663,56 @@ Display a confirm prompt if the value is equal to or greater than  the =$Confirm
 ***** =SupportsPaging=
 
 Adds three parameters (=-Skip=, =-First=, =-IncludeTotalCount=) to support paging. These parameters can be obtained through =$PSCmdlet.PagingParameters=.
+
+***** =SupportsShouldProcess=
+
+Enable =-Confirm= and =-WhatIf= (dryrun) standard parameters.
+
+#+begin_src shell
+function Stop-ProcessUsingWMI {
+  [CmdletBinding(SupportsShouldProcess = $True)]
+  param(
+    [parameter(mandatory = $true)] [regex] $pattern
+  )
+  foreach ($process in (Get-CimInstance Win32_Process |
+    where { $_.Name -match $pattern })) {
+    if ($PSCmdlet.ShouldProcess(
+        "process $($process.Name) " +
+        " (id: $($process.ProcessId))" ,
+        "Stop Process")) {
+      Invoke-CimMethod -MethodName Terminate -InputObject $process
+    }
+  }
+}
+#+end_src
+
+***** =OutputType=
+
+A type hint
+
+#+begin_src shell
+function Test-OutputType {
+    [CmdletBinding(DefaultParameterSetName = '1nt')]
+    [OutputType('asInt', [int])]
+    [OutputType('asString', [string])]
+    [OutputType('asDouble', ([double], [single]))]
+    [OutputType('lie', [int])]
+    param (
+        [parameter(ParameterSetName='asInt')] [switch] $asInt,
+        [parameter(ParameterSetName='asString')] [switch] $asString,
+        [parameter(ParameterSetName='asDouble')] [switch] $asDouble,
+        [parameter(ParameterSetName='lie')] [switch] $lie
+    )
+    Write-Host "Parameter set: $($PSCmdlet.ParameterSetName)"
+    switch ($PSCmdlet.ParameterSetName) {
+        'asInt' { 1 ; break }
+        'asString' { '1' ; break }
+        'asDouble' { 1.0 ; break }
+        'lie' { 'Hello there'; break } }
+}
+
+(Get-Command Test-OutputType).OutputType
+#+end_src
 
 * Providers and its use: COM and CIM
 
