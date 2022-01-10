@@ -49,7 +49,7 @@ OPC UA is applicable to components in all industrial domains, from sensors to ac
 
 - information model to represent structure, behavior and semantics: a consistent /AddressSpace/ that exposes various services (DA, AE, history, type definitions) with an integrated security model. Various relationships between objects are available to make information presented in various ways.
   + Security model: security measures can be selected and configured to meet the needs of a given installation.
-  + AddressSpace model: the set of information objects (/Node/ typed by /NodeClass/, in terms of /variables/, /events/ and /methods/ as in OOP language such as C#) exposed to clients by a server. The AddressSpace is structured hierarchically but nodes can also be accessed via /References/ from other nodes thus making the /AddressSpace/ a interrelated network of /Nodes/.
+  + AddressSpace model: the set of information objects (/Node/ typed by /NodeClass/, in terms of /variables/, /events/ and /methods/ as in OOP language such as C#) exposed to clients by a server. The AddressSpace is structured hierarchically but nodes can also be accessed via /References/ from other nodes thus making the /AddressSpace/ a interrelated network of /Nodes/. Subsets of the AddressSpace can be reorganized into /views/.
   + Services: organized into logical groups called /Service Sets/.
 
 - message model to interact between applications
@@ -59,7 +59,43 @@ OPC UA is applicable to components in all industrial domains, from sensors to ac
 
 - conformance model to guarantee interoperability
 
+*** Client-Server
+
+Each client may interact concurrently with multiple servers and each server may interact concurrently with multiple clients.
+
+**** Client
+
+The client may send service/publishing requests to a server and receive responses or notification messages.
+
+**** Server
+
 An OPC Server is now more a provider's interface less a hub, to enable more device-to-device communication through OPC.
+
+*** Publish-Subscribe
+
+PubSub is used to communicate messages between different system components without these components having to know each other's identity.
+
+The server send messages to a /Message Oriented Middleware/. Subscribers express interest in specific data and process messages that contain the data.
+
+PubSub may be /broker-less/ (in a network that is able to route datagram-based messages like UDP multicast), or /broker-based/ (in which subscribers listen to certain queues).
+
+- =MonitoredItem=: created by a client in the server to monitor AddressSpace Nodes and generate notification.
+
+- =Subscription=: an endpoint that publishes =Notifications= to clients.
+
+*** OPC UA Services
+
+**** Request/Response Service
+
+Invoked by the client
+
+**** Subscription Services
+
+Notifications are periodically sent to clients.
+
+**** Service Sets
+
+OPC UA Services are divided into /Service Sets/, each defining a logical grouping of Services used to access a particular aspect of the Server.
 
 #+begin_src
 OPC UA software layers
