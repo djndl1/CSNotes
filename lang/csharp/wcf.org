@@ -272,3 +272,18 @@ host.Open();
 - Enable HTTP-GET to publish metadata
 
 #+TODO
+
+
+** Client Programming
+
+- Generate the Proxy if using .NET
+
+- Instantiate the proxy and call methods
+
+- Close or dispose the proxy after using
+
+- Timeout is controllable and deal with the timeout exception
+
+*** Test Client and Host Server
+
+=WcfTestClient.exe= and =WcfSvcHost=
