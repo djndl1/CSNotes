@@ -78,6 +78,8 @@ A runtime environment to expose CLR types as services and consume other services
 
 Unlike DCOM and .NET Remoting, which tries to make a remote object a local one, WCF tries to make every service a remote one: all interactions are done via a proxy, requiring the same configuration and hosting.
 
+- ABC(Address, Binding, Contract): an address defines where the service is; a binding defines how to communicate with the service; a contract defines what the service does
+
 ** Addressing
 
 #+begin_src
@@ -209,3 +211,64 @@ MSMQ offers support for disconnected queued calls.
 - =WebHttpBinding=: accept simple calls over web protocols such as HTTP-GET using REST/POX/JSON patterns.
 
 - =WSFederatedHttpBinding=, =WS2007FederationHttpBinding=, =MsmqIntergrationBinding=, =WS2007HttpBinding=
+
+** Endpoint: the Fusion of the ABC
+
+The endpoint is service's interface and is analogous to a CLR or COM interface. Each endpoint must expose at least one business endpoint, and each endpoint has exactly one contract. A single service can expose multiple endpoints.
+
+*** Configuration File
+
+#+begin_src xml
+<system.serviceModel>
+  <services>
+    <service name = "MyService">
+      <endpoint
+          address = "net.tcp://localhost:8000/MyService"
+          bindingConfiguration = "TransactionalTCP"
+          binding = "netTcpBinding"
+          contract = "IMyContract"
+          />
+      <endpoint
+          address = "net.tcp://localhost:8001/MyService"
+          bindingConfiguration = "TransactionalTCP"
+          binding = "netTcpBinding"
+          contract = "IMyOtherContract"
+          />
+    </service>
+  </services>
+  <bindings>
+    <netTcpBinding>
+      <binding transactionFlow = "true"/> <!-- nameless default binding -->
+
+      <binding name = "TransactionalTCP"
+               transactionFlow = "true"
+               />
+    </netTcpBinding>
+  </bindings>
+  <protocolMapping>
+    <add scheme = "http" binding = "wsHttpBinding" />
+  </protocolMapping>
+
+</system.serviceModel>
+#+end_src
+
+*** Programmatic Configuration
+
+#+begin_src csharp
+ServiceHost host = new ServiceHost(typeof(MyService));
+Binding wsBinding = new WSHttpBinding();
+Binding tcpBinding = new NetTcpBinding();
+host.AddServiceEndpoint(typeof(IMyContract),wsBinding,
+                        "http://localhost:8000/MyService");
+host.AddServiceEndpoint(typeof(IMyContract),tcpBinding,
+                        "net.tcp://localhost:8001/MyService");
+host.AddServiceEndpoint(typeof(IMyOtherContract),tcpBinding,
+                        "net.tcp://localhost:8002/MyService");
+host.Open();
+#+end_src
+
+** Metadata Exchange and Behavior Configuration
+
+- Enable HTTP-GET to publish metadata
+
+#+TODO
