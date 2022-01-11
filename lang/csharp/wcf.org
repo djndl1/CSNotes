@@ -161,3 +161,51 @@ public class ServiceHost<T> : ServiceHost
     {}
 }
 #+end_src
+
+** Binding
+
+WCF groups together sets of communication aspects in /binding/: a consistent, canned set of choices regarding the /transport protocol/, /message encoding/, /communication pattern/, /reliability/, /security/, /transaction propagation/ and /interoperability/. Bindings allow using the same service logic over drastically different plumbing. A single service can support multiple bindings on separate addresses.
+
+*** Basic Binding =BasicHttpBinding=
+
+A legacy ASMX web service.
+
+- http(s), text/MTOM
+
+*** TCP Binding =NetTcpBinding=
+
+Requires both the client and the service to use WCF.
+
+- tcp, binary
+
+*** IPC Binding =NetNamedPipeBinding=
+
+Uses named pipes as a transport for same-machine communication.
+
+- ipc, binary
+
+*** Web Service (WS) Bindign =WSHttpBinding=
+
+Uses Http/Https for transport, designed to interoperate with any party that supports the WS-* standards
+
+- http(s), text/MTOM
+
+*** MSMQ Binding =NetMsmqBinding=
+
+MSMQ offers support for disconnected queued calls.
+
+- binary
+
+*** Additional Bindings
+
+- Context bindings: =BasicContextBinding=, =WSHttpContextBinding=, =NetTcpContextBinding=, able to pass out-of-band parameters to the service
+
+- =WSDualHttpBinding=: two =WSHttpBinding= wired up against each other to support bidirectional duplex communication.
+
+- =NetHttpBinding=: WebSocket but with limited interoperability with the industrial standard, not recommended.
+
+- =UdpBinding=
+
+- =WebHttpBinding=: accept simple calls over web protocols such as HTTP-GET using REST/POX/JSON patterns.
+
+- =WSFederatedHttpBinding=, =WS2007FederationHttpBinding=, =MsmqIntergrationBinding=, =WS2007HttpBinding=
