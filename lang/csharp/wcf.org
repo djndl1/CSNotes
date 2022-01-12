@@ -287,3 +287,35 @@ host.Open();
 *** Test Client and Host Server
 
 =WcfTestClient.exe= and =WcfSvcHost=
+
+** WCF architecture
+
+Interception-based architecture. WCF intercepts the call on the client side and performing pre-call and post-call processing.
+
+The proxy serializes the call stack frame to a message and sends the message down a chain of channels to further process the message (encoding, passing the security call context, propagating the client transaction, managing the reliable session, encrypting the message body) and finally passes to the transport channel.
+
+On the host side, the message goes through decryption, decoding, joining the propaged transaction, setting the security principal, managing the session and activating the service instance. Finally, the dispatcher converts the message to a stack frame and calls the service instance.
+
+The service was called by a local client - the dispatcher. The service instance executes the call and returns control to the dispatcher, which then converts the returned values and error information into a return message, through host-sdie channels to perform post-call processing is such as managing the transaction, deactivating the instance, encoding the reply, encrypting it and so on and finally go through the transport channel.
+
+All the points in the architecture provide hooks for extensibility.
+
+*** Host Architecture
+
+Each host /process/ can have many /app domains/, with each hosting zero or more /service host instances/, and each host instances is dedicated to a particular service type. Each service host instance has zero or more /contexts/ (the innermost execution scope of the service). The host maps the message to a new or existing context and lets it process the call.
+
+** Channels
+
+Invoke operations on a service without ever resorting to using a proxy class.
+
+TODO
+
+** Transport-Level Sessions
+
+The client and channel maintain a logical session at the transport level (optional, dependent on the binding configuration). A session can time out and then gets terminated.
+
+** Reliability
+
+Transport reliablilty guarantees delivery at the network packet leve and in-order delivery of the packets.
+
+Message reliability provides end-to-end guaranteed delivery and order of messages, regardless of how many intermediaries are involved and how many network hops are required to deliver the message from the client to the service.
