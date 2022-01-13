@@ -319,3 +319,17 @@ The client and channel maintain a logical session at the transport level (option
 Transport reliablilty guarantees delivery at the network packet leve and in-order delivery of the packets.
 
 Message reliability provides end-to-end guaranteed delivery and order of messages, regardless of how many intermediaries are involved and how many network hops are required to deliver the message from the client to the service.
+
+* Contracts
+
+** Service Contracts
+
+Method overloading on the client side is possible by manual rework on the proxy. Hierarchical service contracts can be reflected in the client code: the client can see the derived service as a base service. The client can implement the derived proxy out of the base proxy.
+
+*** Service Contract Factoring and Designing
+
+A service contract isa grouping of logically related operations (domain-specific). Proper contract factoring results in more specialized, loosely coupled, fine-tunedd and reusable contracts. Service contracts with just one operatons are possible but should be avoided since it shows the design issue of the entity invovled. The optimal number of service contract members is between three and five.
+
+*** Contract Queries
+
+The client can programmatically verify whether a particular endpoint supports a particular contract.
