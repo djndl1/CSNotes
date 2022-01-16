@@ -1,0 +1,31 @@
+#+TITLE: Net_as_a_better_com
+
+* A Platform for Software Integration
+
+Dotnet provides /CLR/ (integrating software within a single OS process) and /XML web services/ (integrate software at Internet scale), both of which rely on /strongly typed contracts between components and encapsulation/. These contracts rely heavily on /metadata/ and /virtualization/.
+
+- Metadata: CLR and XML Web Services rely on high-fidelity, ubiquitous and extensible metadata to convey programmer intention. e.g. Object-to-XML mapping are captured in metadata for use by the CLR's XML serializer to avoid explicitly coding the deserialization.
+
+- Virtualization: separation of sematnic intentions from phsical implementation details
+
+* A Better COM
+
+** COM
+
+Component technologies focus on the /contracts/ between independently developed and deployed programs.The design paradigm of COM was that component contracts are expressed as /type definitions/. COM was a major advance because it brought the dynamic loading of code and the type system together in a fairly self-consistent manner.
+
+COM is both a programming model and a supporting platform technology.
+
+*** Problems
+
+Most if not all of the problems with the COM platform can be traced back to the nature of contracts between components. In an ideal world, the contracts between components would be expressed purely in terms of the /semantic guarantees/ and /assumptions that exist between the consumer and the component/. The closest practice is
+
+#+begin_quote
+use programmatic type definitions along with human-readable documentation that describes the semantics of those types.
+#+end_quote
+
+COM has the following problems:
+
+1. No standardized interchange format for contract definitions. The COM specification assumed that the type definitions of a contract would be communicated via some out-of-band technique that was outside the scope of COM proper. MIDL and TLB are not isomorphic in functionality. Also, COM does not address the problem of /dependencies/.
+
+2. COM's contract is binary/physical in nature, addressing problems such as calling stack, object reference format, vtable offset, data structure layout, utterly free of semantic content. This binary contract forces component authors to pay attention to some implementation details instead of pure semantics so as to not to break their users' code.
