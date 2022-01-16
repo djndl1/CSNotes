@@ -45,3 +45,15 @@ the CLR provides facilities that let programs read and write metadata without kn
  #+begin_quote
 Contracts in the CLR specifically do not describe the in-memory representation of anything. The CLR postpones the decisions regarding in-memory representations until the type is first loaded at runtime. This gives the CLR a great deal of flexibility with respect to virtual method table layout, stack discipline, alignment, and parameter passing conventions, all of which could change between versions of the CLR without the need to recompile components.
  #+end_quote
+
+** A New Programming Model
+
+CLR is built around types and type safety. The CLR encourages a worldview in which everything is a type, an object, or a value.
+
+#+begin_quote
+the CLR provides a range of services that collectively are called managed execution. Under managed execution, the CLR is omniscient and has complete information about all aspects of a running program. This includes knowledge of the state and liveness of local variables in a method. This includes knowledge of where the code for each stack frame originated. This includes knowledge of all extant objects and object references, including reachability information.
+#+end_quote
+
+Programmers are encouraged to give up the explicit management of memory and instead allocate and use instances of types. Similarly, programmers are encouraged to give up manual thread management and instead use the CLR's facilities for concurrent method execution.
+
+Also, metadata makes /generative programming/ possible. The CLR has CodeDOM for this.
