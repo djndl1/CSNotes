@@ -57,3 +57,60 @@ the CLR provides a range of services that collectively are called managed execut
 Programmers are encouraged to give up the explicit management of memory and instead allocate and use instances of types. Similarly, programmers are encouraged to give up manual thread management and instead use the CLR's facilities for concurrent method execution.
 
 Also, metadata makes /generative programming/ possible. The CLR has CodeDOM for this.
+
+* Components
+
+** CLR Modules
+
+CLR modules are valid win32 PE executables with a few extensions.
+
+#+BEGIN_SRC
+┌────────────────────┐
+│      PE Header     │
+├────────────────────┤
+│    COFF Header     │
+├────────────────────┤
+│                    │
+│ IMAGE_COR20_HEADER │
+│                    │
+├────────────────────┤
+│                    │
+│                    │
+│       CODE         │
+│  CLI/Native code   │
+│                    │
+├────────────────────┤
+│   Resource Code    │
+├────────────────────┤
+│   String/Blob Pools│
+├────────────────────┤
+│ Metadata Tables    │
+└────────────────────┘
+#+END_SRC
+
+ An assembly is a logical collection of one or more modules. Modules are physical constructs that exist as byte streams.
+A module is generally affiliated with only one assembly.
+
+Assemblies are the "atom" of deployment in the CLR and are used to package, load, distribute, and version CLR modules.
+
+- dependency problem: Modules typically rely on types from other assemblies.Every CLR module contains a list of assembly names that identifies which assemblies are used by this module. These external assembly references use the logical name of the assembly, which contains no remnants of the underlying module names or locations. It is the job of the CLR to convert these logical assembly names into module pathnames at runtime
+
+  To assist the CLR in finding the various pieces of an assembly, every assembly has exactly one module whose metadata contains the /assembly manifest/, an additional chunk of CLR metadata that acts as a directory of adjunct files that contain additional type definitions and code. The CLR can directly load modules that contain an assembly manifest only.
+
+- Encapsulation: Assemblies form an encapsulation boundary to protect internal implementation details from interassembly access.
+
+** Asseembly Names
+
+Friendly Name, culture, developer (public key), version
+
+The CLR uses the four-part assembly name to find the correct component at load time.
+
+Assemblies that contain a /CultureInfo/ cannot contain code; rather, they must be resource-only assemblies (also known as satellite assemblies) that can contain only localized strings and other user-interface elements. Assemblies containing code (that is, the vast majority of assemblies) are said to be culture-neutral and have no culture identifier.
+
+The public key (token) is used to resolve file name collisions between organizations, allowing multiple utilities.dll components to coexist in memory and on disk provided that each one originates from a different organization, each of which is guaranteed to have a unique public key.
+
+** Assembly Security
+
+Each assembly can have a public key embedded in its manifest that identifies the developer. Assemblies with public keys also have a /digital signature/ that is generated using the /private key/ before the assembly is first shipped that provides a secure hash of the assembly manifest, which itself contains hashes of all subordinate modules. An assembly can be built with only the public key during development and later signed with the private key to add the digital signature for deployment.
+
+related tools =sn.exe=
