@@ -1,0 +1,56 @@
+#+TITLE: Uuid_guid
+
+128-bit label used for information in computer systems. Standardized by Open Software Foudnation as part of the DCE, in ISO/IEC and RFC 4122.
+
+#+begin_quote
+anyone can create a UUID and use it to identify something with near certainty that the identifier does not duplicate one that has already been, or will be, created to identify something else. Information labeled with UUIDs by independent parties can therefore be later combined into a single database or transmitted on the same channel, with a negligible probability of duplication.
+#+end_quote
+
+* Uses
+
+- Linux filesystem userspace tools
+
+- Component Object Model: interface ID, Class ID, type library ID, category ID
+
+- As Database keys
+
+* Possible Collision
+
+Unlikely when generated using MAC addresses or one duplicate per trillion/quintillion.
+
+* Format
+
+Represented as 32 hexadecimal digits, normally in a big-endian format.
+
+#+BEGIN_SRC
+# 8-4-4-4-12
+123e4567-e89b-12d3-a456-426614174000
+#+END_SRC
+
+* Versions
+
+- Version 1 (date-time and MAC address); Version 2: similar to Version 1, usually omitted by implementation: relying on the uniqueness of MAC addresses (not actually reliable, though replaceable with random node ID). The timestamp part is so high resolution that practically no two UUIDs would be generated at the same timestamp.
+
+- Version 3 (MD5) and 5 (SHA-1): namespace name-based: hashing a namespace identifier and name
+
+- Version 4: 122 bits randomly generated
+
+* Variants
+
+- Variant 0:
+
+- Variant 1: RFC 4122/DCE 1.1 UUIDs, big-endian
+
+- Variant 2: Microsoft-backward compatible. Note that many UUIDs used in MS Windows are Variant-1 and =guidgen.exe= generates Variant 1 UUIDs.
+
+* Tools
+
+- =uuidgen=: a unix tool able to generate various versions of DCE 1.1 UUIDs, relying on =libuuid=.
+
+- =guidgen.exe=: a Windows developing tool, generates actually Variant 1 UUIDs.
+
+- [[https://devdocs.io/python~3.10/library/uuid][Python's =uuid= module]]: generates version 1, 3, 4 and 5 UUIDs
+
+- C# =System.Guid.NewGuid()=: Version 4 UUID
+
+- Various Online sites

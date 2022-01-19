@@ -114,3 +114,9 @@ The public key (token) is used to resolve file name collisions between organizat
 Each assembly can have a public key embedded in its manifest that identifies the developer. Assemblies with public keys also have a /digital signature/ that is generated using the /private key/ before the assembly is first shipped that provides a secure hash of the assembly manifest, which itself contains hashes of all subordinate modules. An assembly can be built with only the public key during development and later signed with the private key to add the digital signature for deployment.
 
 related tools =sn.exe=
+
+** The CLR Loader
+
+Dependencies are loaded just-in-time only when necessary by the loader. Most assemblies are loaded by name using the assembly resolver, using the four-part assembly name to determine which underlying file to load into memory. This is determined by
+
+- /Version policies/: Version policies are used to redirect the assembly resolver to load an alternate version of the requested assembly. Version policies can be specified per application, per component (/publisher policy/) and per machine.
