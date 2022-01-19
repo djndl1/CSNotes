@@ -1,0 +1,36 @@
+#+TITLE: Com Prog
+
+* COM Objects
+
+#+begin_quote
+marketing had a field day with the terminology.
+#+end_quote
+
+** Why And A lot of other buzzwords
+
+#+begin_quote
+COM evolved out of the solution to a specific problem — how to allow a
+word processor to edit the spread sheet in a letter without the user having to
+exit the word processor to do it. This solution was called OLE (Object Linking and Embedding)
+and contained a very sophisticated API that allows you
+even today to edit a letter within Internet Explorer using Microsoft Word.
+With the second release of OLE (OLE2), its creators modified
+OLE32.DLL to expose more of the basic functionality of OLE so that its API
+could be used to allow any application to access the functionality of
+another.
+#+end_quote
+
+- ActiveX Controls: COM-based GUI controls
+
+- Used in Client-Server applications
+
+- Multi-language library development
+
+** Use
+
+- =CoCreateInstance= with Class IDs and Interface IDs
+  + COM inforamtion is located under =HKEY_CLASSES_ROOT=, which points to =HKLM:\Software\Classes=
+  + /Class ID/ (/CLSID/): the filename
+  + /AppID/: an entry for remote COM server.
+  + /Interface/:
+  + /Program ID/: A friendly name associated with a class ID
