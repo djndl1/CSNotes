@@ -1,0 +1,35 @@
+* XML Documents/Files
+
+MIME media types: =application/xml=, =text/xml= for raw XML. More specific XML applications have their own MIME types.
+
+* Attributes
+
+Attributes are quite limited in structure. The value of the attribute is simply a text string. An element-based structure is a lot more flexible and extensible. Nonetheless, attributes are certainly more convenient in some applications
+
+* CDATA Sections
+
+#+BEGIN_SRC xml
+<p>You can use a default <code>xmlns</code> attribute to avoid
+having to add the svg prefix to all your elements:</p>
+     <![CDATA[
+       <svg xmlns="http://www.w3.org/2000/svg"
+            width="12cm" height="10cm">
+         <ellipse rx="110" ry="130" />
+         <rect x="4cm" y="1cm" width="3cm" height="6cm" />
+       </svg>
+     ]]>
+#+END_SRC
+
+* Processing Instructions
+
+A means of passing information to particular applications that may read the document. Processing instructions are markup but not elements.
+
+#+BEGIN_SRC xml
+<?robots index="yes" follow="no"?> <!-- meant for robots as the target to consume -->
+#+END_SRC
+
+* XML Declaration
+
+- Encoding: UTF-8 default if not specified
+
+- standalone: if a DTO read is needed for this document
