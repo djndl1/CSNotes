@@ -28,9 +28,93 @@ another.
 
 ** Use
 
+*** Create a CoClass
+
 - =CoCreateInstance= with Class IDs and Interface IDs
   + COM inforamtion is located under =HKEY_CLASSES_ROOT=, which points to =HKLM:\Software\Classes=
   + /Class ID/ (/CLSID/): the filename
   + /AppID/: an entry for remote COM server.
   + /Interface/:
   + /Program ID/: A friendly name associated with a class ID
+
+*** COM Communication
+
+Cross-process calls are done through automatically generated proxy/stub pairs. =OLE32.DLL= provides the standard proxy/stub. The objects referenced by pointers are serialized to and from the server.
+
+*** Destroy a CoClass
+
+The object itself uses a reference counter scheme. Decrement its refcount after using a CoClass. An EXE COM server also checks the refcount by sending messages its client and decrement the refcount if no response is made.
+
+*** Example-1: Simple Creation and Deletion of a COM Component
+
+#+BEGIN_SRC c++
+int SimpleComUse()
+{
+        IDesktopWallpaper* wallpaper;
+        HRESULT hr = ::CoCreateInstance(
+                CLSID_DesktopWallpaper,
+                nullptr,
+                CLSCTX_ALL,
+                IID_IDesktopWallpaper,
+                (LPVOID*)&wallpaper);
+
+        if (FAILED(hr))
+        {
+                return 1;
+        }
+
+        DESKTOP_WALLPAPER_POSITION wallpaperPosition;
+        hr = wallpaper->GetPosition(&wallpaperPosition);
+        if (FAILED(hr))
+        {                return 2;        }
+        // use the results
+         wallpaper->Release();
+}
+#+END_SRC
+
+#+BEGIN_SRC cpp
+template<typename I>
+static const bool is_com_type_v = std::is_base_of_v<IUnknown, I>;
+
+template <typename I>
+struct com_deleter {
+    void operator()(I *coptr) {
+        static_assert(is_com_type_v<I>, "The class is not
+a COM type");
+
+        if (coptr != nullptr) {
+            coptr->Release();
+        }
+    }
+};
+#+END_SRC
+
+** Binding
+
+/Early binding/ (Custom Interface): access to COM object definition at compile time
+
+/Late binding/ (Automation Interface): a suitably prepared client can query the object at runtime to find out its interface, requires =IDispatch= be implemented.
+
+** Singleton
+
+There is not builtin support in COM to support singletons.
+
+** Single/Multiple Use EXE
+
+A COM class that forces COM to start up a new EXE on calling is called a /Single Use/ class.
+
+** Running Object Table
+
+The server can allow clients to access an existing COM object by registering it in the /Running Object Table/ using COM API call.
+
+** DLL Host
+
+COM DLLs can be used across machine boundaries. There are APIs and prewritten exe =DLLHOST.EXE= for such /DLL Surrogate/ Applications.
+
+** Thread Safety
+
+COM provides threading models to ensure thread safety.
+
+** Writing COM in Standard C++
+
+Not a very good idea, use MFC or ATL.
