@@ -118,3 +118,156 @@ COM provides threading models to ensure thread safety.
 ** Writing COM in Standard C++
 
 Not a very good idea, use MFC or ATL.
+
+* COM Communication
+
+COM automates interprocess communications through OLE32.DLL for simple argument types or a custom proxy/stub DLL,
+defined by an IDL file.
+
+In Both cases, arguments are marshalled into NDR transfer syntax and then go through MSRPC to the server.
+
+** IDL
+
+*** Early Binding
+
+#+begin_src c++
+[
+    object,
+    uuid(E1637ED6-1746-11D2-9BC7-00AA003D8695)
+]
+interface IWzd : IUnknown
+{
+    HRESULT Initialize();
+    HRESULT method1([in] short nIn,
+    [out] char *pOut,
+    [in, out] char *pInOut
+     );
+    HRESULT method2([in, out] char *pInOut);
+};
+
+#+end_src
+
+*** Late Binding
+
+1. =GetTypeInfo()= and =GetTypeInfoCount()= returns all of the methods and properties of a COM object.
+
+2. A client gets the ID of a method or property by calling =GetIDsofNames= and then invoke the method/property by using =Invoke()=
+
+#+begin_src c++
+dispinterface CWzd
+{
+properties:
+    [id(1)] int property1;
+methods:
+    [id(2)] HRESULT method1();
+};
+}
+
+#+end_src
+
+*** Dual Interface
+
+#+begin_src cpp
+[
+    uuid(E1637ED6-1746-11D2-9BC7-00AA003D8695),
+    oleautomation,
+    dual
+]
+interface IHello : IDispatch
+{
+    [id(1)] HRESULT Initialize(); HRESULT method1([in] short nIn,
+    [out] char *pOut, [in, out] char *pInOut
+);
+    [id(2)] HRESULT method2([in, out] char *pInOut);
+};
+
+#+end_src
+
+*** Type Library Declaration
+
+#+begin_src cpp
+library WzdTypeLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+[
+    uuid(DCBC68C9-4E2A-11D2-AB34-00C04FA3729B),
+]
+    coclass WzdClass
+    {
+        [default] interface IWzd;
+    };
+};
+#+end_src
+
+** Argument Passing
+
+*** Types
+
+=OLE32.DLL= only understands standard types and cannot pass structures so a proxy/stub DLL is needed.
+However, VB cannot use such DLLs.
+
+**** Array
+
+
+**** Structures
+
+COM defined structures, not C++ classes/structures.
+
+**** CoClass
+
+Use =IUnknonw= or =IDispatch= as the argument type and cast them on the server side.
+
+**** Memory Pointer
+
+Memory management is now distributed, thus requires a different set of API. Use =CoTaskMemAlloc()= and =CoTaskMemDealloc()=.
+Memory pointers can be marshalled in three ways:
+
+- =[ref]= (readonly by value): passes the memory pointer and any data it points to and the server promises not to change or deallocate the memory.
+
+- =[unique]=: default, the server can change the memory and even deallocate it and this pointer is the unique one that points to the corresponding memory.
+
+- =[ptr]=: the most transparent
+
+*** Argument Attribute
+
+- =[in]=: only transmit this from the client to the server
+
+- =[out]=: nothing to transmit to the server. The client must fill this argument to accept the outbound result or to put a =NULL= to discard the result.
+
+- =[in, out]=: send the data to the server and expect the data to be modified there and returned. If no data is to send, use =NULL= here.
+
+- =[out, retval]=: returned as the result of the call, only used on the last argument.
+
+*** VB Interoperability
+
+- =BSTR= (binary string, UTF-16 encoded) for VB strings, allocated by =SysAllocString()=.
+
+- =SAFEARRAY= for VB array.
+
+- =VARIANT= for VB variant.
+
+*** Reverse Communication
+
+The client can pass a callback to the server and expect the server to communicate with the client.
+
+- Connection Points and Sinks: the client has sinks (a mini COM server on the client side) for the server to call and the serve has a connection point to call this sink.
+
+  TODO
+
+** Encapsulation and Aggreation
+
+No runtime inheritance for COM. The user is forced to use manual encapsulation to derive from a base class or let COM do aggregation.
+With aggregation, the client call =QueryInterface= to get an interface to the base class's methods. ???
+
+*** Security
+
+- Activation Security: DCOM server side functionality can be turned off.
+
+*** Object Security
+
+More fine-granular control over what objects can be created and accessed.
+
+- The client must use an account identical to what the server uses.
+
+- The server must grant permissions to allow the client to create and access an object.
