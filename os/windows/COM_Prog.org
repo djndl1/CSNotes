@@ -271,3 +271,126 @@ More fine-granular control over what objects can be created and accessed.
 - The client must use an account identical to what the server uses.
 
 - The server must grant permissions to allow the client to create and access an object.
+
+** Thread Safety
+
+Call =CoInitialize= from each thread the app creates before using COM from that thread.
+
+*** Automatic Thread Safety
+
+[[https://docs.microsoft.com/en-US/troubleshoot/windows/win32/descriptions-workings-ole-threading-models][Descriptions and Workings of OLE Threading issues]]
+
+[[https://www.codeguru.com/soap/understanding-com-apartments-part-i/][Understading COM apartments Part One]]
+
+[[https://www.codeguru.com/soap/understanding-com-apartments-part-ii/][Understanding COM Apartments Part Two]]
+
+The core concept of COM Concurrency revolves around /apartment/.
+
+An /apartment/ is a /concurrency boundary/. The primary reason that apartments exist
+is to enable COM to serialize method calls to objects that aren’t thread-safe.
+If you don’t tell COM that an object is thread-safe, COM won’t allow more than one call at a time to reach the object.
+Tell COM that the object is thread-safe, it will happily allow the object to field concurrent method calls on multiple threads.
+
+Every thread that uses COM, and every object that those threads create, is assigned to an apartment (when calling =CoInitialize(Ex)=.
+Apartments never span process boundaries.
+If COM assigns the object and the thread that created it to the same apartment,
+then the client has direct, unimpeded access to the object.
+But if COM places the object in another apartment, calls to the object from the thread that created it are marshaled.
+
+**** Single Threaded Apartment
+
+In practice, a thread protected by COM synchronization mechanism.
+
+COM is able to use a message loop to synchronize any cross-thread call to a method of a COM object in an STA.
+This certainly has some performance implication since any call is synchronized into the
+same thread entirely (the opposite of multithreading).
+
+Every call destined for an object in an STA is transferred to the STA’s thread before being delivered.
+COM is able to track the call chain
+of an incoming call to an STA and let the STA process this incoming call
+if the incoming call might be indirectly initiated by a call from the STA
+so that no deadlock occurs 
+
+**** Multithreaded Apartment
+
+A MTA is just the whole process. A MTA has no message queue and hidden window.
+Calls inbound to an object in an MTA are transferred to threads randomly selected from an RPC thread pool and are not serialized.
+The user should provide synchronization inside the COM object so that any thread can access it directly.
+
+**** Neutral Apartment
+
+NTA hosts objects only and threads are never assigned to NTA. Since NTA does not host any threads,
+the execution flow is still on its original thread yet uses a COM object not in its original apartment,
+reducing marshalling overhead across apartments.
+
+**** Objects and Apartments
+
+- None (Single): Main STA. The objects might access the same global resource, thus running on the same
+  STA (the Main STA) will guarantee that.
+
+- Apartment: Any STA
+
+- Free: MTA
+
+- Both: STA or MTA
+
+- Neutral: NTA
+
+COM tries its best to place in-proc objects in the same apartments as the threads that create them..
+
+#+caption:  Object and Apartments In-Proc
+|     | None     | Apartment     | Free | Both          | Neutral |
+| STA | Main STA | Creator's STA | MTA  | Creator's STA | NTA     |
+| MTA | Main STA | STA           | MTA  | MTA           | NTA     |
+|-----+----------+---------------+------+---------------+---------|
+
+**** How to write clients
+
+- Always remember calling =CoInitializeEx= and =CoUninitialize=
+
+- An STA thread needs a message loop!
+
+#+begin_src cpp
+MSG msg;
+while (GetMessage (&msg, 0, 0, 0))
+    DispatchMessage (&msg);
+#+end_src
+
+- Never Pass Raw, Unmarshaled Interface Pointers Between Apartments, i.e. create a
+  new proxy for user apartments.
+  + =CoMarshalInterThreadInterfaceInStream=, =CoGetInterfaceAndReleaseStream=, =CoGetInterfaceAndReleaseStream=
+  + The Global InterfaceTable: =IGlobalInterfaceTable::RegisterInterfaceInGlobal=, =IGlobalInterfaceTable::GetInterfaceFromGlobal=
+
+**** How to write servers
+  
+- Apartment threading model only promise safe concurrent access to the object itself,
+  but not the data they access.
+
+- Objects Marked =ThreadingModel=Free= or =ThreadingModel=Both= Should be Wholly Thread-Safe
+
+- Avoid Using TLS in Objects Marked =ThreadingModel=Free= or =ThreadingModel=Both= since
+  the next call might not be executed in the same MTA thread.
+
+For out-of-proc objects, COM places an out-of-proc object in the same apartment as the thread in the server process that creates the object.
+In reality, this is determined by the apartment of the thread in which the class object is created and registered.
+
+There are several factors that determines which mechanism is used for thread safety.
+
+- the concurrency model used by the COM DLL, specified in =CoInitializeEx=.
+
+- the threading model a COM object is using: =Single=, =Appartment=, =Free= or =Both=.
+
+- Whether a COM object is in a DLL or an EXE.
+
+- Whether the COM object is created by another COM object.
+
+An out-of-process EXE is by definition running in another thread than the caller.
+If the server chooses =COINIT_APARTMENTTHREADED=, then the server objects will always
+be created in the same communal thread. =COINIT_MULTITHREADED= fires a new thread for each
+new COM object.
+
+There are much more complicated cases when using an in-process server.
+
+A process that does COM work is a collection of apartments with,
+at most, one multithreaded apartment (threads that fight to execute a COM method)
+but any number of single-threaded apartments (threads in which COM objects are protected by COM).
