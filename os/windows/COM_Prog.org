@@ -119,6 +119,20 @@ COM provides threading models to ensure thread safety.
 
 Not a very good idea, use MFC or ATL.
 
+** COM Infrastructure
+
+*** The COM Library
+
+A set of DLLs and EXEs (primarily =ole32.dll= and =Rpcss.exe=) to provide basic services for COM.
+
+- A small number of fundamental functions that facilitate the creation of COM applications, both client and server.
+
+- Implementation-locator services through which COM determines, from a unique class identifier (CLSID), which server implements that class and where that server is located. 
+
+- Transparent remote procedure calls
+
+- A standard mechanism to allow an application to control how memory is allocated within its process.
+
 * COM Communication
 
 COM automates interprocess communications through OLE32.DLL for simple argument types or a custom proxy/stub DLL,
@@ -255,14 +269,64 @@ The client can pass a callback to the server and expect the server to communicat
 
   TODO
 
-** Encapsulation and Aggreation
+** Encapsulation and Aggreation To Reuse 
+
+Since implementation inheritance relies on the internal implementation
+of an object, building reusable components is to be able to treat the
+object as an opaque box.
 
 No runtime inheritance for COM. The user is forced to use manual encapsulation to derive from a base class or let COM do aggregation.
 With aggregation, the client call =QueryInterface= to get an interface to the base class's methods. ???
 
+- Containment (Encapsulation): the outer object acts as the client of the inner object
+
+- Aggregation (not very practical): the outer object exposes interfaces from the inner object
+  as if they were implemented on the outer object, a specialized case of containment.
+  There is no need to delegate interface calls from the outer object to the inner object,
+  as the inner object's interfaces are directly available to external clients. 
+  COM objects must be preprogrammed to support the ability to be aggregated by another object.
+  + The client should not see the inner object's =IUnknown= to present only
+    the identity of the outer object
+
+*** An Example of Aggregable (inner) object
+
+1. The =IUnknown= implementation of an aggregable object controls its own refcounting and interfaces.
+
+2. The other interfaces of an aggregable delegates its =QueryInterface=,
+   =AddRef= and =Release= to the outer object (to present the inner object
+   as part of the outer object).
+
+3. The inner object has no ownership of a pointer to the outer object (no =AddRef= on the outer object)
+   otherwise there would form a circular reference, or even worse, an object
+   referencing itself under the non-aggregation case.
+
+4. The outer object should only own an =IUnknown= pointer of the inner object.
+
+[[https://docs.microsoft.com/en-us/windows/win32/com/aggregation][Aggregation]]
+
+[[https://www.codeproject.com/Articles/5337/COM-Concept-Unleashing-Aggregation][Com Concept: Unleashing Aggregation]]
+
+*** Aggrgating (outer) object
+
+The outer component controls the lifetime of the inner component
+via non-delegating interface pointer.
+
+1. the outer object can only ask for the =IUnknown= of the inner object when creating
+
+2. the outer object must deref once when querying one of the inner object's interface
+   except =IUnknown= since these interfaces of the inner object delegate =AddRef= to the
+   outer object thus the outer object is =AddRef= to itself.
+   Also, when disposing this pointer, the inner interface would deref
+   the refcount of the outer object, thus the outer should call its own =AddRef()= to
+   compensate. (It is required that the outer object's refcount should not be
+   affected by the inner object's interface).
+
 *** Security
 
-- Activation Security: DCOM server side functionality can be turned off.
+- /Activation Security/: how new objects are created, how clients connect to new and existing objects,
+  and how certain public services, such as the Class Table and the Running Object Table are secured.
+
+- /Call Security/: how security operates in an established connection between a client to a COM object.
 
 *** Object Security
 
