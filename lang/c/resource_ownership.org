@@ -1,0 +1,166 @@
+* How Rust works
+
+Three Rules
+
+1. Each value has a variable called it's /owner/.
+
+2. There can only be one owner at a time
+   + by default Rust moves value to another owner when assigning unless
+     the object has implemented the =Copy= trait
+
+4. When the owner goes out of scope, the value will be dropped
+
+
+#+begin_src rust
+  fn main() {
+      let s1 = String::from("hello");
+      let s2 = s1; // by default move the resource of s1 to s2,
+      // a consequence of rule 2, even if deep-copy, 
+      // is safe here, it // is expensive after all
+
+      println!("{}, world!", s1); // compile error
+  }
+#+end_src
+
+Implicit deep copy requires an implementation of the =Copy= trait and
+no =Drop= method.
+
+The semantics for passing a value to a function are similar to
+those for assigning a value to a variable.
+Passing a variable to a function will move or copy depending on the
+function signature and the argument type, but basically the same
+rule for the assignment.
+
+** Using a value without transferring ownership: Reference
+
+/Borrowing/: the action of creating a reference.
+
+- At any given time, you can have either one mutable reference
+  or any number of immutable references.
+ 
+- References must always be valid.
+
+
+1. Reference is by default immutable (to the pointed value).
+
+2. unless specified both in the signature and the user's code
+
+3. /Only one mutable reference to a particular piece of data at a time/
+   (derived from Rule 2) to prevent /data races/.
+
+4. One cannot have a mutable reference and an immutable one to the same
+   value at the same time.
+
+* [[https://resources.sei.cmu.edu/asset_files/WhitePaper/2013_019_001_55008.pdf][Pointer Ownership Model]]
+
+[[https://insights.sei.cmu.edu/blog/using-the-pointer-ownership-model-to-secure-memory-management-in-c-and-c/][Using the Pointer Ownership Model to Secure Memory Management in C and C++]]
+
+#+begin_quote
+The pointer ownership model (POM) can statically
+identify certain classes of errors involving dynamic
+memory in C programs. The model works by requiring
+the developer to identify responsible pointers; these are
+the pointers whose objects must be explicitly freed
+before the pointers themselves may be destroyed. POM
+can be statically analyzed to ensure that the design is
+consistent and secure, and that the code correctly
+implements the design. 
+#+end_quote
+
+** Pointer/Resource Categories
+
+- /Responsible/ pointers (owner): responsible for freeing its pointed-to object
+  A responsible pointer might be in the following states
+   + /good/: safe to dereference and must be freed after use
+   + /null/: may be freed but with no effect
+   + /uninitialized/: with no value
+   + /zombie/: a pointer whose value has been transferred or freed.
+     Zombie pointers must not be dereferenced or freed.
+
+- /Irresponsible/ pointers (borrower):
+
+- /Out-of-scope/ pointers: not applied to by this model. Refcounted, GCed, circular linked list
+  An Out-of-scope pointer shall not be assigned the value of a responsible pointer
+
+- A struct is responsible if it contains any responsible pointers, or it
+   contains any other responsible objects. A responsible object is good if
+   all of its responsible pointers are good or null. A responsible object
+   is zombie if none of its responsible pointers are good. A responsible
+   object is inconsistent if it is either good nor zombie.
+
+** Basic Pointer Rules
+
+1. Every object on the heap must be referenced by exactly one responsible
+   pointer.
+
+2. Irresponsible pointers can point anywhere but cannot free anything.
+
+3. The subtypes of pointer variables never changes: once a responsible pointer, always a responsible pointer.
+   the state of responsible pointers can change in the following ways
+   + assignment (write of a responsible pointer into another responsible pointer)
+   + producer return value or as a producer argument
+   + consumer argument (giving up ownership)
+
+4. Any function that modifies the state of an object must not exit with
+   the object in an inconsistent state.
+
+** Function Category
+
+1. /no-return function/
+
+2. /producer function/: a function that produces a responsible object, =malloc=, =strdup=
+
+3. /consumer function/: a function that frees or transfer a responsible object
+   e.g. =realloc=
+
+** Argument Types
+
+- /producer argument/ or /producer return value/: an argument or return value that takes ownership
+
+- /consumer argument/: an argument whose ownership will be taken or freed
+
+- /irresponsible pointer argument/: it is permissible to pass any pointer
+
+- /forced irresponsible pointer argument/: a pointer-to-pointer argument, not for modifying the memory or consuming it,
+  but the value of the original pointer might be modified.
+  A responsible pointer must not be passed as a forced-irresponsible pointer argument.
+
+** Ownership Rules:
+
+- Ownership can be transferred from one responsible pointer
+   to another, leaving the old one a unusable end-of-lifetime 'zombie' pointer.
+   (Basic Rule 1)
+
+- An irresponsible pointer is not an owner
+  + should never be a producer argument =**T= or producer return value (a pointer value representing a new resource) (Basic Rule 3)
+  + should never be a consumer argument (the function would either free the pointed data or give it to some other responsible pointer) (Basic Rule 3)
+  + should never be copied over to a responsible pointer (this basically implies that the resource now has two owners) (Basic Rule 1)
+
+#+begin_src c
+  char *irp = irp_init_val;
+  irp = malloc(5);
+
+  char *irp = irp_init_val;
+  free(irp);
+  
+  char *rp;
+  char *irp = irp_init_val;
+  rp = irp; // bad
+  memcpy(&rp, &irp, sizeof(rp)); //bad
+#+end_src
+  
+- A responsible pointer can only be assign the following value:
+  + =NULL= (nullify the pointer after ownership transfer, being freed or for proper initialization)
+  + another responsible pointer (ownership transfer)
+  + a producer return value (or as an argument) (ownership transfer)
+
+- An /uninitialized responsible/ pointer's value shall never be /copied/ to
+  an /irresponsible pointer/ ,/consumed/, /dereferenced/.
+
+- A /good responsible/ pointer shall never be overwritten,
+  go out of scope while good.
+
+- A /zombie responsible/ pointer shall never be assigned, consumed or dereferenced.
+
+- A conversion to integer from a responsible pointer can be considered
+  an implicit assignment to an irresponsible pointer and then conversion to an integer.
