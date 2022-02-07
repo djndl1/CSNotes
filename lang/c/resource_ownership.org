@@ -8,7 +8,7 @@ Three Rules
    + by default Rust moves value to another owner when assigning unless
      the object has implemented the =Copy= trait
 
-4. When the owner goes out of scope, the value will be dropped
+3. When the owner goes out of scope, the value will be dropped
 
 
 #+begin_src rust
@@ -50,6 +50,11 @@ rule for the assignment.
 
 4. One cannot have a mutable reference and an immutable one to the same
    value at the same time.
+
+** Use slices to reference a part of a collection
+
+This keeps variables about part of a collection in sync with the collection's owner:
+slices are references to a contiguous sequence.
 
 * [[https://resources.sei.cmu.edu/asset_files/WhitePaper/2013_019_001_55008.pdf][Pointer Ownership Model]]
 
