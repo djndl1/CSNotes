@@ -535,3 +535,22 @@ The server object needs to implement =ICallFactory= and the returned call object
 is cast to the =AsyncIMyInterface=, and then the respective =Begin_MyCall= is called.
 The client can then optionally call =Finish_MyCall= by casting the call object to =ISynchronize= and waiting at
 =Wait= and finally calling =Finish_MyCall= to obtain the result.
+
+** COM+
+
+More of an enhancement to MTS than any change to COM.
+
+*** DLL Surrogate
+
+To split an monolithic COM EXE server into COM DLL servers, a standard COM EXE is needed to launch the app.
+
+#+begin_quote
+A DLL Surrogate is a special EXE application that can load COM DLLs on
+behalf of a client — on the same machine or another machine.
+#+end_quote
+
+Use =OLE/COM Viewer= to configure the client to let =DLLHOST.EXE= to host COM DLL servers.
+
+*** MTS
+
+distributed transaction
