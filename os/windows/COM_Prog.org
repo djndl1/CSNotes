@@ -157,7 +157,7 @@ or between a client and the COM library, allocate memory using this allocator.
 - =in/out= parameters are allocated by the caller and then freed and reallocated by the one called. The caller is responsible
   for freeing he final returned value using the standard COM memory allocator.
 
-In failure conditions, the client typically has no wway to clean up the =out= or =in/out= parameters. The server must return
+In failure conditions, the client typically has no way to clean up the =out= or =in/out= parameters. The server must return
 robust values back to the caller to handle.
 
 - the client shouldn't have to take any action w.r.t. memory management on failure.
@@ -168,7 +168,17 @@ robust values back to the caller to handle.
 
 **** Refcount Rules
 
+#+begin_quote
+from a client's perspective, reference counting is strictly and clearly a per-interface-pointer notion, and therefore objects that take advantage of this capability by dynamically constructing, destroying, loading, or unloading portions of their functionality based on the currently extant interface pointers may be implemented.
+#+end_quote
 
+The default rule: The default case is that AddRef must be called for every new copy of an interface pointer and Release must be called for every destruction of an interface pointer.
+
+***** Complementary Rules
+
+- In-Out parameters to functions: the caller must call =AddRef= on the parameter before passing it in because the parameter will be reassigned
+
+- Local copy of a global variable requires an =AddRef=
 
 *** COM Server
 
