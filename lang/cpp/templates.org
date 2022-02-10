@@ -818,3 +818,114 @@ However, for default arguments, it must be:
 
 #+BEGIN_SRC C++
 #+END_SRC
+
+* Curiously Recurring Template Pattern (F-bound Polymorphism)
+
+[[https://web.archive.org/web/20030604104137/http://archive.devx.com/free/mgznarch/vcdj/1999/julmag99/atlinherit1.asp][ATL and Upside-Down Inheritance]]
+
+#+begin_src cpp
+template <class T>
+struct Base
+{
+    void interface()
+    {
+        // ...
+        static_cast<T*>(this)->implementation();
+        // ...
+    }
+
+    static void static_func()
+    {
+        // ...
+        T::static_sub_func();
+        // ...
+    }
+};
+
+struct Derived : Base<Derived>
+{
+    void implementation();
+    static void static_sub_func();
+};
+#+end_src
+
+** A Object counter for a Type
+
+#+begin_src cpp
+template <typename T>
+struct counter
+{
+    static inline int objects_created = 0;
+    static inline int objects_alive = 0;
+
+    counter()
+    {
+        ++objects_created;
+        ++objects_alive;
+    }
+
+    counter(const counter&)
+    {
+        ++objects_created;
+        ++objects_alive;
+    }
+protected:
+    ~counter() // objects should never be removed through pointers of this type
+    {
+        --objects_alive;
+    }
+};
+// X and Y are two different types and counter<X> and counter<Y> are two different types thus
+// two counters are maintained
+class X : counter<X>
+{
+    // ...
+};
+
+class Y : counter<Y>
+{
+    // ...
+};
+#+end_src
+
+** [[https://marcoarena.wordpress.com/2012/04/29/use-crtp-for-polymorphic-chaining/][Polymorphic Method Chaining]]
+
+
+#+begin_src cpp
+// Base class
+template <typename ConcretePrinter>
+class Printer
+{
+public:
+    Printer(ostream& pstream) : m_stream(pstream) {}
+
+    template <typename T>
+    ConcretePrinter& print(T&& t)
+    {
+        m_stream << t;
+        return static_cast<ConcretePrinter&>(*this);
+    }
+
+    template <typename T>
+    ConcretePrinter& println(T&& t)
+    {
+        m_stream << t << endl;
+        return static_cast<ConcretePrinter&>(*this);
+    }
+private:
+    ostream& m_stream;
+};
+
+// Derived class
+class CoutPrinter : public Printer<CoutPrinter>
+{
+public:
+    CoutPrinter() : Printer(cout) {}
+
+    CoutPrinter& SetConsoleColor(Color c)
+    {
+        // ...
+        return *this;
+    }
+};
+#+end_src
