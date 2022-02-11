@@ -1,0 +1,144 @@
+#+TITLE: ATL
+
+* Basics
+
+An ATL class will inherit
+
+** =CComObjectRootEx=
+
+provides the implementation of the =IUnknown= interface.
+It depends on the thread model classes (=CComMultThreadModel= or =CComSingleThreadModel=) to provide proper implementation of atomic increment/decrement and multi-threading locks.
+
+** =CComCoClass=
+
+implements the class factory
+
+** Optional =IDispatchImpl<>=
+
+implements =IDispatch=
+
+** =COM_MAP= macros
+
+generate code to fill in a lookup table for =QueryInterface=
+
+** Adding an Additional Interface
+
+1. Add the new interface in the IDL file.
+
+2. inherit the interface in the class declaration
+
+3. add the new interface to the COM MAP
+
+4. implement the new interface
+
+** Events
+
+TODO
+
+** String
+
+COM uses the =OLECHAR= character data type as the base of its string type =LPOLESTR=: a NUL-terminated array of =OLECHAR= characters.
+
+Some COM components uses =BSTR=, a length-prefixed array of =OLECHAR= with special semantics.
+
+*** =BSTR= and =CComBSTR=
+
+NUL-terminated string is a C-specific concept.
+
+The Microsoft Visual Basic interpreter, the Microsoft Java virtual machine, and most scripting languages, such as VBScript and JScript, internally represent a string as a =BSTR=.
+
+1. =BSTR= is a pointer to a length-prefixed (length of effective characters without the NUL) array of NUL-terminated =OLECHAR= characters. Since there is a length
+   prefixed, the actual string may contain =NUL= characters.
+
+2. =SysAllocString= and =SysFreeString=
+
+3. A =NULL= =BSTR= implies an empty string
+
+*** =CString=
+
+*** Conversion
+
+COM defines a few conversion classes between =LPTSTR=,
+=LPWSTR=, =LPSTR=, =LPOLESTR= and string helpers such as
+=ocscpy=, =CharNextO=.
+
+** Smart Types
+
+*** =VARIANT= and =CComVariant=
+
+used as parameters or the return value of varying data types.
+
+*** =SAFEARRAY= and =CComSafeArray=
+
+TODO
+
+** Collections and Enumerations
+
+- /COM object model/: a parent object that holds a set of child objects.
+  /COM collections/ and /enumerators/ are the glue that holds the parent
+  and the children together.
+
+
+*** COM Collection
+
+- /COM collection/: a COM object that holds a set of data and allows the client to manipulate its contents via a COM interface. COM defines collections through coding conventions.
+
+A COM Collection at least has the following form.
+
+#+begin_src cpp
+[ object, dual ] // typicall dual
+template <typename T>
+interface ICollection : IDispatch {
+  [propget]
+  HRESULT Count([out, retval] long* pnCount);
+
+  [id(DISPID_VALUE), propget]
+  HRESULT Item([in] long n, [out, retval] T* pnItem); // typically 1-based but depdending on the author
+
+  [id(DISPID_NEWENUM), propget]
+  HRESULT _NewEnum([out, retval] IUnknown** ppEnum); // exposes an enumerator
+};
+#+end_src
+
+*** COM Enumerator
+
+- /COM Enumerator/: basically a container iterator. An enumerator allows the client to decide how many elements
+  it wants.
+
+- an enumerator is capable of accessing the data of the collection and maintaining a logical pointer to the next
+  element to retrieve.
+
+[[https://docs.microsoft.com/en-us/windows/win32/midl/call-as][Call-as attribute]]
+
+ #+begin_src cpp
+template <typename T>
+interface IEnum : IUnknown {
+  [local] // no stubs generated
+  HRESULT Next([in] ULONG celt,
+               [out] T* rgelt,
+               [out] ULONG *pceltFetched); // can be NULL if celt is one
+  // check if a number of elt elements is available
+  // and retrieve them in rgelt
+  // the MIDL compiler implements the RemoteNext
+
+
+  // the method that provides marshalling,
+  [call_as(Next)] // map Next to RemoteNext
+  HRESULT RemoteNext([in] ULONG celt,
+                     [out, size_is(celt),
+                      length_is(*pceltFetched)] T* rgelt,
+                     [out] ULONG *pceltFetched); // cannot be NULL, must be provided
+
+  HRESULT Skip([in] ULONG celt); // moves the logical pointer but retrieves no data, no skipping backward
+  HRESULT Reset(); // moves the pointer back to the beginning
+  HRESULT Clone([out] IEnum<T> **ppenum);
+  // returns a copy of the enumerator (including its current state)
+}
+ #+end_src
+
+The client calls =Next=, which actually calls =IEnum_Next_Proxy= which in turns calls =IEnum_RemoteNext_Proxy=, transmitting the message to
+=IEnum_RemoteNext_Stub=, which calls the server side
+=IEnum_Next_Stub=. Basically just some wrapper around
+the =RemoteNext= to get around the MIDL limitation.
+
+VBA calls the enumerator methods in its for-each looop.
