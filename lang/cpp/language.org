@@ -1,0 +1,50 @@
+* Range-Based Loop (C++11 and above)
+
+#+begin_src cpp
+// the simple form
+for (range-declaration : range-expression)
+// which expands to
+auto && __range = range-expression ;
+for (auto __begin = begin_expr, __end = end_expr; __begin != __end;
+     ++__begin) {
+    range-declaration = *__begin;
+    loop-statement
+}
+#+end_src
+
+The =range-expression= is where the magic happens. It needs to be
+
+1. An array with a known size: =begin_expr= is =__range= and =end_expr= is =(__range + bound)=.
+
+2. a class type with a member named =begin()= (=__range.begin()=) and a member =end()= (=__range.end()=).
+
+3. By Koenig lookup to find a pair of free functions of =begin(__range)= and =end(__range)==.
+
+   Thus, the following implementation from /Windows Implementation Library/ is totally valid.
+
+#+begin_src cpp
+template <typename T>
+ class pointer_range
+ {
+ public:
+     pointer_range(T begin_, T end_) : m_begin(begin_), m_end(end_) {}
+     T begin() const  { return m_begin; }
+     T end() const    { return m_end; }
+ private:
+     T m_begin;
+     T m_end;
+ };
+#+end_src
+
+And the following use runs fine.
+
+#+begin_src cpp
+int main() {
+    int a[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
+
+    for (int i : pointer_range<int*>(&a[0], &a[10])) {
+        std::cout << i << ' ';
+    }
+    std::cout << '\n';
+}
+#+end_src
