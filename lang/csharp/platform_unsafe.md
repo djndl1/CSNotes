@@ -64,6 +64,24 @@ Use `System.Runtime.InteropService.SafeHandle` to provide a class that implement
 
 Function pointers map to delegates. https://stackoverflow.com/questions/5235445/pinvoke-c-function-takes-pointer-to-function-as-argument
 
+# Memory Management
+
+## Strings `string` and `StringBuilder`
+
+Marshalled as =BSTR= or null=terminated strings (unicode or not).
+
+- Normal `string` argument is `[in] BSTR`: copied; However, if marshalled as `LPWSTR`, it is directly accessed by unmanaged code. In either case, strings are immutable and not copied back to .NET.
+  Native code is not responsible for releasing the memory unless the string reference is passed and a new value is assigned, otherwise, .NEt owns the memory and will release it after the call.
+
+- `ref string` argument is `[in, out] BSTR *s`;
+
+## COM Marshaling
+
+Interop Marshaling is handled completely by CLR's Interop Marshaler, independent of COM marshaling. 
+Marshaler provides copy-in/copy-out behavior rather than true by-reference semantics.
+
+Each RCW maintains a cache of interface pointers on the COM object it wraps and releases its reference on the COM object when the RCW is no longer needed.
+
 # Unsafe Code
 
 Unsafe code is an explicit code block and compilation option. `unsafe` is a directive to the compiler to permit pointer and address manipulation within the unsafe block. Furthermore, unsafe does not imply unmanaged.
