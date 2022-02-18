@@ -10,7 +10,7 @@ Three main aspects of COM Interop
 
    COM interop ensures a consistent programming model with native .NET when dealing with unmanaged code.
 
-* About coma
+* About COM
 
 ** Useful Tools
 
