@@ -1,0 +1,128 @@
+#+TITLE: Com_interop
+
+Three main aspects of COM Interop
+
+1. Core services that provides the infrastructure to communicate with COM components.
+
+2. A set of APIs to ease programming COM interop.
+
+3. A set of tools for uses from type library generation to proper registration.
+
+   COM interop ensures a consistent programming model with native .NET when dealing with unmanaged code.
+
+* About coma
+
+** Useful Tools
+
+- =OLEVIEW.EXE=: =oleview stdole2.tlb=
+
+- =MIDL.EXE=: compile an IDL to a binary library
+
+- =REGSVR32.EXE= registers and unregisters COM components in the Windows Registry
+
+** COM/NET Comparison
+
+*** Programming Model
+
+.NET has richer object orientation, supporting implementation inheritance
+while COM enable implementation reuse via aggregation and containment.
+
+*** Type Information
+
+COM has type library as a language-neutral way to provide type information.
+A typelib may reside in a DLL as a resource or as an independent file.
+CoClasses states a subset of interfaces that they implement, not necessarily
+all of them. COM type information cannot be guaranteed to be correct, complete
+or even available. Some COM interfaces do expose their type info
+(=ITypeInfo=, =ITypeInfo2= etc.)
+
+.NET exposes type information via /metadata/, which is guaranteed to be complete
+for every component and work with every language in .NET. The .NET CLR knows
+everything about a type from the beginning, thus discards any runtime metadata
+query.
+
+*** Identity
+
+COM uses GUIDs to identify componets e.g. CLSID, IID, LIBID, APPID(used to DCOM to identify an app).
+Some classes also has a friendly ProgID (non-unique), used commonly by VB.
+
+.NET types has a its type name (with the namespace prefixed) along with its (hopefully strongly named) assembly name as its identifier: the assembly-qualified
+type name (=typeof(T).AssemblyQualifiedName=).
+
+*** Locating components
+
+COM components are registered in the Windows Registry. COM GUIDs are
+placed under =HKEY_CLASSES_ROOT\=. COM checks the registry values
+under the key for the specified ID to find the name and location of
+the DLL that needs to be loaded to activate the class.
+
+Registered LibIDs are used VB and Visual Studio to provide a list of components that can referenced. Interfaces are often registered with entries to special marshaling classes.
+
+COM reigstration is brittle and can be easily destroyed, tampered or polluted. Files might be moved and registry information might not be correct from the very start.
+
+.NET locates its components in the GAC, the local directory, or some other location specified in a configuration file. Private applications don't have to
+share components.
+
+*** Type compatibility
+
+In COM, components interoperability is accomplished through COM's binary
+standard.
+
+In .NET, everything is executed in the CLR's type system.
+
+*** Versioning
+
+COM has a =Major.Minor= version scheme for its type libs. ProgIds have
+a versioning scheme that contains a version-dependent and a version-independent one. Interfaces has no versioning info (interfaces are in themselves a versioning mechanism): any updates to an interface must be done to a new interface with a different IID.
+
+.NET has a sophisticate versioning scheme that guarantees multiple versions of
+an assembly can live side-by-side. The users and the authors can also specify
+their own versioning policies for components.
+
+*** Type Safety
+
+.NET objects cannot casually access any memory locations and malicious code
+is monitored by the framework.
+
+*** Error Handling
+
+COM: integral status code =HRESULT=, or wrapped in VB's global =Err= object.
+
+.NET: errors are communicated to clients via exceptions: extensible, human-readable, although with some performance implication.
+
+*** Object Lifetime
+
+COM: manual/automatic reference counting
+
+.NET: tracing garbage collection.
+
+** How Does COM Interop Work
+
+Wrappers: RCW and CCW.
+
+*** RCW (Runtime Callable Wrapper)
+
+A proxy to a COM object.
+
+The wrapper forwards calls to the original object through
+its exposed interfaces. Each RCW caches interface pointers
+for the COM object it wraps and internally performs reference
+counting on these interface pointers. A RCW without metadata
+looks like a generic RCW type =System.__ComObject=, otherwise it
+looks much like the original coclass.
+
+*** CCW (COM-Callable Wrapper)
+
+CCWs maintain refcounts like normal COM objects. Each CCW holds
+a referenfe to the .NET object it wraps. When the CCW's refcount
+reaches zero, it destroys itself and releases the inner reference,
+causing the wrapped managed object eligible for garbage collection.
+
+** Some Unmanaged Techs and their Managed Counterparts
+
+| ADO              | System.Data              |
+| Active Directory | System.DirectoryServices |
+| MSXML            | System.Xml               |
+| Win32 Graphics   | System.drawing           |
+| Win32 Window GUI | System.Windows.Forms     |
+| WMI              | System.Management        |
