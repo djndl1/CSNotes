@@ -126,3 +126,108 @@ causing the wrapped managed object eligible for garbage collection.
 | Win32 Graphics   | System.drawing           |
 | Win32 Window GUI | System.Windows.Forms     |
 | WMI              | System.Management        |
+
+* Use COM in .NET
+
+- Interop Assemblies: contains metadata of COM objects for .NET to understand.
+  + Primary Interop Assembly: specifically marked interop assembly 
+    as a commonly used interop assembly by the COM author to avoid multiple generated interop assemblies for the same typelib.
+
+- Automatically generate interop assemblies:
+  + Visual Studio References
+  + =TLBIMP.EXE=
+
+** COM Marshaling
+
+Interop Marshaling is handled completely by CLR's Interop Marshaler, independent of COM marshaling.
+
+1. Marshaler provides copy-in/copy-out behavior rather than true by-reference semantics
+for reference types when there is a difference between internal representations.
+
+2. Blittable types are always exposed directly in memory (as of .NET 1.0)
+
+*** Custom Marshaling
+
+TODO
+
+** Interactions with COM Objects
+
+- =new= an RCW
+
+- Create in API without even metadata for the COM object
+  + =Type.GetTypeFromGetProgID()=, =Type.GetTypeFromGetCLSID()=, =Type.GetType()= (requires an interop assembly)
+  + =Activator.CreateInstance(typeObject)=
+  + Call them in a late bound fashion or cast the object to an predefined interface marked with
+    COM metadata
+
+*** Error Handling
+
+- By default =System.Runtime.InteropServices.COMException=
+
+  The type of the exception thrown is based onthe returned =HRESULT= and the contents
+  of the exception can contain customized information of =IErrorInfo= is available.
+  Some =HRESULT= are converted into .NET exceptions like =System.OutOfMemoryException=.
+
+*** Calling Methods and Properties
+
+Basically the same as the normal .NET methods/properties.
+However, parameterized properties needs some special treatment when using C# or C++.
+
+#+begin_src csharp
+// HRESULT User([in] BSTR Name, [out, retval] IVSSUser** ppIUser);
+user = database.get_User("Guest");
+#+end_src
+
+One can always dynamically invoke a COM method (only with =IDispatch= though) by calling =Type.InvokeMember=.
+For pure =IUnknown= COM objects, having metadata defintions of the type and using
+different reflection APIs =Type.Invoke= is a must.
+
+**** Argument Passing
+
+***** =VARIANT=
+
+ON the surface, a =VARIANT= can be represented as an =Object= and passing the right of =Object= to the COM component is usually straightforward. There are a few wrappers
+(=BstrWrapper=, =CurrencyWrapper=, =DispatchWrapper=, =UnknownWrapper=, =ErrorWrapper=, =VariantWrapper=)
+to indicate a proper marshaling of certain managed types into =VARIANT=. To force a null
+object inside the COM component, use =new UnknownWrapper(null)= or =new DispatchWrapper(null)=.
+
+***** Late Binding and By-Reference Parameters
+
+All parameters are packaged in =VARIANT= when late binding to a COM component.
+The CLR has no way to known whether an object should be passed by value or not.
+=Type.InvokeMember= passes all parameter by value by default (=ParameterModifier=
+changes the default behavior).
+
+***** Optional Parameters
+
+With C# 4.0, there is suppport for optional parameters and named parameters.
+Pass a =Type.Missing= (=System.Reflection.Missing.Value=) for missing variant when necessary. The worst case is when the missing value is a pointer to a missing variant
+
+#+begin_src csharp
+object missing = Type.Missing;
+myCom.ComMethod(arg1, ref missing); // [in, optional] VARIANT* optionalValue
+#+end_src
+
+*** Lifetime Management (A somewhat controversial topic)
+
+=Marshal.ReleaseComObject= deterministically releases an RCW, but not really a good solution. See [[https://devblogs.microsoft.com/visualstudio/marshal-releasecomobject-considered-dangerous/][Marshal.ReleaseComObject Considered Dangerous]]
+
+There are of course some exceptions (especially when working buggy code):
+[[https://stackoverflow.com/questions/37904483/as-of-today-what-is-the-right-way-to-work-with-com-objects][What is the right way to work with COM objects]]
+
+#+begin_quote
+
+#+end_quote
+
+Better use
+
+#+begin_src csharp
+if (Marshal.AreComObjectsAvailableForCleanup())
+{
+    GC.WaitForPendingFinalizers();
+}
+#+end_src
+
+*** Type casting
+
+If the metadata of an RCW supports the target type, then there's no need for =QueryInterface=.
