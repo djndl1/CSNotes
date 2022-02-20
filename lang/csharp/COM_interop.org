@@ -215,10 +215,6 @@ myCom.ComMethod(arg1, ref missing); // [in, optional] VARIANT* optionalValue
 There are of course some exceptions (especially when working buggy code):
 [[https://stackoverflow.com/questions/37904483/as-of-today-what-is-the-right-way-to-work-with-com-objects][What is the right way to work with COM objects]]
 
-#+begin_quote
-
-#+end_quote
-
 Better use
 
 #+begin_src csharp
@@ -231,3 +227,95 @@ if (Marshal.AreComObjectsAvailableForCleanup())
 *** Type casting
 
 If the metadata of an RCW supports the target type, then there's no need for =QueryInterface=.
+
+** Inspect at Interop Assemblies
+
+*** Data Type Conversion For Function Parameters
+
+| IDL                       | VB6          | .NET            |                                                                                                                          |   |
+| char                      | N/A          | System.SByte    |                                                                                                                          |   |
+| short                     | Integer      | System.Int16    |                                                                                                                          |   |
+| int, long, HRESULT, SCODE | Long         | System.Int32    |                                                                                                                          |   |
+| int64                     | N/A          | System.Int64    |                                                                                                                          |   |
+| unsigned char             | Byte         | System.Byte     |                                                                                                                          |   |
+| unsigned short            | N/A          | System.UInt16   |                                                                                                                          |   |
+| unsgined int/long         | N/A          | System.UInt32   |                                                                                                                          |   |
+| uint64                    | N/A          | System.UInt64   |                                                                                                                          |   |
+| float                     | Single       | System.Single   |                                                                                                                          |   |
+| double                    | Double       | System.Double   |                                                                                                                          |   |
+| BSTR, LPSTR, LPWSTR       | String       | System.String   | UnmanagedType.BStr (default for System.String), Unmanaged.LPStr, Unamanged LPWStr                                        |   |
+| VARIANT_BOOL              | Boolean      | System.Boolean  |                                                                                                                          |   |
+| DATE                      | Date         | System.DateTime |                                                                                                                          |   |
+| GUID                      | N/A          | System.Guid     |                                                                                                                          |   |
+| DECIMAL                   | N/A          | System.Decimal  |                                                                                                                          |   |
+| CURRENCY                  | CURRENCY     | System.Decimal  | [MarshalAs(UnamangedType.Currency)]                                                                                      |   |
+| VARIANT                   | Variant      | System.Object   | default                                                                                                                  |   |
+| IUnknown*                 | Unknown      | System.Object   | [MarshalAs(UnmanagedType.IUnknown)]                                                                                      |   |
+| IDispatch*                | Object       | System.Object   | [MarshalAs(UnmanagedType.IDispatch)]                                                                                     |   |
+| void*                     | Any          | System.IntPtr   | No way to transform into System.Object                                                                                   |   |
+| IDispatchEx*              | IDispatchEx  | IExpando*       | enables dynamic invocation, enable dynamic addition and removal of members. Mainly used by unmanaged scripting language. |   |
+| IEnumVariant*             | IEnumVARIANT | IEnumerator     | CustomMarshaler, EnumeratorToEnumVariantMarshaler(there is also an =IEnumVARIANT= interface though)                      |   |
+| ITypeInfo                 | ITypeInfo    | System.Type     | the gateway to reflection                                                                                                |   |
+
+A typelib might show different types than the original IDL types
+
+| IDL                    | TypeLib        |
+| boolean, small         | char           |
+| wchar_t                | unsigned short |
+| hyper, __int64         | int64`         |
+| [string] char*         | LPSTR          |
+| [string] wchar*        | LPWSTR         |
+| byte                   | unsigned char  |
+| unsigned hyper/__int64 | uint64         |
+
+Each potentially ambiguous .NEt type that the importer produces is marked
+with =MarshalAsAttribute=.
+
+- =[in, out]= =LP(W)STR= should by marked as =ref= instead of by-value.
+
+- =HRESULT= and =SCODE= are marshaled as =UnmanagedType.Error=
+
+- =IDispatchEx= (=IExpando=):
+
+- =IEnumVARIANT= (=IEnumVARIANT= but can be actually marshaled into =IEnumerator=):
+
+**** Arrays
+
+***** =SAFEARRAY= (VB6 Array)
+
+
+***** Fixed-size Array
+
+=MarshalAs= with =SizeConst=
+
+***** Varying Array
+
+A Slice of Fixed-Size array. Typelibs have no notion of the related
+COM attributes (=length_is=, =first_is=, =last_is=), causing the importer to marshal the entire array.
+
+***** Conformant Array (varying-size array)
+
+An array with a dynamic size (=size_is= attribute in COM, ignored by typelibs and the importer. The workaround is to change the method signature.
+
+** Methods and Properties
+
+- =HRESULT= is converted into an exception and a =[out, retval]= parameter is used as the return value. For some rare COM method with no =HRESULT=,
+  =[PreserveSigAttribute]= is annotated in .NET so that the interop marshaler can work properly without a typelib to be present.
+
+- =void ***=-like pointers are not convertable to any .NET types, thus left as =IntPtr=.
+
+- ownership and directions (attributes available in both COM and .NET):
+  + =[in]=: marshaled from caller to callee
+  + =[out]=: marshaled from callee to caller
+  + =[in, out]=: marshaled in both directions
+
+- Parameter Array (=[vararg]= in COM, =[ParamArrayAttribute]= in .NET):
+
+- Property accessors are reflected in .NET metadata. Property accessors share the same DISPID
+  + =propget= to =get_propertyName=
+  + =propputref= to =set_propertyName=
+  + =propput= to =let_propertyName= or =set_propertyName= depending on presence of =propputref=.
+
+- Dispatch ID: =DispIdAttribute=
+    + =DISPID_VALUE(0)= (the default member in VB6): =DefaultMemberAttribute=. Default properties are only available for .NET languages in parameterized properties such as =Item[]=.
+    + =DISPID_NEWENUM(-4)=: found on a collection interface with an =NewEnum=-like method in COM, used by VB6 to enable =For Each= loop, similar to .NET's =GetEnumerator= (C# finds it by method name rather than =IEnumerable= to allow strongly typed implementation, no more bizzare than checking for a special DISPID). The importer knows to transform between them.
