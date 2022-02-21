@@ -320,7 +320,43 @@ An array with a dynamic size (=size_is= attribute in COM, ignored by typelibs an
     + =DISPID_VALUE(0)= (the default member in VB6): =DefaultMemberAttribute=. Default properties are only available for .NET languages in parameterized properties such as =Item[]=.
     + =DISPID_NEWENUM(-4)=: found on a collection interface with an =NewEnum=-like method in COM, used by VB6 to enable =For Each= loop, similar to .NET's =GetEnumerator= (C# finds it by method name rather than =IEnumerable= to allow strongly typed implementation, no more bizzare than checking for a special DISPID). The importer knows to transform between them.
 
-** Responding to COM Events
+** Interfaces
+
+Every COM interfaces corresponds to a .NET interface (marked with =GuidAttribute=, =ComImportAttribute=, and an optional =InterfaceTypeAttribute=).
+Note that any derived interface has duplicated methods from its base interface to maintain the vtable's layout, there are sometimes gap methods.
+
+** Events and Source Interfaces
+
+TODO
+
+** Classes
+
+A /coclass interface/ with the name =CoClassName= inherit the default interface and marked with the same IID as the default interface and =CoClassAttribute= (to directly instantiate this interface).
+A .NET class =CoClassNameClass= then inherit the all the CoClass's interfaces (optionall other .NET interfaces) and implements all virtual methods there.
+
+*** The RCW =CoClassNameClass=
+
+1. A public default constructor (=internal= constructor if =noncreatable=)
+
+2. implements all members of its interfaces
+
+** Modules (Global methods and constants)
+
+Global methods are omitted. They must be imported manually using PInvoke.
+
+** Structures
+
+Do note =VARIANT_BOOL= is converted to a =Int64=, with =-1= as =true= and =0= as =false=
+
+** Unions
+
+=[StructLayout(LayoutKind.Explicit)]= and =[FieldOffset]= on a struct member
+
+** =typedef=
+
+=ComAliasName= where the typedeffed one is actually used, or duplicate the definition with different names.
+
+* Responding to COM Events
 
 COM doesn't have builtin events but use a standard connection point protocol
 

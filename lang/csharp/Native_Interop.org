@@ -1,0 +1,23 @@
+#+TITLE: Native_interop
+
+* SafeHandle
+
+** Why Dispose Pattern Is Not Enough
+
+- Finalizer might get called due to thread abortion, out-of-memory, asynchronous exceptions.
+
+- premature recycling of handles, especially by attackers.
+
+** =SafeHandle=
+
+[[https://docs.microsoft.com/en-us/archive/blogs/bclteam/safehandles-the-best-v2-0-feature-of-the-net-framework-ravi-krishnaswamy][Safe Handle: the best .NET 2.0 feature]]
+
+#+begin_quote
+In classes derived from the CriticalFinalizerObject class, the common language runtime (CLR) guarantees that all critical finalization code will be given the opportunity to execute, provided the finalizer follows the rules for a CER, even in situations where the CLR forcibly unloads an application domain or aborts a thread. If a finalizer violates the rules for a CER, it might not successfully execute. In addition, the CLR establishes a weak ordering among normal and critical finalizers: for objects reclaimed by garbage collection at the same time, all the noncritical finalizers are called before any of the critical finalizers.
+#+end_quote
+
+#+begin_quote
+The SafeHandle class resolves object lifetime issues by assigning and releasing handles without interruption. It contains a critical finalizer that ensures that the handle is closed and is guaranteed to run during unexpected AppDomain unloads, even in cases when the platform invoke call is assumed to be in a corrupted state.
+#+end_quote
+
+Override =IsValid= and =ReleaseHandle()=
