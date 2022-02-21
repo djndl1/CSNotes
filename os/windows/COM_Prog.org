@@ -334,9 +334,10 @@ Memory pointers can be marshalled in three ways:
 
 The client can pass a callback to the server and expect the server to communicate with the client.
 
-- Connection Points and Sinks: the client has sinks (a mini COM server on the client side) for the server to call and the serve has a connection point to call this sink.
+- Connection Points and Sinks: the client has sinks (a mini COM server on the client side, an event handler) for the server to call and the serve has a connection point (event source) to call this sink.
 
-  TODO
+  The client passes its mini-server pointer to the real COM server and the real COM server saves this pointer and call it later. When the real COM server has something
+  to tell the client, it calls a method on its mini-COM server.
 
 ** Encapsulation and Aggreation To Reuse 
 
