@@ -332,7 +332,7 @@ TODO
 ** Classes
 
 A /coclass interface/ with the name =CoClassName= inherit the default interface and marked with the same IID as the default interface and =CoClassAttribute= (to directly instantiate this interface).
-A .NET class =CoClassNameClass= then inherit the all the CoClass's interfaces (optionall other .NET interfaces) and implements all virtual methods there.
+A .NET class =CoClassNameClass= then inherit the all the CoClass's interfaces (optionall other .NET interfaces) and implements all =virtual extern= methods there.
 
 *** The RCW =CoClassNameClass=
 
@@ -397,3 +397,38 @@ The sink queries interface for =IConnectionPointContainer=, calls =FindConnectio
 get the desired connection point and passes itself to the connection point by calling =Advise=.
 The source queries interface for the source interface and calls the callback method on it. Finally,
 the sink can =Unadvise= to disconnect.
+
+**** Connect to COM Connection Points From .NET
+
+***** The COM way
+
+Not flexible, have to implement every methods in the source interface
+
+1. Cast the source to =IConnectionPointContainer=
+
+2. =FindConnectionPoint= from the source
+
+3. =Advise= the connection point by passing a class that implements the source interface
+
+4. =Unadvise= in the finalizer
+
+***** The .NET TypeLib Importer Way
+
+The basic idea is to use one sink helper (which represents a connection and maintains a cookie and a single delegate) for each subscription. To convert methods into events,
+subscritions are transformed into advising a sink helper with a single delegate to be called in its corresponding event method. The source calls on the sink helpers, which
+calls the sink helper's delegate, which was passed in by the user.
+
+- Create a sink helper class (=ClassInterface(None)=) that implement a method-based source interface (marked with COM GUID), with each method calling a delegate member and holds a cookie.
+  A sink helper is responsible for maintaining a subscribed event handler and the corresponding connection's cookie.
+
+- Create an .NET event interface the same as the source COM interface and the related delegate types
+
+- Implement the event interface as an event provider class.
+   + the class is constrcted with a =WeakReference= to the source COM RCW.
+   + keeps a weak reference to the source, a list of sink helpers, a connection point
+   + implement the =Dispose= pattern: =Unadvise= by passing each sink helper's cookie and =Marshal.ReleaseComObject= the connection point if not null.
+   + implement add accessors: initialize the connection point if none, use new sink helper for every new subscription and add this new sink helper to the list.
+   + implement remove accessors: check every sink helper's delegate against the one to be removed, =Unadvise= the matching one and remove it from the list. If the list gets empty,
+     =Marshal.ReleaseComObject= the connection point and set the list and the connection point to null.
+   + the connection point is always lazily initialized and release when no subscrition is present
+   + Subscription and unsubscription always occur in a monitor (=lock= stetement).
