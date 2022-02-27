@@ -1,3 +1,33 @@
 #+TITLE: Win Rt
 
 https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
+
+* What is WinRT Anyway
+
+- Not a runtime (a collection of helper libraries that provide support for a platform or a language).
+
+- An ABI: a set of binary-level common protocols that describe how components
+  can talk to each other.
+  + WinRT API: a set of OOP API that expose OS functionality.
+  + A set of compilers/langauges that understands the ABI, with WinMD to store the metadata of the ABI/API.
+  + 3rd party libraries and controls.
+
+- Strongly-Typed COM: =IInspectable= can be inspected to expose type info and identity.
+
+** WinRT over COM
+
+- =IInspectable= over =IUnknown= for better type info.
+
+- A common metadata format: WinMD
+
+- A common set of collection interfaces.
+
+- Supports object inheritance.
+
+- Passing arbitrary value type as objects.
+
+- New way to hook up events using delegates.
+
+- Ability to resolve ref cycles using .NET GC.
+
+- Data binding through reflection or reflection-like mechanism.
