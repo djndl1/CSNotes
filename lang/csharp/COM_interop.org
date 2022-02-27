@@ -496,3 +496,70 @@ calls the sink helper's delegate, which was passed in by the user.
      =Marshal.ReleaseComObject= the connection point and set the list and the connection point to null.
    + the connection point is always lazily initialized and release when no subscrition is present
    + Subscription and unsubscription always occur in a monitor (=lock= stetement).
+
+Type-import any COM event source interface to see the basic idea of implementation.
+
+* Threading and Apartments
+
+.NET objects can be accessed by any number of threads at any time. Class authors must take on the responsibility of protecting internal state
+from getting corrupted due to concurrent access.
+
+By default the CLR calls =CoInitializeEx(0, COINIT_MULTITHREADED)= (MTA threaded by default). The CLR internally uses COM
+when starting up so COM is always initialized by the time the first line of code inside =Main= is run. A Thread function
+can actually set thread's apartment state to =STA= when the thread has already started even if the default is =MTA=.
+
+COM callbacks to .NET are not guaranteed to occur on a certain thread (e.g. the thread in which the COM component is created).
+No .NET components can assume that they will be called on one thread. Thus, the callback might fail due to missing proxy/stub marshaler
+if the COM object is used there. One way around this is to signal the original thread in the callback to execute the actual callback
+(such as checking an =ManualResetEvent= in a loop).
+
+
+* Manually Defining COM Types in Source Code
+
+Lightweight, easily customizable (no more MSIL), hard to get it done right and creating a new .NET type identity.
+
+** Important Custom Attributes
+
+- =ComImportAttribute=: "this is a type defined previously in COM". =ComImport= Marked types are never exported as COM types.
+
+- =GuidAttribute=: identity
+
+** Defininng Interfaces
+
+The =IUnknown= and dual interface's methods should be defined in the exact same order as they appear in the COM definition.
+For =dispinterface=, DISPIDs must be used, since all method invocations are done via =IDispatch=
+rd
+
+- =InterfaceTypeAttribute=: =IUnknown=, =IDispatch= or a dual interface (by default). Used by the CLR to determine how to present a vtable to COM.
+
+Do not bother with =MethodImplAttribute= when defining interface methods.
+
+
+#+begin_src csharp
+[
+    ComImport,
+    Guid("...")
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)
+]
+interface IAmIUnknown
+#+end_src
+
+#+begin_src csharp
+[
+    ComImport,
+    Guid("...")
+    InterfaceType(ComInterfaceType.InterfaceIsDual)
+]
+interface IAmDual
+{
+    [DispId(id1)]
+    object AProperty { [return: MarshalAs(UnamangedType.IUnknown)] get; }
+
+    [DispId(id2)]
+    int Count { get; }
+
+    [DispId(id3)]
+    [return: MarshalAs(UnmanagedType.IDispatch)]
+    object get_item(int lIndex)
+}
+#+end_src
