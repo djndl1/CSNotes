@@ -148,7 +148,40 @@ for reference types when there is a difference between internal representations.
 
 *** Custom Marshaling
 
-TODO
+**** Dealing with =System.IntPtr=
+
+The importer or hand-written code might leave some arguments as =IntPtr=, exposing the raw COM address.
+Aside from unsafe code, =Marshal= and =GCHanle= are two major classes that can deal with =IntPtr= in pretty
+much the same way as unsafe code.
+
+#+begin_src csharp
+int x = 5;
+int* address = &x;
+// var handle = GCHandle.Alloc(..., GCHandleType.Pinned) // handle to a boxed integer
+// handle.AddrOfPinnedObject()
+// ...
+// if (hanle.IsAllocated) handle.Free()
+#+end_src
+
+=sizeof= reports the managed size of a type, while =Marshal.SizeOf= reports the unmanaged size of a type, not the CLR type (which should be abstracted away by the runtime).
+=Marshal.SizeOf= can be used with any types that can be successfully marshaled into unmanaged code as a structure (even a POCO).
+
+***** Out Null
+
+Sometimes A =NULL= can be passed into an =out= argument to indicate the client should ignore this argument. However, .NET does not allow =null= to be passed in here, the user will
+have to mark this argument as =IntPtr= and a =IntPtr.Zero= is passed if =NULL= is to be allowed.
+
+***** =VARIANT= with =VT_RECORD= (User-defined Type)
+
+There is no easy way to pass an =System.Object= to a =VARIANT= argument with =VT_RECORD= or return such one.
+
+There are two methods to deal with this, both requires definition of a COM =Variant= type and the use of =IRecordInfo=:
+
+1. modify the signature to =ref Variant t=
+
+2. Modify the signature to =ref IntPtr=
+
+   TODO
 
 ** Interactions with COM Objects
 
