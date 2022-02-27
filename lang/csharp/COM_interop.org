@@ -195,7 +195,7 @@ There are two methods to deal with this, both requires definition of a COM =Vari
 
 *** Error Handling
 
-- By default =System.Runtime.InteropServices.COMException=
+- By default =System.Runtime.InteropServices.COMException= (=PreserveSigAttribute= can disable this transformation)
 
   The type of the exception thrown is based onthe returned =HRESULT= and the contents
   of the exception can contain customized information of =IErrorInfo= is available.
@@ -243,6 +243,10 @@ myCom.ComMethod(arg1, ref missing); // [in, optional] VARIANT* optionalValue
 
 *** Lifetime Management (A somewhat controversial topic)
 
+COM objects wrapped in RCWs are not refcounted based on the number of .NET clients. ANy COM interface obtained through an RCW has its reference count
+incremented /once/. WHen the RCW is GCed, its finalizer calls =IUnknown.Release= on every cached interface pointer. The RCW might still be alive on
+a GC heap after releasing.
+
 =Marshal.ReleaseComObject= deterministically releases an RCW, but not really a good solution. See [[https://devblogs.microsoft.com/visualstudio/marshal-releasecomobject-considered-dangerous/][Marshal.ReleaseComObject Considered Dangerous]]
 
 There are of course some exceptions (especially when working buggy code):
@@ -257,9 +261,36 @@ if (Marshal.AreComObjectsAvailableForCleanup())
 }
 #+end_src
 
+If =Marshal.ReleaseComObject= must be used, there are a few caveats:
+
+- One time might not be enough, might as well use a loop
+
+- Release COM objects that are depedent on each other in the correct (typically reverse) order.
+
+- Wrap the COM object to release in a method block marked with =MethodImpl(MethodImplOptions.NoInlining)= to avoid inlining that
+  causes the reference does not go out of scope in time. Since under debug mode, the JIT compiler tracks local variables, making
+  a used object illegible for GC.
+
+- Do not release a COM object that is implemented or marshaled as a .NET object.
+
+Another way to release COM objects is to call
+
+#+begin_src csharp
+GC.Collect();
+GC.WaitForPendingFinalizers();
+#+end_src
+
 *** Type casting
 
 If the metadata of an RCW supports the target type, then there's no need for =QueryInterface=.
+
+The cast procedure is the following:
+
+1. Check if the metadat definition of the source class implements the destination type
+
+2. If not, check if the target interface is marked with =ComEventInterfaceAttribute=
+
+3. If not, =QueryInterface=; if yes, check if the object supports =IConnectionPointContainer= and can =FindConnectionPoint= of the specified event source interface.
 
 ** Inspect at Interop Assemblies
 
@@ -457,7 +488,7 @@ calls the sink helper's delegate, which was passed in by the user.
 - Create an .NET event interface the same as the source COM interface and the related delegate types
 
 - Implement the event interface as an event provider class.
-   + the class is constrcted with a =WeakReference= to the source COM RCW.
+   + the class is constructed with a =WeakReference= to the source COM RCW.
    + keeps a weak reference to the source, a list of sink helpers, a connection point
    + implement the =Dispose= pattern: =Unadvise= by passing each sink helper's cookie and =Marshal.ReleaseComObject= the connection point if not null.
    + implement add accessors: initialize the connection point if none, use new sink helper for every new subscription and add this new sink helper to the list.
