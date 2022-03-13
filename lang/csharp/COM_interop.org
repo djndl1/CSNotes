@@ -427,7 +427,7 @@ COM doesn't have builtin events but use a standard connection point protocol
 *** .NET Callback Pattern
 
 1. Define a class of an interface that implements a set of callback methods, pass an object
-   of this class to the event source: e.g. =System.Collections.IComparer= passed into =System.Array.Sort=
+   of this class to the event source: e.g. =System.Collections.IComparer= passed into =System.Array.Sort= (the Java way)
 
 2. Passing /Delegates/ (type-safe function pointer, possibly with an class instance pointer): delegates also enable multicasting callbacks: multiple delegates can be combined together.
 
@@ -445,16 +445,16 @@ COM doesn't have builtin events but use a standard connection point protocol
 
 **** Connection Points
 
-- /source/ (/connectable object/): the object causing an event to be raised
+- /source/ (/connectable object/) =IConnectionPointContainer=: the object causing an event to be raised
 
-- /sink/ =IConnectionPointContainer=: the object handling events, a sink being attached to a connection point is considered a /connection/
+- /sink/: the object handling events, a sink being attached to a connection point is considered a /connection/
 
 - /source interface/: the callback interface implemented by the sink and called by the source
 
 - /connection point/ =IConnectionPoint=: the object doing the actual callbacks on the source interface
 
 The source coclass list an interface marked with =source= to advertise its supported callback interface (and almost always as a =dispinterface=).
-COClasses that supports events by implementing =IConnectionPointContainer=. The sink calls =Advise=
+CoClasses that supports events by implementing =IConnectionPointContainer=. The sink calls =Advise=
 and =Unadvise= methods to enable clients to hook and unhook a callback interface.
 
 The sink queries interface for =IConnectionPointContainer=, calls =FindConnectionPoint= to
