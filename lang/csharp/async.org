@@ -106,6 +106,13 @@ unhandled entirely, resulting in a process-wide unhandled exception.
 
 It is a bad idea to rudely abort a thread. Cancel any unfinished tasks
 rather than allowing them to run during application shutdown.
+The cancellation token used by the task operation must be the same as
+the one passed to the task instance to guarantee a successful cancellation,
+otherwise it's a faulted task.
+
+For simple tasks, =CancellationToken= isn't much different from a simple atomic boolean.
+=CancellationToken= supports callbacks and =WaitHandle=, a tool with much more advanced
+functionality and uses.
 
 * Async/Await
   :PROPERTIES:
@@ -124,6 +131,9 @@ waiting for the activity to complete.
 • When the activity completes (either by using a new thread or via a
 callback), it is frequently necessary to make a thread synchronization
 context switch back to the original caller that initiated the activity.
+
+From an even-based POV, anything after =await= is the callback code executed
+when the awaited async operation is done.
 
 The =async= method is not the same as normal =Task=s. An async task is
 already started by the time a =Task= is returned. =await= only signifies
@@ -196,3 +206,21 @@ explicitly switch back to the UI thread to update a control.
 
 #+INCLUDE
 
+
+* =Task.Yield=
+
+Basically just attempting an empty task for a potential task scheduler intervention
+to redirect the execution flow.
+Since some UI messages are of lower priority than user's input messages, calling
+=await Task.Yield()= might not keep the UI responsive at all. For a non-UI thread,
+it's probably just a thread switch.
+
+#+begin_src csharp
+await Task.Factory.StartNew(
+    () => {},
+    CancellationToken.None,
+    TaskCreationOptions.None,
+    SynchronizationContext.Current != null?
+        TaskScheduler.FromCurrentSynchronizationContext():
+        TaskScheduler.Current);
+#+end_src
