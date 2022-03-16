@@ -10,9 +10,9 @@ A high-precision coordinate time standard based on the notional passage of prope
 
 ## Universal Time
  
-Universal Time is a time standard based on Earth's rotation, a modern continuation of Greenwich Mean Time (GMT), the mean solar time on the Prime Meridian at Greenwich, England. There are several versions of Universal Time, of which the most commonly used are Coordinated Universal Time (UTC) and UT1. All these versions of UT except for UTC, are based on Earth's rotation relative to distant celestial objects, with a sclaing factor and other adjustments to make them closer to solar time. UTC is based on International Atomic Time, with leap seconds added to keep within 0.9 second of UT1. 
+Universal Time is a time standard based on Earth's rotation, a modern continuation of Greenwich Mean Time (GMT), the mean solar time on the Prime Meridian at Greenwich, England. There are several versions of Universal Time, of which the most commonly used are Coordinated Universal Time (UTC) and UT1. All these versions of UT except for UTC, are based on Earth's rotation relative to distant celestial objects, with a scaling factor and other adjustments to make them closer to solar time. UTC is based on International Atomic Time, with leap seconds added to keep within 0.9 second of UT1. 
 
-A leap second is a one-second adjustment that is occasionally applied to civil time to keep UTC close the mean solar time at 0 Meridian, to accomomodate irregularities and slowdown in the Earth's rotation. Because the Earth's rotation speed varies in response to climatic geological events, UTC leap seconds are spaced and unpredictable. Not all clocks implement leap seconds in the same manner as UTC. Leap seconds in Unix time are commonly implemented by repeating the last second of the day. Network Time Protocol freezes time during the leap second. Other experimental schemes smear time in the vicinity of a leap second.
+A leap second is a one-second adjustment that is occasionally applied to civil time to keep UTC close the mean solar time at 0 Meridian, to accommodate irregularities and slowdown in the Earth's rotation. Because the Earth's rotation speed varies in response to climatic geological events, UTC leap seconds are spaced and unpredictable. Not all clocks implement leap seconds in the same manner as UTC. Leap seconds in Unix time are commonly implemented by repeating the last second of the day. Network Time Protocol freezes time during the leap second. Other experimental schemes smear time in the vicinity of a leap second.
 
 ## Main Versions
 
@@ -43,51 +43,53 @@ The __tz database__ (tzdata, the zoneinfo database, or IANA time zone database)i
 
 Daylight saving time is the practice of advancing clocks during summer months so that evening daylight lasts longer, while sacrificing normal sunrise times. Typically, regions that use daylight saving time adjust clocks forward one hour close to the start of spring and adjust them backward in the autumn.
 
-# Class `java.util.Date`
+# The Legacy API
 
-the class `Date` represents a specific isntant in time, with millisecond precision. The `Date` class may not conform to UTC since most computer clocks are not accurate enough to be able to reflect the leap-second distinction.
+## Class `java.util.Date`
 
-Most methods of the this class are deprecated. The `Date` class is not very useful for manipulating the kind of information that humans use for dates.
+- Weird representations of years (since 1900) and months (zero indexed)
 
-# Class `java.time.LocalDate`
+- mutable, requires a clone
 
-A date without a time-zone in the ISO-8601 calendar system. An immutable date-time object that represents a date, often viewed as year-month-day. This class does not store or represent a time or time-zone. Instead, it is a description of the date. It cannot represent an instant on the time-line without additional information such as an offset or time-zone.
+- a DateTime not a pure Date, nor a pure timestamp.
 
-This class is immutable and thread-safe
+- Not many functionalities
 
-A `LocalDate` class is obtained by using static _factory methods_ that call constructors on your behalf.
+the class `Date` represents a specific instant in time, with millisecond precision. The `Date` class may not conform to UTC since most computer clocks are not accurate enough to be able to reflect the leap-second distinction.
 
-The following code print the present day in a month.
+## Class `java.util.Calendar`
 
-```java
-import java.time.*;
+Tries to solve the issues of `java.util.Date`
 
-public class CalendarTest {
-  public static void main(String[] args) {
-      LocalDate date = LocalDate.now();
-      int month = date.getMonthValue();
-      int today = date.getDayOfMonth();
+- Mutable
 
-      date = date.minusDays(today - 1); // set to start of month
-      DayOfWeek weekday = date.getDayOfWeek();
-      int value = weekday.getValue();
+- Still zero-based representation of Months
 
-      System.out.println("Mon Tue Wed Thu Fri Sat Sun");
-      for (int i = 1; i < value; i++)
-          System.out.print("    ");                 // move to the weekday of the start of month
-      while (date.getMonthValue() == month) {
-          System.out.printf("%3d", date.getDayOfMonth());
-          if (date.getDayOfMonth() == today)
-              System.out.print("*");
-          else
-              System.out.print(" ");
-          date = date.plusDays
-              (1);
-          if (date.getDayOfWeek().getValue() == 1)
-              System.out.println();
-      }
-      if (date.getDayOfWeek().getValue() != 1)
-          System.out.println();
-  }
-}
-```
+- A civil-time calendar but also a millisecond timestamp
+
+
+# Java 8 =java.time= Package
+
+https://londonjavacommunity.co.uk/about-jsr-310-a-new-java-datetime-api/
+
+Mostly value-based, immutable and thread-safe.
+
+## Java Time-scale
+
+86400 seconds a day without leap second (though the definition of second is not the same as the SI second).
+
+Segmented along the timeline (UTC without leap seconds after 1972-11-03 and UT1 before that).
+
+The `Clock` implementation uses this timescale to provide the current time. The following classes are more or less based on this timescale and can be converted between each other.
+
+## `Instant`
+
+Nanoseconds-precision Unix timestamp
+
+## `LocalTime`
+
+Nanosecond-precision ISO-8601 time without a timezone. A description of the local time on a wall clock.
+
+## `LocalDate`
+
+A date without a time-zone in the ISO-8601 calendar system. An immutable date-time object that represents a date, often viewed as year-month-day.
