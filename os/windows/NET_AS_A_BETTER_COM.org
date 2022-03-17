@@ -1,0 +1,122 @@
+#+TITLE: Net_as_a_better_com
+
+* A Platform for Software Integration
+
+Dotnet provides /CLR/ (integrating software within a single OS process) and /XML web services/ (integrate software at Internet scale), both of which rely on /strongly typed contracts between components and encapsulation/. These contracts rely heavily on /metadata/ and /virtualization/.
+
+- Metadata: CLR and XML Web Services rely on high-fidelity, ubiquitous and extensible metadata to convey programmer intention. e.g. Object-to-XML mapping are captured in metadata for use by the CLR's XML serializer to avoid explicitly coding the deserialization.
+
+- Virtualization: separation of sematnic intentions from phsical implementation details
+
+* A Better COM
+
+** COM
+
+Component technologies focus on the /contracts/ between independently developed and deployed programs.The design paradigm of COM was that component contracts are expressed as /type definitions/. COM was a major advance because it brought the dynamic loading of code and the type system together in a fairly self-consistent manner.
+
+COM is both a programming model and a supporting platform technology.
+
+*** Problems
+
+Most if not all of the problems with the COM platform can be traced back to the nature of contracts between components. In an ideal world, the contracts between components would be expressed purely in terms of the /semantic guarantees/ and /assumptions that exist between the consumer and the component/. The closest practice is
+
+#+begin_quote
+use programmatic type definitions along with human-readable documentation that describes the semantics of those types.
+#+end_quote
+
+COM has the following problems:
+
+1. No standardized interchange format for contract definitions. The COM specification assumed that the type definitions of a contract would be communicated via some out-of-band technique that was outside the scope of COM proper. MIDL and TLB are not isomorphic in functionality. Also, COM does not address the problem of /dependencies/.
+
+2. COM's contract is binary/physical in nature, addressing problems such as calling stack, object reference format, vtable offset, data structure layout, utterly free of semantic content. This binary contract forces component authors to pay attention to some implementation details instead of pure semantics so as to not to break their users' code.
+
+** CLR: A Better COM
+
+A fully specified machine-readable extensible strongly typed format (/metadata/) for describing component contract.
+
+- Standardized full-specified contract defintion
+
+#+begin_quote
+the CLR provides facilities that let programs read and write metadata without knowledge of the underlying file format. CLR metadata is cleanly and easily extensible via custom attributes, which are themselves strongly typed. CLR metadata also contains component dependency and version information, allowing the use of a new range of techniques to handle component versioning. Finally, the presence of CLR metadata is mandatory
+#+end_quote
+
+- Logical structure of types as the contract. The CLR defers the physical structure layout to execution time. To implement this deferred reification of contracts, CLR-based components use Common Intermediate Language (CIL) for their method implementations instead of machine code. The CLR knowns the name/types of the methods and fields it tries to access.
+
+ #+begin_quote
+Contracts in the CLR specifically do not describe the in-memory representation of anything. The CLR postpones the decisions regarding in-memory representations until the type is first loaded at runtime. This gives the CLR a great deal of flexibility with respect to virtual method table layout, stack discipline, alignment, and parameter passing conventions, all of which could change between versions of the CLR without the need to recompile components.
+ #+end_quote
+
+** A New Programming Model
+
+CLR is built around types and type safety. The CLR encourages a worldview in which everything is a type, an object, or a value.
+
+#+begin_quote
+the CLR provides a range of services that collectively are called managed execution. Under managed execution, the CLR is omniscient and has complete information about all aspects of a running program. This includes knowledge of the state and liveness of local variables in a method. This includes knowledge of where the code for each stack frame originated. This includes knowledge of all extant objects and object references, including reachability information.
+#+end_quote
+
+Programmers are encouraged to give up the explicit management of memory and instead allocate and use instances of types. Similarly, programmers are encouraged to give up manual thread management and instead use the CLR's facilities for concurrent method execution.
+
+Also, metadata makes /generative programming/ possible. The CLR has CodeDOM for this.
+
+* Components
+
+** CLR Modules
+
+CLR modules are valid win32 PE executables with a few extensions.
+
+#+BEGIN_SRC
+┌────────────────────┐
+│      PE Header     │
+├────────────────────┤
+│    COFF Header     │
+├────────────────────┤
+│                    │
+│ IMAGE_COR20_HEADER │
+│                    │
+├────────────────────┤
+│                    │
+│                    │
+│       CODE         │
+│  CLI/Native code   │
+│                    │
+├────────────────────┤
+│   Resource Code    │
+├────────────────────┤
+│   String/Blob Pools│
+├────────────────────┤
+│ Metadata Tables    │
+└────────────────────┘
+#+END_SRC
+
+ An assembly is a logical collection of one or more modules. Modules are physical constructs that exist as byte streams.
+A module is generally affiliated with only one assembly.
+
+Assemblies are the "atom" of deployment in the CLR and are used to package, load, distribute, and version CLR modules.
+
+- dependency problem: Modules typically rely on types from other assemblies.Every CLR module contains a list of assembly names that identifies which assemblies are used by this module. These external assembly references use the logical name of the assembly, which contains no remnants of the underlying module names or locations. It is the job of the CLR to convert these logical assembly names into module pathnames at runtime
+
+  To assist the CLR in finding the various pieces of an assembly, every assembly has exactly one module whose metadata contains the /assembly manifest/, an additional chunk of CLR metadata that acts as a directory of adjunct files that contain additional type definitions and code. The CLR can directly load modules that contain an assembly manifest only.
+
+- Encapsulation: Assemblies form an encapsulation boundary to protect internal implementation details from interassembly access.
+
+** Asseembly Names
+
+Friendly Name, culture, developer (public key), version
+
+The CLR uses the four-part assembly name to find the correct component at load time.
+
+Assemblies that contain a /CultureInfo/ cannot contain code; rather, they must be resource-only assemblies (also known as satellite assemblies) that can contain only localized strings and other user-interface elements. Assemblies containing code (that is, the vast majority of assemblies) are said to be culture-neutral and have no culture identifier.
+
+The public key (token) is used to resolve file name collisions between organizations, allowing multiple utilities.dll components to coexist in memory and on disk provided that each one originates from a different organization, each of which is guaranteed to have a unique public key.
+
+** Assembly Security
+
+Each assembly can have a public key embedded in its manifest that identifies the developer. Assemblies with public keys also have a /digital signature/ that is generated using the /private key/ before the assembly is first shipped that provides a secure hash of the assembly manifest, which itself contains hashes of all subordinate modules. An assembly can be built with only the public key during development and later signed with the private key to add the digital signature for deployment.
+
+related tools =sn.exe=
+
+** The CLR Loader
+
+Dependencies are loaded just-in-time only when necessary by the loader. Most assemblies are loaded by name using the assembly resolver, using the four-part assembly name to determine which underlying file to load into memory. This is determined by
+
+- /Version policies/: Version policies are used to redirect the assembly resolver to load an alternate version of the requested assembly. Version policies can be specified per application, per component (/publisher policy/) and per machine.

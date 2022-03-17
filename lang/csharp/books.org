@@ -1,0 +1,8 @@
+* Books
+
+* COM Interop and PInvoke
+
+** [[https://www.worldcat.org/title/net-and-com/oclc/1027152755&referer=brief_results][.NET and COM: The Complete Interoperability Guide]]
+
+Although this books is mainly about .NET/COM interop, it has a nice chapter that introduces .NET from a traditional non-web point of view
+that focuses on component-based programming, how .NET resolves the issues of COM, its related concepts, programming languages and tools.

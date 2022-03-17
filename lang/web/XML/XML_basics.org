@@ -1,0 +1,56 @@
+#+TITLE: Xml_basics
+
+#+begin_quote
+Extensible Markup Language (XML) is a markup language and file format for storing, transmitting, and reconstructing arbitrary data. It defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.
+...
+The language is widely used for the representation of arbitrary data structures[7] such as those used in web services.
+#+end_quotee
+
+* Why
+
+The main purpose of XML is serialization, i.e. storing, transmitting, and reconstructing arbitrary data.
+
+** Applicaations
+
+- For the interchange of data over the Internet..
+
+* Language Structure
+
+As a markup language, XML labels, categorizes, and structurally organizes information. Or, XML is a /metamarkup language/ (/Extensible/): it doesn't have a fixed set of tags and elements that are supposed to work for everybody in all areas of interest for all time. Any attempt to create a finite set of such tags is doomed to failure. Instead, XML allows developers and writers to define the elements they need as they need them. XML is a structural and semantic markup language, not a presentation language.
+
+- XML tags represent the data structure and contain metadata.
+
+- An additional XML schema (XSD) defines the necessary metadata for interpreting and validating XML.
+
+* Evolution
+
+SGML (too complex) => A Lite-version SGML (XML 1.0) => XSL (Extensible Stylesheet Language, an XML application which transforms XML documents into a form that could be viewed in web browsers): XMLT and XSL-FO => CSS added => XLink, XPointer => DOM and SAX API for PLs. => DTD and XSD
+
+* Key Concepts
+
+- /Processor/ (XML parser) and /Application/: The processor analyzes the markup and passes structured information to an application (not a software application but a particular domain with an agreed set of tags).
+
+- /XML Declaration/: at the beginning of an XML file that describes some information about this XML file.
+
+- /Markup/ and /Content/: the characters making up an XML Document are divided into /markup/ (between =<= and =>= or between =&= and =;=) and /content/. The markup in an XML document describes the structure of the document and ,in a well-designed XML document, semantics
+
+- /Tag/: a markup construct that begins with =<= and ends with =>=:
+    + /start tag/: =<section>=
+    + /end tag/: =</section>=
+    + /empty element tag/: =<line-break />=
+
+- /Element/: a start tag and end tag pair or an empty element tag. The characters between the start tag and the end tag is its content, which may contains markup (/child elements/).
+
+- /Attribute/: a markup construct of name-value pair within a start tag or empty-element-tag
+
+* XML Schema
+
+The markup permitted in a particular XML application can be documented in a /schema/. A /Processor/ may validate an XML document against its schema.
+
+** XML Schema Languages
+
+- /Document Type Defintions/: most broadly supported, and defined by XML 1.0.
+
+- /The W3C XML Schema Language/ (XSD): a more powerful and quite common one
+
+- /RELAX NG/, /Schematron/ and others
