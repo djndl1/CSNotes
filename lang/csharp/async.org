@@ -80,44 +80,33 @@ abstract level than threading.
 
 #+INCLUDE "async/TaskWrapper.cs" src csharp
 
-* Error Handling
-  :PROPERTIES:
-  :CUSTOM_ID: error-handling
-  :END:
+Overrall, this model is still event-based, the code inside =ContinueWith= or after =await= is the callback, that is, called after the task's
+is completed (faulted, cancelled or successfully ran to completion).
 
-A try-catch-block does not work on =Task.Start()= since the control flow
-possibly moves out of the block long before the exception occurs. For an
-asynchronous task, any exception is aggregated into
+* Error Handling
+
+ An Exception that occurred in the task's code does not interrupt the execution flow. The task's status and other properties must be checked to see the task's consequence. Thus A try-catch-block does not work on =Task.Start()= since the control flow possibly moves out of the block long before the exception occurs.
+
+For an asynchronous task, any exception is aggregated into
 =AggregateException=. A continuation on fault can act as an exception
 handler, otherwise, waiting on a faulted task or trying to get the
 result will throw an =AggregationException=.
 
 If an exception that occurs within a task goes entirely
-unobserved---that is, (1) it isn't caught from within the task; (2) the
-completion of the task is never observed, via Wait(), Result, or
-accessing the Exception property, for example; and (c) the faulted
-ContinueWith() is never observed---then the exception is likely to go
-unhandled entirely, resulting in a process-wide unhandled exception.
+unobserved---that is, (1) it isn't caught from within the task; (2) the completion of the task is never observed, via =Wait()=, =Result=, or accessing the Exception property, for example; and (c) the faulted
+=ContinueWith()= is never observed---then the exception is likely to go unhandled entirely, resulting in a process-wide unhandled exception.
 
 * Cancellation
-  :PROPERTIES:
-  :CUSTOM_ID: cancellation
-  :END:
 
-It is a bad idea to rudely abort a thread. Cancel any unfinished tasks
-rather than allowing them to run during application shutdown.
+It is a bad idea to rudely abort a thread. Cancel any unfinished tasks rather than allow them to run during application shutdown.
 The cancellation token used by the task operation must be the same as
-the one passed to the task instance to guarantee a successful cancellation,
-otherwise it's a faulted task.
+the one passed to the task instance to guarantee a successful cancellation, otherwise it's a faulted task.
 
-For simple tasks, =CancellationToken= isn't much different from a simple atomic boolean.
-=CancellationToken= supports callbacks and =WaitHandle=, a tool with much more advanced
-functionality and uses.
+A task must throw =OperationCanceledException= when cancelled to mark the task canceled.
+
+For simple tasks, =CancellationToken= isn't much different from a simple atomic boolean. =CancellationToken= supports callbacks (=Register= a callback on cancellation) and =WaitHandle= (used for a cancellable wait), a tool with much more advanced functionality and uses.
 
 * Async/Await
-  :PROPERTIES:
-  :CUSTOM_ID: asyncawait
-  :END:
 
 TAP was created to address these key problems:
 
@@ -132,24 +121,58 @@ waiting for the activity to complete.
 callback), it is frequently necessary to make a thread synchronization
 context switch back to the original caller that initiated the activity.
 
-From an even-based POV, anything after =await= is the callback code executed
-when the awaited async operation is done.
+From an even-based POV, anything after =await= is the callback code executed when the awaited async operation is done. A series of await is the same as a series of continued and wrapped tasks. In this example, async/await seems more of syntax sugar with exceptions and results automatically unwrapped and a few synchornization stuff.
 
-The =async= method is not the same as normal =Task=s. An async task is
-already started by the time a =Task= is returned. =await= only signifies
-the execution yieding and the result unwrapping.
+#+begin_src csharp
+static void DownloadAndBlur()
+{
+  var url = "https://...jpg";
+  var fileName = Path.GetFileName(url);
+  DownloadImage(url).ContinueWith(task1 =>
+  {
+    var originalImageBytes = task1.Result;
+    var originalImagePath = Path.Combine(ImageResourcesPath, fileName);
+    SaveImage(originalImageBytes, originalImagePath).ContinueWith(task2 =>
+    {
+      BlurImage(originalImagePath).ContinueWith(task3 =>
+      {
+        var blurredImageBytes = task3.Result;
+        var blurredFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_blurred.jpg";
+        var blurredImagePath = Path.Combine(ImageResourcesPath, blurredFileName);
+        SaveImage(blurredImageBytes, blurredImagePath).ContinueWith(task4 =>
+        {
+          done = true;
+        });
+      });
+    });
+  });
+}
 
-An asynchronous task is not necessarily on a new thread, IO-bound async
-tasks are inheritantly asynchronous without a new thread since they are
-handled by the OS and the low-level hardware interrupt mechanism.
+static async void DownloadAndBlur()
+{
+  var url = "https://...jpg";
+  var fileName = Path.GetFileName(url);
+  var originalImageBytes = await DownloadImage(url);
+  var originalImagePath = Path.Combine(ImageResourcesPath, fileName);
+  await SaveImage(originalImageBytes, originalImagePath);
+  var blurredImageBytes = await BlurImage(originalImagePath);
+  var blurredFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_blurred.jpg";
+  var blurredImagePath = Path.Combine(ImageResourcesPath, blurredFileName);
+  await SaveImage(blurredImageBytes, blurredImagePath);
+  done = true;
+}
+#+end_src
+
+=async= methods are not the same as normal =Task=s. An async task is
+already started by the time a =Task= is returned. =await= only signifies the execution yieding and the result unwrapping. However, the control will return to the first calling method without =await= (looks similar to how a =Task= is run) on its firsts opportunity.
+The underlying implementation is to string them together in the semantic equivalent of =Task.ContinueWith()= except that all of the code between the await operators will execute in the caller's synchronization context. =async=/=await= is a superior =Task.ContinueWith= with similar semantics, execution flow, better synchornization and exception handling.
 
 For an async task invoked on the UI thread, regardless of whether the
-await statements occur within an iteration or as separate entries, they
-will execute serially, one after the other and in the same order they
-were invoked from the calling thread. The underlying implementation is
-to string them together in the semantic equivalent of
-Task.ContinueWith() except that all of the code between the await
-operators will execute in the caller's synchronization context.
+await statements occur within an iteration or as separate entries, they will execute serially, one after the other and in the same order they were invoked from the calling thread.
+
+However, =await= is not suitable for fire-and-forget, since there's no way to execute the code after the await before the async method compeletes. Continue a =Task= with =TaskContinuationOptions.OnlyOnFaulted= instead.
+
+An asynchronous task is not necessarily on a new thread, IO-bound async tasks are inheritantly asynchronous without a new thread since they are handled by the OS and the low-level hardware interrupt mechanism.
 
 ** Async Streams (C# 8.0)
    :PROPERTIES:
