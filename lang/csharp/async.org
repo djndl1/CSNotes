@@ -83,7 +83,11 @@ abstract level than threading.
 Overrall, this model is still event-based, the code inside =ContinueWith= or after =await= is the callback, that is, called after the task's
 is completed (faulted, cancelled or successfully ran to completion).
 
-* Error Handling
+** =Task.Run=
+
+Useful for CPU-intense tasks for suboptimal for async I/O operations. Library authors are discouraged from using Task.Run in library methods: It should be up to the caller when threads are launched.  It's generally recommended that calls to =Task.Run= are put as close to the UI code and event handlers as possible (Do not conceal a thread).
+
+** Error Handling
 
  An Exception that occurred in the task's code does not interrupt the execution flow. The task's status and other properties must be checked to see the task's consequence. Thus A try-catch-block does not work on =Task.Start()= since the control flow possibly moves out of the block long before the exception occurs.
 
@@ -96,7 +100,7 @@ If an exception that occurs within a task goes entirely
 unobserved---that is, (1) it isn't caught from within the task; (2) the completion of the task is never observed, via =Wait()=, =Result=, or accessing the Exception property, for example; and (c) the faulted
 =ContinueWith()= is never observed---then the exception is likely to go unhandled entirely, resulting in a process-wide unhandled exception.
 
-* Cancellation
+** Cancellation
 
 It is a bad idea to rudely abort a thread. Cancel any unfinished tasks rather than allow them to run during application shutdown.
 The cancellation token used by the task operation must be the same as
@@ -106,7 +110,7 @@ A task must throw =OperationCanceledException= when cancelled to mark the task c
 
 For simple tasks, =CancellationToken= isn't much different from a simple atomic boolean. =CancellationToken= supports callbacks (=Register= a callback on cancellation) and =WaitHandle= (used for a cancellable wait), a tool with much more advanced functionality and uses.
 
-* Async/Await
+** Async/Await
 
 TAP was created to address these key problems:
 
@@ -202,7 +206,7 @@ safely.
 The Synchronization context gets set automatically for types of
 applications where that is critical.
 
-* =async void=: Non-Option
+** =async void=: Non-Option
   :PROPERTIES:
   :CUSTOM_ID: async-void-non-option
   :END:
@@ -215,7 +219,7 @@ has been completely executed and to handle an exception. Any exception
 thrown on an =async void= method likely ends up on the UI
 =SynchronizationContext= effectively an unhandled exception.
 
-* Async/Await with the Windows UI
+** Async/Await with the Windows UI
   :PROPERTIES:
   :CUSTOM_ID: asyncawait-with-the-windows-ui
   :END:
