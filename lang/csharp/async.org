@@ -59,19 +59,54 @@
   :CUSTOM_ID: event-based-asynchronous-patterns
   :END:
 
-A single async method and a corresponding MethodNameCompleted event.
+A single async method and a corresponding =MethodNameCompleted= event.
 Classes can optionally support cancellation, progress reporting and
-incremental results for each asynchronous method. An asynchronous method
-may also support multiple pending calls (multiple concurrent
-invocations), allowing your code to call it any number of times before
+incremental results for each asynchronous method.
+
+An asynchronous method
+may also support multiple pending calls (multiple concurrent invocations), allowing your code to call it any number of times before
 it completes other pending operations (/multiple-invocation/, which can
-be queried through an extra parameter =userState=).
+be queried through an extra parameter =UserState=).
 
 #+INCLUDE: "async/ProgramWithEvents.cs" src csharp
 
+** Basic Model
 
-a =Task= is control flow running in another dimension, in a more
-abstract level than threading.
+A async method and its =Completed= event.
+
+- single invocation: =InvalidOperationException= if the previous call is not completed. The user is responsible for providing a unique =userState= as
+  task IDs and maintaining a list of task IDs to track pending operations.
+
+- multiple invocation: an async method with a =userState= parameter.
+
+- Cancellation: a =CancelAsync= that may take a task ID.
+
+** Advanced Model
+
+- =ProgressChanged= or =MethodNameProgressChanged= for tracking progress
+
+** Interop With TAP
+
+Sets a =TaskCompletionSource= when the event is fired
+
+#+begin_src csharp
+public static Task<string> DownloadStringAsync(Uri url)
+ {
+     var tcs = new TaskCompletionSource<string>();
+     var wc = new WebClient();
+     wc.DownloadStringCompleted += (s,e) =>
+         {
+             if (e.Error != null)
+                tcs.TrySetException(e.Error);
+             else if (e.Cancelled)
+                tcs.TrySetCanceled();
+             else
+                tcs.TrySetResult(e.Result);
+         };
+     wc.DownloadStringAsync(url);
+     return tcs.Task;
+}
+#+end_src
 
 
 [Task.Wait and Inlining][https://devblogs.microsoft.com/pfxteam/task-wait-and-inlining/]
