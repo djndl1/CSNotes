@@ -115,8 +115,11 @@ public static Task<string> DownloadStringAsync(Uri url)
 
 #+INCLUDE "async/TaskWrapper.cs" src csharp
 
-Overrall, this model is still event-based, the code inside =ContinueWith= or after =await= is the callback, that is, called after the task's
-is completed (faulted, cancelled or successfully ran to completion).
+Overrall, this model is still event-based, the code inside =ContinueWith= or after =await= is the callback, that is, called after the task's is completed (faulted, cancelled or successfully ran to completion).
+
+** Task Status
+
+Any task returned by a TAP method should =Start= the task before returning rather than leaving it =Created=.
 
 ** =Task.Run=
 
@@ -141,7 +144,7 @@ It is a bad idea to rudely abort a thread. Cancel any unfinished tasks rather th
 The cancellation token used by the task operation must be the same as
 the one passed to the task instance to guarantee a successful cancellation, otherwise it's a faulted task.
 
-A task must throw =OperationCanceledException= when cancelled to mark the task canceled.
+A task delegate must throw =OperationCanceledException= when cancelled to mark the task canceled. A TAP method should returns a =Task= that ended in the =Canceled= if honoring the request. =await= such operations results in =OperationCanceledException=.
 
 For simple tasks, =CancellationToken= isn't much different from a simple atomic boolean. =CancellationToken= supports callbacks (=Register= a callback on cancellation) and =WaitHandle= (used for a cancellable wait), a tool with much more advanced functionality and uses.
 
@@ -206,12 +209,32 @@ static async void DownloadAndBlur()
 already started by the time a =Task= is returned. =await= only signifies the execution yieding and the result unwrapping. However, the control will return to the first calling method without =await= (looks similar to how a =Task= is run) on its firsts opportunity.
 The underlying implementation is to string them together in the semantic equivalent of =Task.ContinueWith()= except that all of the code between the await operators will execute in the caller's synchronization context. =async=/=await= is a superior =Task.ContinueWith= with similar semantics, execution flow, better synchornization and exception handling.
 
-For an async task invoked on the UI thread, regardless of whether the
-await statements occur within an iteration or as separate entries, they will execute serially, one after the other and in the same order they were invoked from the calling thread.
-
 However, =await= is not suitable for fire-and-forget, since there's no way to execute the code after the await before the async method compeletes. Continue a =Task= with =TaskContinuationOptions.OnlyOnFaulted= instead.
 
 An asynchronous task is not necessarily on a new thread, IO-bound async tasks are inheritantly asynchronous without a new thread since they are handled by the OS and the low-level hardware interrupt mechanism.
+
+*** Advanced Topics
+
+**** UI App
+
+For an async task invoked on the UI thread, regardless of whether the await statements occur within an iteration or as separate entries, they will execute serially, one after the other and in the same order they were invoked from the calling thread.
+
+One of the key advantages of the =async=/=await= pattern is that it
+leverages the synchronization context to ensure that continuation
+work---work that appears after the await statement---will always execute
+on the same synchronization task that invoked the await statement. This
+approach is of significant value because it eliminates the need to
+explicitly switch back to the UI thread to update a control.
+
+**** =await= in =Task.Run()=
+
+- Run the IO independent of the current execution, instead of waiting for the IO to finish.
+
+** Progress Reporting
+
+*** =IProgress= =System.Progress<T>=
+
+Progress is reported synchronously on its captured synchornization context.
 
 ** Async Streams (C# 8.0)
    :PROPERTIES:
@@ -254,22 +277,7 @@ has been completely executed and to handle an exception. Any exception
 thrown on an =async void= method likely ends up on the UI
 =SynchronizationContext= effectively an unhandled exception.
 
-** Async/Await with the Windows UI
-  :PROPERTIES:
-  :CUSTOM_ID: asyncawait-with-the-windows-ui
-  :END:
-
-One of the key advantages of the =async=/=await= pattern is that it
-leverages the synchronization context to ensure that continuation
-work---work that appears after the await statement---will always execute
-on the same synchronization task that invoked the await statement. This
-approach is of significant value because it eliminates the need to
-explicitly switch back to the UI thread to update a control.
-
-#+INCLUDE
-
-
-* =Task.Yield=
+** =Task.Yield=
 
 Basically just attempting an empty task for a potential task scheduler intervention
 to redirect the execution flow.
