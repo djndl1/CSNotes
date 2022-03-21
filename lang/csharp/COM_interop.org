@@ -1,0 +1,565 @@
+#+TITLE: Com_interop
+
+Three main aspects of COM Interop
+
+1. Core services that provides the infrastructure to communicate with COM components.
+
+2. A set of APIs to ease programming COM interop.
+
+3. A set of tools for uses from type library generation to proper registration.
+
+   COM interop ensures a consistent programming model with native .NET when dealing with unmanaged code.
+
+* About COM
+
+** Useful Tools
+
+- =OLEVIEW.EXE=: =oleview stdole2.tlb=
+
+- =MIDL.EXE=: compile an IDL to a binary library
+
+- =REGSVR32.EXE= registers and unregisters COM components in the Windows Registry
+
+** COM/NET Comparison
+
+*** Programming Model
+
+.NET has richer object orientation, supporting implementation inheritance
+while COM enable implementation reuse via aggregation and containment.
+
+*** Type Information
+
+COM has type library as a language-neutral way to provide type information.
+A typelib may reside in a DLL as a resource or as an independent file.
+CoClasses states a subset of interfaces that they implement, not necessarily
+all of them. COM type information cannot be guaranteed to be correct, complete
+or even available. Some COM interfaces do expose their type info
+(=ITypeInfo=, =ITypeInfo2= etc.)
+
+.NET exposes type information via /metadata/, which is guaranteed to be complete
+for every component and work with every language in .NET. The .NET CLR knows
+everything about a type from the beginning, thus discards any runtime metadata
+query.
+
+*** Identity
+
+COM uses GUIDs to identify componets e.g. CLSID, IID, LIBID, APPID(used to DCOM to identify an app).
+Some classes also has a friendly ProgID (non-unique), used commonly by VB.
+
+.NET types has a its type name (with the namespace prefixed) along with its (hopefully strongly named) assembly name as its identifier: the assembly-qualified
+type name (=typeof(T).AssemblyQualifiedName=).
+
+*** Locating components
+
+COM components are registered in the Windows Registry. COM GUIDs are
+placed under =HKEY_CLASSES_ROOT\=. COM checks the registry values
+under the key for the specified ID to find the name and location of
+the DLL that needs to be loaded to activate the class.
+
+Registered LibIDs are used VB and Visual Studio to provide a list of components that can referenced. Interfaces are often registered with entries to special marshaling classes.
+
+COM reigstration is brittle and can be easily destroyed, tampered or polluted. Files might be moved and registry information might not be correct from the very start.
+
+.NET locates its components in the GAC, the local directory, or some other location specified in a configuration file. Private applications don't have to
+share components.
+
+*** Type compatibility
+
+In COM, components interoperability is accomplished through COM's binary
+standard.
+
+In .NET, everything is executed in the CLR's type system.
+
+*** Versioning
+
+COM has a =Major.Minor= version scheme for its type libs. ProgIds have
+a versioning scheme that contains a version-dependent and a version-independent one. Interfaces has no versioning info (interfaces are in themselves a versioning mechanism): any updates to an interface must be done to a new interface with a different IID.
+
+.NET has a sophisticate versioning scheme that guarantees multiple versions of
+an assembly can live side-by-side. The users and the authors can also specify
+their own versioning policies for components.
+
+*** Type Safety
+
+.NET objects cannot casually access any memory locations and malicious code
+is monitored by the framework.
+
+*** Error Handling
+
+COM: integral status code =HRESULT=, or wrapped in VB's global =Err= object.
+
+.NET: errors are communicated to clients via exceptions: extensible, human-readable, although with some performance implication.
+
+*** Object Lifetime
+
+COM: manual/automatic reference counting
+
+.NET: tracing garbage collection.
+
+** How Does COM Interop Work
+
+Wrappers: RCW and CCW.
+
+*** RCW (Runtime Callable Wrapper)
+
+A proxy to a COM object.
+
+The wrapper forwards calls to the original object through
+its exposed interfaces. Each RCW caches interface pointers
+for the COM object it wraps and internally performs reference
+counting on these interface pointers. A RCW without metadata
+looks like a generic RCW type =System.__ComObject=, otherwise it
+looks much like the original coclass.
+
+*** CCW (COM-Callable Wrapper)
+
+CCWs maintain refcounts like normal COM objects. Each CCW holds
+a referenfe to the .NET object it wraps. When the CCW's refcount
+reaches zero, it destroys itself and releases the inner reference,
+causing the wrapped managed object eligible for garbage collection.
+
+** Some Unmanaged Techs and their Managed Counterparts
+
+| ADO              | System.Data              |
+| Active Directory | System.DirectoryServices |
+| MSXML            | System.Xml               |
+| Win32 Graphics   | System.drawing           |
+| Win32 Window GUI | System.Windows.Forms     |
+| WMI              | System.Management        |
+
+* Use COM in .NET
+
+- Interop Assemblies: contains metadata of COM objects for .NET to understand.
+  + Primary Interop Assembly: specifically marked interop assembly 
+    as a commonly used interop assembly by the COM author to avoid multiple generated interop assemblies for the same typelib.
+
+- Automatically generate interop assemblies:
+  + Visual Studio References
+  + =TLBIMP.EXE=
+
+** COM Marshaling
+
+Interop Marshaling is handled completely by CLR's Interop Marshaler, independent of COM marshaling.
+
+1. Marshaler provides copy-in/copy-out behavior rather than true by-reference semantics
+for reference types when there is a difference between internal representations.
+
+2. Blittable types are always exposed directly in memory (as of .NET 1.0)
+
+*** Custom Marshaling
+
+**** Dealing with =System.IntPtr=
+
+The importer or hand-written code might leave some arguments as =IntPtr=, exposing the raw COM address.
+Aside from unsafe code, =Marshal= and =GCHanle= are two major classes that can deal with =IntPtr= in pretty
+much the same way as unsafe code.
+
+#+begin_src csharp
+int x = 5;
+int* address = &x;
+// var handle = GCHandle.Alloc(..., GCHandleType.Pinned) // handle to a boxed integer
+// handle.AddrOfPinnedObject()
+// ...
+// if (hanle.IsAllocated) handle.Free()
+#+end_src
+
+=sizeof= reports the managed size of a type, while =Marshal.SizeOf= reports the unmanaged size of a type, not the CLR type (which should be abstracted away by the runtime).
+=Marshal.SizeOf= can be used with any types that can be successfully marshaled into unmanaged code as a structure (even a POCO).
+
+***** Out Null
+
+Sometimes A =NULL= can be passed into an =out= argument to indicate the client should ignore this argument. However, .NET does not allow =null= to be passed in here, the user will
+have to mark this argument as =IntPtr= and a =IntPtr.Zero= is passed if =NULL= is to be allowed.
+
+***** =VARIANT= with =VT_RECORD= (User-defined Type)
+
+There is no easy way to pass an =System.Object= to a =VARIANT= argument with =VT_RECORD= or return such one.
+
+There are two methods to deal with this, both requires definition of a COM =Variant= type and the use of =IRecordInfo=:
+
+1. modify the signature to =ref Variant t=
+
+2. Modify the signature to =ref IntPtr=
+
+   TODO
+
+** Interactions with COM Objects
+
+- =new= an RCW
+
+- Create in API without even metadata for the COM object
+  + =Type.GetTypeFromGetProgID()=, =Type.GetTypeFromGetCLSID()=, =Type.GetType()= (requires an interop assembly)
+  + =Activator.CreateInstance(typeObject)=
+  + Call them in a late bound fashion or cast the object to an predefined interface marked with
+    COM metadata
+
+*** Error Handling
+
+- By default =System.Runtime.InteropServices.COMException= (=PreserveSigAttribute= can disable this transformation)
+
+  The type of the exception thrown is based onthe returned =HRESULT= and the contents
+  of the exception can contain customized information of =IErrorInfo= is available.
+  Some =HRESULT= are converted into .NET exceptions like =System.OutOfMemoryException=.
+
+*** Calling Methods and Properties
+
+Basically the same as the normal .NET methods/properties.
+However, parameterized properties needs some special treatment when using C# or C++.
+
+#+begin_src csharp
+// HRESULT User([in] BSTR Name, [out, retval] IVSSUser** ppIUser);
+user = database.get_User("Guest");
+#+end_src
+
+One can always dynamically invoke a COM method (only with =IDispatch= though) by calling =Type.InvokeMember=.
+For pure =IUnknown= COM objects, having metadata defintions of the type and using
+different reflection APIs =Type.Invoke= is a must.
+
+**** Argument Passing
+
+***** =VARIANT=
+
+ON the surface, a =VARIANT= can be represented as an =Object= and passing the right of =Object= to the COM component is usually straightforward. There are a few wrappers
+(=BstrWrapper=, =CurrencyWrapper=, =DispatchWrapper=, =UnknownWrapper=, =ErrorWrapper=, =VariantWrapper=)
+to indicate a proper marshaling of certain managed types into =VARIANT=. To force a null
+object inside the COM component, use =new UnknownWrapper(null)= or =new DispatchWrapper(null)=.
+
+***** Late Binding and By-Reference Parameters
+
+All parameters are packaged in =VARIANT= when late binding to a COM component.
+The CLR has no way to known whether an object should be passed by value or not.
+=Type.InvokeMember= passes all parameter by value by default (=ParameterModifier=
+changes the default behavior).
+
+***** Optional Parameters
+
+With C# 4.0, there is suppport for optional parameters and named parameters.
+Pass a =Type.Missing= (=System.Reflection.Missing.Value=) for missing variant when necessary. The worst case is when the missing value is a pointer to a missing variant
+
+#+begin_src csharp
+object missing = Type.Missing;
+myCom.ComMethod(arg1, ref missing); // [in, optional] VARIANT* optionalValue
+#+end_src
+
+*** Lifetime Management (A somewhat controversial topic)
+
+COM objects wrapped in RCWs are not refcounted based on the number of .NET clients. ANy COM interface obtained through an RCW has its reference count
+incremented /once/. WHen the RCW is GCed, its finalizer calls =IUnknown.Release= on every cached interface pointer. The RCW might still be alive on
+a GC heap after releasing.
+
+=Marshal.ReleaseComObject= deterministically releases an RCW, but not really a good solution. See [[https://devblogs.microsoft.com/visualstudio/marshal-releasecomobject-considered-dangerous/][Marshal.ReleaseComObject Considered Dangerous]]
+
+There are of course some exceptions (especially when working buggy code):
+[[https://stackoverflow.com/questions/37904483/as-of-today-what-is-the-right-way-to-work-with-com-objects][What is the right way to work with COM objects]]
+
+Better use
+
+#+begin_src csharp
+if (Marshal.AreComObjectsAvailableForCleanup())
+{
+    GC.WaitForPendingFinalizers();
+}
+#+end_src
+
+If =Marshal.ReleaseComObject= must be used, there are a few caveats:
+
+- One time might not be enough, might as well use a loop
+
+- Release COM objects that are depedent on each other in the correct (typically reverse) order.
+
+- Wrap the COM object to release in a method block marked with =MethodImpl(MethodImplOptions.NoInlining)= to avoid inlining that
+  causes the reference does not go out of scope in time. Since under debug mode, the JIT compiler tracks local variables, making
+  a used object illegible for GC.
+
+- Do not release a COM object that is implemented or marshaled as a .NET object.
+
+Another way to release COM objects is to call
+
+#+begin_src csharp
+GC.Collect();
+GC.WaitForPendingFinalizers();
+#+end_src
+
+*** Type casting
+
+If the metadata of an RCW supports the target type, then there's no need for =QueryInterface=.
+
+The cast procedure is the following:
+
+1. Check if the metadat definition of the source class implements the destination type
+
+2. If not, check if the target interface is marked with =ComEventInterfaceAttribute=
+
+3. If not, =QueryInterface=; if yes, check if the object supports =IConnectionPointContainer= and can =FindConnectionPoint= of the specified event source interface.
+
+** Inspect at Interop Assemblies
+
+*** Data Type Conversion For Function Parameters
+
+| IDL                       | VB6          | .NET            |                                                                                                                          |   |
+| char                      | N/A          | System.SByte    |                                                                                                                          |   |
+| short                     | Integer      | System.Int16    |                                                                                                                          |   |
+| int, long, HRESULT, SCODE | Long         | System.Int32    |                                                                                                                          |   |
+| int64                     | N/A          | System.Int64    |                                                                                                                          |   |
+| unsigned char             | Byte         | System.Byte     |                                                                                                                          |   |
+| unsigned short            | N/A          | System.UInt16   |                                                                                                                          |   |
+| unsgined int/long         | N/A          | System.UInt32   |                                                                                                                          |   |
+| uint64                    | N/A          | System.UInt64   |                                                                                                                          |   |
+| float                     | Single       | System.Single   |                                                                                                                          |   |
+| double                    | Double       | System.Double   |                                                                                                                          |   |
+| BSTR, LPSTR, LPWSTR       | String       | System.String   | UnmanagedType.BStr (default for System.String), Unmanaged.LPStr, Unamanged LPWStr                                        |   |
+| VARIANT_BOOL              | Boolean      | System.Boolean  |                                                                                                                          |   |
+| DATE                      | Date         | System.DateTime |                                                                                                                          |   |
+| GUID                      | N/A          | System.Guid     |                                                                                                                          |   |
+| DECIMAL                   | N/A          | System.Decimal  |                                                                                                                          |   |
+| CURRENCY                  | CURRENCY     | System.Decimal  | [MarshalAs(UnamangedType.Currency)]                                                                                      |   |
+| VARIANT                   | Variant      | System.Object   | default                                                                                                                  |   |
+| IUnknown*                 | Unknown      | System.Object   | [MarshalAs(UnmanagedType.IUnknown)]                                                                                      |   |
+| IDispatch*                | Object       | System.Object   | [MarshalAs(UnmanagedType.IDispatch)]                                                                                     |   |
+| void*                     | Any          | System.IntPtr   | No way to transform into System.Object                                                                                   |   |
+| IDispatchEx*              | IDispatchEx  | IExpando*       | enables dynamic invocation, enable dynamic addition and removal of members. Mainly used by unmanaged scripting language. |   |
+| IEnumVariant*             | IEnumVARIANT | IEnumerator     | CustomMarshaler, EnumeratorToEnumVariantMarshaler(there is also an =IEnumVARIANT= interface though)                      |   |
+| ITypeInfo                 | ITypeInfo    | System.Type     | the gateway to reflection                                                                                                |   |
+
+A typelib might show different types than the original IDL types
+
+| IDL                    | TypeLib        |
+| boolean, small         | char           |
+| wchar_t                | unsigned short |
+| hyper, __int64         | int64`         |
+| [string] char*         | LPSTR          |
+| [string] wchar*        | LPWSTR         |
+| byte                   | unsigned char  |
+| unsigned hyper/__int64 | uint64         |
+
+Each potentially ambiguous .NEt type that the importer produces is marked
+with =MarshalAsAttribute=.
+
+- =[in, out]= =LP(W)STR= should by marked as =ref= instead of by-value.
+
+- =HRESULT= and =SCODE= are marshaled as =UnmanagedType.Error=
+
+- =IDispatchEx= (=IExpando=):
+
+- =IEnumVARIANT= (=IEnumVARIANT= but can be actually marshaled into =IEnumerator=):
+
+**** Arrays
+
+***** =SAFEARRAY= (VB6 Array)
+
+
+***** Fixed-size Array
+
+=MarshalAs= with =SizeConst=
+
+***** Varying Array
+
+A Slice of Fixed-Size array. Typelibs have no notion of the related
+COM attributes (=length_is=, =first_is=, =last_is=), causing the importer to marshal the entire array.
+
+***** Conformant Array (varying-size array)
+
+An array with a dynamic size (=size_is= attribute in COM, ignored by typelibs and the importer. The workaround is to change the method signature.
+
+** Methods and Properties
+
+- =HRESULT= is converted into an exception and a =[out, retval]= parameter is used as the return value. For some rare COM method with no =HRESULT=,
+  =[PreserveSigAttribute]= is annotated in .NET so that the interop marshaler can work properly without a typelib to be present.
+
+- =void ***=-like pointers are not convertable to any .NET types, thus left as =IntPtr=.
+
+- ownership and directions (attributes available in both COM and .NET):
+  + =[in]=: marshaled from caller to callee
+  + =[out]=: marshaled from callee to caller
+  + =[in, out]=: marshaled in both directions
+
+- Parameter Array (=[vararg]= in COM, =[ParamArrayAttribute]= in .NET):
+
+- Property accessors are reflected in .NET metadata. Property accessors share the same DISPID
+  + =propget= to =get_propertyName=
+  + =propputref= to =set_propertyName=
+  + =propput= to =let_propertyName= or =set_propertyName= depending on presence of =propputref=.
+
+- Dispatch ID: =DispIdAttribute=
+    + =DISPID_VALUE(0)= (the default member in VB6): =DefaultMemberAttribute=. Default properties are only available for .NET languages in parameterized properties such as =Item[]=.
+    + =DISPID_NEWENUM(-4)=: found on a collection interface with an =NewEnum=-like method in COM, used by VB6 to enable =For Each= loop, similar to .NET's =GetEnumerator= (C# finds it by method name rather than =IEnumerable= to allow strongly typed implementation, no more bizzare than checking for a special DISPID). The importer knows to transform between them.
+
+** Interfaces
+
+Every COM interfaces corresponds to a .NET interface (marked with =GuidAttribute=, =ComImportAttribute=, and an optional =InterfaceTypeAttribute=).
+Note that any derived interface has duplicated methods from its base interface to maintain the vtable's layout, there are sometimes gap methods.
+
+** Events and Source Interfaces
+
+TODO
+
+** Classes
+
+A /coclass interface/ with the name =CoClassName= inherit the default interface and marked with the same IID as the default interface and =CoClassAttribute= (to directly instantiate this interface).
+A .NET class =CoClassNameClass= then inherit the all the CoClass's interfaces (optionall other .NET interfaces) and implements all =virtual extern= methods there.
+
+*** The RCW =CoClassNameClass=
+
+1. A public default constructor (=internal= constructor if =noncreatable=)
+
+2. implements all members of its interfaces
+
+** Modules (Global methods and constants)
+
+Global methods are omitted. They must be imported manually using PInvoke.
+
+** Structures
+
+Do note =VARIANT_BOOL= is converted to a =Int64=, with =-1= as =true= and =0= as =false=
+
+** Unions
+
+=[StructLayout(LayoutKind.Explicit)]= and =[FieldOffset]= on a struct member
+
+** =typedef=
+
+=ComAliasName= where the typedeffed one is actually used, or duplicate the definition with different names.
+
+* Responding to COM Events
+
+COM doesn't have builtin events but use a standard connection point protocol
+
+*** .NET Callback Pattern
+
+1. Define a class of an interface that implements a set of callback methods, pass an object
+   of this class to the event source: e.g. =System.Collections.IComparer= passed into =System.Array.Sort= (the Java way)
+
+2. Passing /Delegates/ (type-safe function pointer, possibly with an class instance pointer): delegates also enable multicasting callbacks: multiple delegates can be combined together.
+
+3. Subscribing to /events/ (abstraction over multicast delegates, with two =add= and =remove= accessors, invocable only inside the server class). Do unsubscribe when disposing the subscriber, otherwise
+   the publisher will hold a reference to the subscriber.
+
+*** COM Callback Pattern
+
+1. Passing an interface instance (common in COM)
+
+2. Pasing a function pointer
+
+3. Connection Points (the COM equivalent of .NET events, but less granular since it's based on interfaces):
+   a general protocol for setting up and using interface callbacks.
+
+**** Connection Points
+
+- /source/ (/connectable object/) =IConnectionPointContainer=: the object causing an event to be raised
+
+- /sink/: the object handling events, a sink being attached to a connection point is considered a /connection/
+
+- /source interface/: the callback interface implemented by the sink and called by the source
+
+- /connection point/ =IConnectionPoint=: the object doing the actual callbacks on the source interface
+
+The source coclass list an interface marked with =source= to advertise its supported callback interface (and almost always as a =dispinterface=).
+CoClasses that supports events by implementing =IConnectionPointContainer=. The sink calls =Advise=
+and =Unadvise= methods to enable clients to hook and unhook a callback interface.
+
+The sink queries interface for =IConnectionPointContainer=, calls =FindConnectionPoint= to
+get the desired connection point and passes itself to the connection point by calling =Advise=.
+The source queries interface for the source interface and calls the callback method on it. Finally,
+the sink can =Unadvise= to disconnect.
+
+**** Connect to COM Connection Points From .NET
+
+***** The COM way
+
+Not flexible, have to implement every methods in the source interface
+
+1. Cast the source to =IConnectionPointContainer=
+
+2. =FindConnectionPoint= from the source
+
+3. =Advise= the connection point by passing a class that implements the source interface
+
+4. =Unadvise= in the finalizer
+
+***** The .NET TypeLib Importer Way
+
+The basic idea is to use one sink helper (which represents a connection and maintains a cookie and a single delegate) for each subscription. To convert methods into events,
+subscritions are transformed into advising a sink helper with a single delegate to be called in its corresponding event method. The source calls on the sink helpers, which
+calls the sink helper's delegate, which was passed in by the user.
+
+- Create a sink helper class (=ClassInterface(None)=) that implement a method-based source interface (marked with COM GUID), with each method calling a delegate member and holds a cookie.
+  A sink helper is responsible for maintaining a subscribed event handler and the corresponding connection's cookie.
+
+- Create an .NET event interface the same as the source COM interface and the related delegate types
+
+- Implement the event interface as an event provider class.
+   + the class is constructed with a =WeakReference= to the source COM RCW.
+   + keeps a weak reference to the source, a list of sink helpers, a connection point
+   + implement the =Dispose= pattern: =Unadvise= by passing each sink helper's cookie and =Marshal.ReleaseComObject= the connection point if not null.
+   + implement add accessors: initialize the connection point if none, use new sink helper for every new subscription and add this new sink helper to the list.
+   + implement remove accessors: check every sink helper's delegate against the one to be removed, =Unadvise= the matching one and remove it from the list. If the list gets empty,
+     =Marshal.ReleaseComObject= the connection point and set the list and the connection point to null.
+   + the connection point is always lazily initialized and release when no subscrition is present
+   + Subscription and unsubscription always occur in a monitor (=lock= stetement).
+
+Type-import any COM event source interface to see the basic idea of implementation.
+
+* Threading and Apartments
+
+.NET objects can be accessed by any number of threads at any time. Class authors must take on the responsibility of protecting internal state
+from getting corrupted due to concurrent access.
+
+By default the CLR calls =CoInitializeEx(0, COINIT_MULTITHREADED)= (MTA threaded by default). The CLR internally uses COM
+when starting up so COM is always initialized by the time the first line of code inside =Main= is run. A Thread function
+can actually set thread's apartment state to =STA= when the thread has already started even if the default is =MTA=.
+
+COM callbacks to .NET are not guaranteed to occur on a certain thread (e.g. the thread in which the COM component is created).
+No .NET components can assume that they will be called on one thread. Thus, the callback might fail due to missing proxy/stub marshaler
+if the COM object is used there. One way around this is to signal the original thread in the callback to execute the actual callback
+(such as checking an =ManualResetEvent= in a loop).
+
+
+* Manually Defining COM Types in Source Code
+
+Lightweight, easily customizable (no more MSIL), hard to get it done right and creating a new .NET type identity.
+
+** Important Custom Attributes
+
+- =ComImportAttribute=: "this is a type defined previously in COM". =ComImport= Marked types are never exported as COM types.
+
+- =GuidAttribute=: identity
+
+** Defininng Interfaces
+
+The =IUnknown= and dual interface's methods should be defined in the exact same order as they appear in the COM definition.
+For =dispinterface=, DISPIDs must be used, since all method invocations are done via =IDispatch=
+rd
+
+- =InterfaceTypeAttribute=: =IUnknown=, =IDispatch= or a dual interface (by default). Used by the CLR to determine how to present a vtable to COM.
+
+Do not bother with =MethodImplAttribute= when defining interface methods.
+
+
+#+begin_src csharp
+[
+    ComImport,
+    Guid("...")
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)
+]
+interface IAmIUnknown
+#+end_src
+
+#+begin_src csharp
+[
+    ComImport,
+    Guid("...")
+    InterfaceType(ComInterfaceType.InterfaceIsDual)
+]
+interface IAmDual
+{
+    [DispId(id1)]
+    object AProperty { [return: MarshalAs(UnamangedType.IUnknown)] get; }
+
+    [DispId(id2)]
+    int Count { get; }
+
+    [DispId(id3)]
+    [return: MarshalAs(UnmanagedType.IDispatch)]
+    object get_item(int lIndex)
+}
+#+end_src

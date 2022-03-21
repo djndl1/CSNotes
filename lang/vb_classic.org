@@ -48,13 +48,111 @@ Forms expose a special property, the =Controls= collection, which contains all t
 
 * Basics
 
-1. =Set= is there only to assign object reference
+** Types
 
-2. =Variant= can be used as a =Result<T, E>=, returning the result when no error and an error number if needed.
+- =Integer= and =Long=
 
-3. =TypeName= returns the name of the type
+- =Single= and =Double=
 
-4. =Dictionary= belongs to an external library: Microsoft Scripting Runtime
+- =Date= (=DATE=): =#12/3/2013#
+
+- =Currency= (=CURRENCY=)
+
+- =Boolean=
+
+- =Variant= (=VARIANT=): the default data type that can store any type of data
+
+- =String= (=BSTR=)
+
+** Basic Keywords
+
+- =Dim=: declare variable
+
+- =Set= is there only to assign object reference
+
+- =Variant= can be used as a =Result<T, E>=, returning the result when no error and an error number if needed.
+
+- =TypeName= returns the name of the type
+
+- =Dictionary= belongs to an external library: Microsoft Scripting Runtime
+
+** Quick I/O
+
+=InputBox=
+
+=MsgBox=
+
+** Common Functions
+
+=Len(String)=
+
+=&=: string concatenation
+
+=Mid=: get a substring
+
+- =LBound=, =UBound=
+
+- =Split= a string
+
+- =Join= an array of strings
+
+- =Filter= a string based on a criterion
+
+- =Left=, =Right=: the leftmost/rightmost n chars
+
+- =LCase=, =UCase=
+
+- =Space=: n spaces
+
+- =Replace= a part of a string with another string
+
+- =StrReverse=
+
+- =LTrim=, =RTrim=
+
+- =Asc= a character
+
+- =Chr= an ASCII code integer
+
+** Programming Construct
+
+=If () Then ... ElseIf () Then ... Else ...=
+
+#+begin_src sql
+For Each item In Col
+...
+Next item
+
+For i = 0 To N
+...
+Next i
+#+end_src
+
+#+begin_src sql
+While (expr)
+...
+Wend
+
+Do While (expr)
+...
+Loop
+
+Do Until (expr)
+...
+Loop
+#+end_src
+
+#+begin_src sql
+Private/Public Sub SubName
+...
+End Sub
+
+Private/Public Function FuncName
+...
+End Function
+#+end_src
+
+
 
 * Error Handling
 

@@ -1,0 +1,30 @@
+#+TITLE: Tcp
+
+Reliable and ordered
+
+- /Positive Acknowledgement with Retransmission/ (PAR): A device using PAR resend
+  the data unit until it receives an acknowledgement. The receiver would discard
+  a damaged PDU (here a segment) and the sender would continue to resend the data for
+  positive acknowledgement.
+
+* Sequence Number
+
+- /Sequence Number/: a 4-byte field in TCP headers of outgoing segments to detect missing or misordered packets and achieve reliable and ordered delivery. Sequence numbers are based on packet sizes (Next SEQ = Current SEQ + Current Package Size). TCP stacks are capable of retransmitting or resequencing the data to restore the original order based on the sequence number.
+
+* Sliding Window
+
+In a naive TCP implementation, a sender sends a segment and waits until the acknowledgement arrives. If not, the sender resends the previous segment. This might noty fully take advantage of the underlying network bandwith.
+
+- /Sliding Window/: A window is a space whtat holds or can hold multiple bytes, which are PDUs. Sliding means moving to a new set of bytes after acknowledgement.
+    + Sliding window sizes are advertised to each other during TCP connection establishment.
+
+  Sliding windows are required for reliable communication.
+
+* Handshake
+
+- Three steps
+  + Client - SYN (Synchronize Sequence Number) - Server: the client informs the server it is going to start communication with a certain sequence number (/Initial Sequence Number/). =SYN= flag set and the initial sequence number.
+
+  + Server - SYN/ACK - Client: the server responds by sending an acknowledgement with
+    the sequence number it will start using (TCP is full-duplex). =SYN= (the server's initial sequence number) and =ACK= (with the client's next sequence number) flags set.
+  + Client - ACK - Server: the client acknowledges the response of the server. =ACK= flag set with the server's next sequence number.

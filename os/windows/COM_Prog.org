@@ -1,0 +1,557 @@
+#+TITLE: Com Prog
+
+* COM Objects
+
+#+begin_quote
+marketing had a field day with the terminology.
+#+end_quote
+
+** Why And A lot of other buzzwords
+
+#+begin_quote
+COM evolved out of the solution to a specific problem — how to allow a
+word processor to edit the spread sheet in a letter without the user having to
+exit the word processor to do it. This solution was called OLE (Object Linking and Embedding)
+and contained a very sophisticated API that allows you
+even today to edit a letter within Internet Explorer using Microsoft Word.
+With the second release of OLE (OLE2), its creators modified
+OLE32.DLL to expose more of the basic functionality of OLE so that its API
+could be used to allow any application to access the functionality of
+another.
+#+end_quote
+
+- ActiveX Controls: COM-based GUI controls
+
+- Used in Client-Server applications
+
+- Multi-language library development
+
+** Use
+
+*** Create a CoClass
+
+1. Through some custom function to return a certain interface of a CoObject
+
+2. Calling some functions or a class factory with a CLSID.
+
+3. =CoCreateInstance= with Class IDs and Interface IDs
+   + COM inforamtion is located under =HKEY_CLASSES_ROOT=, which points to =HKLM:\Software\Classes=
+   + /Class ID/ (/CLSID/): the filename
+   + /AppID/: an entry for remote COM server.
+   + /Interface/:
+   + /Program ID/: A friendly name associated with a class ID
+
+*** COM Communication
+
+Cross-process calls are done through automatically generated proxy/stub pairs. =OLE32.DLL= provides the standard proxy/stub. The objects referenced by pointers are serialized to and from the server.
+
+*** Destroy a CoClass
+
+The object itself uses a reference counter scheme. Decrement its refcount after using a CoClass. An EXE COM server also checks the refcount by sending messages its client and decrement the refcount if no response is made.
+
+*** Example-1: Simple Creation and Deletion of a COM Component
+
+#+BEGIN_SRC c++
+int SimpleComUse()
+{
+        IDesktopWallpaper* wallpaper;
+        HRESULT hr = ::CoCreateInstance(
+                CLSID_DesktopWallpaper,
+                nullptr,
+                CLSCTX_ALL,
+                IID_IDesktopWallpaper,
+                (LPVOID*)&wallpaper);
+
+        if (FAILED(hr))
+        {
+                return 1;
+        }
+
+        DESKTOP_WALLPAPER_POSITION wallpaperPosition;
+        hr = wallpaper->GetPosition(&wallpaperPosition);
+        if (FAILED(hr))
+        {                return 2;        }
+        // use the results
+         wallpaper->Release();
+}
+#+END_SRC
+
+#+BEGIN_SRC cpp
+template<typename I>
+static const bool is_com_type_v = std::is_base_of_v<IUnknown, I>;
+
+template <typename I>
+struct com_deleter {
+    void operator()(I *coptr) {
+        static_assert(is_com_type_v<I>, "The class is not
+a COM type");
+
+        if (coptr != nullptr) {
+            coptr->Release();
+        }
+    }
+};
+#+END_SRC
+
+** Binding
+
+/Early binding/ (Custom Interface): access to COM object definition at compile time
+
+/Late binding/ (Automation Interface): a suitably prepared client can query the object at runtime to find out its interface, requires =IDispatch= be implemented.
+
+** Singleton
+
+There is not builtin support in COM to support singletons.
+
+** Single/Multiple Use EXE
+
+A COM class that forces COM to start up a new EXE on calling is called a /Single Use/ class.
+
+** Running Object Table
+
+The server can allow clients to access an existing COM object by registering it in the /Running Object Table/ using COM API call.
+
+** DLL Host
+
+COM DLLs can be used across machine boundaries. There are APIs and prewritten exe =DLLHOST.EXE= for such /DLL Surrogate/ Applications.
+
+** Thread Safety
+
+COM provides threading models to ensure thread safety.
+
+** Writing COM in Standard C++
+
+Not a very good idea, use MFC or ATL.
+
+** COM Infrastructure
+
+*** The COM Library
+
+A set of DLLs and EXEs (primarily =ole32.dll= and =Rpcss.exe=) to provide basic services for COM.
+
+- A small number of fundamental functions that facilitate the creation of COM applications, both client and server.
+
+- Implementation-locator services through which COM determines, from a unique class identifier (CLSID), which server implements that class and where that server is located. 
+
+- Transparent remote procedure calls
+
+- A standard mechanism to allow an application to control how memory is allocated within its process.
+
+*** Memory Management
+
+For both the author and the user to have a compatible allocation/deallocation policy (on public API),
+COM defines a universal convention for memory allocation.
+
+**** The OLE Memory Allocator
+
+The default thread-safe implementation of COM memory allocator.
+Whenever ownership of an allocated chunk of memory is passed through a COM interface
+or between a client and the COM library, allocate memory using this allocator.
+
+**** Memory Management Rules
+
+- =In= parameters must be allocated and freed by the caller.
+
+- =out= parameters must be allocated by the one called and freed by the caller using the standard COM task memory allocator.
+
+- =in/out= parameters are allocated by the caller and then freed and reallocated by the one called. The caller is responsible
+  for freeing he final returned value using the standard COM memory allocator.
+
+In failure conditions, the client typically has no way to clean up the =out= or =in/out= parameters. The server must return
+robust values back to the caller to handle.
+
+- the client shouldn't have to take any action w.r.t. memory management on failure.
+
+- set =out= parameters to =NULL= (after all, it's the server that is responsible for allocating the memory).
+
+- Left the =in/out= parameters as they are or explicitly set.
+
+**** Refcount Rules
+
+#+begin_quote
+from a client's perspective, reference counting is strictly and clearly a per-interface-pointer notion, and therefore objects that take advantage of this capability by dynamically constructing, destroying, loading, or unloading portions of their functionality based on the currently extant interface pointers may be implemented.
+#+end_quote
+
+The default rule: The default case is that AddRef must be called for every new copy of an interface pointer and Release must be called for every destruction of an interface pointer.
+
+***** Complementary Rules
+
+- In-Out parameters to functions: the caller must call =AddRef= on the parameter before passing it in because the parameter will be reassigned
+
+- Local copy of a global variable requires an =AddRef=
+
+*** COM Server
+
+The server must ensure that the requested object is created and activated and an interface pointer is returned to the client.
+
+The server must implement a class object by implementing the =IClassFactory= interface.
+
+- =IClassFactory=: =CreateInstance= and =LockServer=
+
+- The implemented class must then be registered with CLSID in the system registry and its DLL/EXE location and how it should be launched.
+
+* COM Communication
+
+COM automates interprocess communications through OLE32.DLL for simple argument types or a custom proxy/stub DLL,
+defined by an IDL file.
+
+In Both cases, arguments are marshalled into NDR transfer syntax and then go through MSRPC to the server.
+
+** Marshaling
+
+Marshaling is the process of packaging and unpackaging parameters so a remote procedure call can take place.
+
+#+begin_quote
+In the case of most COM interfaces, the proxies and stubs for standard marshaling are in-process component objects which are loaded from a systemwide DLL provided by COM in Ole32.dll.
+
+In the case of custom interfaces, the proxies and stubs for standard marshaling are generated by the interface designer, typically with MIDL.
+#+end_quote
+
+Marshaling can be customized by implementing the =IMarshal= interface for the CoObject to create, initialize and manage a proxy in a proxy process.
+
+** IDL
+
+*** Early Binding
+
+#+begin_src c++
+[
+    object,
+    uuid(E1637ED6-1746-11D2-9BC7-00AA003D8695)
+]
+interface IWzd : IUnknown
+{
+    HRESULT Initialize();
+    HRESULT method1([in] short nIn,
+    [out] char *pOut,
+    [in, out] char *pInOut
+     );
+    HRESULT method2([in, out] char *pInOut);
+};
+
+#+end_src
+
+*** Late Binding
+
+1. =GetTypeInfo()= and =GetTypeInfoCount()= returns all of the methods and properties of a COM object.
+
+2. A client gets the ID of a method or property by calling =GetIDsofNames= and then invoke the method/property by using =Invoke()=
+
+#+begin_src c++
+dispinterface CWzd
+{
+properties:
+    [id(1)] int property1;
+methods:
+    [id(2)] HRESULT method1();
+};
+}
+
+#+end_src
+
+*** Dual Interface
+
+#+begin_src cpp
+[
+    uuid(E1637ED6-1746-11D2-9BC7-00AA003D8695),
+    oleautomation,
+    dual
+]
+interface IHello : IDispatch
+{
+    [id(1)] HRESULT Initialize(); HRESULT method1([in] short nIn,
+    [out] char *pOut, [in, out] char *pInOut
+);
+    [id(2)] HRESULT method2([in, out] char *pInOut);
+};
+
+#+end_src
+
+*** Type Library Declaration
+
+#+begin_src cpp
+library WzdTypeLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+[
+    uuid(DCBC68C9-4E2A-11D2-AB34-00C04FA3729B),
+]
+    coclass WzdClass
+    {
+        [default] interface IWzd;
+    };
+};
+#+end_src
+
+** Argument Passing
+
+*** Types
+
+=OLE32.DLL= only understands standard types and cannot pass structures so a proxy/stub DLL is needed.
+However, VB cannot use such DLLs.
+
+**** Array
+
+
+**** Structures
+
+COM defined structures, not C++ classes/structures.
+
+**** CoClass
+
+Use =IUnknonw= or =IDispatch= as the argument type and cast them on the server side.
+
+**** Memory Pointer
+
+Memory management is now distributed, thus requires a different set of API. Use =CoTaskMemAlloc()= and =CoTaskMemDealloc()=.
+Memory pointers can be marshalled in three ways:
+
+- =[ref]= (readonly by value): passes the memory pointer and any data it points to and the server promises not to change or deallocate the memory.
+
+- =[unique]=: default, the server can change the memory and even deallocate it and this pointer is the unique one that points to the corresponding memory.
+
+- =[ptr]=: the most transparent
+
+*** Argument Attribute
+
+- =[in]=: only transmit this from the client to the server
+
+- =[out]=: nothing to transmit to the server. The client must fill this argument to accept the outbound result or to put a =NULL= to discard the result.
+
+- =[in, out]=: send the data to the server and expect the data to be modified there and returned. If no data is to send, use =NULL= here.
+
+- =[out, retval]=: returned as the result of the call, only used on the last argument.
+
+*** VB Interoperability
+
+- =BSTR= (binary string, UTF-16 encoded) for VB strings, allocated by =SysAllocString()=.
+
+- =SAFEARRAY= for VB array.
+
+- =VARIANT= for VB variant.
+
+*** Reverse Communication
+
+The client can pass a callback to the server and expect the server to communicate with the client.
+
+- Connection Points and Sinks: the client has sinks (a mini COM server on the client side, an event handler) for the server to call and the serve has a connection point (event source) to call this sink.
+
+  The client passes its mini-server pointer to the real COM server and the real COM server saves this pointer and call it later. When the real COM server has something
+  to tell the client, it calls a method on its mini-COM server.
+
+** Encapsulation and Aggreation To Reuse 
+
+Since implementation inheritance relies on the internal implementation
+of an object, building reusable components is to be able to treat the
+object as an opaque box.
+
+No runtime inheritance for COM. The user is forced to use manual encapsulation to derive from a base class or let COM do aggregation.
+With aggregation, the client call =QueryInterface= to get an interface to the base class's methods. ???
+
+- Containment (Encapsulation): the outer object acts as the client of the inner object
+
+- Aggregation (not very practical): the outer object exposes interfaces from the inner object
+  as if they were implemented on the outer object, a specialized case of containment.
+  There is no need to delegate interface calls from the outer object to the inner object,
+  as the inner object's interfaces are directly available to external clients. 
+  COM objects must be preprogrammed to support the ability to be aggregated by another object.
+  + The client should not see the inner object's =IUnknown= to present only
+    the identity of the outer object
+
+*** An Example of Aggregable (inner) object
+
+1. The =IUnknown= implementation of an aggregable object controls its own refcounting and interfaces.
+
+2. The other interfaces of an aggregable delegates its =QueryInterface=,
+   =AddRef= and =Release= to the outer object (to present the inner object
+   as part of the outer object).
+
+3. The inner object has no ownership of a pointer to the outer object (no =AddRef= on the outer object)
+   otherwise there would form a circular reference, or even worse, an object
+   referencing itself under the non-aggregation case.
+
+4. The outer object should only own an =IUnknown= pointer of the inner object.
+
+[[https://docs.microsoft.com/en-us/windows/win32/com/aggregation][Aggregation]]
+
+[[https://www.codeproject.com/Articles/5337/COM-Concept-Unleashing-Aggregation][Com Concept: Unleashing Aggregation]]
+
+*** Aggrgating (outer) object
+
+The outer component controls the lifetime of the inner component
+via non-delegating interface pointer.
+
+1. the outer object can only ask for the =IUnknown= of the inner object when creating
+
+2. the outer object must deref once when querying one of the inner object's interface
+   except =IUnknown= since these interfaces of the inner object delegate =AddRef= to the
+   outer object thus the outer object is =AddRef= to itself.
+   Also, when disposing this pointer, the inner interface would deref
+   the refcount of the outer object, thus the outer should call its own =AddRef()= to
+   compensate. (It is required that the outer object's refcount should not be
+   affected by the inner object's interface).
+
+*** Security
+
+- /Activation Security/: how new objects are created, how clients connect to new and existing objects,
+  and how certain public services, such as the Class Table and the Running Object Table are secured.
+
+- /Call Security/: how security operates in an established connection between a client to a COM object.
+
+*** Object Security
+
+More fine-granular control over what objects can be created and accessed.
+
+- The client must use an account identical to what the server uses.
+
+- The server must grant permissions to allow the client to create and access an object.
+
+** Thread Safety
+
+Call =CoInitialize= from each thread the app creates before using COM from that thread.
+
+*** Automatic Thread Safety
+
+[[https://docs.microsoft.com/en-US/troubleshoot/windows/win32/descriptions-workings-ole-threading-models][Descriptions and Workings of OLE Threading issues]]
+
+[[https://www.codeguru.com/soap/understanding-com-apartments-part-i/][Understading COM apartments Part One]]
+
+[[https://www.codeguru.com/soap/understanding-com-apartments-part-ii/][Understanding COM Apartments Part Two]]
+
+The core concept of COM Concurrency revolves around /apartment/.
+
+An /apartment/ is a /concurrency boundary/. The primary reason that apartments exist
+is to enable COM to serialize method calls to objects that aren’t thread-safe.
+If you don’t tell COM that an object is thread-safe, COM won’t allow more than one call at a time to reach the object.
+Tell COM that the object is thread-safe, it will happily allow the object to field concurrent method calls on multiple threads.
+
+Every thread that uses COM, and every object that those threads create, is assigned to an apartment (when calling =CoInitialize(Ex)=.
+Apartments never span process boundaries.
+If COM assigns the object and the thread that created it to the same apartment,
+then the client has direct, unimpeded access to the object.
+But if COM places the object in another apartment, calls to the object from the thread that created it are marshaled.
+
+**** Single Threaded Apartment
+
+In practice, a thread protected by COM synchronization mechanism.
+
+COM is able to use a message loop to synchronize any cross-thread call to a method of a COM object in an STA.
+This certainly has some performance implication since any call is synchronized into the
+same thread entirely (the opposite of multithreading).
+
+Every call destined for an object in an STA is transferred to the STA’s thread before being delivered.
+COM is able to track the call chain
+of an incoming call to an STA and let the STA process this incoming call
+if the incoming call might be indirectly initiated by a call from the STA
+so that no deadlock occurs 
+
+**** Multithreaded Apartment
+
+A MTA is just the whole process. A MTA has no message queue and hidden window.
+Calls inbound to an object in an MTA are transferred to threads randomly selected from an RPC thread pool and are not serialized.
+The user should provide synchronization inside the COM object so that any thread can access it directly.
+
+**** Neutral Apartment
+
+NTA hosts objects only and threads are never assigned to NTA. Since NTA does not host any threads,
+the execution flow is still on its original thread yet uses a COM object not in its original apartment,
+reducing marshalling overhead across apartments.
+
+**** Objects and Apartments
+
+- None (Single): Main STA. The objects might access the same global resource, thus running on the same
+  STA (the Main STA) will guarantee that.
+
+- Apartment: Any STA
+
+- Free: MTA
+
+- Both: STA or MTA
+
+- Neutral: NTA
+
+COM tries its best to place in-proc objects in the same apartments as the threads that create them..
+
+#+caption:  Object and Apartments In-Proc
+|     | None     | Apartment     | Free | Both          | Neutral |
+| STA | Main STA | Creator's STA | MTA  | Creator's STA | NTA     |
+| MTA | Main STA | STA           | MTA  | MTA           | NTA     |
+|-----+----------+---------------+------+---------------+---------|
+
+**** How to write clients
+
+- Always remember calling =CoInitializeEx= and =CoUninitialize=
+
+- An STA thread needs a message loop!
+
+#+begin_src cpp
+MSG msg;
+while (GetMessage (&msg, 0, 0, 0))
+    DispatchMessage (&msg);
+#+end_src
+
+- Never Pass Raw, Unmarshaled Interface Pointers Between Apartments, i.e. create a
+  new proxy for user apartments.
+  + =CoMarshalInterThreadInterfaceInStream=, =CoGetInterfaceAndReleaseStream=, =CoGetInterfaceAndReleaseStream=
+  + The Global InterfaceTable: =IGlobalInterfaceTable::RegisterInterfaceInGlobal=, =IGlobalInterfaceTable::GetInterfaceFromGlobal=
+
+**** How to write servers
+  
+- Apartment threading model only promise safe concurrent access to the object itself,
+  but not the data they access.
+
+- Objects Marked =ThreadingModel=Free= or =ThreadingModel=Both= Should be Wholly Thread-Safe
+
+- Avoid Using TLS in Objects Marked =ThreadingModel=Free= or =ThreadingModel=Both= since
+  the next call might not be executed in the same MTA thread.
+
+For out-of-proc objects, COM places an out-of-proc object in the same apartment as the thread in the server process that creates the object.
+In reality, this is determined by the apartment of the thread in which the class object is created and registered.
+
+There are several factors that determines which mechanism is used for thread safety.
+
+- the concurrency model used by the COM DLL, specified in =CoInitializeEx=.
+
+- the threading model a COM object is using: =Single=, =Appartment=, =Free= or =Both=.
+
+- Whether a COM object is in a DLL or an EXE.
+
+- Whether the COM object is created by another COM object.
+
+An out-of-process EXE is by definition running in another thread than the caller.
+If the server chooses =COINIT_APARTMENTTHREADED=, then the server objects will always
+be created in the same communal thread. =COINIT_MULTITHREADED= fires a new thread for each
+new COM object.
+
+There are much more complicated cases when using an in-process server.
+
+A process that does COM work is a collection of apartments with,
+at most, one multithreaded apartment (threads that fight to execute a COM method)
+but any number of single-threaded apartments (threads in which COM objects are protected by COM).
+
+** Asynchronous Call
+
+Asynchronous call is not available for interfaces that implements/inherits =IDispatch=.
+The server object needs to implement =ICallFactory= and the returned call object of =ICallFactory::CreateCall=
+is cast to the =AsyncIMyInterface=, and then the respective =Begin_MyCall= is called.
+The client can then optionally call =Finish_MyCall= by casting the call object to =ISynchronize= and waiting at
+=Wait= and finally calling =Finish_MyCall= to obtain the result.
+
+** COM+
+
+More of an enhancement to MTS than any change to COM.
+
+*** DLL Surrogate
+
+To split an monolithic COM EXE server into COM DLL servers, a standard COM EXE is needed to launch the app.
+
+#+begin_quote
+A DLL Surrogate is a special EXE application that can load COM DLLs on
+behalf of a client — on the same machine or another machine.
+#+end_quote
+
+Use =OLE/COM Viewer= to configure the client to let =DLLHOST.EXE= to host COM DLL servers.
+
+*** MTS
+
+distributed transaction
