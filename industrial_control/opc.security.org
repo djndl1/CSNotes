@@ -1,0 +1,104 @@
+#+TITLE: Opc Security
+
+* Terms
+
+- Application Instance (and its related certificate)
+
+- Secure Channel
+
+* Architecture
+
+** Objectives
+
+- Authentication
+
+- Authorization
+
+- Confidentiality
+
+- Non-Repudiation
+
+- Integrity
+
+- Auditability
+
+- Availability
+
+** Possible Security Threats
+
+***  DoS
+
+- Message flooding
+
+- Resource Exhaustion: limited-number but resource-hungry messages
+
+- Application Crashes: special message that takes advantage of certain bugs that take down the system.
+
+*** Eavesdropping
+
+TODO
+
+...
+
+** OPC UA Security Architecture
+
+A generic solution, with the security objectives addressed at different levels.
+
+At the /Application Layer/, The system needs to perform Authentication and Authorization and establish a /Secure Channel/.  A session is established before a Secure channel is established and used. If the Secure channel is down, the session remains for a certain amount of time. The binding of users, Sessions and Secure Channels is flexible.
+
+#+begin_quote
+The Secure Channel provides encryption to maintain Confidentiality, Message Signatures to maintain Integrity and Certificates to provide application Authentication. The data that comes from the Application Layer is secured and passes the “secured” data to the Transport
+Layer.
+#+end_quote
+
+A sessionless communication provides /User Authentication/ and ensures /Confidentiality/ and /Integrity/.
+
+*** PubSub Security
+
+TODO
+
+** /SecurityPolicy/
+
+#+begin_quote
+A SecurityPolicy specifies which security mechanisms are to be used and are derived from a Security Profile. Security policies are used by the Server to announce which mechanisms it supports and by the Client to select one to use with the Secure Channel it wishes to open or for the session-less connection it wishes to make.
+#+end_quote
+
+It mainly involves:
+
+- algorithms for signing and encryption
+
+- algorithm for key derivation
+
+normally made by the server administrator.
+
+** Security Profile
+
+The security mechanisms available and from which /SecurityPolicy/ is derived.
+
+** Security Mode
+
+- None
+
+- Sign
+
+- SignAndEncrypt
+
+** User Authentication
+
+The Client passes user credentials to the Server via /Session Services/. The user of a /Session/ can be changed using the /ActivateSession/ Service.
+
+** Application Authentication
+
+#+begin_quote
+Each OPC UA Application Instance has a Certificate (Application Instance Certificate) assigned that is exchanged during Secure Channel establishment. The receiver of the Certificate checks whether it trusts the Certificate and based on this check it accepts or rejects the request or response Message from the sender.
+#+end_quote
+
+** Role-Based Security
+
+#+begin_quote
+The OPC UA approach assigns Permissions to Roles. Clients are then granted Roles based on connection information.
+#+end_quote
+
+** Auditing
+
+TODO
