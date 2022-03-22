@@ -226,6 +226,13 @@ on the same synchronization task that invoked the await statement. This
 approach is of significant value because it eliminates the need to
 explicitly switch back to the UI thread to update a control.
 
+**** =async Task=, =Task= and =async void= return type
+
+- A pure =Task=-returning method is a synchronous method, while =async Task= is compiled with state-machine code inside. =async Task= methods are like any delegate code running inside =Task.Run()=.
+
+1. =async Task= method stores any exception thrown in itself in the returned =Task= and it remains dormant only when observed by =await=, =Task.Wait()=, =Task.Result= etc. Since pure =Task=-returning methods runs synchronously, the exception is thrown directly instead of wrapped in an =AggregateException= (in the case of =Task.FromException()=).
+   =async void= throws the exception to the synchornization context if any, otherwise =ThreadPool.QueueUserWorkItem=.
+
 **** =await= in =Task.Run()=
 
 - Run the IO independent of the current execution, instead of waiting for the IO to finish.
