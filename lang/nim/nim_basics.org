@@ -1,0 +1,26 @@
+#+TITLE: Nim Basics
+
+#+begin_src shell
+nim c -r nim_file.nim arg1 arg2
+#+end_src
+
+
+- =r"C:\Program Files\nim"=: raw string literal
+  + ="""..."""=: multiline string literal
+
+- =#[Documentation comment]#=: allowed only in a few places as they belong to the syntax tree!
+
+- =1_000_000=, =1.0e9=, =0xFF=, =0b1001=, =0o123=
+
+- =var=: global/local variable
+
+ #+begin_src nim
+var
+  x, y: int
+  # a comment can occur here too
+  a, b, c: string
+ #+end_src
+
+- =const=: compile-time constant
+
+- =let=: declares single assignment variable (=final= in Java)
