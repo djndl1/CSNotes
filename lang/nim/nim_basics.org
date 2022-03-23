@@ -4,6 +4,20 @@
 nim c -r nim_file.nim arg1 arg2
 #+end_src
 
+* Basic Types
+
+- =bool=: =not=, =and=, =or=, =xor=, =<=, ~<=~, =>=, ~>=~, ~==~. =and= and =or= performs short circuit evaluation.
+
+- =char=: one byte
+
+- integers: =int=, =uint=, =(u)int8=, =(u)int16=, =(u)int32=, =(u)int64=
+  + =0'i8=, =0'i32=, =0'u=. =int= has the same size as a pointer.
+  + =shl=, =shr=
+  + bit shifting operators always treat their arguments as unsigned.
+  + unsigned integers wrap around and never over- or underflow.
+
+- floating-point, =float= (currently always 64-bit), =flaot32=, =float64=
+  + =0.0'f32=, =0.0'f64=
 
 - =r"C:\Program Files\nim"=: raw string literal
   + ="""..."""=: multiline string literal
@@ -24,3 +38,75 @@ var
 - =const=: compile-time constant
 
 - =let=: declares single assignment variable (=final= in Java)
+
+- =repr()=: the internal type representation, for debugging
+
+* Iterators
+
+- =1 .. 10=, =countup(1, 10)= (full closed):
+
+- =countdown(10, 1)=
+
+- =1 ..< 10=,
+
+- =.. ^n=: to the the last n-th element
+
+- =.items=, =.mitems= immutable/mutable elements
+
+- =.pairs=, =.mpairs=: element and its index number
+
+* Control Flow
+
+- Python-style if-elif-else, while, for loop with iterators
+
+#+begin_src nim
+case name
+of "":
+    ...
+of "name":
+    ...
+of "Dave", "Frank":
+    ...
+else:
+    echo "Hi, ", name
+#+end_src
+
+- when-elif-else: compile-time if
+
+* Scope
+
+=block= statement with label to create a scope
+
+* Indentation
+
+#+begin_src nim
+if x: x = false
+
+const fac4 = (var x = 1; for i in 1..4: x *= i; x)
+#+end_src
+
+Like Python, Expressions can contain indentation at certain places for better readability: indentation within expressions is allowed after operators, an open parenthesis and after commas.
+
+With parenthesis and semicolons (;) you can use statements where only an expression is allowed
+
+* Declaration
+
+Variables, procedures needs to be declared before it can be used.
+
+* Procedure
+
+#+begin_src nim
+proc yes(arg1: argType1): returnType =
+    ...
+#+end_src
+
+A procedure that returns a value has an implicit variable =result= as its return value,
+initialized with its default value. A procedure that does not have any return statement and does not use the special =result= variable returns the value of its last expression.
+
+A parameter with =var= in its type is passed by reference.
+
+=discard= before a procedure to discard the return value.
+
+Nim procedures supports named arguments, default parameter values and overloading.
+
+Operator overloading is also supported. =``= notation is used to call operators like a normal procedure.
