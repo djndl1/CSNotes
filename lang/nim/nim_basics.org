@@ -41,6 +41,127 @@ var
 
 - =repr()=: the internal type representation, for debugging
 
+* Advanced Types
+
+** Enumerations
+
+#+begin_src nim
+type
+  Direction = enum
+    north, east, south, west
+#+end_src
+
+** Ordinal Types
+
+Enumerations, integers, =char=, =bool=, subranges.
+
+- =ord(x)=
+
+- =inc(x)=, =inc(x, n)=, =dec(x)=, =dec(x, n)=
+
+- =succ(x)=, =succ(x, n)=, =pred(x)=, =pred(x, n)=
+
+*** Subranges
+
+A range of values from an integer or enumeration type.
+
+*** Sets
+
+Sets of an ordinal type, implemented as a high performance bit vectors, often used to define a type for the flags of a procedure.
+
+*** Bit fields
+
+Enum, sets and casting can used together
+
+#+begin_src nim
+type
+  MyFlag* { .size: sizeof(cint). } = enum
+    A
+    B
+    C
+    D
+  MyFlags = set[MyFlag]
+#+end_src
+
+** Array
+
+- Value type, not a pointer to a region of memory
+
+- Array access is bounds checked (at compile-time or at runtime) by default.
+
+- Array indices are specified by users (do not always starts at zero).
+
+More like C# arrays
+
+*** Open Array
+
+Array type used in typing with variable sizes, compatible with arrays and sequences.
+
+** Sequence
+
+Resizable array
+
+#+begin_src nim
+var x: seq[int]
+x = @[1, 2, 3, 4, 5]
+#+end_src
+
+** Varargs
+
+=varargs=
+
+#+begin_src nim
+proc myWriteln(f: File, a: varargs[string, `$`]) =
+  for s in items(a):
+    write(f, s)
+  write(f, "\n")
+#+end_src
+
+** Slices
+
+An object of type =Slice= which contains two bounds.
+
+** Objects
+
+Value type, record type.
+
+#+begin_src nim
+type
+  Person = object
+    name: string
+    age: int
+#+end_src
+
+** Tuples
+
+Tuple types are structurally typed: different tuple-types are equivalent if they specify fields of the same type and of the same name in the same order. Tuples created with different field names will be considered different objects despite having the same field types
+
+#+begin_src nim
+type
+  Person = tuple
+    name: string
+    age: int
+
+PersonY = (string, int)
+#+end_src
+
+** References =ref= and Pointers =ptr= (Untraced by GC)
+
+#+begin_src nim
+type
+  Node = ref object
+    le, ri: Node
+    data: int
+
+var n = Node(data: 9)
+new(n)
+n = nil
+#+end_src
+
+** Procedural Type
+
+Basically a delegate or function pointer type
+
 * Iterators
 
 - =1 .. 10=, =countup(1, 10)= (full closed):
@@ -54,6 +175,15 @@ var
 - =.items=, =.mitems= immutable/mutable elements
 
 - =.pairs=, =.mpairs=: element and its index number
+
+#+begin_src nim
+iterator countup(a, b: int): int =
+  var res = a
+  while res <= b:
+    yield res     # can only called from a loop
+    inc(res)
+#+end_src
+
 
 * Control Flow
 
