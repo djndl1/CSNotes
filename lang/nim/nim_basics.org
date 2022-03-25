@@ -240,3 +240,22 @@ A parameter with =var= in its type is passed by reference.
 Nim procedures supports named arguments, default parameter values and overloading.
 
 Operator overloading is also supported. =``= notation is used to call operators like a normal procedure.
+
+* Modules
+
+Each module is in its own file. Modules enable information hiding and separate compilation.
+
+- Only top-level symbols marked with =*= are exported.
+
+- A module's top-level statements are executed at the start of the program.
+
+- Each module has a special magic constant =isMainModule= if the module is compiled
+  as the main file.
+
+- =import mymodule except y= excludes certain symbols.
+
+- =from mymodule import x, y, z=
+
+- =from mymodule (as m) import nil=: =m.x()=
+
+- =include= C-style =#include=
