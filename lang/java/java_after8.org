@@ -1,0 +1,19 @@
+#+TITLE: Java_after8
+
+* Java 9
+
+- Process API: =java.lang.ProcessHandle=
+
+- =try= with resource without declaring new a variable
+
+- private interface methods to implement default methods
+
+* Java 10
+
+ - =var=: type declaration inference.
+
+* Java 11
+
+- =java source.java=
+
+- =java.net.http= HTTP Client
