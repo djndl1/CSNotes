@@ -146,3 +146,53 @@ identical secondary windings.
 [[./pics/diode-diode20.gif]]
 
 No more special-center tapped transformer
+
+A smoothing capacity across the load improves the average DC output of the rectifier and reduces the AC variation of the rectified output.
+
+** Zener Diode
+
+Diode with a preconfigured avalanche breakdown voltage. Once the avalanche occurs with a reversed bias, the voltage ($V_{z}$)remains fairly constant over a wide range of reverse currents.
+
+The Zener diode is used in its reverse breakdown mode. This behavior can be used to regulate or stabilize a voltage source against supply or load variations. A simpliest type of voltage regulartors.
+
+- /voltage regulator/: provides a constant output voltage to a load connected in parallel with it in spite of the ripples in the supply voltage or variations in the load current.
+
+#+CAPTION: Zener Diode Regulator
+[[./pics/diode-diode24.gif]]
+
+- The diode can sometimes generate electrical noise on top of the DC supply as it tries to stablize the voltage. A large-value decoupling capacitor across the Zener's output may be required to give additional smoothing.
+
+*** Zener Diode In Practice
+
+- In series
+
+- Clipping: modify an iunput AC waveform or any sinusoid producing a differently
+  shape output waveform depending on the circuit arrangement.
+  + Diode clipper circuit (limiter)
+
+[[./pics/diode-diode42.gif]]
+
+*** LED
+
+Made from a very thin layer of fairly heavily doped semiconductor material.
+Light Emitting Diodes are made from exotic semiconductor compounds such as Gallium Arsenide (GaAs), Gallium Phosphide (GaP), Gallium Arsenide Phosphide (GaAsP), Silicon Carbide (SiC) or Gallium Indium Nitride (GaInN) all mixed together at different ratios to produce a distinct wavelength of colour. The epoxy resin shell concentrates the light emitted by the junction upward.
+
+- /1.2/ to /3.6/ volts with a forward current rating of about /10/ to /30/ mA, with /12/ to /20/ mA being the most common range.
+
+- Multi-coloured LEDs are now available that can produce a range of different colours from within a single device.
+
+- LEDs are typically controlled by ICs or transistors.
+
+- LED light intensity can be controlled using PWM, not just by current intensity.
+
+**** In Practice
+
+- Multicolored LED
+
+- Bi-color LED in inverse parallel to indicate the direction of the current.
+
+- LED Display
+
+- Opto-coupler: a couple of a LED and a photo-diode/transistor/triac. This provides an optical signal path between an input connection and an output connection while maintaining electrical isolation between two circuits.
+  + This electrical isolation is especially useful where the signal from a low voltage circuit such as a battery powered circuit, computer or microcontroller, is required to operate or control another external circuit operating at a potentially dangerous mains voltage.
+  + Opto-isolators are digital or switching devices, so they transfer either “ON-OFF” control signals or digital data. Analogue signals can be transferred by means of frequency or pulse-width modulation.
