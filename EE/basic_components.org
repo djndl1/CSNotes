@@ -196,3 +196,34 @@ Light Emitting Diodes are made from exotic semiconductor compounds such as Galli
 - Opto-coupler: a couple of a LED and a photo-diode/transistor/triac. This provides an optical signal path between an input connection and an output connection while maintaining electrical isolation between two circuits.
   + This electrical isolation is especially useful where the signal from a low voltage circuit such as a battery powered circuit, computer or microcontroller, is required to operate or control another external circuit operating at a potentially dangerous mains voltage.
   + Opto-isolators are digital or switching devices, so they transfer either “ON-OFF” control signals or digital data. Analogue signals can be transferred by means of frequency or pulse-width modulation.
+
+
+
+
+** Bypass Diodes in Solar Panels
+
+
+
+** Schottky Diode
+
+Meta-semiconductor diode having a low forward voltage drop and a fast switching speed.
+
+Formed by joining together an N-type semiconductor and a metal electrode with no
+deleption layer. When forward biased, electrons from the n-type side moves to the anode, allowing the current to flow to the cathode. When reversed biased, the depletion layer is immediately widened since there are no minority carriers and diffusion. Thus, a Schottky diode can rapidly respond to changes in bias.
+
+- low forward voltage
+
+- low power dissipation due to the low knee voltage, suitable for low-voltage and high-current applications (in many integrated-circuits).
+
+- high-speed switching
+
+- larger reverse leakage current
+
+*** In Practice
+
+- Ohmic contacts: commonly used to connect semiconductor wafers and chips with
+  external connecting pins or circuitry of a system.
+
+- Logic Gates: high speed switching in TTL logic
+
+- Schottky Clamped Transistor: a standard bipolar junction transistor with a Schottky diode connected in parallel across its base-collector junction to keep the transistor out of hard saturation.
