@@ -121,3 +121,28 @@ Small diodes generally used in electronic circuits.
 **** Related Reading
 
 [[https://www.allaboutcircuits.com/technical-articles/transient-voltage-suppressors-tvs-an-introduction/][An Introduction to Transient Voltage Suppressors (TVS)]]
+
+** Power Diodes and Rectifiers
+
+- Power Diodes: large PN junction area with a high-forward current capability up to serveral KA and a reverse blocking voltage of up to several KVs.
+  + not suitable for high-frequency applications over 1MHz.
+  + 1N400x Series Glass Passivated rectifying diodes
+
+- Rectification: the conversion of an alternating voltage into a continuous voltage
+  + uncontrolled (diodes), controlled (thyristor)
+  + Half-wave rectifier
+  + Smoothing Capcity: connect a large value (smoothing) capacitor across the output voltage terminals in parallel as a "temporary power source" to smooth the voltage.
+
+*** Full Wave Rectifier
+
+#+CAPTION: Full-wave rectifier
+[[./pics/diode-diode18.gif]]
+
+A larger transformer for a given power is required with two separate but
+identical secondary windings.
+
+**** Bridge Rectifier
+
+[[./pics/diode-diode20.gif]]
+
+No more special-center tapped transformer
