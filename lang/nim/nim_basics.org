@@ -375,3 +375,23 @@ proc newPlus(a, b: Expression): PlusExpr = PlusExpr(a: a, b: b)
 
 echo eval(newPlus(newPlus(newLit(1), newLit(2)), newLit(4)))
 #+end_src
+
+* Exceptions
+
+Allocated on the heap, derived from =system.Exception=
+
+- =raise=: throw a new exception or the last exception
+
+#+begin_src nim
+try:
+  let a = readLine(f)
+except OverlowDefect:
+  let
+    e = getCurrentException();
+    msg = getCurrentExceptionMsg();
+finally:
+  close(f)
+#+end_src
+
+The author of a procedure must indicate the exceptions that might be raised
+in the signature using ={.raises: [exceptionName, ...].}=, otherwise the compiler would error. ={.effects.}= pragma tells the compiler to output all inferred effects up to that point. Or use =doc= command to determine the potential exceptions.
