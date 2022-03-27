@@ -395,3 +395,80 @@ finally:
 
 The author of a procedure must indicate the exceptions that might be raised
 in the signature using ={.raises: [exceptionName, ...].}=, otherwise the compiler would error. ={.effects.}= pragma tells the compiler to output all inferred effects up to that point. Or use =doc= command to determine the potential exceptions.
+
+* Generics
+
+#+begin_src nim
+type
+  BinaryTree*[T] = ref object # BinaryTree is a generic type with
+                              # generic param `T`
+    le, ri: BinaryTree[T]     # left and right subtrees; may be nil
+    data: T                   # the data stored in a node
+
+proc newNode*[T](data: T): BinaryTree[T] =
+  # constructor for a node
+  new(result)
+  result.data = data
+
+proc add*[T](root: var BinaryTree[T], n: BinaryTree[T]) =
+  # insert a node into the tree
+  if root == nil:
+    root = n
+  else:
+    var it = root
+    while it != nil:
+      # compare the data items; uses the generic `cmp` proc
+      # that works for any type that has a `==` and `<` operator
+      var c = cmp(it.data, n.data)
+      if c < 0:
+        if it.le == nil:
+          it.le = n
+          return
+        it = it.le
+      else:
+        if it.ri == nil:
+          it.ri = n
+          return
+        it = it.ri
+
+proc add*[T](root: var BinaryTree[T], data: T) =
+  # convenience proc:
+  add(root, newNode(data))
+
+iterator preorder*[T](root: BinaryTree[T]): T =
+  # Preorder traversal of a binary tree.
+  # This uses an explicit stack (which is more efficient than
+  # a recursive iterator factory).
+  var stack: seq[BinaryTree[T]] = @[root]
+  while stack.len > 0:
+    var n = stack.pop()
+    while n != nil:
+      yield n.data
+      add(stack, n.ri)  # push right subtree onto the stack
+      n = n.le          # and follow the left pointer
+#+end_src
+
+* Templates
+
+A simple substitution mechanism that operates on Nim's abstract syntax trees.
+Teplates are processed in the semantics pass of the compiler.
+
+#+BEGIN_SRC nim
+import std/math
+
+template liftScalarProc(fname) =
+  ## Lift a proc taking one scalar parameter and returning a
+  ## scalar value (eg `proc sssss[T](x: T): float`),
+  ## to provide templated procs that can handle a single
+  ## parameter of seq[T] or nested seq[seq[]] or the same type
+  ##
+  ## .. code-block:: Nim
+  ##  liftScalarProc(abs)
+  ##  # now abs(@[@[1,-2], @[-2,-3]]) == @[@[1,2], @[2,3]]
+  proc fname[T](x: openarray[T]): auto =
+    var temp: T
+    type outType = typeof(fname(temp))
+    result = newSeq[outType](x.len)
+    for i in 0..<x.len:
+      result[i] = fname(x[i])
+#+END_SRC
