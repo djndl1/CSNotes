@@ -472,3 +472,17 @@ template liftScalarProc(fname) =
     for i in 0..<x.len:
       result[i] = fname(x[i])
 #+END_SRC
+
+* Macro
+
+A function that is executed at compile-time and transforms a Nim syntax tree into a different
+
+** Arguments
+
+- Untyped: not checked when passed, only checked when the macro is expanded.
+
+- Typed (constrained ??): semantically checked before passed to the macro. Identifier nodes are resolved as symbols and conversions are visible in the syntax tree as calls.
+
+- static arguments =static[int]=: a way to pass values as values and not as syntax tree nodes to a macro.
+
+- code blocks arguments (???)
