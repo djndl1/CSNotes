@@ -1,406 +1,70 @@
-One way to lower the latency and enabling multitasking.
+# Threading
 
-* Basics
+- /Thread/: the basic unit to which an operating system allocated processor time.
 
-/task/: =Task<T>= class, a unit of potentially high-latency work that produces  
-a resultant task value or desired side effect.
+- /Thread Context/: all the information the thread hnneds to seamlessly resume execution, including the thread's set of CPU registers and stack.
 
-/thread pool/: a collection of threads, along with logic for determining how to assign
-work to those threads.
+* Thread
 
-** Problems
+** =System.Threading.Thread=
 
-non-atomic operations; race conditions; complex memory models; deadlocks;
+- =ThreadState=: of interest only in a few debugging scenarios.
+  + thread abortion is not longer supported in new dotnet, better use a process for such code.
 
-1. monitoring an asynchronous operation state for completion;
+- =IsBackground=: Either foreground threads or background threads: foreground threads keep the process alive.
+  + the main application thread is a foreground thread
+  + any thread created by a =Thread= class constructor without setting it to background later is a foreground one
+  + all threads that enter the managed execution environment from unmanaged code is by default background
+  + thread pool threads are by default background.
 
-2. thread pooling;
+- External unmanaged threads in COM: the CLR checks in its TLS if the thread is already a CLR thread, if not, a new =Thread= object is created and installed in the TLS of that thread.
 
-3. avoiding deadlocks;
+- Thread Procedure Parameters: =ParameterizedThreadStart= might do, but a more type-safe way is to encapsulate both the thread procedure and the data fields into a worker object, and pass the thread procedure that uses the internal state of the worker object to the =Thread= object.
 
-4. providing atomicity across operations and synchronizing data access;
+- Thread Return value:
+  + pass a callback to the thread procedure to call.
 
-* TPL (Task Parallel Library)
+- =CurrentCulture= (culture-sensitive oprations as parsing and formatting, string comparison and sorting and also controls the writing system and calendar used by a thread), =CurrentUICulture= (culture-sensitive retrieval of resources in resource files)
+  + initialized by the current system culture =CultureInfo.DefaultThreadCurrentCulture= and UI culture (not true for TAP async operations).
 
-Instead of creating a OS thread, the TPL typically requests a worker thread fro the 
-thread pool. A task scheduler might use many different strategies to fulfill the purpose.
+- Thread Information
+  + Managed Thread id and hash code. Managed Threads do not directly map to unmanaged threads in a one-to-one way.
+  + =Name=
+  + =ThreadState=
+  + =ThreadPriority=
+  + =IsThreadPool=
+  + =IsBackground=
 
-/task/: an object that encapsulates work that executes asynchronously. uniquely
- identified by the =Id= property. =AsyncState= can be used to associated additional
-data with a task. The =IsCompleted= and =Status= properties are for querying the task's state.
+- Pausing and Interrupting
+  - =Thread.Sleep()=
+  - =.interrupt()=: interrupt a blocking (sleeping, waiting, joining) thread by throw a =ThreadInterruptedException= in the interrupted thread.
 
-
-Polling a worker for result is dangerous since the scheduler might decide 
-the task be carried out on the calling thread.
-
-=.ContinueWith()= sets a continuation for the current task. Several options exist 
-for tweaking the behavior, like starting only when the antecedent is cancelled/throwing 
-an unhandled exception/has run to completion, which can be used as an event listener.
-
-#+begin_src csharp
-     Task taskA = Task.Run( () =>
-               Console.WriteLine("Starting..."))
-          .ContinueWith(antecedent =>
-               Console.WriteLine("Continuing A..."));
-      Task taskB = taskA.ContinueWith( antecedent =>
-          Console.WriteLine("Continuing B..."));
-      Task taskC = taskA.ContinueWith( antecedent =>
-          Console.WriteLine("Continuing C..."));
-      Task.WaitAll(taskB, taskC);
-      Console.WriteLine("Finished!");
-#+end_src 
-
-Waiting on cancelled task or faulted task will result in an exception. The proper
-way to do this is to =.WaitAny=, which will throw an =AggregatedException= that
-then needs to be handled.
+- Cancellation: use =CancellationToken= for cooperative cancellation.
+  + the canceled operation should better throw an =OperationCanceledException= if needed.
+  + Operations can cancel itself by
+    + polling =CancellationToken.IsCancellationRequested= for long-running operations.
+    + registering a callback =CancellationToken.Register= if the operations becme blocked that they cannot check the value of the token in a timely manner. The registered method is called synchronously. Performing manual threading in a callback can cause deadlock.
+    + in case the async operation is using a wait handle and has no way to check the token. Synchronization prititives can be awaited but can be waken up by a cancellation.
+  + To listen to multiple cancellation tokens, =CancellationTokenSource.CreateLinkedTokenSource=.
 
 #+begin_src csharp
-Task<string> task = Task.Run<string>(
-              () => PiCalculator.Calculate(10));
-
-      Task faultedTask = task.ContinueWith(
-          (antecedentTask) =>
-          {
-              Trace.Assert(antecedentTask.IsFaulted);
-              Console.WriteLine(
-                  "Task State: Faulted");
-          },
-          TaskContinuationOptions.OnlyOnFaulted);
-
-      Task canceledTask = task.ContinueWith(
-          (antecedentTask) =>
-          {
-              Trace.Assert(antecedentTask.IsCanceled);
-              Console.WriteLine(
-                  "Task State: Canceled");
-          },
-          TaskContinuationOptions.OnlyOnCanceled);
-
-      Task completedTask = task.ContinueWith(
-          (antecedentTask) =>
-          {
-              Trace.Assert(antecedentTask.IsCompleted);
-              Console.WriteLine(
-                  "Task State: Completed");
-          },  TaskContinuationOptions.
-                  OnlyOnRanToCompletion);
-
-      completedTask.WaitAny(completedTask, canceledTask, faultedTask);
+int eventThatSignaledIndex =
+       WaitHandle.WaitAny(new WaitHandle[] { mre, token.WaitHandle },
+                          new TimeSpan(0, 0, 20));
 #+end_src
 
-Generally, unhandled exceptions on any thread are treated as fatal. All exceptions
-on all threads must be caught. For unhandled task in an asynchronous running task,
-the task scheduler inserts a catchall exception handler around the delegate .
+** =System.Threading.ThreadPool=
 
-#+begin_src csharp
-        var task = Task.Run(()  =>
-        {
-            throw new InvalidOperationException();
-        });
+provides a pool of threads but not really a pool of threads in the OOP sense.
 
-        try 
-        {
-            task.Wait();
-        }
-        catch (AggregateException e)
-        {
-            e.Handle(eachException => // handle them altogether
-            {
-                Console.WriteLine($"Error: {eachException.Message}");
-                return true;
-            });
-        }
-#+end_src
+Examples
+  - When creating a default =Task=.
+  - Asynchronous timer =System.Threading.Timer= and =System.Timer.Timer=
+  - wait handle callback =ThreadPool.RegisterWaitForSingleObject=: call a method in a thread-pool thread when signaled.
+  - =ThreadPool.QueueUserWorkItem=
 
-** Cooperative Cancellation by the TPL
+- One thread pool per process. The default size is determined by various factors such as the size of the virtual address space. The actual size can change during the lifetime of the process. The thread pool creates and destroys worker threads in order to optimize throughput.
 
-A task that supports cancellation monitors a =CancellationToken= object by
-periodically polling it to see if a cancellation request has been issued.
+- The managed thread pool does not clear the TLS used when reusing a thread.
 
-#+begin_src csharp
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using AddisonWesley.Michaelis.EssentialCSharp.Shared;
-
-public class Program
-{
-  public static void Main()
-  {
-      string stars = "*".PadRight(Console.WindowWidth-1, '*');
-      Console.WriteLine("Push ENTER to exit.");
-      CancellationTokenSource cancellationTokenSource=
-          new CancellationTokenSource();
-      
-      Task task = Task.Run(
-          () => WritePi(cancellationTokenSource.Token), 
-                        cancellationTokenSource.Token);
-      // Wait for the user's input
-      Console.ReadLine();
-
-      cancellationTokenSource.Cancel();// task is probably already running 
-      Console.WriteLine(stars);
-      task.Wait(); 
-      Console.WriteLine();
-  }
-
-   private static void WritePi(
-      CancellationToken cancellationToken)
-  {
-      const int batchSize = 1;
-      string piSection = string.Empty;
-      int i = 0;
-      while(!cancellationToken.IsCancellationRequested || i == int.MaxValue)
-      {
-          piSection = PiCalculator.Calculate(
-              batchSize, (i++) * batchSize);
-          Console.Write(piSection);
-      }
-  }
-}
-#+end_src
-
-The task is not rudely cancelled immediately but given some time to continue its
-operation before it finds out it has been cancelled and ends the task gracefully
-without aborting or exiting.
-
-
-The task acknowledged cancellation by throwing an
-=OperationCanceledException= with its own =CancellationToken= while the token
- was in signaled state, or the task's =CancellationToken= was already signaled
- before the task started executing.
-
-About [[https://docs.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads][Cancellation]].
-
-** Start New Tasks
-
-=Task.Run()= should be used by default unless it proves insufficient.
- =Task.Factory.StartNew()= is for more options. Only in rare cases should creation
-be separated from scheduling, calling =Start()= after constructor initialization.
-For a long-running task, call =StartNew()= with =TaskCreationOptions.LongRunning=.
-
-It is possible to run a task synchronously using =Task.RunSynchronously()=
-
-** Tasks Are Disposable
-
-Task may allocate a =WaitHandle= when waiting for it to complete. The =WaitHandle=
-is typically disposed by a finalizer invocation when the program exits.
-
-* Low-level System.Threading
-
-=Thread= and =ThreadPool=
-
-Putting a thread to sleep is a bad programming practice because the whole point
- of allocating an expensive resource like a thread is to get work out of that resource.
-Some use cases:
-
-1. sleep for zero delay to indicate a yielding.
-
-2. simulate a high-latency task without actually computing in test code.
-
-Thread pools have the assumption that tasks are processor-bound and low-latency.
-=ThreadPool= can be deprecated entirely in favor of the TPL.
-
-** =Thread=
-
-Constructed with a =ThreadStart= (and =ParameterizedThreadStart=) delegate (not required for static methods).
-and then call =.Start()=. The current thread is retrieved by the =CurrentThread= static property.
-
-Background threads do not keep a process running if all foreground threads have terminated, once 
-all foreground threads have been stopped, the runtime stops all background thrads and shuts down.
-The main thread and all explicitly constructed =Thread= objects are in the foreground.
-Thread pool threads and all threads that enter the managed execution environment from unmanaged code
-are background threads. =IsBackground= sets a thread to the background.
-
-Each thread has a =CurrentCulture= that supports culture-sensitive operations such as 
-parsing and formatting, string comparison and sorting, and also controls the writing system
-and calendar used by a thread.
-
-A thread has a name, a hash code (uniquely identifying a thread), a thread ID (doesn't necessarily fixed on an OS thread),
-current state, scheduling priority level, =IsThreadPoolThread=, =IsBackground=.
-
-
-* Task-Based Asynchronous Pattern
-
-the primitive version:
-
-
-#+BEGIN_SRC csharp
-using System;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
-using System.Runtime.ExceptionServices;
-
-public class Program
-{
-  public const string DefaultUrl =
-      "https://IntelliTect.com";
-
-  public static void Main(string[] args)
-  {
-      if (args.Length == 0)
-      {
-          Console.WriteLine("ERROR: No findText argument specified.");
-          return;
-      }
-      string findText = args[0];
-
-      string url = DefaultUrl;
-      if (args.Length > 1)
-      {
-          url = args[1];
-          // Ignore additional parameters
-      }
-      Console.Write(
-          $"Searching for '{findText}' at URL '{url}'.");
-
-      using WebClient webClient = new WebClient();
-      Console.Write("\nDownloading...");
-      Task task = webClient.DownloadDataTaskAsync(url)
-          .ContinueWith(antecedent =>
-          {
-              byte[] downloadData = antecedent.Result;
-              Console.Write("\nSearching...");
-              return CountOccurrencesAsync(
-                  downloadData, findText);
-          })
-          .Unwrap()
-          .ContinueWith(antecedent =>
-          {
-              int textOccurrenceCount = antecedent.Result;
-              Console.WriteLine(
-                  @$"{Environment.NewLine}'{findText}' appears {
-                      textOccurrenceCount} times at URL '{url}'.");
-          });
-      try
-      {
-          while(!task.Wait(100))
-          {
-              Console.Write(".");
-          }
-      }
-      catch(AggregateException exception)
-      {
-          exception = exception.Flatten();
-          try
-          {
-              exception.Handle(innerException =>
-              {
-                  // Rethrowing rather than using
-                  // if condition on the type
-                  ExceptionDispatchInfo.Capture(
-                      innerException)
-                      .Throw();
-                  return true;
-              });
-          }
-          catch(WebException)
-          {
-              // ...
-          }
-          catch(IOException )
-          {
-              // ...
-          }
-          catch(NotSupportedException )
-          {
-              // ...
-          }
-      }
-  }
-
-  private static Task<int> CountOccurrencesAsync(
-        byte[] downloadData, string findText)
-  {
-      // ...
-  }
-}
-#+END_SRC
-
-The `async`/`await` version
-
-#+BEGIN_SRC csharp
-using System;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
-
-public class Program
-{
-  public const string DefaultUrl =
-      "https://IntelliTect.com";
-
-  public static async Task Main(string[] args)
-  {
-      if (args.Length == 0)
-      {
-          Console.WriteLine("ERROR: No findText argument specified.");
-          return;
-      }
-      string findText = args[0];
-
-      string url = DefaultUrl;
-      if (args.Length > 1)
-      {
-          url = args[1];
-          // Ignore additional parameters
-      }
-      Console.Write(
-          $"Searching for '{findText}' at URL '{url}'.");
-
-      using WebClient webClient = new WebClient();
-      Task<byte[]> taskDownload =
-          webClient.DownloadDataTaskAsync(url);
-
-      Console.WriteLine("Downloading...");
-      byte[] downloadData = await taskDownload;
-      Task<int> taskSearch = CountOccurrencesAsync(
-          downloadData, findText);
-
-      Console.WriteLine("Searching...");
-      int textOccurrenceCount = await taskSearch;
-
-      Console.WriteLine(
-          @$"{Environment.NewLine}'{findText}' appears {
-              textOccurrenceCount} times at URL '{url}'.");
-  }
-
-  private static async Task<int> CountOccurrencesAsync(
-      byte[] downloadData, string findText)
-  {
-      int textOccurrenceCount = 0;
-
-      using MemoryStream stream = new MemoryStream(downloadData);
-      using StreamReader reader = new StreamReader(stream);
-
-      int findIndex = 0;
-      int length = 0;
-      do
-      {
-          char[] data = new char[reader.BaseStream.Length];
-          length = await reader.ReadAsync(data);
-          for (int i = 0; i < length; i++)
-          {
-              if (findText[findIndex] == data[i])
-              {
-                  findIndex++;
-                  if (findIndex == findText.Length)
-                  {
-                      // Text was found
-                      textOccurrenceCount++;
-                      findIndex = 0;
-                  }
-              }
-              else
-              {
-                  findIndex = 0;
-              }
-          }
-      }
-      while (length != 0);
-
-      return textOccurrenceCount;
-  }
-}
-#+END_SRC
+- Not for Single-threaded apartment.
