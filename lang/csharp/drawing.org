@@ -1,0 +1,5 @@
+#+TITLE: Drawing
+
+* =System.Drawing=
+
+Before drawing anything, there should be a =Graphics= GDI+ drawing surface.
