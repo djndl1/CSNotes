@@ -1,5 +1,35 @@
 #+TITLE: Maven
 
+* What is Maven
+
+#+begin_quote
+Apply patterns to a project's build infrastructure in order to promote
+comprehension and productivity by providing a clear path in the use of best practices
+#+end_quote
+
+Essentially a project management and comprehension tool that manages
+
+- Builds
+
+- Documentation
+
+- Reporting
+
+- Dependencies
+
+- SCMs
+
+- Releases
+
+- Distribution
+
+* Archetype
+
+An original pattern or model from which all other things of the same kind.
+A template of a project which is combined with some user input to produce a
+working Maven project.
+
+
 * Quote Arguments under any Windows shell
 
 * POM Outline
