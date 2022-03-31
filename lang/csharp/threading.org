@@ -68,3 +68,17 @@ Examples
 - The managed thread pool does not clear the TLS used when reusing a thread.
 
 - Not for Single-threaded apartment.
+
+** Thread Local Storage
+
+- TLS static field: best performance, compile-time needs anticipated
+  + =[ThreadStatic] static=: not shared between threads. Field intialization occurs only once on the first thread thus not reliable: the same TLS fields on other threads will not be initialized as expected.
+
+- Lazily Initialized =ThreadLocal<T>= class, recommended.
+
+- Data Slots =System.LocalDataStoreSlot=: flexible, slower and more awkward to use.
+  + A slot is a key to the value
+  + named and unnamed slots
+  + =Thread.AllocateNamedDataSlot()= (a slot for all threads), =GetNamedDataSlot=, =FreeNamedDataSlot=, =Thread.AllocateDataSlot=
+  + =Thread.SetData=, =Thread.GetData=
+  + Any slots can still be used even if =FreeNamedDataSlot= has freed it, as long as any =LocalDataStoreSlot= to it is still used. However, a new one is used if the slot name is used after freeing.
