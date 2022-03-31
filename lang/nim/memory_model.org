@@ -1,0 +1,30 @@
+#+TITLE: Memory Model
+
+* Two ways to organize memory
+
+- stack:
+
+- heap
+
+In Nim all data is stored on stack unless =new()= proc is used to allocate memory on the heap, which returns a reference to the object.
+
+* Nim's Way
+
+** A few Utility Method
+
+- =addr(x)=, =unsafeAddr(x)=: the address =ptr T= of variable =x=
+
+- =sizeof(x)=: the size of variable =x= in bytes
+
+- =typeof(x)=: returns the string representation of the type of variable =x=
+
+- dereference =[]=: =p[]= 30, similar to =*p = 30= in C.
+  + dereferencing is automatic for object or tuple access when using =.= access operator.
+
+References are traced while pointers are not.
+
+** How Nim Stores Data
+
+- Scalars are usually kept on the tack.
+
+- =seq= and =tuple= are like C++ types, a handle on the stack and the resource on the heap.
