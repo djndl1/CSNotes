@@ -27,7 +27,13 @@ An international standard covering the exchange of date- and time-related data.
 
 ISO 8601 applies to representations and formats of dates in the Gregorian calendar and potentially proleptic Gregorian, of time based on the 24-hour timekeeping system with optional UTC offset, of time intervals, and combinations thereof. The standard does not assign any specific meaning to elements of the date/time to be represented; the meaning will depend on the context of its use.
 
-RFC 3339 as a simplified version for us on web.
+### [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) as a simplified version for us on web.
+
+Some takeaways
+
+- DST are hard to predict and determine, thus local offsets are used.
+
+- To ensure interoperability, devices that has no notion of UTC or timezone should either otain the time in UTC, use another host in the same local time zone as a bridge, or prompt the user for such settings.
 
 ### Principles
 
