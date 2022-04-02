@@ -68,3 +68,44 @@ Examples
 - The managed thread pool does not clear the TLS used when reusing a thread.
 
 - Not for Single-threaded apartment.
+
+** Thread Local Storage
+
+- TLS static field: best performance, compile-time needs anticipated
+  + =[ThreadStatic] static=: not shared between threads. Field intialization occurs only once on the first thread thus not reliable: the same TLS fields on other threads will not be initialized as expected.
+
+- Lazily Initialized =ThreadLocal<T>= class, recommended.
+
+- Data Slots =System.LocalDataStoreSlot=: flexible, slower and more awkward to use.
+  + A slot is a key to the value
+  + named and unnamed slots
+  + =Thread.AllocateNamedDataSlot()= (a slot for all threads), =GetNamedDataSlot=, =FreeNamedDataSlot=, =Thread.AllocateDataSlot=
+  + =Thread.SetData=, =Thread.GetData=
+  + Any slots can still be used even if =FreeNamedDataSlot= has freed it, as long as any =LocalDataStoreSlot= to it is still used. However, a new one is used if the slot name is used after freeing.
+
+* Synchronization
+
+** Synchronized Code Region
+
+=Monitor= locks objects not value types. The monitor box every value object passed to it for each call, making the code unable to synchronize with other threads and unable to exit the critical region. The monitor maintains for each synchronized object
+
+- the thread the owns the lock
+
+- the threads ready to take the lock if available
+
+- the thread waiting for signaling to enter the ready queue
+
+  The =Monitor= is pure managed full portable and possibly more efficient synchronization mechanism.
+
+*** Operations
+
+- =Enter=, =TryEnter=: enter a critical section. Recursive locking is supported. Waiting on a lock can be =Thread.Interrupt=-ed.
+
+- =Exit=: release the lock on the object, the end of a critical section protected by the locked object.
+
+- =Wait=, =Pulse=, =PulseAll=: similar to the semantics of a conditional variable but with one cv per lock. Callable only within the critical section.
+
+** =System.Collections.Concurrent=: builtin synchronized add/remove operations
+
+Insteead of traditional locking on =.SyncRoot= using a thread-safe wrapper from =.Synchronized()=, thread-safe collections use lightweight synchronization mechanism such as
+=SpinWait=, =SpinLock=, =SemaphoreSlim=, =CountdownEvent=. Some doesn't even use lock at all, =Interlocked= lock-free operations are used.
