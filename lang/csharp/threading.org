@@ -107,5 +107,31 @@ Examples
 
 ** =System.Collections.Concurrent=: builtin synchronized add/remove operations
 
+The traditional sync wrapper provides a [[https://docs.microsoft.com/en-us/archive/blogs/bclteam/synchronization-in-generic-collections-brian-grunkemeyer][false image]] that the threading problem can be easily solved by just using that wrapper.
+
 Insteead of traditional locking on =.SyncRoot= using a thread-safe wrapper from =.Synchronized()=, thread-safe collections use lightweight synchronization mechanism such as
 =SpinWait=, =SpinLock=, =SemaphoreSlim=, =CountdownEvent=. Some doesn't even use lock at all, =Interlocked= lock-free operations are used.
+
+** =IProducerConsumerCollection<T>=
+
+Thread-safe collections intended for producer/consumer usage.
+
+*** =BlockingCollection<T>=
+
+- An implementation of producer/consumer pattern
+  - concurrent addition and removal of items from multiple threads
+  - a bounded colletion (with a predefined limited maximum capacity) that blocks =Add= and =Take= operations when the collection is full or empty.
+    + This prevents the producer from moving too far ahead of the consumers.
+  - Addition and removal are cancellable to allow unblocking.
+  - =GetConsumingEnumerable=: the client can consume (take elements from) the collection with an =IEnumerable<T>=
+  - One can use multiple such =BlockCollection<T>= as a resource pool with =TakeFromAny= and =AddToAny=
+
+- Warning! =IDiposable= (and not thread-safe to dispose)
+
+#+begin_quote
+A producing thread can call =CompleteAdding= to indicate that no more items will be added. Consumers monitor the =IsCompleted= property to know when the collection is empty and no more items will be added (so that both the producer and consumer can gracefully shutdown). A producer task adds items to the collection as long as some external condition is true, and then calls =CompleteAdding=. The consumer task takes items until the =IsCompleted= property is true.
+#+end_quote
+
+=CompleteAdding= means the production will end and no more items will be available from this collection.
+
+This collection uses an underlying =IProducerConsumerCollection= as the data store. The default one is a =ConcurrentQueue<T>=.
