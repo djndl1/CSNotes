@@ -85,6 +85,12 @@ Examples
 
 * Synchronization
 
+- general definition: To cause two or more events or actions to happen at exactly the same time or same rate, or in a *time-coordinated* way.
+
+- *Thread Synchronization*  a mechanism which ensures that two or more concurrent processes or threads do not simultaneously execute some particular program segment known as critical section.
+
+- *Race Condition*: the condition of an electronics, software, or other system where the system's substantive behavior is dependent on the sequence or timing of other uncontrollable events.
+
 ** Synchronized Code Region
 
 =Monitor= locks objects not value types. The monitor box every value object passed to it for each call, making the code unable to synchronize with other threads and unable to exit the critical region. The monitor maintains for each synchronized object
@@ -112,13 +118,14 @@ The traditional sync wrapper provides a [[https://docs.microsoft.com/en-us/archi
 Insteead of traditional locking on =.SyncRoot= using a thread-safe wrapper from =.Synchronized()=, thread-safe collections use lightweight synchronization mechanism such as
 =SpinWait=, =SpinLock=, =SemaphoreSlim=, =CountdownEvent=. Some doesn't even use lock at all, =Interlocked= lock-free operations are used.
 
+
 ** =IProducerConsumerCollection<T>=
 
 Thread-safe collections intended for producer/consumer usage.
 
 *** =BlockingCollection<T>=
 
-- An implementation of producer/consumer pattern
+- An implementation of producer/consumer pattern (e.g. pipeline)
   - concurrent addition and removal of items from multiple threads
   - a bounded colletion (with a predefined limited maximum capacity) that blocks =Add= and =Take= operations when the collection is full or empty.
     + This prevents the producer from moving too far ahead of the consumers.
@@ -135,3 +142,9 @@ A producing thread can call =CompleteAdding= to indicate that no more items will
 =CompleteAdding= means the production will end and no more items will be available from this collection.
 
 This collection uses an underlying =IProducerConsumerCollection= as the data store. The default one is a =ConcurrentQueue<T>=.
+
+** =ConcurrentDictionary=
+
+Operations such as =GetOrAdd=, =AddOrUpdate= are thread-safe but not atomic. One thread that =GetOrAdd= might not get what it adds if the item doesn't exist already, but gets an item added by another thread.
+
+Various =Try*= methods exist because the key might have already been added/removed.
