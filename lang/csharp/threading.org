@@ -69,6 +69,25 @@ Examples
 
 - Not for Single-threaded apartment.
 
+** Timers
+
+- =System.Threading.Timer= (server-based or service component in an MT environment): executes a callback method defined when instantiated on a thread pool thread at regular intervals
+  + a simple, lightweight timer that uses callback method.
+  + due time (the delay before the first execution) and the period can be changed
+  + use =.Dispose(WaitHandle)= to wait until all callbacks have completed (this is not for a safe disposal of the timer). It signals when no callbacks are running. This method is provided to signal the end of the timer's lifetime (along with its callback).
+
+- =System.Timers.Timer= (server-based or service component in an MT environment): raises an event on a thread pool thread. A wrapper around =System.Threading.Timer= to provide more functionality (geared towards a design interface).
+  + useful for a long-running server.
+  + has an =Elapsed= event to fire
+  + can be =AutoReset= to be periodic or only once.
+  + the event might be fired before the last one finishes, making reentrancy of the event handler a requirement.
+  + =SynchronizingObject=: for use with WinForms controls. A timer might stop before all queued event handlers (since the signal to fire the event is on the thread pool, unlike the winforms timer), thus resulting a race condition.
+
+- =System.Windows.Forms.Timer=
+  + requires a UI message pump
+  + always operate from the same thread or marshal the call onto another thread.
+  + low resolution compared to other timers.
+
 ** Thread Local Storage
 
 - TLS static field: best performance, compile-time needs anticipated
