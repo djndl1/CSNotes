@@ -76,7 +76,6 @@ Examples
   + due time (the delay before the first execution) and the period can be changed
   + use =.Dispose(WaitHandle)= to wait until all callbacks have completed (this is not for a safe disposal of the timer). It signals when no callbacks are running. This method is provided to signal the end of the timer's lifetime (along with its callback).
 
-- =System.Timers.Timer= (server-based or service component in an MT environment): raises an event on a thread pool thread. A wrapper around =System.Threading.Timer= to provide more functionality (geared towards a design interface).
   + useful for a long-running server.
   + has an =Elapsed= event to fire
   + can be =AutoReset= to be periodic or only once.
@@ -138,7 +137,7 @@ Insteead of traditional locking on =.SyncRoot= using a thread-safe wrapper from 
 =SpinWait=, =SpinLock=, =SemaphoreSlim=, =CountdownEvent=. Some doesn't even use lock at all, =Interlocked= lock-free operations are used.
 
 
-** =IProducerConsumerCollection<T>=
+*** =IProducerConsumerCollection<T>=
 
 Thread-safe collections intended for producer/consumer usage.
 
@@ -162,8 +161,64 @@ A producing thread can call =CompleteAdding= to indicate that no more items will
 
 This collection uses an underlying =IProducerConsumerCollection= as the data store. The default one is a =ConcurrentQueue<T>=.
 
-** =ConcurrentDictionary=
+*** =ConcurrentDictionary=
 
 Operations such as =GetOrAdd=, =AddOrUpdate= are thread-safe but not atomic. One thread that =GetOrAdd= might not get what it adds if the item doesn't exist already, but gets an item added by another thread.
 
 Various =Try*= methods exist because the key might have already been added/removed.
+
+** Manual Synchronization
+
+*** =WaitHandle=: Native OS synchronization handles.
+
+Represent all synchronization objects in the runtime that allow multiple wait operations.
+
+- =WaitOne=: blocks and wait for a signal
+
+- =SignalAndWait=: signal and wait another
+
+- =WaitAny=, =WaitAll=
+
+**** =System.Threading.Mutex=
+
+- more overhead than the =Monitor= class.
+- named mutexes can be used globally with any processes =Global\= or session-locally =Local\=.
+  + On Windows, every login is a session. Services typically run in a different non-interactive session. On Unix, a shell has its own session.
+  + if the name already exists, the already-created named session is used.
+- can be used with other =WaitHandle=.
+- Recursive
+- using abandoned mutex (a mutex acquired but not released by a thread before disposal) results in an =AbandonedMutextException=
+
+**** =System.Threading.Semaphore=, =System.Threading.SemophoreSlim=
+
+A number that represent currently allowed concurrent entries to manage a limited resource.
+
+- named semaphores can be used globally or session-locally.
+
+- A thread can decide to release several entries.
+
+- recursive
+
+- has no thread affinity
+
+=SemaphoreSlim= supports async waits and does not use kernel semaphores.
+
+**** =EventWaitHandle=: Thread Synchronization Event
+
+Allows threads to communicate with each other by signaling.
+
+#+begin_quote
+A synchronization event can be either in an unsignaled or signaled state. When the state of an event is unsignaled, a thread that calls the event's =WaitOne= overload is blocked until an event is signaled. The =EventWaitHandle.Set= method sets the state of an event to signaled.
+#+end_quote
+
+An event can either be automatically reset or manually reset after signaling (and releasing a waiting thread).
+
+- =AutoResetEvent=, =ManualResetEvent=: basically just =EventWaitHandle= with a special constructor.
+
+- =ManualResetEventSlim=: a lightweight =ManualResetEvent= local to a process.
+
+**** =CountdownEvent=
+
+Signaled when its count reaches zero.
+
+- can be used to unblock multiple threads with a signal from one thread.
