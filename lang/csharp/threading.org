@@ -205,20 +205,27 @@ A number that represent currently allowed concurrent entries to manage a limited
 
 **** =EventWaitHandle=: Thread Synchronization Event
 
-Allows threads to communicate with each other by signaling.
-
-#+begin_quote
-A synchronization event can be either in an unsignaled or signaled state. When the state of an event is unsignaled, a thread that calls the event's =WaitOne= overload is blocked until an event is signaled. The =EventWaitHandle.Set= method sets the state of an event to signaled.
-#+end_quote
-
-An event can either be automatically reset or manually reset after signaling (and releasing a waiting thread).
-
-- =AutoResetEvent=, =ManualResetEvent=: basically just =EventWaitHandle= with a special constructor.
-
-- =ManualResetEventSlim=: a lightweight =ManualResetEvent= local to a process.
 
 **** =CountdownEvent=
 
 Signaled when its count reaches zero.
 
 - can be used to unblock multiple threads with a signal from one thread.
+
+**** =ReaderWriterLock= (deprecated), =ReaderWriterLockSlim=
+
+Protects a resource that is read by multiple threads and written to by one thread at a time.
+
+- Read-Writer lock alternates between a collection of readers and one writer. As long as a writer is waiting for the lock, other readers are also blocked (so that the writer is not blocked indefinitely by chance).
+
+- a thread can enter the lock in three modes
+  + read mode: one or more reader threads
+  + write mode: only one writer thread has acquired the lock
+  + upgradable read mode: for cases where a thread usually reads but sometiems write (e.g. =AddOrUpdate=). A reader thread in upgradable mode =EnterUpgradableReadLock= can =(Try)EnterWriteLock= and
+    =ExitUpgradableReadLock= after finishing the job. A thread in upgradeable mode can =EnterReadLock= to downgrade to upgradable read mode.
+
+- Mutex rules: a thread might block for several reasons
+  + a reader thread might block if there is a writer thread has acquired or is waiting for the lock.
+  + the thread is a writer and any other threads are in the above three modes.
+  + a thread that tries to enter upgradeable mode blocks if there is already a thread in upgradeable mode, if there are threads waiting to enter write mode or if there is a single thread in write mode.
+  + Recursion is not enabled.
