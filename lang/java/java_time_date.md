@@ -147,23 +147,50 @@ Mostly value-based, immutable and thread-safe.
 
 ## Java Time-scale
 
-86400 seconds a day without leap second (though the definition of second is not the same as the SI second).
+- 86400 seconds a day without leap second (though the definition of second is not the same as the SI second).
 
-Segmented along the timeline (UTC without leap seconds after 1972-11-03 and UT1 before that).
+- Segmented along the timeline (UTC without leap seconds after 1972-11-03 and UT1 before that).
+
+- Exactly matches the official time at noon each day.
+
+- Closely matches it elsewhere in a precisely defined day.
 
 The `Clock` implementation uses this timescale to provide the current time. The following classes are more or less based on this timescale and can be converted between each other.
 
-## `Instant`
+## `Temporal`
 
-Nanoseconds-precision Unix timestamp
+Do not use zoned time unless really needs absolute time instances.
 
-## `LocalTime`
+### `Instant`
+
+Nanoseconds-precision Unix timestamp. The maximum/minimum years representable are 10 billions years AC/CE.
+
+### `LocalTime`
 
 Nanosecond-precision ISO-8601 time without a timezone. A description of the local time on a wall clock.
 
-## `LocalDate`
+### `LocalDate`
 
 A date without a time-zone in the ISO-8601 calendar system. An immutable date-time object that represents a date, often viewed as year-month-day.
+
+### `Year`
+
+### `YearMonth`
+
+### `MonthDay` `TemporalAccessor` but not `Temporal`
+
+## `TemporalAmount`
+
+### `Period`
+
+A date-based amount of time interval. e.g. `P2Y3M4D`
+
+
+### `Duration`
+
+nanosecond-precision time interval.
+
+- supports basic arithmetic operations.
 
 ## Enums
 
