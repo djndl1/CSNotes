@@ -258,3 +258,47 @@ A group of tasks cooperate by moving through a series of phases, where each in t
 #+end_quote
 
 All threads reaching the barrier signal and wait for other threads until enough threads have signaled.
+
+** Atomic Operations =System.Threading.Interlocked=
+
+- Simple atomic operations: =Add=, =And=, =Or=, =Increment=, =Decrement=, =Exchange=
+
+- =Read=: Atomic load a 64-bit integer (mainly for 32-bit systems).
+
+- =CompareExchange=: used for atomic state change on a certain condition.
+
+*** Memory Barrier
+
+Full memory barrier.
+
+- Sequential Consistency:
+
+** Exception Handling
+
+Certain unhandled exceptions =ThreadAbortException=, =AppDomainUnloadedException= does not terminate the app but only the threads (thought the termination of the main thread would terminate the app).
+
+- Unhandled exceptions thrown in thread pool threads only returns the handle back to the thread pool.
+
+- Do not swallow exceptions during development, testing.
+
+** Static Members
+
+#+begin_quote
+To prevent the execution of code on a type that is not initialized, the common language runtime blocks all calls from other threads to static members of the class until the class constructor (~static~ constructor) has finished running.
+#+end_quote
+
+** Tips and Practices
+
+- Do not call =Thread.Abort= on other threads (not available in .NET Core).
+
+- Do not use random public objects (=this= of type objects) with =Monitor=
+
+- Do use multiple threads for tasks that require different resources, and avoid assigning multiple threads to a single resource.
+
+- use =Interlocked= for simple state changes.
+
+For class libraries
+
+- Avoid the need for synchronization if possible
+
+- make static data thread safe by default, instance data should not be thread safe by default.
