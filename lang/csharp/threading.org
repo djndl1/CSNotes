@@ -101,6 +101,12 @@ Examples
   + =Thread.SetData=, =Thread.GetData=
   + Any slots can still be used even if =FreeNamedDataSlot= has freed it, as long as any =LocalDataStoreSlot= to it is still used. However, a new one is used if the slot name is used after freeing.
 
+*** Async Local
+
+#+begin_quote
+Because the task-based asynchronous programming model tends to abstract the use of threads, ~AsyncLocal<T>~ instances can be used to persist data across threads.
+#+end_quote
+
 * Synchronization
 
 - general definition: To cause two or more events or actions to happen at exactly the same time or same rate, or in a *time-coordinated* way.
