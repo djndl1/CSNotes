@@ -2,6 +2,40 @@
 
 * JDBC =java.sql=
 
+** JDBC Driver Types
+
+- *type 1*: translates JDBC to ODBC, which requires a ODBC driver and related configuration.
+
+- *type 2*: partly Jasva nad partly in native code.
+
+- *type 3*: pure Java library that uses database-independent protocol to communicate with database requests to a server component, which then translates the requests into a database-specific protocol.
+
+- *type 4*: a pure Java library that translates JDBC requests directly to a database-specific protocol.
+
+** JDBC Configuration
+
+- Database URLs: ~jdbc:subprotocol:other stuff~ e.g. ~jdbc:derby://localhost:1527/COREJAVA;create=true~
+
+- Registration
+  + automatically if there is a file in ~META-INF/services/java.sql.Driver~.
+  + ~Class.forName("org.postgresql.Driver")~; ~java. -Djdbc.drivers=org.postgresql.Driver ProgramName~; ~System.setProperty("jdbc.drivers", "org.postgresql.Driver")~
+
+** JDBC Connection
+
+- use =java.sql.DriverManager=
+
+- A ~Statement~ has at most one *open* result set. Do not fuss with multiple concurrent result sets (~Statements~) (there's a limit to the number of statements per connection).
+
+- Closing a =Connection= closes =Statement=​s, which in turn closes =ResultSet=​s.
+
+** Error Handling
+
+Each ~SQLException~ has a change of ~SQLException~ objects that are retrieved with ~getNextException~.
+
+- ~SQLException~ implments the ~Iterable<Throwable>~ for easy retrival.
+
+- ~SQLException~ is orgainized into a hierarchy.
+
 ** Oracle JDBC
 
 Use thin client driver.
