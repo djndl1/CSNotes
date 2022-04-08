@@ -91,6 +91,9 @@ CallableStatement cs4 = conn.prepareCall
   + auto-commit disabled and connection closed
   + any DDL
 
+- Some databases support save points ~Savepoint~ to allow fine-grained control over transactions.
+  + ~Connection.releaseSavepoint(svpt)~ when no longer necessary.
+
 ** Common Concepts
 
 *** =java.sql.ResultSet=
