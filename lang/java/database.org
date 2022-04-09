@@ -162,3 +162,27 @@ rs.deleteRow();
 #+begin_quote
 It is much more efficient to execute an UPDATE statement than to make a query and iterate through the result, changing data along the way. Updatable result sets make sense for interactive programs in which a user can make arbitrary changes, but for most programmatic changes, a SQL UPDATE is more appropriate.
 #+end_quote
+
+
+*** =java.sql.RowSet=
+
+Row sets do not have to be tied to a database connection.
+
+- ~CachedRowSet~: allows disconnected operation.
+  + create a ~CachedRowSet~: from a ~ResultSet~ or by issuing a query from the row set. Also, cached row sets support paging.
+
+- ~WebRowSet~: a cached row set that can be saved to an XML file.
+
+- ~FilteredRowSet~, ~JoinRowSet~: lightweight operations on row sets that are equivalent to SQL ~SELECT~ and ~JOIN~.
+
+- ~JdbcRowSet~: a thin wrapper around ~ResultSet~ to add userful methods from the ~RowSet~ interface.
+
+*** =java.sql.Connection=
+
+A connection (session) with a specific datbase, under the context of which SQL statements ar executed and results are returned.
+
+- A user may enter a custom mapping for a UDT for type mapping =.setTypeMap()=
+
+Vendors of web containers and application servers supply connection pool implementations.
+Using a connection pool is completely transparent to the programmer.
+Acquire a connection from a source of pooled connections by obtaining a data source and calling ~getConnection~.
