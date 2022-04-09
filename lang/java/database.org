@@ -100,6 +100,23 @@ CallableStatement cs4 = conn.prepareCall
 - Some databases support save points ~Savepoint~ to allow fine-grained control over transactions.
   + ~Connection.releaseSavepoint(svpt)~ when no longer necessary.
 
+** Metadata
+
+#+begin_src java
+DatabaseMetadata meta = conn.getMetaData();
+ResultSet rs = meta.getTables(null, null, null, new String[] { "Tables" }); // metadata about tables
+
+// metadata about a query/ResultSet
+ResultSet rs = stat.executeQuery("SELECT * FROM " + tableName);
+ResultSetMetaData meta = rs.getMetaData();
+for (int i = 1; i <= meta.getColumnCount(); i++)
+{
+   String columnName = meta.getColumnLabel(i);
+   int columnWidth = meta.getColumnDisplaySize(i);
+   . . .
+}
+#+end_src
+
 ** Common Concepts
 
 *** =java.sql.ResultSet=
