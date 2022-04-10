@@ -328,6 +328,37 @@ The constructor of an enumeration is always private. All enumerated types are su
 
 5. Do not overuse reflection. It is not usually appropriate in applications.
 
+## Records
+
+- immutable type similar to C#'s struct but as a nullable type.
+
+- not meant to replace JavaBeans.
+
+- instance fields of a record are automatically `final`.
+
+```java
+record Point(double x, double y) {}
+```
+
+- The canonical constructor can have a compact form that show no parameters to preprocess the parameters as a prelude where the parameters are assigned to the fields.
+
+```java
+record Range(int from, int to)
+{  
+    public Range // Compact form
+   {      
+      if (from > to) // Swap the bounds
+      {
+         int temp = from;
+         from = to;
+         to = temp;
+      }
+   }
+}
+```
+
+- Custom constructors are allowed but they must call the canoical constructor.
+
 ## Reflection (Not for application development)
 
 The _reflection library_ has a very rich and elaborate toolset to write programs that manipulate Java code dynamically. Using reflection, Java can support user interface builders, object-relational mappers, and many other development tools that dynamically inquire about the capabilities of classes.
