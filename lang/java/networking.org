@@ -1,0 +1,147 @@
+#+TITLE: Networking
+
+* Basic Examples
+
+** A Socket Client
+
+#+begin_src java
+import java.util.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.time.*;
+
+public class Networking1 {
+   public static void main(String[] args) throws IOException, UnknownHostException {
+       final String timeServer = "time-a.nist.gov";
+       var address = InetAddress.getByName(timeServer);
+       System.out.println(address.getHostAddress());
+
+       var addresses = InetAddress.getAllByName(timeServer);
+       Arrays.asList(addresses).stream().forEach(addr -> {
+               System.out.println(addr.getHostAddress());
+           });
+
+       try (var s = new Socket(timeServer, 13)) {
+           s.setSoTimeout(1000);
+           try (var in = new Scanner(s.getInputStream(), StandardCharsets.UTF_8)) {
+               while (in.hasNextLine()) {
+                   String line = in.nextLine();
+                   System.out.println(line);
+               }
+           }
+       }
+   }
+}
+#+end_src
+
+** Single-Threaded Server Example
+
+#+begin_src java
+import java.util.*;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+import java.time.*;
+
+public class Networking2 {
+    public static void main(String[] args) throws IOException {
+        try (var s = new ServerSocket(8189)) {
+            try (Socket incoming = s.accept()) {
+                try (InputStream inStream = incoming.getInputStream();
+                     OutputStream outStream = incoming.getOutputStream()) {
+                    try (var in = new Scanner(inStream, StandardCharsets.UTF_8);
+                         var out = new PrintWriter(new OutputStreamWriter(outStream, StandardCharsets.UTF_8))) {
+                        boolean done = false;
+                        while (!done && in.hasNextLine()) {
+                            String line = in.nextLine();
+                            out.println("Echo: " + line);
+                            out.flush();
+
+                            if (line.trim().equals("BYE")) done = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#+end_src
+
+** Multi-threaded Server Example
+
+#+begin_src java
+import java.util.*;
+
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+import java.io.*;
+
+class ThreadedEchoHandler implements Runnable {
+    private Socket incoming;
+
+    public ThreadedEchoHandler(Socket socket) {
+        incoming = socket;
+    }
+
+    @Override
+    public void run() {
+        try (InputStream inStream = incoming.getInputStream(); OutputStream outStream = incoming.getOutputStream()) {
+            try (var in = new Scanner(inStream, StandardCharsets.UTF_8);
+                 var out = new PrintWriter(new OutputStreamWriter(outStream, StandardCharsets.UTF_8))) {
+                boolean done = false;
+                while (!done && in.hasNextLine()) {
+                    String line = in.nextLine();
+                    out.println("Echo: " + line);
+                    out.flush();
+
+                    if (line.trim().equals("BYE"))
+                        done = true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}
+
+public class Networking3 {
+    public static void main(String[] args) throws IOException{
+        try (var s = new ServerSocket(8189)) {
+            int i = 1;
+
+            while (true) {
+                Socket incoming = s.accept();
+                System.out.println("Spawning " + (i++) + " Threads");
+                Runnable handler = new ThreadedEchoHandler(incoming);
+                var thread = new Thread(handler);
+                thread.start();
+            }
+        }
+    }
+}
+#+end_src
+
+
+* Basics
+
+- Half-close connection: ~Socket.shutdownOutput()~, ~Socket.shutdownInput()~. In scenarios like HTTP request, a client connects, issues a request, close the output, catches the response from the response and then disconnects.
+
+- Interruptible Sockets: ~SocketChannel~ supports non-blocking connection and asynchronous shutdown.
+
+** Web
+
+- ~java.net.URL~: a special kind of =java.net.URI=, one with sufficient information to locate a resource.
+  + does not encode or decode any URL components according to the escaping mechanism. The user should provide the encoded version. Use ~java.net.URI~ (whose sole purpose is parsing) to accomplish this.
+    + ~[scheme:]schemeSpecificPart[#fragment]~ where ~schemeSpecificPart]~ is ~[//authority][path][?query]~, ~authority~ in the form of ~[user-info@]host[:port]~
+    + a relative URL is a URL without a scheme
+  + to access a resource, =openConnection= and set a few properties before =connect()= to the resource.
+    + ~HttpURLConnection~: the legacy way to issue a HTTP request before ~java.net.http~ is introduced. Tedious to use to the point where the user has to use streams to manipulate request- and response- bodies .
+
+- ~java.net.http~
+  + has a builder API to configure the client.
