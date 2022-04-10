@@ -157,6 +157,16 @@ The `final` keywords merely means the object reference will never again refer to
 
 Static variables are quite rare, static constants are more common. Static methods don't have a `this` parameter. However, a static method can access a static field. Static factory methods can vary the type of the constructed object. Every class can have a `main` method, a handy trick for unit testing of classes.
 
+## Class initialization
+
+static blocks: C#'s static constuctor.
+
+```java
+static {
+    ... //initialization code
+}
+```
+
 ## Object construction
 
 Numbers defaults to 0, `boolean` to `false`, and object references to `null`.
