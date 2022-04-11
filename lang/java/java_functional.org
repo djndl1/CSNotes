@@ -1,0 +1,15 @@
+#+TITLE: Java_functional
+
+* Basic Functional Interfaces ~java.util.function~
+
+Each functional interface has a single abstract method (*functional method*) to which the lambda expression's parameter and return types are matched or adapted. Annotated with ~FunctionalInterface~
+
+- ~Consumer<T>~, ~BiConsumer~: C# ~Action<T1, T2, ...>~
+
+- ~Supplier<T>~: C# ~Func<TResult>~
+
+- ~Function<T, V>~, ~BiFunction<T, U, R~: C# ~Function<T1, T2, ...>~
+
+- ~Predicate~
+
+- ~Runnable~: C# ~Action~
