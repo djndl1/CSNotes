@@ -359,32 +359,6 @@ record Range(int from, int to)
 
 - Custom constructors are allowed but they must call the canoical constructor.
 
-## Reflection (Not for application development)
-
-The _reflection library_ has a very rich and elaborate toolset to write programs that manipulate Java code dynamically. Using reflection, Java can support user interface builders, object-relational mappers, and many other development tools that dynamically inquire about the capabilities of classes.
-
-A program that can analyze the capabilities of classes is called _reflective_ It can analyze the capabilities of classes, inspect objects at runtime, implement generic array manipulation code and take advantage of `Method` objects that work like function pointers in C++.
-
-### The `Class` class
-
-The Java runtime system always maintains what is called runtime type identification on all objects. This information keeps track of the class to which each object belongs.
-
-```java
-System.out.println(e.getClass().getName() + " " + e.getName());
-```
-
-`T.class` is the matching class object of type `T`. Note that `T` doesn't have to be a class. The `Class` class is actually a generic class. `Employee.class` is of type `Class<Employee>`. The virtual machine manages a unique `Class` object for each type.
-
-```java
-var className = "java.util.Random"; // or any other name of a class with 
-                                    // a no-arg constructor
-Class cl = Class.forName(className);
-Object obj = cl.getConstructor().newInstance();
-```
-
-This constructs a new instance of type `cl`;
-
-TODO
 
 # Interfaces
 
