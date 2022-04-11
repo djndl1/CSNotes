@@ -1,0 +1,488 @@
+#+TITLE: Nim Basics
+
+#+begin_src shell
+nim c -r nim_file.nim arg1 arg2
+#+end_src
+
+* Basic Types
+
+- =bool=: =not=, =and=, =or=, =xor=, =<=, ~<=~, =>=, ~>=~, ~==~. =and= and =or= performs short circuit evaluation.
+
+- =char=: one byte
+
+- integers: =int=, =uint=, =(u)int8=, =(u)int16=, =(u)int32=, =(u)int64=
+  + =0'i8=, =0'i32=, =0'u=. =int= has the same size as a pointer.
+  + =shl=, =shr=
+  + bit shifting operators always treat their arguments as unsigned.
+  + unsigned integers wrap around and never over- or underflow.
+
+- floating-point, =float= (currently always 64-bit), =flaot32=, =float64=
+  + =0.0'f32=, =0.0'f64=
+
+- =r"C:\Program Files\nim"=: raw string literal
+  + ="""..."""=: multiline string literal
+
+- =#[Documentation comment]#=: allowed only in a few places as they belong to the syntax tree!
+
+- =1_000_000=, =1.0e9=, =0xFF=, =0b1001=, =0o123=
+
+- =var=: global/local variable
+
+ #+begin_src nim
+var
+  x, y: int
+  # a comment can occur here too
+  a, b, c: string
+ #+end_src
+
+- =const=: compile-time constant
+
+- =let=: declares single assignment variable (=final= in Java)
+
+- =repr()=: the internal type representation, for debugging
+
+* Advanced Types
+
+** Enumerations
+
+#+begin_src nim
+type
+  Direction = enum
+    north, east, south, west
+#+end_src
+
+** Ordinal Types
+
+Enumerations, integers, =char=, =bool=, subranges.
+
+- =ord(x)=
+
+- =inc(x)=, =inc(x, n)=, =dec(x)=, =dec(x, n)=
+
+- =succ(x)=, =succ(x, n)=, =pred(x)=, =pred(x, n)=
+
+*** Subranges
+
+A range of values from an integer or enumeration type.
+
+*** Sets
+
+Sets of an ordinal type, implemented as a high performance bit vectors, often used to define a type for the flags of a procedure.
+
+*** Bit fields
+
+Enum, sets and casting can used together
+
+#+begin_src nim
+type
+  MyFlag* { .size: sizeof(cint). } = enum
+    A
+    B
+    C
+    D
+  MyFlags = set[MyFlag]
+#+end_src
+
+** Array
+
+- Value type, not a pointer to a region of memory
+
+- Array access is bounds checked (at compile-time or at runtime) by default.
+
+- Array indices are specified by users (do not always starts at zero).
+
+More like C# arrays
+
+*** Open Array
+
+Array type used in typing with variable sizes, compatible with arrays and sequences.
+
+** Sequence
+
+Resizable array
+
+#+begin_src nim
+var x: seq[int]
+x = @[1, 2, 3, 4, 5]
+#+end_src
+
+** Varargs
+
+=varargs=
+
+#+begin_src nim
+proc myWriteln(f: File, a: varargs[string, `$`]) =
+  for s in items(a):
+    write(f, s)
+  write(f, "\n")
+#+end_src
+
+** Slices
+
+An object of type =Slice= which contains two bounds.
+
+** Objects
+
+Value type, record type.
+
+#+begin_src nim
+type
+  Person = object
+    name: string
+    age: int
+#+end_src
+
+** Tuples
+
+Tuple types are structurally typed: different tuple-types are equivalent if they specify fields of the same type and of the same name in the same order. Tuples created with different field names will be considered different objects despite having the same field types
+
+#+begin_src nim
+type
+  Person = tuple
+    name: string
+    age: int
+
+PersonY = (string, int)
+#+end_src
+
+** References =ref= and Pointers =ptr= (Untraced by GC)
+
+#+begin_src nim
+type
+  Node = ref object
+    le, ri: Node
+    data: int
+
+var n = Node(data: 9)
+new(n)
+n = nil
+#+end_src
+
+** Procedural Type
+
+Basically a delegate or function pointer type
+
+* Iterators
+
+- =1 .. 10=, =countup(1, 10)= (full closed):
+
+- =countdown(10, 1)=
+
+- =1 ..< 10=,
+
+- =.. ^n=: to the the last n-th element
+
+- =.items=, =.mitems= immutable/mutable elements
+
+- =.pairs=, =.mpairs=: element and its index number
+
+#+begin_src nim
+iterator countup(a, b: int): int =
+  var res = a
+  while res <= b:
+    yield res     # can only called from a loop
+    inc(res)
+#+end_src
+
+
+* Control Flow
+
+- Python-style if-elif-else, while, for loop with iterators
+
+#+begin_src nim
+case name
+of "":
+    ...
+of "name":
+    ...
+of "Dave", "Frank":
+    ...
+else:
+    echo "Hi, ", name
+#+end_src
+
+- when-elif-else: compile-time if
+
+* Scope
+
+=block= statement with label to create a scope
+
+* Indentation
+
+#+begin_src nim
+if x: x = false
+
+const fac4 = (var x = 1; for i in 1..4: x *= i; x)
+#+end_src
+
+Like Python, Expressions can contain indentation at certain places for better readability: indentation within expressions is allowed after operators, an open parenthesis and after commas.
+
+With parenthesis and semicolons (;) you can use statements where only an expression is allowed
+
+* Declaration
+
+Variables, procedures needs to be declared before it can be used.
+
+* Procedure
+
+#+begin_src nim
+proc yes(arg1: argType1): returnType =
+    ...
+#+end_src
+
+A procedure that returns a value has an implicit variable =result= as its return value,
+initialized with its default value. A procedure that does not have any return statement and does not use the special =result= variable returns the value of its last expression.
+
+A parameter with =var= in its type is passed by reference.
+
+=discard= before a procedure to discard the return value.
+
+Nim procedures supports named arguments, default parameter values and overloading.
+
+Operator overloading is also supported. =``= notation is used to call operators like a normal procedure.
+
+* Modules
+
+Each module is in its own file. Modules enable information hiding and separate compilation.
+
+- Only top-level symbols marked with =*= are exported.
+
+- A module's top-level statements are executed at the start of the program.
+
+- Each module has a special magic constant =isMainModule= if the module is compiled
+  as the main file.
+
+- =import mymodule except y= excludes certain symbols.
+
+- =from mymodule import x, y, z=
+
+- =from mymodule (as m) import nil=: =m.x()=
+
+- =include= C-style =#include=
+
+* Pragmas
+
+={. pragma .}
+
+* OOP
+
+- Objects are value types in Nim.
+
+** Inheritance
+
+Types with inheritance should be marked as =ref= types (otherwise polymorphism doesn't work since the object will be truncated upon assignment).
+
+#+begin_src nim
+type
+  Person = ref object of RootObj
+    name*: string
+    age: int
+#+end_src
+
+- =RootObj= can be an ancestor but not the only one. =inheritable= can be used to introduce new object roots apart from =system.RootObj=.
+
+- Objects that have no ancestors are implicitly =final=
+
+- Composition is often preferable to inheritance for simple code reuse.
+
+** Mutually Recursive Types
+
+Complex data structures which depend on each other. e.g. A tree-node
+
+- only declared with a single type section
+
+ #+begin_src nim
+type
+  Node = ref object
+  le, ri: Node
+  sym: ref Sym
+
+  Sym = object
+    name: string
+    line: int
+    code: Node
+ #+end_src
+
+** Type Conversion
+
+- Type cast: interpret the bit pattern in an other way
+
+- type conversion: the abstract value is preserved =destination_type(expression_to_convert)=
+
+** Object Variants
+
+#+begin_src nim
+type
+  NodeKind = enum  # the different node types
+    nkInt,          # a leaf with an integer value
+    nkFloat,        # a leaf with a float value
+    nkString,       # a leaf with a string value
+    nkAdd,          # an addition
+    nkSub,          # a subtraction
+    nkIf            # an if statement
+  Node = ref object
+    case kind: NodeKind  # the `kind` field is the discriminator
+    of nkInt: intVal: int
+    of nkFloat: floatVal: float
+    of nkString: strVal: string
+    of nkAdd, nkSub:
+      leftOp, rightOp: Node
+    of nkIf:
+      condition, thenPart, elsePart: Node
+#+end_src
+
+** Properties
+
+#+begin_lang nim
+type
+  Socket* = ref object of RootObj
+    h: int # cannot be accessed from the outside of the module due to missing star
+
+proc `host=`*(s: var Socket, value: int) {.inline.} =
+  ## setter of host address
+  s.h = value
+
+proc host*(s: Socket): int {.inline.} =
+  ## getter of host address
+  s.h
+
+var s: Socket
+new s
+s.host = 34  # same as `host=`(s, 34)
+#+end_lang
+
+** Dynamic Dispatch
+
+Using a dispatch tree instead of a vtable.
+
+#+begin_src nim
+type
+  Expression = ref object of RootObj ## abstract base class for an expression
+  Literal = ref object of Expression
+    x: int
+  PlusExpr = ref object of Expression
+    a, b: Expression
+
+# watch out: 'eval' relies on dynamic binding
+method eval(e: Expression): int {.base.} =
+  # override this base method
+  quit "to override!"
+
+method eval(e: Literal): int = e.x
+method eval(e: PlusExpr): int = eval(e.a) + eval(e.b)
+proc newLit(x: int): Literal = Literal(x: x)
+proc newPlus(a, b: Expression): PlusExpr = PlusExpr(a: a, b: b)
+
+echo eval(newPlus(newPlus(newLit(1), newLit(2)), newLit(4)))
+#+end_src
+
+* Exceptions
+
+Allocated on the heap, derived from =system.Exception=
+
+- =raise=: throw a new exception or the last exception
+
+#+begin_src nim
+try:
+  let a = readLine(f)
+except OverlowDefect:
+  let
+    e = getCurrentException();
+    msg = getCurrentExceptionMsg();
+finally:
+  close(f)
+#+end_src
+
+The author of a procedure must indicate the exceptions that might be raised
+in the signature using ={.raises: [exceptionName, ...].}=, otherwise the compiler would error. ={.effects.}= pragma tells the compiler to output all inferred effects up to that point. Or use =doc= command to determine the potential exceptions.
+
+* Generics
+
+#+begin_src nim
+type
+  BinaryTree*[T] = ref object # BinaryTree is a generic type with
+                              # generic param `T`
+    le, ri: BinaryTree[T]     # left and right subtrees; may be nil
+    data: T                   # the data stored in a node
+
+proc newNode*[T](data: T): BinaryTree[T] =
+  # constructor for a node
+  new(result)
+  result.data = data
+
+proc add*[T](root: var BinaryTree[T], n: BinaryTree[T]) =
+  # insert a node into the tree
+  if root == nil:
+    root = n
+  else:
+    var it = root
+    while it != nil:
+      # compare the data items; uses the generic `cmp` proc
+      # that works for any type that has a `==` and `<` operator
+      var c = cmp(it.data, n.data)
+      if c < 0:
+        if it.le == nil:
+          it.le = n
+          return
+        it = it.le
+      else:
+        if it.ri == nil:
+          it.ri = n
+          return
+        it = it.ri
+
+proc add*[T](root: var BinaryTree[T], data: T) =
+  # convenience proc:
+  add(root, newNode(data))
+
+iterator preorder*[T](root: BinaryTree[T]): T =
+  # Preorder traversal of a binary tree.
+  # This uses an explicit stack (which is more efficient than
+  # a recursive iterator factory).
+  var stack: seq[BinaryTree[T]] = @[root]
+  while stack.len > 0:
+    var n = stack.pop()
+    while n != nil:
+      yield n.data
+      add(stack, n.ri)  # push right subtree onto the stack
+      n = n.le          # and follow the left pointer
+#+end_src
+
+* Templates
+
+A simple substitution mechanism that operates on Nim's abstract syntax trees.
+Teplates are processed in the semantics pass of the compiler.
+
+#+BEGIN_SRC nim
+import std/math
+
+template liftScalarProc(fname) =
+  ## Lift a proc taking one scalar parameter and returning a
+  ## scalar value (eg `proc sssss[T](x: T): float`),
+  ## to provide templated procs that can handle a single
+  ## parameter of seq[T] or nested seq[seq[]] or the same type
+  ##
+  ## .. code-block:: Nim
+  ##  liftScalarProc(abs)
+  ##  # now abs(@[@[1,-2], @[-2,-3]]) == @[@[1,2], @[2,3]]
+  proc fname[T](x: openarray[T]): auto =
+    var temp: T
+    type outType = typeof(fname(temp))
+    result = newSeq[outType](x.len)
+    for i in 0..<x.len:
+      result[i] = fname(x[i])
+#+END_SRC
+
+* Macro
+
+A function that is executed at compile-time and transforms a Nim syntax tree into a different
+
+** Arguments
+
+- Untyped: not checked when passed, only checked when the macro is expanded.
+
+- Typed (constrained ??): semantically checked before passed to the macro. Identifier nodes are resolved as symbols and conversions are visible in the syntax tree as calls.
+
+- static arguments =static[int]=: a way to pass values as values and not as syntax tree nodes to a macro.
+
+- code blocks arguments (???)

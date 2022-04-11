@@ -1,0 +1,44 @@
+#+TITLE: Java_after8
+
+* Java 9
+
+- Process API: =java.lang.ProcessHandle=
+
+- =try= with resource without declaring new a variable
+
+- private interface methods to implement default methods
+
+* Java 10
+
+ - =var=: type declaration inference.
+
+* Java 11
+
+- =java source.java=
+
+- =java.net.http= HTTP Client
+
+* Jasa 14
+
+- switch expression
+
+ #+begin_src java
+boolean isTodayHoliday = switch (day) {
+    case "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY" -> false;
+    case "SATURDAY", "SUNDAY" -> true;
+    default -> throw new IllegalArgumentException("What's a " + day);
+};
+ #+end_src
+
+ - record
+
+* Java 16
+
+- =Stream.toList()=
+
+- ~if (obj instanceof String s) { }~
+
+* Java 17
+
+- =sealed= with =permits= to determine exactly what classes are allowed to implement this interface or abstract class
+  - any subclass must be marked as =final=, =non-sealed= or =sealed=.

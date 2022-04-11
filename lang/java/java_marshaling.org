@@ -1,0 +1,88 @@
+#+TITLE: Java Marshaling
+
+* Jackson
+
+** Data Binding (To/From POJO)
+
+*** =ObjectMapper=
+
+- =readValue=
+
+ #+begin_src java
+Map<String, ResultValue> results = mapper.readValue(jsonSource,
+   new TypeReference<Map<String, ResultValue>>() { } ); // Java has type erasure for generics
+ #+end_src
+
+- =writeValue*=
+
+=ObjectMapper= can use a tree model:
+
+#+begin_src java
+// can be read as generic JsonNode, if it can be Object or Array; or,
+// if known to be Object, as ObjectNode, if array, ArrayNode etc:
+ObjectNode root = mapper.readTree("stuff.json");
+String name = root.get("name").asText();
+int age = root.get("age").asInt();
+
+// can modify as well: this adds child Object as property 'other', set property 'type'
+root.with("other").put("type", "student");
+String json = mapper.writeValueAsString(root);
+
+// with above, we end up with something like as 'json' String:
+// {
+//   "name" : "Bob", "age" : 13,
+//   "other" : {
+//      "type" : "student"
+//   }
+// }
+#+end_src
+
+*** Streaming Parser, generator
+
+- =JsonGenerator=: operate on a stream to generate JSON in it.
+
+- =JsonParser=: created from a stream/file to proceed token by token
+
+*** Configuration
+
+**** Faatures (Similar to =System.Text.Json='s =JsonOption=)
+
+- high-leve features: =mapper.enable()=, -=mapper.disable()=, =SerializationFeature=, =DeserializationFeature=.
+
+- low-level features: =mapper.configure()=, =JsonParser.Feature=
+
+**** Annotations
+
+Annotations are "shared" between matching fields, getters and setters: if only one has =@JsonIgnore=, it affects others
+
+- =@JsonProperty= on a property or a getter: sets the property name.
+
+- =@JsonIgnore=, =@JsonIgnoreProperties=
+
+- =@JsonCreator= and =@JsonProperty= on a constructor: useful for supporting immutable objects.
+
+*** Conversion Between POJO
+
+TODO
+
+*** Types
+
+**** Enum
+
+**** Serialization
+
+- Default: as a string of the value
+
+- As object: =@JsonFormat(Shape = JsonFormat.Shape.Object)=
+
+- =@JsonValue= on a property of a getter
+
+**** Deserialization
+
+- Default: from the name string of the value
+
+- With =@JsonValue=, use the returned value to determine which enum value to use.
+
+- use the of value of =@JsonProperty()= to determine. The value of =@JsonProperty()= of enum values maps to the serialized value of enum values.
+
+- use =@JsonCreator()= to map to a enum value

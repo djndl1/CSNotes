@@ -157,6 +157,16 @@ The `final` keywords merely means the object reference will never again refer to
 
 Static variables are quite rare, static constants are more common. Static methods don't have a `this` parameter. However, a static method can access a static field. Static factory methods can vary the type of the constructed object. Every class can have a `main` method, a handy trick for unit testing of classes.
 
+## Class initialization
+
+static blocks: C#'s static constuctor.
+
+```java
+static {
+    ... //initialization code
+}
+```
+
 ## Object construction
 
 Numbers defaults to 0, `boolean` to `false`, and object references to `null`.
@@ -318,32 +328,37 @@ The constructor of an enumeration is always private. All enumerated types are su
 
 5. Do not overuse reflection. It is not usually appropriate in applications.
 
-## Reflection (Not for application development)
+## Records
 
-The _reflection library_ has a very rich and elaborate toolset to write programs that manipulate Java code dynamically. Using reflection, Java can support user interface builders, object-relational mappers, and many other development tools that dynamically inquire about the capabilities of classes.
+- immutable type similar to C#'s struct but as a nullable type.
 
-A program that can analyze the capabilities of classes is called _reflective_ It can analyze the capabilities of classes, inspect objects at runtime, implement generic array manipulation code and take advantage of `Method` objects that work like function pointers in C++.
+- not meant to replace JavaBeans.
 
-### The `Class` class
-
-The Java runtime system always maintains what is called runtime type identification on all objects. This information keeps track of the class to which each object belongs.
+- instance fields of a record are automatically `final`.
 
 ```java
-System.out.println(e.getClass().getName() + " " + e.getName());
+record Point(double x, double y) {}
 ```
 
-`T.class` is the matching class object of type `T`. Note that `T` doesn't have to be a class. The `Class` class is actually a generic class. `Employee.class` is of type `Class<Employee>`. The virtual machine manages a unique `Class` object for each type.
+- The canonical constructor can have a compact form that show no parameters to preprocess the parameters as a prelude where the parameters are assigned to the fields.
 
 ```java
-var className = "java.util.Random"; // or any other name of a class with 
-                                    // a no-arg constructor
-Class cl = Class.forName(className);
-Object obj = cl.getConstructor().newInstance();
+record Range(int from, int to)
+{  
+    public Range // Compact form
+   {      
+      if (from > to) // Swap the bounds
+      {
+         int temp = from;
+         from = to;
+         to = temp;
+      }
+   }
+}
 ```
 
-This constructs a new instance of type `cl`;
+- Custom constructors are allowed but they must call the canoical constructor.
 
-TODO
 
 # Interfaces
 

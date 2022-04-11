@@ -1,0 +1,13 @@
+#+TITLE: Helper Tools
+
+* Validation
+
+** =org.hiberate.validator=
+
+* =io.springfox=
+
+- =ApiInfoBuilder= sets up title, version and others
+
+* =org.mapstruct.mapstruct=
+
+

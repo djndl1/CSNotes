@@ -1,5 +1,35 @@
 #+TITLE: Maven
 
+* What is Maven
+
+#+begin_quote
+Apply patterns to a project's build infrastructure in order to promote
+comprehension and productivity by providing a clear path in the use of best practices
+#+end_quote
+
+Essentially a project management and comprehension tool that manages
+
+- Builds
+
+- Documentation
+
+- Reporting
+
+- Dependencies
+
+- SCMs
+
+- Releases
+
+- Distribution
+
+* Archetype
+
+An original pattern or model from which all other things of the same kind.
+A template of a project which is combined with some user input to produce a
+working Maven project.
+
+
 * Quote Arguments under any Windows shell
 
 * POM Outline
@@ -34,6 +64,43 @@
 * [[https://maven.apache.org/plugins/index.html][Plugins]]
 
 Maven is not a single monolithic build tool but a plugin execution framework: all work is done by plugins.
+
+** Compiler Plugin
+
+Used to compile the sources of the project using =javax.tools.JavaCompiler=. This plugin has two goals:
+
+- =compiler:compile=: the =compile= phase, compile the main source files
+
+- =compiler:testCompile=: the =test-compile= phase, used to compile the test source files.
+
+*** Set language version and target VM version
+
+=maven.compiler.source= and =maven.compiler.target= in properties.
+
+=maven.compiler.release= (Since JDK 9): Java SE framework version, i.e. usable API.
+
+*** Pass Javac arguments
+
+#+begin_src xml
+<configuration>
+  <compilerArgs>
+    <arg>...</arg>
+  </compilerArgs>
+</configuration>
+#+end_src
+
+*** Set Toolchain
+
+#+begin_src xml
+<configuration>
+  <verbose>true</verbose>
+  <fork>true</fork>
+  <executable><!-- path-to-javac --></executable>
+  <compilerVersion>1.3</compilerVersion>
+</configuration>
+#+end_src
+
+Or use the toolchain plugin.
 
 * Create Projects
 

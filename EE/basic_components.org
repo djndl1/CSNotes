@@ -1,0 +1,229 @@
+#+TITLE: Basic Components
+
+* Semiconductor
+
+#+begin_quote
+A solid substance can conduct electric current only if it contains charged particles, electrons, which are free to move about and not attached to atoms.
+#+end_quote
+
+The conductivity of semiconductors can be greatly improved by replacing or adding certain donor or acceptor atoms (/doping/) to this crystalline structure thereby, producing more free electrons than holes or vice versa.
+
+** Extrinsic Semiconductor
+
+Doped with /doping agent/ to purposely give it different electrical properties than
+intrinsic semiconductor.
+
+*** N-Type Semiconductor
+
+Antimony/Phosphorus as /donor/ atoms, with an excess of current-carrying
+electrons. Positive-charged nuclei cannot move freely due to chemical bonds,
+while the free electrons move around.
+
+*** P-Type Semiconductor
+
+Aluminium, Boron or Indium (which have only three valence electrons in their outermost orbital) as /acceptor/ atoms. The four closed bond cannot be formed,
+leaving a hole for free electrons to fill in. The filled atoms are negatively charged, leaving free positively charged "holes".
+
+*** PN Junction
+
+Indivually, these two types are both valid materials that can conduct current, not much different from a normal useful conductor. However, when joined together, a large density gradient exists between bothe sides of the /PN junction/: free electrons from the N-type side move to the P-side to fill up the holes there,
+leaving the N-type positively charged. This /diffusion/ causes both sides lose electrical neutrality. This process goes on to a equilibrium where the formed voltage prevents any more free electrons from crossing the junction.
+This newly-formed layer (/The Deletion Layer/) is now depleted of any moer free
+charge carriers.
+
+#+begin_src
+                      Electrons move
+           N                                 P
+                    ┌─────────────►
+┌───────────────────┴┼───────┼───────┬──────────────────────────┐
+│                    │       │       │                          │
+│                    │       │       │                          │
+│                    │       │       │                          │
+│                    │       │       │                          │
+│                    │       │       │                          │
+│                    │   +   │   -   │                          │
+│                    │       │       │                          │
+│                    │       │       │                          │
+│                    │       │       │                          │
+│                    │       │       │                          │
+│                    │       │       │                          │
+└────────────────────┴───────┴───────┴──────────────────────────┘
+#+end_src
+
+Since the N-type has mainly free electrons, but maintains high potential, preventing carriers from easily crossing the junction. This /potential barrier/ opposes both the flow of holes and electrons across the junction.
+
+* Diode
+
+With both sides of a PN junction attached with electrical contacts, a /PN Junction diode/ is made.
+
+#+CAPTION: PN Junction Diode
+[[./pics/diode5.gif]]
+
+** PN Junction Diode
+
+*** With Zero External Voltage (Zero Bias)
+
+The potential barrier discourages the diffusion of majority carriers but helps minority carriers to drift across the junction.
+
+- /Forward Current/ $I_{F}$: a few holes in P-type side with enough energy move across the junction
+
+- /Reverse Current/ $I_{R}$: Since the N-type side has higher potential, the holes there move across the junction.
+
+This will at last result in a "Dynamic equilibrium".
+
+*** With Reverse Biase (External Voltage from N to P)
+
+The external voltage attracts majority carriers to the electrodes, widening the
+depletion layer.
+
+- /Reverse leakage current/: a small current that flows through the junction in $\mu A$
+
+A reverse bias high enough will overheat and break the diode, causing the diode
+to become shorted.
+
+*** With Forward Bias (External Voltage from P to N)
+
+The external voltage encourage majority carriers to cross the junction.
+
+- /knee/: the point where the potential barrier is overcome by the external voltage
+
+After the knee, the diode basically becomes shorted.
+
+** Signal Diode
+
+Small diodes generally used in electronic circuits.
+
+- Point Contact Diode
+
+- Glass Passivated Diode
+
+*** Parameters
+
+- Maximum Forward Current $I_{F\(max\)}$
+
+- Peak Inverse Voltage $V_{R\(max\)}$: the maximum allowable reverse operating
+  voltage that can be applied across the diode without reverse breakdown and damage. Usually less than the avalanche breakdown level.
+
+- Total Power Dissipation $P_{D\(max)\)}$: maximum possible power dissipation of the diode when it is forward biased
+
+- Maximum Operating Temperature: relates to the Junction Temperature
+
+*** Signal Diodes In Practice
+
+- Signal diode arrays: switching or clamping in digital circuits to protect against eletrostatic discharge (ESD) and voltage transients.
+
+- Signal diodes in series: provide a constant DC voltage across the diode combination.
+
+- Freewheel diodes: a diode connected in parallel witha coid or inductive load to prevent damage to the delicate switching circuit by suppressing the voltage spikes or transient that are generated when the load is suddenly turned off.
+  + when the coil is turned on, the diode is reversely biased, when the coil is
+    suddenly turned off, the inductive current flows forward through the coil.
+
+**** Related Reading
+
+[[https://www.allaboutcircuits.com/technical-articles/transient-voltage-suppressors-tvs-an-introduction/][An Introduction to Transient Voltage Suppressors (TVS)]]
+
+** Power Diodes and Rectifiers
+
+- Power Diodes: large PN junction area with a high-forward current capability up to serveral KA and a reverse blocking voltage of up to several KVs.
+  + not suitable for high-frequency applications over 1MHz.
+  + 1N400x Series Glass Passivated rectifying diodes
+
+- Rectification: the conversion of an alternating voltage into a continuous voltage
+  + uncontrolled (diodes), controlled (thyristor)
+  + Half-wave rectifier
+  + Smoothing Capcity: connect a large value (smoothing) capacitor across the output voltage terminals in parallel as a "temporary power source" to smooth the voltage.
+
+*** Full Wave Rectifier
+
+#+CAPTION: Full-wave rectifier
+[[./pics/diode-diode18.gif]]
+
+A larger transformer for a given power is required with two separate but
+identical secondary windings.
+
+**** Bridge Rectifier
+
+[[./pics/diode-diode20.gif]]
+
+No more special-center tapped transformer
+
+A smoothing capacity across the load improves the average DC output of the rectifier and reduces the AC variation of the rectified output.
+
+** Zener Diode
+
+Diode with a preconfigured avalanche breakdown voltage. Once the avalanche occurs with a reversed bias, the voltage ($V_{z}$)remains fairly constant over a wide range of reverse currents.
+
+The Zener diode is used in its reverse breakdown mode. This behavior can be used to regulate or stabilize a voltage source against supply or load variations. A simpliest type of voltage regulartors.
+
+- /voltage regulator/: provides a constant output voltage to a load connected in parallel with it in spite of the ripples in the supply voltage or variations in the load current.
+
+#+CAPTION: Zener Diode Regulator
+[[./pics/diode-diode24.gif]]
+
+- The diode can sometimes generate electrical noise on top of the DC supply as it tries to stablize the voltage. A large-value decoupling capacitor across the Zener's output may be required to give additional smoothing.
+
+*** Zener Diode In Practice
+
+- In series
+
+- Clipping: modify an iunput AC waveform or any sinusoid producing a differently
+  shape output waveform depending on the circuit arrangement.
+  + Diode clipper circuit (limiter)
+
+[[./pics/diode-diode42.gif]]
+
+*** LED
+
+Made from a very thin layer of fairly heavily doped semiconductor material.
+Light Emitting Diodes are made from exotic semiconductor compounds such as Gallium Arsenide (GaAs), Gallium Phosphide (GaP), Gallium Arsenide Phosphide (GaAsP), Silicon Carbide (SiC) or Gallium Indium Nitride (GaInN) all mixed together at different ratios to produce a distinct wavelength of colour. The epoxy resin shell concentrates the light emitted by the junction upward.
+
+- /1.2/ to /3.6/ volts with a forward current rating of about /10/ to /30/ mA, with /12/ to /20/ mA being the most common range.
+
+- Multi-coloured LEDs are now available that can produce a range of different colours from within a single device.
+
+- LEDs are typically controlled by ICs or transistors.
+
+- LED light intensity can be controlled using PWM, not just by current intensity.
+
+**** In Practice
+
+- Multicolored LED
+
+- Bi-color LED in inverse parallel to indicate the direction of the current.
+
+- LED Display
+
+- Opto-coupler: a couple of a LED and a photo-diode/transistor/triac. This provides an optical signal path between an input connection and an output connection while maintaining electrical isolation between two circuits.
+  + This electrical isolation is especially useful where the signal from a low voltage circuit such as a battery powered circuit, computer or microcontroller, is required to operate or control another external circuit operating at a potentially dangerous mains voltage.
+  + Opto-isolators are digital or switching devices, so they transfer either “ON-OFF” control signals or digital data. Analogue signals can be transferred by means of frequency or pulse-width modulation.
+
+
+
+
+** Bypass Diodes in Solar Panels
+
+
+
+** Schottky Diode
+
+Meta-semiconductor diode having a low forward voltage drop and a fast switching speed.
+
+Formed by joining together an N-type semiconductor and a metal electrode with no
+deleption layer. When forward biased, electrons from the n-type side moves to the anode, allowing the current to flow to the cathode. When reversed biased, the depletion layer is immediately widened since there are no minority carriers and diffusion. Thus, a Schottky diode can rapidly respond to changes in bias.
+
+- low forward voltage
+
+- low power dissipation due to the low knee voltage, suitable for low-voltage and high-current applications (in many integrated-circuits).
+
+- high-speed switching
+
+- larger reverse leakage current
+
+*** In Practice
+
+- Ohmic contacts: commonly used to connect semiconductor wafers and chips with
+  external connecting pins or circuitry of a system.
+
+- Logic Gates: high speed switching in TTL logic
+
+- Schottky Clamped Transistor: a standard bipolar junction transistor with a Schottky diode connected in parallel across its base-collector junction to keep the transistor out of hard saturation.

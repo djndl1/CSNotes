@@ -27,7 +27,75 @@ An international standard covering the exchange of date- and time-related data.
 
 ISO 8601 applies to representations and formats of dates in the Gregorian calendar and potentially proleptic Gregorian, of time based on the 24-hour timekeeping system with optional UTC offset, of time intervals, and combinations thereof. The standard does not assign any specific meaning to elements of the date/time to be represented; the meaning will depend on the context of its use.
 
-[ISO 8601 on Wikipedia](https://en.wikipedia.org/wiki/ISO_8601). Read the `General Principles`, `Dates`, `Times`. The External links has links to the draft of the standard.
+### [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) as a simplified version for us on web.
+
+Some takeaways
+
+- DST are hard to predict and determine, thus local offsets are used.
+
+- To ensure interoperability, devices that has no notion of UTC or timezone should either otain the time in UTC, use another host in the same local time zone as a bridge, or prompt the user for such settings.
+
+### Principles
+
+- Ordered from largest to smallest, with the lexicographical order the same to chronological order except for negative years or time offset..
+
+- fixed number of digits are padded with zeros.
+
+- hyphen between date components and colon between time components.
+
+- reduced precision by dropping the less significant components is allowed.
+
+- allow a decimal fraction to the smallest time value
+
+### Date
+
+`YYYY-MM-DD` (extended), `YYYY-MM`, `YYYYMMDD` (basic)
+
+- Year: `YYYY` or `+YYYYY` `-YYYYY`
+
+- Month: `MM` 01-12
+
+- Week `Www` e.g. `2009-W53-7` 01-53
+
+- Ordinal date `YYYY-DDD` e.g. `1981-095`: the 95th day of 1981
+
+### Time
+
+- `T[hh][mm][ss]` (basic), `T[hh]:[mm]:ss` where hh between 00 and 23, mm between 00 and 59, ss between 00 and 60 (the leap second)
+
+- `T` may be omitted in extended format.
+
+- `[ss]`, `[mm][ss]` may be omitted for reduced precision.
+
+### Timezone
+
+- Local time: no UTC relation information
+
+- UTC: `T09:30Z`
+
+- Time offsets from UTC: `+03:00`, `-0300`, `-03`
+
+### DateTime
+
+- `T` is not allowed to be removed now.
+
+### Duration
+
+- `P[n]Y[n]M[n]DT[n]H[n]M[n]S`, `P[n]W`: where `P` denotes duration. zero components can be omitted.
+
+- `PYYYYMMDDThhmmss`, `P[YYYY]-[MM]-[DD]T[hh]:[mm]:[ss]`
+
+### Time Intervals
+
+Between two time points.
+
+- combined date
+
+- start and duration
+
+- duration and end
+
+- duration only
 
 ## Time zone
 
@@ -42,6 +110,8 @@ The __tz database__ (tzdata, the zoneinfo database, or IANA time zone database)i
 ## daylight saving time/daylight time/summer time
 
 Daylight saving time is the practice of advancing clocks during summer months so that evening daylight lasts longer, while sacrificing normal sunrise times. Typically, regions that use daylight saving time adjust clocks forward one hour close to the start of spring and adjust them backward in the autumn.
+
+When switching to summer time, a gap is made. When switching back to winter time, an overlap is formed.
 
 # The Legacy API
 
@@ -59,7 +129,9 @@ the class `Date` represents a specific instant in time, with millisecond precisi
 
 ## Class `java.util.Calendar`
 
-Tries to solve the issues of `java.util.Date`
+A bridge between time instant and human calendars but has a DateTime component
+
+Tries to solve the issues of `java.util.Date` but has both a human calendar and a timestamp.
 
 - Mutable
 
@@ -67,8 +139,9 @@ Tries to solve the issues of `java.util.Date`
 
 - A civil-time calendar but also a millisecond timestamp
 
+The most used is `GregorianCalendar` (a proleptic Julian-Gregorian calendar). The user is supposed to create a `Calendar` and `getTime()` just to get a `Date`.
 
-# Java 8 =java.time= Package
+# Java 8 `java.time` Package
 
 https://londonjavacommunity.co.uk/about-jsr-310-a-new-java-datetime-api/
 
@@ -76,20 +149,145 @@ Mostly value-based, immutable and thread-safe.
 
 ## Java Time-scale
 
-86400 seconds a day without leap second (though the definition of second is not the same as the SI second).
+- 86400 seconds a day without leap second (though the definition of second is not the same as the SI second).
 
-Segmented along the timeline (UTC without leap seconds after 1972-11-03 and UT1 before that).
+- Segmented along the timeline (UTC without leap seconds after 1972-11-03 and UT1 before that).
+
+- Exactly matches the official time at noon each day.
+
+- Closely matches it elsewhere in a precisely defined day.
 
 The `Clock` implementation uses this timescale to provide the current time. The following classes are more or less based on this timescale and can be converted between each other.
 
-## `Instant`
+## `TemporalAccessor` (Readonly), `Temporal`
 
-Nanoseconds-precision Unix timestamp
+Do not use zoned time unless really needs absolute time instances.
 
-## `LocalTime`
+### `Instant`
+
+Nanoseconds-precision Unix timestamp. The maximum/minimum years representable are 10 billions years AC/CE.
+
+### `LocalTime`
 
 Nanosecond-precision ISO-8601 time without a timezone. A description of the local time on a wall clock.
 
-## `LocalDate`
+### `LocalDate`
 
 A date without a time-zone in the ISO-8601 calendar system. An immutable date-time object that represents a date, often viewed as year-month-day.
+
+### `LocalDateTime`
+
+Nanosecond-precision date-time without a timezone -in ISO-8601.
+
+### `ZoneId`
+
+A tiemzone ID such as `Europe/Paris`, used to identify the rules `ZoneRules` used to convert between an `Instant` and a `LocalDateTime`. Two distinct types exists
+
+- Fixed offsets: a fully-resolved offset from UTC/UT/GMT that uses the same offset for al local date-times.
+
+- Geographical regions: an area where a specific set of rules `ZoneRulesProvider` for finding the offset from UTC.
+
+`LocalDateTime.atZone(ZoneId)`
+
+### `ZonedDateTime`
+
+nanosecond-precision date-time with a timezone, viewed as a `LocalDateTime` combined with a `ZoneId`.
+
+When working with `ZonedDateTime` with daylight saving time, a `Duration` adds an exact number of time, while a `Period` add a conceptual day.
+
+### `OffsetDateTime`, `OffsetTime`
+
+model data in simpler applications. This class may be used when modeling date-time concepts in more detail, or when communicating to a database or in a network protocol.
+
+### `Year`
+
+### `YearMonth`
+
+### `MonthDay` `TemporalAccessor` but not `Temporal`
+
+## `TemporalAmount`
+
+### `Period`
+
+A date-based amount of time interval. e.g. `P2Y3M4D`
+
+### `Duration`
+
+nanosecond-precision time interval.
+
+- supports basic arithmetic operations.
+
+## TemporalAdjuster
+
+A tool for modifying temporal objects. They exist to externalize the process of adjustment.
+
+The implementation must take the input object and adjust it. It defines the logic of the adjustment and is responsible for documenting that logic.
+
+e.g. the next Tuesday, the first day of the month.
+
+```java
+LocalDate firstTuesday = LocalDate.of(year, month, 1).with(
+   TemporalAdjusters.nextOrSame(DayOfWeek.TUESDAY));
+   
+TemporalAdjuster NEXT_WORKDAY = w ->
+   {
+      var result = (LocalDate) w;
+      do
+      {
+         result = result.plusDays(1);
+      }
+      while (result.getDayOfWeek().getValue() >= 6);
+      return result;
+   };
+
+LocalDate backToWork = today.with(NEXT_WORKDAY);
+
+TemporalAdjuster NEXT_WORKDAY = TemporalAdjusters.ofDateAdjuster(w ->
+   {
+      LocalDate result = w; // No cast
+      do
+      {
+         result = result.plusDays(1);
+      }
+      while (result.getDayOfWeek().getValue() >= 6);
+      return result;
+   });
+```
+
+`TemporalAdjusters` contains common adjuster logic.
+
+## Enums
+
+Sane representations of months, years, days
+
+- `Month`
+
+- `DayOfWeek`
+
+## Formatting and Parsing
+
+Provides three kinds of formatters to format a `TemporalAccessor` and parse a `CharSequence`.
+
+- Predefined standard formatters
+
+- pattern letters
+
+- localized styles e.g. `SHORT`, `MEDIUM`, `LONG`
+
+## Interoperating With Legacy Code
+
+- `Date.toInstant()`, `Date.from(Instant)`
+
+- `GregorianCalendar.from(ZonedDateTime)`, `GregorianCalendar.toZonedDateTime()`
+
+- `Timestamp.from(Instant)`, `Timestamp.toInstant()`, `Timestamp.valueOf(LocalDateTime)`, `Timestamp.toLocalDateTime()`
+
+- `java.sql.Date.valueOf(LocalDate)`, `java.sql.Date.toLocalDate()`
+
+- `java.sql.Time.valueOf(LocalTime)`, `java.sql.Time.toLocalTime()`
+
+- `java.util.TimeZone.getTimeZone(ZoneId)`, `java.util.TimeZone.toZoneId()`
+
+- `java.nio.file.attribute.FileTime.from(Instant)`, `java.nio.file.attribute.FileTime.toInstant()`
+
+- `DateTimeFormatter.toFormat()`

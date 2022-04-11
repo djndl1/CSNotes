@@ -1,406 +1,304 @@
-One way to lower the latency and enabling multitasking.
+# Threading
 
-* Basics
+- /Thread/: the basic unit to which an operating system allocated processor time.
 
-/task/: =Task<T>= class, a unit of potentially high-latency work that produces  
-a resultant task value or desired side effect.
+- /Thread Context/: all the information the thread hnneds to seamlessly resume execution, including the thread's set of CPU registers and stack.
 
-/thread pool/: a collection of threads, along with logic for determining how to assign
-work to those threads.
+* Thread
 
-** Problems
+** =System.Threading.Thread=
 
-non-atomic operations; race conditions; complex memory models; deadlocks;
+- =ThreadState=: of interest only in a few debugging scenarios.
+  + thread abortion is not longer supported in new dotnet, better use a process for such code.
 
-1. monitoring an asynchronous operation state for completion;
+- =IsBackground=: Either foreground threads or background threads: foreground threads keep the process alive.
+  + the main application thread is a foreground thread
+  + any thread created by a =Thread= class constructor without setting it to background later is a foreground one
+  + all threads that enter the managed execution environment from unmanaged code is by default background
+  + thread pool threads are by default background.
 
-2. thread pooling;
+- External unmanaged threads in COM: the CLR checks in its TLS if the thread is already a CLR thread, if not, a new =Thread= object is created and installed in the TLS of that thread.
 
-3. avoiding deadlocks;
+- Thread Procedure Parameters: =ParameterizedThreadStart= might do, but a more type-safe way is to encapsulate both the thread procedure and the data fields into a worker object, and pass the thread procedure that uses the internal state of the worker object to the =Thread= object.
 
-4. providing atomicity across operations and synchronizing data access;
+- Thread Return value:
+  + pass a callback to the thread procedure to call.
 
-* TPL (Task Parallel Library)
+- =CurrentCulture= (culture-sensitive oprations as parsing and formatting, string comparison and sorting and also controls the writing system and calendar used by a thread), =CurrentUICulture= (culture-sensitive retrieval of resources in resource files)
+  + initialized by the current system culture =CultureInfo.DefaultThreadCurrentCulture= and UI culture (not true for TAP async operations).
 
-Instead of creating a OS thread, the TPL typically requests a worker thread fro the 
-thread pool. A task scheduler might use many different strategies to fulfill the purpose.
+- Thread Information
+  + Managed Thread id and hash code. Managed Threads do not directly map to unmanaged threads in a one-to-one way.
+  + =Name=
+  + =ThreadState=
+  + =ThreadPriority=
+  + =IsThreadPool=
+  + =IsBackground=
 
-/task/: an object that encapsulates work that executes asynchronously. uniquely
- identified by the =Id= property. =AsyncState= can be used to associated additional
-data with a task. The =IsCompleted= and =Status= properties are for querying the task's state.
+- Pausing and Interrupting
+  - =Thread.Sleep()=
+  - =.interrupt()=: interrupt a blocking (sleeping, waiting, joining) thread by throw a =ThreadInterruptedException= in the interrupted thread.
 
-
-Polling a worker for result is dangerous since the scheduler might decide 
-the task be carried out on the calling thread.
-
-=.ContinueWith()= sets a continuation for the current task. Several options exist 
-for tweaking the behavior, like starting only when the antecedent is cancelled/throwing 
-an unhandled exception/has run to completion, which can be used as an event listener.
-
-#+begin_src csharp
-     Task taskA = Task.Run( () =>
-               Console.WriteLine("Starting..."))
-          .ContinueWith(antecedent =>
-               Console.WriteLine("Continuing A..."));
-      Task taskB = taskA.ContinueWith( antecedent =>
-          Console.WriteLine("Continuing B..."));
-      Task taskC = taskA.ContinueWith( antecedent =>
-          Console.WriteLine("Continuing C..."));
-      Task.WaitAll(taskB, taskC);
-      Console.WriteLine("Finished!");
-#+end_src 
-
-Waiting on cancelled task or faulted task will result in an exception. The proper
-way to do this is to =.WaitAny=, which will throw an =AggregatedException= that
-then needs to be handled.
+- Cancellation: use =CancellationToken= for cooperative cancellation.
+  + the canceled operation should better throw an =OperationCanceledException= if needed.
+  + Operations can cancel itself by
+    + polling =CancellationToken.IsCancellationRequested= for long-running operations.
+    + registering a callback =CancellationToken.Register= if the operations becme blocked that they cannot check the value of the token in a timely manner. The registered method is called synchronously. Performing manual threading in a callback can cause deadlock.
+    + in case the async operation is using a wait handle and has no way to check the token. Synchronization prititives can be awaited but can be waken up by a cancellation.
+  + To listen to multiple cancellation tokens, =CancellationTokenSource.CreateLinkedTokenSource=.
 
 #+begin_src csharp
-Task<string> task = Task.Run<string>(
-              () => PiCalculator.Calculate(10));
-
-      Task faultedTask = task.ContinueWith(
-          (antecedentTask) =>
-          {
-              Trace.Assert(antecedentTask.IsFaulted);
-              Console.WriteLine(
-                  "Task State: Faulted");
-          },
-          TaskContinuationOptions.OnlyOnFaulted);
-
-      Task canceledTask = task.ContinueWith(
-          (antecedentTask) =>
-          {
-              Trace.Assert(antecedentTask.IsCanceled);
-              Console.WriteLine(
-                  "Task State: Canceled");
-          },
-          TaskContinuationOptions.OnlyOnCanceled);
-
-      Task completedTask = task.ContinueWith(
-          (antecedentTask) =>
-          {
-              Trace.Assert(antecedentTask.IsCompleted);
-              Console.WriteLine(
-                  "Task State: Completed");
-          },  TaskContinuationOptions.
-                  OnlyOnRanToCompletion);
-
-      completedTask.WaitAny(completedTask, canceledTask, faultedTask);
+int eventThatSignaledIndex =
+       WaitHandle.WaitAny(new WaitHandle[] { mre, token.WaitHandle },
+                          new TimeSpan(0, 0, 20));
 #+end_src
 
-Generally, unhandled exceptions on any thread are treated as fatal. All exceptions
-on all threads must be caught. For unhandled task in an asynchronous running task,
-the task scheduler inserts a catchall exception handler around the delegate .
+** =System.Threading.ThreadPool=
 
-#+begin_src csharp
-        var task = Task.Run(()  =>
-        {
-            throw new InvalidOperationException();
-        });
+provides a pool of threads but not really a pool of threads in the OOP sense.
 
-        try 
-        {
-            task.Wait();
-        }
-        catch (AggregateException e)
-        {
-            e.Handle(eachException => // handle them altogether
-            {
-                Console.WriteLine($"Error: {eachException.Message}");
-                return true;
-            });
-        }
-#+end_src
+Examples
+  - When creating a default =Task=.
+  - Asynchronous timer =System.Threading.Timer= and =System.Timer.Timer=
+  - wait handle callback =ThreadPool.RegisterWaitForSingleObject=: call a method in a thread-pool thread when signaled.
+  - =ThreadPool.QueueUserWorkItem=
 
-** Cooperative Cancellation by the TPL
+- One thread pool per process. The default size is determined by various factors such as the size of the virtual address space. The actual size can change during the lifetime of the process. The thread pool creates and destroys worker threads in order to optimize throughput.
 
-A task that supports cancellation monitors a =CancellationToken= object by
-periodically polling it to see if a cancellation request has been issued.
+- The managed thread pool does not clear the TLS used when reusing a thread.
 
-#+begin_src csharp
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using AddisonWesley.Michaelis.EssentialCSharp.Shared;
+- Not for Single-threaded apartment.
 
-public class Program
-{
-  public static void Main()
-  {
-      string stars = "*".PadRight(Console.WindowWidth-1, '*');
-      Console.WriteLine("Push ENTER to exit.");
-      CancellationTokenSource cancellationTokenSource=
-          new CancellationTokenSource();
-      
-      Task task = Task.Run(
-          () => WritePi(cancellationTokenSource.Token), 
-                        cancellationTokenSource.Token);
-      // Wait for the user's input
-      Console.ReadLine();
+** Timers
 
-      cancellationTokenSource.Cancel();// task is probably already running 
-      Console.WriteLine(stars);
-      task.Wait(); 
-      Console.WriteLine();
-  }
+- =System.Threading.Timer= (server-based or service component in an MT environment): executes a callback method defined when instantiated on a thread pool thread at regular intervals
+  + a simple, lightweight timer that uses callback method.
+  + due time (the delay before the first execution) and the period can be changed
+  + use =.Dispose(WaitHandle)= to wait until all callbacks have completed (this is not for a safe disposal of the timer). It signals when no callbacks are running. This method is provided to signal the end of the timer's lifetime (along with its callback).
 
-   private static void WritePi(
-      CancellationToken cancellationToken)
-  {
-      const int batchSize = 1;
-      string piSection = string.Empty;
-      int i = 0;
-      while(!cancellationToken.IsCancellationRequested || i == int.MaxValue)
-      {
-          piSection = PiCalculator.Calculate(
-              batchSize, (i++) * batchSize);
-          Console.Write(piSection);
-      }
-  }
-}
-#+end_src
+  + useful for a long-running server.
+  + has an =Elapsed= event to fire
+  + can be =AutoReset= to be periodic or only once.
+  + the event might be fired before the last one finishes, making reentrancy of the event handler a requirement.
+  + =SynchronizingObject=: for use with WinForms controls. A timer might stop before all queued event handlers (since the signal to fire the event is on the thread pool, unlike the winforms timer), thus resulting a race condition.
 
-The task is not rudely cancelled immediately but given some time to continue its
-operation before it finds out it has been cancelled and ends the task gracefully
-without aborting or exiting.
+- =System.Windows.Forms.Timer=
+  + requires a UI message pump
+  + always operate from the same thread or marshal the call onto another thread.
+  + low resolution compared to other timers.
 
+** Thread Local Storage
 
-The task acknowledged cancellation by throwing an
-=OperationCanceledException= with its own =CancellationToken= while the token
- was in signaled state, or the task's =CancellationToken= was already signaled
- before the task started executing.
+- TLS static field: best performance, compile-time needs anticipated
+  + =[ThreadStatic] static=: not shared between threads. Field intialization occurs only once on the first thread thus not reliable: the same TLS fields on other threads will not be initialized as expected.
 
-About [[https://docs.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads][Cancellation]].
+- Lazily Initialized =ThreadLocal<T>= class, recommended.
 
-** Start New Tasks
+- Data Slots =System.LocalDataStoreSlot=: flexible, slower and more awkward to use.
+  + A slot is a key to the value
+  + named and unnamed slots
+  + =Thread.AllocateNamedDataSlot()= (a slot for all threads), =GetNamedDataSlot=, =FreeNamedDataSlot=, =Thread.AllocateDataSlot=
+  + =Thread.SetData=, =Thread.GetData=
+  + Any slots can still be used even if =FreeNamedDataSlot= has freed it, as long as any =LocalDataStoreSlot= to it is still used. However, a new one is used if the slot name is used after freeing.
 
-=Task.Run()= should be used by default unless it proves insufficient.
- =Task.Factory.StartNew()= is for more options. Only in rare cases should creation
-be separated from scheduling, calling =Start()= after constructor initialization.
-For a long-running task, call =StartNew()= with =TaskCreationOptions.LongRunning=.
+*** Async Local
 
-It is possible to run a task synchronously using =Task.RunSynchronously()=
+#+begin_quote
+Because the task-based asynchronous programming model tends to abstract the use of threads, ~AsyncLocal<T>~ instances can be used to persist data across threads.
+#+end_quote
 
-** Tasks Are Disposable
+* Synchronization
 
-Task may allocate a =WaitHandle= when waiting for it to complete. The =WaitHandle=
-is typically disposed by a finalizer invocation when the program exits.
+- general definition: To cause two or more events or actions to happen at exactly the same time or same rate, or in a *time-coordinated* way.
 
-* Low-level System.Threading
+- *Thread Synchronization*  a mechanism which ensures that two or more concurrent processes or threads do not simultaneously execute some particular program segment known as critical section.
 
-=Thread= and =ThreadPool=
+- *Race Condition*: the condition of an electronics, software, or other system where the system's substantive behavior is dependent on the sequence or timing of other uncontrollable events.
 
-Putting a thread to sleep is a bad programming practice because the whole point
- of allocating an expensive resource like a thread is to get work out of that resource.
-Some use cases:
+** Synchronized Code Region
 
-1. sleep for zero delay to indicate a yielding.
+=Monitor= locks objects not value types. The monitor box every value object passed to it for each call, making the code unable to synchronize with other threads and unable to exit the critical region. The monitor maintains for each synchronized object
 
-2. simulate a high-latency task without actually computing in test code.
+- the thread the owns the lock
 
-Thread pools have the assumption that tasks are processor-bound and low-latency.
-=ThreadPool= can be deprecated entirely in favor of the TPL.
+- the threads ready to take the lock if available
 
-** =Thread=
+- the thread waiting for signaling to enter the ready queue
 
-Constructed with a =ThreadStart= (and =ParameterizedThreadStart=) delegate (not required for static methods).
-and then call =.Start()=. The current thread is retrieved by the =CurrentThread= static property.
+  The =Monitor= is pure managed full portable and possibly more efficient synchronization mechanism.
 
-Background threads do not keep a process running if all foreground threads have terminated, once 
-all foreground threads have been stopped, the runtime stops all background thrads and shuts down.
-The main thread and all explicitly constructed =Thread= objects are in the foreground.
-Thread pool threads and all threads that enter the managed execution environment from unmanaged code
-are background threads. =IsBackground= sets a thread to the background.
+*** Operations
 
-Each thread has a =CurrentCulture= that supports culture-sensitive operations such as 
-parsing and formatting, string comparison and sorting, and also controls the writing system
-and calendar used by a thread.
+- =Enter=, =TryEnter=: enter a critical section. Recursive locking is supported. Waiting on a lock can be =Thread.Interrupt=-ed.
 
-A thread has a name, a hash code (uniquely identifying a thread), a thread ID (doesn't necessarily fixed on an OS thread),
-current state, scheduling priority level, =IsThreadPoolThread=, =IsBackground=.
+- =Exit=: release the lock on the object, the end of a critical section protected by the locked object.
+
+- =Wait=, =Pulse=, =PulseAll=: similar to the semantics of a conditional variable but with one cv per lock. Callable only within the critical section.
+
+** =System.Collections.Concurrent=: builtin synchronized add/remove operations
+
+The traditional sync wrapper provides a [[https://docs.microsoft.com/en-us/archive/blogs/bclteam/synchronization-in-generic-collections-brian-grunkemeyer][false image]] that the threading problem can be easily solved by just using that wrapper.
+
+Insteead of traditional locking on =.SyncRoot= using a thread-safe wrapper from =.Synchronized()=, thread-safe collections use lightweight synchronization mechanism such as
+=SpinWait=, =SpinLock=, =SemaphoreSlim=, =CountdownEvent=. Some doesn't even use lock at all, =Interlocked= lock-free operations are used.
 
 
-* Task-Based Asynchronous Pattern
+*** =IProducerConsumerCollection<T>=
 
-the primitive version:
+Thread-safe collections intended for producer/consumer usage.
+
+*** =BlockingCollection<T>=
+
+- An implementation of producer/consumer pattern (e.g. pipeline)
+  - concurrent addition and removal of items from multiple threads
+  - a bounded colletion (with a predefined limited maximum capacity) that blocks =Add= and =Take= operations when the collection is full or empty.
+    + This prevents the producer from moving too far ahead of the consumers.
+  - Addition and removal are cancellable to allow unblocking.
+  - =GetConsumingEnumerable=: the client can consume (take elements from) the collection with an =IEnumerable<T>=
+  - One can use multiple such =BlockCollection<T>= as a resource pool with =TakeFromAny= and =AddToAny=
+
+- Warning! =IDiposable= (and not thread-safe to dispose)
+
+#+begin_quote
+A producing thread can call =CompleteAdding= to indicate that no more items will be added. Consumers monitor the =IsCompleted= property to know when the collection is empty and no more items will be added (so that both the producer and consumer can gracefully shutdown). A producer task adds items to the collection as long as some external condition is true, and then calls =CompleteAdding=. The consumer task takes items until the =IsCompleted= property is true.
+#+end_quote
+
+=CompleteAdding= means the production will end and no more items will be available from this collection.
+
+This collection uses an underlying =IProducerConsumerCollection= as the data store. The default one is a =ConcurrentQueue<T>=.
+
+*** =ConcurrentDictionary=
+
+Operations such as =GetOrAdd=, =AddOrUpdate= are thread-safe but not atomic. One thread that =GetOrAdd= might not get what it adds if the item doesn't exist already, but gets an item added by another thread.
+
+Various =Try*= methods exist because the key might have already been added/removed.
+
+** Manual Synchronization
+
+*** =WaitHandle=: Native OS synchronization handles.
+
+Represent all synchronization objects in the runtime that allow multiple wait operations.
+
+- =WaitOne=: blocks and wait for a signal
+
+- =SignalAndWait=: signal and wait another
+
+- =WaitAny=, =WaitAll=
+
+**** =System.Threading.Mutex=
+
+- more overhead than the =Monitor= class.
+- named mutexes can be used globally with any processes =Global\= or session-locally =Local\=.
+  + On Windows, every login is a session. Services typically run in a different non-interactive session. On Unix, a shell has its own session.
+  + if the name already exists, the already-created named session is used.
+- can be used with other =WaitHandle=.
+- Recursive
+- using abandoned mutex (a mutex acquired but not released by a thread before disposal) results in an =AbandonedMutextException=
+
+**** =System.Threading.Semaphore=, =System.Threading.SemophoreSlim=
+
+A number that represent currently allowed concurrent entries to manage a limited resource.
+
+- named semaphores can be used globally or session-locally.
+
+- A thread can decide to release several entries.
+
+- recursive
+
+- has no thread affinity
+
+=SemaphoreSlim= supports async waits and does not use kernel semaphores.
+
+**** =EventWaitHandle=: Thread Synchronization Event
 
 
-#+BEGIN_SRC csharp
-using System;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
-using System.Runtime.ExceptionServices;
+*** =CountdownEvent=
 
-public class Program
-{
-  public const string DefaultUrl =
-      "https://IntelliTect.com";
+Signaled when its count reaches zero.
 
-  public static void Main(string[] args)
-  {
-      if (args.Length == 0)
-      {
-          Console.WriteLine("ERROR: No findText argument specified.");
-          return;
-      }
-      string findText = args[0];
+- can be used to unblock multiple threads with a signal from one thread.
 
-      string url = DefaultUrl;
-      if (args.Length > 1)
-      {
-          url = args[1];
-          // Ignore additional parameters
-      }
-      Console.Write(
-          $"Searching for '{findText}' at URL '{url}'.");
+*** =ReaderWriterLock= (deprecated), =ReaderWriterLockSlim=
 
-      using WebClient webClient = new WebClient();
-      Console.Write("\nDownloading...");
-      Task task = webClient.DownloadDataTaskAsync(url)
-          .ContinueWith(antecedent =>
-          {
-              byte[] downloadData = antecedent.Result;
-              Console.Write("\nSearching...");
-              return CountOccurrencesAsync(
-                  downloadData, findText);
-          })
-          .Unwrap()
-          .ContinueWith(antecedent =>
-          {
-              int textOccurrenceCount = antecedent.Result;
-              Console.WriteLine(
-                  @$"{Environment.NewLine}'{findText}' appears {
-                      textOccurrenceCount} times at URL '{url}'.");
-          });
-      try
-      {
-          while(!task.Wait(100))
-          {
-              Console.Write(".");
-          }
-      }
-      catch(AggregateException exception)
-      {
-          exception = exception.Flatten();
-          try
-          {
-              exception.Handle(innerException =>
-              {
-                  // Rethrowing rather than using
-                  // if condition on the type
-                  ExceptionDispatchInfo.Capture(
-                      innerException)
-                      .Throw();
-                  return true;
-              });
-          }
-          catch(WebException)
-          {
-              // ...
-          }
-          catch(IOException )
-          {
-              // ...
-          }
-          catch(NotSupportedException )
-          {
-              // ...
-          }
-      }
-  }
+Protects a resource that is read by multiple threads and written to by one thread at a time.
 
-  private static Task<int> CountOccurrencesAsync(
-        byte[] downloadData, string findText)
-  {
-      // ...
-  }
-}
-#+END_SRC
+- Read-Writer lock alternates between a collection of readers and one writer. As long as a writer is waiting for the lock, other readers are also blocked (so that the writer is not blocked indefinitely by chance).
 
-The `async`/`await` version
+- a thread can enter the lock in three modes
+  + read mode: one or more reader threads
+  + write mode: only one writer thread has acquired the lock
+  + upgradable read mode: for cases where a thread usually reads but sometiems write (e.g. =AddOrUpdate=). A reader thread in upgradable mode =EnterUpgradableReadLock= can =(Try)EnterWriteLock= and
+    =ExitUpgradableReadLock= after finishing the job. A thread in upgradeable mode can =EnterReadLock= to downgrade to upgradable read mode.
 
-#+BEGIN_SRC csharp
-using System;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
+- Mutex rules: a thread might block for several reasons
+  + a reader thread might block if there is a writer thread has acquired or is waiting for the lock.
+  + the thread is a writer and any other threads are in the above three modes.
+  + a thread that tries to enter upgradeable mode blocks if there is already a thread in upgradeable mode, if there are threads waiting to enter write mode or if there is a single thread in write mode.
+  + Recursion is not enabled.
 
-public class Program
-{
-  public const string DefaultUrl =
-      "https://IntelliTect.com";
 
-  public static async Task Main(string[] args)
-  {
-      if (args.Length == 0)
-      {
-          Console.WriteLine("ERROR: No findText argument specified.");
-          return;
-      }
-      string findText = args[0];
+*** =System.Threading.SpinLock=
 
-      string url = DefaultUrl;
-      if (args.Length > 1)
-      {
-          url = args[1];
-          // Ignore additional parameters
-      }
-      Console.Write(
-          $"Searching for '{findText}' at URL '{url}'.");
+A mutex that spins while it waits to acquire a lock. Use with care and profile performance of the code before switching to =SpinLock=.
 
-      using WebClient webClient = new WebClient();
-      Task<byte[]> taskDownload =
-          webClient.DownloadDataTaskAsync(url);
+- Beneficial when locks are fine-grained and large in number.
 
-      Console.WriteLine("Downloading...");
-      byte[] downloadData = await taskDownload;
-      Task<int> taskSearch = CountOccurrencesAsync(
-          downloadData, findText);
+- a spin lock might yield the time space.
 
-      Console.WriteLine("Searching...");
-      int textOccurrenceCount = await taskSearch;
+*** =System.Threading.SpinWait=
 
-      Console.WriteLine(
-          @$"{Environment.NewLine}'{findText}' appears {
-              textOccurrenceCount} times at URL '{url}'.");
-  }
+Common spinning logic. It spins several times before it starts to yield.
 
-  private static async Task<int> CountOccurrencesAsync(
-      byte[] downloadData, string findText)
-  {
-      int textOccurrenceCount = 0;
+*** Barrier: the End of One Phase of Work
 
-      using MemoryStream stream = new MemoryStream(downloadData);
-      using StreamReader reader = new StreamReader(stream);
+Useful when a parallel operation occurs in phases.
 
-      int findIndex = 0;
-      int length = 0;
-      do
-      {
-          char[] data = new char[reader.BaseStream.Length];
-          length = await reader.ReadAsync(data);
-          for (int i = 0; i < length; i++)
-          {
-              if (findText[findIndex] == data[i])
-              {
-                  findIndex++;
-                  if (findIndex == findText.Length)
-                  {
-                      // Text was found
-                      textOccurrenceCount++;
-                      findIndex = 0;
-                  }
-              }
-              else
-              {
-                  findIndex = 0;
-              }
-          }
-      }
-      while (length != 0);
+#+begin_quote
+A group of tasks cooperate by moving through a series of phases, where each in the group signals it has arrived at the Barrier in a given phase and implicitly waits for all others to arrive. The same Barrier can be used for multiple phases.
+#+end_quote
 
-      return textOccurrenceCount;
-  }
-}
-#+END_SRC
+All threads reaching the barrier signal and wait for other threads until enough threads have signaled.
+
+** Atomic Operations =System.Threading.Interlocked=
+
+- Simple atomic operations: =Add=, =And=, =Or=, =Increment=, =Decrement=, =Exchange=
+
+- =Read=: Atomic load a 64-bit integer (mainly for 32-bit systems).
+
+- =CompareExchange=: used for atomic state change on a certain condition.
+
+*** Memory Barrier
+
+Full memory barrier.
+
+- Sequential Consistency:
+
+** Exception Handling
+
+Certain unhandled exceptions =ThreadAbortException=, =AppDomainUnloadedException= does not terminate the app but only the threads (thought the termination of the main thread would terminate the app).
+
+- Unhandled exceptions thrown in thread pool threads only returns the handle back to the thread pool.
+
+- Do not swallow exceptions during development, testing.
+
+** Static Members
+
+#+begin_quote
+To prevent the execution of code on a type that is not initialized, the common language runtime blocks all calls from other threads to static members of the class until the class constructor (~static~ constructor) has finished running.
+#+end_quote
+
+** Tips and Practices
+
+- Do not call =Thread.Abort= on other threads (not available in .NET Core).
+
+- Do not use random public objects (=this= of type objects) with =Monitor=
+
+- Do use multiple threads for tasks that require different resources, and avoid assigning multiple threads to a single resource.
+
+- use =Interlocked= for simple state changes.
+
+For class libraries
+
+- Avoid the need for synchronization if possible
+
+- make static data thread safe by default, instance data should not be thread safe by default.

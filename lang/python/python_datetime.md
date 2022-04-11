@@ -10,21 +10,54 @@ object
         datetime    # a combination of time and date 
 ```
 
+DateTime types are of microsecond-precision.
 
-The datetime module supplies classes for manipulating dates and times in both simple and complex ways.
+There are two kinds of date and time objects: 
 
-There are two kinds of date and time objects: “naive” and “aware”. An aware object has sufficient knowledge of applicable algorithmic and political time adjustments, such as time zone and daylight saving time information, to locate itself relative to other aware objects. A naive object does not contain enough information to unambiguously locate itself relative to other date/time objects. Such information is purely up to the program to interpret. 
+- naive: an aware object has sufficient knowledge of applicable algorithmic and political time adjustments, such as time zone and daylight saving time information, to locate itself relative to other aware objects. 
 
-Objects of `date` type are always naive. An object of type `time` or `datetime` may be naive or aware depending on whether it has a proper `tzinfo` object.
+- aware: a naive object does not contain enough information to unambiguously locate itself relative to other date/time objects. Such information is purely up to the program to interpret. 
 
-## class `date` 
+`date​`s are always naive. `time` or `datetime` may be naive or aware depending on whether it has a proper `tzinfo` object.
 
-Several useful factory methods:
+`date`, `datetime`, `time` and `timezone` are 
 
-- classmethod `.today()` return the current local date. Equivalent to `date.fromtimestamp(time.time())`
+- immutable
 
-- classmethod `.fromtimestamp()`: return the local date corresponding to the POSIX timestamp
+- hashable
 
-- classmethod `.fromordinal()`: the date corresponding the proleptic Gregorian ordinal
+- support efficient pickling
 
-- classmethod `.fromisoformat()`: return a `date` corresponding to a date string.
+- limited support for ISO-8601
+
+## `timedelta`
+
+A duration, the difference between two dates or times.
+
+- supports `+`, `-`, `*`, `/`, `//`, `%`, with `timedelta` and other date-time types
+
+- comparisons are supported
+
+## `date` 
+
+Represents a date (year, month, day)
+
+## `datetime`
+
+microsecond-precision date-time
+
+- No leap second
+
+- `datetime.now(timezone.utc)`/`datetime.fromtimestamp(timestamp, timezone.utc)` is better than `datetime.utcnow()`/`datetime.utcfromtimestamp()` as the latter has no time zone.
+
+- supports `+` (with `timedelta`), `-` (with `datetime` and `timedelta`) and comparison with `datetime`
+
+## `time`
+
+A time of day
+
+## `tzinfo`
+
+### `timezone`
+
+Fixed offset from UTC, doesn't support daylight saving time.
