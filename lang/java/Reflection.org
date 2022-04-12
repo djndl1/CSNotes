@@ -58,3 +58,25 @@ Like C#, Java can have resource files packed with related classes.
 
 - ~java.lang.reflect.Modifier~: Modifiers are represented as bit flags.
   + various methods for decoding.
+
+** Objects Reflection
+
+- ~obj.getClass()~, ~cls.getDeclaredField('filedName')~, ~field.get(obj)~
+
+- The security mechanism of Java ensures that an inaccessible field cannot be casually accessed unless ~field.setAccessible(true)~.
+  + useful for debuggers, persistent storage and similar mechanisms.
+
+** Generic Array Code
+
+#+begin_src java
+    public static <T> T[] copyOf (T[] array, int length) {
+        Class cls = array.getClass();
+        if (!cls.isArray()) return null;
+
+        var newArray = Array.newInstance(cls.getComponentType(), length);
+
+        System.arraycopy(array, 0, newArray, 0, Math.min(length, array.length));
+
+        return (T[])newArray;
+    }
+#+end_src
