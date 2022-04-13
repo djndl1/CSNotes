@@ -1,0 +1,16 @@
+#+TITLE: Containers and Collections
+
+* Basic Builtin Types
+
+Anything that implements the iterable protocol (~__iter__()~) is iterable.
+
+- *Iterator*: similar to Java's ~Iterator~ or C#'s ~Enumerator~. Iterators are iterable themselves (but only one-pass).
+
+- *Container*: its ~__iter__()~ (typicall via ~iter()~) can returns an new iterator to allow multiple iteration passes.
+
+- *Generator Function*: a convenient way to implement the iterator protocol. It employs the ~yield~ expression and returns a *generator iterator*.
+
+- *Generator Iterator*: an iterator returned by a generator function.
+  + ~send()~: send a value as the return value of the ~yield~ expression (~value = yield value~ is legal) and resume the generator (~__next()~ returns ~None~).
+  + ~close()~:
+  + ~throw()~: throw an exception at the yield expression
