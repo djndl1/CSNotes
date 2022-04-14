@@ -14,3 +14,37 @@ Anything that implements the iterable protocol (~__iter__()~) is iterable.
   + ~send()~: send a value as the return value of the ~yield~ expression (~value = yield value~ is legal) and resume the generator (~__next()~ returns ~None~).
   + ~close()~:
   + ~throw()~: throw an exception at the yield expression
+
+** Sequence Types
+
+*** Common Operations
+
+- test membership: ~x in s~, ~x not in s~
+
+- concatenation ~s + t~
+
+- repetition ~s * n~: shadow copy
+
+- indexer ~s[i]~, ~s[i:j]~, ~s[i:j:k]~: slices are automatically clamp to ~len(s)~ if needed. ~None~ is converted to ~0~ or ~len(s)~ depending on its position.
+
+- ~min(s)~, ~max(s)~
+
+- length: ~len(s)~
+
+- ~s.count(x)~:
+
+- indexOf: ~s.index(x, [i, [j]])~
+
+*** Operations of Mutable Sequences
+
+- assignment to slices and indexers
+
+- deletion of certain range of elements
+
+- ~append()~, ~insert()~, ~extend()~
+
+- ~clear()~, ~pop()~, ~remove()~
+
+- ~copy()~
+
+- ~reverse()~ in place
