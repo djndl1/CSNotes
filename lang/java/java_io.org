@@ -8,7 +8,21 @@ A separate hierarchy provides classes, inheriting from the abstract
 
 * Some Basic Classes
 
-- ~File~: an abstract representation of file and directory pathnames.
+- ~File~ (legacy): an abstract representation of file and directory pathnames. Just =toPath()= and use ~Path~
+
+
+- ~Path~: used to locate a file in a file system. A hierarchical path composed of a sequence of directory and file name elements separated by a special separator or delimiter.
+  + doesn't have to correspond to a file that exists (it's not a ~FileInfo~, similar to ~URI~)
+  + more convenient that the legacy ~File~
+  + ~Paths.get()~ or better ~Path.of()~
+  + can ~resolve()~ (combine paths), ~relativize()~, ~normalize()~
+
+- ~Files~: does the actual filesystem operations.
+  + common filesystem operations
+  + file metadata
+  + quick and dirty file I/O operations
+  + =list()=​s or =walk=​s a directory lazily, goes through ~newDirectoryStream()~ or traverses by ~walkFileTree~.
+  + can access a ZIP file system.
 
 * Input/Output Stream =java.io=
   :PROPERTIES:
@@ -126,33 +140,16 @@ and =write(byte[])= methods.
   :CUSTOM_ID: binary-data
   :END:
 
-The =DataOutput= interface provides for converting data from any of the
-Java primitive types to a series of bytes and writing these bytes to a
-binary stream.
+- ~DataOuptut~: converting data from any of the Java primitive types to a series of bytes and writing these bytes to a binary stream.
+  + In Java, all values are written in the big-endian fashion, regardless of
+    the processor. That makes Java data files platform-independent.
+  + do not use ~writeUTF~
+- ~DataOutputStream~:A data output stream lets an application write primitive Java data types to an output stream in a portable way.
 
-In Java, all values are written in the big-endian fashion, regardless of
-the processor. That makes Java data files platform-independent.
+- ~DataInput~: The DataInput interface provides for reading bytes from a binary stream and reconstructing from them data in any of the Java primitive types.
+- ~DataInputStream~: A data input stream lets an application read primitive Java data types from an underlying input stream in a machine-independent way.
 
-Since nobody else uses the Java version of the modification of UTF-8,
-one should only use the =writeUTF= method to write strings intended for
-a Java virtual machine.
-
-The =DataInput= interface provides for reading bytes from a binary
-stream and reconstructing from them data in any of the Java primitive
-types.
-
-#+BEGIN_SRC java
-  var in = new DataInputStream(new FileInputStream("employee.dat"));
-  var out = new DataOutputStream(new FileOutputStream("employee.dat"));
-#+END_SRC
-
-=RandomAccessFile=, implementing =DataOutput= and =DataInput=, supports
-both reading and writing to a random access file.
-
-#+BEGIN_SRC java
-  var in = new RandomAccessFile("employee.dat", "r");
-  var inOut = new RandomAccessFile("employee.dat", "rw");
-#+END_SRC
+- =RandomAccessFile=: implementing =DataOutput= and =DataInput=, supports both reading and writing to a random access file. (your plain old C file API)
 
 #+BEGIN_SRC java
   public static void writeFixedString(String s, int size, DataOutput out)
@@ -165,9 +162,7 @@ both reading and writing to a random access file.
         out.writeChar(ch);
      }
   }
-#+END_SRC
 
-#+BEGIN_SRC java
   public static String readFixedString(int size, DataInput in) throws IOException {
       var b = new StringBuilder(size);
       int i = 0;
