@@ -185,6 +185,12 @@ both reading and writing to a random access file.
   }  
 #+END_SRC
 
+* Object Serialization
+
+- ~Serializable~: https://docs.oracle.com/javase/8/docs/platform/serialization/spec/serialTOC.html
+
+  TODO
+
 * Working With =Files=
   :PROPERTIES:
   :CUSTOM_ID: working-with-files
