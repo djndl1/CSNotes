@@ -125,3 +125,11 @@ class Point(namedtuple('Point', ['x', 'y'])):
     def __str__(self):
         return 'Point: x=%6.3f  y=%6.3f  hypot=%6.3f' % (self.x, self.y, self.hypot)
 #+end_src
+
+** ~Collection.abc~ Abstract Base Classes for Containers
+
+The user may
+
+- inherit these ABC to write a new container type
+
+- register an existing container type as a subclass of an ABC
