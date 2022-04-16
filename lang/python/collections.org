@@ -48,3 +48,62 @@ Anything that implements the iterable protocol (~__iter__()~) is iterable.
 - ~copy()~
 
 - ~reverse()~ in place
+
+*** Lists: mutable, heterogeneous
+
+- ~sort()~: in place sort
+
+*** Tuple: immutable, heterogeneous
+
+*** Range: immutable seqeunce of numbers
+
+- for looping a specific number of items in ~for~ loops
+
+- lazy evaluation
+
+*** ~str~: Immutable Text Sequence
+
+*** ~bytes~ (immutable), ~bytearray~ (mutable): manipulating binary data
+
+- can convert to (~.hex()~) and from (~fromhex()~) hexdecimal number.
+
+*** ~memoryview~: access the internal data of an object
+
+An element of ~memoryview~ may or may not be a byte.
+
+- ~cast()~ to another format is possible i.e. change how the memory view is interpreted.
+** Hashable
+
+Has a hash value which never changes during its lifetime.
+
+- necessarily immutable
+
+- has ~__hash__()~ and ~__eq__()~
+
+- Immutable containers are hashable if there elements are hashable.
+
+- UDTs are hashable derived from there ~id()~
+
+** Set
+
+- ~set~ (mutable), ~frozenset~ (immutable)
+
+Unordered collection of distinct hashable objects.
+
+- Sets do not support indexing, slicin or other sequence-like behavior.
+
+- Supports set comparison based on set's semantics.
+
+- set operations through ~|~, ~^~ (symmetric difference), ~&~, ~-~ (difference): unlike method set operations, these operators only support set types.
+
+- ~>~​/​~<~ test proper superset/subset, ~>=~​/​~<=~   test superset/subset
+
+** Dict
+
+A mpaping object maps hashable values to arbitrary objects.
+
+- ~|~, ~|=~: merge dicts
+
+- ~=~: comparisons are based on kv-pairs.
+
+- Dictionary order is guaranteed to be insertion order
