@@ -107,3 +107,21 @@ A mpaping object maps hashable values to arbitrary objects.
 - ~=~: comparisons are based on kv-pairs.
 
 - Dictionary order is guaranteed to be insertion order
+
+* ~Collections~ Module: Specialized container datatypes
+
+- ~namedtuple()~: a type construction function that creates namedtuple type
+  + replacement of tuple
+  + construction arguments are of string: e.g. ~namedtuple('Point', ['x', 'y'])~
+  + can have default values for fields
+  + subclassing is possible
+
+#+begin_src python
+class Point(namedtuple('Point', ['x', 'y'])):
+    __slots__ = ()
+    @property
+    def hypot(self):
+        return (self.x ** 2 + self.y ** 2) ** 0.5
+    def __str__(self):
+        return 'Point: x=%6.3f  y=%6.3f  hypot=%6.3f' % (self.x, self.y, self.hypot)
+#+end_src
