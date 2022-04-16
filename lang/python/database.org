@@ -1,0 +1,28 @@
+#+TITLE: Database
+
+* [[https://peps.python.org/pep-0249][DBAPI]]
+
+- ~Connection~: created by the ~.connect()~ method
+  + closeable
+  + support transactions
+  + create a ~cursor~ to perform database operations.
+
+- ~cursor~: a database cursor used to perform database operations
+  + closeable
+  + cursors are not isolated from each other.
+  + has the ~.description~ of columns and ~.rowcount~ of affected rows.
+  + ~callproc()~, ~.execute()~ query or command, ~executemany()~ a query or command with a set of parameters.
+  + ~fetch*()~ results in a variety of ways.
+  + some databases support multiple result sets ~.nextset()~
+
+- parameter styles:
+
+- database data types
+  + ~Date()~, ~Time()~, ~Timestamp()~, ~Binary()~, ~DateFromTicks()~, ~TimeFromTicks()~, ~TimestampFromTicks()~ creates various objects mapping to their corresponding database types.
+  + ~STRING~, ~BINARY~, ~NUMBER~, ~DATETIME~, ~ROWID~ type codes are provided
+  + database null is represented by ~None~
+
+- ~Error~: of ~StandardError~
+  + ~DatabaseError~
+    + ~InternalError~, ~OperationalError~, ~ProgrammingError~, ~IntegrityError~, ~DataError~, ~NotSupportedError~
+  + ~InterfaceError~
