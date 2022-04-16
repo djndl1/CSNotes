@@ -108,6 +108,14 @@ A mpaping object maps hashable values to arbitrary objects.
 
 - Dictionary order is guaranteed to be insertion order
 
+* ~array~: efficient asrrays of numeric values
+
+Typed array of numeric elements.
+
+#+begin_src python
+c = array('b', [1, 2, 3, 4, 20])
+#+end_src
+
 * ~Collections~ Module: Specialized container datatypes
 
 - ~namedtuple()~: a type construction function that creates namedtuple type
