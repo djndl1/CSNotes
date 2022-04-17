@@ -134,6 +134,17 @@ class Point(namedtuple('Point', ['x', 'y'])):
         return 'Point: x=%6.3f  y=%6.3f  hypot=%6.3f' % (self.x, self.y, self.hypot)
 #+end_src
 
+- ~defaultdict()~: has a factory method to provide a default one if the one being retrieved is missing
+  + ~int~ missing factory for counting
+
+#+begin_src python
+s = 'mississippi'
+d = defaultdict(int)
+for k in s:
+    d[k] += 1
+
+#+end_src
+
 ** ~Collection.abc~ Abstract Base Classes for Containers
 
 The user may
