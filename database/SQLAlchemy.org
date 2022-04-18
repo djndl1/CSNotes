@@ -1,15 +1,5 @@
 #+TITLE: Sql Alchemy
 
-* DB-API 2.0
-
-The two core constructs are
-
-1. =Connection=: represents a connection to the database and provides transactional behavior.
-
-2. =Cursor=: represents the execution of a command or a query, associated with a connection.
-
-SQL parameters may be passed in five different styles, depending on the DBAPI implementation. The exact type mapping of parameters is implementation-defined, however the implementation must provide standardized functions to construct objects of the corresponding python types.
-
 * Core: SQLAlchemy Expression Language, A Backend-Neutral SQL in Python style
 
 Interfacing with the database is done through =sqlalchemy.engine.Engine= (=create_engine=) and =sqlalchemy.engine.Connection= (typically =engine.connect()=).
