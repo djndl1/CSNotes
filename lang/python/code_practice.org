@@ -36,7 +36,29 @@
 
 ** Documentation
 
-- Write docstrings for all public modules, functions, classes and methods
+- Write [[>][docstrings]] for all public modules, functions, classes and methods
+
+- string literal lines can act as documentation or comments
+
+Multiline docstrings
+
+- *script docstring*: usage of the script
+
+- *module docstring*: list the exported classes, exceptions and functions, with a one-line summary for each.
+  + *package docstring*: list subpackages and modules also.
+
+- *function/method docstring*: summarize the behavior and documents its arguments, return values, side effects, exception raised and restrictions on when it can be called.
+
+- *class docstring*: behavior, public methods and instance variables.
+
+#+begin_src python
+def my_func():
+    """this is my function
+
+       more details go here
+    """
+#+end_src
+
 
 ** Nameing Convention
 
