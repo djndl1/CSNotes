@@ -89,6 +89,15 @@ CallableStatement cs4 = conn.prepareCall
                        ( "begin ? := func(?,?); end;" ) ; // stored func
  #+end_src
 
+** JDBC Escape Syntax
+
+#+begin_quote
+JDBC provides a way of smoothing out some of the differences in the way different DBMS vendors implement SQL. This is called escape syntax. Escape syntax signals that the JDBC driver, which is provided by a particular vendor, scans for any escape syntax and converts it into the code that the particular database understands. This makes escape syntax DBMS-independent.
+#+
+
+- date, time, timestamp literals: ~{d 'yyyy-mm-dd'}~, ~{t 'hh:mm:ss'}~, ~{ts yyyy-mm-dd hh:mm:ss[.f...]}~
+
+
 ** Transactions
 
 - by default auto-commit mode. no =commit= or =rollback= is allowed. =Connection.setAutoCommit()=
@@ -186,3 +195,56 @@ A connection (session) with a specific datbase, under the context of which SQL s
 Vendors of web containers and application servers supply connection pool implementations.
 Using a connection pool is completely transparent to the programmer.
 Acquire a connection from a source of pooled connections by obtaining a data source and calling ~getConnection~.
+
+** Apache DbUtils
+
+- ~ResultSetHandler~: a generic interface that can convert a ~ResultSet~ to other objects.
+  + doesn't support ~java.time~ directly.
+  + a few common implementations that transform ~ResultSet~ into arrays, maps and JavaBeans are provided.
+  + each provided implementation uses an ~RowProcessor~ (~BasicRowProcessor~ by default) to handle row transformation.
+    + the ~RowProcessor~ in turn employs a ~BeanProcessor~ (a more powerful ~GenerousBeanProcessor~ is available) to convert columns into JavaBean properties. By default, columns are mapped to properties by case-insensitive names.
+    + Columns are handled by various implementations of ~ColumnHandler~ and ~PropertyHander~ loaded as services by ~BeanProcessor~. The ~BeanProcessor~ reads columns by ~ColumnHandler~ and coerces them using a ~PropertyHandler~ if available and compatible.
+
+- ~SqlNullCheckedResultSet~, ~StringTrimmedResultSet~: two useful ~ResultSet~ wrappers.
+
+*** An example of ~LocalDateTimePropertyHandler~
+
+Use SPI to write a jar that contains this handler and add it to the classpath. DbUtils will load it and properly convert ~Timestamp~ to ~java.time~ types.
+
+#+begin_src java
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import org.apache.commons.dbutils.ColumnHandler;
+import org.apache.commons.dbutils.PropertyHandler;
+
+public class LocalDateTimePropertyHandler implements PropertyHandler {
+
+    @Override
+    public boolean match(Class<?> parameter, Object value) {
+        final String targetType = parameter.getName();
+        if ("java.time.LocalDateTime".equals(targetType)) {
+            return true;
+        } else if ("java.time.LocalDate".equals(targetType)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Object apply(Class<?> parameter, Object value) {
+        final String targetType = parameter.getName();
+        if ("java.time.LocalDate".equals(targetType)) {
+            Timestamp tsValue = (Timestamp) value;
+            value = tsValue.toLocalDateTime().toLocalDate();
+        } else if ("java.time.LocalDateTime".equals(targetType)) {
+            Timestamp tsValue = (Timestamp) value;
+            value = tsValue.toLocalDateTime();
+        }
+
+        return value;
+    }
+}
+#+end_src
