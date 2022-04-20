@@ -198,6 +198,8 @@ Acquire a connection from a source of pooled connections by obtaining a data sou
 
 ** Apache DbUtils
 
+A more flexible but less featured Dapper.
+
 - ~ResultSetHandler~: a generic interface that can convert a ~ResultSet~ to other objects.
   + doesn't support ~java.time~ directly.
   + a few common implementations that transform ~ResultSet~ into arrays, maps and JavaBeans are provided.
@@ -206,6 +208,13 @@ Acquire a connection from a source of pooled connections by obtaining a data sou
     + Columns are handled by various implementations of ~ColumnHandler~ and ~PropertyHander~ loaded as services by ~BeanProcessor~. The ~BeanProcessor~ reads columns by ~ColumnHandler~ and coerces them using a ~PropertyHandler~ if available and compatible.
 
 - ~SqlNullCheckedResultSet~, ~StringTrimmedResultSet~: two useful ~ResultSet~ wrappers.
+
+- ~StatementConfiguration~: configuration options for a ~Statement~, configures fetch direction, fetch size, the maximum size of a field, the maximum number of rows in a ~ResultSet~ and the timeout.
+
+- ~QueryRunner~: responsible for actually executing SQLs.
+    + it wraps a ~DataSource~ to provide connections and uses a ~StatementConfiguration~ to configure ~Statement~​s.
+    + results are handled by the passed ~ResultSetHandler~.
+    + easy handling of ~OutParameter~ for inout or out parameters.
 
 *** An example of ~LocalDateTimePropertyHandler~
 
