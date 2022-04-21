@@ -1,0 +1,18 @@
+#+TITLE: Functional
+
+* Basic Functions
+
+- ~map~: returns a ~map~ type representing a mapping operation.
+
+ #+begin_src python
+def plus_one(a): return a + 1
+def plus(a, b): return a + b
+
+v1 = [1, 2, 3, 4]
+v2 = [4, 3, 2, 1]
+
+print(list(map(plus_one, v1)))
+print(list(map(plus, v1, v2)))
+ #+end_src
+
+- ~filter~: a ~filter~ type, an operation, ~filter(lambda x: x > 5, [1, 2, 5, 6, 7])~
