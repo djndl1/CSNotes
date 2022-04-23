@@ -257,3 +257,31 @@ public class LocalDateTimePropertyHandler implements PropertyHandler {
     }
 }
 #+end_src
+
+
+** HikariCP Connection Pooling
+
+~HikariDataSource~ is a pooled ~DataSource~ implementation.
+
+#+begin_src java
+HikariConfig config = new HikariConfig();
+config.setJdbcUrl("jdbc:mysql://localhost:3306/simpsons");
+config.setUsername("bart");
+config.setPassword("51mp50n");
+config.addDataSourceProperty("cachePrepStmts", "true");
+config.addDataSourceProperty("prepStmtCacheSize", "250");
+config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+HikariDataSource ds = new HikariDataSource(config);
+#+end_src
+
+Or in the property file
+
+#+begin_src
+dataSourceClassName=org.postgresql.ds.PGSimpleDataSource
+dataSource.user=test
+dataSource.password=test
+dataSource.databaseName=mydb
+dataSource.portNumber=5432
+dataSource.serverName=localhost
+#+end_src
