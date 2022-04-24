@@ -52,9 +52,9 @@ exits   |  +---------------------------------+         |
 
 # Thread Properties
 
-## Interrupting
+## Interrupting (Cancellation)
 
-the `interrupt` method can be used to request termination of a thread. When the `interrupt` method is called on a thread, the _interrupted status_ of the thread is set. Each thread should occasionally check whether it has been interrupted.
+the `interrupt` method can be used to request termination of a thread. When the `interrupt` method is called on a thread, the _interrupted status_ of the thread is set. Each thread should occasionally check whether it has been interrupted. (C#'s `CancellationToken`)
 
 ```java
 while (!Thread.currentThread().isInterrupted() && more work to do)
@@ -90,11 +90,11 @@ Runnable r = () -> {
 
 ## Daemon Threads
 
-`.setDaemon(true)`. A daemon is simply a thread that has no other role in life than to serve others. Examples are timer threads that send regular “timer ticks” to other threads or threads that clean up stale cache entries. When only daemon threads remain, the virtual machine exits. There is no point in keeping the program running if all remaining threads are daemons.
+`.setDaemon(true)`. a thread that has no other role in life than to serve others. Examples are timer threads that send regular “timer ticks” to other threads or threads that clean up stale cache entries. When only daemon threads remain, the virtual machine exits. There is no point in keeping the program running if all remaining threads are daemons.
 
 ## Handlers for Uncaught Exceptions
 
-The `run` method of a thread cannot throw any checked exceptions, but it can be terminated by an unchecked exception. In that case, the thread dies. Before the thread dies, the exception is passed to a handler for uncaught exceptions. The handler implements `Thread.UncaughtExceptionHandler`. If you don't install a handler for an individual thread, the handler is the thread's `ThreadGroup` object (A thread group is a collection of threads that can be managed together).
+The `run` method of a thread can be terminated by an unchecked exception under which case the thread dies. Before the thread dies, the exception is passed to a handler for uncaught exceptions that implements `Thread.UncaughtExceptionHandler`. If a handler for an individual thread is not installed, the handler is the thread's `ThreadGroup` object (*LEGACY, NOT RECOMMENDED*)
 
 ## Thread Priorities
 
@@ -103,7 +103,6 @@ A thread inherits the priority of the thread that constructed it. You can increa
 Thread priorities are highly system-dependent. When the virtual machine relies on the thread implementation of the host platform, the Java thread priorities are mapped to the priority levels of the host platform, which may have more or fewer thread priority levels.
 
 Thread priorities may have been useful in early versions of Java that didn’t use operating systems threads. You should not use them nowadays.
-
 
 # Synchronization
 
