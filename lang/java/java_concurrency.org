@@ -1,0 +1,719 @@
+Multithreading is extremely useful in practice. Graphical user interface
+(GUI) programs have a separate thread for gathering user interface
+events from the host operating environment
+
+* Thread States
+  :PROPERTIES:
+  :CUSTOM_ID: thread-states
+  :END:
+
+Threads can be in one of six states:
+
+- new: created but not yet running. A certain amount of bookkeeping
+  needs to be done before a thread can run.
+
+- runnable: after invoding =.start()=, the thread is in the runnable
+  state. A runnable thread may or may not actually be running. A thread
+  can =yield= its control.
+
+- blocked: when a thread tries to acquire an intrinsic object lock and
+  the lock is currently held by another thread, it becomes blocked.
+
+- waiting: when a thread waits for another thread to notify the
+  scheduler of a condition
+
+- timed waiting: several methods have a timeout parameter.
+
+- terminated: the =run= method exits normally or an uncaught exception
+  terminates the =run= method.
+
+When a thread is blocked or waiting (or, of course, when it terminates),
+another thread will be scheduled to run. When a thread is reactivated
+(for example, because its timeout has expired or it has succeeded in
+acquiring a lock), the scheduler checks to see if it has a higher
+priority than the currently running threads. If so, it preempts one of
+the current threads and picks a new thread to run.
+
+#+BEGIN_SRC sh
+      +--------+
+      |        |
+      |  new   |                                +---------+
+      |        |                                |         |
+      +---|----+     acquiring a lock           |  bloked |
+          | +---------------------------------->+         |
+          | |  +-------<------------------------|---------+
+  start   | ^  |   lock acquired
+          | |  |
+          | |  |
+          | |  v
+      +---v-|--+                                +---------+
+      |        | waiting for notification       |         |
+      |runnable+------------------------------> | waiting |
+      |        |    notification occurred       |         |
+      +---|--|-+ <------------------------------|---------+
+          |  ^ |
+          |  | |  waiting for timeout or notification
+  run     |  | +------------------------------>+---------+
+  method  |  |                                 |  timed  |
+  exits   |  +---------------------------------+         |
+          | timeout or notification occurred   | waiting |
+          v                                    +---------+
+      +---|------+
+      |          |
+      |terminated|
+      |          |
+      +----------+
+#+END_SRC
+
+~stop()~ a threading might causing inconsistency and causing data loss.
+~suspend()~​/​~resume()~ may lead to deadlocks since the suspended might hold a lock that the caller is trying to obtain.
+
+* Thread Properties
+  :PROPERTIES:
+  :CUSTOM_ID: thread-properties
+  :END:
+
+** Interrupting (Cancellation)
+   :PROPERTIES:
+   :CUSTOM_ID: interrupting-cancellation
+   :END:
+
+the =interrupt= method can be used to request termination of a thread.
+When the =interrupt= method is called on a thread, the /interrupted
+status/ of the thread is set. Each thread should occasionally check
+whether it has been interrupted. (C#'s =CancellationToken=)
+
+#+BEGIN_SRC java
+  while (!Thread.currentThread().isInterrupted() && more work to do)
+  {
+     do more work
+  }
+#+END_SRC
+
+When the =interrupt= method is called on a thread that blocks on a call
+such as =sleep= or =wait=, the blocking call is terminated by an
+=InterruptedException=.
+
+There is no language requirement that a thread which is interrupted
+should terminate. Interrupting a thread simply grabs its attention. The
+interrupted thread can decide how to react to the interruption. Some
+threads are so important that they should handle the exception and
+continue. But quite commonly, a thread will simply want to interpret an
+interruption as a request for termination
+
+#+BEGIN_SRC java
+  Runnable r = () -> {
+     try {
+        . . .
+        while (!Thread.currentThread().isInterrupted() && more work to do)
+        {
+           do more work
+        }
+     }
+     catch(InterruptedException e) {
+        // thread was interrupted during sleep or wait
+     }
+     finally {
+        cleanup, if required
+     }
+     // exiting the run method terminates the thread
+  };
+#+END_SRC
+
+if your loop calls =sleep=, don't check the interrupted status. Instead,
+catch the exception.
+
+** Daemon Threads
+   :PROPERTIES:
+   :CUSTOM_ID: daemon-threads
+   :END:
+
+=.setDaemon(true)=. a thread that has no other role in life than to
+serve others. Examples are timer threads that send regular "timer ticks"
+to other threads or threads that clean up stale cache entries. When only
+daemon threads remain, the virtual machine exits. There is no point in
+keeping the program running if all remaining threads are daemons.
+
+** Handlers for Uncaught Exceptions
+   :PROPERTIES:
+   :CUSTOM_ID: handlers-for-uncaught-exceptions
+   :END:
+
+The =run= method of a thread can be terminated by an unchecked exception
+under which case the thread dies. Before the thread dies, the exception
+is passed to a handler for uncaught exceptions that implements
+=Thread.UncaughtExceptionHandler=. If a handler for an individual thread
+is not installed, the handler is the thread's =ThreadGroup= object
+(/LEGACY, NOT RECOMMENDED/)
+
+** Thread Priorities
+   :PROPERTIES:
+   :CUSTOM_ID: thread-priorities
+   :END:
+
+A thread inherits the priority of the thread that constructed it. You
+can increase or decrease the priority of any thread with the
+=setPriority= method. You can set the priority to any value between
+=MIN_PRIORITY= (defined as 1 in the Thread class) and =MAX_PRIORITY=
+(defined as 10). =NORM_PRIORITY= is defined as 5.
+
+Thread priorities are highly system-dependent. When the virtual machine
+relies on the thread implementation of the host platform, the Java
+thread priorities are mapped to the priority levels of the host
+platform, which may have more or fewer thread priority levels.
+
+Thread priorities may have been useful in early versions of Java that
+didn't use operating systems threads. You should not use them nowadays.
+
+* Synchronization
+  :PROPERTIES:
+  :CUSTOM_ID: synchronization
+  :END:
+
+The problem is that access to shared data is not atomic, it can be
+interrupted in the middle.
+
+** Lock Objects
+   :PROPERTIES:
+   :CUSTOM_ID: lock-objects
+   :END:
+
+- =Lock= interface: doesn't work with ~try~-resource statement. Try lombok's ~@Cleanup("unlock")~
+  + provides interruptible, non-interruptible and timed lock.
+  + =ReentrantLock=
+  + =ReentrantReadWriteLock=
+
+
+** Condition Object/Variables
+   :PROPERTIES:
+   :CUSTOM_ID: condition-objectvariables
+   :END:
+
+Often, a thread enters a critical section only to discover that it can't
+proceed until a condition is fulfilled. Use a condition object to manage
+threads that have acquired a lock but cannot do useful work.
+
+#+BEGIN_SRC java
+  // inferior solution
+
+  public void transfer(int from, int to, int amount) {
+     bankLock.lock();
+     try {
+        while (accounts[from] < amount) {
+           // unlock and wait
+           . . .
+        }
+        // transfer funds
+        . . .
+     }
+     finally {
+        bankLock.unlock();
+     } 
+#+END_SRC
+
+- =Condition=: a condition variable
+  + A lock object can have one or more associated condition.
+  + Once a thread calls the =await= method, it enters a wait set for that condition. The thread is not made
+    runnable when the lock is available. Instead, it stays deactivated until
+    another thread has called the =signalAll= method on the same condition.
+    When a thread calls =await=, it has no way of reactivating itself.
+  + =signal()= notifies one thread, which can be dangerous since if this
+    thread's condition has not been satisfied, the whole system deadlocks.
+
+** Synchronized Keyword
+
+Every object in Java has an intrinsic lock. If a method is declared with
+the =synchronized= keyword, the object's lock protects the entire
+method. That is, to call the method, a thread must acquire the intrinsic
+object lock. The instrinsic lock has a single associated condition (~wait()~, ~notify()~, ~notifyAll()~).
+
+Static synchronized methods lock the class object.
+
+#+BEGIN_SRC java
+  class Bank
+  {
+     private double[] accounts;
+     public synchronized void transfer(int from, int to, int amount) 
+           throws InterruptedException {
+        while (accounts[from] < amount)
+           wait(); // wait on intrinsic object lock's single condition
+        accounts[from] -= amount;
+        accounts[to] += amount;
+        notifyAll(); // notify all threads waiting on the condition
+     }
+     public synchronized double getTotalBalance() { . . . }
+  }
+#+END_SRC
+
+- Do not use =Lock=, =Condition= or =synchronized= if possible. There are other mechanism in =java.util.concurrent=.
+
+- Use =synchronized= first if sufficient. Use =Lock=​/​=Condition= for additional power.
+
+The =synchronized= keyword may choose to lock on a certain object.
+
+#+BEGIN_SRC java
+  synchronized (obj) {
+  // critical section
+  }
+#+END_SRC
+
+It's possible to use an ad-hoc lock
+
+#+BEGIN_SRC java
+  public class Bank
+  {
+     private double[] accounts;
+     private var lock = new Object();
+     . . .
+     public void transfer(int from, int to, int amount) {
+        synchronized (lock) // an ad-hoc lock, RAII simulation! {
+           accounts[from] -= amount;
+           accounts[to] += amount;
+        }
+        System.out.println(. . .);
+     }
+  }
+#+END_SRC
+
+*** The Monitor Concept
+   :PROPERTIES:
+   :CUSTOM_ID: the-monitor-concept
+   :END:
+
+- Has only privaste fields
+
+- Each instance has an associated lock
+
+- This lock locks every method of the object.
+
+The Java designer loosely adapted the monitor concept.
+    + Every object in Java has an intrinsic lock and an intrinsic condition.
+    + If a method is declared with the ~synchronized~ keyword, it acts like a monitor method.
+    + The condition variable is accessed by calling =wait=/=notifyAll=/=notify=.
+
+** =volatile= and =final=
+   :PROPERTIES:
+   :CUSTOM_ID: volatile-and-final
+   :END:
+
+- =volatile=: a lock-free mechanism for synchronizing access to an instance field.
+    + The compiler will insert the appropriate code to ensure that a change to
+      the done variable in one thread is visible from any other thread that reads the variable.
+    + It does not provide any atomicity.
+
+#+BEGIN_SRC java
+  private volatile boolean done;
+  public boolean isDone() { return done; }
+  public void setDone() { done = true; }
+#+END_SRC
+
+- =final=: guarantee the field is properly initialized.
+
+** Atomics ~java.util.concurrent.atomic~
+   :PROPERTIES:
+   :CUSTOM_ID: atomics
+   :END:
+
+OOP atomic operations.
+
+** On-Demand Initialize-Once
+
+Static variables are initialized only once and are protected by a lock.
+
+#+begin_src java
+public class OnDemandData {
+    private OnDemandData() { ... }
+
+    public static OnDemanData() getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    private static Holder
+    {
+        static final OnDemanData INSTANCE = new OnDemandData();
+    }
+}
+#+end_src
+
+** Thread-Local Variables
+   :PROPERTIES:
+   :CUSTOM_ID: thread-local-variables
+   :END:
+
+#+BEGIN_SRC java
+  public static final ThreadLocal<SimpleDateFormat> dateFormat
+     = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+
+  String dateStamp = dateFormat.get().format(new Date());
+#+END_SRC
+
+* Thread-Safe Collections
+  :PROPERTIES:
+  :CUSTOM_ID: thread-safe-collections
+  :END:
+
+You can protect a shared data structure by supplying a lock, but it is
+usually easier to choose a thread-safe implementation instead.
+
+** Blocking Queues
+   :PROPERTIES:
+   :CUSTOM_ID: blocking-queues
+   :END:
+
+Many threading problems can be formulated elegantly and safely by using
+one or more queues. Producer threads insert items into the queue, and
+consumer threads retrieve them. Instead of having every thread transfer
+data, insert transfer object into a queue and let one thread handlle the
+transfers, no synchronization needed.
+
+A blocking queue causes a thread to block when you try to add an element
+when the queue is currently full or to remove an element when the queue
+is empty. Blocking queues are a useful tool for coordinating the work of
+multiple threads. Worker threads can periodically deposit intermediate
+results into a blocking queue. Other worker threads remove the
+intermediate results and modify them further. The queue automatically
+balances the workload.
+
+Use =put= and =take= when using the queue as a thread management tool.
+
+The =java.util.concurrent= package supplies several variations of
+blocking queues. By default, the =LinkedBlockingQueue= has no upper
+bound on its capacity, but a maximum capacity can be optionally
+specified. The =LinkedBlockingDeque= is a double-ended version. The
+=ArrayBlockingQueue= is constructed with a given capacity and an
+optional parameter to require fairness. The =PriorityBlockingQueue= is a
+priority queue, not a first-in/first-out queue. Elements are removed in
+order of their priority. A =DelayQueue= contains objects that implement
+the =Delayed= interface. Elements can only be removed from a
+=DelayQueue= if their delay has elapsed. Java 7 adds a =TransferQueue=
+interface that allows a producer thread to wait until a consumer is
+ready to take on an item.
+
+** Efficient Maps, Sets and Queues
+   :PROPERTIES:
+   :CUSTOM_ID: efficient-maps-sets-and-queues
+   :END:
+
+The =java.util.concurrent= package supplies efficient implementations
+for maps, sorted sets, and queues: =ConcurrentHashMap=,
+=ConcurrentSkipListMap=, =ConcurrentSkipListSet=, and
+=ConcurrentLinkedQueue=. These collections return /weakly consistent
+iterators/, meaning that these iterators may not reflect all
+modifications that are made after they were constructed. The concurrent
+hash map can efficiently support a large number of readers and a fixed
+number of writers.
+
+To atomically update an entry of a map, use =compute= method:
+
+#+BEGIN_SRC java
+  map.compute(word, (k, v) -> v == null ? 1 : v + 1);
+#+END_SRC
+
+Also, there are =computeIfPresent= and =computeIfAbsent=.
+
+#+BEGIN_SRC java
+  map.computeIfAbsent(word, k -> new LongAdder()).increment(); // lazy evaluation
+#+END_SRC
+
+The =.merge()= has a parameter for the initial value if not present in
+the map. Otherwise the function passed is called, combining the existing
+value and the initial value.
+
+#+BEGIN_SRC java
+  map.merge(word, 1L, Long::sum);
+#+END_SRC
+
+The Java API provides bulk operations on concurrent hash maps that can
+safely execute even while other threads operate on the map. The bulk
+operations traverse the map and operate on the elements they find as
+they go along.
+
+- =search=
+
+- =reduce=: combines all keys and/or value, using a provided
+  accumulation function
+
+- =forEach=: applies a function to all keys and/or values
+
+It is possible to specify a parallelism threshold so that the bulk
+operation is parallelized when the map contains more elements than the
+threshold.
+
+#+BEGIN_SRC java
+  String result = map.search(threshold, (k, v) -> v > 1000 ? k : null);
+  map.forEach(threshold, (k, v) -> k + " -> " + v, System.out::println);
+  Long sum = map.reduceValues(threshold, Long::sum);
+
+  Integer maxlength = map.reduceKeys(threshold,
+     String::length, // transformer
+     Integer::max); // accumulator
+#+END_SRC
+
+There is no =ConcurrentHashSet= class, The static =newKeySet= method
+yields a =Set<K>= that is actually a wrapper around a
+=ConcurrentHashMap<K, Boolean>=. (All map values are =Boolean.TRUE=).
+
+#+BEGIN_SRC java
+  Set<String> words = ConcurrentHashMap.<String>newKeySet();
+#+END_SRC
+
+The =CopyOnWriteArrayList= and =CopyOnWriteArraySet= are thread-safe
+collections in which all mutators make a copy of the underlying array so
+that iterators have consistent view that it can access without any
+synchronization expense.
+
+The =Arrays= class has a number of parallelized operations. The static
+=Arrays.parallelSort= method can sort an array of primitive values or
+objects. The =parallelSetAll= method fills an array with values that are
+computed from a function. =parallelPrefix= method replaces each array
+element with the accumulation of the prefix for a given associative
+operation.
+
+* Tasks and Thread Pools
+  :PROPERTIES:
+  :CUSTOM_ID: tasks-and-thread-pools
+  :END:
+
+** ~Future~
+   :PROPERTIES:
+   :CUSTOM_ID: callables-and-futures
+   :END:
+
+- =Callable=: similar to a =Runnable= but returns a value.
+
+#+BEGIN_SRC java
+  public interface Callable<V>
+  {
+     V call() throws Exception;
+  }
+#+END_SRC
+
+- =Future=: holds the result of an asynchronous operation.
+  + allows determination of whether execution has completed, and provides a means to cancel execution
+  + =get()= when the result is ready, block if not.
+  + =cancel()= the operation
+  + Subinterfaces
+    - ~RunnableFuture~: a ~Future~ that is also a ~Runnable~
+    - ~ScheduledFuture~: a delayed (scheduled in the future) ~Future~.
+
+- ~FutureTask~: A simple ~RunnableFuture~ implementation, a ~Future~ container for an async operation.
+
+*** ~CompletableFuture~
+
+TODO
+
+** Executors
+   :PROPERTIES:
+   :CUSTOM_ID: executors
+   :END:
+
+- =Executor=: separate thread management and creation from the rest of the application.
+  + ~execute()~ a ~Runnable~.
+
+- =ExecutorService= (extends =Executor=): a more complete asynchronous task execution framework.
+  + supports ~Future~ for async tasks: ~submit()~, ~invokeAll()~
+  + can ~shutdown()~ to stop accepting tasks or ~shutdownNow()~ to attempt to stop all active tasks immediately.
+    Use ~awaitTermination()~ to wait for submitted tasks to finish execution.
+
+- =ScheduledExecutorService= (a replacement for ~java.util.Timer~): schedule commands to run after a given delay or to execute periodically
+
+  Most of the executor in ~java.util.concurrent~ use thread pools.
+
+- =Executors=: provides a number of static factory methods for constructing thread pools.
+  + =newCachedThreadPool=: expandable thread pool; idle threads are kept (cached) for 60 seconds; for short-lived tasks
+  + =newFixedThreadPool=: a fixed set of threads; idle threads are kept indefinitely;
+  + =newWorkStealingPool=: A pool suitable for "fork-join" tasks in which
+    complex tasks are broken up into simpler tasks and idle threads "steal" simpler tasks;
+  + =newSingleThreadExecutor=: A "pool" with a single thread that executes the submitted tasks sequentially;
+  + =newScheduledThreadPool=: A fixed-thread pool for scheduled execution;
+  + =newSingleThreadScheduledExecutor=: A single-thread "pool" for scheduled execution.
+
+A better way is to use =ExecutorCompletionService= manages a blocking
+queue of =Future= objects, containing the results of the submitted tasks
+as they become available.
+
+#+BEGIN_SRC java
+  var service = new ExecutorCompletionService<T>(executor);
+  for (Callable<T> task : tasks) service.submit(task);
+  for (int i = 0; i < tasks.size(); i++)
+     processFurther(service.take().get()); // take the Future once the result is available
+#+END_SRC
+
+*** The Fork-Join Framework
+    :PROPERTIES:
+    :CUSTOM_ID: the-fork-join-framework
+    :END:
+
+    TODO
+
+The fork-join framework is designed to support computationally intensive tasks such as image or video processing.
+
+Suppose a problem like
+
+#+BEGIN_SRC java
+  if (problemSize < threshold) 
+     solve problem directly
+  else {
+     break problem into subproblems
+     recursively solve each subproblem
+     combine the results
+  }
+#+END_SRC
+
+#+BEGIN_SRC java
+  class Counter extends RecursiveTask<Integer> {
+     . . .
+     protected Integer compute() {
+        if (to - from < THRESHOLD)
+        {
+           solve problem directly
+        }
+        else {
+           int mid = (from + to) / 2;
+           var first = new Counter(values, from, mid, filter);
+           var second = new Counter(values, mid, to, filter);
+           invokeAll(first, second);
+           return first.join() + second.join();
+        }
+     }
+  }
+#+END_SRC
+
+Read more at [[https://en.wikipedia.org/wiki/Work_stealing][Work Stealing]]
+
+** Asynchronous Computations
+   :PROPERTIES:
+   :CUSTOM_ID: asynchronous-computations
+   :END:
+
+*** Completable Futures
+    :PROPERTIES:
+    :CUSTOM_ID: computable-futures
+    :END:
+
+Event-based async task (C# ~Task~).
+
+- Supports continuation (~.thenAccept()~).
+
+- ~.supplyAsync()~: C# ~Task.Run()~
+
+**** Make an Async Operation
+
+#+BEGIN_SRC java
+  public CompletableFuture<String> readPage(URL url) {
+     return CompletableFuture.supplyAsync(() -> { // implicitly set the result of the future from the functor
+           try {
+              return new String(url.openStream().readAllBytes(), "UTF-8");
+           }
+           catch (IOException e) {
+              throw new UncheckedIOException(e);
+           }
+        }, executor);
+  }
+#+END_SRC
+
+The =CompletableFuture= is called completable because it's also a promise (the result can be set explictly). C# ~Task.FromResult()~, ~Task.FromException()~
+
+#+BEGIN_SRC java
+  var f = new CompletableFuture<Integer>();
+  executor.execute(() ->
+     {
+        int n = workHard(arg);
+        f.complete(n);
+     });
+  executor.execute(() ->
+     {
+        int n = workSmart(arg);
+        f.complete(n);
+     });
+
+  Throwable t = . . .;
+  f.completeExceptionally(t);
+#+END_SRC
+
+**** Result Handling
+
+A =CompletableFuture= can complete in two ways:
+
+- successful with a result
+
+- with an uncaught exception
+
+Use =whenComplete= method to handle both cases.
+
+#+BEGIN_SRC java
+  f.whenComplete((s, t) -> {
+     if (t == null) { Process the result s; }
+     else { Process the Throwable t; }
+  });
+#+END_SRC
+
+**** Cancellation
+
+
+Canceling sets a =CompletableFuture= object to be completed exceptionally
+with a =CancellationException=. In general, this makes sense
+since a =CompletableFuture= may not have a single thread that is responsible for its completion.
+
+**** Continuation/Composing Asynchronous Tasks
+
+Event-based async callbacks with a chain of async tasks are difficult to manage. Java supports composing
+completable futures
+
+- ~thenApply()~
+
+- ~thenCompose()~: compose async functions (i.e. the result of the first one is automatically unwrapped and passed to the next async ~Future~).
+
+- ~handle()~, ~exceptionally()~: async result handling.
+
+- ~allOf~, ~anyOf~: C# ~Task.WhenAll()~, ~Task.WhenAny()~
+
+
+*** Long-Running Tasks in User Interface Callbacks
+    :PROPERTIES:
+    :CUSTOM_ID: long-running-tasks-in-user-interface-callbacks
+    :END:
+
+User interfaces are not thread-safe. Each user interface library provides some
+mechanism to schedule a ~Runnable~ for execution on the UI thread. It is
+tedious to implement user feedback in a worker thread, so each user
+interface library provides some kind of helper class for managing the
+details. After each work unit, update the UI to show prograss. After the
+work is finised, make a final stage to the UI.
+
+**** Swing
+
+- ~EventQueue.invokeLater()~ to marshal the call.
+
+- ~SwingWorker~
+
+** Processes
+   :PROPERTIES:
+   :CUSTOM_ID: processes
+   :END:
+
+=Process= class executes a command (which cannot be a shell built-in) in
+a separate operating system process and intereacts with its own standard
+input, output and error streams. =ProcessBuild= class configures a
+=Process= object.
+
+#+BEGIN_SRC java
+  var builder = new ProcessBuilder("gcc", "myapp.c");
+#+END_SRC
+
+=.directory()= changes the =directory= method. =getOutputStream()=,
+=getInputStream()= and =getErrorStream()= returns stdout, stdin and
+stderr by default. =.redirectIO= is possible.
+
+To modify the environment variables of the process, get the
+=environment= from the builder and put or remove entries.
+
+(Java 9) offers a =startPipeline= (shell =|=), which accepts a list of
+process builders and chains them together.
+
+=start= fires up a process and =waitFor= waits for the process to finish
+and returns its exit value.
+
+=ProcessHandle= gets more information about a process that the program
+started. It can get its process ID, its parent process, its children,
+and descendants.
