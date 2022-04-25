@@ -86,3 +86,5 @@ TODO
 - use the of value of =@JsonProperty()= to determine. The value of =@JsonProperty()= of enum values maps to the serialized value of enum values.
 
 - use =@JsonCreator()= to map to a enum value
+
+* Gson
