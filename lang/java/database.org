@@ -285,3 +285,9 @@ dataSource.databaseName=mydb
 dataSource.portNumber=5432
 dataSource.serverName=localhost
 #+end_src
+
+* Transaction Management
+
+** Atomikos
+
+A lightweight transaction manager.
