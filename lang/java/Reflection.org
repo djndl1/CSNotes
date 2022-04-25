@@ -80,3 +80,7 @@ Like C#, Java can have resource files packed with related classes.
         return (T[])newArray;
     }
 #+end_src
+
+* Third Party Tools
+
+** ByteBuddy
