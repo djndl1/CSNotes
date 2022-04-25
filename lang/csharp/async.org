@@ -1,3 +1,5 @@
+One mental model of an async operation is to think of it as a message that is passed around and processed during its lifetime.
+
 [[https://dschenkelman.github.io/2013/11/29/asynchronous-io-in-c-why-tasks-a-k-a-promises-futures/][C# Futures]]
 
 * Asynchronous Programming Model
