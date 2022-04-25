@@ -1,6 +1,6 @@
 # Java intro
 
-Java is a whole platform, with a huge library, containing lots of reusable code, a high-quality executation envrionment that provides services such as security, portability across operating systems, and automatic garbage collection.
+Java is a whole platform, with a huge library, containing lots of reusable code, a high-quality execution envrionment that provides services such as security, portability across operating systems, and automatic garbage collection.
 
 The syntax for java is a cleaned-up version of C++ syntax. Java is object-oriented, distributed (having an extensive library for coping with TCP/IP protocols so that accessing remote objects is as easy as accessing a local file system), robust (has a pointer model that eliminates the possiblity of overwriting memory and corrpting data); though not as great as expected, java security model is still good. Since Java generates bytecode, it is architecture-neutral and its specification has no implementation-dependent aspects. Java's JIT compiler now provides high performance. Java was the first mainstream language to support concurrent programming. 
 
@@ -310,7 +310,6 @@ public enum Size {
 The constructor of an enumeration is always private. All enumerated types are subclasses of the class `Enum`.
 
 - `valueOf()` - `toString()`
-
 
 - `.ordinal()`: yields the position of an enumerated constant in the `enum` declaration, counting from zero.
 
@@ -632,8 +631,7 @@ public class TalkingClock
 }
 ```
 
-The compiler mo
-difies all inner class constructors, adding a parameter for the outer class reference. The explicit outer class reference is `OuterClass.this`. The `beep` above can be rewritten as `TalkingClock.this.beep`. The inner object constructor can be `outerObject.new InnerClass(args)`. It is also possible to set the outer reference to another object by eplicitly naming it.
+The compiler modifies all inner class constructors, adding a parameter for the outer class reference. The explicit outer class reference is `OuterClass.this`. The `beep` above can be rewritten as `TalkingClock.this.beep`. The inner object constructor can be `outerObject.new InnerClass(args)`. It is also possible to set the outer reference to another object by eplicitly naming it.
 
 ```java
 var jabberer = new TalkingClock(1000, true);
@@ -687,7 +685,7 @@ invite(new ArrayList<String>() {{ add("Harry"); add("Tony"); }});
 
 For many years, Java programmers routinely used anonymous inner classes for event listeners and other callbacks. Nowadays, you are better off using a lambda expression.
 
-## Static Inner Classes
+## Static Inner Classes (Similar to C#'s inner class)
 
 If the referece of the outer class is not needed by the inner class, simply placed inside there, the inner class can be declared `static`.
 
@@ -736,17 +734,26 @@ The mission of exception handling is to transfer control from where the error oc
 
 The traditional reaction to an error in a method is to return a special error code that the calling method analyzes. Unfortunately, it is not always possible to return an error code. Java allows every method an alternative exit path if it is unable to complete its task in the normal way. An object that encapsulates the error information is thrown. The exception-handling mechanism begins its search for an exception handler that can deal with this particular error condition.
 
-An exception object is always an instance of a class derived from `Throwable`. The `Error` branch of `Throwable` describes internal errors and resource exhaustion situations inside the Java runtime system, where nothing can be done. The `Exception` branch  further splits into `RuntimeException` (a programming error) and `IOException`.
+- _Exception Object_: any object of `Throwable`
 
-"If it is a `RuntimeException`, it was your fault!" Any exception derived from `Error` or `RuntimeException` is an _unchecked exception_. The compiler checks that an exception handler is provided for all checked exceptions.
+```
+Throwable 
+  |--- Error # internal errors and resource exhaustion situations inside JVM, unchecked
+  |___ Exception # unchecked except RuntimeException
+      |___ RuntimeException # programming error, unchecked
+      |___ Other Exceptions # checked
 
-In C++, `runtime_error` is equivalent to those exceptions in Java that are not of type `RuntimeException` while `logic_error` is the equivalent of Java's `RuntimeException` and also denotes logical errors in the program.
+```
 
-In Java, a method tells the compiler what can go wrong. A method must declare all the checked exceptions that it might throw. If your method fails to faithfully declare all checked exceptions, the compiler will issue an error message.
+- _Checked Exception_: exceptions checked by the compiler in a method's signature. The user should somehow handle it.
+
+In Java, a method tells the compiler what can go wrong. A method must declare all the checked exceptions that it might throw (checked by the compiler).
 
 ```java
 public FileInputStream(String name) throws FileNotFoundException // a constructor of FileInputStream
 ```
+
+- _Unchecked Exception_: not checked by the compiler, subclasses of `RuntimeException`
 
 Unchecked exceptions are either beyond your control (`Error`) or result from conditions that you should not have allowed in the first place (`RuntimeException`).
 
@@ -770,13 +777,9 @@ try {
     handler for the second type 
 } catch (ExceptionType3 | ExceptionType4 e) // you can also hadnle multiple exceptios together, `e` is implicitly final here
 ```
-If any code inside `try` block throws an exception of the class specified in the catch clause, The program skips the remainder of the code in the try block and executes the handler code inside the catch clause. If any of the code in a method throws an exception of a type other than the one named in the catch clause, this method exits immediately.
+If no exception handling should be done, the method should declare the kind of exception it might throw and let the caller handle it by adding a `throws` specifier to alert the caller that an exception may be thrown.
 
-If we decide that no exception handling should be done, the method should declare the kind of exception it might throw and let the caller handle it. When you propagate an exception, you must add a throws specifier to alert the caller that an exception may be thrown.
-
-If you are writing a method that overrides a superclass method which throws no exceptions, then you must catch each checked exception in your method’s code
-
-As a general rule, you should catch those exceptions that you know how to handle and propagate those that you do not know how to handle.
+If a method that overrides a superclass method which throws no exceptions, then each checked exception in the subclass's method must be caught.
 
 ### Rethrow an exception
 
@@ -904,13 +907,13 @@ walker.forEach(frame -> analyze frame)
 
 - Do not micromanage exceptions. `try`-block should not be used at a micro-level, i.e. statement-level.
 
-- Make good use of the exception hierarchy. Don’t just throw a `RuntimeException`. Find an appropriate subclass or create your own. Don’t just catch `Throwable`. It makes your code hard to read and maintain. Respect the difference between checked and unchecked exceptions. Do not hesitate to turn an exception into another exception that is more appropriate.
+- Make good use of the exception hierarchy. Don’t just throw a `RuntimeException`. Find an appropriate subclass or create your own. Don’t just catch `Throwable`. Respect the difference between checked and unchecked exceptions. Do not hesitate to turn an exception into another exception that is more appropriate.
 
 - Do not squelch exceptions.
 
 - When you detect an error, “tough love” works better than indulgence. Do not hesitate to throw an exception.
 
-- Propagating exceptions is not a sign of shame.  Often, it is actually better to propagate the exception instead of catching it.
+- Propagating exceptions is not a sign of shame. Often, it is actually better to propagate the exception instead of catching it.
 
 # Assertions
 
