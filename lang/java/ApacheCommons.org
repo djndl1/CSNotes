@@ -1,0 +1,60 @@
+#+TITLE: Apache Commons Reusable Java Components
+
+* Common Lang 3 (Complement to ~java.lang~)
+
+** ~java.lang~
+
+-  ~Objects~: already has some null-safe and null handling utils.
+  + ~checkFromIndexSize~, ~checkIndex*~: out-of-bound check
+  + ~requireNonNull()~, ~requireNonNullElseGet()~
+  + null-safe ~toString(Object)~
+
+- ~Character~
+  + ~charCount~ of a code point, ~codePointAt()~ a string or a char array
+
+- ~Arrays~
+  + ~binarySearch()~
+  + ~copyOf()~, ~copyOfRange()~: copy arrays
+  + ~deepEquals()~ and ~equals()~ of arrays
+  + ~fill()~ arrays
+  + find ~mismatch()~​ed
+  + ~setAll()~, ~parallelSetAll()~: for-each
+  + ~sort()~, ~parallelSort()~
+  + ~parallelPrefix()~: accumulate onto each element
+
+** String Manipulation
+
+- ~StringUtils~: null-safe string utilities including those unsafe ones already in ~String~
+  + ~equals~: comparable to C#'s string comparison ~==~
+  + ~defaultIfBlank()~, ~defaultIfEmpty()~: C# ~nullOrWhiteSpace ?? anotherString~
+  + ~defaultString()~: C# ~nullableString ?? ""~, ~nullableString ?? anotherString~
+  + ~isEmpty~, ~isBlank~, ~isNotBlank~, ~isNotEmpty~: C# ~IsNullOrEmpty()~, ~IsNullOrWhiteSpace()~
+  + ~join()~, ~joinWith()~: enhanced version of ~String.join~
+  + other interesting methods: ~wrap()~, ~unwrap()~, ~rotate()~
+
+- ~RandomStringUtils~: simple random text generators.
+
+** Objects
+
+- ~ObjectUtils~:
+  + ~compare()~
+  + ~defaultIfNull()~, ~firstNonNull()~, ~getIfNull()~: null-coalesce
+  + ~isEmpty()~, ~isNotEmpty()~: for collection-like types
+  + ~max()~, ~median~, ~media()~, ~min()~, ~mode()~: accepts varargs
+
+** Arrays
+
+- ~ArrayUtils~: null safe
+  + ~add()~, ~addAll()~, ~addFirst()~, ~insert()~
+  + ~remove()~, ~removeAll()~, ~removeAllOccurrences()~, ~removeElement()~
+  + ~clone()~
+  + ~contains()~
+  + ~isEmpty()~, ~isNotEmpty()~
+  + ~isSameLength()~
+  + ~get()~: null-safe indexer
+  + ~indexesOf()~, ~indexOf()~, ~lastIndexOf()~
+  + ~isSorted()~
+  + ~reverse()~, ~shift()~ (rotate-shift), ~shuffle()~
+  + ~subarray()~
+  + ~swap()~
+  + ~nullToEmpty()~: not of much use.
