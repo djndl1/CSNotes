@@ -1,43 +1,75 @@
-Bottom-up programming leads naturally to extensible software. Working button-up is also the best-way to get reusable software.
+Lisp has outgrown "LISt Processor": Common Lisp is a general-purpose programming language with a wide variety of data structures.
+
+# Basic Concepts
+
+- *cons cell*: an ordered pair `(car . cdr)` created by `(cons a b)`. The elements can be either cons cells or atoms.
+
+- *atom*: anything that is not a cons cell: integers, floating-point numbers, strings, symbols (the reader converts all unescaped characters in a name to uppercase and then interned into the package's symbol table)
+
+- *S-expression*: an atom or an expression of the form of a cons cell where `car` and `cdr` are S-expressions. S-expressions refer to the syntax of a certain form, not data types.
+
+- *Lisp Forms*: any atom and any list that has a symbol as its first element are legal Lisp forms. 
+
+- *Proper List*: a nil or a cons cell whose cdr is another proper list. A conceptual singly-linked list. A proper list always ends with a `NIL`. Lists can be written as S-expressions of a chain of nested cons cells. 
+
+```lisp
+(cons 'a '(b c d))
+(cons 'a (cons 'b nil))
+```
+
+- *Cycle*: An S-expression that contains a reference to itself.
+
+- *Top level**: an interactive front-end. 
+
+# Run/Load A Program
+
+- `(load "source.lisp")`
+
+Lisp implementations are divided into
+
+- *Reader*: translates text into S-expressions.
+
+- *Evaluator*: implements the semantics of the language. Defines a syntax of Lisp forms that can be built out of S-expressions.
+
+Code can be generated in Lisp in the form of S-expressions and fed into the evaluator to execute.
+
+## Evaluation
+
+- A symbol are taken by the evaluator as the name of a variable and evaluated to the current value of the variable (except for keyword symbols and `T` and `NIL`). Other atoms are evaluated to themselves.
+
+- List evaluations: function call forms, macro forms, special form
+
+Function call forms `(function-name argument*)`: arguments are evaluated from left to right before the function is executed.
+
+Special operators (25 in total) e.g. `(if x (...) (...))` is evaluated to the rules of that operator.
+
+Macros give users a way to extend its syntax. The elements of the macro from are passed unevaluated to the macro function and expanded and then returned and evaluated according to the normal rules.
 
 # Basics
 
-_toplevel_: an interactive front-end . 
-
-`+` can take multiple arguments
-
-All lisp expressions are either _atoms_ (like 1) or _lists_.
-
-When Lisp evaluates a function call, the arguments first evaluated from left to right, and them passed to the function named by the operator. Not all the operators in Clisp are functions but most are.
-
 ## Data
-
-Lisp has _symbols_ (words that do not usually evaluate to themselves) and _lists_ (zero or more elements of any type enclosed in parentheses and then quoted). Lisp programs are expressed as lists, which means Lisp programs can generate lisp code. Unquoted lists are treated as code.
-
-`nil` = `()`
 
 `quote` / `'`: a special operator meaning it does nothing. A way to protect expressions from evaluation.
 
-## List Operations
+### Numbers
 
-- `cons`: builds lists `(cons 'a '(b c d))`, `(cons 'a (cons 'b nil))`
+### Boolean and Truth
 
-- `car`/`cdr`: the first element and everything after as a list
+- `nil`/`NIL`/`()`/`'()`/`'NIL` <-> `t`, `'T`: everything except `nil` counts as true in a logical context
 
-## Boolean and Truth
+#### Common Predicates
 
-`nil` - `t`: everything except `nil` counts as true in a logical context
+Clisp predicates often have names that end with `p`. `integerp`
 
-The function `listp` returns true if its arguments is a list. Clisp predicates often have names that end with `p`. `integerp`
+- `listp`: check if the argument is a list.
 
-- `null`: returns true of the empty list
+- `null`: check if the argument is a `NIL`
 
-- `not` returns true if its argument is false
+- `not`: reverse the boolean value
 
-`if` is a special operator in that one of its argument is not evaluated.
+- `if` is a special operator in that one of its argument is not evaluated.
 
-- `(and ...)`, `(or ...)`: evaluate as many as they need to in order to decide what to return. They are macros. 
-
+- `(and ...)`, `(or ...)` (macros): evaluate as many as they need to in order to decide what to return.
 
 ## Input and Output
 
