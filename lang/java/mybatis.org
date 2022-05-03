@@ -1,3 +1,0 @@
-#+TITLE: Mybatis
-
-For legacy or denormalized databases or to obtain full control of SQL execution.
