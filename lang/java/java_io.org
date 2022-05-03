@@ -1,0 +1,281 @@
+In the Java API, an object form which we can read a sequence of bytes is
+called an /input stream/. The opposite is an /output stream/. The
+abstract classes =InputStream= and =OutputStream= are the basis for a
+hierarchy of I/O classes.
+
+A separate hierarchy provides classes, inheriting from the abstract
+=Reader= and =Writer= classes for processing Unicode characters.
+
+* Some Basic Classes
+
+- ~File~ (legacy): an abstract representation of file and directory pathnames. Just =toPath()= and use ~Path~
+
+
+- ~Path~: used to locate a file in a file system. A hierarchical path composed of a sequence of directory and file name elements separated by a special separator or delimiter.
+  + doesn't have to correspond to a file that exists (it's not a ~FileInfo~, similar to ~URI~)
+  + more convenient that the legacy ~File~
+  + ~Paths.get()~ or better ~Path.of()~
+  + can ~resolve()~ (combine paths), ~relativize()~, ~normalize()~
+
+- ~Files~: does the actual filesystem operations.
+  + common filesystem operations
+  + file metadata
+  + quick and dirty file I/O operations
+  + =list()=​s or =walk=​s a directory lazily, goes through ~newDirectoryStream()~ or traverses by ~walkFileTree~.
+  + can access a ZIP file system.
+
+* Input/Output Stream =java.io=
+  :PROPERTIES:
+  :CUSTOM_ID: inputoutput-stream-java.io
+  :END:
+
+- ~InputStream~: an input stream of bytes, blocking-read raw bytes
+  + ~available()~ to estimate possible bytes to read
+  + ~read()~ (there's a reason why it returns the number of bytes it reads) or ~readNBytes()~ (exactly N, end of stream or an exception) some bytes into a buffer
+  + ~skip()~ some bytes
+  + ~close()~ after using
+  + ~mark~ and ~reset~ to repeatedly read some bytes
+
+- ~OutputStream~: an output stream of bytes.
+  - ~write()~ bytes
+  - ~flush()~ the sink
+  - ~close()~ after using.
+
+Java has more than 60 different input/output stream types. Instead of using raw =read= and =write=, use their subclasses.
+
+Use =java.io.File.separator= for portable programs instead of ~/~ or ~\\~.
+
+In Java, some input streams (e.g. ~FileInputStream~) can retrieve bytes from files and other more exotic locations. Others (~DataInputStream~) can assemble bytes into more useful data types or provide some other capabilities. These streams can be combined.
+
+#+BEGIN_SRC java
+  var din = new DataInputStream(
+      new BufferedInputStream(
+          new FileInputStream("employee.dat")));
+#+END_SRC
+
+A =PushbackInputStream= can unread a byte, that is, read a byte to
+inspect it and then put it back.
+
+#+BEGIN_SRC java
+  var din = new DataInputStream(
+     pbin = new PushbackInputStream(
+        new BufferedInputStream(
+           new FileInputStream("employee.dat"))));
+#+END_SRC
+
+The ability to mix and match filter classes to construct useful
+sequences of input/output stream gives gives an immense amount of
+flexibility.
+
+#+BEGIN_SRC java
+  var zin = new ZipInputStream(new FileInputStream("employee.zip"));
+  var din = new DataInputStream(zin);
+#+END_SRC
+
+** Text I/O
+   :PROPERTIES:
+   :CUSTOM_ID: text-io
+   :END:
+
+For Unicode text, use subclasses of =Reader= and =Writer= classes. The basic methods
+are similar to those of streams. =OutputStreamWriter= and =InputStreamReader= deal with Unicode code
+units.
+
+*** Input
+
+- ~Reader~: reading character streams
+  + ~read()~, ~mark()~, ~reset()~
+
+- ~InputStreamreader~: a bridge from byte streams to character streams
+  + efficient use requires wrapping an ~InputStreamReader~ within a ~BufferedReader~.
+
+- ~Scanner~: a token parser that can read various primitive types and strings using regular expressions. ~std::cin~, ~scanf~
+  + closes the underlying source if the scanner is closed.
+  + ~hasNext()~, ~next()~ and their friends: blocking-read tokens as strings or various types
+  + ~findXXX()~: find occurrences of the matched pattern in the stream.
+
+#+BEGIN_SRC java
+var in = new InputStreamReader(new FileInputStream("data.txt"), StandardCharsets.UTF_8);
+
+Strign content = Files.readString(path, charset);
+
+try (Stream<String> lines = Files.lines(path, charset)) { // IO stream requires closing
+     ...
+}
+#+END_SRC
+
+*** Output
+
+- ~Writer~: writing to character streams.
+  + ~write(char)~, ~flush()~, ~close()~
+
+- ~OutputStreamWriter~: a bridge from character straem to byte stream.
+  + efficient use requires using ~BufferedWriter~ to wrap an ~OutputStreamWriter~.
+
+- ~PrintWriter~: pritns formatted representations of objects to a text-output stream. ~std::cout~
+  + automatic file flushing is by default disabled
+  + implements all of the print methods in ~PrintStream~
+  + ~checkError()~ needs to be done explicitly (no exceptions will be thrown)
+
+- ~PrintStream~: legacy, similar to ~PrintStream~
+
+=System.err= and =System.out= are instances of =PrintStream=. The =PrintStream= class internally
+converts Unicode characters to the default host encoding in the same way
+the =PrintWriter= does. Objects of type =PrintStream= act exactly like
+print writers when using the =print= and =println= methods, but unlike
+print writers they allow you to output raw bytes with the =write(int)=
+and =write(byte[])= methods.
+
+*** Character Set and Encoding
+
+- ~Charset~: defines methods for creating decoders and encoders
+  + every instance of JVM has a default charset ~Charset.defaultCharset()~:
+  + ~encode()~ and ~decode()~, ~newDecoder()~ and ~newEncoder()~
+
+- ~StandardCharsets~: charsets that are guaranteed to be available
+  + default to UTF-8 after Java 17
+
+* Binary Data
+  :PROPERTIES:
+  :CUSTOM_ID: binary-data
+  :END:
+
+- ~DataOuptut~: converting data from any of the Java primitive types to a series of bytes and writing these bytes to a binary stream.
+  + In Java, all values are written in the big-endian fashion, regardless of
+    the processor. That makes Java data files platform-independent.
+  + do not use ~writeUTF~
+- ~DataOutputStream~:A data output stream lets an application write primitive Java data types to an output stream in a portable way.
+
+- ~DataInput~: The DataInput interface provides for reading bytes from a binary stream and reconstructing from them data in any of the Java primitive types.
+- ~DataInputStream~: A data input stream lets an application read primitive Java data types from an underlying input stream in a machine-independent way.
+
+- =RandomAccessFile=: implementing =DataOutput= and =DataInput=, supports both reading and writing to a random access file. (your plain old C file API)
+
+#+BEGIN_SRC java
+  public static void writeFixedString(String s, int size, DataOutput out)
+        throws IOException
+  {
+     for (int i = 0; i < size; i++)
+     {
+        char ch = 0;
+        if (i < s.length()) ch = s.charAt(i);
+        out.writeChar(ch);
+     }
+  }
+
+  public static String readFixedString(int size, DataInput in) throws IOException {
+      var b = new StringBuilder(size);
+      int i = 0;
+      var done = false;
+      while (!done && i < size) {
+        char ch = in.readChar();
+        i++;
+        if (ch == 0)
+          done = true;
+        else
+          b.append(ch);
+      }
+      in.skipBytes(2 * (size - i));
+      return b.toString();
+  }  
+#+END_SRC
+
+* Object Serialization
+
+- ~Serializable~: https://docs.oracle.com/javase/8/docs/platform/serialization/spec/serialTOC.html
+
+  TODO
+
+* Working With =Files=
+  :PROPERTIES:
+  :CUSTOM_ID: working-with-files
+  :END:
+
+The =Path= interface and =Files= class are much more convenient to use
+than =File= class. The =Path= interface and =Files= class encapsulate
+the functionality required to work with the file system on the user's
+machine.
+
+** =Path= Interface
+   :PROPERTIES:
+   :CUSTOM_ID: path-interface
+   :END:
+
+A =Path= represents a path that is hierarchical and composed of a
+sequence of directory and file name elements separated by a special
+separator or delimiter. A /root component/ identifies a file system
+hierarchy. The /name element/ is the name of a file or a directory. A
+=Path= represent a root, a root and a sequence of names, or simply one
+or more name elements. Accessing a file using an empty path is
+equivalent to accessing the default directory of the file system.
+
+#+BEGIN_SRC java
+  Path absolute = Paths.get("/home", "harry");
+  Path relative = Paths.get("myprog", "conf", "user.properties");
+#+END_SRC
+
+The =Files= class makes quick work of common file operations.
+
+#+BEGIN_SRC java
+  byte[] bytes = Files.readAllBytes(path);
+  List<String> lines = Files.readAllLines(path, charset);
+  Files.write(path, content.getBytes(charset));
+  Files.write(path, content.getBytes(charset), StandardOpenOption.APPEND);
+  Files.write(path, lines);
+#+END_SRC
+
+To create files and directories:
+
+#+BEGIN_SRC java
+  Files.createDirectory(path);
+  Files.createFile(path);
+#+END_SRC
+
+To copy, move and delete files:
+
+#+BEGIN_SRC java
+  Files.copy(fromPath, toPath);
+  Files.move(fromPath, toPath);
+  Files.delete(path);
+#+END_SRC
+
+To get file information:
+
+#+BEGIN_SRC java
+  long fileSize = Files.size(path);
+  BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+#+END_SRC
+
+All file systems report a set of basic attributes, encapsulated by the
+=BasicFileAttributes= interface, which partially overlaps with that
+information.
+
+To visit directory entries:
+
+#+BEGIN_SRC java
+  try (Stream<Path> entries = Files.list(pathToDirectory))
+  {
+     . . .
+  }
+
+  try (Stream<Path> entries = Files.walk(pathToRoot))
+  {
+     // Contains all descendants, visited in depth-first order
+  }
+#+END_SRC
+
+TODO
+
+* Memory Mapped Files
+  :PROPERTIES:
+  :CUSTOM_ID: memory-mapped-files
+  :END:
+
+TODO
+
+* File Locking
+  :PROPERTIES:
+  :CUSTOM_ID: file-locking
+  :END:
+
+A file lock controls access to a file or a range of bytes within a file.

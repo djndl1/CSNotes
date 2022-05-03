@@ -1,0 +1,86 @@
+#+TITLE: Reflection
+
+The *reflection library* has a very rich and elaborate toolset to write programs that manipulate Java code dynamically. Using reflection, Java can support user interface builders, object-relational mappers, and many other development tools that dynamically inquire about the capabilities of classes.
+
+A program that can analyze the capabilities of classes is called *reflective* It can
+
+- analyze the capabilities of classes
+
+- inspect objects at runtime
+
+- implement generic array manipulation code
+
+- take advantage of ~Method~ objects that work like function pointers in C++.
+
+* The ~Class~ class
+
+The Java runtime system always maintains what is called runtime type identification on all objects. This information  The virtual machine manages a *unique* ~Class~ object for each type.keeps track of the class to which each object belongs.
+
+** Get The Class
+
+- ~obj.getClass()~
+
+#+begin_src java
+System.out.println(e.getClass().getName() + " " + e.getName()); // C#'s obj.GetType()
+#+end_src
+
+- ~T.class~ (C# ~typeof(T)~) is the matching class object of type ~T~. ~Employee.class~ is of type ~Class<Employee>~.
+
+- ~Class.forName()~
+
+#+begin_src java
+var className = "java.util.Random"; // or any other name of a class with
+                                    // a no-arg constructor
+Class cl = Class.forName(className);
+var obj = (java.util.Random)cl.getConstructor().newInstance();
+#+end_src
+
+** Resource
+
+Like C#, Java can have resource files packed with related classes.
+
+~cls.getResource()~
+
+** Class Reflection
+
+- ~java.lang.reflect.Field~ from ~cls.getFields()~
+  + can set/get the value of the field
+  + ~getType()~: the field's type
+  + ~getDeclaringClass()~: the field's containing class.
+
+- ~java.lang.reflect.Method~
+  + can invoke the method
+  + can get the signature (the checked exceptions, the return type, paramter types, annotations)
+  + is bridge/default/synthetic
+
+- ~java.lang.reflect.Constructor<T>~ from ~cls.getConstructors()~
+  + can construct a new instance.
+
+- ~java.lang.reflect.Modifier~: Modifiers are represented as bit flags.
+  + various methods for decoding.
+
+** Objects Reflection
+
+- ~obj.getClass()~, ~cls.getDeclaredField('filedName')~, ~field.get(obj)~
+
+- The security mechanism of Java ensures that an inaccessible field cannot be casually accessed unless ~field.setAccessible(true)~.
+  + useful for debuggers, persistent storage and similar mechanisms.
+
+** Generic Array Code
+
+#+begin_src java
+    public static <T> T[] copyOf (T[] array, int length) {
+        Class cls = array.getClass();
+        if (!cls.isArray()) return null;
+
+        var newArray = Array.newInstance(cls.getComponentType(), length);
+
+        System.arraycopy(array, 0, newArray, 0, Math.min(length, array.length));
+
+        return (T[])newArray;
+    }
+#+end_src
+
+* Third Party Tools
+
+** ByteBuddy
