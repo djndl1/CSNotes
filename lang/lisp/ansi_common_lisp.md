@@ -221,21 +221,6 @@ The representation of lists as conses makes it natural to use them as pushdown s
         (our-nthcdr (- n 1) (cdr lst))))
 ```
 
-## Equality
-
-`eq` tests if two arguments are the same identical object. 
-
-`eql` = `eq` + testing if two numbers or two characters are of the same value. `eql` tells whether two objects are conceptually the same, while `eq` tells whether two objects are implementationally identical. Thus `eql` is the default comparison predicate. 
-
-`equal` tests if two objects are structurally similar (isomorphic) objects. A rough rule of thumb is that two objects are `equal` iff their printed representations are the same.
-
-`=` is used to compare mathematical values.
-
-```lisp
-(= 5 5.0) ==> true
-(eql 5 5.0) ==> false
-```
-
 ## Mapping functions
 
 `mapcar` returns the result of applying the function to elements taken from each list until some list runs out.
@@ -1102,7 +1087,6 @@ Functions are at the core of Lisp. `fboundp` tells whether there is a function w
 
 Lisp makes no distinction between a program, a procedure and a function. Functions do for everything. Use `load` to load a lisp program.
 
-
 CL has different namespaces for functions and variables. A symbol can be bound to a value (`boundp`, `symbol-value`) or a function (`fboundp`, `symbol-function`). If a symbol is evaluated, it's treated as a variable in that its value cell is returned. 
 
 ## Local Functions 
@@ -1125,11 +1109,17 @@ Local functions are only accessible within a certain context, defined with `labe
 
 ## Parameter List
 
-- `&rest`: variadic parameter list
+- `&rest`: indicates the variable after which is a variadic parameter list
 
 - `&optional`: optional parameter. Default values are enclosing in a list with the paramter
 
-- `&key`: keyword parameter
+```lisp
+;; optional parameter with a default value 10. This default value can be another parameter, a third variable that indicates the presence of the default parameter can be declared in the default parameter list.
+(defun optional-parameters (a &optional (b 10)) 
+  (list a b))
+```
+
+- `&key`: keyword parameter. They have default parameters of `nil` if not specified. It's even possible to write `((:apple a) (:box b))` to specify parameter names different from variable names.
 
 ```lisp
 (defun our-funcall (fn &rest args)
@@ -1139,21 +1129,30 @@ Local functions are only accessible within a certain context, defined with `labe
   (list a x y z))
 ```
 
+Combining keyword parameters and optional parameters could lead to problems where keyword symbols are treated as arguments for optional parameters. Use keyword parameters only.
+
+Combining keyword parameters and the `&rest` parameters might lead to surprising results: arguments would be treated as both and thus create duplication.
+
+## Return Values
+
+- by default the function returns the value of the last expression.
+
+- `return-from` can be used to return in the middle of a block (e.g. a function).
+
 ## Functional Programming
 
 It would inconvenient to do without side-effects entirely.
 
-
 ## Functions as Objects (First-Class Functions)
 
-`function` returns a function object given the name of the function. Just as `'` is an abbreviation for `(quote ...)`, `#'` (_sharp quote_) is for `(function ...)`.
+- `function` returns a function object given the name of the function. Just as `'` is an abbreviation for `(quote ...)`, `#'` (_sharp quote_) is for `(function ...)`.
 
 ```lisp
 (apply #'+ '(1 2 3))
 (funcall #'+ 1 2 3)
 ```
 
-lambda expression: 
+lambda expression (anonymous functions since all Lisp functions are closures): 
 
 ```lisp
 (lambda (x y)
