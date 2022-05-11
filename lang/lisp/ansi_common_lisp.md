@@ -105,7 +105,7 @@ The bindings of the inner variable shadows the outer bindings.
 
 ### Constant
 
-- `defconstant`: 
+- `defconstant`: sometimes with `**` surrounded. The constant can be redefined and thus leads to undesired behavior. Use this only for true constants.
 
 # Lists
 
