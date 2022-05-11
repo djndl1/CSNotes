@@ -75,39 +75,43 @@ Clisp predicates often have names that end with `p`. `integerp`
 
 The most general output function in Common Lisp is `format`. The standard function for input is `read`, which a complete parser, does not just read characters and return a string.
 
-
 ## Variables
 
-`let` introduces new local variables.
+All values in Clisp are references to objects.
 
-```lisp
-(defun ask-number ()
-    (format t "Please enter a number.")
-    (let ((val (read)))
-        (if (numberp val)
-            val
-            (ask-number))))
+- *binding*: an association of an identified to an entity. Machine languages have no built-in notion of identifiers. Bindings can be *dynamic* or *static*. Dynamic dispatch is dynamic in the sense that the function called is not known until the subtype is known at runtime, but can be static since the subtype can be known before compilation in many cases. The referencing identifier can be *rebound*, and the referenced entity can be *mutated* (not related to binding).
 
-(ask-number)
-```
+- *binding occurrence*: The establishment of a binding.
 
-`defparameter` creates a global variable, which is often surrounded by `**`.
-`defconstant` defines global constants.
-`boundp` checks if a name is bound to a global variable or constant.
+- *applied occurrence*: assignment, subprogram calls.
 
-The most general assignment operator is `setf`. `setf` creates a global variable implicitly just by assigning a value to it. It is better style to use explicit `defparameter`. `setf` can set an expression as well as a variable name. The first argument to `setf` can be almost any expressioon that refers to a particular place.
+- *scope*: the portion of program in which a binding of a name with an entity applies. A property of a name binding.
 
-```lisp
-(setf (car x) 'n)
-```
+- *context*: a property of a program, a portion of source code, or a portion of runtime.
+
+- *lexical scope*: "The portion of program" means the source code, the _lexical/static context_, which can be determined at compile time. e.g. most modern languages
+
+- *dynamic scope*: "The portion of program" means the _execution/runtime/dynamic context_, resolved by searching the local execution context, and then the outer execution context and so on progressing up the call stack. e.g. some dialects of Lisp, some scripting languages. Each name has a global stack of bindings. Introducing a local variable with name x pushes a binding onto the global x stack (which may have been empty), which is popped off when the control flow leaves the scope. Evaluating x in any context always yields the top binding
+
+- *binding form*: any construct that introduces a new variable name that's usable only within the construct e.g. the function definition, `let`, `let*`
+
+The bindings of the inner variable shadows the outer bindings.
+
+- By default, all binding forms introduce *lexically scoped variables*. However, closures can keep the binding of the captured variable even out of the binding form (infinite *extent*).
+
+- *Global Variable* (`defparameter` (unconditionally (re)definition, `defvar` (define a variable and optionally initialize it only when uninitialized)): settable by `setf`. `boundp` checks if a name is bound to a global variable or constant.
+
+- *Dynamic Variable* (indefinite scope but dynamic extent on a per-thread basis): may or may not be a global one: any construct that creates a new variable binding of the same variable name will be a dynamic one and shadow the global one (Define a global with the `**` pair to avoid such shadowings for pure global variables), and a dynamic variable can be declared locally (relatively rare).
+
+### Constant
+
+- `defconstant`: 
 
 # Lists
 
 https://stackoverflow.com/questions/134887/when-to-use-or-quote-in-lisp
 
-Lisp has outgrown "LISt Processor". Common Lisp is a general-purpose programming language with a wide variety of data structures.
-
-a `cons` is a pair of pointers; the first one is the `car` and the second is the `cdr`. Conses provide a convenient representation for pairs of any type. The two halves of a cons can point to any kind of object, including conses. The `cdr` of a list is either another cons or `nil`. Lists are not a distinct kind of object, but conses linked together (singly linked lists). Every that is not a cons is an atom. Note that `nil` is both an atom and a list. Each time `cons` is called, Lisp allocates a new piece of memory with room.
+Lists are conses linked together. Every that is not a cons is an atom. Note that `nil` is both an atom and a list. Each time `cons` is called, Lisp allocates a new piece of memory with room.
 
 `list` builds a list; `copy-list` copies a list; `append` returns the concatenation of any number of lists.
 
