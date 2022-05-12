@@ -107,6 +107,19 @@ The bindings of the inner variable shadows the outer bindings.
 
 - `defconstant`: sometimes with `**` surrounded. The constant can be redefined and thus leads to undesired behavior. Use this only for true constants.
 
+### Assignment
+
+- `setf`: the general-purpose assignment macro (not just for variable assignment) for all assignment. `setf` returns the assigned value.
+
+```lisp
+(setf x 10)
+(setf (aref a 0) 10)
+(setf (gethash 'key hash) 10)
+(setf (field o) 10)
+```
+
+- `incf`, `decf`, `rotatef` (swap), `shiftf`, `push`, `pop`, `pushnew`: modify macros
+
 # Lists
 
 https://stackoverflow.com/questions/134887/when-to-use-or-quote-in-lisp
