@@ -118,7 +118,37 @@ The bindings of the inner variable shadows the outer bindings.
 (setf (field o) 10)
 ```
 
-- `incf`, `decf`, `rotatef` (swap), `shiftf`, `push`, `pop`, `pushnew`: modify macros
+- [ ] `incf`, `decf`, `rotatef` (swap), `shiftf`, `push`, `pop`, `pushnew`: modify macros
+
+# Macros
+
+## Standard Control Constructs
+
+- `when`, `unless`: conditional constructs with a series of forms without `progn`.
+
+```lisp
+(defmacro my-when (condition &rest body)
+  `(if ,condition (progn ,@body)))
+
+(defmacro my-unless (condition &rest body)
+  `(if (not ,condition) (progn ,@body)))
+```
+
+- `cond`: a chain of `if-else if-else if-else`
+
+- `and`, `or`: actually not that different from a normal C `&&`/`||`, except that since Lisp forms always return values, all forms can be used here.
+
+### Looping
+
+Looping is provided through macros.
+
+- `return`: breaks out of a loop early.
+
+- `dolist`: iterates over a list for the body and finally evaluates the result form.
+
+- `dotimes`: similar to `dolist` but with a form that returns the count instead of a list.
+
+- `do`: similar to a for-loop with an additional result-form after the end test.
 
 # Lists
 
