@@ -1,0 +1,28 @@
+#+title: Findutils
+
+* Find
+
+#+begin_src bash
+find [FILE] [expression]
+#+end_src
+
+- =expression=: used to select files, consists of one or more *primaries*
+  + *options*: overall operations
+  + *tests*: tests the file's attributes
+  + *actions*: have side effects and return a boolean value.
+  + *operators*:
+
+** Find Files with Certain Names
+
+- *tests*: =-name=, =-iname=, shell patterns
+
+- *tests*: =-path=, =-wholename=: match paths (not necessarily absolute paths)
+
+- *tests*: =-regex=, =-iregex= regex match on the whole path with =-regextype= (defaulting to emacs-style regex):
+
+** Find Files that Match Contents
+
+#+begin_src bash
+grep -l -e '[Mm]athematics' *.lyx # -l list the matching files' names
+find . -name '*.lyx'  | xargs grep -l '[Mm]athematics' # recursively
+#+end_src
