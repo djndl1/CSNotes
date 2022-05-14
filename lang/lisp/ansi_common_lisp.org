@@ -421,6 +421,50 @@ Looping is provided through macros.
       (print item))
 #+END_SRC
 
+** Custom Macros
+
+- macro parameters are automatically destructured, which gives an error if the parameter count is illegal.
+
+- =&rest= = =&body=
+
+ #+begin_src lisp
+(defun primep (number)
+  (when (> number 1)
+    (loop for fac from 2 to (isqrt number) never (zerop (mod number fac)))))
+
+(defun next-prime (number)
+  (loop for n from number when (primep n) return n))
+
+(defmacro do-primes ((var start end) &body body)
+    `(do ((,var (next-prime ,start) (next-prime (+1 ,var))))
+         ((> ,var ,end))
+       ,@body))
+
+;;; macroexpand can be used to inspect the expanded macro.
+ #+end_src
+
+ Basically, everything in =`= is quoted except those prefixed with ~,~.
+
+ Macros are abstractions, and abstractions are always leaky to some degree.
+ The above code leaks as the end-form might be a function call and is called multiple times, giving a different limit each time.
+
+#+begin_src lisp
+(defmacro do-primes ((var start end) &body body)
+  (let ((ending-value-name (gensym))) ; fix variable shadowing
+  `(do ((,var (next-prime ,start) (next-prime (+ 1 ,var)))
+        (,ending-value-name ,end)) ; fix multiple end-form evaluations
+       ((> ,var ,ending-value-name))
+       ,@body)))
+#+end_src
+
+*** Some Tips
+
+- Include any subforms in the expansion in position that will be evaluated in the same order as the subforms appear in the macro call.
+
+- Make sure subforms are evaluated only once by creating a variable in the expansion to hold the value of evaluating the argument form and then using that variable anywhere else the value is needed in the expansion.
+
+- Use =gensym= to create such variables used in the expansion.
+
 * Lists
   :PROPERTIES:
   :CUSTOM_ID: lists
