@@ -239,6 +239,21 @@ The bindings of the inner variable shadows the outer bindings.
 
 - =cond=: a chain of =if-else if-else if-else=
 
+ #+begin_src lisp
+    ;;; the conditions are evaluated in order until one of them returns true
+    (defun our-member (obj lst)
+      (cond ((atom lst) nil)
+            ((eql (car lst) obj) lst)
+            (t (our-member obj (cdr lst)))))
+
+    (defun month-length (mon)
+      (case mon
+        ((jan mar may jul aug oct dec) 31)
+        ((apr jun sept nov) 30)
+        (feb (if (leap-year) 29 28))
+        (otherwise "unknown month")))
+ #+end_src
+
 - =and=, =or=: actually not that different from a normal C =&&=/=||=,
   except that since Lisp forms always return values, all forms can be
   used here.
@@ -255,11 +270,156 @@ Looping is provided through macros.
 - =dolist=: iterates over a list for the body and finally evaluates the
   result form.
 
+#+BEGIN_SRC lisp
+    (defun our-length (lst)
+      (let ((len 0))
+        (dolist (obj lst)
+          (incf len)) ;such an assignment is not unacceptable
+        len))
+
+    (our-length '(1 2 3 4 5))
+
+    (defun our-length-recursive (lst)
+      (if (null lst)
+          0
+          (+ 1 (our-length-recursive (cdr lst)))))
+
+    (our-length-recursive '(1 2 3 4 5 6))
+#+END_SRC
+
 - =dotimes=: similar to =dolist= but with a form that returns the count
   instead of a list.
 
 - =do=: similar to a for-loop with an additional result-form after the
   end test.
+
+#+BEGIN_SRC lisp
+    (defun show-squares (start end)
+      (do ((i start (+ i 1)))
+          ((> i end) 'done)
+
+    (format t "~A ~A~%" i (* i i))))
+
+    (show-squares 1 5)
+
+;; the recursive version
+    (defun show-squares-recursive (i end)
+      (if (> i end)
+          'done
+          (progn
+            (format t "~A ~A~%" i (* i i))
+            (show-squares (+ i 1) end))))
+#+END_SRC
+
+**** The =loop= Macro
+
+- =(loop body-form*)=: infinite loop until breaking out
+
+- extended =loop= that does not look lispy.
+
+#+BEGIN_SRC lisp
+    (loop for x in '(1 2 3)
+          do (print x))
+    (loop for x in '(1 2 3)
+          collect (* x 10))
+    (loop for x on '(1 2 3)
+          do (print x))
+    (loop for x across #(1 2 3)
+          do (print x))
+    (loop for x in '(a b c)
+          for y across #(1 2 3)
+          collect (list x y))
+    (loop (print "hello"))
+    (loop for i in '(1 2 3 4)
+          when (> i 3)
+            return i)
+    (loop repeat 10
+          do (format t "Hello!~%"))
+    (loop repeat 10 collect (random 10))
+    (loop for x from 1 to 3
+          collect (loop for y from 1 to x
+                        collect y))
+    (loop for x from 1 to 3
+          for y = (* x 10)
+          with z = x
+          collect (list x y z))
+    (loop for x in '(a b c d e)
+          for y from 1
+
+          when (> y 1)
+            do (format t ", ")
+          do (format t "~A" x))
+    (loop for i from 0 to 10
+          do (print i))
+    (loop for i from 0 below 10
+          do (print i))
+    (loop for i from 10 downto 0
+          do (print i))
+    (loop for i from 10 above 0
+          do (print i))
+    (loop repeat 10
+          for x = (random 100)
+          if (evenp x)
+            collect x into evens
+          else
+            collect x into odds
+          finally (return (values evens odds))
+          )
+    (loop for x in '(1 2 3 4 5)
+          until (> x 3)
+          collect x)
+    (loop for x in '(1 2 3 4 5)
+          while (< x 3)
+          collect x)
+    (loop named loop-1
+          for x from 0 to 20 by 2
+          do (loop for y from 0 to 100 by (1+ (random 3))
+                   when (< x y)
+                     do (return-from loop-1 (values x y))))
+    (loop for x in '(1 2 3 2)
+          thereis (numberp x))
+    (loop for i from 1 to 3 count (oddp i))
+    (loop for i from 1 to 3 sum i)
+    (loop for i from 1 to 3
+          sum (* i i) into total
+          do (print i)
+          finally (print total))
+    (loop for i from 1 to 3 maximize (mod i 3))
+    (loop for (a b) in '((x 1) (y 2) (z 3))
+          collect (list b a))
+    (loop for (x . y) in '((1 . a) (2 . b) (3 . c))
+          collect y)
+    (loop for (x . nil) in '((1 . a) (2 . b) (3 . c))
+          collect x)
+    (loop for rest on '(a 2 b 2 c 3) by #'cddr
+          collect rest)
+    (loop for (key value) on '(a 2 b 2 c 3) by #'cddr
+          collect (list key (* 2 value)))
+
+
+    (mapcar (lambda (it) (+ it 10)) '(1 2 3 4 5))
+    (mapcar #'list
+            '(a b c)
+            '(1 2 3))
+    (mapcan #'list
+            '(a b c)
+            '(1 2 3))
+
+    ;; Generic for lists and vectors
+    (map 'list (lambda (it) (+ it 10)) '(1 2 3 4 5))
+    (map 'vector (lambda (it) (+ it 10)) #(1 2 3 4 5))
+    (map 'string (lambda (it) (code-char it)) '#(97 98 99))
+
+    (dotimes (n 10)
+      (print n))
+    (dotimes (i 10)
+      (if (> i 3)
+          (return)
+          (print i)))
+
+    (dolist (item '(1 2 3))
+      (print item))
+#+END_SRC
 
 * Lists
   :PROPERTIES:
@@ -1132,201 +1292,9 @@ An inorder traverse function
 
 Nearly all the time =progn= is used
 
-** Context
-   :PROPERTIES:
-   :CUSTOM_ID: context
-   :END:
-
-=let=, =let*= and =destructuring-bind= create lexical scope.
-
 #+BEGIN_SRC lisp
-    (let ((x 2) (y 3))
-        (+ 3 5))
-    ;;; is equivalent to 
-    ((lambda (x y) (+ x y)) 3 5)
 #+END_SRC
 
-** Conditionals
-   :PROPERTIES:
-   :CUSTOM_ID: conditionals
-   :END:
-
-=if=, =when=, =unless=, all of which conceptually originate from =cond=.
-
-#+BEGIN_SRC lisp
-    ;;; the conditions are evaluated in order until one of them returns true
-    (defun our-member (obj lst)
-      (cond ((atom lst) nil)
-            ((eql (car lst) obj) lst)
-            (t (our-member obj (cdr lst)))))
-
-    (defun month-length (mon)
-      (case mon
-        ((jan mar may jul aug oct dec) 31)
-        ((apr jun sept nov) 30)
-        (feb (if (leap-year) 29 28))
-        (otherwise "unknown month")))
-#+END_SRC
-
-** Iteration
-   :PROPERTIES:
-   :CUSTOM_ID: iteration
-   :END:
-
-When we want to do something repeatedly, it is sometimes more natural to
-use iteration than recursion.
-
-The =do= macro (and =do*=) is the fundamental iteration operator.
-
-#+BEGIN_SRC lisp
-    (defun show-squares (start end)
-      (do ((i start (+ i 1)))
-          ((> i end) 'done)
-
-    (format t "~A ~A~%" i (* i i))))
-
-    (show-squares 1 5)
-#+END_SRC
-
-The above iteration has a recursive version
-
-#+BEGIN_SRC lisp
-    (defun show-squares-recursive (i end)
-      (if (> i end)
-          'done
-          (progn
-            (format t "~A ~A~%" i (* i i))
-            (show-squares (+ i 1) end))))
-
-    (show-squares-recursive 1 5)
-#+END_SRC
-
-To iterate through the elements of a list, use =dolist=:
-
-#+BEGIN_SRC lisp
-    (defun our-length (lst)
-      (let ((len 0))
-        (dolist (obj lst)
-          (setf len (+ len 1))) ;such an assignment is not unacceptable
-        len))
-
-    (our-length '(1 2 3 4 5))
-#+END_SRC
-
-A recursive version
-
-#+BEGIN_SRC lisp
-    (defun our-length-recursive (lst)
-      (if (null lst)
-          0
-          (+ 1 (our-length-recursive (cdr lst)))))
-
-    (our-length-recursive '(1 2 3 4 5 6))
-#+END_SRC
-
-#+BEGIN_SRC lisp
-    (loop for x in '(1 2 3)
-          do (print x))
-    (loop for x in '(1 2 3)
-          collect (* x 10))
-    (loop for x on '(1 2 3)
-          do (print x))
-    (loop for x across #(1 2 3)
-          do (print x))
-    (loop for x in '(a b c)
-          for y across #(1 2 3)
-          collect (list x y))
-    (loop (print "hello"))
-    (loop for i in '(1 2 3 4)
-          when (> i 3)
-            return i)
-    (loop repeat 10
-          do (format t "Hello!~%"))
-    (loop repeat 10 collect (random 10))
-    (loop for x from 1 to 3
-          collect (loop for y from 1 to x
-                        collect y))
-    (loop for x from 1 to 3
-          for y = (* x 10)
-          with z = x
-          collect (list x y z))
-    (loop for x in '(a b c d e)
-          for y from 1
-
-          when (> y 1)
-            do (format t ", ")
-          do (format t "~A" x))
-    (loop for i from 0 to 10
-          do (print i))
-    (loop for i from 0 below 10
-          do (print i))
-    (loop for i from 10 downto 0
-          do (print i))
-    (loop for i from 10 above 0
-          do (print i))
-    (loop repeat 10
-          for x = (random 100)
-          if (evenp x)
-            collect x into evens
-          else
-            collect x into odds
-          finally (return (values evens odds))
-          )
-    (loop for x in '(1 2 3 4 5)
-          until (> x 3)
-          collect x)
-    (loop for x in '(1 2 3 4 5)
-          while (< x 3)
-          collect x)
-    (loop named loop-1
-          for x from 0 to 20 by 2
-          do (loop for y from 0 to 100 by (1+ (random 3))
-                   when (< x y)
-                     do (return-from loop-1 (values x y))))
-    (loop for x in '(1 2 3 2)
-          thereis (numberp x))
-    (loop for i from 1 to 3 count (oddp i))
-    (loop for i from 1 to 3 sum i)
-    (loop for i from 1 to 3
-          sum (* i i) into total
-          do (print i)
-          finally (print total))
-    (loop for i from 1 to 3 maximize (mod i 3))
-    (loop for (a b) in '((x 1) (y 2) (z 3))
-          collect (list b a))
-    (loop for (x . y) in '((1 . a) (2 . b) (3 . c))
-          collect y)
-    (loop for (x . nil) in '((1 . a) (2 . b) (3 . c))
-          collect x)
-    (loop for rest on '(a 2 b 2 c 3) by #'cddr
-          collect rest)
-    (loop for (key value) on '(a 2 b 2 c 3) by #'cddr
-          collect (list key (* 2 value)))
-
-
-    (mapcar (lambda (it) (+ it 10)) '(1 2 3 4 5))
-    (mapcar #'list
-            '(a b c)
-            '(1 2 3))
-    (mapcan #'list
-            '(a b c)
-            '(1 2 3))
-
-    ;; Generic for lists and vectors
-    (map 'list (lambda (it) (+ it 10)) '(1 2 3 4 5))
-    (map 'vector (lambda (it) (+ it 10)) #(1 2 3 4 5))
-    (map 'string (lambda (it) (code-char it)) '#(97 98 99))
-
-    (dotimes (n 10)
-      (print n))
-    (dotimes (i 10)
-      (if (> i 3)
-          (return)
-          (print i)))
-
-    (dolist (item '(1 2 3))
-      (print item))
-#+END_SRC
 
 ** Multiple Values
    :PROPERTIES:
