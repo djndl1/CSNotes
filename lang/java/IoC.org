@@ -1,0 +1,17 @@
+#+TITLE: IoC
+
+Loose Coupling and Information Hiding.
+
+* Service Provider Interfaces
+
+- *Service*: a well-known interface or class for which zero, one or many service providers exist.
+
+- *Service Provider*: a class that implements or subclasses the well-known interface or class.
+  + configured and identified through a provider file in ~META-INF/services/~
+  + installed in the form of a ~JAR~ in the classpath.
+
+- ~ServiceLoader~: an object that locates and loads service providers deployed in the runtime environment.
+
+Application ncode refers only to the service and is assumed to be capable of choosing between multiple service providers.
+
+Java has already provided some SPIs in ~java.util.spi~.

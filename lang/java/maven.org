@@ -127,3 +127,19 @@ use archetypes =mvn archetype:generate=, basically templates. Archetypes are add
 - =mvn deploy=: deploy the package to a remote repository
 
 - =mvn site=: generate a site documentation
+
+* Project Inheritance: Parent and Child
+
+A *child project* can inherit properties and dependencies of a *parent project* by using ~<parent></parent>
+
+** Spring Boot
+
+*** ~spring-boot-starter-parent~
+
+has no actual compile dependencies, but dependencies that can be opt-in by the user.
+
+- actual dependencies are added in ~<dependencies></dependencies>~ without specifying the version.
+
+- version management are declared in ~<dependencyManagement></dependencyManagement>~
+
+- properties can be overriden to reconfigure dependencies.

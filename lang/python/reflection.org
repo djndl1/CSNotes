@@ -1,0 +1,41 @@
+#+TITLE: Reflection
+
+- ~type(obj)~: get the type object of ~obj~.
+
+- ~instanceof(obj, A)~: is type or subtype or
+
+- ~hasattr(obj, 'a')~
+
+- ~id(obj)~: a unique ID of the object
+
+- ~dir(obj)~: all the attributes and methods of an object
+
+- ~vars(obj)~: instance variables of an object
+
+- ~callable(obj)~: if the object is callable
+
+* Dynamical Modification of An Object
+
+- ~obj.new_attr = 5~
+
+- ~setattr(A, '__init__', a_init)~
+
+- change a method's body
+
+ #+begin_src python
+def test():
+    print("Test")
+
+test.__code__ = (lambda: print("Hello")).__code__
+
+def test(): # a function that executes only once
+    test.__code__ = (lambda: None).__code__
+    print ("Test")
+ #+end_src
+
+* Create Classes At Runtime
+
+#+begin_src python
+A = type('A', (), {'x': 1})
+a = A()
+#+end_src

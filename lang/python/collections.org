@@ -1,0 +1,154 @@
+#+TITLE: Containers and Collections
+
+* Basic Builtin Types
+
+Anything that implements the iterable protocol (~__iter__()~) is iterable.
+
+- *Iterator*: similar to Java's ~Iterator~ or C#'s ~Enumerator~. Iterators are iterable themselves (but only one-pass).
+
+- *Container*: its ~__iter__()~ (typicall via ~iter()~) can returns an new iterator to allow multiple iteration passes.
+
+- *Generator Function*: a convenient way to implement the iterator protocol. It employs the ~yield~ expression and returns a *generator iterator*.
+
+- *Generator Iterator*: an iterator returned by a generator function.
+  + ~send()~: send a value as the return value of the ~yield~ expression (~value = yield value~ is legal) and resume the generator (~__next()~ returns ~None~).
+  + ~close()~:
+  + ~throw()~: throw an exception at the yield expression
+
+** Sequence Types
+
+*** Common Operations
+
+- test membership: ~x in s~, ~x not in s~
+
+- concatenation ~s + t~
+
+- repetition ~s * n~: shadow copy
+
+- indexer ~s[i]~, ~s[i:j]~, ~s[i:j:k]~: slices are automatically clamp to ~len(s)~ if needed. ~None~ is converted to ~0~ or ~len(s)~ depending on its position.
+
+- ~min(s)~, ~max(s)~
+
+- length: ~len(s)~
+
+- ~s.count(x)~:
+
+- indexOf: ~s.index(x, [i, [j]])~
+
+*** Operations of Mutable Sequences
+
+- assignment to slices and indexers
+
+- deletion of certain range of elements
+
+- ~append()~, ~insert()~, ~extend()~
+
+- ~clear()~, ~pop()~, ~remove()~
+
+- ~copy()~
+
+- ~reverse()~ in place
+
+*** Lists: mutable, heterogeneous
+
+- ~sort()~: in place sort
+
+*** Tuple: immutable, heterogeneous
+
+*** Range: immutable seqeunce of numbers
+
+- for looping a specific number of items in ~for~ loops
+
+- lazy evaluation
+
+*** ~str~: Immutable Text Sequence
+
+*** ~bytes~ (immutable), ~bytearray~ (mutable): manipulating binary data
+
+- can convert to (~.hex()~) and from (~fromhex()~) hexdecimal number.
+
+*** ~memoryview~: access the internal data of an object
+
+An element of ~memoryview~ may or may not be a byte.
+
+- ~cast()~ to another format is possible i.e. change how the memory view is interpreted.
+** Hashable
+
+Has a hash value which never changes during its lifetime.
+
+- necessarily immutable
+
+- has ~__hash__()~ and ~__eq__()~
+
+- Immutable containers are hashable if there elements are hashable.
+
+- UDTs are hashable derived from there ~id()~
+
+** Set
+
+- ~set~ (mutable), ~frozenset~ (immutable)
+
+Unordered collection of distinct hashable objects.
+
+- Sets do not support indexing, slicin or other sequence-like behavior.
+
+- Supports set comparison based on set's semantics.
+
+- set operations through ~|~, ~^~ (symmetric difference), ~&~, ~-~ (difference): unlike method set operations, these operators only support set types.
+
+- ~>~​/​~<~ test proper superset/subset, ~>=~​/​~<=~   test superset/subset
+
+** Dict
+
+A mpaping object maps hashable values to arbitrary objects.
+
+- ~|~, ~|=~: merge dicts
+
+- ~=~: comparisons are based on kv-pairs.
+
+- Dictionary order is guaranteed to be insertion order
+
+* ~array~: efficient asrrays of numeric values
+
+Typed array of numeric elements.
+
+#+begin_src python
+c = array('b', [1, 2, 3, 4, 20])
+#+end_src
+
+* ~Collections~ Module: Specialized container datatypes
+
+- ~namedtuple()~: a type construction function that creates namedtuple type
+  + replacement of tuple
+  + construction arguments are of string: e.g. ~namedtuple('Point', ['x', 'y'])~
+  + can have default values for fields
+  + subclassing is possible
+
+#+begin_src python
+class Point(namedtuple('Point', ['x', 'y'])):
+    __slots__ = ()
+    @property
+    def hypot(self):
+        return (self.x ** 2 + self.y ** 2) ** 0.5
+    def __str__(self):
+        return 'Point: x=%6.3f  y=%6.3f  hypot=%6.3f' % (self.x, self.y, self.hypot)
+#+end_src
+
+- ~defaultdict()~: has a factory method to provide a default one if the one being retrieved is missing
+  + ~int~ missing factory for counting
+
+#+begin_src python
+s = 'mississippi'
+d = defaultdict(int)
+for k in s:
+    d[k] += 1
+
+#+end_src
+
+** ~Collection.abc~ Abstract Base Classes for Containers
+
+The user may
+
+- inherit these ABC to write a new container type
+
+- register an existing container type as a subclass of an ABC

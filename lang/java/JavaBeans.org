@@ -1,0 +1,45 @@
+#+TITLE: Java Beans (Compared to C#'s ~System.ComponentModel~)
+
+A platform-neutral reusable software component model (that can be manipulated visually in a builder tool).
+
+- support for introspection (so that a builder tool can analyze how a bean works at design time): a key feature of JavaBeans compared to class libraries.
+
+- support for events (to connect up beans) and properties (for customization and for programmatic use)
+
+- support for persistence
+
+- MT Safety: Java Beans should assume that they are running in a multi-threaded environment and that several different threads may be simultaneously delivering events and/or calling methods and/or setting properties.
+
+- A JavaBean may not be a Java object, but a set of cooperating objects, in which case the user should not cast, but ~Beans.getInstanceOf()~ another view of the bean.
+
+* Properties:
+
+Discrete, named attributes that can affect its appearance or its behavior.
+
+- always via *accessors*
+
+- *indexed properties* (~int~): throws ~ArrayIndexOutOfBoundsException~ (sometimes along with accessors that expose the whole array).
+
+- *bound properties*: of whose changes some other bean is notified.
+  + ~PropertyChangeListener~
+
+- *Constrained properties*: a property whose changes might be validated and rejected by some other bean.
+  + ~PropertyVetoException~ on setter methods of such properties.
+  + ~VetoableChangeListener~: the recipient might choose to throw a ~PropertyVetoException~ to veto the change in the listener.
+
+A bean can optionally provide events for change of specific properties.
+
+* Introspection
+
+** Properties
+
+#+begin_src java
+public <PropertyType> get<PropertyName>();        // normal getter
+public void set<PropertyName>(<PropertyType> a); // normal setter
+public boolean is<PropertyName>();              // boolean getter
+
+public <PropertyElement> get<PropertyName>(int a); // indexed element getter
+public void set<PropertyName>(int a, <PropertyElement> a); // indexed element setter
+public <PropertyElement>[] get<PropertyName>();
+public void set<PropertyName>(<PropertyElement>[] a); // indexed element setter
+#+end_src

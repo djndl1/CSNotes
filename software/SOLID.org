@@ -1,0 +1,62 @@
+#+TITLE: The SOLID Design Principles
+
+For OOP, how code should be split up, which parts should be internal or exposed, and how code should use other code.
+
+* Single Responsibility
+
+#+begin_quote
+There should never be more than one reason for a class to change.
+#+end_quote
+
+Each module should do one thing and do it well.
+
+- Less testing
+
+- lower coupling
+
+- well-organized
+
+* Open for Extension, Closed for Modification
+
+To limit the dependency on the author of the class but also protect internal code from unskilled hands.
+
+#+begin_quote
+Objects or entities should be open for extension but closed for modification.
+#+end_quote
+
+A class should be extendable without modifying the class itself.
+
+OO languages can easily extend an existing class by inheritance. FP languages have to define hook points to allow modification.
+
+* Liskov Substitution
+
+#+begin_quote
+If S is a subtype of T, then objects of type T may be replaced with objects of type S without altering any of the desirable properties of the program.
+#+end_quote
+
+If your program “promises” to do something (such as implement an interface or a function), you need to keep to your promise and not surprise your clients.
+Many dynamic languages use duck typing to accomplish this.
+
+Violating Liskov Substitution might produce misleading code: we should expect some behavior to work, but it doesn’t.
+
+* Inrterface Segregation
+
+#+begin_quote
+A client should never be forced to implement an interface that it doesn’t use, or clients shouldn’t be forced to depend on methods they do not use.
+#+end_quote
+
+Don’t show your clients more than they need to see
+
+* Dependency Inversion
+
+The decoupling of software modules. This way, instead of high-level modules depending on low-level modules, both will depend on abstractions
+
+#+begin_quote
+Entities must depend on abstractions, not on concretions. It states that the high-level module must not depend on the low-level module, but they should depend on abstractions.
+#+end_quote
+
+* Reading
+
+[[https://www.digitalocean.com/community/conceptual_articles/s-o-l-i-d-the-first-five-principles-of-object-oriented-design][SOLID Principles]]
+
+[[https://stackoverflow.blog/2021/11/01/why-solid-principles-are-still-the-foundation-for-modern-software-architecture/][Why SOLID Principles Are Still the Foundation of Modern Software]]

@@ -14,3 +14,90 @@ a common means for discrete objects to communicate with each other.
 #+begin_quote
 In duck typing, an object's suitability is determined by the presence of certain methods and properties, rather than the type of the object itself.
 #+end_quote
+
+* [[https://peps.python.org/pep-0483/][Type Hint]]
+
+** Basic Concepts
+
+- *type*: a set of values and a set of functions that one can apply to these values
+  + can be defined in a few ways
+    + enumerating all values
+    + defining an interface of functions on the values of the type
+    + a class definition
+    + etc. e.g. generics specialization
+  + appear in variable and function type annotation, used by static type checkers.
+  + cannot be instantiated (raises ~TypeError~)
+  + cannot be subclassed except for ~Generic~
+
+- *class*: object factories defined by the ~class~ statement
+  + a dynamic, runtime concept
+  + an implementation of an abstract type
+
+- *subtype relation*
+  + (*state*) values of a subtype are also in the set of values of the supertype
+  + (*behavior*) every function from the supertype are in the set of functions of the subtype
+
+- *subtype declaration*
+  + *nominal typing*: the type tree is based on the class tree (C++, C, Java, C#).
+  + *structural typing*: the subtype relation is deduced from the declared methods by the compiler (Golang).
+  + *duck typing*: similar to structural typing but only part of the (Python)
+
+- *gradual typing*
+  + *is-consistent-with relationship*: ~A = B~ is legal if the type of A is consistent with the type of B.
+    - type A is consistent with type B if type A is a subtype of type B.
+    - ~Any~ is consistent with every type but not a subtype of every type.
+    - every type is consistent with ~Any~.
+
+** Fundamental Building Blocks
+
+- ~Any~
+
+- ~Union[t1, t2, ...]~: subtype of at least one of ~tX~.
+  + ~Optional[t1]~: ~Union[t1, None]~
+
+- ~Tuple[t1, t2, ..., tn]~: a tuple of type ~(t1, t2, ..., tn)~.
+  + covariant
+
+- ~Callable[[t1, t2, ..., tn], tr]~: a function
+
+- ~Intersection[t1, t2, ..., tn]~
+
+** Generic Type
+
+- *generic building block*: ~Generic[X, Y, ...]~
+  + ~class MyGenericClasss(Generic(T))~
+
+#+begin_src python
+class CustomQueue(Generic[T]):
+
+    def put(self, task: T) -> None:
+        ...
+    def get(self) -> T:
+        ...
+
+def communicate(queue: CustomQueue[str]) -> Optional[str]:
+    ...
+#+end_src
+
+Builtin container and container ABC are extended with type parameters.
+
+- *generic type*: classes that behave as generic type constructors e.g. ~List[int]~, ~Iterable[Task]~
+
+- *generic function*: functions that behave in the type generic manner
+
+- *type variable*: a variable defined as a name of a type
+  + ~Y = TypeVar('Y', t1, t2)~: a union of type ~t1~, ~t2~
+
+#+begin_src python
+S = TypeVar('S', str, bytes)
+def longest(first: S, second: S) -> S: # S is now a constrained type
+    return first if len(first) >= len(second) else second
+#+end_src
+
+- variance (covariance, contravariance, invariance)
+
+** Others
+
+- NoneType ~type(None)~
+
+- type alias ~Point = Tuple[float, float]~
