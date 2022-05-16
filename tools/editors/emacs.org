@@ -1,0 +1,36 @@
+#+title: Emacs
+
+
+- *keymaps*: Emacs binds keys to named commands, a special type of Lisp function.
+
+- =C-h= to invoke help
+
+* Editing
+
+** Insertion
+
+- =C-q= to insert any non-graphic characters.
+
+- =C-x 8 RET=: inserts unicode characters.
+
+- =C-o=: insert a blank line after (=C-x C-o=) delete blank lines.
+
+** Point (Cursor) Navigation
+
+- =M-g M-g=: =goto-line=
+
+- =M-g TAB=: move to column
+
+- To navigate a line visually, set =line-move-visual= to =t=
+
+** Cursor location
+
+- =line-number-mode=, =column-number-mode=, =hl-line-mode= (highlight), =display-line-mode=
+
+- =what-line=, =C-x ==
+
+- =count-words=, =M-== (=count-words-regioin=)
+
+** Numeric arguments
+
+- =digit-argument=, =negative-argument=, =universal-argument=: specifies arguments for the next command (not necessarily a repetition). To force a repetition, use =C-x z= after the command.
