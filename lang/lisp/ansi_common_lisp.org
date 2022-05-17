@@ -455,6 +455,11 @@ Looping is provided through macros.
         (,ending-value-name ,end)) ; fix multiple end-form evaluations
        ((> ,var ,ending-value-name))
        ,@body)))
+
+;;; one can even replace the let-gensym with the following macro
+(defmacro with-gensyms ((&rest names) &body body)
+  `(let ,(loop for n in names collect `(,n (gensym))) ; ,n, otherwise, the variable list would consists of only the variable n
+     ,@body))
 #+end_src
 
 *** Some Tips
