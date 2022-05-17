@@ -36,3 +36,17 @@
 ** Numeric arguments
 
 - =digit-argument=, =negative-argument=, =universal-argument=: specifies arguments for the next command (not necessarily a repetition). To force a repetition, use =C-x z= after the command.
+
+** Minibuffer
+
+The area under the modeline, used also by the echo area.
+
+*** Minibuffer Completion
+
+=TAB=, =SPC=, =RET=, =?=, use with =M-v= (switch to the completion list)
+
+*** Minibuffer History
+
+- =previous-history-element=, =next-history-element=, =list-command-history=
+
+- =C-x ESC ESC=: reexecute a recent minibuffer command
