@@ -9,6 +9,8 @@
 
 ** Insertion
 
+- =C-j=: newline (useful in minibuffer)
+
 - =C-q= to insert any non-graphic characters.
 
 - =C-x 8 RET=: inserts unicode characters.
