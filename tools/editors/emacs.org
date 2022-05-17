@@ -37,6 +37,8 @@
 
 - =digit-argument=, =negative-argument=, =universal-argument=: specifies arguments for the next command (not necessarily a repetition). To force a repetition, use =C-x z= after the command.
 
+  To use arguments with a named command, specify the argument before running =M-x= with the command.
+
 ** Minibuffer
 
 The area under the modeline, used also by the echo area.
