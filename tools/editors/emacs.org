@@ -52,3 +52,21 @@ The area under the modeline, used also by the echo area.
 - =previous-history-element=, =next-history-element=, =list-command-history=
 
 - =C-x ESC ESC=: reexecute a recent minibuffer command
+
+* Help
+
+- =C-h=
+
+- =C-h a=: searches for commands
+
+- =C-h b=: describe bindings
+
+- =C-h d=: search in documentation for keywords
+
+- =C-h i=: the GNU Info manual
+
+- =C-h f=: describe functions
+
+- =C-h C-f= the Emacs FAQ
+
+- =C-h p=: lists available Emacs packages
