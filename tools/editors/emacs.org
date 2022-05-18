@@ -70,3 +70,29 @@ The area under the modeline, used also by the echo area.
 - =C-h C-f= the Emacs FAQ
 
 - =C-h p=: lists available Emacs packages
+
+* Region, Mark
+
+- *Mark*: the initially starting end of the selected region.
+
+- *Mark Ring*: each buffer remembers previous locations of the mark in the *mark ring*. Setting a mark and then releasing it saves the mark in the mark ring.
+  + =C-u C-SPC=: move the cursor back to the previous mark.
+  + A global mark ring exists alongside the buffers' ring. =C-x C-SPC= jumps to the buffer and position of the latest entry in the global ring (saved at the same time as in a buffer's ring).
+
+- =C-SPC=, =C-@=: set the mark at point, enter the mark mode
+
+- =C-x C-x= (=exchange-point-and-mark=): switch between the cursor and the mark
+
+- =SHIFT=-selection together with certain cursor motion commands: =S-M-f=
+
+- =M-@=: move mark to the end of the next word, =C-M-@=: mark to the end of following balanced expression.
+
+- =C-x h=: =mark-whole-buffer=; =C-x C-p= (=mark-page=)
+
+** Operating on the Region
+
+- =C-w=: =kill-region=, =M-w=: =kill-ring-save=.
+
+- =M-%=: =query-replace=, query whether to replace and replace if yes.
+
+- =C-x TAB=: indent
