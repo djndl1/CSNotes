@@ -96,3 +96,47 @@ The area under the modeline, used also by the echo area.
 - =M-%=: =query-replace=, query whether to replace and replace if yes.
 
 - =C-x TAB=: indent
+
+* Killing And Moving Text
+
+- *killing*: erasing text and saving it into the kill ring.
+
+- *yanking*: pasting the text from the kill ring back into the buffer.
+
+Killing also copies text to the system's clipboard.
+
+** Deletion
+
+- Delete blanks: =M-\= (delete whitespaces around point), =M-SPC= (delete all but =just-one-space=), =M-^=: move the current line up by deleting the previous newline, while =C-x C-o=: deletes the next newline of the current line.
+
+** Killing
+
+- =C-k=: =kill-line= (kill to the next line), works with arguments
+
+- =C-S-backspace=: =kill-whole-line=, works with arguments.
+
+- =C-w=: =kill-region=; =M-w=; =M-d=: =kill-word=; =M-BACKSPACE=: =backward-kill-word=;
+
+- =C-M-k=: =kill-sexp=
+
+- =M-z char=: =zap-to-char= (kill to the next occurrence of the character).
+
+** Yanking
+
+Emacs respects the system's clipboard.
+
+- =C-y= (with arguments earlier kills are inserted), =M-y= (=yank-pop=, choose from the kill ring).
+
+- =C-M-w= + kill command: kill the text and append/prepend it to the previous kill entry.
+
+- =mouse-yank-primary=: yanks the primary selection under X. The secondary selection of X is rarely used.
+
+- =append-to-buffer=, =prepend-to-buffer=, =copy-to-buffer= (destroy and copy), =insert-buffer=, =append-to-file=
+
+** Rectangles
+
+There are two ways to do rectangle operations.
+
+- The Rectangle commands, starting with =C-x r=: =C-x r k=, =C-x r M-w=, etc.
+
+- Enter the rectangle mark mode with =C-x SPC= and use normal commands.
