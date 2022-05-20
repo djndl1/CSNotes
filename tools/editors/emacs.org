@@ -9,6 +9,7 @@
 
 ** Insertion
 
+
 - =C-j=: newline (useful in minibuffer)
 
 - =C-q= to insert any non-graphic characters.
@@ -140,3 +141,29 @@ There are two ways to do rectangle operations.
 - The Rectangle commands, starting with =C-x r=: =C-x r k=, =C-x r M-w=, etc.
 
 - Enter the rectangle mark mode with =C-x SPC= and use normal commands.
+
+* Register
+
+- *Register*: positions, text, rectangles, numbers, windows configurations, a file name are saved for later use.
+
+- *Bookmark*: records files and positions.
+
+** Saving positions
+
+- =C-x r SPC a=: =point-to-register= record the position of point and the current buffer in register =a=
+
+- =C-x r j a=: =jump-to-register= =a=
+
+TODO
+
+* Controlling the Display
+
+- =scroll-down-command=, =scroll-up-command=, =scroll-down=, =scroll-up= scrolls text, not the window, opposite to what modern editors do.
+
+- =recenter=, =C-l= (=recenter-to-bottom=, with arguments, this scroll the page to put the point at a certain line in the window, =C-u C-l= recenters), =C-M-l= (=reposition=).
+
+- =view-mode=: =SPC= and =S-SPC= to scroll
+
+- =follow-mode=: scroll two buffers that shows the same buffer together
+
+TODO
