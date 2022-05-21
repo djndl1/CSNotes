@@ -148,13 +148,17 @@ There are two ways to do rectangle operations.
 
 - *Bookmark*: records files and positions.
 
-** Saving positions
+** Saving Positions
 
 - =C-x r SPC a=: =point-to-register= record the position of point and the current buffer in register =a=
 
 - =C-x r j a=: =jump-to-register= =a=
 
-TODO
+** Saving Text
+
+- =C-x r s r=: =copy-to-register=; =append-to-register=, =prepend-to-register=
+
+- =C-x r i r=: =insert-register=
 
 * Controlling the Display
 
