@@ -180,3 +180,23 @@ There are two ways to do rectangle operations.
 =list-faces-display= displays all faces.
 
 TODO
+* Major and Minor Modes
+
+- *Major Mode*: specialized facilities for working on a specialized file type. Major modes are mutually exclusive.
+  + Three groups:
+    - Normal text, plain or markup
+    - Various programming languages
+    - special buffers such as shell, =Dired=, =Message=.
+  + =C-h m= describes the current mode.
+  + Each major mode defines a mode hook, a list of Lisp functions to run each time the mode is enabled in a buffer.
+
+- *Minor Mode*: optional features not necessarily specific to a type of file or buffer.
+  + Minor modes can be buffer-local or global.
+  + Some useful minor modes:
+    - =display-line-numbers=
+    - visual line-mode.
+    - line number mode, enabled by default
+    - menu bar mode
+    - scroll bar mode
+
+Emacs determines the major mode by first finding a =; -*- mode: my-mode ;-*-= string in the buffer, then by =#!=, then by matching the start of the text, then matching the file name and finally falling back to another mode.
