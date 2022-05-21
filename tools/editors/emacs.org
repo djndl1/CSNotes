@@ -200,3 +200,22 @@ TODO
     - scroll bar mode
 
 Emacs determines the major mode by first finding a =; -*- mode: my-mode ;-*-= string in the buffer, then by =#!=, then by matching the start of the text, then matching the file name and finally falling back to another mode.
+
+* Normal Text Editing
+
+- =M-t=: =transpose-words=, exchange two words at both sides of the point.
+
+- =M-a=, =M-e=, =M-k=, =C-x DEL=: sentence editing commands.
+
+- Case conversion
+  + =M-l=, =M-u=
+  + =M-c=
+  + =C-x C-l=, =C-x C-u=
+
+- =M-{=, =M-}=, =M-h=: paragraph commands
+
+- =auto-fill-mode=: automatically breaks the line at spaces when necessary (filling the text)
+  + =M-q=: =fill-paragraph=
+  + =C-x f=: set the fill column
+  + =fill-region=
+  + =M-o M-s= Center a line
