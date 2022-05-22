@@ -226,3 +226,88 @@ Emacs determines the major mode by first finding a =; -*- mode: my-mode ;-*-= st
   + =C-x f=: set the fill column
   + =fill-region=
   + =M-o M-s= Center a line
+
+* Source Code Editing
+
+- =prog-mode-hook= is run before the PL's major mode.
+
+- *defun*: a major definition at top level in the buffer such as a function.
+  Many PL modes assume by default that any opening delimiter found at the left
+  margin is the start of a top-level definition (*defun*)
+  + =beginning-of-defun=, =end-of-defun=, =mark-defun=
+
+- *Imenu*: list major definitions in a buffer
+
+- =which-function-mode=: show in which function the point is.
+
+** Indentation
+
+Emacs is responsible for reindenting the source code buffer.
+
+- =TAB=: =indent-for-tab-command=, =C-u TAB=: shift an entire parenthetical grouping
+
+- =C-M-q=: Reindent all the lines within a parenthetical grouping.
+
+- =c-set-style=, =c-default-style= for various major modes.
+
+** Balanced Expressions
+
+- =C-M-f/b/k/t/@/SPC=: move, kill, transpose, mark based on sexp.
+
+- =C-M n/p/u/d=: parenthetical grouping navigation: next grouping, previous grouping, uplevel, downlevel
+
+- =electric-pair-mode=: easy insertion of matching delimiters.
+
+** Comments
+
+- =M-;=: =comment-dwim=; =C-x C-;=: =comment-line=, =C-u M-;=: =comment-kill=;
+
+** Find Identifier References
+
+- *identifier*: a syntactical subunit of the program: a function, a subroutine, a method, a class, a data type, a macro.
+
+- *xref*: the unified interface for dealing with identifiers. The backend for the major mode is responsible for gathering the information of identifiers: either using builtin means or through an external program (=etags=).
+
+- =M-.= =xref-find-definition=; =xref-find-apropos=, =xref-find-defintions-other-window=; =M-,=: =xref-go-back=
+
+- =M-?=: =xref-find-references=
+
+- =xref-query-replace-in-results=
+
+- =C-M-i=: =complete-symbol=
+
+** Programming Documentation Lookup
+
+- =C-h S=: =info-lookup-symbol= to view the Info doc for a symbol used in the program.
+
+- =man=, =woman=
+
+- =C-h f=, =C-h v= for elisp.
+
+** Other Features
+
+- =hs-minor-mode=: hideshow a block, =C-c @= with various related command. But we also have =fold.el=.
+
+- the =semantic= package: language-aware editing commands based on source code parsers.
+
+- =prettify-symbols-mode=: replace certain strings with more attractive versions for display purposes. Not really for programming.
+
+- =flymake-mode=: a linter for many PLs.
+
+** For C-Family Languages
+
+- =C-M-a=, =C-M-e=, =M-a=, =M-e=
+
+  TODO
+
+** Compilation
+
+=compile=, =recompile=
+
+** Debugging
+
+- *GUD* (Grand Unified Debugger): an Emacs interface to a wide variety of symbolic debuggers.
+
+- =gdb=, =gud-gdb=
+
+- =C-x C-a=-series of commands to control the debugger.
