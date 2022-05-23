@@ -5,6 +5,17 @@
 
 - =C-h= to invoke help
 
+* File Handling
+
+- the minibuffer supports =$= to read an envvar.
+
+- =C-x C-f=: =find-file=; =C-x C-r=: =find-file-read-only=; =C-x C-v=:
+  =find-alternate-file= (kills the current one and find another); =C-x 4 f=: =find-file-other-window=;
+  =C-x 5 f=: =find-file-other-frame=; =find-file-literally= (treat the file as a file of ASCII).
+
+- =C-x C-s=: =save-buffer= (the current one), =C-x s=: =save-some-buffers=;
+  =C-x C-w=: =write-file= (SaveAs); =M-~=: mark as not modified to avoid saving.
+
 * Editing
 
 ** Insertion
