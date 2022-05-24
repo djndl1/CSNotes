@@ -1,40 +1,12 @@
 * Basic Operations
 
-- ~ZZ~ / ~:wq~
+** Status-Aware
 
-- ~:e!~: returns to the last saved version of the file
+- =C-g=: show the location in a file and the file status
 
-- ~:w!~: overwrite the existing file
+** Motion
 
-- ~c~: change, a combination of delete followed by insert.
-
-- ~cc~: change the entire line
-
-- ~C~: = ~c$~
-
-- ~D~: delete to the end of the line = ~d$~
-
-- ~s~: substitute a certain number of text object, i.e. delete and insert
-
-- ~y~ (yank), ~p~ (put)
-
-- ~.~: repeat the former command
-
-- ~Y~: = ~yy~
-
-- ~ra~: replace the current char with ~a~
-
-- ~R~: replace mode, overstrike the current line
-
-- =~=: changing case
-
-- ~xp~: transpose the current and the next character
-
-- ~A~/~I~: append to the end/begging of the line
-
-- ~J~: join
-
-- ~-~ / ~+~: to the first char of the previous/next line
+- ~e~: move to the end of the current word
 
 - ~^f~ / ~^b~: scroll up/down a screen
 
@@ -50,11 +22,62 @@
 
 - ~(~ / ~)~, ~{~ / ~}~, ~[[~ / ~]]~: move to beginning of current/next sentence/paragraph/section
 
+- =%=: move to the matching parenthesis
+
 - Commands that change text can be combined with ~/~ and ~?~
 
 - ~f~ / ~F~ / ~t~ / ~T~ / ~;~ /~,~
 
 - ~G~ / ~``~: go to/back
+
+** Change Text
+
+Format: [Change] [Count] [Motion]
+
+- ~d~: delete
+  + ~D~: delete to the end of the line = ~d$~
+
+- ~ra~: replace the current char with ~a~, no need to enter the insert mode
+
+- ~c~: change, a combination of delete followed by insert. ~ce~, ~cw~
+  - ~cc~: change the entire line
+  - ~C~: = ~c$~
+
+- =~=: changing case
+
+- ~ZZ~ / ~:wq~
+
+- ~:e!~: returns to the last saved version of the file
+
+- ~:w!~: overwrite the existing file
+
+- ~s~: substitute a certain number of text object, i.e. delete and insert
+
+- ~y~ (yank), ~p~ (put)
+
+- ~.~: repeat the former command
+
+- ~Y~: = ~yy~
+
+- ~R~: replace mode, overstrike the current line
+
+- ~xp~: transpose the current and the next character
+
+- ~A~/~I~: append to the end/begging of the line
+
+- ~J~: join
+
+- ~-~ / ~+~: to the first char of the previous/next line
+
+** Search/Replace
+
+- =:s/thee/the/=, optionally with =g= (globally in the line)
+
+- =#,#s/old/new/g=, =%s/old/new/g= (the whole buffer=, =%s/old/new/gc= (prompt whether to substitute or not)
+
+** Undo/Redo
+
+- ~u~: undo; ~U~: undo all on a line, ~C-r~: redo
 
 * Advanced Operations
 
@@ -250,19 +273,21 @@ slashes can be replaced by colons as delimiters.
 
 - ~-o~/~-oNumber~
 
-- ~:split~, ~Ctrl-Ws~
+- ~:split~, ~Ctrl-Ws~: split the window horizontally
 
-- ~:new~, ~Ctrl-Wn~
+- ~:vnew~ / ~:vsplit~, ~Ctrl-Wv~: vertically split the window
 
-- ~:vnew~ / ~:vsplit~, ~Ctrl-Wv~
+- ~:new~, ~Ctrl-Wn~: new window
+
+- ~:close~, ~Ctrl-Wc~: close the current window; ~:only~: close all but the current window
+
+- ~Ctrl-W~ + ~+, -~: increase/decrease the current windows, ~=~: resize all windows to equal size. + ~<, >~: decrease/increase, + ~|~: resizes the current window to the widest size possible
 
 - ~Ctrl-W~ + ~h,j,k,l~, ~t~ (top), ~b~ (bottom), ~p~ (previous)
 
 - ~Ctrl-W~ + ~r~: rotate windows, + ~x~: exchange two windows in a row or column
 
 - ~Ctrl-W~ + ~K, J, H, L, T (tab)~: move the current window, full height
-
-- ~Ctrl-W~ + ~+, -~: increase/decrease the current windows, ~=~: resize all windows to equal size. + ~<, >~: decrease/increase, + ~|~: resizes the current window to the widest size possible
 
 - ~Ctrl-W~ + ~q~: quit a window; + ~c~: close the current window
 
