@@ -176,6 +176,19 @@ There are two ways to do rectangle operations.
 - =C-x r r r=: =copy-rectangle-to-register=
 
 - =C-x r i r=: =insert-register=
+
+** Bookmarks
+
+- =C-x r m RET=:set the bookmark for the visited file at point.
+
+- =C-x r m bookmark RET=: =bookmark-set=
+
+- =C-x r b bookmark RET=: =bookmark-jump=
+
+- =C-x r l=: =list-bookmarks=
+
+- =bookmark-save=: save all the current bookmarks in the default bookmark file.
+
 * Controlling the Display
 
 - =scroll-down-command=, =scroll-up-command=, =scroll-down=, =scroll-up= scrolls text, not the window, opposite to what modern editors do.
