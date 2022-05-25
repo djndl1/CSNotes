@@ -373,3 +373,13 @@ Emacs is responsible for reindenting the source code buffer.
 - =gdb=, =gud-gdb=
 
 - =C-x C-a=-series of commands to control the debugger.
+
+* Emacs Lisp Packages
+
+- =list-packages=: =h=, =?= =RET= etc. This menu can be operated on.
+
+** Installation
+
+- =package-install=: packages are downloaded from =package-archive=s
+
+Emacs searches =package-user-dir= and =package-directory-list= for installed packages.
