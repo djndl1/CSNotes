@@ -1,3 +1,19 @@
+All ed commands operate on whole lines or ranges of lines.
+
+*ed* supports two mode:
+
+- *command*: commands are read from the stdin and executed to manipulate the
+  contents of the editor buffer.
+  + =[ADDRESS [, ADDRESS]]COMMAND[PARAMETERS]=
+
+- *input*: with a input command such as =a=, =i=, =c=, ed enters input mod, the
+  primary means of adding text to a file. The standard input is written directly
+  to the buffer editor buffer and then terminated by a single period =.= on a
+  line.
+
+  Since ed operates on lines, there's a reason for commands like =s/old/new/p= to exist
+  since one cannot easily modify an individual word.
+
 * Basic Operations
 
 - ~a~: append, ~.~: end
