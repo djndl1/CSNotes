@@ -16,6 +16,23 @@
 - =C-x C-s=: =save-buffer= (the current one), =C-x s=: =save-some-buffers=;
   =C-x C-w=: =write-file= (SaveAs); =M-~=: mark as not modified to avoid saving.
 
+** Backup Files
+
+Emacs saves the file the first time it's loaded into the buffer as a backup.
+
+TODO
+
+** Directory
+
+- =C-x -C-d=: =list-directory=;
+
+- =C-u C-x C-d=: a more verbose directory listing
+
+- =make-directory=, =delete-directory=
+
+*** =Dired=
+
+TODO
 * Editing
 
 ** Insertion
