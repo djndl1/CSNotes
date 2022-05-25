@@ -33,6 +33,22 @@ TODO
 *** =Dired=
 
 TODO
+
+** Comparing Files
+
+- =diff=, with =diff-switches=; =ediff=: a sophisticated diff mode.
+
+- =diff-buffer-with-file= (and =magit-diff-buffer-file=): compares the buffer with its file.
+
+- =compare-windows=
+
+=diff-mode= shows a patch, the difference between two files. Changes in a patch
+are grouped into *hunks* (contiguous chunks of text that contains one or more
+changed lines). Each hunk starts with a *hunk header* that specifies the old and
+new line numbers at which the hunk occurs.
+
+TODO
+
 * Editing
 
 ** Insertion
