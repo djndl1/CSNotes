@@ -16,6 +16,10 @@
 - =C-x C-s=: =save-buffer= (the current one), =C-x s=: =save-some-buffers=;
   =C-x C-w=: =write-file= (SaveAs); =M-~=: mark as not modified to avoid saving.
 
+- =insert-file=, =write-region=: read into/write text region to
+
+  Emacs is able to read/write files in a compressed format or in an archive.
+
 ** Backup Files
 
 Emacs saves the file the first time it's loaded into the buffer as a backup.
@@ -32,8 +36,14 @@ TODO
 
 *** =Dired=
 
-TODO
+- =C-x d=; =dired-listing-switches=
 
+- Navigation: =SPC=, =DEL=, =j=, =M-s f C-s=
+
+- Deletion: =d= (=dired-flag-file-deletion=), =u= (=dired-unmark=), =DEL=
+  (=dired-unmark-backward=), =x= (=dired-do-flagged-delete=)
+
+- Opening: =o=, =C-o=, =v= (view the file), =^= (move up the directory)
 ** Comparing Files
 
 - =diff=, with =diff-switches=; =ediff=: a sophisticated diff mode.
