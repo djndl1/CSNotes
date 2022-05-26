@@ -14,6 +14,15 @@ All ed commands operate on whole lines or ranges of lines.
   Since ed operates on lines, there's a reason for commands like =s/old/new/p= to exist
   since one cannot easily modify an individual word.
 
+* Line Addressing
+
+'ed' has a current line address =.= that is used by commands.
+
+- *address range* format: =a,b=, =a;b=
+  + =$=: the last line; =+N=, =-N=: the n-th next/previous line; =+=, =-=
+  + =,=: all lines, =;=: the current to the last
+  + =/RE/=, =?RE?=: the next/previous line that contains the regex.
+
 * Basic Operations
 
 - ~a~: append, ~.~: end
@@ -58,7 +67,7 @@ g/peling/s//pelling/gp
 - ~v~: opposite of ~g~
 
 - ~&~: used on the right-hand part of a substitute command where it means "whatever was matched on the left-hand side"
-
+x
 * Basic Concept
 
 Editing is done in two distinct modes: 
