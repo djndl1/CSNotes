@@ -259,6 +259,31 @@ TODO
 
  To return to where the search starts (saved in the mark ring), =C-u C-SPC=. =C-s C-s=/=C-r C-r= starts the previous search again. =C-s M-n=/=C-s M-p= chooses from the search ring. =M-e= to enter the minibuffer to modify the search string.
 
+* Buffers and Windows
+
+** Buffers
+
+- =C-x b=, =C-x 4 b=, =C-x 5 b= (separate frame)
+
+- =C-x C-b=: =list-buffers=
+
+- =C-x C-q=: =read-only-mode=
+
+- =C-x k=: =kill-buffer=; =kill-matching-buffers=; =clean-buffer-list=
+
+- =buffer-menu=; =buffer-menu-other-window=
+
+** Windows
+
+- =C-x 2=, =C-x 3=: split horizontally/vertically
+
+- =C-x o=: =other-window=; =C-M-v=: =scroll-other-window=
+
+- =C-x 4=-family commands display buffers in another window
+
+- =C-x 0=: =delete-window=; =C-x 1=: =delete-other-window=;
+
+- =C-x ~=; =C-x }=; =C-x {=; =C-x -=; =C-x +=
 * Major and Minor Modes
 
 - *Major Mode*: specialized facilities for working on a specialized file type. Major modes are mutually exclusive.
