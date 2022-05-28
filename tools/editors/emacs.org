@@ -418,3 +418,28 @@ Emacs is responsible for reindenting the source code buffer.
 - =package-install=: packages are downloaded from =package-archive=s
 
 Emacs searches =package-user-dir= and =package-directory-list= for installed packages.
+
+* TRAMP: Transparent Remote Access Multiple Protocol
+
+=/method:user@host:/path/to/file=
+
+#+begin_src
+/smb:user%domain@host:/path/to/file # windows SAMBA
+/ssh:user@host#port:/path/to/file # SSH with a custom port
+/sudo: # use another user's identity for a while
+/su: # as another user
+#+end_src
+
+Supports ssh, telnet, samba, GVFS, FUSE, Android adb
+
+- *inline methods*: use the same login connection to transfer file contents
+  + ssh, telnet, su, sudo, plink
+
+- *external methods*: operate over multiple channels
+  + rcp, scp, rsync, fcp, ftp, smb
+  + GVFS: atp, dav(s), gdrive, mtp, nextcloud, sftp
+  + FUSE: sshfs
+  + docker, kubernetes, magit, hdfs,vagrant
+
+- Some useful options
+  + =tramp-remote-path=
