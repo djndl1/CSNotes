@@ -459,3 +459,11 @@ Supports ssh, telnet, samba, GVFS, FUSE, Android adb
 - =C-c C-z=: =c-display-defun-name=
 
 - =C-c C-e=: =c-macro-expand=
+
+** Emacs Vim Mode
+
+*** Viper
+
+Implemented as a collection of minor modes.
+
+- =C-z=: enter/exit Emacs state.
