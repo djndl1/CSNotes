@@ -419,7 +419,9 @@ Emacs is responsible for reindenting the source code buffer.
 
 Emacs searches =package-user-dir= and =package-directory-list= for installed packages.
 
-* TRAMP: Transparent Remote Access Multiple Protocol
+* Packages
+
+** TRAMP: Transparent Remote Access Multiple Protocol
 
 =/method:user@host:/path/to/file=
 
@@ -443,3 +445,17 @@ Supports ssh, telnet, samba, GVFS, FUSE, Android adb
 
 - Some useful options
   + =tramp-remote-path=
+
+** CC Mode
+
+- Basic options
+  + =c-basic-offset=: indentation offset
+  + =c-default-style=: the basic style of indentation
+
+- =C-c .=: =c-set-style=
+
+- =C-c :=: =c-scope-operator=
+
+- =C-c C-z=: =c-display-defun-name=
+
+- =C-c C-e=: =c-macro-expand=
