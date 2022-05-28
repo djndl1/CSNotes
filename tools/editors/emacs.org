@@ -467,6 +467,12 @@ Supports ssh, telnet, samba, GVFS, FUSE, Android adb
 Implemented as a collection of minor modes.
 
 - =C-z=: enter/exit Emacs state.
+
+** flycheck
+
+- =C-c ! n/p= (=flycheck-previous/next-error=): navigate through errors
+
+- =C-c ! l= (=flycheck-list-errors=)
 ** =lsp-mode=
 
 - code completion:
