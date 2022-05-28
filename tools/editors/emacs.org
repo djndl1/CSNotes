@@ -467,3 +467,51 @@ Supports ssh, telnet, samba, GVFS, FUSE, Android adb
 Implemented as a collection of minor modes.
 
 - =C-z=: enter/exit Emacs state.
+** =lsp-mode=
+
+- code completion:
+  + =completion-at-point=
+
+- code actions on the modeline: refactor, format, rename
+
+- hovers (=lsp-ui=)
+
+- code outline =imenu=, =helm-imenu=
+
+- code navigation =xref=, =lsp-treemacs=, =lsp-ui=
+  + =lsp-find-definition=
+  + =lsp-find-references=
+
+- code lens
+
+- breadcrumbs on headline, the hierarchy information of the current cursor.
+
+** =lsp-ui=
+
+- =lsp-ui-sideline=: various information on the right line
+
+- =lsp-ui-peek=: peek defintions, references. similar to that of VSCode.
+
+- =lsp-ui-doc=: show docs
+
+- =lsp-ui-imenu=: show imenu entries
+  + =lsp-ui-imenu-auto-refresh=
+
+** =lsp-treemacs=
+
+- =lsp-tremacs-sync-mode=: set to 1
+
+- =lsp-treemacs-errors-list=: show errors at the bottom (like in VSCode)
+
+- =lsp-treemacs-symbols=: show symbols, outline on the left.
+
+- =lsp-treemacs-references/implementations=: show references/implementations at
+  the bottom (like in Visual Studio).
+
+** =lsp-ivy=
+
+- =lsp-ivy-workspace-symbol=
+
+- =lsp-ivy-global-workspace-symbol=
+
+  Show symbols in ivy's interactive completion interface.
