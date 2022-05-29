@@ -473,6 +473,36 @@ Implemented as a collection of minor modes.
 - =C-c ! n/p= (=flycheck-previous/next-error=): navigate through errors
 
 - =C-c ! l= (=flycheck-list-errors=)
+
+** Treemacs
+
+Managing directories as workspaces
+
+- *workspace*: multiple projects (folders) forms a single workspace.
+
+- =treemacs-advanced-helpful-hydra=
+
+** Projectile
+
+A project interaction library for easy project management and navigation.
+  + searching/replace in the directory
+
+- *project*: a folder containing some special file (a VCS marker or a project
+  descriptor file).
+  + marker: =.projectile=, VCS directories, some project description file.
+
+- =Lead-key p=
+
+- =projectile-find-file=
+
+- =projectile-switch-project=
+
+- =lead-key p s=: =search-project=
+
+- =projectile-find-other-file=: find related file (e.g. source - header)
+
+* Language Server Protocol
+
 ** =lsp-mode=
 
 - code completion:
