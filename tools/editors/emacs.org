@@ -474,6 +474,22 @@ Implemented as a collection of minor modes.
 
 - =C-c ! l= (=flycheck-list-errors=)
 
+** Ivy
+
+- =ivy=: provides a basic framework and UI for listing/search/filtering/completion while
+  typing in more details
+  + =ivy-read=
+
+- =swiper=: search
+
+- =counsel=: provides some useful command based on ivy and more abstraction
+  + =counsel-find-file=
+  + =counsel-M-x=
+  + =counsel-describe-function=
+  + =counsel-describe-variable=
+  + =counsel-find-library=
+  + =counsel-git=, =counsel-git-grep=, =counsel-ag=, =counsel-locate=
+
 ** Treemacs
 
 Managing directories as workspaces
