@@ -551,3 +551,9 @@ A project interaction library for easy project management and navigation.
 - =lsp-ivy-global-workspace-symbol=
 
   Show symbols in ivy's interactive completion interface.
+
+** =dap-mode=
+
+- =dap-debug=: use a debug template to start the debugging
+
+- =dap-debug-edit-template=: prepare a template declaration inside a temporary buffer.
