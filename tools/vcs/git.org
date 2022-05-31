@@ -1,1 +1,32 @@
 #+title: Git
+
+Distributed Version Control System: clients don't checkout the latest snapshot
+of the files but fully mirror the repository, including its full history.
+
+* Important Features
+
+- Unlike many VCSes, Git treats its data like a *stream of snapshots* instead of
+files and their delta changes. Unchanged files just happen to be in multiple
+snapshots.
+
+- *Distributed*: due to the distributed nature of Git, nearly every operation in
+  Git is local since it has the full history of the data, making it fast and
+  reliable.
+
+- *Integrity*: everything is checksummed (currently with SHA-1) before stored to
+  disk.
+
+* Basic Concepts
+
+-  The Three States
+  + *Modified*: File is changed by not commited to the database
+  + *Staged*: marked to go into the next commit snapshot.
+  + *Committed*: the data is stored in the local database.
+
+- *The Git Directory*: where Git stores the metadata and object database for the
+  project in version control.
+
+- *The Staging Area*: a file in the Git directory that stores information about
+  what will go into the next commit.
+
+- *The Working Tree*: A single checkout of one version of the project.
