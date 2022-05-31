@@ -30,3 +30,16 @@ snapshots.
   what will go into the next commit.
 
 - *The Working Tree*: A single checkout of one version of the project.
+
+* Basic configuration
+
+- System configuration: =/etc/gitconfig/=
+
+- Global configuration: =~/.gitconfig=, =~/.config/git/config=, with the
+  =--global= option
+
+- Repository-local configuratiion: =config= file in the =.git= directory.
+
+- Some common options
+  + =init.defaultBranch=: better set to =main=
+  + =user.name=, =user.email=
