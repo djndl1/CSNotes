@@ -26,7 +26,7 @@ snapshots.
 - *The Git Directory*: where Git stores the metadata and object database for the
   project in version control.
 
-- *The Staging Area*: a file in the Git directory that stores information about
+- *The Staging Area*/*The Git Index*: a file in the Git directory that stores information about
   what will go into the next commit.
 
 - *The Working Tree*: A single checkout of one version of the project.
@@ -38,8 +38,77 @@ snapshots.
 - Global configuration: =~/.gitconfig=, =~/.config/git/config=, with the
   =--global= option
 
-- Repository-local configuratiion: =config= file in the =.git= directory.
+- Repository-local configuration: =config= file in the =.git= directory.
 
 - Some common options
   + =init.defaultBranch=: better set to =main=
   + =user.name=, =user.email=
+
+* Basic Operations
+
+** Removing/Moving Files
+
+- =git rm=: remove a file from the index and possibly from the filesystem so
+  that Git no longer tracks the file. Git blocks the removal if there is a
+  discrepancy between the HEAD and the staging index or the working tree
+  version.
+  The problem with using =rm= is that the staging index is not affected and thus
+  requires another =git add=. =git rm= acts as a shortcut to update both the
+  working directory and the staging index.
+  + =--cached=: keep the file in the filesystem but remove it from the staging
+    area, e.g. simply untrack the file (the file is treated as a totally new
+    file).
+
+- =git mv=: basically a filesystem =mv= and =git add= after =git rm= the
+  original. Git is smart enough to guess the file has been renamed.
+
+** Commit History
+
+- =git log=
+  + =--stat=: prints a list of modified files
+  + =--pretty= with =oneline=, =short=, =full=, =fuller=, =format:...=
+  + =--graph=: a nice little ASCII graph.
+  + filtering
+    + =--since=, =--until=p
+    + =--grep=: search for keywords in the commit messages
+    + =-S=: filter the commit that changed the string after
+    + a path after =--=: limiting the change to a directory/file.
+
+** Undoing
+
+- =git commit --amend=: make changes to the last commit (only before pushing to
+  the remote).
+
+=git restore= (restore the working tree) was introduced in 2.23.0 and replaces some use of =git reset=.
+
+- =git reset HEAD path/to/file=, =git restore --staged <file>=: unstage a file
+
+- =git checkout -- path/to/file=, =git restore <file>=: unmodify a file
+
+** Remotes
+
+- =git remote -v=: list remotes with URLs
+
+- =git remote show remoteName=
+
+- =git remote rename old new=
+
+** Tagging
+
+A special point in the commit history.
+
+- =git tag=, =git tag -l=
+
+- *lightweight tag*: a pointer to a specific commit
+  + =git tag=
+
+- *annotated tag*: a full object that has the tagger's info, a tagging message
+  and can be signed.
+  + =git tag -a <tag> -m <tag_message>=
+
+Tags must be explicitly pushed =git push <remote> tag_name=, =git push <remote>
+--tags= and deleted by =git tag -d= and =git push <remote> --delete <tagname>=
+
+** Aliasing
+
+=git config --global alias.myAlias command=
