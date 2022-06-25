@@ -1,0 +1,41 @@
+#+title: Tmux
+
+- Hierarchy : *Served* - *Session* - *Window* - *Pane*
+  + =tmux list-clients=
+  + =tmux -L=: start a new tmux server with the specified name.
+
+- Why tmux: multitasking, running applications in the background, pair
+  programming
+
+* Practical Usage
+
+Tmux is controlled by sending various commands to it. Commands are can be sent
+using keyboard sequences, prefixed by a certain key, or =tmux command=, or in
+the prompt after =Prefix := inside tmux.
+
+- prefix key: the default is =C-b=. With nested sessions, the prefix key must be
+  typed twice.
+
+- =Prefix d=: detach from the session.
+
+- Clipboard: tmux has a cliboard to copy/paste across sessions, windows and
+  panes.
+  + =Prefix [= to enter copy mode, =Prefix ]= to paste and =Alt-W= to copy.
+
+* Hierarchy
+
+- *Session*: =tmux new-session=
+  + =Prefix (=, =Prefix )=, =Prefix L=, =Prefix s=: to switch between sessions
+
+- *Window*:
+  + =Prefix c=: create a new window
+  + =Prefix x=: kill a window with all its panes.
+  + =Prefix 1,2,3,4=, =Prefix .= =Prefix I=. =Prefix w= shows windows.
+  + =rename-window=
+
+- *Pane*
+  + =split-window -v, -h=, =Prefix %/"=
+  + =Prefix ;=, =Prefix Up/Down/Left/Right=: move between panes
+  + =Prefix o=
+  + =Prefix z+ zoom in/out
+  + =resize-pane=; =Prefix C-ArrowKey=
