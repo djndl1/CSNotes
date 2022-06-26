@@ -112,3 +112,83 @@ Tags must be explicitly pushed =git push <remote> tag_name=, =git push <remote>
 ** Aliasing
 
 =git config --global alias.myAlias command=
+
+* Branching
+
+Branches are low in overhead in Git and Git encourages the use of branches.
+
+Commit objects have a pointer to its previous (possibly multiple) commits. A
+branch is just a *HEAD* pointer to a certain commit. Switching branches simply
+changes the commit that the HEAD pointer points to.
+
+#+begin_src shell
+git branch <branch_name>
+git branch -d <branch_name> # delete
+git push <remote_name> --delete <branch_name>
+git branch --move # rename a branch
+git switch # git checkout <branchName>
+#+end_src
+
+** Merging
+
+#+begin_src shell
+git branch --merged     # merged into the current branch
+git branch --no-merged  # not merged into the current branch
+#+end_src
+
+Three-way merging creates a new (merge) commit, unlike a fast-foward merge which
+simply moves the source branch pointer to the target one.
+
+#+begin_src shell
+git mergetool
+#+end_src
+
+Merge conflicts need to be resolved and then commit.
+
+** Rebasing
+
+Rebasing eliminates the merge commit introduced by the three-way merging.
+The rebasing branch is set to the base branch and then the commits are applied
+to it. These commits are, unfortunately, new commits. Rebasing creates new
+commits and rewrites the commit history. This would cause great confusion if
+pushed to the remote.
+
+#+begin_src shell
+git rebase master # currently on the experiment branch
+git checkout master
+git merge experiment
+#+end_src
+
+This ends up with a new linear commit history so that the maintainer does not
+need to do any integration work.
+
+** Workflows
+
+There can be a few long-running branches with various levels of stability. Once
+that branch reaches a certain level of stability, it can then merged into
+another branch with more stability, all the way up to the branch for release.
+
+** Remotes
+
+Remote refereces =<remote>/<branch>= are pointers to remote branches. Remote
+branches are cached locally.
+
+A local branch may track a remote branch (its upstream branch) to establish a
+direct relationship.
+
+#+begin_src shell
+git fetch
+
+git pull # better use git fetch
+
+git push <remote> <local_branch>:<remote_branch>
+
+git push <remote> -d <remote_branch>
+
+git branch -u <remote>/<remote_branch>    # set a local branch to track a remote branch
+
+git checkout <remote_branch> # create a local branch based on the remote branch if it doesn't exist and switch to it
+git checkout -b <new_branch> <remote>/<remote_branch> # there's always the standard way
+
+git branch -vv
+#+end_src
