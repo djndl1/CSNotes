@@ -1,0 +1,173 @@
+* Basic definition
+  :PROPERTIES:
+  :CUSTOM_ID: basic-definition
+  :END:
+
+Functional programming is a programming paradigm that treats computation
+as the evaluation of mathematical functions and avoids changing-state
+and mutable data.
+
+It is a declarative programming paradigm in that programming is done
+with expressions or declarations instead of statements.
+
+Functional code is idempotent: a function's return value depends only on
+its arguments, so calling a function with the same value for an argument
+always produces the same result.
+
+Functional programming has its origins in lambda calculus.
+
+* Concepts
+  :PROPERTIES:
+  :CUSTOM_ID: concepts
+  :END:
+
+** higher-order functions
+   :PROPERTIES:
+   :CUSTOM_ID: higher-order-functions
+   :END:
+
+Higher-order functions are functions that can either take other
+functions as arguments or return them as results.
+
+e.g. differential operator $d/dx$, which returns the derivative of a
+function $f$.
+
+** first-class function
+   :PROPERTIES:
+   :CUSTOM_ID: first-class-function
+   :END:
+
+first class is a CS term that describes programming language entities
+that have no restriction on their, such as arguments to other functions.
+
+** Pure functions
+   :PROPERTIES:
+   :CUSTOM_ID: pure-functions
+   :END:
+
+Pure funcitons (or expressions) have no side effects (memory or I/O).
+
+** Recursion
+   :PROPERTIES:
+   :CUSTOM_ID: recursion
+   :END:
+
+Iteration/looping in functional languages is usually accomplished via
+recursion.
+
+?tail recursion?
+
+** strict versus non-strict evaluation
+   :PROPERTIES:
+   :CUSTOM_ID: strict-versus-non-strict-evaluation
+   :END:
+
+refer to how function arguments are processes when an expression is
+being evaluated.
+
+** referential transparency
+   :PROPERTIES:
+   :CUSTOM_ID: referential-transparency
+   :END:
+
+Functional programs do not have assignment statements, that is, the
+value of a variable in a functional program never changes once defined.
+This eliminates any chances of side effects because any variable can be
+replaced with its actual value at any point of execution. So, functional
+programs are referentially transparent.
+
+** type systems
+   :PROPERTIES:
+   :CUSTOM_ID: type-systems
+   :END:
+
+Functional programming languages have tended to use typed lambda
+calculus, rejecting all invalid programs at compilation t ime and
+risking false positive errors.
+
+???
+
+** data structures
+   :PROPERTIES:
+   :CUSTOM_ID: data-structures
+   :END:
+
+???
+
+* Monads
+
+Design Pattern that allows a user to chain operations while the monad manages secret work behind the scenes.
+
+Normal value -> wrap function -> monadic value -> run (unwrap if necessary) -> Normal value -> fed into a transform function -> returned as a monadic value -> run ... (thus easy to chain)
+
+The user only provides the final transform function (mapping normal values to monadic results) and gets all the benefits from monads.
+
+** An Example of Logging
+
+#+begin_src javascript
+// wrapper type
+interface NumberWithLogs {
+    result: number
+    logs: string[]
+}
+
+// the functions (bind) run transformations on monadic values
+function square(x: number): NumberWithLogs {
+    return {
+        result: x * x,
+        logs: [ `Squared ${x} to get ${x * x}` ]
+    }
+}
+
+function addOne(x: number): NumberWithLogs {
+    return {
+        result: x + 1
+        logs: [ `Added 1 to ${x} to get ${x + 1}` ]
+    }
+}
+
+// wrap function: return, pure, unit: allows entry to monad ecosystem
+function wrapWithLogs(x: number): NumberWithLogs {
+    return {
+        result: x,
+        logs: []
+    }
+}
+
+function runWithLogs(
+    input: NumberWithLogs,
+    transform: (_: number) => NumberWithLogs
+): NumberWithLogs {
+    const newNumberWithLogs = transform(input.result)
+    return {
+        result: newNumberWithLogs.result
+        logs: input.logs.concat(newNumberWithLogs.logs)
+    }
+}
+#+end_src
+
+* Option/Maybe
+
+Handling missing values.
+
+- Wrapper Type =Option<T>=
+
+- Wrap Function =function some<T> (x: T): Option<T>=, turns T's into =Option<T>=
+
+- Run Function:
+
+  #+begin_src javascript
+function run<T>(input: Option<T>, transform: (_: T) => Option<T>): Option<T> {
+    if (input == None) {
+        return none
+    }
+    return transform(input.value)
+}
+  #+end_src
+
+  #+begin_src javascript
+// suppose Option<T> supports the run function.
+function getPetNickname(): Option<string> {
+    return getCurrentUser().run(getPet).run(getNickName) // no more null handling
+}
+  #+end_src
