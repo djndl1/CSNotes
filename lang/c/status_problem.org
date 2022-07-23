@@ -1,0 +1,29 @@
+#+TITLE: Status_problem
+
+* [[https://gankra.github.io/blah/c-isnt-a-language/][C Isn't A language Anymore]]
+
+#+begin_quote
+C is the lingua franca of programming. We must all speak C, and therefore C is not just a programming language anymore – it’s a protocol that every general-purpose programming language needs to speak.
+#+end_quote
+
+To interoperate with C, i.e. understanding the types and declaration in C header files:
+
+- the layouts of the types needs to be understood.
+
+- resolve the symbols that represents a function pointer
+
+- call the function with the appropriate ABI.
+
+The problems are
+
+- C headers are hard to parse. A good parsr basically is already a C compiler.
+
+- THERE IS NO C ABI. Not even the well-defined C ABIs are properly supported by major C compilers. Even basic types are not defined the same.
+
+C has become an IDL for which it has never been designed.
+
+- Symbol versioning only partially solves the signature change problem.
+
+- A opaque types behind a pointer is only valid when the implementation behind scene remains functionally the same across versions.
+
+- Primitives types such as ~intmax_t~ is never gonna change so as not to break old codebase.

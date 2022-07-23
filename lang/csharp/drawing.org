@@ -1,0 +1,21 @@
+#+TITLE: Drawing
+
+* =System.Drawing=
+
+Before drawing anything, there should be a =Graphics= GDI+ drawing surface, an object used to create graphical images.
+
+- use the =Paint= event of a form.
+
+- =Control.CreateGraphics=
+
+- =Graphics.FromImage= to alter an image
+
+  A =Graphics= needs pens and brushes for drawing on it.
+
+** =Pen=
+
+Drawing lines, outlining shapes or rendering other geometric representations.
+
+** =Brush=
+
+filling areas of graphics.

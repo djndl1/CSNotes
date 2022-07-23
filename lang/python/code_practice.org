@@ -1,0 +1,93 @@
+#+TITLE: Code_practice
+
+* [[https://peps.python.org/pep-0008/][PEP8]]
+
+- 4 spaces identation
+
+- when using implicit line joining, either vertically align elements or using a haning indent (can be more than 4 spaces) with the first element on the line after the beginning brace/bracket/parenthesis.
+
+- 80 character line. Prefer line continuation inside parentheses, brackets and braces to a backslash.
+
+- break a line before binary operators.
+
+- Top level function and class definitions are separated with two blank lines, methods inside a class with one blank line.
+
+- Always use UTF-8
+
+- imports
+  + module imports should be on separate lines.
+  + module imports should be grouped: stdlib first, related third party second, local imports finally
+  + use absolute imports unless it's too verbose
+  + wildcard imports should be avoided.
+
+- use double quote for triple-quoted strings.
+
+- a trailing comma after a single token (an element of a list or an argument of a function) is encouraged.
+
+- whitespace
+  + avoid whitespace inside parentheses, brackets or braces
+  + avoid trailing whitespace anywhere
+  + avoid spaces in keyword arguments unless after a type hint
+
+** Comments
+
+- Comments should be complete sentences.
+  + use inline comments sparingly
+
+** Documentation
+
+- Write [[>][docstrings]] for all public modules, functions, classes and methods
+
+- string literal lines can act as documentation or comments
+
+Multiline docstrings
+
+- *script docstring*: usage of the script
+
+- *module docstring*: list the exported classes, exceptions and functions, with a one-line summary for each.
+  + *package docstring*: list subpackages and modules also.
+
+- *function/method docstring*: summarize the behavior and documents its arguments, return values, side effects, exception raised and restrictions on when it can be called.
+
+- *class docstring*: behavior, public methods and instance variables.
+
+#+begin_src python
+def my_func():
+    """this is my function
+
+       more details go here
+    """
+#+end_src
+
+
+** Nameing Convention
+
+- use ASCII compatible identifiers.
+
+- module name: short, all-lowercase names
+
+- package name: short all-lowercase names, underscores are discouraged.
+
+- class name: CapWord. Callable classes may use functions' naming convention.
+  + Exception name: use suffix ~Error~ for error exceptions.
+
+- type variable: CapWord with short names, with ~_contra~ or ~_co~ to indicate variance.
+
+- Function names and variable names: lowercase separated by underscores.
+
+- ~self~ for instance methods and ~cls~ for class methods.
+
+- constants are all capital letters with underscores separating words.
+
+** Access Control
+
+- public attributes without a underscore prefix
+  + simple public attributes should not have accessors or property.
+
+- use double underscore prefix for pure private (not even used by subclasses)
+
+- Documented interfaces are considered public unless explicitly stated to be internal
+
+- modules should explicitly declare the names in their public API using the ~__all__~ attribute.
+
+- internal interfaces should be prefixed with a single leading underscore.

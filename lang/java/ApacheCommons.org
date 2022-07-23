@@ -58,3 +58,46 @@
   + ~subarray()~
   + ~swap()~
   + ~nullToEmpty()~: not of much use.
+
+
+* OGNL
+
+An expression language for getting and setting properties of Java objects plus list projection, selection and lambda expressions.
+
+- a binding language between GUI elements to model objects.
+
+** Syntax
+
+- *property*: the same as a bean property.
+
+*** Operators
+
+- ~and~, ~or~, ~bor~ (bitwise or), ~xor~, ~band~, ~eq~ (~==~), ~neq~ (~!=~), ~lt~, ~gt~, ~gte~, ~not~ are valid boolean operators.
+
+- ~in~, ~not in~: List membership test
+
+*** Expressions
+
+- String literals support single quotes.
+
+- ~B~/​~b~ suffixes for ~BigDecimal~ and ~h~​/​~H~​ for ~BigInteger~
+
+- ~#var~: an OGNL variable. OGNL also has an implicit current object ~#this~.
+
+- Properties:
+  + maps treats all property references as element lookups or storage.
+  + non-string properties (such as element member of lists and arrays) must be accessed using ~array[0]~.
+  + ~array.length~ is the same as ~array["length"]~, just as ~array[0]~ is effectively ~array.0~ (even though this expression is illegal).
+  + JavaBean indexers are rendered as ~obj.someProperty[idx]~.
+  + OGNL supports non-integer indexers.
+
+*** Collections
+
+- List ~{ null, "Untitled" }~
+
+- map ~#{ "foo": "foo value", "bar": "bar value" }~, ~#@java.util.LinkedHashMap@{ "foo" : "foo value", "bar" : "bar value" }~
+
+- projection: map the same property of elements in a collection
+  + ~listeners.{delegate}~ returns a list of all the listeners' delegates.
+
+- selection (filter): ~listeners.{? #this instanceof ActionListener}~

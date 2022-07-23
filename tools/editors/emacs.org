@@ -1,0 +1,72 @@
+#+title: Emacs
+
+
+- *keymaps*: Emacs binds keys to named commands, a special type of Lisp function.
+
+- =C-h= to invoke help
+
+* Editing
+
+** Insertion
+
+- =C-j=: newline (useful in minibuffer)
+
+- =C-q= to insert any non-graphic characters.
+
+- =C-x 8 RET=: inserts unicode characters.
+
+- =C-o=: insert a blank line after (=C-x C-o=) delete blank lines.
+
+** Point (Cursor) Navigation
+
+- =M-g M-g=: =goto-line=
+
+- =M-g TAB=: move to column
+
+- To navigate a line visually, set =line-move-visual= to =t=
+
+** Cursor location
+
+- =line-number-mode=, =column-number-mode=, =hl-line-mode= (highlight), =display-line-mode=
+
+- =what-line=, =C-x ==
+
+- =count-words=, =M-== (=count-words-regioin=)
+
+** Numeric arguments
+
+- =digit-argument=, =negative-argument=, =universal-argument=: specifies arguments for the next command (not necessarily a repetition). To force a repetition, use =C-x z= after the command.
+
+  To use arguments with a named command, specify the argument before running =M-x= with the command.
+
+** Minibuffer
+
+The area under the modeline, used also by the echo area.
+
+*** Minibuffer Completion
+
+=TAB=, =SPC=, =RET=, =?=, use with =M-v= (switch to the completion list)
+
+*** Minibuffer History
+
+- =previous-history-element=, =next-history-element=, =list-command-history=
+
+- =C-x ESC ESC=: reexecute a recent minibuffer command
+
+* Help
+
+- =C-h=
+
+- =C-h a=: searches for commands
+
+- =C-h b=: describe bindings
+
+- =C-h d=: search in documentation for keywords
+
+- =C-h i=: the GNU Info manual
+
+- =C-h f=: describe functions
+
+- =C-h C-f= the Emacs FAQ
+
+- =C-h p=: lists available Emacs packages

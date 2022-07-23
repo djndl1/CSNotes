@@ -1,0 +1,89 @@
+#+TITLE: Functional
+
+* Basic Functions
+
+- ~map~: returns a ~map~ type representing a mapping operation.
+
+ #+begin_src python
+def plus_one(a): return a + 1
+def plus(a, b): return a + b
+
+v1 = [1, 2, 3, 4]
+v2 = [4, 3, 2, 1]
+
+print(list(map(plus_one, v1)))
+print(list(map(plus, v1, v2)))
+ #+end_src
+
+- ~filter~: a ~filter~ type, an operation, ~filter(lambda x: x > 5, [1, 2, 5, 6, 7])~
+
+- ~all~, ~any~
+
+- ~enumerate~: enumeration of an iterable with its index
+
+- ~max~, ~min~: may accepts an ordering functor
+
+- ~reversed~: returns a reverse iterator
+
+- ~slice~: returns a slice object.
+
+- ~sorted~: returns a sorted *list*
+
+- ~sum~: sum over an iterable
+
+- ~zip~: produceing tuples from each iterable
+
+* ~functools~
+
+Highor-order functions that act on or return other functions
+
+- ~reduce~:
+
+ #+begin_src python
+# semantically
+def reduce(function, iterable, initializer=None):
+    it = iter(iterable)
+    if initializer is None:
+        value = next(it)
+    else:
+        value = initializer
+    for element in it:
+        value = function(value, element)
+    return value
+ #+end_src
+
+ #+begin_src python
+# sum over
+reduce(lambda x, y: x + y, a, 0)
+ #+end_src
+
+- ~partial~: a callable from another callable with part of its arguments filled.
+
+ #+begin_src python
+# semantically equivalence
+
+def partial(func, /, *args, **keywords):
+    def newfunc(*fargs, **fkeywords):
+        newkeywords = {**keywords, **fkeywords}
+        return func(*args, *fargs, **newkeywords)
+    newfunc.func = func
+    newfunc.args = args
+    newfunc.keywords = keywords
+    return newfunc
+ #+end_src
+
+- ~@singledispatch~, ~singledispatchmethod~: transform a function into a generic function that dispatches to actual implementation based on (the type of) a the first (single) argument.
+    + implementations are registered using ~annotatedFunc.register~ as an annotation or a method.
+
+
+* ~itertools~
+
+- ~accumulate()~: replace an element with an accumulated result of all elements before it including itself.
+
+- ~chain()~, ~chain.from_iterable(iterable of iterables)~: concatenating iterables
+
+- ~count()~: a counter that generates an iterable of numbers (infinitely)
+
+- ~cycle()~: cycle through an iterable infinitely
+
+- ~repeat()~: repeat an object infinitely or n times.

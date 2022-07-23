@@ -1,0 +1,50 @@
+#+TITLE: Coding_practice
+
+** Google Style
+
+- UTF-8
+
+- Prefer the graphic form of non-ascii code to escaped ones.
+
+*** Source File
+
+#+begin_src
+license or copyright
+
+package statement;
+
+import statements; // no wildcard imports
+
+exactly one top-leve class.
+#+end_src
+
+- Use some logical order for class members.
+
+- column limit: 100
+
+- one variable per declaration.
+
+- ~public protected private abstract default static final transient volatile synchronized native strictfp~ order
+
+*** Line breaks
+
+Prefer to break at a higher syntactic level.
+
+*** Naming
+
+~CamelCase~ for acronymns: ~HttpClient~
+
+- ASCII letters and digits.
+
+- special prefixes are not used.
+
+- ~UpperCamelCase~ for class names.
+
+- ~lowerCamelCase~ for method names.
+  + test methods are exceptions, where underscores can ber used.
+
+- ~UPPER_SNAKE_CASE~ for constant names.
+
+- ~lowerCamelCase~ for non-constant field, parameters, local variables.
+
+- type variables: single capital letter or a ~MyNameT~
