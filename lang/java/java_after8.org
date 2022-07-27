@@ -1,6 +1,12 @@
 #+TITLE: Java_after8
 
-* Java 9
+* Java 9/10/11
+
+- =List.of(), Map.of()=
+
+- =java.util.concurrent.Flow=
+
+- Multi-Release jars for multiple different JDK versions.
 
 - Process API: =java.lang.ProcessHandle=
 
@@ -8,11 +14,7 @@
 
 - private interface methods to implement default methods
 
-* Java 10
-
  - =var=: type declaration inference.
-
-* Java 11
 
 - =java source.java=
 
@@ -20,7 +22,7 @@
 
 * Jasa 14
 
-- switch expression
+- switch expression: =yield= returns a value
 
  #+begin_src java
 boolean isTodayHoliday = switch (day) {
@@ -32,11 +34,17 @@ boolean isTodayHoliday = switch (day) {
 
  - record
 
+* Java 15
+
+Text blocks =""" """=: multiline string, similar to C# =@=, and also with =\s= =\= to remove certain characters in the text block.
+
 * Java 16
 
 - =Stream.toList()=
 
 - ~if (obj instanceof String s) { }~
+
+- Unix-Domain Sockets
 
 * Java 17
 
