@@ -39,7 +39,7 @@ A number with exponent field equal to 0 is defined to be 0. It is possible to st
 
 The hardware mapping registers on an x86-64 CPU can map pages of 2 different sizes - 2MB and 4096 bytes (for kernel and for other cases respectively in Linux). The operation of the memory system is to translate the upper bits of the address from a process's logical address to a physical address.
 
-In Linux, memory for a process is divided into 4 logical regions:
+On Linux, memory for a process is divided into 4 logical regions:
 
 - text: starting at 0 (0x400000 in an x86-64) `.text`
 
@@ -54,9 +54,7 @@ In Linux, memory for a process is divided into 4 logical regions:
 cat /proc/$$/maps
 ```
 
-String in `yasm` do not end in null bytes automatically.
-
-## Use `gdb`to example memory
+## Use `gdb`to examine memory
 
 ```bash
 p expression
@@ -114,6 +112,8 @@ Software can access the 64-bit registers as 64-bit, 32-bit, 6-bit and 8-bit valu
 
 Immediate operands can be 1, 2, or 4 bytes for most instructions. 
 
+### Simple Move
+
 - `mov` allows 8 byte immediate values. The source and destination must be the same size and cannot be both memory locations.
 
 ```assembly
@@ -121,6 +121,8 @@ mov     rax, 100
 mov     eax, 100 // shorted, sometimes preferred.
 mov   rax, [a]  ; load from memory
 ```
+
+### Extended Move
 
 - `movzx`/`movz`(GAS): move and zero extend
 
@@ -137,6 +139,7 @@ mov   [a], rax  ; move data from rax to a
 mov   rbx, rax  ; move data from rax to rbx
 ```
 
+### Condtional Move
 
 There are a collection of conditional move instructions which can be used profitably rather than using branching.
 
@@ -155,6 +158,8 @@ cmovl rax, rbx
 
 If a value from memory is used in more than 1 operation, it might be faster to move into a register first.
 
+### Exchange
+
 - `xchg`: the exchange operation is atomic. This can have a large performance penalty. Only one operand can be in memory, the other must be a register.
 
 - `cmpxchg`: compare and exchange. There is no implicit `lock` prefix.
@@ -169,16 +174,21 @@ static inline int a_cas(volatile int *p, int t, int s)
 }
 ```
 
+### Array Copy
+
 - `movs` + `b`/`w`/`d`/`p`: moves from the address specified by `rsi` to the address specified by `rdi`. After each data item is moved, `rdi` and `rsi` registers are advanced 1, 2, 4 or 8 bytes depending on the size of the item.
 
 ```assembly
+// copy 100000 bytes from the array pointed by rsi to the array pointed by rdi
 lea     rsi, [source]   ; load effective address
 lea     rdi, [destination]
 mov     rcx, 100000
 rep     movsb
 ```
 
-- `lea`: Load Effective Address. Calculates the address of `src` and loads it into `dest`. It calculates the address in the same way as `mov`, but it loads the address itself instead of loads the content at that address.
+### Address Move
+
+- `lea`: Load Effective Address. Calculates the address of `src` and loads it into `dest`. It calculates the address in the same way as `mov`, but it loads the address itself instead of loads the content at that address. One way to abuse `lea` to is to treat content of the register as an address and use `lea` to do multiplication and move `lea rax [rbx+rbx*2]` (multiply `rbx` by three and save the result to `rax`). 
 
 # Arithmetic
 
@@ -214,7 +224,7 @@ neg   byte  [x]
 
 `CF` and `OF` flags are set when the product exceeds 64 bits, unless a smaller multiply is requested.
 
-- `idiv`/`div`: takes `rdx`:`rax` as the dividend and takes a single operand (register or memory reference). `rax` for the quotient and `rdx` for the remainder.
+- `idiv`/`div`: takes the content in `rdx:rax` as the dividend and takes a single operand (register or memory reference) as the divisor. `rax` for the quotient and `rdx` for the remainder.
 
 
 # Bit Operations
@@ -636,6 +646,8 @@ strlen:
 
 - `ret`: return from a function; pops the address from the top of the stack and transfer control to that address
 
+## Calling Convention
+
 Under Linux, the first 6 integer parameters are passed in registers `rdi`, `rsi`, `rdx`, `rcx`, `r8`, `r9`. The first 8 floating point parameters are passed in `xmm0`-`xmm7`. Additional parameters are pushed onto the stack in reverse order. Functions with a variable number of parameters pass the number of floating point parameters in the function call using `rax`. `rax` for integer return values and `xmm0` for floating point return values. The stack pointer is expected to be maintained on 16 byte boundaries in memory (ending in `0`) to allow local variables in functions to be placed at 16 byte alignments for SSE and AVX instructins. Executing a `call` would then decrement `rsp`, leaving it ending with an `8`. Conforming functions should either push something or subtract from `rsp` to get it back on a 16 byte boundary.
 
 ```assembly
@@ -734,7 +746,7 @@ greater:
   ret
 ```
 
-The Linux syscall intefaace is different for 32-bit mode and 64-bit mode. Syscalls are defined in `/usr/binclude/asm/unistd_xx.h`. For 32-bit syscalls, place the syscall number in `eax` and use the software interrupt instruction `int 0x80`. Syscalls have parameters which are placed in `ebx`, `ecx`, `edx`, `esi`, `edi` and `ebp`, return values are in `eax`. For 64-bit syscalls, the syscall number is placed in `rax`, the parameters are placed in `rdi`, `rsi`, `rdx`, `r10`, `r8`, `r9`, return values are in `rax`. x86-64 linux uses the `syscall` instruction to execute a syscall.
+The Linux syscall inteface is different for 32-bit mode and 64-bit mode. Syscalls are defined in `/usr/binclude/asm/unistd_xx.h`. For 32-bit syscalls, place the syscall number in `eax` and use the software interrupt instruction `int 0x80`. Syscalls have parameters which are placed in `ebx`, `ecx`, `edx`, `esi`, `edi` and `ebp`, return values are in `eax`. For 64-bit syscalls, the syscall number is placed in `rax`, the parameters are placed in `rdi`, `rsi`, `rdx`, `r10`, `r8`, `r9`, return values are in `rax`. x86-64 linux uses the `syscall` instruction to execute a syscall.
 
 ```assembly
 segment .data
