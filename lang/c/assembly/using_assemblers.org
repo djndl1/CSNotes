@@ -2,7 +2,7 @@
 
 * Linking with GCC
 
-use =-no-pie= for these objects.
+use =-no-pie= when linking the object files produced by =yasm= and =nasm=.
 
 * Yasm
 
