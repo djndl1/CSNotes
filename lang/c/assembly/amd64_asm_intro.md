@@ -98,7 +98,75 @@ https://www.kernel.org/doc/html/latest/x86/x86_64/mm.html#complete-virtual-memor
 
 # Registers
 
-- 16 general-purpose 64-bit registers: `rax`, `rbx`, `rcx`, `rdx`, `rsi`, `rdi`, `rbp`, `r8`-`r15`. The old 32-bit and 16-bit registers are still available as lower part of the 64-bit registers: `eax`/`ax`, `ebx`/`bx` ... `r8b`/`r8w`,`r8d`
+## General-Purpose Registers 
+
+16 general-purpose 64-bit registers:
+
+- `rax` (accumulator)
+  
+- `rbx` (base register)
+  
+- `rcx` (count register)
+  
+- `rdx` (data register)
+  
+- `rsi` (source index) 
+  
+- `rdi` (destination index) 
+
+- `rbp` (base pointer)
+
+- `rsp`: (stack pointer)
+
+- `r8`-`r15`
+
+-  `rflags`: flag register. The higher 32 bits are currently reserved and are always read zero.
+
+- `rip`: Instruction pointer
+
+- `CS`, `DS`, `ES`, `FS`, `GS`, `SS`
+
+For most instrucitons, the default operand size in 64-bit mode is 32 bits. 
+
+- To access the full 64-bit operand size, most instructions must contain a REX prefix.
+
+
+
+### Legacy Registers
+
+The old 32-bit, 16-bit and 8-bit registers are still available as lower part of the 64-bit registers: `eax`/`ax`/`ah`/`al`, `ebx`/`bx`/`bh`/`bl` ... `r8b`/`r8w`,`r8d`, `eflags`/`flags`, `ip`/`eip`
+
+Operations on the 8-bit and 16-bit parts of the registers do not modify the rest of the register. 32-bit operations use the lower 32-bit part and clear the higher 32-bit.
+
+## Flags Register
+
+The low 16 bits of `rflags` are accessible by application software while the 31:16 of `rflags` contain flags accessible only to system software.
+
+### Control Flag
+
+- `DF`: direction, a flag controls the diretion of string operations.
+
+### Status Flag
+
+Result Information form Logical and Arithmetic Operations and Control Information for conditional move and jump instructions.
+
+- `OF`: overflow
+
+- `SF`: sign
+
+- `ZF`: zero
+
+- `AF`: auxilliary carry
+
+- `PF`: parity
+
+- `CF`: carry
+
+## System Flags
+
+The higher 16 bits
+
+## Floating Point Registers 
 
 - 16 modern floating-point registers (128- or 256-bit)
 
@@ -108,11 +176,29 @@ https://www.kernel.org/doc/html/latest/x86/x86_64/mm.html#complete-virtual-memor
 
 Software can access the 64-bit registers as 64-bit, 32-bit, 6-bit and 8-bit values.
 
-## Moving Data
+# Operands
+
+## Data Types
+
+- bit 1, nibble 4, byte 8, word 16, doubleword 32, quadword 64, double quadword 128, double octword 256
+
+- unsigned/signed intergers of 8, 16-, 32, 64, 128 bits
+
+- BCD digits 
+
+- half-, single-, double-precision floating point
+
+These fundamental types may be aggregated into composite data types 
+
+- strings of characters, doubleword and quadword: a continuous seqeuence of a single data type.
+
+- packed BCD (two BCD stored in a single byte), packed integers (integer vector), packed single- and double-precision floating point (floating-point vectors)
+
+# Moving Data
 
 Immediate operands can be 1, 2, or 4 bytes for most instructions. 
 
-### Simple Move
+## Simple Move
 
 - `mov` allows 8 byte immediate values. The source and destination must be the same size and cannot be both memory locations.
 
@@ -122,7 +208,7 @@ mov     eax, 100 // shorted, sometimes preferred.
 mov   rax, [a]  ; load from memory
 ```
 
-### Extended Move
+## Extended Move
 
 - `movzx`/`movz`(GAS): move and zero extend
 
@@ -139,7 +225,7 @@ mov   [a], rax  ; move data from rax to a
 mov   rbx, rax  ; move data from rax to rbx
 ```
 
-### Condtional Move
+## Condtional Move
 
 There are a collection of conditional move instructions which can be used profitably rather than using branching.
 
@@ -158,7 +244,7 @@ cmovl rax, rbx
 
 If a value from memory is used in more than 1 operation, it might be faster to move into a register first.
 
-### Exchange
+## Exchange
 
 - `xchg`: the exchange operation is atomic. This can have a large performance penalty. Only one operand can be in memory, the other must be a register.
 
@@ -174,7 +260,7 @@ static inline int a_cas(volatile int *p, int t, int s)
 }
 ```
 
-### Array Copy
+## Array Copy
 
 - `movs` + `b`/`w`/`d`/`p`: moves from the address specified by `rsi` to the address specified by `rdi`. After each data item is moved, `rdi` and `rsi` registers are advanced 1, 2, 4 or 8 bytes depending on the size of the item.
 
@@ -186,7 +272,7 @@ mov     rcx, 100000
 rep     movsb
 ```
 
-### Address Move
+## Address Move
 
 - `lea`: Load Effective Address. Calculates the address of `src` and loads it into `dest`. It calculates the address in the same way as `mov`, but it loads the address itself instead of loads the content at that address. One way to abuse `lea` to is to treat content of the register as an address and use `lea` to do multiplication and move `lea rax [rbx+rbx*2]` (multiply `rbx` by three and save the result to `rax`). 
 
@@ -266,7 +352,7 @@ mov [sample], rax
 
 # Branching and Looping
 
-- `jmp`: assembly version of `goto`
+- `jmp`: assembly version of `goto`. `jmp` can jump to an address contained in a register or memory location.
 
 ```assembly
 segment .data
@@ -396,14 +482,17 @@ while:
   jnl   end_while
   bt    rax, 0
   setc  bl
-  add   ebx, ebx
+  add   edx, ebx
   shr   rax, 1
   inc   rcx
   jmp   while
 ```
 
 ```asm
-/* a hand-coded supposedly correct bit counts */
+/* 
+  a hand-coded supposedly correct bit counts
+  that uses `and` instead of `bt` to test the 0th bit
+*/
   .text
   .global bit_count_asm
   .type bit_count_asm, @function
@@ -593,12 +682,13 @@ for:
 end_for:
 ```
 
+## Repeat String Instructions
 
 - `rep`: repeats a string/array instruction the number of times specified in `rcx` (count register). The repeat instructions allow setting array elements to a specified value, copying one array to another, and shifting a specific value in an array. The string instructions use `rax` (holding a specific value), `rsi` (source index), `rdi` (destination index). The string operations update `rsi` and `rdi` after each use, managed by `DF` flag (0 for increasing, 1 for decreasing).
 
+- `movsb`: move from one memory location to another (copy an array)
 
-
-- `stos` + `b`/`w`/`d`/`q`: moves the item in `al`/`ax`/`eax`/`rax` to memory
+- `stos` + `b`/`w`/`d`/`q`: moves the item in `al`/`ax`/`eax`/`rax` to memory (fill an aray)
 
 ```assembly
 ;; fill an array with 1000000 double words all equal to 1
@@ -608,7 +698,7 @@ lea     rdi, [destination]
 rep     stosd
 ```
 
-- `lods` + `b`/`w`/`d`/`q`: moves the item from the address specified by `rsi` to `al`/`ax`/`eax`/`rax`
+- `lods` + `b`/`w`/`d`/`q`: moves the item from the address specified by `rsi` to `al`/`ax`/`eax`/`rax`. Better than manually maintaining the counter
 
 ```assembly
 lea     rsi, [source]
@@ -628,8 +718,8 @@ skip:   sub     ecx, 1
 segment .text
 global strlen
 strlen:
-    cld     ; clear DF to 0, the opposite is `std`
-    mov     rcx, -1 ; maximum number of iterations
+    cld     ; clear DF to 0 so that the string operations processes increasing addresses (here `rdi`), the opposite is `std`
+    mov     rcx, -1 ; maximum number of iterations, it decreases per repetition
     xor     al, al
     repne   scasb
     mov     rax, -2
@@ -639,6 +729,23 @@ strlen:
 
 - `cmpsb`, used with `repe` to compare values until either the count reaches 0 or two different values are located
 
+```assembly
+segment . text
+global mememp
+
+mememp :
+  mov rex, rdx
+  repe cmpsb ; compare until end or difference
+  cmp rex , 0
+  jz equal  ; reached the end
+  movzx eax , byte [rdi-1]
+  movzx ecx , byte [rsi-1]
+  sub rax, rex
+  ret
+equal:
+  xor eax, eax
+  ret
+```
 
 # Functions
 
