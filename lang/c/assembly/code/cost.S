@@ -1,7 +1,7 @@
 segment .data
   cost  dq      0
   pkh   dq      3
-  kh    dq      500
+  kh    dq      1500
   dol   dq      0
   pen   dq      0
 
@@ -9,16 +9,16 @@ segment .data
   global main
 
 main:
-  mov   rax, [kh]
-  mul   qword [pkh]
-  add   rax, 5
-  mov   rbx, 1000
-  div   rbx
-  mov   [dol], rax
-  mov   rax, rdx
-  mov   rdx, 0
-  mov   rbx, 100
-  mul   qword rbx
-  mov   [pen], rax
-  ret
+  push rbp
+  mov rbp, rsp
 
+  mov rax, [kh]
+  sub rax, 1000
+  cmovg rbx, rax
+  imul rbx, [pkh]
+
+  add rbx, 500
+  mov [cost], rbx
+
+  pop rbp
+  ret
