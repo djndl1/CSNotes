@@ -274,7 +274,11 @@ rep     movsb
 
 ## Address Move
 
-- `lea`: Load Effective Address. Calculates the address of `src` and loads it into `dest`. It calculates the address in the same way as `mov`, but it loads the address itself instead of loads the content at that address. One way to abuse `lea` to is to treat content of the register as an address and use `lea` to do multiplication and move `lea rax [rbx+rbx*2]` (multiply `rbx` by three and save the result to `rax`). 
+- `lea`: Load Effective Address. Calculates the address of `src` and loads it into `dest`. It calculates the address in the same way as `mov`, but it loads the address itself instead of loads the content at that address. One way to abuse `lea` to is to treat content of the register as an address and use `lea` to do multiplication and move `lea rax [rbx+rbx*2]` (multiply `rbx` by three and save the result to `rax`).
+
+## Packed Integer Move
+
+- `movdqa`, `vmovdqa`: move quadword aligned
 
 # Arithmetic
 
@@ -1122,9 +1126,9 @@ TODO
 
 Each `xmm` occupies the first 128 bits of the corresponding `ymm`.
 
-- `movss`, `movsd`: 32-bit/64-bit floating-point scalar move
+- `movss`, `movsd`: move scalar single/double
 
-- `movaps`/`movapd`: aligned, on a 16-byte boundary in memory; move four floats/two doubles
+- `movaps`/`movapd`: move aligned packed single/double, on a 16-byte boundary in memory
 
 - `movups`/`movupd`: unaligned
 
@@ -1136,7 +1140,7 @@ Using an aligned move on an unaligned address results in a segfault.
 
 ```asm
 movups  xmm0, [x]   ; move 4 floats
-movups  ymm0, [x]
+movups  ymm0, [x]   ; move 8 floats
 movupd  [a], xmm15
 ```
 
