@@ -749,13 +749,106 @@ equal:
 
 # Functions
 
+## Stacks
+
+- `push`: subtract 8 from `rsp` and place the value being pushed at that address.
+
+- `pop`: moves the value at the location pointed by `rsp` and then adds 8 to `rsp`.
+
+- `enter`/`leave`: provide support for block structured languages. They establish/release the stack frame on entering/returning from a procedure.
+
+Each function maintains a pointer in `rbp` to a value on the stack identifying the previous value of `rbp` along with the return address. 
+
+```
+                          ┌────────────────────────────────┐ lower address
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │       Red Zone                 │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          ├────────────────────────────────┤
+rsp  ────────────────────►│  already occupied              │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          │                                │
+                          ├────────────────────────────────┤
+current rpb   ───────────►│     previous rbp               ├───────────┐
+                          ├────────────────────────────────┤           │
+                          │   next instruction after ret   │           │
+                          ├────────────────────────────────┤           │
+                          │                                │           │
+                          │                                │           │
+                          │                                │           │
+                          │                                │           │
+                          │                                │           │
+                          │                                │           │
+                          │                                │           │
+                          │                                │           │
+                          │                                │           │
+                          │                                │           │
+                          ├───────────────────────────────┬┘           │
+                          │ the 2nd previous rbp          │◄───────────┘
+                          ├───────────────────────────────┴┐
+                          │ next instruction after ret     │
+                          └────────────────────────────────┘ higher address
+```
+
+
+## Call Instruction
+
 - `call`: call a function, the operand is a label in the text segment of a program; it pushes the address of instruction following the call onto the stack and to transfer control to the address associated with the label.
 
-- `ret`: return from a function; pops the address from the top of the stack and transfer control to that address
+```assembly
+;; semantically
+  push next_instruction
+  jmp  my_function
+next_instruction:
+```
+
+- `ret`: return from a function; pops the address to return to from the top of the stack and transfer control to that address.
 
 ## Calling Convention
 
-Under Linux, the first 6 integer parameters are passed in registers `rdi`, `rsi`, `rdx`, `rcx`, `r8`, `r9`. The first 8 floating point parameters are passed in `xmm0`-`xmm7`. Additional parameters are pushed onto the stack in reverse order. Functions with a variable number of parameters pass the number of floating point parameters in the function call using `rax`. `rax` for integer return values and `xmm0` for floating point return values. The stack pointer is expected to be maintained on 16 byte boundaries in memory (ending in `0`) to allow local variables in functions to be placed at 16 byte alignments for SSE and AVX instructins. Executing a `call` would then decrement `rsp`, leaving it ending with an `8`. Conforming functions should either push something or subtract from `rsp` to get it back on a 16 byte boundary.
+- The order in which scalar parameters are allocated
+
+- How parameters are passed
+
+- /register preservation/: which registers the called function must preserve for the caller (_non-volatile_ registers) and which not. /Callee-saved/ registers are guaranteed to retain their values after a subroutine call. Saving here means the caller/callee must save the values in the register somewhere else and restore them later since the registers will be used by other subroutines. 
+
+- how the integrity of the stack is maintained: the arguments pushed on the stack for calling must be cleaned up after returning by the caller or upon returning by the callee.
+
+### [SysV AMD64 Calling Convention](https://raw.githubusercontent.com/wiki/hjl-tools/x86-psABI/x86-64-psABI-draft.pdf)
+
+- The first 6 integer parameters are passed in registers `rdi`, `rsi`, `rdx`, `rcx`, `r8`, `r9`. The first 8 floating point parameters are passed in `xmm0`-`xmm7`. Additional parameters are pushed onto the stack in reverse order. Functions with a variable number of parameters pass the number of floating point parameters in the function call using `rax`. 
+
+- `rdx:rax` for integer return values and `xmm1:xmm0`/`ymm0`/`zmm0` for floating point return values. 
+
+- `r10` for static chain pointer.
+
+- Variadic functions have its number of floating-point arguments passed in by the caller in the `al` register. 
+
+- The stack pointer is expected to be maintained on 16 byte boundaries in memory (ending in `0`) to allow local variables in functions to be placed at 16 byte alignments for SSE and AVX instructions. Executing a `call` would then decrement `rsp`, leaving it ending with an `8`. Conforming functions should either push something or subtract from `rsp` to get it back on a 16 byte boundary.
+
+- `rbx`, `rsp`, `rbp`, `r12`-`r15` are callee-saved. All other registers are caller-saved.
+
+- 128 bytes red zone below the current stack pointer, reserved and safe to use.
 
 ```assembly
   section .data
@@ -780,7 +873,6 @@ main:
 ```
 
 `_start` needs all parameters on the stack. `main` is like all other normal C functions.
-
 
 It's possible to give local variables symbolic names:
 
@@ -876,6 +968,37 @@ main:
   call  exit
 
 ```
+
+## Windows Calling Convention
+
+### Win32
+
+#### cdecl: The Default Convention for x86 C Compilers.
+
+Used by IA-32 [Unix-like](http://sco.com/developers/devspecs/abi386-4.pdf) and Windows.
+
+- Arguments are passed on the stack from right to left. Integer value returned in `eax`, floating point value in `st0`. 
+
+- `eax`, `ecx`, `edx` are volatile and the rest are callee-saved. The x87 FPU registers must be empty when calling and exiting if not used for returning value.
+
+Variations of this conventions exist, leading to incompatibility.
+
+#### stdcall: The Standard Win32 API Convention.
+
+ Callee-cleaned: that is, not only the callee needs to return `rsp` to where it was before the `call`. it also needs to pop out the arguments pushed by the caller by using `ret nbytes_of_arguments`. 
+
+### [Win64 and UEFI](https://docs.microsoft.com/en-us/cpp/build/x64-software-conventions?view=msvc-170)
+
+`stdcall`, `thiscall`, `cdecl`, `fastcall` are all resolved to this convention for 64-bit windows. There is only one AMD64 convention for Win64.
+
+- `rcx`, `rdx`, `r8`, `r9` for integers, `xmm0`, `xmm1`, `xmm2`, `xmm3` for floating point arguments. Additional arguments are pushed onto the stack from right to left.
+
+- Simple structs are passed as if they were integers. Otherwise passed in with a pointer. Oversized struct return value is placed in a caller-provided space, the pointer of which is passed implicitly to the callee as the first argument. 
+
+- `eax`, `xmm0` for return values.
+
+- A 32 bytes on the stack is allocated by the caller for the callee to save the four parameters.
+  and later restored by the caller.
 
 # Arrays
 
