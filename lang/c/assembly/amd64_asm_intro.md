@@ -1003,6 +1003,13 @@ Variations of this conventions exist, leading to incompatibility.
 
 - A 32 bytes on the stack is allocated by the caller for the callee to save the four parameters.
   and later restored by the caller.
+  
+## Caveats
+
+Structures and classes are not always passed into the callee's stack frame even if the high-level language's semantics seems so. They might be passed by reference.
+
+Structures and classes are probably returned in memory, i.e., an implicit pointer (not necessarily pointing to somewhere in the heap) argument is passed into the callee and populated by the callee and returns the pointer.
+
 
 # Arrays
 
