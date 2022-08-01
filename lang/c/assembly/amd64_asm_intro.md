@@ -1151,6 +1151,8 @@ movups  ymm0, [x]   ; move 8 floats
 movupd  [a], xmm15
 ```
 
+## Arithmetic
+
 - addition: `addss`/`addsd`; the floating point add instrucitons do not set any flags, so testing must be done using a compare instruction. `addps`/`addpd`
 
 ```asm
@@ -1173,7 +1175,25 @@ movupd  [a], xmm15
 
 - division: `divsd`/`divss`; `divpd`/`divps`
 
-- conversion: `cvtss2sd`, one float to double; `cvtps2pd`: two packed floats to 2 packed doubles; `cvtsd2ss`/`cvtpd2ps`; `cvtss2si`: float to quad-word integer or a double, `cvtsd2si`: double to a double or a quad-word integer. `cvttss2si`/`cvttsd2si`: truncate and convert. `cvtsi2ss`/`cvtsi2sd`: convert a quad-word integer to a single/double. When using a memory location, `dword` or `qword` may be added to specify the size.
+## Conversion
+
+`cvtss2sd`, one float to double; `cvtps2pd`: two packed floats to 2 packed doubles; `cvtsd2ss`/`cvtpd2ps`; `cvtss2si`: float to quad-word integer or a double, `cvtsd2si`: double to a double or a quad-word integer. `cvttss2si`/`cvttsd2si`: truncate and convert. `cvtsi2ss`/`cvtsi2sd`: convert a quad-word integer to a single/double. When using a memory location, `dword` or `qword` may be added to specify the size.
+
+## Comparison
+
+- quiet NaN and signalling NaN
+
+- ordered comparison and unordered comparison
+
+- GCC uses unordered comparisons where only SNaN causes an exception.
+
+- `ucomiss`/`ucomisd`
+
+- `jb`, `jbe`, `ja`, `jae`
+
+## Mathematical Functions
+
+8087 mathemtical functions are deprecated in favor of library functions. SSE instructions contain some other common floating-point function.
 
 - max/min: `minss`/`maxss`; `minsd`/`maxsd`; `minps`/`minpd`; `maxps`/`maxpd`
 
