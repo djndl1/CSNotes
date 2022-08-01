@@ -1,0 +1,118 @@
+#+title: Modernizing Legacy Cpp
+
+* Turn on compiler warnings.
+
+* Compile C code as C++ code
+
+- Take advantage of the better type system of C++.
+  + stricter pointer type check.
+
+* Get Rid of Preprocessor
+
+- Conditional compilation branching can be horrible and hard to read and maintain.
+  + simple conditions on architectures, debug/release build types, different compilers, different C-like languages make sense.
+  + Split conditional parts out and =#ifdef= entire functions instead of parts of the original function.
+
+- Macros: type-unsafe, used more frequently than necessary, do not obey the usual name lookup rules.
+
+* Use RAII and Scope Reduction.
+
+- Write a destructor!
+
+- Maybe a smart pointer to avoid all the trouble of writing an RAII wrapper.
+
+* Keep Function Flow Linear
+
+- easier to understand and modify
+
+RAII not only frees programmers from worrying about resource management, it helps to linearize the function so that the function can return/bail out at any time without needing to clean up the resource. /RAII is an essential prerequisite for introducing exceptions./
+
+Goto-based cleanup and single-exit should never be used anymore.
+
+* Introducing Exceptions
+
+Modern C++ code throws! Introduce exception boundaries to isolate throwing code from legacy exception-free code.
+
+#+begin_src cpp
+extern "C" HRESULT boundary_function()
+{
+    try {
+        // code that throws
+
+        return S_OK;
+    } catch (...) { // catch can be more granular; these catch clauses can be written as an inline function that catch and throw again
+        return E_FAIL;
+    }
+}
+
+
+inline HRESULT translate_thrown_exception_to_hresult() {
+    try { throw; }
+    catch (A) { return ... }
+    catch (B) { return ... }
+    catch (C) { return ... }
+    catch (D) { return ... }
+    catch (...) { return ... }
+}
+#+end_src
+
+A more clever way is to make the boundary a template
+
+#+begin_src cpp
+template <typename Callable>
+HRESULT call_and_translate_for_boundary(Callable&& f)
+{
+    try {
+        f(); return S_OK;
+    } catch (A) { retunr A_OK; }
+    catch (B) { retunr B_OK; }
+    catch (C) { retunr C_OK; }
+    catch (D) { retunr D_OK; }
+}
+#+end_src
+
+* Const Correctness
+
+- All APIs should be const correct: const objects should be marked =const=; member functions that don't mutate an object should be const.
+
+- Mark everything =const= if possible, not just parameters. The surface area of things that might change is effectively reduced.
+
+** Where =const= Is Inappropriate
+
+- member variable
+
+- by-value return types: why restrict the user when object is already not owned by the producer.
+
+- class-type local variables that may be moved from (move semantics may mutate objects) or returned (the return type would need to be =const=).
+
+* Cast
+
+C cast does nearly everything and is ambiguous and not clear in semantics. C casts should be avoided.
+
+* Loops
+
+Loops are error-prone. Use =<algorithm>=.
+
+* Modern C++-03
+
+** Expressive Zero-cost abstractions
+
+Code is written to express human intent, not what the computer should do.
+
+** Strong Typing with a Preference for Static over Dynamic
+
+Prefer regular types and value semantics over pointers and references.
+
+Values are much more natural to manipulate and free of ownership.
+
+Move semantics may be hard to do in C++03, but doable.
+
+Static over dynamic, =template= over =virtual=: inheritance is the worst form of composition and dynamic polymorphism requires it by design. Too much =virtual= incur a performance penalty and implies a pointer semantics, which is to be avoided. STL iterators are another example of static typing and avoiding inheritance (a container just return an iterator without having to inherit a base class or implement an interfac).
+
+** Concept-Based Generic Programming and Duck Typing
+
+Concret types are not important, the concepts behind are.
+
+More tedious and typing-heavy but with SFINAE it's still possible.
+
+** Stack-Based Scoping of Resources
