@@ -1,1 +1,90 @@
 #+title: MCS51 Basics
+
+* Hardware
+
+** Original MCS-51 From Intel
+
+- 8-bit CPU
+
+- Logcal separation of program and Data memory: /64K program address space/ and /64K Data memory address space/.
+
+- /4K on chip Program memory/ and /128 bytes on-chip Data RAM/
+
+- 32 bidirectional GPIO
+
+- two 16-bit timer/counters
+
+- Full duplex UART
+
+- 6-source/5-vector interrupt structure with two priority levels
+
+*** Special Functiona Register (SFR)
+
+A map of the on-chip memory area used for various functions on the chip.
+
+** STC89C52
+
+- 6T (enabled when flashing) or 12T per machine cycle
+
+- 8K Flash ROM
+
+- 512 Bytes RAM
+
+- 3 16-bit timers
+p
+The duration of two clock cycles is called a _state_. The duration of six states is known as one _machine cycle_. Complex instructions take more than one machine cycle to be carried out.
+
+** Storage
+
+The 8051 implements a /separate memory space for code and data/. Both can be expanded externally to 64KB. The internal memory consists of /on-chip ROM/ and /on-chip data RAM/.
+
+*** On-Chip RAM (0x00-0xFF)
+
+/Registers/ and /IO ports/ are memory mapped. The /stack/ resides within the internal RAM.
+
+The internal data memory space is divided between _internal RAM_ and _special function registers_ (SFR). The 128 bytes extra RAM in the enhanced version is only accessible using indirect addressing. Direct addressing will access SFRs.
+
+**** General-Purpose RAM (0x30-0x7F)
+
+Accessible using direct or indirect address (address in =R0= or =R1=).
+
+**** Bit-Addressable Storage (20-2F)
+
+128-bits for direct bit operations. Bit addresses range from 0x00-0x7F, 0x20-0x2F by byte address. Direct bit operations on such memory region avoids any read-modify-write on typical byte-address memory.
+
+**** Register Banks (0x00-0x1F)
+
+32 registers, 4 banks for fast context switch.
+
+=R0= through =R7= (=0x00= - =0x07=). The active register bank may be altered by changing the register bank select bits in the program status word.
+
+**** 21 Special Function Registers (0x80-0xFF) Including IO Ports P1-P4
+
+Mosst SFRs are accessed using direct addressing.
+
+Some are both bit-addressable and byte-addressable. Special registers have their bit addresses starting at the same number as their byte addresses.
+
+- /Program Status Word/, PSW, 0xD0
+  + =CY=: Carry Flag; also as the boolean accumulator, a 1-bit register for boolean instructions operating on bits.
+  + =AC=: Auxilliary carry flag: for BCD operations.
+  + =F0=: flag 0, for user applications.
+  + =RS1:RS0=: register bank selector
+  + =OV=: overflow flag, set for operations that result in a number that is out of the range of an signed byte.
+  + =P=: even parity flag, the number of 1-bits in the accumulator plus the P bit is always aeven.
+
+- /Accumulator B/, 0xF0: used along with the accumulator A for multiply and divide operations. Can also be treated as a general-purpose scratchpad register.
+
+- /Stack Pointer/, SP, 0x81: empty ascending, initialized by default at 0x07, starting at regsiter bank 1.
+  + The stack is kept in internal RAM and is limited to addresses accessible by indirect addressing. Stack sizes are limited, 256 bytes at most.
+
+- /Data Pointer/, DPTR, 0x82 (DPL), 0x83 (DPH): used to specify the address when accessing external code or data memory.
+
+- /Port Registers/, P1-P4: bit-addressable
+
+- /Timer Registers/: two 16-bit timers/counters, the TMOD (timer mode register) and the TCON (timer control register).
+
+- /Serial Port Registers/: SBUF (serial data buffer) for holding received/transmitted data, SCON (serial port control register).
+
+- /Power Control Register/ PCON
+
+- /Interrupt Enable/ IE, /Interrupt Priority Register/ IP.
