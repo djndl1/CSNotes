@@ -1010,6 +1010,23 @@ Structures and classes are not always passed into the callee's stack frame even 
 
 Structures and classes are probably returned in memory, i.e., an implicit pointer (not necessarily pointing to somewhere in the heap) argument is passed into the callee and populated by the callee and returns the pointer.
 
+## Linux System Calls
+
+### 32 Bit
+
+Put the syscall number in `eax`, parameters in `ebx`, `ecx`, `edx`, `esi`, `edi`, and `ebp` and then `int 0x80`
+
+### 64 Bit
+
+- Syscall number in `rax`
+
+- Parameters in `rdi`, `rsi`, `rdx`, `r10`, `r8`, `r9`. Return values in `rax`
+
+- `syscall`
+
+### C Wrappers
+
+Using C wrappers around syscalls instead of `syscall` is preferred.  
 
 # Arrays
 
