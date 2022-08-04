@@ -1,3 +1,4 @@
+DEFAULT REL
 segment .data
   a     dq      55
   b     dq      45

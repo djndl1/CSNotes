@@ -1,3 +1,4 @@
+DEFAULT REL
 segment .data
 	xdiff   dd   0
 	ydiff   dd   0

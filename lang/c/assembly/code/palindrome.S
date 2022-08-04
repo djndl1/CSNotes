@@ -1,3 +1,4 @@
+DEFAULT REL
     section .data
 
     word1   db  "REFER",0x00
@@ -27,7 +28,7 @@ is_palindrome:
     push    rbp
     mov     rbp, rsp
 
-    call    strlen
+    call    strlen wrt ..plt
 
     cmp     rax, 2
     jl      .yes

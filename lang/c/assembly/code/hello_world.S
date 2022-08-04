@@ -1,3 +1,5 @@
+DEFAULT REL
+
   section .data
 msg:    db      "Hello World!", 0x0a, 0
 
@@ -11,7 +13,7 @@ main:
 
   lea   rdi, [msg]              ; parameter 1 for printf
   xor   eax, eax                ; 0 floating point parameters
-  call  printf
+  call  printf wrt ..plt
   xor   eax, eax                ; return 0
 
   pop   rbp

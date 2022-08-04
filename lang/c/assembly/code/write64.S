@@ -1,3 +1,4 @@
+DEFAULT REL
     section .data
 hello:  db  "Hello World", 0x0a
 

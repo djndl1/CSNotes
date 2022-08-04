@@ -1,7 +1,7 @@
+DEFAULT REL
     section     .data
     arr     dd  3,45,34,6,1,3,6,7
     cnt     db  8
-
 
     section     .text
     global      main
@@ -21,13 +21,14 @@ main:
     cmp     eax, esi
     jge     .end_for
 
-    mov     edi, DWORD [arr+4*eax]
-    cmp     edi, DWORD [arr+4+4*eax]
+    lea     r8, [arr]
+    mov     edi, DWORD [r8+4*rax]
+    cmp     edi, DWORD [r8+4+4*rax]
     jle     .next_for
 
-    mov     edx, DWORD [arr+4+4*eax]
-    mov     DWORD [arr+4+4*eax], edi
-    mov     DWORD [arr+4*eax], edx
+    mov     edx, DWORD [r8+4+4*rax]
+    mov     DWORD [r8+4+4*rax], edi
+    mov     DWORD [r8+4*rax], edx
     mov     cl, 1
 
 .next_for:

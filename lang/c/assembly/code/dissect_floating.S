@@ -1,3 +1,4 @@
+DEFAULT REL
 segment .data
   f     dq      -1.25
   sign  db      0

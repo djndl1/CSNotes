@@ -1,3 +1,4 @@
+DEFAULT REL
 segment .data
   a      db     0xaf
 

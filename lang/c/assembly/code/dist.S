@@ -1,25 +1,29 @@
+  DEFAULT REL
+
   segment .data
-ax  dq  4
-ay  dq  5
-bx  dq 10
-by  dq 13
+A_x  dq  4
+A_y  dq  5
+B_x  dq 10
+B_y  dq 13
 dist dq 0
 
   segment .text
-  global _start
-_start:
-  push rbx
-  push rax
-  push rdx
+  global main
 
-  mov rax, [ax]
-  sub rax, [bx]
-  mov rbx, [ay]
-  sub rbx, [by]
+main:
+  push rbp
+  mov rbp, rsp
+
+  mov rax, [A_x]
+  sub rax, [B_x]
+  mov rbx, [A_y]
+  sub rbx, [B_y]
 
   imul rax, rax
   imul rbx, rbx
   add rax, rbx
 
   mov [dist], rax
+
+  pop rbp
   ret

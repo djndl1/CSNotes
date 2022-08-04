@@ -1,3 +1,4 @@
+DEFAULT REL
 segment .data
   cost  dq      0
   pkh   dq      3
