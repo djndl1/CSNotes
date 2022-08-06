@@ -1,0 +1,29 @@
+#+title: ArM32_architecture
+
+- /Processing Element/: the behavior of the ARM abstract machine.
+
+- Features
+  + a large uniform register file
+  + a load/store architecture: where data processing operations operate only on register contents,
+     not directly on memory contents.
+  + simple addressing modes: load/store addresses determined from register contents and instruction fields only.
+
+- Execution State: register widths; instruction sets; exception model; virtual memory system; programmer's model
+  + /AArch64/: 64-bit Execution state:
+    + 31 64-bit GP registers
+    + 32 128-bt SIMD vector and scalar floating-point support
+    + a single A64 instruction set
+    + 64-bit virtual addressing
+  + /AArch32/: 32-bit Execution state, compatible with Armv7-A.
+    + 32-bit registers
+    + T32/A32 instructions
+    + 32 64-bit Advanced SIMD registers
+  + /Interprocessing/: transferring control between the two states on a change of /Exception level/.
+
+- Profiles
+  + /Application/: MMU, A64/A32/T32 instruction sets
+  + /Real-time/: MPU
+  + /Microcontroller/: low-latency interrupt processing; R-profile PMSA; T32 instruction set.
+
+- Data Types
+  + Bytes, HalfWord, Word (32 bits), Doubleword, QuadWord
