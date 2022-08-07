@@ -27,3 +27,91 @@
 
 - Data Types
   + Bytes, HalfWord, Word (32 bits), Doubleword, QuadWord
+
+- Processor Modes: different levels of execution privileges
+  + User Mode: restricted access to system resources
+  + FIQ, IRQ, Supervisor, monitor, abort, etc. full access to system resources
+
+* Registers
+
+Registers are arranged in partially overlapping banks. Each processor mode uses a different register bank for rapid context switching.
+
+** Genral-Purpose Registers
+
+15 generall-purpose registers (R0-R12, SP, LR) are visible at any time
+
+- =LR=: store the return address when a subroutine call is made or the return address for the exception when in exception handling modes.
+
+** Access Restriction
+
+- 16-bit T32 instructions can only acecss a subset of registers, mostly R0 to R7 (Lo Registers). Most T32 instructions cannot use =SP=.
+
+** Register Synomyms
+
+- A1-A4: Argument Registers, R0-R3
+
+- V1-V4: Variable Registers, R4-R11
+
+- SB: Static Base Register, R9
+
+- IP: intra-procedure call scratch register, R12
+
+- SP, LR, PC: R13, R14, R15
+
+** Extension Register
+
+- Q0-Q15: SIMD Quadword registers
+
+- D0-D31: SIMD double-precison
+
+- S0-S31: single-precision
+
+** Program Counter
+
+- Increment by the size of the instruction executed (4 bytes)
+
+- The value is the typically two instructions forward (8 bytes for A32, 4 bytes for T32).
+
+** Program Status
+
+/CPSR/ and /APSR/: CPSR may also contains some info about the configuration of the CPU.
+
+- N:
+
+- Z
+
+- C
+
+- V
+
+- GE: set by parallel add/subtract
+
+- Q: Saturation/Overflow. sticky bit, not automatically cleared when related operations are performed.
+
+On exception, CPSR is saved to SPRSR (Saved Program Status Register). Each exception handling mode has its own one.
+
+* Instruction sets
+
+- Register Load/Store
+
+- Multiple Register Load/Store
+
+- Data Processing: operate on the general purpose registers.
+
+- Branch and control
+
+- Status Register Access
+
+** A32
+
+- 32 bits long
+
+- Stored word-aligned
+
+** T32
+
+- 16 bits or 32 bits
+
+- Half-word aligned
+
+- Provides functionality almost identical to tyhat of the A32.
