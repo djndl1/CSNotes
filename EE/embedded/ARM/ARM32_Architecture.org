@@ -90,6 +90,23 @@ Registers are arranged in partially overlapping banks. Each processor mode uses 
 
 On exception, CPSR is saved to SPRSR (Saved Program Status Register). Each exception handling mode has its own one.
 
+* Floating-Point Programming
+
+Based on VFPv4
+
+** Registers
+
+- /D0-D31/ double precision registers
+
+- /S0-S31/ single precision registers.
+
+- /S0-S31/ as aliases for /D0-D15/
+
+** Data Types
+
+- F16, F32(F), F64(D) for use in floating point instructions as a modifier.freebird
+
+
 * Instruction sets
 
 - Register Load/Store
