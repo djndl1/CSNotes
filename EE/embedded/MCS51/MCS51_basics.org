@@ -89,6 +89,19 @@ Some are both bit-addressable and byte-addressable. Special registers have their
 
 - /Interrupt Enable/ IE, /Interrupt Priority Register/ IP.
 
+*** External Memory
+
+- requires at least Port 1 as both the data and the address but.
+
+- ALE asserted at the first half of the memory cycle to tell an external latch
+  to latch the address signal output by Port 1 as the address bus, and then cleared to use it as the data bus.
+
+TODO: external code/data memory details
+
+*** Enhancements
+
+- An additional 128 bytes of on-chip RAM from 0x80 to 0xFF, accessible only using indirect addressing.
+
 ** Ports
 
 - Port 0 (32-39): also as multiplexed address and data bus
@@ -110,3 +123,10 @@ Some are both bit-addressable and byte-addressable. Special registers have their
 8051 requires two clock cycles to perform a single discrete operation (/state/): fetching, decoding or executing.
 To fully execute an instruction, 6 states are required, i.e. 12 clock cycles, a machine cycle. Complex instructions
 may need more than one machine cycle.
+
+** Reset
+
+Hold the /RST/ high for at least two machine cycles and return it to low either by a manual switch or a power-on reset (PoR).
+The Registers will return to a default state.
+
+- Program Counter: to =0x0000=.
