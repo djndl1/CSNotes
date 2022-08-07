@@ -554,6 +554,55 @@ There is no scope to multiply by an immediate value. Multiplies operate only on 
 
 Integer SIMD provides the ability to pack, extract and unpack 8-bit and 16-bit quantities within 32-bit registers and to perform arithmetic operations with a single instruction. Subword quantities in each register are operated on in parallel and the GE flags are set or cleared according to the results of the instruction to indicate overflow.
 
+### Flow Control
+
+#### Selection
+
+- perform an operation that updates the `CPRSR` falgs
+
+- use conditional execution to select a block of instructions to execute.
+
+```assembly
+cmp r0, r1
+movlt r0, #1
+movge r0, #0
+```
+
+```assembly
+cmp r0, r1
+bge else
+mov r0, #1
+b after
+else: mov r0, #0
+after: ...
+```
+#### Iteration
+
+The transfer of control from a statement in a sequence to a previous statement in the sequence.
+
+##### Pre-Test Loop
+
+```assembly
+loop: cmp r0, r1
+      blt done
+      ...
+      b loop
+done:
+    ...
+```
+
+##### Post-Test Loop
+
+A post-test loop requries only one label and one branch instruction but executes at least once while a pre-test loop needs two labels, a conditional branching and an unconditional branching.
+
+```assembly
+loop:
+  ...
+  
+  cmp r0, r1
+  blt loop
+```
+
 ### Functions
 
 Put the parameters in arguments and onto the stack, and =bl= the function.
@@ -572,4 +621,72 @@ Put the parameters in arguments and onto the stack, and =bl= the function.
         mov     r11, sp   @ update frame register
         
         pop     {r11, pc} @ epilogue
+```
+
+#### Aggregate types
+
+##### Array
+
+```asm
+@ copy an array
+
+sub sp, sp, #400
+mov r0, #0
+mov r1, #0
+
+loop:
+  str r1, [sp, rf0, lsl #2]
+  add r0, r0, #1
+  cmp r0, #100
+  blt loop
+```
+
+##### Structure/Record
+
+```C
+struct student {
+  char first_name[50];
+  char last_name[30];
+  unsigned char class;
+  int grade;
+}
+
+void func()
+{
+  struct student newStudent;
+  
+  strcpy(newStudent.first_name, "Sam");
+  strcpy(newStudent.last_name, "Smith");
+  newStudent.class = 2;
+  newStudent.grade = 88;
+}
+```
+
+```assembly
+  .data
+  .equ  s_first_name, 0
+  .eqw  s_last_name, 30
+  .equ  s_class, 60,
+  .equ  s_grade, 64,
+  .equ  s_size, 68
+  
+sam: .string "Sam"
+smith: .string "Smith"
+
+  sub sp, sp, #s_size
+  mov r0, sp
+  add r0, r0, #s_first_name
+  ldr r1, =sam
+  bl  strcpy
+  
+  mov r0, sp
+  add r0, r0, #s_last_name
+  ldr r1, =smith
+  bl  strcpy
+  
+  mov r0, sp
+  mov r1, #2
+  strb r1, [r0, #s_class]
+  mov r1, #88
+  str r1, [r0, #s_grade]
 ```
