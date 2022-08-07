@@ -31,7 +31,7 @@ A map of the on-chip memory area used for various functions on the chip.
 - 512 Bytes RAM
 
 - 3 16-bit timers
-p
+
 The duration of two clock cycles is called a _state_. The duration of six states is known as one _machine cycle_. Complex instructions take more than one machine cycle to be carried out.
 
 ** Storage
@@ -88,3 +88,25 @@ Some are both bit-addressable and byte-addressable. Special registers have their
 - /Power Control Register/ PCON
 
 - /Interrupt Enable/ IE, /Interrupt Priority Register/ IP.
+
+** Ports
+
+- Port 0 (32-39): also as multiplexed address and data bus
+
+- Port 1 (1-8): simple GPIO
+
+- Port 2 (21-28): also as the high-bytes of the address bus
+
+- Port 3 (10-17): with some special features such as external interrupts, serial IO etc
+
+- /PSEN/ (Program Store Enable): output control signal to enable external program code memory, typically connect to the Output Enable pin of an external EPROM.
+
+- /ALE/ (Address Latch Enable): output signal latches the address into an external register before using Port 0 as the data bus.
+
+- /EA/ (External Access): use external program memory only.
+
+** Timing
+
+8051 requires two clock cycles to perform a single discrete operation (/state/): fetching, decoding or executing.
+To fully execute an instruction, 6 states are required, i.e. 12 clock cycles, a machine cycle. Complex instructions
+may need more than one machine cycle.
