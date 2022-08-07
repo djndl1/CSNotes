@@ -1,0 +1,59 @@
+#+title: Hackers Delight
+
+* Basics
+
+** Rightmost Bits
+
+- Lemma:
+  + =x-1= clears the current rightmost 1-bit (though new set bits might arise on the right of this bit).
+  + =x+1= sets the current rightmost 0-bit.
+  - =-x=: the rightmost 1-bit and its right left unchanged, its left reversed.
+
+- Formulas:
+  + =x & (x - 1)= clears the rightmost 1-bit, or =0= if none: since =x-1= has =x='s rightmost 1-bit cleared, and any bits right of this bit were initially =0=, the result should still be zero.
+    + determine if an unsigned integer is a power of 2 (an integer of only one 1-bit) or is 0: 0-test after the operation
+  + =x | (x + 1)= sets the rightmost 0-bit or =x= if none: similar to the above
+  + =x & (x + 1)= clears trailing =1=​s
+    + determine if an unsigned integer is $2^{n}-1$ or $0$, the result of which yields a full zero.
+  + =x | (x - 1)= sets the trailing 0-bits, or =x= if none
+  + =!x & (x + 1)=: create a word with a single 1-bit at the position of the rightmost 0-bit in =x=.
+  + =~x | (x - 1)=  create a word with a single 0-bit at the position of the rightmost 1-bit in =x=.
+  + =~x & (x - 1)=, =~(x | -x)=, =(x & -x) - 1= create a word with 1's at the postions of trailing 0's in x and 0's elsewhere.
+  + =~x | (x + 1)=: all 0 at the positions of the trailing 1's in =x= and 0's elsewhere.
+  + =x & (-x)=: leaves only the rightmost 1-bit.
+  + =x ^ (x - 1)=: leave only the bits at the positions of the rightmost 1-bit and its right.
+  + =x ^ (x + 1)=: all 1 at the positions of the rightmost 0-bit and its righ.tg
+
+** De Morgan's Laws Extended
+
+#+begin_src
+~(-x) = x - 1
+~(x + y) = ~x - y
+~(x - y) = ~x + y
+#+end_src
+
+** Addition Combined With Logical Operations
+
+#+begin_src
+-x = ~(0) - x + 1 = ~x + 1 = ~(x - 1)
+~x = ~(0) - x = (x + (-x) - 1) - x = (-x) - 1
+
+-(~x) = x + 1 # if repeatedly applied
+~(-x) = x - 1
+#+end_src
+
+** Exchange Two Registers
+
+#+begin_src
+x <- x ^ y
+y <- y ^ x
+x <- x ^ y
+#+end_src
+
+** Alternating Among Two or More Values
+
+#+begin_src
+x <- a + b - x
+# or
+x <- a ^ b ^ x
+#+end_src
