@@ -57,3 +57,22 @@ x <- a + b - x
 # or
 x <- a ^ b ^ x
 #+end_src
+
+* Bit Rearranging
+
+** Reversing Bits
+
+Reverse adjacent bits and then reverse adjacent bit pairs, then adjacent nibbles, then adjacent bytes and so on.
+Byte reversal is only the later stages of bit reversal, though simple byte reversal does not require this repeated
+swap: or and shifted bytes will do.
+
+#+begin_src
+// reverse bits within a byte
+x = (x & 0x55) << 1 | (x & 0xAA) >> 1    // move the lower bit up and the upper bit down, then or them.
+x = (x && 0x33) << 2 | (x & 0xCC) >> 2
+x = (x && 0x0F) << 4 | (x & 0xF0) >> 4
+
+// 32-bit byte reversal
+(x << 24) | ((x & 0xFF00) << 8) |
+((x >> 8) & 0xFF00) | (x >> 24);
+#+end_src
