@@ -130,3 +130,58 @@ Hold the /RST/ high for at least two machine cycles and return it to low either 
 The Registers will return to a default state.
 
 - Program Counter: to =0x0000=.
+
+* Instruction Set
+
+** Adressing
+
+- /Register/: access registers
+
+- /Direct/
+
+- /Immediate/ =#12=: 8-bit or 16-bi for =DPTR=
+
+- /Indirect/: =@Rn=
+
+- /Relative/: 8-bit signed offset. Used with certain jump instructions and normally as a label.
+
+- /Absolute/: used only with =ACALL= and =AJMP=, 11 bits of address, allow branching within the current 2K page of code memory. The higher 5 bits determines the 2K page.
+
+- /Long/: used only with =LCALL= and =LJMP=: full 16-bit address. Position-dependent.
+
+- /Indexed/: a base register (either the program counter or the data pointer) with an offset (the accumulator): =@A+DPTR=
+
+** Arithmetic
+
+- =INC= operates on =DPTR= while =DEC= does not work with 16-bit =DPTR=.
+
+#+begin_src assembly
+    DEL     DPL
+    MOV     R7, DPL
+    DJNE    R7, #0xFF, SKIP ; if underfloor
+    DEC     DPH
+SKIP:
+#+end_src
+
+- For BCD arithmetic, =ADD= and =ADDC= must be followed by a =DA A= opration to ensure the result is range for BCD.
+
+** Bitwise
+
+- =XRL=: quick and easy way to invert port bits.
+
+- =RR=, =RL=; =RRC=, =RLC=: useful for shift a bit across registers.
+
+- =SWAP A=: swaps the high and low nibbles with the accumulator. Useful operation in BCD manipulations.
+
+** Data Transfer
+
+- =MOV=
+
+- =PUSH=, =POP=: the stack is full-ascending.
+
+- =XCH A=: exchange data between the accumulator and the address.
+
+- =XCHD A @Ri=: exchange the lower nibbles.
+
+- =MOVX=: External RAM requires indirect addressing either through =R0=/=R1= or =DPTR= (16-bit addresses).
+   All such data transfer instructions execute in two machine cycles and uses the accumulator as either the source or destination.
