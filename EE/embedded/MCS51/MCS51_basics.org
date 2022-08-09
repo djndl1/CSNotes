@@ -185,3 +185,54 @@ SKIP:
 
 - =MOVX=: External RAM requires indirect addressing either through =R0=/=R1= or =DPTR= (16-bit addresses).
    All such data transfer instructions execute in two machine cycles and uses the accumulator as either the source or destination.
+
+** Boolean Instructions
+
+- =SETB=, =CLR=
+
+- The carry bit =CY= in the PSW is used as the a single-bit accumulator of the boolean processor.
+
+- No single-bit XOR operation.
+
+- =JC= (jump if carried), =JB= (jump if bit set), =JBC= (jump if the bit is set and then clear the bit), =JNC= (jump if not carried), =JNB= (jump if bit not set)
+
+** Branching
+
+- =SJMP= (8-bit offset), =LJMP= (16-bit offset), =AJMP= (11-bit absolute address).
+
+#+begin_src asm
+MOV DPTR, #JUMP_TABLE
+MOV A, #INDEX_NUMBER
+RL   A
+JMP @A+DPTR
+
+...
+
+JUMP_TABLE: AJMP CASE0
+            AJMP CASE1
+            AJMP CASE2
+            AJMP CASE3
+#+end_src
+
+*** Subroutines
+
+- =ACALL=, =LCALL=. The return address is pushed on the stack, low-byte first, high-byte second.
+
+- =RET=: returns execution to the instruction following the =CALL=.
+
+- =RETI=: return from an interrupt service routine. If not in an interrupt handler, =RETI= is identical to =RET=
+
+*** Conditonal Jump
+
+- 8-bit offsest.
+
+- =JZ=, =JNZ=: test if the accumulator is zero and jump.
+
+- =DJNZ=: decrement and jump if not zero, counter loop for n-times until zero.
+
+- =CJNE=: compare and jump if not equal. Loop until equal, also for greater/less-than comparison.
+
+#+begin_src asm
+CJNE  A, #20, $+3 ; to JNC regardless of the result. The net result is a pure comparison
+JNC   BIG
+#+end_src
