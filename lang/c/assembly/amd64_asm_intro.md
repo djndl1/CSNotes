@@ -738,9 +738,9 @@ segment . text
 global mememp
 
 mememp :
-  mov rex, rdx
+  mov rcx, rdx
   repe cmpsb ; compare until end or difference
-  cmp rex , 0
+  cmp rcx , 0
   jz equal  ; reached the end
   movzx eax , byte [rdi-1]
   movzx ecx , byte [rsi-1]
@@ -985,7 +985,11 @@ Used by IA-32 [Unix-like](http://sco.com/developers/devspecs/abi386-4.pdf) and W
 
 - `eax`, `ecx`, `edx` are volatile and the rest are callee-saved. The x87 FPU registers must be empty when calling and exiting if not used for returning value.
 
+- the caller is responsible to unwind the stack space used by the arguments after the call. 
+
 Variations of this conventions exist, leading to incompatibility.
+
+Note that function names is conventionally prefixed with an underscore.
 
 #### stdcall: The Standard Win32 API Convention.
 
@@ -1354,3 +1358,4 @@ main:
   leave
   ret
 ```
+
