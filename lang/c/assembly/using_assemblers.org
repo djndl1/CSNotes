@@ -15,3 +15,108 @@ yasm [-m x86/amd64] -f elf64/elf32/win32/win64 -g dwarf2 [-l name.lst] name.asm
 #+begin_src shell
 nasm -f bin/elfx32/elf64/win32/win64/ -g -F elf32/elf64/elfx32/win32/win64
 #+end_src
+
+- listing file =-l list_file.lst=, a file where addresses and generated code are listed on the left and the actual expanded source code on the right.
+
+- include file search directories =-i=xs
+
+- define and undefine a macro =-d=, =-u=
+
+- preprocess only =-E=
+
+- Optimization:
+  - =-O1=, =-Ox= (recommended and the default), =-Ov=
+
+- Warning:, =-w= enable certain infrequent warnings,
+  + =-w+error=, =-Werror=: treat warnings as errors.
+
+** NASM Language
+
+#+begin_src asm
+label:  instruction operands    ; comment
+#+end_src
+
+*** Pseudo-Instructions
+
+Not actual x86 instructions but for programming sake.
+
+- =Dx=: =DB=, =DW=, =DD=, =DQ=, =DT= (ten bytes), =DO= (octoword), =DY= (YMM register wide), =DZ= (ZMM register wide)
+  + MASM =Dx ?= and =DUP= syntax are supported
+
+- =RESB=, =RESW=, =RESD=, =RESQ=, =REST=, =RESTO=, =RESY=, =RESZ=: declare unintialized storage space.
+
+- =INCBIN=: include binary data file.
+
+- =EQU=: defines constants with labels.
+
+#+begin_src asm
+messsage    db  `hello world`
+msglen      equ $-message
+#+end_src
+
+- =TIMES=: causes the instruction to be assembled multiple times, an equivalent to the =DUP= syntax.
+
+#+begin_src asm
+zerobuf:  times 64 db 0
+times 100 movsb
+#+end_src
+
+**** Critical Expressions
+
+Epxressions revolved on the first pass, through which the size of the assembled code and data is determined so that the addresses of all symbols can be resolved.
+
+*** Constant Literal
+
+- Suffixes: =H=/=X= (hexademcimal), =D=/=T= (decimal), =Q=/=O= (octal), =B=/=Y= (binary); Prefixes: =0x=/=0h= (hex), =0d=/=0t= (decimal), =0o=, =0q= (octal), =0b=, =0y= (binary)
+
+- Character string: single or double quotes for verbatim strings; =``= backquoted strings support C-style escapes for special characters.
+
+- Character Contansts: ASCII character to represent a byte number, up to 8 such characters, arranged in little-endian order.
+
+#+begin_src asm
+mov  eax, 'abcd'
+#+end_src
+
+- unicode string operator: =__?utf16?__=, =__?utf16le?__=, =__?utf16be?__=, =__?utf32?__=, =__?utf32le?==, =__?utf32be?__= accepts UTF-8 strings and outputs as little-endian Unicode strings.
+
+- floating-point: =__?floatN?__= (N = 8(minifloat)/16/32/64/80m/80e/128l/128h) ooperators used to produce representations of a specific floating-point number as an integer, =__?bfloat16?__=; =1.222_22_22=, =1.22222=, =k1e+4000= or C99-style hexadecimal floating-point: =0x=; =__?Infinity?__=, =__?QNaN?__=, =__?SNaN?__=.
+
+#+begin_src asm
+mov  rax, _?float64?__(3.14)
+mov  rax, 0x400921fb...
+#+end_src
+
+*** Effective Address
+
+- Nasm is capable of doing algrbra on illegal syntax like =[ebx*5]=, =[label1*2 - label2]=.
+
+- =[WORD/DWORD/BYTE/NOSPLIT eax + 3]= to force offset width.
+
+- Absolute address is generated in 64-bit mode by default.
+  The =REL= keyword makes it PC-relative, or even more by putting =default rel= at the beginning of the file.
+
+*** Expressions
+
+- =$=: the assembly position at the beginning of the line; =$$= the beginning of the section.
+
+- C-style conditional operator, =||=, =^^= (xor), =&&=; comparison operators; and even =<=>= spaceship; =|=, =^=, =&=; =<<=, =>>=, =<<<=, =>>>= (signed shift)
+
+- =+=, =-=, =/=, =//= (signed division), =%=, =%%= (signed modulo)
+
+- =-=, =+=, =~=, =!=
+
+- =SEG=: the segment address of its operand
+
+*** Local Labels
+
+- =.labelname=: a local label associated with the previous non-local one. Also accessible out of its parent non-local label by using syntax like =NonLocalLabel.LocalLabel=
+
+- =..@= special label that does not interfere with the normal local-label mechanism.
+
+- =..symbol=: special symbols.
+
+** ndisasm
+
+#+begin_src shell
+ndisasm -b {16|32|64} filename
+#+end_src
