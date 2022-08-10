@@ -115,6 +115,24 @@ mov  rax, 0x400921fb...
 
 - =..symbol=: special symbols.
 
+** Directives
+
+- =BITS 16/32/64=: mostly unnecessary since the output format pretty much determines the architecture.
+
+- =DEFAULT REL/ABS=: RIP-relative addressing
+
+- =SECTION/SEGMENT=
+
+- =EXTERM=: import symbols from other modules.
+
+- =GLOBAL=: exporting symnbols to other modules
+
+- =COMMON=: like a global variable declared in the uninitialized data section, but at link time, these common variables will be merged.
+
+- =STATIC=: file-scoped local symbol.
+
+- =G|LPREFIX=, =G|LPOSTFIX=: mangling symbols to fit specific API conventions.
+
 ** ndisasm
 
 #+begin_src shell
