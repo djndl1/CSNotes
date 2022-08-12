@@ -1,0 +1,10 @@
+#+title: Java Test
+
+* AssertJ: A Rich Set of Assertions
+
+- =org.assertj.core.api.Assertions=: the main entry point
+
+ #+begin_src java
+assertThat(...).as("Test description")...;
+assertThatThrownBy(throwing code).hasMessage("myError");
+ #+end_src
