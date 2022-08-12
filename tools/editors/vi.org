@@ -34,10 +34,15 @@
 
 Format: [Change] [Count] [Motion]
 
+- =o= / =O=: insert a newline below/above and enter the insert mode.
+
+- =a=: append after the cursor, =i= before the cursor; =A=: append to the current line.
+
 - ~d~: delete
   + ~D~: delete to the end of the line = ~d$~
 
-- ~ra~: replace the current char with ~a~, no need to enter the insert mode
+- ~ra~: replace the current char with ~a~, no need to enter the insert mode;
+  ~R~: the replace mode that replaces everything in its way, basically the INSERT key in CUA.
 
 - ~c~: change, a combination of delete followed by insert. ~ce~, ~cw~
   - ~cc~: change the entire line
@@ -53,7 +58,7 @@ Format: [Change] [Count] [Motion]
 
 - ~s~: substitute a certain number of text object, i.e. delete and insert
 
-- ~y~ (yank), ~p~ (put)
+- ~y~ (yank), ~p~, ~P~ (put after/before)
 
 - ~.~: repeat the former command
 
@@ -78,6 +83,11 @@ Format: [Change] [Count] [Motion]
 ** Undo/Redo
 
 - ~u~: undo; ~U~: undo all on a line, ~C-r~: redo
+
+** Set Option
+
+- =:set=
+  + =ic= (ignore case), =hls= (hlsearch), =is= (incsearch), =noic=, =inv= to the option inverts the option.
 
 * Advanced Operations
 
@@ -109,6 +119,12 @@ The general form of ~vi~ commands is
 #+end_src
 
 =vi= saves the last nine deleted line in nine numbered deletion buffers.
+
+* External Commands
+
+- =!shell_command=
+
+- =:r FILENAME=, =:r !ls=: read into the current buffer
 
 * ex commands
 
