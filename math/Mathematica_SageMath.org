@@ -1,0 +1,38 @@
+#+title: Mathematica_SageMath
+
+* Introduction
+
+** Basic Calculation
+
+#+begin_src
+2^3^4
+Log[Cos[E^Sqrt[4.7]]]
+N[5, 10] # gives numerical value
+Block[
+    {$MaxExtraPrecision = 500},
+    N[Sin[(E + Pi) ^ 100], 300]
+]
+#+end_src
+
+#+begin_src python
+2 ^ 3 ^ 4
+log(cos(e^sqrt(4.7)))
+5.n(digits=10) # 10-digit numerical approximation
+numerical_approx(5, digits=10)
+sin(((e + pi) ^ 100).n(digits=500)).n(digits=300)
+#+end_src
+
+** Graphics
+
+#+begin_src
+Plot[Sin[x]/x, {x, -40, 40}, PlotRange->All]
+#+end_src
+
+#+begin_src python
+plot(sin(x) / x, xmin=-40, xmax=40)
+plot([sin(cos(x)), cos(sin(x))],
+     (x, -2*pi, 2*pi),
+     legend_label=["sin(cos(x))", "cos(sin(x))"],
+     ticks=[[-2*pi,-3*pi/2, -pi, -pi/2, 0, pi/2], None],
+     tick_formatter="latex")
+#+end_src
