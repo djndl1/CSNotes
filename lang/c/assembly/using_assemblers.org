@@ -1,0 +1,17 @@
+#+title: Using Assemblers
+
+* Linking with GCC
+
+use =-no-pie= for these objects.
+
+* Yasm
+
+#+begin_src shell
+yasm [-m x86/amd64] -f elf64/elf32/win32/win64 -g dwarf2 [-l name.lst] name.asm
+#+end_src
+
+* Nasm
+
+#+begin_src shell
+nasm -f bin/elfx32/elf64/win32/win64/ -g -F elf32/elf64/elfx32/win32/win64
+#+end_src

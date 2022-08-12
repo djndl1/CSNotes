@@ -1,0 +1,59 @@
+#+title: Function_programming_in_java
+
+Imperative programming cannot be proved correct. Various techiniques are employed to avoid bugs. FP provides such techinques. FP is not restricted to certain languages, but is used as a programming paradigm. Functional programming pushes abstraction to the limit.
+
+* What Is Functional Programming
+
+Functional programming is not the oppposite of object-oriented programming. It is often opposed to imperative programming, where programs are composed of elements that "do" something: an initial state, a transition and an end state (*state mutation*).
+
+Functional programs are composed of elements that "are" something rather than "do" something.
+Functional programming deals with various pure functions, returning values and having no side effects.
+
+** Some Major Difference from Imperative Programming
+
+1. *No observable, intentional side effects* viewed from outside the function. In practice, it is impossible for a function to have no side effects at all (out-of-memory, a value based on current time etc). Side effects are unavoidable, but to be delayed. Functional programming replaces side effects with returning a representation fo these effects.
+    - No mutation of variables
+    - No printing to the console or to any device
+    - No writing to files, databases, networks, or whatever
+    - No exception throwing
+
+2. *Referential Transparency*: does not mutate or depend on the external world.
+   + *self-contained*: usable in any context.
+   + *deterministic*
+   + *No =Exception= thrown*.
+   + won't create conditions causing other code to unexpectedly fail.
+   + does not hang when some external device is unavailable.
+
+** Benefits
+
+- Easy to reason about since they are deterministic. Only extensive testing is needed to ensure that the code behaves as expected.
+
+- Easy to test since there is no side effects and thus no mocks.
+
+- More modular since they have no side effects to handle, no exceptions to catch, no context mutation to deal with, no shard mutable state and no concurrent modifications.
+
+- Easy Composition and recombination . Various base functions are written and then combined into higher-level ones until there is a single function that correspond to the program to build.
+
+** Substitution Model
+
+Replacing referentially transparent expressions with their values does not change the overall meaning.
+
+** Some Features
+
+- no assignment statements, variables are not mutated once initialized.
+
+- functional programs contain no side effects: a function can can have no effect other than to compute its result.
+
+- First-class functions.
+
+- Anonymouse functions
+
+- Closures
+
+- Currying
+
+- Lazy evaluation
+
+- Parametric polymorphism
+
+- Algebraic data types

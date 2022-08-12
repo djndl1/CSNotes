@@ -1,0 +1,7 @@
+#+title: OPC DA DCOM Remote
+
+OPC DA DCOM configuration is well documented in KEPServerEx's documentation and in other vendors'. However, when launching a client to access a remote OPC DA server. There are some curious situations.
+
+1. The windows firewall must open certain ports, seemingly TCP 135 but there is an option in the windows firewall configuration called RCP dynamic ports to choose. Not sure which one actually helps.
+
+2. Matrikon OPC Explorer works well with documented DCOM configuration. KEPServerEX's runtime needs to run as the same user instead of a system user. OPC Quick client and others I don't known why they work and don't work.
