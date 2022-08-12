@@ -3,18 +3,18 @@
   :CUSTOM_ID: basics
   :END:
 
-1. All windows are contained within the root window. The display screen
-   of the X window server is the /root window/. A subwindow must be
+1. All windows are contained within *the root window*. The display screen
+   of the X window server is the *root window*. A *subwindow* must be
    contained within its parents or be truncated, that is, if parts of
    the window exceed the expanse of the root window.
 
 2. a parent window alone has a title bar.
 
-3. Menus, buttons, and dialogue boxes are all treated as windows.
+3. Most things are windows: menus, buttons, and dialogue boxes are all treated
+   as windows. Those that are not windows must be drawn in a window.
 
-4. All length measurements are in screen pixels.
-
-5. Each window contains and carries its own coordinate system.
+4. Each window contains and carries its own coordinate system with the origin at
+   its top-left corner in screen pixels.
 
 All X window programming consists of
 
@@ -28,6 +28,11 @@ All X window programming consists of
 
 X Window is a client and server system, of which the protocol is a
 series of messages between the two.
+  - The client contains the Xlib call, which generate the protocol messages
+    sent to the server.
+  - The server receives the messages and drives the hardware to display.
+
+The X Windows System provides /mechanisms/ while  toolkits implements /policies/.
 
 An Xlib application program goes through the following steps:
 
@@ -36,12 +41,15 @@ An Xlib application program goes through the following steps:
    :CUSTOM_ID: open-connection-to-the-server
    :END:
 
-- /Screen/: infromtion of the nature of the screen. A phsyical monitor
+/Screen/, /Visual/ and /Display/ are structures established when the connection
+to the server is made to buffer necessary information about the server.
+
+- /Screen/: information of the physical nature and the X11 model of the screen. A physical monitor
   and hardware that can be color, grayscale or monochrome.
 
 - /Visual/: how colors are represented
 
-- /Display/: formation of X protocol packet: byte order, host:display
+- /Display/: formation of X protocol packet: byte order, =host:display=
   string, default screen number. A set of screens for a single user with
   one keyboard and one pointer is called a display.
 
@@ -57,9 +65,9 @@ server.
    :CUSTOM_ID: create-a-top-level-window
    :END:
 
-A parent window can contain sub-windows and the sub-windows can contain
-sub-window and so on. All windows are sub-windows of a maste rwindow
-(root window), controlled by the Window Manager on the server.
+A *parent window* can contain *sub-windows* and the sub-windows can contain
+sub-window and so on. All windows are sub-windows of a *master window*
+(*root window*), controlled by the *Window Manager* on the server.
 
 #+BEGIN_SRC C
     Window XCreateWindow(Display *display, Window parent, int x, int y, unsigned int width, unsigned int height, unsigned int border_width, int depth, unsigned int class, Visual *visual, unsigned long valuemask, XSetWindowAttributes *attributes);
