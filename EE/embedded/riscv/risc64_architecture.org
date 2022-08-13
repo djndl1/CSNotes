@@ -1,0 +1,164 @@
+#+title: Risc64_architecture
+
+* Basic Terminology
+
+- /Core/: a hardware component that contains an independent instruction fetch unit. It may have multiple RISCV-compatible hardware thread resources called /harts/.
+
+- /Coprocessor/: a unit that is attched to a RISC-V core which contains additional architectural state and instruction-set extensions.
+
+- /Accelerator/: a non-programmable fixed-function unit or a core that can operate autonomously, specialized for certain tasks.
+
+- /Software Execution Environment/, /Execution Environment Interface/: execution environments range fromn bare-metal hardware implementations, to RISC-V OSes, hypervisors to RISC-V emulators.
+
+* Instruction Set
+
+Four distinct base ISAs are designed in parallel as opposed to adding on later to sit on top of another. RISCV is designed to support customization and specialization with the differentiation of standard encoding, reserved encoding and custom encoding.
+
+- A base integer ISA, present in any implementation
+  + /RV32I/, /RV64I/, /RV32E/ (for microcontrollers), /RV128I/
+
+- optional extensions: M (integer multiplication/division), A (atomic operations), F/D/Q/L (various floating-point instructions), P (packed SIMD), V (Vector)
+
+** Encoding
+
+- Fix-lenght 32-bit instructions by default aligned on 32-bit boundaries
+
+- designed to support ISA extensions with variable-length instructions with lengths of 16-bit instruction parcels.
+
+* Memory Model
+
+- a single byte-addressable space of its bitness for all memory accesses
+
+- word = 4-bytes, halfword = 2 bytes, doubleword = 8 bytes, quadword = 16 bytes.
+
+- the address space may contain one or more I/O devices, determined by the execution environment.
+
+* Exceptions, Traps, Interrupes
+
+- /Exception/: unusual conditon occurring at runtime associated with an isntruction in the current RISC-V hart.
+
+- /Interrupt/: an external asynchronous event that may cause a RISC-V hart to experience an unexpected transfer of control.
+
+- /trap/: the transfer of control to a trap handler caused by either an exception or an interrupt.
+
+From the perspective of software, traps can be divided into
+
+- /Contained traps/: visible to and handled by software.
+
+- /Request traps/: The trap is a synchronous exception that is an explicit call to the execution
+environment requesting an action on behalf of software inside the execution environment. e.g. a syscall
+
+- /Invisible Traps/:  handled by the execution environment.
+
+- /Fatal traps/: a fator failure and causes the execution environment to terminate execution.
+
+* RV32I Base Integer Instruction Set
+
+** Programming Model
+
+- =x0=: zero register, hardwired to be zero
+
+- =x1=-=x31= general purpose registers
+  + the standard calling convention uses =x1= to hold the return address for a call and =x5= as an alternate link register, =x2= as the stack pointer.
+
+- =pc=: program counter
+
+** Encoding and Formats
+
+Simple and consistent
+
+- 0-6: opcode; 7-11: destination register; 15-19: source register 1; 20-24: source register 2;
+
+TODO
+
+** Integer Computation Instruction
+
+Register-immediate: I type format; Register-Register: R-type
+
+- =ADDI=; =ADD=
+
+- =SUB=
+
+- =SLTI=, =SLTIU=; =SEQZ rd, rs= for =SLTIU rd, rs1, 1=
+  =SLT=, =SLTU=
+
+- =ANDI=, =ORI=, =XORI= (=NOT= for =XORI rd, rs1, -1=); =AND=, =OR=, =XOR=
+
+- =SLLI=, =SRLI=; =SRAI=; =SLL=; =SRL=; =SRA=
+
+- =LUI=, =AUIPC=:
+  + the combination of =AUIPC= and the 12-bit immediate in a =JALR= can transfer control to any 32-bit PC-relative address.
+  + an =AUIPC= plus the 12-bit immediate offset in regular load/store instructions can access any 32-bit PC relative data address.
+  + =AUIPC= is better for obtaining the current PC than =JAL+4= since it does not interfere with the branch predictor.
+
+- =NOP= for =ADDI x0, x0, 0=
+
+** Control Transfer
+
+- the target should be four-byte aligned.
+
+- =JAL=: jump and link, target an offset of 1MB (2-bytes).
+
+- =JALR=: jump and link register: the target is the source register offset by a 12-bit sign extended immediate.
+
+- Branches: =BEQ=, =BNE=; =BLT=, =BLTU=; =BGE=, =BGEU=: 4KB branch range.
+
+** Load/Store
+
+- Only load and store instructions access memory and arithmetic instructions only operate on CPU registers.
+
+- little-endian or big-endian dependending on the EEI.
+
+- Effective address: =rs1= with sign-extended 12-bit offset.
+
+- =LW= (load word); =LH=, =LHU=; =LB=, =LBU=
+
+- =SW=, =SH=, =SB=
+
+* RV64I Base Integer Instruction Set
+
+- Integer registes and user address space is widened to 64 bits.
+
+- Most integer computational instructions operate on 64-bit values.
+  Additional instructions are added to provide 32-bit manipulation.
+
+** Integer Operations
+
+- =ADDIW=: the result is sign-extended to fit in the 64-bit register.
+
+- =SLLI=, =SRLI= (logic shift); =SRAI=: arithmetic right shift.
+
+- =SLLIW=, =SRLIW=, =SRAIW=: RV64I=only instructions that operate on 32-bit values and produce signed 32-bit results.
+
+- =LUI=: places 20-bit unsigned immdiate into bits [31-12] of the destination register place zero out all the lower bits and then sign-extend to 64 bits.
+
+- =AUIPC=: used to build PC-relative addresses. It appends 12 low-byte zero bits to the 20-bit U-immediate,
+  sign extends to 64 bits and adds it to the addres, adds it to the address of the =AUIPC= instruction and then places the result in the destination register.
+
+** Load/Store
+
+- =LD=: load a 64-bit value from memory into register =rd=
+
+- =LWU=
+
+- =SD=
+
+* M Standard Extension
+
+- =MUL= (lower half); =MULH=, =MULHU=, =MULHSU= (upper half): full multiplication would be =MULH((S)H) rdh, rs1, rs2; MUL rdl, rs1, rs2=
+
+- =MULW=
+
+- =DIV=; =DIVU=; =DIVW=, =DIVUW=
+
+- =REM=, =REMU=; =REMW=, =REMUW=
+
+Full division would be =DIV(U) rdq, rs1, rs2; REM(U) rdr, rs1, rs2=.
+
+* F Standard Extension: Single-Precision Floating-Point Computational Instructions
+
+- =f0=-=f31= 32-bit wide register; =fscr= control and status reegsiter, which contains the operating mode and exception status of the floating-point unit.
+
+* D Standard Extension: Double-Precision Floating-Point
+
+=f0= through =f32= are widened to 64 bits
