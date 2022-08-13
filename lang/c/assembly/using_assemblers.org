@@ -30,6 +30,10 @@ nasm -f bin/elfx32/elf64/win32/win64/ -g -F elf32/elf64/elfx32/win32/win64
 - Warning:, =-w= enable certain infrequent warnings,
   + =-w+error=, =-Werror=: treat warnings as errors.
 
+** Use GDB on Windows With NASM
+
+Assemble the code into ELF with DWARF debug info and use GCC/LD to link it.
+
 ** NASM Language
 
 #+begin_src asm
