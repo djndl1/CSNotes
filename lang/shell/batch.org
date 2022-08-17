@@ -1,0 +1,160 @@
+#+title: Batch
+
+* Basics
+
+- =%COMSPEC= for the full path of =cmd.exe=; Run the script with =cmd.exe=
+  to start a child process and use =/C= (run the command and then close,
+  here to prevent =EXIT= closes the host window)
+
+- Use =.cmd= instead of =.bat=
+
+- =REM= for comments but =::= can also be employed most of the time.
+
+- =@ECHO OFF= to suppress printing and restore with =ECHO ON=
+
+- print-debugging is the only debugging.
+
+** Variables
+
+Undeclared/uninitialized variables is an empty string.
+
+#+begin_src shell
+REM set clobbers any existing variables
+set foo=bar
+
+set /A four=2*2
+
+REM without an argument, `set` lists all existing variables
+#+end_src
+
+- =setlocal= starts a local scope and =endlocal= ends the scope. One of the uses of local scopes is to override a global variable like =PATH=
+
+*** Some Common Variables
+
+- =USERPROFILE=: the home directory
+
+- =HOMEDRIVE=, =HOMEPATH=
+
+- =OS=
+
+- =USERDOMAIN=, =USERNAME=
+
+- =ProgramFiles=: the Program Files folder
+
+- =windir=: the windows directory
+
+- =PATH=
+
+- =ComSpec=: tthe full path of =cmd.exe=
+
+- =SystemDrive=, =SystemRoot=
+
+- =%0=, =%1= ... are arguments. Arguments after =$9= is only accessible by first =SHIFT= the arguments.
+
+*** Variable Substitution
+
++ see =FOR /?= or =CALL /?= for some variable substitution
+
++ =%~I=: removing any surrounding quotes
+
++ =%~fI=: fully qualified path name
+
++ =%~dI=: drive letter
+
++ =%~pI=: path
+
++ =%~nI=: filename
+
++ =%~xI=: file extension
+
++ =%~sI=: short names
+
++ =%~aI=: file attributes
+
++ =%~tI=: date/time of file
+
++ =%~$PATH:I=: get the fullpath of the file if it's in the =PATH=.
+
+These substitutions can be combined: =%~dpI= to get the parent path.
+
+** Return Codes
+
+- =%ERRORLEVEL%=
+
+#+begin_src bat
+IF %ERRORLEVEL% NEQ 0 (
+    REM do something to handle an error
+)
+
+IF %ERRORLEVEL% EQU 9009 (
+    REM handle a certain error
+)
+
+SomeCommand.exe && echo Success
+
+REM execute under failure
+SomeCommand.exe || Exit /B 1  REM /B exit the current script
+SomeCommand.exe || GOTO :EOF        REM jump to the end of the file and return 1
+#+end_src
+
+#+begin_src bat
+@echo off
+setlocal enableextensions
+
+REM error codes of 2's power allows for easy bitwise combination
+set /A errno=0
+set /A ERROR_HELP_SCREEN=1
+set /A ERROR_COMMAND_NOTFOUND=2
+set /A ERROR_OTHERCOMMAND_FAILED=4
+
+SomeCommand.exe
+IF %ERRORLEVEL% NEQ 0 SET /A errno^|=%ERROR_SOMECOMMAND_NOT_FOUND%
+
+OtherCommand.exe
+IF %ERRORLEVEL% NEQ 0 (
+    SET /A errno^|=%ERROR_OTHERCOMMAND_FAILED%
+)
+
+EXIT /B %errno%
+#+end_src
+
+** stdio
+
+- =stdin= (0), =stdout= (1), =stderr= (2)
+
+- =>=: redirects, =>>= appends
+
+- =2>&1=: combine =stderr= and =stdout=
+
+- =<=: =stdin= redirection
+
+- =NUL=: a pseudofile similar to =/dev/null=
+
+- =|=: piping
+  + =type con > output.txt=: =type= (=cat= under Unix) the console input and output to a file
+
+** IF-Conditional
+
+#+begin_src bat
+REM IF /? for help
+
+IF EXIST "dfdfasf.txt" ECHO FOUND
+
+IF NOT EXIST "dfdfasf.txt" ECHO NOT FOUND
+
+IF EXIST "DFa" (
+         ...
+   ) ELSE (
+     ...
+   )
+
+IF "%var%"=="" (...)   REM if set
+
+IF NOT DEFINED var (...)
+
+IF "%var%" == "a string" ( ... )
+
+IF "%var%" EQU/NEQ/GEQ/LEQ "1" (  )
+
+IF /I "%ERORRLEVEL%" NEQ "0" ( ... ) REM case insensitive string comparison
+#+end_src
