@@ -158,3 +158,48 @@ IF "%var%" EQU/NEQ/GEQ/LEQ "1" (  )
 
 IF /I "%ERORRLEVEL%" NEQ "0" ( ... ) REM case insensitive string comparison
 #+end_src
+
+
+** Loop
+
+- =GOTO= and =:label= are there but not used much anymore.
+
+- =FOR=: =%I= in the command and =%%I= in a batch file
+
+#+begin_src bat
+FOR /D %I IN ("%USERPROFILE%"\*) DO @ECHO %I      REM looping through directories
+FOR /R "%TEMP%" %I IN (*) DO @ECHO %I        REM recursive loop through subfolder
+#+end_src
+
+** Function
+
+There is no strict functions, but labels and the =call= keyword can emulate it.
+Put an =EXIT /B= before any function to avoid falling through. There is not way to return anything other than an error code. A function is more like a script.
+
+#+begin_src bat
+@ECHO OFF
+SETLOCAL
+
+:: script global variables
+SET me=%~n0
+SET log=%TEMP%\%me%.txt
+
+:: The "main" logic of the script
+IF EXIST "%log%" DELETE /Q %log% >NUL
+
+:: do something cool, then log it
+CALL :tee "%me%: Hello, world!"
+
+:: force execution to quit at the end of the "main" logic
+EXIT /B %ERRORLEVEL%
+
+:: a function to write to a log file and write to stdout
+:tee
+ECHO %* >> "%log%"
+ECHO %*
+EXIT /B 0
+#+end_src
+
+** Logging
+
+Use the =tee= implementation above. Use the =DATE= and =TIME= variables for time and add a prefix to any logging message =script: some message=.freebird
