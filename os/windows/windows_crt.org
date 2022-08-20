@@ -1,0 +1,61 @@
+#+title: Windows Crt
+
+* UCRT
+
+** Refactoring
+
+*** Issues
+
+- Verioned CRT makes it difficult to adopt new versions due to uncontrollable dependency on older versions.
+
+- Old versions are no longer actively fixed.
+
+- Hard to maintain and add new features.
+
+*** How the New CRT is Archtected
+
+- =VCRuntime=: the runtime functionality for things like process startup and exception handling.
+
+- =AppCRT=: common C library functions.
+
+- =DesktopCRT=: functionality usable only by desktop apps.
+
+The latter two are later merged into the Universal CRT, named =ucrtbase.dll= and =ucrtbased.dll= (the debug version), included as part of the Windows OS.
+
+*** How it's Done
+
+Compile code as C++ and convert C code using C++ features such as RAII, template and function overloading.
+
+** Deployment
+
+On Windows 10/11, the system-wide UCRT is always used even if an application includes an application-local copy.
+
+* API Sets
+
+- /API Sets/: In Core OS components, Win32 APIs are organized into functional groups. (As a result of MinWin refactoring, see [[https://arstechnica.com/information-technology/2016/05/onecore-to-rule-them-all-how-windows-everywhere-finally-happened/][Windows OneCore]])
+  API sets provide common interface names for Win32 API since Win32 API implementations have different DLL names on different Windows devices,
+  make the apps portable across all Windows platforms. The developer no longer links to =kernel32.lib= or =advapi32.lib= but with umbrella library
+  that contains the set of core OS APIs.
+  Also API sets provide a query mechanism to detect whether an API is available.
+
+**  API Set Names
+
+- =api-= (guaranteed to exist), =ext-= (optional extensions)
+
+- =l<n>-<n>-<n>=
+
+API Set names an be used in =LoadLibrary= or P/Invoke instead of a DLL module name, even if they might not be real dlls.
+
+** Umbrella Libraries
+
+- =OneCore.lib=: the core Win32 API intefaces.
+
+- =OneCore_apiset.lib=: use API set direct forwarding
+
+- =OneCoreUap.lib= core Win32 API for WinRT.
+
+- =OneCore_UAP_apisetlib=
+
+** Check Availability
+
+- =IsApiSetImplemented()=
