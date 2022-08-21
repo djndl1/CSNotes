@@ -1,0 +1,112 @@
+#+title: Concepts
+
+* Terminology
+
+- /WinAPI functions/
+
+- /Native System Services/: WinNT system call.
+
+- /Kernel Support Functions/Routines/: kernel mode subroutines
+
+- /Windows services/: processes started by Windows service control manager.
+
+
+* Difference From Windows 9x/ME
+
+- Multiprocessor system
+
+- Security model: discretionary access control
+
+- Fully 32-bit OS, no 16-bit code in itself.
+
+- Fully reentrant. Nonreentrant-code requires a system-wide lock for protection,
+  resulting in bad performance due to forced single threading when executing 16-bit low-level code.
+
+- 16-bit code run in their own memory space rather than shared under Windows 9x
+
+- Shared memory are only visible to processes have the mapping,
+  unlike Windows 9x where all shared memory are shared across all processes.
+
+- Fully protected kernel memory pages from user mode.
+
+* Process
+
+** Components
+
+- A /private virtual address space/
+  + /virtual address descriptors/ (VADs): used to keep track of the virtual addresses being used.
+
+- an executable program
+
+- a list of open handles to system resources
+
+- a security context called /access token/ that identifies the user, security groups and privileges associated with the process.
+  + security identification and credentials
+
+- a process ID (client ID)
+
+- at least a thread of execution.
+
+** Job
+
+a group of processes managed as a unit. A conpensation for the lack of a structured process tree.
+
+* Thread
+
+** Components
+
+- Context
+  + A set of CPU registers representing the state of processor
+  + two stacks: kernel mode and user mode
+  + TLS area
+
+- a thread ID (client ID, generated in the same namespace as process IDs)
+
+- (optional) security context: impersonate the security context of another process.
+
+Threads cannot access memory address space of another process except a shared memory section
+or its host process has the right to open another process to use cross-process memory functions.
+
+* Virtual Memory
+
+- the lower 2GB for process-private storage and the upper 2GB for OS memory utilization. on 32-bit x86 systems.
+  Certain programs can be configured to use 3GB private memory.
+
+- 8192GB user process space on amd64.
+
+The OS components and device drivers share a single virtual address space. This leads the signing requirement of device drivers.
+
+* Multiple Sessions
+
+- Terminal services: the support in Windows for multiple interactive user sessions on a single system.
+
+- /Session Zero/: the login session at the physical console.
+
+- Client editions typically supports only one remote session.
+
+* Objects
+
+OS concepts are abstracted as objects as in OOP. A kernel object has /attributes/, /methods/.
+
+* Security
+
+- discretionary protection for all shareable system objects
+
+- security auditing
+
+** Access Control
+
+- /discretionary access control/: the user's security context is compared with the object's access control list
+  to determine if the user can access that object.
+
+- /privileged access control/: the addministrator can take ownership of the file even if the owner no longer exists.
+
+* Registry
+
+The system database that contains the information required to boot and configure the system,
+systemwide software settings, the security database and per-user configuration settings.
+Also a way to query the in-memory volatile data such as the current hardware state of the system.
+
+* Unicode
+
+Ansi version of WinAPI converts the ansi string to/from UTF-16 and calls its Unicode counterparts.
