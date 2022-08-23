@@ -1,0 +1,316 @@
+#+title: Architecture
+
+* Initial Design Goals
+
+- 32-bit preemptive, reentrant virtual memory OS
+
+- portable across multiple hardware platforms
+
+- Supports SMP
+
+- Supports distributed computing
+
+- Compatible with MS-DOS and Win3.x
+
+- POSIX-compliant
+
+- meets certain security requirements
+
+- unicode support
+
+* Overview
+
+- Separation of kernel mode and user mode
+
+- Monolithic kernel: most OS code and device driver code shares the same kernel-mode protected memory space.
+
+- Highly Object-based design
+
+#+begin_src
+           ┌──────────────────┐       ┌────────────┐    ┌─────────────────┐   ┌────────────────────────┐
+           │                  │       │  Service   │    │     User        │   │ Environment Subsystems │
+           │     System       │       │ processes  │    │ Applications    │   │                        │
+           │    Support       │       └─────┬──────┘    └──────┬──────────┘   └──────────┬─────────────┘
+           │    Processes     │             │                  │                         │
+           │ (logon process,  │             │                  │                         │
+           │  session manager)│       ┌─────▼──────────────────▼──────────┐              │
+           │                  │       │ Subsystems DLLs (e.g. Win32, Unix)│              │
+           └───────┬──────────┘       └──────────────┬────────────────────┘              │
+                   │                                 │                                   ▼
+───────────────────▼─────────────────────────────────▼────────────────────────────────────────────────────────
+
+
+            ┌─────────────────────────────────┐
+            │           Executive             │                ┌──────────────────┐
+            ├────────────────┬────────────────┤                │    Windowing     │
+            │     Kernel     │    Device      │                │       &          │
+            │                │    Drivers     │                │     Graphics     │
+            ├────────────────┴────────────────┤                └──────────────────┘
+            │Hardware Abstract Layer (HAL)    │
+            └─────────────────────────────────┘
+#+end_src
+
+** User Mode
+
+- /User applications/: Win32, Win64, Win3.1 16-bit, MS-DOS 16-bit, POSIX 32-bit, OS/2 32-bit. Applications do not call the native Windows OS services (syscalls) directly but go through one or more subsystem DLLs, which translate a documented API into undocumented Windows system service calls, which might or might not involve sending messages to the environemnt subsystem server processes.
+
+- /Environment subsystem server processes/: subsystems consists of more than just DLLs. They need some server processes.
+  + Win32
+  + POSIX
+  + OS/2
+
+** Kernel Mode
+
+- /Windows Executive/: the base OS services: memory management, process/thread management, security, I/O, networking, interprocess communication.
+
+- /Windows Kernel/: low-level OS functions: thread shceduling, interrupt and exception dispatching, multiprocessor synchronization; a set of routines and basic objects for the executive to implement higher-level constructs.
+
+- /Device Drivers/: translate user IO calls into specific hardware device IO requests, filesystem and network drivers.
+
+- /Hardware Abstraction Layer (HAL)/ =Hal.dll=: a layer of code that isolates the high-level part of the kernel code from platform-specific hardware differences.
+
+- /Windowing and Graphics System/: USER and GDI functions.
+
+** Core System Files
+
+- =Ntoskrnl.exe=, =Ntkrnlpa.exe= (PAE version): executive and kernel
+
+- =Hal.dll=: HAL
+
+- =Win32k.sys=: the kernel-mode part of the Windows subsystem
+
+- =Ntdll.dll=: internal support functions and system service dispatch stubs to executive functions
+
+- =Kernel32.dll=, =Advapi32.dll=, =User32.dll=, =Gdi32.dll=: Core Windows subsystem DLLs.
+
+** Portable Design
+
+- /Layered design/: fucntions that are architecture-specific are implemented in the kernel. Functions that can differ among systems within the same architecture are implemented in the HAL.
+
+- Written mostly in C/C++, rarely in assembly.
+
+** Symmetric Multiprocessing
+
+The OS and user threads can be scheduled to run on any processor, unlike
+/assymmetric multiprocessing/, where one major processor executes the kernel code while others run only user code.
+
+Some key system files are different (even named differently on the distribution media) based on the OS'es multiprocessing support for performance reason (uniprocessor does not need certain mechanisms), determined at installation time. Most other system files are the same for all versions, which properly handles multiprocessing synchronization.
+
+*** Hyperthreading (Obsolete Technology)
+
+One physical processor provides many logical processors with its own CPU state with shared execution engine and onboard cache.
+
+*** NUMA (Non-Uniform Memory Architecture)
+
+Each processor node (groups of processors) has its own processors and memory and is connected to the larger system through a cache-coherent interconnect bus. All processors can still access all memory but node-local memory access is faster.
+
+** Key System Components
+
+*** Environment Subsystems and Subsystem DLLs
+
+=HKLM:System\CurrentControlSet\Control\Session Manager\Subsystems=
+
+The Windows Subsystem is mandatory for any Windows NT system, with its
+images =Csrss.exe= (Client-Server Runtime Subsystem, originally intended to hold all subsystems as threads) and =Win32k.sys=.
+
+Application can only target one subsystem. The application targets subsystem DLLs.
+    - Windows subsystem: =Kernel32.dll=, =Advapi32.dll=, =User32.dll=, =Gdi32.dll=
+    - POSIX: =Psxdll.dll=
+
+A call into the subsystem DLL:
+    1. either implemented inside the DLL purely in user mode;
+    2. one or more calls into the Windows executive.
+    3. some work is required to be done in the environemnt subsystem process, in which case a request message is sent to the subsystem process to perform some operation and then the result is returned to the subsystem DLL before returning to the caller.
+    4. Sometimes it involves both 2. and 3.
+
+Other subysystems uses the Windows subsystem to perform windowing and graphics.
+
+**** The Windows Subsystem
+
+***** Components
+
+- =Csrss.exe= supports
+  + Console windows
+  + Create/deleting processes and threads
+  + portions of the support for 16-bit virtual DOS machine processes
+  + various miscellaneous functions
+
+- =Win32k.sys=
+  + the window manager that controls window displays; manages screen output; collect interactive I/O devices; passes user meesages to applications.
+  + The /Graphics Device Interface (GDI)/: a library of functions for graphics output devices. The GDI interprets application requests for graphic output and sends the requests to graphics display drivers.
+
+- Subsystem DLLs: translate documented Windows API functions into kernel-mode systme service calls to =Ntoskrnl.exe= and =Win32k.sys=
+
+- Graphics device drivers; printer drivers; video minport drivers.
+
+***** Graphics Display
+
+Application call =USER= functions to create user interface controls. The window manager communicates these requests to the GDI, which passes them to the graphics device drivers. A display driver is paired with a video miniport driver to complete video display support.
+
+The bulk of the graphics part was moved into the kernel mode to allow more direct access to kernel service and to reduce context switching. The drawing and updating for console/text windows are left in user mode. This change might not seem as dangerous since the =Csrss.exe= process is already critical to the OS (even server applications that does not use window display might send window messages) even if it just runs in user mode and moving part of its functionality in kernel mode does not introduce many risks.
+
+**** The POSIX Subsystem (Abandoned Later)
+
+Runs on demand. Limited implementation although later enhanced. A special =Posix.exe= support image is launched to actually run the POSIX app.
+
+**** The OS/2 Subsystem (Already Abandoned in Windows 2000)
+
+*** =Ntdll.dll=: The Syscall Interface
+
+- /System service dispatch stubs/: Wrapper functions around actual Windows kernel mode service functions.
+
+- Internal support vfunctions used by subsystems: image loader; the heap manager; Windows subsystem process communication functions; general runtime library routines. User-mode asynchronous procedure call dispatcher and exception dispatcher.
+
+*** Executive
+
+The upper layer of =Ntoskrnl.exe=
+
+**** Functions Available
+
+- /System service/, most exported via =Ntdll.dll=;
+
+- Device driver functions called through the user of =DeviceIoControl=
+
+- Functions called only from kernel mode, some exported and documented.
+
+***** Object Manager
+
+Creates, manages and deletes Windows executive objeccts and abstract data types that are used to represent operating system resources.
+
+***** LPC Facility
+
+LPC, an optimized version of RPC that passes messages between a client process and a server process on the same computer.
+
+***** Runtime Library Functions
+
+String processing; arithmetic operations; data type conversion; security structure processing
+
+***** Executive Support Routines
+
+System memory allocation; interlocked memory access; resources; fast mutexes
+
+**** Components
+
+- /configuration manager/: responsible for implementing and managing the system registry
+
+- /process and thread manager/: creates and terminates processes and threads implemented in the Windows kernel. Additional semantics and functions are added in the executive.
+
+- /security reference monitor/: enforces security policies on the local computer.
+
+- /I/O manager/: device-independent I/O, responsible for dispatching to the appropriate device drivers for further processing.
+
+- /Plug and Play manager/: determines the drivers required to support devices and dynamically loads them and assigns the appropriate hardware resources.
+
+- /power manager/: coordinates power events and generates power management I/O notification to device drivers to actuate change in power.
+
+- /WDM Windows management Instrumentation Routines/: enable device drivers to publish performance and configuration information and receive commands from the user-mode WMI service.
+
+- /Cache Manager/: manage file caching in memory using memory-mapping files.
+
+- /Memory Manager/: virtual memory; support for cache manager
+
+- /Logical prefetcher/: optimizing the loading of data referenced during the startup of the system or a process.
+
+*** Kernel
+
+A set of functions in =Ntoskrnl.exe= that provides fundamental mechanisms, a low-level base of well-defined,
+predictable operating system primitives and mechanisms:
+  - thread scheduling
+  - synchronization
+  - low-level hardware architecture-dependent support
+
+**** Kernel objects
+
+Most executive-level objects encapsulate one or more kernel objcts, incorporating their kernel-defined attributes.
+
+- /control objects/: establish semantics for controlling various operating system functions.
+  + APC object
+  + DPC (deferred procedure call) object
+  + interrupt object
+
+- /dispatcher objects/: incorporates synchronization capabilities that alter or affect thread scheduling
+  + kernel thread
+  + mutex
+  + event
+  + kernel event pair
+  + semaphore
+  + timer
+  + waitable timer
+
+**** Hardware Support
+
+- Isolate the executive and device drivers from variations between the hardware architectures.
+  + e.g. translation buffer and CPU cache support; context switching
+
+*** Hardware Abstraction Layer
+
+Abstract details of I/O interfaces; interrupt controllers; multiprocessor communication mechanisms. It contains functions that are both architecture-specific and machine-dependent. HAL routines are documented.
+
+HAL deals with more than ISA-specific abstractions. Some i386 HALs examples are
+    - =Hal.dll= for standard PCs.
+    - =Halacpi.dll= for Advanced Configuration and Power Interface PCs.
+    - =Halapic.dll= for Advanced Programmable Interrupt Controller PCs
+    - =Halaacpi.dll= for APIC and ACPI PCs
+    - =Halmps.dll= for multiprocessor PC
+    - =Halmacpi.dll= for multiprocessor ACPI PCs
+    - =Halborg.dll=: Silicon Graphics workstation
+    - =Halsp.dll=: Compaq SystemPro
+
+*** Device Drivers
+
+Loadable kernel-mode modules =.sys= that interface between the I/O manager and the relevant hardware. They run in the context of a user thread, a kernel thread or as a result of an interrupt.
+
+**** Types
+
+- /Hardware device drivers/: output to/input from a physical device or network.
+
+- /Filesystem drivers/: accept file-oriented I/O requests and translate them in to I/O requests for a particular device
+
+- /Fielsystem filter drivers/: disk mirroring, encryption; intercept I/Os and perform some added-value processing before passing the I/O to the next layer.
+
+- /Network redirectors and servers/: filesystem drivers that transmit filesystem I/O requests to a mchine on the network.
+
+- /Protocol drivers/: networking protocol such as TCP/IP
+
+- /Kernel streaming filter drivers/: chained together to perform signal processing on data streams.
+
+Device drivers are the only way to add user-written kernel-mode code to the system, thus sometimes written not for devices but to access internal OS functionality.
+
+**** Windows Driver Model (WDM)
+
+- /bus driver/: a bus controller, adapter or any device that has child devices.
+
+- /function driver/: main device driver and provides the operational interface for its device. Required unless the device is used raw (I/O is done by the bus driver and any bus filter drivers).
+
+- /filter device/: add functionality to a device or to modify I/O requests or response from other drivers.
+
+Device drivers are defined in =HKLM\System\CurrentControlSet\Services\= with their type code being =1=.
+
+**** System Processes
+
+- /Idle Process/: one thread per CPU for idle CPU time, not really a user-mode image
+
+- /System Process/: the majority of the kernel-mode system threads
+  + system threads are created by =PsCreateSystemThread=. A device driver can create a system thread but by default a system thread is owned by this /System Process/.
+  + kernel threads are created to complete various tasks
+    - page swapping
+    - I/O polling
+    - responding to network I/O requests for filedata shared to the network by the server device driver =Srv.sys=
+
+- /Session Manager/ (=Smss.exe=): the first user-mode process
+  + Configured in =HKLM\System\CurrentControlSet\Control\Session Manager\=
+  + laucnes the subsystem processes =Csrss.exe= and the Winlogon process, which in turn creates the rest of the system processes. the main thread in =Smss= then waits forever on the process handles to the two child processes.
+  + It also waits for new terminal sessions.
+
+- /Windows subsystem/ (=Csrss.exe=)
+
+- /Logon Process/ (=Winlogon.exe=): handles interactive user logons and logoffs. A /secure attention sequence/ (by default Ctrl-Alt-Delete), which cannot be simulated by a user-mode process, activates a user logon.
+  + the =GINA= dll used can substituted to provide a different authentication method other than username/password.
+
+- /Local security authentication server/: (=Lsass.exe=)
+  + performs the user logon check and generate an access token that contains the user's security context if the logon succeeds.
+  + =lsass= checks the username/password and starts the userinit process, which performs some initialization before starting the /Shell/ process defined in the registry (by default =explorer.exe=) and then exits.
+
+- /Service Control manager/ (=Services.exe=) and its children such as =svchost.exe=
+  + =Services.exe= is responsible for starting, stopping and interacting with service processes.
+  + Services are defined in =HKLM\System\CurrentControlSet\Services=
