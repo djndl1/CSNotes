@@ -1,0 +1,43 @@
+#+title: System Mechanisms
+
+Base mechanisms used by the kernel-mode code
+
+* Trap Dispatching
+
+- /Trap/: a processor's mechanism for capturing the executing thread thwne an exception or an ainterrupt occurs and tranferring control to a fixed location (/trap handler/) in the OS.
+
+- /interrupt/: an asynchronous event that is unrelated to what the processor is executing.
+  + sources: I/O devices; processor clocks; timers etc.
+  + handled by /Interrupt Service Routines/
+
+- /exception/: a synchronous condition that results from the execution of a particular instruction. Handled by the /Exception dispatcher/ and then various exception handlers.
+  + sources: memory access violation; certain debugger instructions; divide-by-zero errors etc.
+  + the kernel also regards system service callss as exceptions, handled by /System Services/
+  + virtual address exceptions are handled by /Virtual memory manager's pager/.
+  + Unexpected exceptions are handled typicall by /KeBugCheckEx/, which halts the computer.
+
+Either hardware or software can generate exceptions and interrupts. The processor records machine state on the kernel stack of the thread that is interrupted for a return later. Windows switches the thread's kernel stack is the thread is in user mode. Windows creates a /trap frame/ on the kernel stack of the interrupted thread. The frontend trap handling functions perform the general trap handling and then transferring control to other functions to field the trap.
+
+** Interrup Dispatching
+
+Interrupt-driven devices allow the OS to run asynchronously by overlapping central processing with I/O operations. The kernel can also initiate a software interrupt and break into the execution of a thread. The kernel can also disable interrupts especially when processing an interrupt or dispatching an excpetion.
+
+Interrupt trap handlers transfer control to an external ISR (often provided by device drivers) or an internal kernel routine to handle the interrupt.
+
+*** Hardware Interrupt Processing
+
+External interrupts come into the /interrupt controller/ which in turn interrupts the processor. The processor queries the interrupt controller for the /interrupt request (IRQ)/ and translates the IRQ into an index in the /interrupt dispatch table/ (filled at boot time) to find the appropriate interrupt dispatch routine.
+
+The interrupt dispatch table (IDT) is also used to configure trap handlers for exceptions. The number of supported IRQs is determined by the design of the interrupt controller.
+
+**** X86 Interrupt Controller
+
+- i8259A Programmable Interrupt Controller (PIC)
+  + 15 interrupt lines
+  + uniprocessor support
+
+- i82489 Advanced Programmable Interrupt Controller (APIC)
+  + 256 interrrupt lines
+  + multiprocessor support
+  + necessary for x64 version of Windows
+  + An I/O APIC accepts device interrupts and routes the interrupt (the algorithm used is selected by the Windows HAL) to a APIC local to a certain processor
