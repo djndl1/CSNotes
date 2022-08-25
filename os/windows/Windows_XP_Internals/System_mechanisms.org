@@ -28,7 +28,7 @@ Interrupt trap handlers transfer control to an external ISR (often provided by d
 
 External interrupts come into the /interrupt controller/ which in turn interrupts the processor. The processor queries the interrupt controller for the /interrupt request (IRQ)/ and translates the IRQ into an index in the /interrupt dispatch table/ (filled at boot time) to find the appropriate interrupt dispatch routine.
 
-The interrupt dispatch table (IDT) is also used to configure trap handlers for exceptions. The number of supported IRQs is determined by the design of the interrupt controller.
+The interrupt dispatch table (IDT, an implementation of /Interrupt Vector Table/) is also used to configure trap handlers for exceptions. The number of supported IRQs is determined by the design of the interrupt controller.
 
 **** X86 Interrupt Controller
 
@@ -41,3 +41,62 @@ The interrupt dispatch table (IDT) is also used to configure trap handlers for e
   + multiprocessor support
   + necessary for x64 version of Windows
   + An I/O APIC accepts device interrupts and routes the interrupt (the algorithm used is selected by the Windows HAL) to a APIC local to a certain processor
+
+*** Software-Level Interrupt Request Levels
+
+An interupt controller defines the hardware-level interrupt prioritization.
+The OS kernel imposes another level of interrupt priority scheme (/Interrupt Request Levels/)
+
+- 32 on i386 and 16 on AMD64
+
+- an IRQL is an attribute of an interrupt source.
+
+- Each processor has an IRQL setting that changes as the OS code executes and  it determines which interrupts the processor can receive.
+  + All components of the system attempt to keep the IRQL at passive level to allow device drivers to respond to hardware interrupts in a timely manner.
+  + the CPU's IRQL is always at passive level when a user-mode thread is executing. Only the kernel-mode code can set the IRQL.
+
+#+begin_src
+┌──────────────┐
+│    High      │halting the system
+├──────────────┤
+│  Power Fail  │not actually used
+├──────────────┤
+│Interprocessor│request another processor to perform an action
+├──────────────┤
+│   Clock      │ for system clock to track time of day; measure/allot CPU time to threads
+├──────────────┤
+│    Profile   │RTC kernel profiling
+├──────────────┤
+│              │
+│              │device interrupts
+│ for devices  │
+│              │
+├──────────────┤
+│ DPC/dispatch │
+├──────────────┤ software interrupts
+│     APC      │
+├──────────────┤
+│   Passive    │ normal thread execution, not for interrupts
+└──────────────┘
+#+end_src
+
+**** Determining the  IRQL of An Interrupt
+
+A bus driver determines what interrupts can be assigned to a device and the PnP manager decides the acceptable interrupt assignments after taking into account previous assignments for all other devices.
+
+Windows doesn't prioritize device IRQs in any controllable way and user-level applications execute only when a processor's IRQL is at passive level, making Windows unsuitable for real-time tasks. User-mode apps must wait for ISRs and DPC code to finish, which is uncontrollable for designers.
+
+*** Interrupt Objects
+
+- A kernel control object that allows device drivers to register ISRs for their devices.
+  + ISR address
+  + IRQL at which the device interrupts
+  + the associated entry in the IDT with the ISR
+
+Interrupt objects abstract PIC details from device drivers, allowing the drivers to register ISRs without accessing the IDT (usually in assembly code), thus improves portability.
+
+Also, interrupt objects allow to kernel to call more than one ISR for any interrupt level =KiChainedDispatch=. The chained call is broken when one of the ISR claims the interrupt.
+
+**** The Control Flow of Interrupts
+
+The interrupt dispatch table (by the hardwawre) transfers the control to the handler code that resides in an interrupt code, which passes a pointer to the interrupt object to either =KiInterruptDispatch= or =KiChainedDispatch= to raise the IRQL (in the interrupt table) and actually execute the ISR, whose address is also stored in the interrupt object.
