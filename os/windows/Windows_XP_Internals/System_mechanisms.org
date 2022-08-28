@@ -208,3 +208,30 @@ Conditions that result directly from the execution of the running program.
 Each thread has an unhandled exception handler declared in or =start-of-process= or =start-of-thread= function and installed at the top of the stack. This function (=UnhandledExceptionFilter=) provides the system-defined behavior for unhandled exceptions, based on =HKLM\Software\Microsoft\Windows NT\CurrentVersion\AeDebug\=. By default, it is configured to automatically start the debugger =Dr Watson= (not really a debugger, but a crash dumper and logger) and ask the user what to do.
 
 - /Error Reporting/: error-reporting mechanism introduced in Windows XP/2003.
+
+** System Service Dispatching
+
+Triggered as a result of executing an instruction assigned to system service dispatching.
+
+*** 32-bit x86
+
+- Prior to Pentium 2: =int 0x2e= with the syscall number in =eax= and =ebx= pointing to a list of parameters.
+
+- Pentium 2 and higher =sysenter= with the syscall number in =eax= and =edx= pointing to a list of parameter. =sysexit= ends the syscall. K6 and higher 32-bit AMD processors have a =syscall= instruction that works similarly to =sysenter=.
+
+Windows detects the type of processor in use and sets up the appropriate syscall code at boot time.
+
+*** 64-bit x86
+
+the =syscall= instruction.
+
+*** Kernel-Mode System Service Dispatching
+
+The syscall number is used to locate the system service inforamtion in the /system service dispatch table/ (by =KiSystemService=), with each entry containing a pointer to a system service. The syscall number is generated automatically as part of a kernel compile.
+
+=KiSystemService= copies the arguments from the user-mode stack to the thread's kernel-mode and any memory buffer is checked first for accessibility before copying to the kernel mode.
+
+Each thread has a pointer to its system service table. Two bits of the syscall number is used to locate the system service table by the dispatcher.
+    + the core executive system services in =Ntoskrnl.exe= is in =KeServiceDescriptorTable=. USER and GDI services in =Win32k.sys= are in =KeServiceDescriptorTableShadow= (also contains the core services).
+
+Documented System API call functions in =Ntdll.dll= to access system services except for USER and GDI functions, which directly perform syscalls.
