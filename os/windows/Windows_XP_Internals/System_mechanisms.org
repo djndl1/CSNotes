@@ -4,7 +4,7 @@ Base mechanisms used by the kernel-mode code
 
 * Trap Dispatching
 
-- /Trap/: a processor's mechanism for capturing the executing thread thwne an exception or an ainterrupt occurs and tranferring control to a fixed location (/trap handler/) in the OS.
+- /Trap/: a processor's mechanism for capturing the executing thread when an exception or an interrupt occurs and tranferring control to a fixed location (/trap handler/) in the OS.
 
 - /interrupt/: an asynchronous event that is unrelated to what the processor is executing.
   + sources: I/O devices; processor clocks; timers etc.
@@ -16,7 +16,7 @@ Base mechanisms used by the kernel-mode code
   + virtual address exceptions are handled by /Virtual memory manager's pager/.
   + Unexpected exceptions are handled typicall by /KeBugCheckEx/, which halts the computer.
 
-Either hardware or software can generate exceptions and interrupts. The processor records machine state on the kernel stack of the thread that is interrupted for a return later. Windows switches the thread's kernel stack is the thread is in user mode. Windows creates a /trap frame/ on the kernel stack of the interrupted thread. The frontend trap handling functions perform the general trap handling and then transferring control to other functions to field the trap.
+Either hardware or software can generate exceptions and interrupts. The processor records machine state on the kernel stack of the thread that is interrupted for a return later. Windows switches to the thread's kernel stack if the thread is in user mode. Windows creates a /trap frame/ on the kernel stack of the interrupted thread. The frontend trap handling functions perform the general trap handling and then transferring control to other functions to field the trap.
 
 ** Interrup Dispatching
 
@@ -86,7 +86,7 @@ A bus driver determines what interrupts can be assigned to a device and the PnP 
 
 Windows doesn't prioritize device IRQs in any controllable way and user-level applications execute only when a processor's IRQL is at passive level, making Windows unsuitable for real-time tasks. User-mode apps must wait for ISRs and DPC code to finish, which is uncontrollable for designers.
 
-*** Interrupt Objects
+*** Interrupt Objects =nt!_kinterrupt=
 
 - A kernel control object that allows device drivers to register ISRs for their devices.
   + ISR address
@@ -100,3 +100,88 @@ Also, interrupt objects allow to kernel to call more than one ISR for any interr
 **** The Control Flow of Interrupts
 
 The interrupt dispatch table (by the hardwawre) transfers the control to the handler code that resides in an interrupt code, which passes a pointer to the interrupt object to either =KiInterruptDispatch= or =KiChainedDispatch= to raise the IRQL (in the interrupt table) and actually execute the ISR, whose address is also stored in the interrupt object.
+
+** Software Interrupts
+
+- The kernel also generates software interrupts:
+  + initiating thread dispatching
+  + non-time-critical interrupt processing
+  + Handling timer expiration
+  + Asynchronous procedure execution in the context of a particular thread
+  + Asynchronous I/O operations
+
+*** Dispatch/Deferred Procedure Call Interrupts (DPC)
+
+- for thread dispatching: DPC/distach-level interrupt is issued to defer thread dispatching until conditions are right (when the kernel completes its current work and lower the IRQL).
+
+- /Deferred Procedure Call/: a function that performs a system task that is less time-critical than the current one.
+  + represented by a /DPC object/ visible only to device drivers and other system code, maintained in one queue per processor. The system requests a DPC by creating a DPC object and placing it in a queue.
+  + the kernel processes each DPC in the queue of the processor before the processor's IRQL drops from an IRQL of DPC/dispatch level or higher to a level lower than the DPC/dispatch level.
+  + primarily for device drivers, but also for the kernel: the system clock issues an interrrupt at clock IRQL at every tick, updating the system time and decrementing a counter of the current thread that indicates the remaining time the thread can run. When the counter reaches zero, a rescheduling DPC is queued and the processor's IRQL is lowered. Device interrupts are handled before the DPC is executed.
+
+**** Delivery
+
+The kernel may or may not generate a DPC/dispatch-level interrupt when =KeInsertQueueDpc= queuing a DPC, depending on the target processor and the importance of the DPC. If the target processor is not the current one and the DPC is imporant enough, an interprocessor interrupt is issued to dispatch the DPC and execute it there. The system idle thread on a processor also drains the DPC queue for the process.
+
+**** Additional Reading
+
+[[https://www.osr.com/nt-insider/2009-issue1/deferred-procedure-call-details/][Deferred Procedure Call Details]]
+
+*** Asynchronous Procedure Call (APC) Interrupts
+
+- APC has a few properties
+  + APC routines always run in the context of a particular user thread (thus in a particular address space)
+  + can cause pre-emption of the currently running thread
+  + APC routines are subject to thread scheduling (preemptible) and can acquire resources, wait for object handles, incur page faults and call system services.
+
+- Described by /APC objects/: waiting in a thread-specific
+  kernel-managed APC queue. Each thread has two APC queues,
+  kernel-mode and user-mode. The kernel queues an APC object to the
+  thread and then, if permitted, requests a software interrupt at APC
+  level.
+  + Kernel mode APCs interrupt a thread and execute a procedure
+    without the thread's intervention or consent.
+  + A thread can disable kernel-mode APCs by raising the IRQL to
+    =APC_LEVEL= or by calling =KeEnterGuardedRegion=
+  + User mode APC interrupts require the thread be in an /alertable wait state/. The thread handles all APCs in a FIFO order.
+  + an APC may or may not runs in the =APC_LEVEL= IRQL.
+
+- Uses: APC functions are queued to be called in the future.
+    + kernel mode: OS work that must be completed within the address
+      space of a particular thread: directing a thread to stop an
+      interruptible system service; recoding the results of an async
+      I/O operation in a thread's address space; making a thread
+      suspend or terminate itself or to get/set its user-mode
+      execution context. A thread can resume its exeuction after an
+      I/O operation through the use of APCs
+    + user mode: The I/O completion is implemented by queuing an APC
+      to the thread that issued the I/O. The callback is exeucted
+      when the thread is in an /alertable wait state/, typically by
+      calling =WaitForXXX= with an /alertable/ option or by calling
+      =SleepEx=. Then the kernel interrupts the thread, calls the APC
+      routine in the context of that thread and resume thread's
+      execution when the APC routine completes. User-mode APCs
+      execute at passive level.
+
+**** Delivery
+
+APCs are delivered by calling =KiDeliverApc= at well-defined points. More details in [[https://dennisbabkin.com/inside_nt_apc/][Inside NT's Asynchronous Procedure Call]].
+
+User-mode APCs are delivered when the thread enters an alertable
+wait state. The kernel transfers control to the APC routine and resumes thread's execution when the APC routine completes.
+
+Kerel-mode APCs can be /regular/ or /special/. Special kernel-mode APCs run at the =APC_LEVEL=. Regular kernel-mode APCs are delivered when certain conditions are met while special APCs preempt user-mode execution.
+
+From [[https://medium.com/tenable-techblog/api-series-setthreadcontext-d08c9f84458d][API Series: SetThreadContext]]
+
+#+begin_quote
+KiSwapThread is kernel function for dispatching threads to run and it ends with a call to KiDeliverApc, which checks if there are any pending APCs in the target thread and executes them.
+#+end_quote
+
+**** Additional Readings
+
+[[https://weblogs.asp.net/kennykerr/parallel-programming-with-c-part-1-asynchronous-procedure-calls][Parallel Programming With C++: APC]]
+
+[[https://dennisbabkin.com/inside_nt_apc/][Inside NT's Asynchronous Procedure Call]]
+
+[[https://guishou.blog.csdn.net/article/details/104326170][APC机制详解]]
