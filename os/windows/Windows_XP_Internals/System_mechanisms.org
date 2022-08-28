@@ -185,3 +185,26 @@ KiSwapThread is kernel function for dispatching threads to run and it ends with 
 [[https://dennisbabkin.com/inside_nt_apc/][Inside NT's Asynchronous Procedure Call]]
 
 [[https://guishou.blog.csdn.net/article/details/104326170][APC机制详解]]
+
+** Exception Dispatching
+
+Conditions that result directly from the execution of the running program.
+
+- Structured Exception Handling: the application can gain control when the exception occurs and fix the condition or declare to the system the exception is not recognized and the system should search for a handler that might process the exception.
+  + All exceptions except those simple ones are serviced by a kernel module /exception dispatcher/. The kernel transparently handles some exceptions such as debug trap by calling a debugger.
+  + User mode environment subsystem can establish /frame-based exception handlers/, that is, exception handlers associated with a certain stack frame. The kernel searches exception handlers down the stack to handle the exception. If none, the default handler will be called.
+  + kernel-mode mechanism
+    - an exception is raised, the CPU transfers control to the kernel trap handler and establishes a trap frame.
+    - The trap frame creates an exception record that contains the reason and the exception handler tries to locate a frame-based exception handler. Otherwise it's a fatal OS error.
+  + user-mode mechanism
+    - the exception dispatch would first tries to find a debugger process attached.
+    - if none, it switches to user mode and tries to find a proper frame-based exception handler there.
+    - if none, it switches back to kernel mode and tries to call the debugger again.
+    - if none, it notifies the exceptio nport of the environment subsystem and let it take control. CSRSS simply notifies the user and kills the process. The POSIX subsystem sends a POSIX signal to the thread.
+    - if the exception is still not handled, the process is killed by the kernel.
+
+*** Unhandled Exception
+
+Each thread has an unhandled exception handler declared in or =start-of-process= or =start-of-thread= function and installed at the top of the stack. This function (=UnhandledExceptionFilter=) provides the system-defined behavior for unhandled exceptions, based on =HKLM\Software\Microsoft\Windows NT\CurrentVersion\AeDebug\=. By default, it is configured to automatically start the debugger =Dr Watson= (not really a debugger, but a crash dumper and logger) and ask the user what to do.
+
+- /Error Reporting/: error-reporting mechanism introduced in Windows XP/2003.
