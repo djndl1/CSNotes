@@ -42,6 +42,28 @@
 
 - =Ctrl-Z=/=F6=: end-of-file character
 
+*** Useful Commands
+
+- =type=: cat
+
+- =assoc= (the associated file type with an extension) and =ftype= to determine the path that can execute a certain type of files
+
+- =clip=: redirect the output of a command or the contents of a file to the clipboard
+
+- =runas=: run a command as another user (typically the administrator)
+
+- =dir=, =copy= (strange behavior!!!), =xcopy=, =move=, =rename=, =del=
+
+- =pushd=, =popd=; =cd=/=chdir=
+
+- =wmic=: WMI operations from the command line
+
+- =reg=: manipulate the registry key
+
+- =taskkill=: find processes and kill them; =tasklist=: list running processes. The two can be used together.
+
+- =echo=: commands and keywords in a batch file are normally echoed to stdout. Prefixing a command with =@= turns the echo off. =@echo off= turns the global echo off. =echo.= prints an empty line. To dislay a string without printing the final newline, =set /p "=string" < nul=
+
 ** Variables
 
 Undeclared/uninitialized variables is an empty string.
