@@ -1,0 +1,22 @@
+#+title: Distributed
+
+The development of computer performance, network capability and computer miniature brings about /distributed systems/.
+
+- /distributed system/: a collection of autonomous computing elements (/node/) that appears to its users as a single coherent system.
+  + /collaboration of autonomous nodes/: how to connect these nodes and make them collaborate lies at the heart of developing distributed systems.
+    + nodes are programmed to exchange messages with each other to achieve common goals. Nodes may need time synchronization. A system of nodes requires membership management. Authentication and confidentiality are also issues within a distributed systems.
+    + Distributed systems are orften organized as /overlay networks/, with each node being a software process and message passing done through TCP/IP or UDP channels. They can be /structured overlay/, where each node has a well-defined set of neighbors and /unstructured overlay/, where each node has a number of references to randomly selected other nodes. e.g. P2P networks
+  + /single coherent system/: a distributed system is coherent if it behaves according to the expectations of its users. It requires /distribution transparency/. Network node failure can cause an issue for this coherent system.
+
+- /Middleware/: a separate layer of software that is logically placed on top of the respective OSes of the comptuers of the system.
+  + the middleware provides the means for components of a single distributed application or different applications to communicate with each other andhides the difference in hardware and OSes from each application.
+  + Middleware is the OS of distributed systems: a manager of resources offering its applications to efficiently share and deploy those resources across a network.
+    - facilities for interapplication communication
+    - security services
+    - accounting services
+    - masking of and recovery from failures
+  + OSes provide services to applications. Middleware can also be viewed as a container of commonly used components and functions.
+    - Communication: e.g. RPC
+    - Transactions: special support for executing services in an all-or-nothing fashion.
+    - service composition: new applications are developed by taking existing programs and gluing them together. e.g. take Google map data and enhance it with trip planners.
+    - reliability: reliability guarantees can simplify developing distributed applications.
