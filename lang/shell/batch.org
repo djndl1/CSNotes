@@ -14,6 +14,34 @@
 
 - print-debugging is the only debugging.
 
+** CMD Tricks
+
+- =ESC= to clear history recall
+
+- =F8=: completes the recall
+
+- =F7=: show history
+
+- =doskey=: make macros (aliases)
+  + =/macrofile=macrofile=
+  + =Alt-F10= to delete all macros, =doskey macro== deletes a single macro
+  + =/macros= list all macros
+  + =/history=: show history
+
+- =HKCU:software\Microsoft\Command Processor\AutoRun= configures the profile script.
+
+*** Editing Tips
+
+- Hold =SHIFT= and use arrow keys, =HOME=, =END=, =PageUp=, =PageDown= to select text. =Ctrl-M= starts the mark mode.
+  Press =ENTER=, =Ctrl-Shift-C=, =Ctrl-Insert= to copy the selection to the clipboard. =ESC= cancel the selection.
+  Left click to select and right click to paste. =Ctrl-V= or =Shift-Insert= to paste.
+
+- =Ctrl-Up=, =Ctrl=Down=: scroll the console window up/down.
+
+- =Ctrl-End=, =Ctrl-HOME=: delete to the end/beginning of the line
+
+- =Ctrl-Z=/=F6=: end-of-file character
+
 ** Variables
 
 Undeclared/uninitialized variables is an empty string.
@@ -49,7 +77,7 @@ REM without an argument, `set` lists all existing variables
 
 - =SystemDrive=, =SystemRoot=
 
-- =%0=, =%1= ... are arguments. Arguments after =$9= is only accessible by first =SHIFT= the arguments.
+- =%0=, =%1= ... are arguments. Arguments after =$9= is only accessible by first =SHIFT= the arguments. =$*= For all arguments
 
 *** Variable Substitution
 
