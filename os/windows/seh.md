@@ -30,7 +30,7 @@ The `__except` block or the filter expression can determine the exact exception 
 
 ```c
 // literal constants
-DWORD GeetExceptionCode(void);
+DWORD GetExceptionCode(void);
 // detailed info about the exception
 LPEXCEPTION_POINTERS GetExceptionInformation(void);
 ```
@@ -67,11 +67,11 @@ Although chaining `__try`, `__catch` and `__finally` is not allowed, embedding o
 
 Termination handlers do not execute if a process or thread terminates whether the process or thread terminates itself by using `ExitProcess` or `ExitThread` or whether the termination is caused externally by =TerminateProcess= or =TerminateThread=.
 
-SEH is not encouraged to use with C++. A Windows exception or termination handler will not call destructors to destroy C++ object inst5ances.
+SEH is not encouraged to use with C++. A Windows exception or termination handler will not call destructors to destroy C++ object instances.
 
 # Console Control Handlers
 
-=SetConsoleCtrlHandler= allows one or more specified functions to be executed on receipt of a Ctrl-C, Ctrl-break or one othree other console-related signals.
+`SetConsoleCtrlHandler` allows one or more specified functions to be executed on receipt of a Ctrl-C, Ctrl-break or one othree other console-related signals.
 
 ```c
 BOOL WINAPI SetConsoleCtrlHandler(
@@ -80,7 +80,9 @@ BOOL WINAPI SetConsoleCtrlHandler(
 );
 ```
 
-# Vectored Exception Handling
+# [https://docs.microsoft.com/en-us/archive/msdn-magazine/2001/september/under-the-hood-new-vectored-exception-handling-in-windows-xp](Vectored Exception Handling)
+
+Unlike frame-based SEH, VEH is process-wide. The behavior is similar to POSIX signals.
 
 When an exception occurs, the VEHs are called first, before the system unwinds the stack to look for structured exception handlers.
 
@@ -90,3 +92,5 @@ PVOID AddVectoredExceptionHandler(
   PVECTORED_EXCEPTION_HANDLER Handler
 );
 ```
+
+The returned value is a handle to the exception handler and used to remove the handler with `RemoveVectoredExceptionHandler`.
