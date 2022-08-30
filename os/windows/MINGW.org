@@ -1,0 +1,41 @@
+#+title: Mingw
+
+* Unicode
+
+- =wmain=: UTF-16 environment and command line arguments, as well as a MBCS version.
+  +  =-municode= is necessary and the macros =_UNICODE= (for =tchar.h=) and =_UNICODE= (for Win32 API functions) should be defined.
+  + =wmain= should be marked as =extern "C"= under C++.
+
+* [[https://reactos.org/wiki/PSEH][PSEH]]: SEH Handling
+
+#+begin_src cpp
+#include <pseh/pseh.h>
+
+#include <windows.h>
+#include <iostream>
+
+
+using std::cout;
+
+extern "C"
+int wmain(int argc, wchar_t *argv[]) {
+    _SEH_TRY {
+        int a = 4;
+        int b = a / 0;
+    }
+    _SEH_HANDLE {
+        std::cout << "divied by zero: " << std::hex << _SEH_GetExceptionCode() << '\n';
+    }
+    _SEH_END;
+
+    return 0;
+}
+#+end_src
+
+* =__try1=
+
+Sorta works, but limited
+
+[[https://sourceforge.net/p/mingw-w64/mailman/message/35219710/][Report on __try1 and SEH]]
+
+[[http://www.programmingunlimited.net/siteexec/content.cgi?page=mingw-seh][SEH and MinGW]]
