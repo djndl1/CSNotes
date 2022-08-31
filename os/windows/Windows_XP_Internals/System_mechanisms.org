@@ -254,3 +254,34 @@ Documented System API call functions in =Ntdll.dll= to access system services ex
 
 - /kernel objects/: more primitive set of objects omplemented by the Windows kernel.
 
+* WoW64
+
+- Implemented as a set of user-mode DLLs.
+  + =Wow64.dll=: process and thread creation, hooks exception dispatching and base system calls exported by =Ntoskrnl.exe=. Also filesystem direction and registry direction and reflection.
+  + =Wow64Cpu.dll=: manages the 32-bit CPU context of each running thread inside Wow64 and provides processor architecture-specific support for switching CPU mode from 32-bit to 64-bit and vice versa.
+  + =wow64win.dll=: intercepts the GUI system calls exported by =Win32k.sys=
+
+- 2GB or 4GB depending on the large address flag
+
+- /image loading/: =Wow64.dll= loads the 32-bit =Ntdll.dll= and maps it into the address space. The CPU runs in 32-bit mode.
+
+- /Syscalls/: special 32-bit versions of =Ntdll.dll=, =User32.dll=, =Gdi32.dll= are used. These dlls calls into Wow64 and transitions into native 64-bit code and issues the corresponding native 64-bit syscalls with any conversion of parameters necessary.
+
+- /exception dispatching/: Wow64 captures the native exception and context record from the kernel and prepares a 32-bit exception and context record and then dispatches it.
+
+- /User Callback/: parameters are converted.
+
+- /filesystem redirections/
+  + =\Windows\System32\= is not renamed to facilitate the porting of applications to 64-bit.
+  + 32-bit processes have their paths to =System32= redirected to =Syswow64= and =Program Files= to =Program Files (x86)=.
+  + some other folders under =System32= are exempted from tis redirection.
+
+- Components of 32-bit and 64-bit versions have different views into the registry. Mainly at =HKLM\Software=, =HKCR=, =HKCU\Software\Classes= where a key called =Wow6432Node= stores 32-bit configuration information. All other parts of the registry are shared between 32-bit and  64-bit applications. =LocalServer32= CLSIDs are reflected to the 64-bit view.
+
+** Restrictions
+
+- Little 16-bit support
+
+- 32-bit kernel mdoe device drivers are not supported
+
+- 64-bit processes cannot load 32-bit DLLs and vice versa.
