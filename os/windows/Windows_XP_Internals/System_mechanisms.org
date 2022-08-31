@@ -235,3 +235,22 @@ Each thread has a pointer to its system service table. Two bits of the syscall n
     + the core executive system services in =Ntoskrnl.exe= is in =KeServiceDescriptorTable=. USER and GDI services in =Win32k.sys= are in =KeServiceDescriptorTableShadow= (also contains the core services).
 
 Documented System API call functions in =Ntdll.dll= to access system services except for USER and GDI functions, which directly perform syscalls.
+
+* Object Manager: Executive Component Responsible for Creating, Deleting, Protecting and Tracking Objects
+
+- A common uniform mechanism for using system resources
+
+- isolate object protection to one location in the OS
+
+- a mechanism to charge processes for their use of objects so that limits can be placed on the eusage of system resources
+
+- an object-naming scheme that can incorporate existing objects such as devices, files and directories of a filesystem or other independent collections of objects.
+
+** Two Kinds Of Objects
+
+- /executive objects/: implemented by the components of the executive
+  + primitives used to build the environment subsystems. The environment subsystem supplies to its applications with their own sets of objects, many of which correspond directly to executive objects.
+  + some examples: symlink (not just file symlinks), process, thread, job, section (file mapping object), file, access token (the security profile of a process or a thread), event, semaphore, mutex (called mutant in the kernel), timer, IoCompletion, key (reistry key), WindowsStation, desktop
+
+- /kernel objects/: more primitive set of objects omplemented by the Windows kernel.
+
