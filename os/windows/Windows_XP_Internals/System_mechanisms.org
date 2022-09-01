@@ -254,6 +254,49 @@ Documented System API call functions in =Ntdll.dll= to access system services ex
 
 - /kernel objects/: more primitive set of objects omplemented by the Windows kernel.
 
+* System Worker Threads
+
+System worker threads perform work on behalf of other threads:
+doing work for tasks running at higher IRQL; for use by device drivers.
+
+A device driver or an executive component request a system worker thread's services by calling
+=ExQueueWorkItem= or =IoQueueWorkItem=, which places a work item on a queue dispatcher object
+where the worker threads look for work.
+
+** Worker Threads
+
+- /delayed worker threads/ (7 on XP/2003): at priority 12 for work items that are not time-critical
+
+- /critical worker threads/ (5 on XP/2003): at priority 13 with their stacks in physical memory at all times.
+
+- /the hypercritical worker thread/ (1 on XP/2003)
+
+The system creates /dynamic worker threads/ for critical work items if necessary.
+
+* Local Procedure Call (LPCs)
+
+An interprocess communication facility for high-speed message passing. Used for
+    - local RPC
+    - a few Windows APIs that send messages to the Windows subsystem process.
+    - communication between the security reference monitor and the LSASS process.
+
+LPC can exchange messages by either copying the data from one address space to another or by directly operarting on a shared section.
+
+The client first connects to the server's /connection port/
+then a server communication port and a client communication port are established for the two parties.
+which are used by the two for further communication.
+
+* Kernel Event Tracing
+
+For recording trace data of the operation of several components of the kernel and some device drivers for use in system troubleshooting.
+
+A /controller/ starts/stops logging sessions and manage buffer pools.
+A /provider/ provides event classes and accepts commands from a controller for starting/stopping traces of the event classes.
+A /consumer/ selects one or more trace session for which it reads trace data.
+
+A logging session /NT Kernel Logger/ is for use by the kernel and core drivers, /provided/ by the WMI device driver.
+The WMI driver is responsible for starting a thread in the system process to log the trace data in a log file.
+
 * WoW64
 
 - Implemented as a set of user-mode DLLs.
