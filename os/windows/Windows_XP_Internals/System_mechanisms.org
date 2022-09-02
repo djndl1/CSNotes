@@ -254,6 +254,67 @@ Documented System API call functions in =Ntdll.dll= to access system services ex
 
 - /kernel objects/: more primitive set of objects omplemented by the Windows kernel.
 
+** Object Structure
+
+The object manager controls the object headers
+and the owning executive components control the object bodies of the object types they create.
+
+*** Object Header
+
+Common to all objects
+
+- /Object name/: used for identify and make visible to other processes for sharing.
+
+- /Object directory/: a hierarchical structure in which store object names.
+
+- /Security descriptor/
+
+- /Quota charges/: charged against a process
+
+- /Open handle count/ and /open handle list/
+
+- /Object type/: points to a type object that contains attributes common to objects of this type
+
+- /refcount/: the number of times a kernel-mode component has referenced the address of the object.
+
+**** Type Objects
+
+- Common to all objects of a particular type, created once when creating a new object type.
+
+- An object Of its own type, a type object.
+
+- A few type object attributes are visible to user mode
+  + /Type name/: e.g. "process", "event", "port"
+  + /Pool Type/: whether objects should be allocated from paged or nonpaged memory
+  + /Default quota charges/
+  + /Access Types/: the types of access a thread can request when opening a handle to an object of this type
+  + /Generic access rights mapping/: how read/write/execute/all map to the type-specific access rights.
+  + /Synchronization/: whether a thread casn wait for objects of this type to change from one state to another to synchronize its execution.
+  + /Methods/
+
+*** Object Methods
+
+A new object type registers one or more methods with the object manager.
+
+**** Common Object Methods
+
+These methods do not map to user-mode APIs.
+They are called by the object manager at well-defined points in the lifetime of objects of that type.
+
+- /Open/: only for the WindowsStation to request for some memory from =Win32k.sys=.
+
+- /Close/:
+
+- /Delete/: for the object to clean up its internal resources.
+
+- /Query name/, /Parse/: the object manager delegates control of finding an object to a secondary
+  object manager if it finds an object that exists outside the object manager namespace
+  (the others are filesystem namespace and the registry namespace). The object manager
+  calls the /parse/ method of the node if any with the remained of the path.
+
+- /Security/: security information of a file is stored in the file itself and therefore the I/O
+  system must call this method to read/modify it.
+
 * System Worker Threads
 
 System worker threads perform work on behalf of other threads:
