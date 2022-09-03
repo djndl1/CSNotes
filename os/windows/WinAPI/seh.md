@@ -80,7 +80,7 @@ BOOL WINAPI SetConsoleCtrlHandler(
 );
 ```
 
-# [https://docs.microsoft.com/en-us/archive/msdn-magazine/2001/september/under-the-hood-new-vectored-exception-handling-in-windows-xp](Vectored Exception Handling)
+# [Vectored Exception Handling](https://docs.microsoft.com/en-us/archive/msdn-magazine/2001/september/under-the-hood-new-vectored-exception-handling-in-windows-xp)
 
 Unlike frame-based SEH, VEH is process-wide. The behavior is similar to POSIX signals.
 
