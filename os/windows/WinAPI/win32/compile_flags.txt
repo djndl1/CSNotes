@@ -1,5 +1,5 @@
--I/usr/include/wine/wine/windows/
--I/usr/include/wine/wine/msvcrt/
+-I/usr/i686-w64-mingw32/include
+-D_WIN32_WINNT=0x0601
 -DUNICODE
 -D_UNICODE
 -fshort-wchar

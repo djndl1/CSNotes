@@ -18,6 +18,10 @@
   );
 #+END_SRC
 
+#+INCLUDE: "win32/src/processes.cpp" src cpp
+
+A proess handle is more than just an identifier: it also contains security access rights. It is a channel through which a process is manipulated.
+
 ** Specifying the Executable and the Command Line
    :PROPERTIES:
    :CUSTOM_ID: specifying-the-executable-and-the-command-line
@@ -35,9 +39,12 @@ the first token in =lpCommandLine= is the program name.
 
 2. To make an individual handle inheritable, use a =SECURITY_ATTRIBUTES=
    structure at creation time of the handle or duplicate an existing
-   handle
+   handle.
+
+3. The two security attributes passed in are used to configure the two handles returned.
 
 #+BEGIN_SRC C
+// handle duplication creates a different way to access the same object.
   BOOL DuplicateHandle(
     HANDLE   hSourceProcessHandle,
     HANDLE   hSourceHandle,
@@ -55,7 +62,7 @@ is the preferred way to use I/O redirection). Non-file handles and
 handles that are not used to redirect stdio can be converted to text and
 placed in a command line argument or in an environment variable.
 
-The inherited handles are distinct copies, a parent and child might be
+The inherited handles are distinct copies (but with the same value), a parent and child might be
 accessing the same file using different file pointers.
 
 ** Process Information
@@ -68,7 +75,7 @@ accessing the same file using different file pointers.
   DWORD GetCurrentProcessId();
 #+END_SRC
 
-To get a real process handle, get the PID and =OpenProcess= it.
+To get a real process handle, get the PID and =OpenProcess= it or duplicate the current pseudohandle.
 
 #+BEGIN_SRC C
   HANDLE OpenProcess(DWORD dwDesiredAccess, BOOL  bInheritHandle, DWORD dwProcessId);
@@ -81,6 +88,8 @@ run it with =NULL= as the module handle of these functions.
   DWORD GetModuleFileNameW(HMODULE hModule, LPWSTR  lpFilename, DWORD   nSize);
   DWORD GetModuleFileNameExW(HANDLE  hProcess, HMODULE hModule, LPWSTR  lpFilename, DWORD   nSize);
 #+END_SRC
+
+#+INCLUDE: "win32/src/processes.cpp" src cpp
 
 * Process Termination
   :PROPERTIES:
