@@ -315,6 +315,39 @@ They are called by the object manager at well-defined points in the lifetime of 
 - /Security/: security information of a file is stored in the file itself and therefore the I/O
   system must call this method to read/modify it.
 
+*** Object Handles and The Process Handle Table
+
+Referring to an objet by its handle is faster than using its name
+because the object manager can skip the name lookup and find the object directly.
+Also it provides a consistent interface to reference objects regardless of their type.
+
+**** Handle Table
+
+An object handle is an index into a process-specific /handle table/.
+The handle table is a three-level table that stores pointers to objects,
+some flags (embedded in the unused/constant part of the pointer integer) and access masks.
+On WinXP, only one third level table is created at process startup and
+it has =(PageSize)/(PointerSize)-1= entries; more tables are created if needed.
+
+**** Kernel Handle Table
+
+Kernel-mode code uses a different handle table =ObpKernelHandleTable=
+
+*** Object Security
+
+A process must specify a set of /desired access rights/ when opening a handle to an object.
+The object manager passes this set of access rights to the /security reference monitor/
+to check. The security reference monitor then returns a set of valid access rights to the object
+manager that indicates the granted access rights to the process.
+
+*** Object Retention
+
+Objects may be /temporary/ (freed when not used) or /permanent/ (present until explicitly freed).
+
+- temporary objects are refcounted by handle (user-mode) or by pointer (kernel-mode)
+
+- when the pointer refcount reaches 0, the object manager deletes the object from memory.
+
 * System Worker Threads
 
 System worker threads perform work on behalf of other threads:
