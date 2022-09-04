@@ -20,11 +20,44 @@ int wmain()
     PROCESS_INFORMATION pi = { 0 };
     int error = ::create_process(L"C:\\windows\\system32\\cmd.exe", nullptr, &pi);
     if (!error) {
-        std::wcout << "Created a process: " << pi.dwProcessId << '\n';
+        std::wcout << L"Created a process: " << pi.dwProcessId << L'\n';
     } else {
-        const wchar_t *error_p = ::get_error_message(error);
-        std::wstring error_msg{std::move(error_p)};
-        std::wcout << "Failed to create a process: " << error_msg << "\n";
+        std::wstring error_msg = windows::get_error_message(error);
+        std::wcout << L"Failed to create a process: " << error_msg << L"\n";
+    }
+
+    ::WaitForSingleObject(pi.hProcess, INFINITE);
+
+    DWORD cmd_exit_code;
+    BOOL success = ::GetExitCodeProcess(pi.hProcess, &cmd_exit_code);
+
+    if (success) {
+        std::wcout << L"Exit Code: " << cmd_exit_code << L'\n';
+    } else {
+
+        std::wstring error_msg = windows::get_error_message(error);
+        std::wcout << L"Failed to retrieve the exit code: " << error_msg << L'\n';
+    }
+
+    error = ::create_process(L"C:\\windows\\system32\\cmd.exe", nullptr, &pi);
+    if (!error) {
+        std::wcout << L"Created a process: " << pi.dwProcessId << L'\n';
+    } else {
+        std::wstring error_msg = windows::get_error_message(error);
+
+        std::wcout << L"Failed to create a process: " << error_msg << L"\n";
+    }
+
+    ::TerminateProcess(pi.hProcess, 10);
+
+    success = ::GetExitCodeProcess(pi.hProcess, &cmd_exit_code);
+
+    if (success) {
+        std::wcout << L"Exit Code: " << cmd_exit_code << L'\n';
+    } else {
+        std::wstring error_msg = windows::get_error_message(error);
+
+        std::wcout << L"Failed to retrieve the exit code: " << error_msg << L'\n';
     }
 
     return 0;
