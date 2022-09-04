@@ -348,6 +348,10 @@ Objects may be /temporary/ (freed when not used) or /permanent/ (present until e
 
 - when the pointer refcount reaches 0, the object manager deletes the object from memory.
 
+*** Resoruce Accouting
+
+The Windows object manager provides a central facility for resource accounting. Each object header contains an attribute /quota charges/ that records how much the object manager subtracts from a process's allocated paged or nonpaged pool quota. Each process points to a quota structure that records the limits and current values for /nonpaged pool/, /paged pool/ and /page file usage/. =HKLM\System\CurrentControlSet\Session Manager\Memory Management\=
+
 * System Worker Threads
 
 System worker threads perform work on behalf of other threads:
