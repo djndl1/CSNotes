@@ -407,6 +407,14 @@ The client first connects to the server's /connection port/
 then a server communication port and a client communication port are established for the two parties.
 which are used by the two for further communication.
 
+* Windows Global Flags
+
+the =NtGlobalFlag= structure, a set flags (not for customers)
+that controls internal debugging, tracing and validation support in the OS,
+initialized by =HKLM\System\CurrentControlSet\Control\Session Manager\GlobalFlag=.
+
+Use =Gflags.exe= to view and change it.
+
 * Kernel Event Tracing
 
 For recording trace data of the operation of several components of the kernel and some device drivers for use in system troubleshooting.
