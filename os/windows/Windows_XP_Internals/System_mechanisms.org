@@ -352,6 +352,16 @@ Objects may be /temporary/ (freed when not used) or /permanent/ (present until e
 
 The Windows object manager provides a central facility for resource accounting. Each object header contains an attribute /quota charges/ that records how much the object manager subtracts from a process's allocated paged or nonpaged pool quota. Each process points to a quota structure that records the limits and current values for /nonpaged pool/, /paged pool/ and /page file usage/. =HKLM\System\CurrentControlSet\Session Manager\Memory Management\=
 
+*** Object Names
+
+The object naming scheme is strctured as hierarchical and is used to distinguish one object from another and for finding/retrieving a particular object and for sharing among processes (placed in the global namespace).
+
+Only =BaseNamedObjects= (mutexes, events, semaphores, waitable timers and section objects) and =\GLOBAL??= (MS-DOS device names, full of symlinks) are visible to user mode.
+
+Object names are global to single computer but not visible across a network.
+
+Symlinks (themselves objects) apply to objects and not just files. The most common use is to map the Windows internal devices to Win9x/DOS-style drive letters and serial ports.
+
 * System Worker Threads
 
 System worker threads perform work on behalf of other threads:
