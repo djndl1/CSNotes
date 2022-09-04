@@ -362,6 +362,19 @@ Object names are global to single computer but not visible across a network.
 
 Symlinks (themselves objects) apply to objects and not just files. The most common use is to map the Windows internal devices to Win9x/DOS-style drive letters and serial ports.
 
+**** Session Namespaces
+
+The console session has access to the /global/ namespace. Additional sessions are given a session-private view of the namespace =\Session\sessionId\=
+including
+
+- =\DosDevices= (renamed to the session ID)
+
+- =\Windows=
+
+- =\BaseNamedObjects=
+
+The object manager creates objects under the session-specific directory unless the =\Global\= prefix is explicitly specified. However, under WinXP/2003 =\Global\= is not necessary to find an object in the global directory since the object manager would automatically look in the global directory for the object if not found in the local directory.
+
 * System Worker Threads
 
 System worker threads perform work on behalf of other threads:
