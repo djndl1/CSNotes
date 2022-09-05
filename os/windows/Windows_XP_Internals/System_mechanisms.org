@@ -457,3 +457,50 @@ The WMI driver is responsible for starting a thread in the system process to log
 - 32-bit kernel mdoe device drivers are not supported
 
 - 64-bit processes cannot load 32-bit DLLs and vice versa.
+
+* Synchronization: Mutual Exclusion
+
+Mutual Exclusion on a multiprocessor system.
+
+** High-IRQL Synchronization
+
+Raising the IRQL high enough to prevent other potential access (interrupts) to the global resource.
+
+*** Interlocked Operations
+
+Atomic operations provided by the ISA, capable of locking the multiprocessor bus.
+
+*** Spinlocks
+
+- =KeAcquireSpinlock=, =KeReleaseSpinLock=
+
+The kernel keeps spinning until acquiring the lock.
+
+The lock is often implemented as a hardware-supported test-and-set instruction. On uniprocessors,
+a simple IRQL is already enough.
+
+On Windows, any spinlock is associated with an IRQL at or higher than the DPC/dispatch level,
+masking any thread dispatching.
+
+*** Queued Spinlocks
+
+- =KeAcquireQueuedSpinlock=
+
+The spinning processors are put in a queue waiting for the spinlock.
+The waiting processors do not test the spin lock directly. Instead, a processor
+checks the flag of the process ahead of to query whether the turn has come for
+itself. The multiprocessor's bus isn't as heavily trafficked by interprocessor
+synchronization. This also gives a more consistent performance across processors
+since it enforces a FIFO ordering to the lock.
+
+*** Instack Queued Spinlocks
+
+Queued spin locks dynamically allocated with =KeAcquireInStackQueuedSpinlock=, =KeReleaseInStackQueuedSpinlock=.
+
+*** Executive Interlocked Operations
+
+A few synchronization functions implemented with spinlocks:
+
+- =ExinterlockedPopEntryList=, =ExinterlockedPushEntryList=
+
+- =ExinterlockedInsertHeadList=, =ExinterlockedRemoveHeadList=.
