@@ -504,3 +504,61 @@ A few synchronization functions implemented with spinlocks:
 - =ExinterlockedPopEntryList=, =ExinterlockedPushEntryList=
 
 - =ExinterlockedInsertHeadList=, =ExinterlockedRemoveHeadList=.
+
+** Low-IRQL Synchronization
+
+There are a few restrictions of spinlocks:
+
+- the protected resources must be accessed quickly
+
+- the critical section cannot be paged out of memory, cannot refer to pageable data,
+  cannot call external procedures and cannot generate interrupts or exceptions.
+
+Other synchronization mechanisms are available for use when spinlocks are not suitable.
+
+*** Kernel Dispatcher Objects
+
+The user-visible synchronization objects acquire their synchronization by encapsulating
+at least one kernel dispatcher objects.
+
+A synchronization object is either /signaled/ or /nonsignaled/. A thread waiting on
+a dispatcher object sets the dispatcher object to nonsignaled. When the kernel sets
+an object to signaled, =KiWaitTest= checks for potential waiting threads and
+releases them from their waiting state.
+
+- A thread waits for an object
+
+- the kernel sets it to waiting and puts it to a list of waiting threads
+
+- the object somehow is signaled.
+
+- the kernel checks the list to find any thread that can be released and set them to ready.
+
+**** Signaling
+
+How an object is signaled is highly depedent on the type of the object.
+
+- /Process/: last thread terminates
+
+- /thread/: thread terminates
+
+- /file/: I/O operation completes
+
+- /event/ (notification, manual reset event): thread sets the event; all waiting threads are released
+
+- /event/ (synchronization): thred sets the event; one thread released; event object reset
+
+- /Keyed Event/: thread sets event with a key;
+  the thread waiting for the key and not of the same process as the signaler is released.
+
+- /Semaphore/: count drops by 1; one thread released.
+
+- /Timer/ (notification): set time arrives or time interval expires; all released
+
+- /timer/ (synchronization): set time arrives or time interval expires; one released
+
+- /mutex/ (thread-affiliated: a mutex object has ownership associated with it): thread releases the mutex; one thread released.
+
+- /queue/: item is placed on queue; one thread released.
+
+=CRITICAL_SECTION= is implemented based on event objects.
