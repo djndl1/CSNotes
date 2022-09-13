@@ -1,0 +1,25 @@
+#+title: Awk
+
+A sequence of patterns and actions that tell what to look for in the input data
+and what to do when it's found. A set of files arae searched for lines matched by
+any of the patterns and the corresponding action is performed on a matching line.
+
+* Basics
+
+- Pattern-action statement: =pattenr { action }=. Each awk program is a sequence of one or more pattern-action statements.
+
+#+begin_src awk
+ip a | awk '$1 == "inet" { print $2} '
+awk -f programFile inputfiless...
+#+end_src
+
+- =$1=, =$2= ... fields; =$0= the entire line; =NF=: the number of fields; =$NF=: the last field. Any expression can be used after =$= to denote a field number; =NR=: number of lines
+
+#+begin_src awk
+{ print } # or
+{ print $0 }
+#+end_src
+
+- the C-style =printf= format print is also supported.
+
+- ./selection/:
