@@ -2,7 +2,7 @@
 
 * Basics
 
-- =%COMSPEC= for the full path of =cmd.exe=; Run the script with =cmd.exe=
+- =%COMSPEC%= for the full path of =cmd.exe=; Run the script with =cmd.exe=
   to start a child process and use =/C= (run the command and then close,
   here to prevent =EXIT= closes the host window)
 
@@ -63,6 +63,14 @@
 - =taskkill=: find processes and kill them; =tasklist=: list running processes. The two can be used together.
 
 - =echo=: commands and keywords in a batch file are normally echoed to stdout. Prefixing a command with =@= turns the echo off. =@echo off= turns the global echo off. =echo.= prints an empty line. To dislay a string without printing the final newline, =set /p "=string" < nul=
+
+- =exit=: =/B= exit from only the current batch file or function. The =ErrorLevel= variable is set by =exit= with an error code. =verify >nul= can set the =ERRORLEVEL= to zero.
+
+- =setlocal enableextensions/disableextensions=: additional language features
+
+- =(stmt1 stmt2 stmt3)=: compound statements. The error code of the compound statement is the error code of the last command.
+
+- conditionally chaining commands: =&&= the second runs if the first succeeds; =||= the second runs if the first fails. =&= unconditionally joins two commands.
 
 ** Variables
 
