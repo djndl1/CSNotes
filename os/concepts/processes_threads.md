@@ -1,4 +1,4 @@
-The most central concept in any operating system is the _process_: an abstract of a running program. Processes are one of the oldest and most important abstractions that operating systems provide.
+The most central concept in any operating system is the _process_: an abstract of a running program that turns a physical CPU into multiple virtual CPU. Processes are one of the oldest and most important abstractions that operating systems provide.
 
 # Process
 
@@ -18,7 +18,10 @@ Four principal events cause processes to be created:
 
 4. initialization of a batch job.
 
-Technically, in all these cases, a new process is created by having an existing process execute a process creation syscall. In UNIX, the reason for two-step process creation is to allow the child to manipulate its file descriptors after the `fork` but before the `execve` in order to accomplish rediction of `stdin`, `stdout` and `stderr`.
+Technically, in all these cases, a new process is created by having an existing process execute a 
+process creation syscall. In UNIX, the reason for two-step process creation is to allow the child 
+to manipulate its file descriptors after the `fork` but before the `execve` in order to 
+accomplish redirection of `stdin`, `stdout` and `stderr`.
 
 A process terminates usually due to:
 
@@ -57,7 +60,15 @@ The OS maintains a _process table_ (_process control block_), with one entry per
 
 Suppose a disk interrupt happens. (By hardware) The current program counter, program status word, and sometimes a few registers are pushed onto the current stack by the interrupt hardware. The computer jumps to the address specified in the interrupt vector. (By software) More registers are saved; new stack is setup; C interrupt service runs (to handle the disk); Scheduler decides which process to run next; a process is run.
 
-modelling multiprogramming TODO
+Suppose there are $n$ processes, each spending $p$ fraction of its time waiting for I/O, then the probability of all processes are waiting for I/O is $p^{n}$, the CPU must have at least one process running on it otherwise, then the CPU utilization is 
+
+$$
+1 - p^{n}
+$$
+
+With high I/O accesses, more processes are favored in order to better utilize the CPU.
+
+A better modeling should be constrcted using __queuing theory_.
 
 # Threads
 
