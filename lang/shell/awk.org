@@ -7,6 +7,8 @@ any of the patterns and the corresponding action is performed on a matching line
 * Basics
 
 - Pattern-action statement: =pattenr { action }=. Each awk program is a sequence of one or more pattern-action statements.
+  + a pattern without an action prints all lines matching the pattern
+  + actions are separated by newlines or semicolons
 
 #+begin_src awk
 ip a | awk '$1 == "inet" { print $2} '
@@ -22,4 +24,50 @@ awk -f programFile inputfiless...
 
 - the C-style =printf= format print is also supported.
 
-- ./selection/:
+- =BEGIN= matches before the first line of the first input file; =END= matches after the last line of the last file;
+  Used to do anything before/after the actual matching.
+
+- declaration is not necessary for variables
+
+  #+begin_src awk
+{ pay += $2 * $3 }; END { printf "total pay %.2f\n", pay } # pay is defined the first time it's used and is used afterwards
+  #+end_src
+
+- string are concatenated by a blank between them.
+
+#+begin_src awk
+'{ names = names $1 " " }; END { print names }'
+#+end_src
+
+- NR retains its value in an =END= action, =$0= does not (but =gawk= and =mawk= does preserve =$0=)
+
+#+begin_src awk
+# show the last line
+{ last = $0 }; END { print last } # END { print $0 } works for some implementation
+#+end_src
+
+- C-style if-else, while and for clauses are available.
+
+- Arrays are more powerful than C arrays, with automatic resizing.
+
+#+begin_src awk
+{ line[NR] = $0 }
+END {
+    for (i = NR; i > 0; i--) {
+        print line[i]
+    }
+}
+#+end_src
+
+
+** Some Oneliners
+
+#+begin_src awk
+END {print NR } # print line count
+
+NR = 10 # print the tenth line
+
+# print the count of lines containing "Beth"
+/Beth/ { nlines += 1 }
+END { print nliens }
+#+end_src
