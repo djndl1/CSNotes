@@ -1,0 +1,57 @@
+#+title: Bc
+
+- Use =-l= to load the mathlib.
+
+-  Numbers are decimal arbitrary-precision.
+  + =scale=: the number of digits after the decimal point
+  + =length=: the number of all digits
+
+- Variables:
+  + builtin: =scale= (default to 0; affects how some operations use fractional parts). =ibase=, =obase= the conversion base for input/output numbers, default to 10. =last= printed number.
+
+- C89-style comments or =#=
+
+- C-style arithmetic operators except =^= (exponentiation)
+
+- C-style relational expressions
+
+#+begin_src c
+a = 3 < 5 # a == 3
+#+end_src
+
+* Some Special Expression
+
+- =length=: get the length of a number
+
+- =scale=: get the scale of a number
+
+- =sqrt=: get the square root
+
+- =read()= prompt for a read from stdin.
+
+* Statements
+
+- =print=
+
+- C-style =if=-=else=, =while=, for
+
+- compound statement is supported
+
+- =halt=: quit =bc=; =quit=: quit =bc= on seen.
+
+* Functions
+
+#+begin_src c
+define name(parameters) {
+    auto_list       // local variables, optional: auto name, ...;
+    statement_list
+}
+#+end_src
+
+A function may return a value =return (expression)=.
+
+* Examples
+
+#+begin_src shell
+pi=$(echo '4 * a(1)' | bc -l) # get a PI
+#+end_src
