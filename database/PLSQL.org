@@ -46,11 +46,72 @@ A library in a database
 
 - Intersections: maintain history of relations
 
+* Control Statements
+
+** Conditonal
+
+*** =IF=
+
+#+begin_src sql
+IF conditional THEN
+    statements
+[ELSIF conditional2 THEN
+       statements
+]...
+[ELSE
+    statements]
+END IF;
+#+end_src
+
+*** =CASE=
+
+#+begin_src sql
+CASE selector
+     WHEN selector_value_1 THEN statements_1
+     WHEN selector_value_2 THEN statements_2
+     ...
+     WHEN selector_value_n THEN statements_n
+     [ ELSE
+       else_statements ]
+END CASE;]
+
+CASE
+    WHEN condition_1 THEN statements_1
+    WHEN condition_2 THEN statements_2
+    ...
+    WHEN condition_n THEN statements_n
+    [ ELSE
+      else_statements ]
+END CASE;]
+#+end_src
+
+** Loop
+
+=EXIT=, =EXIT WHEN=; =CONTINUE=, =CONTINUE WHEN= can be anywhere inside a loop.
+
+#+begin_src shell
+
+# an EXIT may take advantage of this label
+[ label ] LOOP
+  statements
+END LOOP [ label ];
+
+# the index is implicitly declared as PLS_INTEGER and cannot be changed
+# the two bounds are required to be numeric expressions.
+[ label ] FOR index IN [ REVERSE ] lower_bound..upper_bound LOOP
+  statements
+END LOOP [ label ];
+
+[ label ] WHILE condition LOOP
+  statements
+END LOOP [ label ];
+#+end_src
+
 * PL/SQL-Specific Types
 
 ** =BOOLEAN=
 
-nullable bool
+nullable bool; not printable by =dbms_output.put_line()=.
 
 ** =PLS_INTEGER=/=BINARY_INTEGER=
 
