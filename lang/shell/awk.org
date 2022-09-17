@@ -71,3 +71,55 @@ NR = 10 # print the tenth line
 /Beth/ { nlines += 1 }
 END { print nliens }
 #+end_src
+
+* Language
+
+- The opening brace of an action muyst be on the same line as the pattern it accompanies.
+
+- statements can be broken after backslashes, commas.
+
+** Patterns
+
+- =BEGIN=, =END=: a way to gain control for initialization and wrapup.
+  + =FS= can be changed at =BEGIN=.
+
+- /expression/: statements are executed at each input line where the expression evaluates to true.
+
+- =/regex/=: lines are matched when they conbtain a string matched by the regex.
+
+- compound pattern: expressions with =&&=, =||=, =|= and parentheses.
+
+- =pattern1, pattern2=: a range pattern that starts from the line matched by =pattern1= to the line matched by =pattenr2= inclusively.
+
+*** Regex Matching
+
+- =/regex/=: matches the input line
+
+- =expression ~ /regex/=: matches the string value of the expression
+
+=expression !~ /regex/=: matches if the string value of the expression does not contain a substring matched by the regex.
+
+Gawk uses the POSIX extended regex.
+
+- metacharacters: =\=, =^=, =$=, =.=, =[=, =]=, =|=, =(=, =)=, =*=, =+=, =?=
+
+- A basic regex
+  + a nonmetacharacter that matches itself
+  + an escape character e.g. =\t=
+  + a quoted metacharacter: =\*=
+  + =^= and =$= that matches the beginning and the end of a string
+  + =.=: any single character
+  + a character class. Quoting metacharacters is not always needed inside a character class.
+
+- operators conmbine regexes into larger ones (=A= and =B= are regexes): ordered by precedence from the lowest to the highest
+  + alternation: =A|B= matches =A= or =B=
+  + concatenation: =AB=
+  + closure =*=: matches zero or more of the previous regex.
+  + positive closure =+=: one or more of the previous regex.
+  + zero or one =?=
+  + grouping =(r)=: matches the same strings as the pattern =r= does.
+    parentheses can often be omitted since groupings take precedence.
+
+*** Range Pattern
+
+A range pattern matches multiple lines. If the second pattern is not found, the match goes on.
