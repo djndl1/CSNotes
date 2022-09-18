@@ -153,3 +153,34 @@ A range pattern matches multiple lines. If the second pattern is not found, the 
 
 - multiline record
   + =RS=: record separator, by default =\n=
+
+* Data Processing
+
+** Sum numbers of each column
+
+#+begin_src awk
+function isnum(n) { return n ~ /^[+-]?[0-9]+\.?[0-9]*$/ }
+NF > 0 && maxfld == 0 {
+    maxfld = NF
+    for (i = 1; i <= NF; i++) {
+        numcol[i] = isnum($i)
+    }
+}
+NF > 0 {
+    for (i = 1; i  <= NF; i++) {
+#        if (numcol[i]) {
+            sum[i] += $i
+ #       }
+    }
+}
+    END {
+        for (i = 1; i <= maxfld; i++) {
+            if (numcol[i]) {
+                printf("%g", sum[i]);
+            } else {
+                printf("--")
+            }
+            printf("%s", i == maxfld ? "\n" : "\t")
+        }
+    }
+#+end_src
