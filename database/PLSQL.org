@@ -359,6 +359,44 @@ BEGIN
 END;
 #+end_src
 
+** Processing Cursors
+
+*** For Loop
+
+#+begin_src sql
+-- an implicit cursor
+BEGIN
+  FOR item IN (
+    SELECT last_name, job_id
+    FROM employees
+    WHERE job_id LIKE '%CLERK%'
+    AND manager_id > 120
+    ORDER BY last_name
+  )
+  LOOP
+    DBMS_OUTPUT.PUT_LINE
+      ('Name = ' || item.last_name || ', Job = ' || item.job_id);
+  END LOOP;
+END;
+/
+
+
+-- an explicit one
+BEGIN
+  FOR item IN (
+    SELECT first_name || ' ' || last_name AS full_name,
+           salary * 10                    AS dream_salary
+    FROM employees
+    WHERE ROWNUM <= 5
+    ORDER BY dream_salary DESC, last_name ASC
+  ) LOOP
+    DBMS_OUTPUT.PUT_LINE
+      (item.full_name || ' dreams of making ' || item.dream_salary);
+  END LOOP;
+END;
+/
+#+end_src
+
 ** Simple Static Cursor
 
 #+begin_src sql
