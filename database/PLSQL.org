@@ -207,7 +207,11 @@ type record_name IS RECORD (
 );
 #+END_SRC
 
-* Row Processing
+* PL/SQL Static SQL
+
+Static SQL statements have basically the same syntax as the SQL but with some extensions and difference.
+
+** Row Processing
 
 =SELECT= without =into= is not allowed in =PL/SQL=.
 
@@ -298,7 +302,7 @@ Constructed and managed by PL/SQL. It closes after the associated statement runs
 
 *** Implicit Cursor Attribute
 
-An implicit cursor has attributes that return information about the most recently run SELECT or DML statement that is not associated with a named cursor.
+An implicit cursor has attributes that return information about the most recently run SELECT or DML statement that is not associated with a named cursor. This cursor is not controlled by the user. It closes after its associated statement runs but /its attribute values remain available until another such statement runs/.
 
 #+begin_src sql
 SQL%ISOPEN/FOUND/NOTFOUND/ROWCOUNT/BULK_ROWCOUNT/BULK_EXCEPTION
@@ -308,7 +312,52 @@ SQL%ISOPEN/FOUND/NOTFOUND/ROWCOUNT/BULK_ROWCOUNT/BULK_EXCEPTION
 
 1. Declare and define a cursor and associate it with a query
 
+#+begin_src sql
+-- cursor queries can capture variables in its scope.
+-- the parameter_list contains formal parameters
+-- used by the cursor query
+-- that are filled when the cursor is opened.
+
+-- declaration
+CURSOR cursor_name [parameter_list] RETURN return_type;
+-- definition
+CURSOR cursor_name [ parameter_list ] [ RETURN return_type ]
+  IS select_statement;
+#+end_src
+
 2. open the query (either via the =OPEN= statement or implicitly in a =FOR= loop) and fetch the result and then =CLOSE= it (not needed in a =FOR= loop).
+
+#+begin_src sql
+FETCH cursor_name INTO into_clause;
+-- either a list of variables or a single record variable.
+#+end_src
+
+A cursor is already associated with a statement (and thus some data) after it is defined. It's not a variable that can be assigned to.
+
+- reading a virtual column is possible with a cursor.
+
+#+begin_src sql
+DECLARE
+  CURSOR c1 IS
+    SELECT employee_id,
+           (salary * .05) raise
+    FROM employees
+    WHERE job_id LIKE '%_MAN'
+    ORDER BY employee_id;
+  emp_rec c1%ROWTYPE;
+BEGIN
+  OPEN c1;
+  LOOP
+    FETCH c1 INTO emp_rec;
+    EXIT WHEN c1%NOTFOUND;
+    DBMS_OUTPUT.PUT_LINE (
+      'Raise for employee #' || emp_rec.employee_id ||
+      ' is $' || emp_rec.raise
+    );
+  END LOOP;
+  CLOSE c1;
+END;
+#+end_src
 
 ** Simple Static Cursor
 
