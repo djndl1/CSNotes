@@ -167,9 +167,31 @@ The sort order of an associative array is affected by NLS parameters
 
 **** Associative Arrays
 
-Has a fixed declared maximum size.
+- Has a fixed declared maximum size.
+
+- declaration is empty initialization.
+
+- a constant associative array can only be initialized by an initializer function.
+
+- Cannot be declared outside a package.
+
+- used for passing collections to/from the database server.
+
+**** Varrays
+
+- variable-sized; dense; one-based index
+
+- capacity is predefined but can be extended.
+
+- a varray variable requires explicit initialization to use the array besides declaration.
 
 **** Nested Tables
+
+- completely dynamically-sized;
+
+- can be dense or sparse (due to deletion).
+
+- elements are not stably ordered (rendering them somewhat useless).
 
 A column type that stores an unspecified number of rows in no particular order. Conceptually, a nested table is a one-dimensional array with an arbitrary number of elements. The size of a nested table can increase dynamically. A nested table can become sparse.
 
