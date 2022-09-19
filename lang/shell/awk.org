@@ -184,3 +184,50 @@ NF > 0 {
         }
     }
 #+end_src
+
+** Histogram of Integers
+
+#+begin_src awk
+function replicate(n, s, t) {
+    while (n-- > 0) {
+        t = t s
+    }
+    return t
+}
+
+NF > 0 && minidx == 0 {
+    minidx = $1
+    maxidx = $1
+}
+
+{
+    x[int($1)]++
+    if ($1 > maxidx) maxidx = int($1)
+    if ($1 < minidx) minidx = int($1)
+
+    if (x[$1] > maxcnt) maxcnt = x[$1]
+    if (x[$1] < mincnt) mincnt = x[$1]
+}
+
+END {
+    segment = (maxidx - minidx) / 10
+    scale = (maxcnt - mincnt) / 10
+
+    printf("Max %d, Min %d\n", maxidx, minidx)
+
+    for (i = minidx; i <= maxidx; i += segment) {
+        cnt = 0
+        for (j = int(i); j < i + segment; j++) {
+            cnt += x[j]
+        }
+        printf("%2d - %2d: %d %s\n", i, i + segment - 1, cnt, replicate(cnt / scale, "*"))
+    }
+    cnt = 0
+    for (j = i; j < maxidx ; j++) {
+            cnt += x[j]
+    }
+    if (i < maxidx)
+        printf("%2d - %2d: %s\n", i, maxidx, replicate(cnt / scale, "*"))
+}
+
+#+end_src
