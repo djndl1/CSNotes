@@ -231,3 +231,35 @@ END {
 }
 
 #+end_src
+
+** Numbers and commas
+
+#+begin_src awk
+function addcomma(x, num) {
+    if (x < 0)
+        return "-" addcomma(-x)
+
+    num = sprintf("%.2f", x)
+    while (num ~ /[0-9][0-9][0-9][0-9]/) {
+        sub(/[0-9][0-9][0-9][,.]/, ",&", num)
+    }
+    return num
+}
+
+function checkcomma(x, num) {
+    if (x ~ /^,/ || x ~ /,$/) return 0
+    if (x < 0) return checkcomma(-x)
+
+    num = x
+    while (num ~ /,[0-9][0-9][0-9]/) {
+        sub(/,[0-9][0-9][0-9]/, "", num)
+    }
+
+    if (num ~ /^[0-9][0-9][0-9][0-9]/) {
+        return 0
+    } else {
+
+        return num ~ /^[0-9]{0,3}\.?[0-9]*$/
+    }
+}
+#+end_src
