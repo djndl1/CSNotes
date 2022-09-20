@@ -72,6 +72,8 @@
 
 - conditionally chaining commands: =&&= the second runs if the first succeeds; =||= the second runs if the first fails. =&= unconditionally joins two commands.
 
+- batch uses =^= to escape special characters.
+
 ** Variables
 
 Undeclared/uninitialized variables is an empty string.
@@ -108,6 +110,20 @@ REM without an argument, `set` lists all existing variables
 - =SystemDrive=, =SystemRoot=
 
 - =%0=, =%1= ... are arguments. Arguments after =$9= is only accessible by first =SHIFT= the arguments. =$*= For all arguments
+  + =SHIFT= shifts arguments to the left.
+
+#+begin_src shell
+@echo %*
+@echo off
+:repeat_shift
+	if "%1" == "" goto shift_end
+	echo %1
+
+	shift
+
+	goto repeat_shift
+:shift_end
+#+end_src
 
 *** Variable Substitution
 
