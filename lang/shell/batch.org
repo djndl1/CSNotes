@@ -127,6 +127,8 @@ REM without an argument, `set` lists all existing variables
 
 *** Variable Substitution
 
+The command line arguments and the =FOR= loop variables can be expanded differently by using certain modifiers =%~{Modifier}{ArgumentNumber or VariableName}=.
+
 + see =FOR /?= or =CALL /?= for some variable substitution
 
 + =%~I=: removing any surrounding quotes
@@ -150,6 +152,47 @@ REM without an argument, `set` lists all existing variables
 + =%~$PATH:I=: get the fullpath of the file if it's in the =PATH=.
 
 These substitutions can be combined: =%~dpI= to get the parent path.
+
+#+begin_src shell
+@echo off
+
+echo The first argument as is: %1
+
+REM Start modifiers example
+echo 1. without quotes: %~1
+echo 2. fully qualified path name: %~f1
+echo 3. drive letter: %~d1
+echo 4. path part: %~p1
+echo 5. just the file name part: %~n1
+echo 6. just the extension part: %~x1
+echo 7. file's attributes: %~a1
+echo 8. file's date and time: %~t1
+echo 9. file's size: %~z1
+echo 10. file path in the PATH environment variable search: %~$PATH:1
+echo 11. file's full path: %~dp1
+echo 12. file's name and extension part: %~nx1
+echo 13. 'dir' like modifier: %~ftza1
+echo 14. fully qualified script path: %~dpnx0
+#+end_src
+
+#+begin_src shell
+djn_dl@DJN D:\CodeSpace\batch>variable_substitution.cmd "variable_substitution.cmd"
+The first argument as is: "variable_substitution.cmd"
+1. without quotes: variable_substitution.cmd
+2. fully qualified path name: D:\CodeSpace\batch\variable_substitution.cmd
+3. drive letter: D:
+4. path part: \CodeSpace\batch\
+5. just the file name part: variable_substitution
+6. just the extension part: .cmd
+7. file's attributes: --a--------
+8. file's date and time: 2022/09/21 22:15
+9. file's size: 596
+10. file path in the PATH environment variable search: D:\CodeSpace\batch\variable_substitution.cmd
+11. file's full path: D:\CodeSpace\batch\
+12. file's name and extension part: variable_substitution.cmd
+13. 'dir' like modifier: --a-------- 2022/09/21 22:15 596 D:\CodeSpace\batch\variable_substitution.cmd
+14. fully qualified script path: D:\CodeSpace\batch\variable_substitution.cmd
+#+end_src
 
 ** Return Codes
 
@@ -241,7 +284,7 @@ IF /I "%ERORRLEVEL%" NEQ "0" ( ... ) REM case insensitive string comparison
 - =FOR=: =%I= in the command and =%%I= in a batch file
 
 #+begin_src bat
-FOR /D %I IN ("%USERPROFILE%"\*) DO @ECHO %I      REM looping through directories
+FOR /D %I IN ("%USERPROFILE%"\*) DO @ECHO %pI      REM looping through directories
 FOR /R "%TEMP%" %I IN (*) DO @ECHO %I        REM recursive loop through subfolder
 #+end_src
 
