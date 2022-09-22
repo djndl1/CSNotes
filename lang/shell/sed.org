@@ -1,0 +1,25 @@
+#+title: Sed
+
+=sed= receives text input, performs certain operations on specified lines (specified by address range) of the input,
+one line at a time then outputs the result.
+
+#+begin_src sed
+[address-range]/p # print address range
+[address-range]/d # delete
+s/pattern1/pattern2/ # substitute the first instance
+[address-range]/s/pattern1/pattern2/ # substitute over address-range
+[address-range]/y/pattern1/pattern2/ # replace any character in pattern1 with the corresponding character in pattern2 over address-range (similar to `tr`)
+[address] i/a pattern Filename        # insert/append pattern at address indicated in file Filename
+g                                   # operate on every pattern match witin each matched line of input
+#+end_src
+
+#+begin_src shell
+sed -e '/^$/d' $filename # sed explicitly adds commands
+sed -n # -n outputs lines only explicitly selected for output; otherwise every line is printed along with those matched.
+#+end_src
+
+#+begin_src
+/[0-9A-Za-z]/,/^$/ { an address range followed by one or more operations requires a pair of curly brackest
+/^$/d
+}
+#+end_src
