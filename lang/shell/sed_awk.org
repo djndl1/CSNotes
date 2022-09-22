@@ -1,4 +1,23 @@
-* Quick Awk
+* Sed
+
+Sed is an editor, an editor for automating editing actions, possibly on multiple files.
+It limits the user to the meothds found in a text editor. =sed= commands are implicitly global
+ (acting on every line) compared to =ed=.
+
+- sed instructions can be separated by a semicolon.
+
+- =-n= suppresses automatic display of input lines (not always good if you want the whole file to be printed, not just the processed lines);
+   =-f= instruct script file, =-e= instruction
+
+* Awk
+
+Awk extends the idea of text editing into computation, make is possible to perform a variety of data processing tasks.
+
+One may use awk for
+
+- /data entry:/ bprocess recording data in a structured way.
+
+- /data retrieval/: extracting data from a file and generating a report.
 
 Each awk program is a sequence of one or more pattern-action statements:
 
