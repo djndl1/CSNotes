@@ -77,6 +77,7 @@
 ** Variables
 
 Undeclared/uninitialized variables is an empty string.
+To delete a variable, set it to nothing ~set variableName=~
 
 #+begin_src shell
 REM set clobbers any existing variables
@@ -85,29 +86,44 @@ set foo=bar
 set /A four=2*2
 
 REM without an argument, `set` lists all existing variables
+REM with an argument but without the assignment, it lists the argument variable
 #+end_src
 
-- =setlocal= starts a local scope and =endlocal= ends the scope. One of the uses of local scopes is to override a global variable like =PATH=
+- By default, variables in a script are automatically exported to its parent CMD. =setlocal= starts a local scope and =endlocal= ends the scope. One of the uses of local scopes is to override a global variable like =PATH=.
 
 *** Some Common Variables
 
-- =USERPROFILE=: the home directory
+**** Current Context
+
+- =CD=: current directory
+
+**** User Environment
+
+- =USERPROFILE=: the home directory; =USERNAME=; =USERDOMAIN=; =APPDATA=; =LOCALAPPDATA=
 
 - =HOMEDRIVE=, =HOMEPATH=
 
-- =OS=
+**** System Variables
 
-- =USERDOMAIN=, =USERNAME=
+- =OS=;
 
-- =ProgramFiles=: the Program Files folder
+- =ProgramFiles=, =ProgramFiles(x86)=: the Program Files folder
 
-- =windir=: the windows directory
+- =ProgramData=
 
-- =PATH=
-
-- =ComSpec=: tthe full path of =cmd.exe=
+- =windir=, =SystemRoot=: the windows directory
 
 - =SystemDrive=, =SystemRoot=
+
+- =TMP=, =Temp=
+
+**** PATH
+
+- =PATH=;
+
+- =PATHEXT=: executable file types without the need to type the extension suffix.
+
+**** Argument Variables
 
 - =%0=, =%1= ... are arguments. Arguments after =$9= is only accessible by first =SHIFT= the arguments. =$*= For all arguments
   + =SHIFT= shifts arguments to the left.
@@ -123,6 +139,51 @@ REM without an argument, `set` lists all existing variables
 
 	goto repeat_shift
 :shift_end
+#+end_src
+
+**** Hardware
+
+- =NUMBER_OF_PROCESSORS=
+
+- =PROCESSOR_ARCHITECTURE=
+
+- =PROCESSOR_IDENTIFIER=
+
+- =PROCESSOR_REVISION=, =PROCESSOR_LEVEL=
+
+**** Batch-Specific
+
+- =ComSpec=: the full path of the current =cmd.exe= or =COMMAND.COM= (on DOS).
+
+-  =DATE=, =TIME=
+
+*** Delayed Variable Expansion
+
+By default, variables are evaluated on reading the statements, not on executing the statements. Thus, it is problematic to modify a variable inside a compound statement and evaluate it immediately since it's evaluated when reading the clause before the modification is even executed.
+
+#+begin_src shell
+@echo off
+
+set value=1 (1)
+
+if "%value%"=="1" ( (2)
+   set value=2 (3)
+   echo The value inside the IF block is '%value%' (4)  REM echoes 1
+   echo Delayed expansion into '!value!'
+) (5)
+
+echo The value after the IF block is '%value%' (6)
+#+end_src
+
+To use a more natural evaluation order, =setlocal ENABLEDELAYEDEXPANSIION= or =CMD /V:ON= and expand a variable with =!VarName!=.
+
+*** Two-Level Expansion
+
+#+begin_src shell
+set VARNAME=Name
+set Name=Albert
+
+call echo %%VARNAME%%
 #+end_src
 
 *** Variable Substitution
