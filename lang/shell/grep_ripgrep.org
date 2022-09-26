@@ -1,0 +1,23 @@
+#+title: Grep_ripgrep
+
+* Frequent Options
+
+- =-F=: treat the pattern as literal strings instead of regular expressions.
+
+- =-i=: ignore case
+
+- =-v= (invert): get lines other than those matching the pattern
+
+- =-n=: line number; =-H=/​=-h= for enabling/disabling filenames per lline.
+
+- =-c=: count matching lines for each input file, no more piping to =wc -l=
+
+- =-m=: limits matching lines
+
+- =-e=: multiple =-e= can specify multiple search strings (OR logic) from the command line. For AND-logic multiple patterns without piping, use =awk= or =sed=.
+
+- =-l=, =-L= (list filenames): list matching/non-matching filenames.
+
+- =-w= (word): the matching lines must have the matched parts as whole words.
+
+- =-Fxf=: with these three options together, it is possible to get common lines between two lines or the difference with =-v= added: that is, use one file as the pattern to match against the other in whole lines and in literal strings.
