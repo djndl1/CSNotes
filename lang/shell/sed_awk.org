@@ -9,6 +9,25 @@ It limits the user to the meothds found in a text editor. =sed= commands are imp
 - =-n= suppresses automatic display of input lines (not always good if you want the whole file to be printed, not just the processed lines);
    =-f= instruct script file, =-e= instruction
 
+- Automation using scripts may appear risky: think through and test.
+
+- sed maintains a /pattern space/: a temporary buffer where a single line of input is held while the editing comamnds are applied. Previous applied commands change the pattern space and later applied commands match the changed line. Sed also has a /hold space/, where text can be placed and retrieved later.
+
+- Similar to =ed=, =sed= accepts addresses in the form of patterns or line addresses.
+  Commands that have the same addressing or nested addressing can be grouped together with brackets.
+
+* Regex
+
+#+begin_src
+^$   # match empty lines
+^.*$ # match the entire line
+#+end_src
+
+** How Regex Matches
+
+- A regex tries to match the longest string possible.
+  One way to limit the extent: =""[^"]"=, explicitly match the delimiters and throw away any delimiters in between.
+
 * Awk
 
 Awk extends the idea of text editing into computation, make is possible to perform a variety of data processing tasks.
