@@ -255,6 +255,8 @@ The first argument as is: "variable_substitution.cmd"
 14. fully qualified script path: D:\CodeSpace\batch\variable_substitution.cmd
 #+end_src
 
+
+
 ** Return Codes
 
 - =%ERRORLEVEL%=
@@ -349,10 +351,27 @@ FOR /D %I IN ("%USERPROFILE%"\*) DO @ECHO %pI      REM looping through directori
 FOR /R "%TEMP%" %I IN (*) DO @ECHO %I        REM recursive loop through subfolder
 #+end_src
 
-** Function
+** Labels
 
-There is no strict functions, but labels and the =call= keyword can emulate it.
-Put an =EXIT /B= before any function to avoid falling through. There is not way to return anything other than an error code. A function is more like a script.
+A nonexistent label causes =GOTO= to display an error and terminates the script unless coupled with another command to handle the error.
+
+#+begin_src shell
+goto %1 >nul 2>&1 || (                    REM redirect the error message
+   echo Failed to go to that label!       REM and handle the error
+   goto :eof                              REM :eof (always with a colon) is a special label when extensions are enabled
+)
+#+end_src
+
+*** Function
+
+Function calls are assembly-level primitive. There is no strict functions, but labels and the =call= keyword can emulate it.
+
+
+- Put an =EXIT /B= (with error code) or =GOTO :eof= (without setting an error code) before any function to avoid falling through.
+  There is not way to return anything other than an error code. A function is more like a script.
+  To exit the script from a function, write a special function that has a syntax error.
+
+- Calling a nonexistent label does not terminate the script.
 
 #+begin_src bat
 @ECHO OFF
