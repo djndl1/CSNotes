@@ -16,11 +16,17 @@ It limits the user to the meothds found in a text editor. =sed= commands are imp
 - Similar to =ed=, =sed= accepts addresses in the form of patterns or line addresses.
   Commands that have the same addressing or nested addressing can be grouped together with brackets.
 
+- Like =ed=, editing a line is achieved by substitution.
+
+- Writing a sed script is like devising a hypothesis. Validate =sed= scripts by =grep=​ping the data with the same pattern.
+
 * Regex
 
 #+begin_src
 ^$   # match empty lines
 ^.*$ # match the entire line
+
+/---/!s/--/\\(em/g # ! do not edit
 #+end_src
 
 ** How Regex Matches
