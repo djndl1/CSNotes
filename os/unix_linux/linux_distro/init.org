@@ -1,0 +1,104 @@
+#+title: Init
+
+The first process started by the kernel during booting.
+A daemon process that continues running until the system is shutdown.
+Several topics are related to init.
+
+- dependencies
+
+- configuration management
+
+- life cycle management: how application daemons are monitored
+  + /reactive/: PID files in =/var= and rc scripts
+  + /proactive/: a universal father process forks and execs daemon processes directly.
+
+* SysV-Style
+
+[[https://savannah.nongnu.org/projects/sysvinit][The one used by Debian]]
+
+** Runlevel
+
+A running system is in one of the predetermined number of states called /runlevels/,
+a software configuration of system which allows only a selected group of applications to exist.
+Switching from one runlevel to another causes a per-level set of scripts to be run.
+The exact setup of these runlevels varies between OSes.
+   + 0, 1, 6 are standardized for halt, single user mode and reboot respectively.
+     Typically, there are single-user mode, multi-user mode without networking, multi-user mode,
+     full mode with GUI etc.
+   + =init= reads =/etc/inittab= to determine the behavior for each runlevel.
+
+
+#+begin_src shell
+/sbin/runlevel
+who -r
+#+end_src
+
+** RC Script
+
+SysVinit executes a master script =/etc/init.d/rc=, which executes all stop-scripts from old runlevel then all start-scripts from the new runlevel.
+
+Each application started by init comes with a wrapper script that implements
+=start=, =stop= and other parameters.
+
+Rc scripts are located in =/etc/init.d=, =/etc/rc.d= or =/sbin/init.d=. Runlevel configuration are in =/etc/rcX.d=: Start scripts begin with a =S= and stop scripts with a =K=, with a number indicating priority. Each service has its own init-script which sometimes also accepts "reload" or "restart".
+
+** Life Cycle Management
+
+- =/var/log/wtmp=: all user logins and logouts.
+
+- =/var/run/utmp=: information on users and processes currently using the system.
+
+- Service scripts can be called during runtime from the command line.
+
+** Dependency Resolution
+
+None, scripts are started in alphabetical order hence the priority number is used in the names.
+
+** Service Management
+
+- The =start= and =stop= parameter with wrapper scripts.
+
+- =telinit= switches the current runlevel.
+
+* OpenRC
+
+- Scripts are handled by =/sbin/rc=.
+
+- Runlevels are in a alphanumerical style with corresponding directories under =/etc/runlevels=.
+
+** Life Cycle Management
+
+PID files in =/vasr/run= and daemon files in =/var/lib/init.d=.
+
+Crashed services can be restarted automatically with =openrc -n= (manually-started services) or simpley =openrc= (for the default runlevel).
+
+** Dependency
+
+Depedencies are specified in the scripts by certain tags.
+
+** Service Management
+
+- rc scripts are modified SysVinit. Service settings, located in =/etc/conf.d/=, are separated from the wrapper scripts.
+
+- =rc-status=: shows the running status for each service in a runlevel.
+
+- =rc-config=:
+
+- =rc-update=: create, delete and modify runlevels and manage services under a runlevel.
+
+- =rc=: switches runlevels.
+
+* [[http://smarden.org/runit/index.html][Runit]]
+
+TODO
+
+** Dependency
+
+** Service Management
+
+One management process is launched for each service. A single runlevel process is launched to manage all these management processes.
+Commands are passed through named pipes.
+
+- =sv=: life-cycle-related commands
+
+- =runsvchdir=: switch runlevels.
