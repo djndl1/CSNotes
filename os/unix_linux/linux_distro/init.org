@@ -102,3 +102,152 @@ Commands are passed through named pipes.
 - =sv=: life-cycle-related commands
 
 - =runsvchdir=: switch runlevels.
+
+* Systemd
+
+- /Unit/: the basic object that =systemd= manages and acts upon. Representations of resources
+  that =systemd= knowns about. Used to abstract services, network resources, devices, filesystem
+  mounts and isolated resource pools.
+
+- /Target/: no more runlevels. Targets are basically synchronization points that the
+  server can use to bring the server into a specific state. Service and other unit files
+  can be tied to a target and multiple targets can be active at the same time.
+
+** Systemd Unit
+
+Units can be activated by sockets, dbus, filesystem path, device.
+
+*** Modify a Unit
+
+Unit files written by upstream projects (often in =/lib/systemd/system/=)
+should be overriden (within =/etc/systemd/system/=) rather than edited directly.
+Make a directory of name =example.service.d= in in =/etc/systemd/system/=
+create a file ending in =.d= to override the unit.
+
+*** Unit Types
+
+- =.service=: how a service or application should start or stop, its dependencies and ordering information.
+
+- =.socket= (in place of =inetd=): describes a network or IPC socket, or a FIFO buffer used for socket-based activation. An associated
+  =.service= file will be started when activity is seen on the socket.
+
+- =.device=: describes a device that has been designated as needing =systemd= management by =udev= ro =sysfs=.
+
+- =.mount=: a mountpoint on the system to be managed by =systemd=. Entries in =/etc/fstab= acan have units created automatically.
+
+- =.automount=: a mountpoint that will be automatically mounted.
+
+- =.swap=: describes swap space on the system.
+
+- =.target=: synchronization points for other units when booting up or changing states.
+
+- =.path=: a path used for path-based activation.
+
+- =.timer=: defines a timer that will be managed by =systemd=, similar to a =cron= job.
+
+- =.snapshot=: used to reconstruct the current state of the system after making changes.
+
+- =.slice=: associated with cgroup nodes.
+
+- =.scope=: created automatically from information received from its bus interfaces. Used to manage
+  sets of system processes that are created externally.
+
+*** Unit File
+
+Unit files are organized with sections, denoted by =[SectionName]=. Unit behavior and metadata
+is defined through the use of simple directives using a key-value with assignment indicated by an
+equal sign. Directives can be overriden in a overriding =.conf= file.
+
+- true can be =1=, =yes=, =on= and =true=
+
+- false can be =0=, =no=, =off= and =false=.
+
+**** Sections
+
+Section order is irrelavant to =systemd=.
+
+- =[Unit]=: an overview of the unit
+  + =Description=: describe the name and basic functionality of the unit, returned by various =systemd= tools.
+  + =Documentation=: a list of URIs for documentation, either man pages or web accessible URIs.
+  + =Requires=: lists any units upon which this unit essentially depends.
+  + =Wants=: less strict requirement for dependencies. Dependencies listed here are started by =systemed= but this unit continues to function without them.
+  + =BindsTo=: more strict than =Requires= since this unit is associated with the life of the dependency.
+  + =After=, =Before=: the start order but not necessarily dependency.
+  + =Conflicts=: units that cannot be run aat the same time as this unit.
+  + =Condition...=, =Assert...=: conditions that must be met to start the unit, otherwise skipped or failed.
+
+- =[Service]=: applicable only for services
+  + =Type=
+    + =simple=: Default if only =ExecStart= is set.
+    + =forking=: TODO
+    + =oneshot=: default if =ExecStart= and =Type= are not set. Used for one-off tasks.
+    + =dbus=: the unit will take a name on the D-Bus bus.
+    + =notify=:the service will issue an notification when it has finished starting up and systemd will wait for this to happen before proceeding.
+  + =ExecStart=: the full path and the arguments of the command to be executed to start the process.
+  + =ExecStartPre=: commands that should be executed before main process is started.
+  + =ExecStartPost=: commands that will be run after the main process.
+  + =ExecReload=: optional directive; the command necessary to reload the configuration of the service if available.
+  + =ExecStop=: the command needed to stop the service. If not given, the process will be killed immeidately when the service is stopped.
+  + =ExecStopPost=
+  + =RestartSec=: the amount of time to wait before attempting to restart the service
+  + =Restart=: the circumstances under which =systemd= will attemp to automatically restart the service.
+    + =always=, =on-success=, =on-failure=, =on-abnormal=, =on-abort=, =on-watchdog=
+  + =TimeoutSec=: the amount of time that =systemd= will wait when stopping the service before marking it as failed or forcefully killing it.
+
+- =[Install]=: defines the behavior of a unit if it is enabled or disabled.
+  + =WantedBy=: becomes =Wants=-ed by another unit.
+  + =RequiredBy=: becomes =Required= by another unit.
+  + =Alias=: Besides aliasing, this also allows multiple providers (units) of the same function.
+  + =Also=: enable/disable units as a set. Supports units are included here.
+
+** Service Management
+
+- =systemctl=:
+  + =start=, =stop=, =restart=, =reload=, =reload-or-restart= (a service may not be table to reload);
+  + =enable= (start automatically), =disable=, =is-enabled=: Unit files in =/lib/systemd/system/= or =/etc/systemd/system/= are linked to =/etc/systemd/system/some_target.target.wants=
+  + =list-units=: List units that systemd currently has in memory.
+    - =--all= lists all; =--state= filters by state; =--type=: filter by type
+    - =LOAD=: the configuration of loaded units is kept in memory
+    - =ACTIVE=: a fairly basic way to tell if the unit has started successfully or not
+    - =SUB=: a lower-level state that indicates more detailed information about the unit.
+  + =list-unit-files=, optional with =--type=: list all installed units.
+    + =enabled=, =disabled=
+    + =static=: does not contain an =install= section used to enable a unit, i.e. cannot be enabled. A one-off action or used only as a dependency.
+  + =status=, =is-active=, =is-failed=
+  + =cat=: show the full contents of a unit file
+  + =list-dependencies=
+    - =--all= optional for all depedent units recursively
+    - =--reverse=: units that depends on this unit
+    - =--before=, =--after=: units that depend on this unit starting before and after themselves
+  + =show=: detailed settings of a unit (unit propertiesx)
+    - =-p=: a certain property
+  + =mask=, =unmask=: mark a unit as completely unstartable, automatically or manually by linking it to =/dev/null=
+  + =edit=: append or modify a unit. A =unit.d= directory and a =override.conf= is created for the unit and merged into the unit file when =systemd= loads the unit.
+    - =--full=: EDIT THE LOADED UNIT itself.
+  + =daemon-reload=: reload the =systemd= process itself to pick up any changes
+  + =get-default=, =set-default=, =list-unit-files --type=target=: manage targets; =isolate=: transition to a specific target. A target is reached when all depedent units are started.
+  + =poweroff=, =reboot=, =rescue= (=isolate rescue.target=)
+
+- =journalctl=: interacts with =journald=, which collects and manages journal entries
+  from all parts of the system. A centralized management solution for logging all kernel and userland processes.
+  + configuration file =/etc/systemd/journald.conf=
+  + binary log data are easier to reformat. By default it uses the =syslog= format. Stored in =/var/log/journal=
+  + by default shows all journals.
+  + =-b=: from the current boot
+  + =-k=: kernel messages only
+  + =-u=: filter by unit
+  + =_PID=: by PID
+  + =_UID=, =_GID=: by user and groups
+  + =--list-boots= show boot records and corresponding journal ID.
+  + =--since=, =--until=: filter journal by time window.
+  + =-F=: show avaiable values for a journal field
+  + =/path/to/executable=: filter by component path
+  + =-p=: by priority (loglevel)
+  + modify the output: =-a= (all entries), =--no-full=, =--no-pager=, =-o json=, =-o json-pretty= and more formats.
+  + =-n 20=: tail 20; =-f=: follow
+  + =--disk-usage=;
+  + =--vacuum-size=, =--vacuum-time=: shrink journal
+  + journal limits can be configured in =journald.conf=.
+
+- =timedatectl=: control the system time and date
+  - =status=
