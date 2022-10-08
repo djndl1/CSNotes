@@ -1,0 +1,41 @@
+#+title: System Monitor
+
+* Top
+
+Top has ha proper readable manual.
+
+- =h=, =?=, =q=
+
+- =-e=, =-E=: change memory unit.
+
+- =-o=: sort by a certain field
+
+- =-p=: monitor PIDs.
+
+** Interactive
+
+- =<Enter>=, or =<Space>=: refresh display
+
+- =?=, =h=: help
+
+- =d=, =s=: change delay time interval
+
+- =H=: threads-mode toggle
+
+- =E=: memory scaling in summary area; =e=: memory scaling in task area.
+
+- =k=: kill a task
+
+- =J=, =j=: justify
+
+- =x=: toggle column highlighting
+
+- =<=, =>=: move the current sort column
+
+- =R=: reverse sort order
+
+- =F=: configure fields
+
+- =L=: locate a string; =&=: locate next
+
+- =O=: filter =COLUMN=<>VALUE=; ===, =+=: reset filters
