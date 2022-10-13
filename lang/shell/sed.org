@@ -1,7 +1,102 @@
 #+title: Sed
 
+Sed is an editor, an editor for automating editing actions, possibly on multiple
+files.
+
 =sed= receives text input, performs certain operations on specified lines (specified by address range) of the input,
 one line at a time then outputs the result.
+
+It limits the user to the meothds found in a text editor. =sed= commands are implicitly global
+ (acting on every line) compared to =ed=.
+
+sed maintains a /pattern space/: a temporary buffer where a single line of input is held while the editing comamnds are applied. Previous applied commands change the pattern space and later applied commands match the changed line. Sed also has a /hold space/, where text can be placed and retrieved later.
+
+Like =ed=, editing a line is achieved by substitution.
+
+Writing a sed script is like devising a hypothesis. Validate =sed= scripts by
+=grep=​ping the data with the same pattern.
+
+** Command Options
+
+- =-n= suppresses automatic display of input lines (not always good if you want the whole file to be printed, not just the processed lines);
+
+- =-f= instruct script file
+
+- =-e= instruction
+
+** Command
+
+- Similar to =ed=, =sed= accepts addresses in the form of patterns or line addresses.
+  Commands that have the same addressing or nested addressing can be grouped together with brackets.
+
+#+begin_src
+address {
+    command1
+    command2
+    command3
+}
+#+end_src
+
+- the ending brace should be on its own line
+
+- no blank characters after any command
+
+- sed instructions can be separated by a semicolon.
+
+*** Substitution
+
+- =[address]s/pattern/replacement/flags=
+  + Flags can be used in combination where it makes sense. Flags can be
+   + =n=: a number indicating that a replacement should be made for only the nth
+     occurrence (one-based)
+   + =g=: globally on all occurrences in the pattern space
+   + =p=: print the contents of the pattern space
+   + =w file=: write the contents of the pattern space to =file=
+  + the delimiter may be any character other than the newline since a newline may be
+    used in a regex, not necessarily =/=.
+  + some characters have special meanings in the replacement string:
+    + =&=: the string matched by the regex
+    + =\n=: the n-th matching grouping
+    + =\=: used to escape =&=, =\=, the newline and the substitution delimiter
+      when used literally.
+
+*** Deletion
+
+- =d=: also a command that can change the control flow as it empties the pattern space.
+
+*** Append, Insert, Change
+
+#+begin_src
+[line-address]a\text # append after
+
+[line-address]i\text # insert before
+
+[address]c\text # replace the content of the pattern space with the supplied text
+#+end_src
+
+*** Transform
+
+- =y=: =[address]y/abc/xyz=, similar to =tr=
+
+*** Print, List
+
+- =p=, =l=: unless =-n= is used, duplicate copies of a line will be output.
+
+*** Print Line Number
+
+- ===: print the linum of the matching line.
+
+*** Next
+
+- =n=: print the pattern space and read in the next line.
+  It causes the next line to replace the current line in the pattern space.
+  This changes the control of flow, breaking the normal premise of =sed=.
+
+** Scripting
+
+- Automation using scripts may appear risky: think through and test.
+
+* Some Examples
 
 #+begin_src sed
 [address-range]/p # print address range
