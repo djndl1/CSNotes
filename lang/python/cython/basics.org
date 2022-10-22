@@ -1,0 +1,20 @@
+#+title: Basics
+
+Cython is Python with C data types. Code which manipulates Python values and C
+values can be freely intermixed. Refcount maintenance and error checking of
+Python operations is automatic and Python error handling system is also available.
+
+* Building
+
+- =pyx= cython source files are first compiled to C source files and then built
+  as a shared library.
+
+- the library is then imported into a Python session.
+
+- The most common way to build cython code is a setuptool =setup.py= (~python
+  setup.py build_ext --inplace~); other ways
+  include =cythonize=, =Pyximport= or jupyter notebooks.
+
+* First Example
+
+#+include: "./hello_world/setup.py" src python
