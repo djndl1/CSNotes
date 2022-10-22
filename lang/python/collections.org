@@ -6,7 +6,7 @@ Anything that implements the iterable protocol (~__iter__()~) is iterable.
 
 - *Iterator*: similar to Java's ~Iterator~ or C#'s ~Enumerator~. Iterators are iterable themselves (but only one-pass).
 
-- *Container*: its ~__iter__()~ (typicall via ~iter()~) can returns an new iterator to allow multiple iteration passes.
+- *Container*: its ~__iter__()~ (typically via ~iter()~) can returns an new iterator to allow multiple iteration passes.
 
 - *Generator Function*: a convenient way to implement the iterator protocol. It employs the ~yield~ expression and returns a *generator iterator*.
 
@@ -152,3 +152,13 @@ The user may
 - inherit these ABC to write a new container type
 
 - register an existing container type as a subclass of an ABC
+
+* Do LINQ Like C#
+
+** Standard Python
+
+#+INCLUDE: "src/python_linq_test.py" src python
+
+** Existing Implementation
+
+- [[https://github.com/Xython/Linq.py][Linq.py]]
