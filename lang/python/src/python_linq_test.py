@@ -156,6 +156,38 @@ class PinqReduction(unittest.TestCase):
         zipped = zip(numbers, letters)
         
         print(dict(zipped))
+
+class PinqSetOperations(unittest.TestCase):
+    def setUp(self) -> None:
+        self.fruit = ['apple', 'orange', 'banana', 'pear', 'apple'
+         'raspberry', 'peach', 'plum', '']
+        
+    def test_difference_as_except(self) -> None:
+        fruit2 = ['raspberry', 'peach', 'plum', '']
+        
+        excepted = set(self.fruit).difference(fruit2)
+       
+        print(excepted)
+        
+    def test_comprehension_as_except(self) -> None:
+        fruit2 = ['raspberry', 'peach', 'plum', '']
+        
+        excepted ={m for m in self.fruit if m not in fruit2}
+        
+        print(excepted)
+        
+    def test_set_union_as_union(self) -> None:
+        fruit2 = ['raspberry', 'peach', 'plum', '2']
+        
+        unioned = set(self.fruit).union(fruit2)
+        
+        print(unioned)
+        
+    def test_comprehension_as_intersection(self) -> None:
+        fruit2 = ['raspberry', 'peach', 'plum', '2']
+        
+        
+        
         
 class PinqMoreIterTools(unittest.TestCase):
     '''
