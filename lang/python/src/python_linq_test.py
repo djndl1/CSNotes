@@ -78,6 +78,29 @@ class PinqTransformation(unittest.TestCase):
         
         self.assertEqual(len(duplicated), sum(1 for u in unique) * 2)
         
+    def test_chain_as_simple_selectmany(self) -> None:
+        fruit2 = ['raspberry', 'peach', 'plum']
+        fruit3 = ['apple', 'orange', 'banana', 'pear']
+
+        lengths = chain(*[map(len, f) for f in [fruit2, fruit3]]) 
+        
+        print(list(lengths))
+        
+class PinqRangeRepeat(unittest.TestCase):
+    def setUp(self) -> None:
+        self.fruit = ['apple', 'orange', 'banana', 'pear', 
+         'raspberry', 'peach', 'plum']
+        
+    def test_range_as_range(self) -> None:
+        rng = range(5, 5 + len(self.fruit))
+        
+        print(list(rng))
+        
+    def test_comprehension_as_repeat(self) -> None:
+        repeated = ['a' for _ in range(0, 10)]
+        
+        self.assertEquals(10, len(repeated))
+        
 class PinqExpansion(unittest.TestCase):
     def setUp(self) -> None:
         self.fruit = ['apple', 'orange', 'banana', 'pear', 
