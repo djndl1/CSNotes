@@ -18,3 +18,38 @@ Python operations is automatic and Python error handling system is also availabl
 * First Example
 
 #+include: "./hello_world/setup.py" src python
+
+* Static Typing
+
+** Declarations
+
+#+begin_src python
+cdef int i, j, k
+cdef float f, g[42], *h
+
+cdef struct Grail:
+	int age
+    float volume
+
+cdef union Food:
+    char *spam
+    float *eggs
+
+cdef enum CheeseType:
+    cheddar, edam,
+    camembert
+
+cdef enum CheeseState:
+    hard = 1
+    soft = 2
+    runny = 3
+
+ctypedef int* IntPtr
+
+
+# a C function with a Python wrapper
+cpdef long cfunc(long l):
+	return 2 * l
+
+#+end_src
+
