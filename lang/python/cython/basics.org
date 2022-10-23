@@ -53,3 +53,24 @@ cpdef long cfunc(long l):
 
 #+end_src
 
+** Functions
+
+A pure Python function (take Python objects as parameters and return Python
+ objects) is defined with =def= while a C function (take either Python objects
+ or C values as parameters and can return either Python objects or C values) uses =cdef= or
+is decorated with =@cython.cfunc=.
+
+When a C type is declared as a parameter of a Python function, the passed value
+is automatically converted to a C value (for numerica values only, otherwise a
+compile-time error).
+
+A parameter without typing is assumed to be a Python object and refcounted
+automatically. =object= is used for explicit Python object declaration.
+
+A function must be a Python function to be called from pure Python code.
+=cpdef= or decoration =@ccall= defines a C function (using the faster C calling
+convention) with a Python wrapper
+and can be overriden by another Python function.
+
+Both kinds of functions can be declared with a C-style declaration syntax, or
+declared as type-annotated Python-style function with appropriate declarations.

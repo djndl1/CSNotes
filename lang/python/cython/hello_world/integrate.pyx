@@ -17,6 +17,10 @@ def fib(n: cython.int):
         
     return result
 
+# C function with a Python wrapper
+cpdef long cfunc(long l):
+    return l * 2
+
 def primes(nb_primes: cython.int) -> Sequence[int]:
     i: cython.int
     p: cython.int[1000] # a C array on the stack
