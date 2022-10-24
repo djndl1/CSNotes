@@ -53,16 +53,29 @@ cpdef long cfunc(long l):
 
 #+end_src
 
+*** Types
+
+All standard C types are supported.
+
+- A C tuple =ctuple= is available for Cython, which is compiled down to C structures.
+
+**** Pointers
+
+- normal C syntax or =cython.p_typename=, =cython.pp_typename=, or constructed
+  with =cython.pointer()=.
+
+- array syntax is the same as in C.
+
 ** Functions
 
-A pure Python function (take Python objects as parameters and return Python
- objects) is defined with =def= while a C function (take either Python objects
- or C values as parameters and can return either Python objects or C values) uses =cdef= or
-is decorated with =@cython.cfunc=.
+- /pure Python function/ =def= : take Python objects as parameters and return Python
+ objects;
+ + When a C type is declared as a parameter of a Python function, the passed value
+   is automatically converted to a C value (for numeric values only, otherwise a
+   compile-time error).
 
-When a C type is declared as a parameter of a Python function, the passed value
-is automatically converted to a C value (for numerica values only, otherwise a
-compile-time error).
+- /C function/ =cdef=, =@cython.cfunc=: takes either Python objects or C values as parameters
+  and can return either Python objects or C values.
 
 A parameter without typing is assumed to be a Python object and refcounted
 automatically. =object= is used for explicit Python object declaration.
@@ -70,7 +83,26 @@ automatically. =object= is used for explicit Python object declaration.
 A function must be a Python function to be called from pure Python code.
 =cpdef= or decoration =@ccall= defines a C function (using the faster C calling
 convention) with a Python wrapper
-and can be overriden by another Python function.
+and can be overridden by another Python function.
 
 Both kinds of functions can be declared with a C-style declaration syntax, or
 declared as type-annotated Python-style function with appropriate declarations.
+
+*** Arguments
+
+- optional arguments are allowed in implementation files =.pyx=.
+
+- keyword-only arguments (arguments after a =*= parameter and before a =**=
+  parameter)
+
+*** Error Propagation
+
+Python functions return an error value along with its return value.
+A C function or a =@cpdef=​/​=@ccall= function may be declared with
+an exception return value =@ctyhon.exceptval= for it as a contract with the
+caller.
+If any exception is raised inside this function, this declared return value is
+returned and the caller should proceed to propagate that exception. The except
+clause is for propagating Python exceptions that have already been raised.
+
+The caller is expected to raise an error on its own after failing a pure C function.
