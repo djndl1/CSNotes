@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 import unittest
 from itertools import dropwhile, islice, chain, groupby, takewhile
 from functools import reduce
@@ -85,6 +85,31 @@ class PinqTransformation(unittest.TestCase):
         lengths = chain(*[map(len, f) for f in [fruit2, fruit3]]) 
         
         print(list(lengths))
+        
+    def test_inner_join_the_hard_way(self) -> None:
+        def inner_join(inner: Iterable[object], inner_key: Callable,
+                       outer: Iterable[object], outer_key: Callable,
+                       result_selector: Callable) -> Iterable[object]:
+            keyed_inner = { k: list(v) for k, v in groupby(sorted(inner, key=inner_key), key=inner_key) }
+            keyed_outer = { k: list(v) for k, v in groupby(sorted(outer, key=outer_key), key=outer_key) }
+            
+            all_keys = set(keyed_inner.keys()).union(keyed_outer.keys())
+            
+            for k in all_keys:
+                inner_elm = keyed_inner.get(k)
+                if not inner_elm:
+                    continue
+                outer_elm = keyed_outer.get(k)
+                if not outer_elm:
+                    continue
+                
+                for i in inner_elm:
+                    for o in outer_elm:
+                        yield result_selector(i, o)
+                
+        joined_by_length = inner_join(self.fruit, len, self.fruit, len, lambda a, b: f'{a}, {b}')
+                
+        print(list(joined_by_length))
         
 class PinqRangeRepeat(unittest.TestCase):
     def setUp(self) -> None:
