@@ -416,7 +416,18 @@ in a loop, thus reducing the coefficients of $n$ or $n^{2}$ in the running time.
   an array for each attribute. A pointer is an index.
 
 2. In many programming languages, an object occupies a contiguous set of locations
-  in the computer memory. A pointer is simply the address. 
+  in the computer memory. A pointer is simply the address.
+
+*** Real-World Examples
+
+- C# =MoreLINQ= uses a singly-linked list to implement a list of prepend/append
+  operations to an =IEnumerable=. See [[https://github.com/morelinq/MoreLINQ/blob/master/MoreLinq/PendNode.cs][PendNode in MoreLINQ]]. Multiple =Item=​s are
+  semantically prepended/appended to a =Source= but implementation-wise
+  prepended to a singly-linked list. When the =IEnumerable= is being iterated
+  over, prepended items are yielded first, appended items are saved for later
+  yield (prepending and appending do not interfere with each other)
+   and the source is yield before the prepended items and the appended
+  items. A =ConcatCount= is maintained to indicate the number of appended items.
 
 ** Rooted Trees
 
