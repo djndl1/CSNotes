@@ -1,0 +1,114 @@
+* Basic Concepts
+
+** [[https://www.ibm.com/docs/en/db2/11.5?topic=instances-designing][Instance]]
+
+Databases are created within Db2 instances on the server. A default instance is
+created during installation and can be dropped later. Each instance controls
+access to one or more databases.
+
+- /instance directory/: where instance-level information are stored
+  + configuration file
+  + system database directory
+  + node directory and node configuration file =db2nodes.cfg=\
+  + and others.
+  + typically under =/sqllib= where the product is installed
+
+** Database
+
+*** Schema
+
+Schemata and users are not related.
+
+#+begin_src sql
+CREATE SCHEMA SCHEMA_NAME [AUTHORIZATION SCHEMA_OWNER];
+SET SCHEMA = SCHEMA_NAME; # set current schema, each user has a default schema
+#+end_src
+
+* Basic Commands
+
+- =db2start=: start the database manager.
+  + launches Db2 as a service on windows by default.
+
+- =db2stop=: stop the database manager
+
+- =db2stat=: show all active Db2 processes
+
+* [[https://www.ibm.com/docs/en/db2/11.5?topic=configuring-registry-environment-variables][Registry]] and Environment
+
+Environment and registry variable control DB2's environment.
+DB2 provides /profile registries/ to control most variables.
+
+- instance-level profile registry
+
+- global-level profile registry
+
+- node-level profile registry
+
+- user-level profile registry
+
+** View, Modify Registry Variables with =db2set=
+
+Refer to [[https://www.ibm.com/docs/en/db2/11.5?topic=variables-registry-environment][Variables Available]]
+
+#+begin_src shell
+db2set -lr # view all supported registry variables
+
+db2set name=value # the current default instance
+db2set name=value -i instance_name # instance-level
+#+end_src
+
+** External Environment Variable
+
+- =DB2INSTANCE=: the default active instance name
+
+- =DB2NODE=: the logical node of a database partition server
+
+- =DB2PATH=: the directory in which Db2 is installed
+
+* Configuration File
+
+Two types of configuration files
+
+** Database Manager Configuration File
+
+Instance-level configuration parameters, stored in a file named =db2systm=
+(=DB2INSTPROF= registry variable), also
+available for clients.
+
+** Database Configuration File
+
+Database-level configuration stored where the database resides, one per database.
+
+* Configuration of TCP/IP communication
+
+- /Connection Port/: the port configured for DB2 to listen to client requests.
+
+- /Connection Service/: the entries specified by in =/etc/services=, which is used
+  by DB2 to find a port for listening request.
+
+DB2 can either use a connection port or a connection service to specify the TCP
+port for communication.
+
+* [[https://www.ibm.com/docs/en/db2/11.5?topic=support-supported-territory-codes-code-pages][Multicultural Support]]
+
+Since Db2 9.5 the default code page is Unicode.
+The default territory depends on the locale of the client that creates the database.
+
+* [[https://www.ibm.com/docs/en/db2/11.5?topic=security-db2-model][Users and Security]]
+  :PROPERTIES:
+  :CUSTOM_ID: users-and-security
+  :END:
+
+https://www.ibm.com/developerworks/data/library/techarticle/dm-0508wasserman/
+
+1. User and group authentication is managed in a facility external to
+   DB2 (the OS, a domain controller or a Kerberos security system),
+   different from other RDBMSs. Both the user and group definition are
+   defined outside of DB2. There are no users in DB2 that are not OS
+   users.
+
+2. DB2 stores and maintains user and group authorization information
+   internally.
+
+
+Create a system user with a password and add it to either =DB2ADMNS= or =DB2USERS=.
