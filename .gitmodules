@@ -1,3 +1,6 @@
 [submodule "lang/CodeOfLanguages"]
 	path = lang/CodeOfLanguages
 	url = ../PLLearningGround.git
+[submodule "desktop/GUITutorials"]
+	path = desktop/GUITutorials
+	url = git@github.com:djndl1/GUITutorials.git
