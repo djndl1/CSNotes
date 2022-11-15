@@ -303,3 +303,9 @@ await Task.Factory.StartNew(
         TaskScheduler.FromCurrentSynchronizationContext():
         TaskScheduler.Current);
 #+end_src
+
+** Should =Task= be disposed
+
+Completely unnecessary.
+
+https://devblogs.microsoft.com/pfxteam/do-i-need-to-dispose-of-tasks/
