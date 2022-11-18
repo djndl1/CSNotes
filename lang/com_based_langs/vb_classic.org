@@ -24,7 +24,9 @@ In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rap
 
 3. GAMBAS: a FOSS variant mainly on Linux
 
-* Form Lifecycle
+* GUI Programming
+
+** Form Lifecycle
 
 1. =Initialize=: variables are initialized
 
@@ -48,33 +50,86 @@ Forms expose a special property, the =Controls= collection, which contains all t
 
 * Basics
 
+- Case-Insensitive
+
+** Modules
+
+- Form Module: basically class module with GUI controls
+
+- Class Module: OOP-like
+
+- BAS Module: C-like
+
+** Variables
+
+- /Global/: application long lifetime; application-wide scope
+  + best practice: define all variables in a UDT and declare such a UDT in one
+    place. =Public MyPublicVar As Long= in BAS modules.
+
+- /Private/ module-level: =Dim= or =Private= statement in the declaration
+  section of a module.
+
+- /Public/ module-level (except in BAS modules where /Public/ variables are
+  global): or called /property/; module-long lifetime.
+
+- /Dynamic Local/: defined within a procedure; procedure-wide scope/lifetime.
+
+- /Static Local/: procedure-wide scope; module-level lifetime.
+  =Static InProgress As Boolean=; useful for preventing procedure reentry.
+
 ** Types
 
-- =Integer= and =Long=
+- =Integer= (16-bit) and =Long= (32-bit, the preferred type for integer values):
+  =&= prefixed forces a literal integer into a =Long= value.
+
+- =Boolean= (2-byte): =0= for =False= and =-1= for =True=
+
+- =Byte=
 
 - =Single= and =Double=
 
-- =Date= (=DATE=): =#12/3/2013#
+- =String= (=BSTR=):
+  + =Dim VarLenStr As String= (variable-length);
+    =Dim FixedLenStr As String * 40= fixed-length (not well-supported by VB's
+    string functions and causes low performance);
+  + =""""= for embedding a quote inside a string.
+  + String constants such as =vbTab= and =vbCrLf= are available.
 
-- =Currency= (=CURRENCY=)
+- =Date= (=DATE=, 8-bytes): =#12/3/2013#
 
-- =Boolean=
+- =Object=: stores references. Object variables are assigned using =Set=.
+  Missing =Set= might lead to unexpected results (the value might be assigned to
+  the object's default property). =Nothing= for null reference.
 
-- =Variant= (=VARIANT=): the default data type that can store any type of data
+- =Variant= (=VARIANT= defined by OLE, 16 bytes with 2 bytes for typing and 14
+  bytes for actual data; most types except =Decimal= use only the upper 8
+  bytes): the default data type that can store any type of data. =Variant= is
+  basically a dynamic type, also the /default type/ for VB if not specified.
+  + A =Variant= variable can be =Empty= and checked using =IsEmpty()=; It can also
+  be =Null=, useful for database programming.
+  + =Variant= can be useful when returning a result of different types on some
+    condition, especially as a =Result<T, E>= type since it can contains a =vbError=
+    type, checked using =IsError=. Use =IsObject= to test for an object within a
+    =Variant=.
+  + Use =VarType= and =TypeName= to get the type information of a =Variant= variable.
 
-- =String= (=BSTR=)
+- [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/decimal-data-type][Decimal]] (12-byte unsigned integer with a scaling factor): not declarable, used
+  only as a =Variant= with =CDec=
+
+- =Currency= (=CURRENCY=, 8-byte number in an integer format scaled down by
+  10000, i.e. =2^63 / 10000=)
 
 ** Basic Keywords
 
 - =Dim=: declare variable
 
-- =Set= is there only to assign object reference
-
-- =Variant= can be used as a =Result<T, E>=, returning the result when no error and an error number if needed.
-
-- =TypeName= returns the name of the type
-
 - =Dictionary= belongs to an external library: Microsoft Scripting Runtime
+
+- [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/with-statement][=With=]] statement: not related to Python's context manager.
+
+** Event
+
+- [[https://learn.microsoft.com/en-us/dotnet/visual-basic/language-reference/modifiers/withevents][=WithEvents=]]:
 
 ** Quick I/O
 
@@ -116,7 +171,11 @@ Forms expose a special property, the =Controls= collection, which contains all t
 
 ** Programming Construct
 
-=If () Then ... ElseIf () Then ... Else ...=
+- Logical operator with ===, =<>=; =And=, =Or=, =Xor=, =Not= bitwise operator
+  (for boolean there's no difference)
+
+=If () Then ... ElseIf () Then ... Else ...=; multi-line branch statement
+requires a =End If=.
 
 #+begin_src sql
 For Each item In Col
@@ -177,3 +236,11 @@ Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
 - Properties can have arguments
 
 - Public variables have default property implemented by the compiler.
+
+* .NET Interop
+
+** Useful =mscorlib= classes
+
+- =UTF8Encoding=, =ASCIIEncoding=
+
+- =ArrayList=
