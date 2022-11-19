@@ -58,7 +58,10 @@ Forms expose a special property, the =Controls= collection, which contains all t
 
 - Class Module: OOP-like
 
-- BAS Module: C-like
+- BAS Module: C-like compilation unit
+
+Module are made a of a /declaration section/ (types, constants and variables)
+plus a collection of procedures.
 
 ** Variables
 
@@ -252,6 +255,15 @@ Do Until (expr)
 Loop
 #+end_src
 
+** Procedure/Function
+
+- Public procedures of a public module can be called through COM. =Public= is
+  the default scope attribute for procedures.
+
+- All event procedures are =Private=
+
+- =Friend= is project-level scope.
+
 #+begin_src sql
 Private/Public Sub SubName
 ...
@@ -262,6 +274,23 @@ Private/Public Function FuncName
 End Function
 #+end_src
 
+*** Parameters and Return Values
+
+- Parameters can be pased =ByVal= or =ByRef= (by default even for basic types
+  like =Long=, which can lead to undetected bugs). A =ByRef= =Variant= accepts
+  arguments of any types.
+
+- /Optional/ parameters: after all other arguments, checked by =IsMissing()=
+  ( A =Missing= value is pushed onto the stack for an optional argument.
+  =IsMissing= would not work if the the type is not =Variant= since the missing value is a
+  =Err= value) and
+  can be used with a default value =Optional color As Long = vbWhite=; A
+  non-Variant optional parameter receives its default value if no default value
+  is assigned (not missing).
+
+- /Named/ arguments: ~NamedArg := paramVal~
+
+- =ParamArray args() As Variant=: any number of arguments as a =Variant= array.
 
 
 * Error Handling
