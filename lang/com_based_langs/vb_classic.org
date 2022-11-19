@@ -119,6 +119,46 @@ Forms expose a special property, the =Controls= collection, which contains all t
 - =Currency= (=CURRENCY=, 8-byte number in an integer format scaled down by
   10000, i.e. =2^63 / 10000=)
 
+- /UDT/: basically a structure or record type.
+  + Fixed-length strings are stored directly in a UDT while variable strings are stored as pointers.
+  + Structures can contain substructures.
+
+#+begin_src
+Private Type EmployeeUDT
+    Name As String
+	DepartmentID As Long
+    Salary As Currency
+End Type
+
+emp1 = emp2 ' copy one UDT to another
+#+end_src
+
+- /Arrays/: ordered sets of homogeneous items.
+  + can be static or dynamic. Dynamic arrays can be first declared =Dim arr() As
+    Type= then defined using =ReDim arr(N) As Type= or with only =ReDim=.
+  + The lower index is assumed to be =0= by default or explicitly with
+    =ReDim Customer(1 To 1000) As String=. Also created by =Array()=
+  + To resize an array, use =ReDim= again. Only the last dimension can resized.
+    To destroy an array, use the =Erase= statement.
+  + Use =LBound=, =UBound= for bounds and length.
+  + Array can be assigned to a =Variant= with =var = arr()= by physically
+    copying. Array assignment only works if the target is a dynamic array.
+     =b() = a()=
+  + Byte Array: a string can be assigned to a byte array with all its Unicode
+    characters converted to its proper binary representation. The opposite is
+    also possible. =LenB=
+
+#+begin_src
+' Dynamically polymorphism, slow execution
+Function ArraySum(arr As Variant) As Variant
+    Dim i As Long, result As Variant
+    For i = LBound(arr) To UBound(arr)
+        result = result + arr(i)
+    Next
+    ArraySum = result
+End Function
+#+end_src
+
 ** Basic Keywords
 
 - =Dim=: declare variable
@@ -126,6 +166,17 @@ Forms expose a special property, the =Controls= collection, which contains all t
 - =Dictionary= belongs to an external library: Microsoft Scripting Runtime
 
 - [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/with-statement][=With=]] statement: not related to Python's context manager.
+
+#+begin_src
+With Emp
+    Print .Name
+    Print .Salary
+    With .Location
+        Print .Address
+        Print .City & "  " & .Zip & "  " & .State
+    End With
+End Type
+#+end_src
 
 ** Event
 
