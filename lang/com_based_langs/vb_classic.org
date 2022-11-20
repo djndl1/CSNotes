@@ -126,7 +126,7 @@ plus a collection of procedures.
   + Fixed-length strings are stored directly in a UDT while variable strings are stored as pointers.
   + Structures can contain substructures.
 
-#+begin_src
+#+begin_src sql
 Private Type EmployeeUDT
     Name As String
 	DepartmentID As Long
@@ -151,7 +151,7 @@ emp1 = emp2 ' copy one UDT to another
     characters converted to its proper binary representation. The opposite is
     also possible. =LenB=
 
-#+begin_src
+#+begin_src sql
 ' Dynamically polymorphism, slow execution
 Function ArraySum(arr As Variant) As Variant
     Dim i As Long, result As Variant
@@ -170,7 +170,7 @@ End Function
 
 - [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/with-statement][=With=]] statement: not related to Python's context manager.
 
-#+begin_src
+#+begin_src sql
 With Emp
     Print .Name
     Print .Salary
@@ -225,34 +225,72 @@ End Type
 
 ** Programming Construct
 
+*** Branch
+
 - Logical operator with ===, =<>=; =And=, =Or=, =Xor=, =Not= bitwise operator
   (for boolean there's no difference)
 
-=If () Then ... ElseIf () Then ... Else ...=; multi-line branch statement
-requires a =End If=.
+- =If () Then ... ElseIf () Then ... Else ...=; multi-line branch statement
+   requires a =End If=.
+   + any non-zero value in =IF= is considered =True=
+   + =IF= is not short-circuited
+
+- =Select Case= supports short-circuited evaluation
+  + Case subexpressions are evaluated only until they return True, after which
+    all the remaining expressions on the same line are skipped.
+
+#+begin_src sql
+Select Case Mid$(Text, i, 1)
+    Case "0" To "9"
+        ' It's a digit.
+    Case "A" To "Z", "a" To "z"
+        ' It's a letter.
+    Case ".", ",", " ", ";", ":", "?"
+        ' It's a punctuation symbol or a space.
+    Case Else
+        ' It's something else.
+End Select
+#+end_src
+
+- =GoTo= is there but not advised. Use sparingly.
+
+**** Functions
+
+All expressions are always evaluated which might lead to unexpected bugs.
+
+- =IIF()=: basically =IF ... Else ... End If=
+
+- =Choose()=: choose a candidate based on the index expression
+
+- =Switch()=: a simple replacement for =Select Case=
+
+*** Loop
+
+There is no =continue= in VB, use =IF= with =GOTO=
 
 #+begin_src sql
 For Each item In Col
 ...
 Next item
 
-For i = 0 To N
+For i = 0 To N [Step Increment]
 ...
 Next i
 #+end_src
 
 #+begin_src sql
-While (expr)
+While (expr) ' break is not available
 ...
 Wend
 
-Do While (expr)
+' break out of the loop by `Exit Do`
+Do While (expr) ''
 ...
 Loop
 
-Do Until (expr)
+Do
 ...
-Loop
+Loop Until (expr)
 #+end_src
 
 ** Procedure/Function
@@ -319,8 +357,17 @@ Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
 
 * .NET Interop
 
+**  Issues
+
+- [[https://learn.microsoft.com/en-us/visualstudio/code-quality/ca1402?view=vs-2022&tabs=csharp][Method overloading]]
+
 ** Useful =mscorlib= classes
 
 - =UTF8Encoding=, =ASCIIEncoding=
 
+- =StringBuilder= works but overloading makes it hard to find the correct method name.
+
 - =ArrayList=
+  + - =For Each ... Next= works for =[DispId(-4)]=
+
+- =Queue=, =HashTable=, =Stack=
