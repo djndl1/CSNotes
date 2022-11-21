@@ -333,15 +333,27 @@ End Function
 
 * Error Handling
 
+Primitive with =GoTo= but better than C's =errno= check.
+
 - =On Error Resume Next=: ignore any error
 
-- =On Error Resume=: retry the erring line
+- =On Error Resume=: retry the erring line. Error is not cleared after the
+  control returns to the calling code.
 
-- =On Error Goto=: jump to the named label to handle any error
+- =On Error Goto=: jump to the named label to handle any error; to exit from a
+  error routine:
+  + =Resume= to retry the line of code that caused the error.
+  + =Resume Next= to resume execution at the next line after the one that caused
+    the error
+  + =Resume <label>=
+  + =Err.Raise=: errs out again
+  + =Exit Sub= or =Exit Function= with the calling code receiving a zero error code.
+
 
 - =On Error Goto 0=: disable any previous =On Error=
 
 If any error inside an event handler goes unhandled, the program terminates.
+Error that go unhandled in event procedures terminates the program immediately.
 
 #+begin_src basic
 Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
