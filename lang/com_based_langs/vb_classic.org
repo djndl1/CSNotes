@@ -359,6 +359,91 @@ Error that go unhandled in event procedures terminates the program immediately.
 Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
 #+end_src
 
+* VBA and VB Libraries
+
+** String Operations and Functions
+
+- =&=: concatenation
+
+- =Left$=, =Right$=, =Mid$=: substring; =Mid$= also returns a string slice,
+  which can be assigned. =Mid$(Text, 3, 4) = "abcd";
+
+- =Len=: string length;
+
+- =LTrim$=, =RTrim$=, =Trim$=: discard unwanted trailing or leading blanks.
+
+- =Asc=, =Chr$=: ASCII-string conversion
+
+- =Space$=, =String$=: construct a string out of repeated characters.
+
+- =StrComp=: case-insensitive string comparison
+
+- =UCase$=, =LCase$=;
+
+- =StrConv= multi-functionality string conversion
+  + case conversion with =vbUpperCase=, =vbLowerCase=, =vbProperCase=
+  + ANSI-Unicode conversion with =vbUnicode=, =vbFromUnicode=
+
+- =Val=: string to decimal representation; locale-independent
+
+- =CInt=, =CLng=, =CSng=, =CDbl=, =CCur=, =CDate=: locale-aware conversion from
+  string
+
+- =Str$=: converts a number into its representation, with a leading space if the
+  number is positive.
+
+- =InStr=, =InStrRev=: =IndexOf=, =IndexOfLast= substring position search
+
+- =Like=: regex-like pattern matching =?= (any single character), =*= (zero or
+  more), =#= (any single digit), =[A-Z]=, =[0-9]=
+
+#+begin_src sql
+value Like "[A-C]###"
+value Like "[AEIOU][A-Z][A-Z]"
+value Like "[!0-9]??*"
+#+end_src
+
+- =Replace=
+
+- =strReverse=
+
+- =Split=, =Join=
+
+- =Filter=: return an array of items (not) containing a certain substring.
+
+- =Format=: string format
+
+** Date and Times
+
+- Date literal =#8/15/1998 9:20:57 PM#=
+
+- =DateSerial=, =TimeSerial=
+
+#+begin_src sql
+Function IsLeapYear(year As Integer) As Boolean
+    ' Are February 29 and March 1 different dates?
+    IsLeapYear = DateSerial(year, 2, 29) <> DateSerial(year, 3, 1)
+End Function
+#+end_src
+
+- =Date=, =Time= property: the current date and time.
+
+- =Now=, =Timer=: the current date and time.
+
+- =DateValue=, =TimeValue=: returns the Date/Time component of the argument.
+  + =Year=, =Month=, =Day=, =Hour=, =Minute=, =Second= returns the corresponding
+    component
+  + =DatePart=
+
+- =Weekday=: locale-dependent; Use =Weekday(arg, vbMonday)= to force locale independence.
+
+- Date Arithmetic
+  + =+=: =Now + 2 + #12:00#=
+  + =DateAdd=, =DateDiff=: addition/difference with the specified time unit.
+
+- Date Format
+  + =Format=, =FormatDateTime=, =MonthName=: useless unless for human eyes.
+
 * OOP
 
 - No parameterized constructors, initializer methods and factory methods are used.
