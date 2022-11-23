@@ -84,6 +84,7 @@ plus a collection of procedures.
 
 - =Integer= (16-bit) and =Long= (32-bit, the preferred type for integer values):
   =&= prefixed forces a literal integer into a =Long= value.
+  + =&H1234=, =&O011064=
 
 - =Boolean= (2-byte): =0= for =False= and =-1= for =True=
 
@@ -360,6 +361,31 @@ Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
 #+end_src
 
 * VBA and VB Libraries
+
+** Numbers
+
+- =/= always converts its operands into =Double=; Use =\= for pure integer
+  division.
+
+- =^=: exponentiation.
+
+- =MOD= works only for integers.
+
+- Common math functions are available: =Abs=, =Sgn=, =Sqr=, =Exp=, =Log=
+
+- =Int=: round to the lower integer, a ceiling function; =Fix=: truncates the decimal part; =Round=
+  to the specified number of digits.
+
+#+begin_src sql
+Function Ceiling(number As Double) As Long
+    Ceiling = -Int(-number)
+End Functio
+#+end_src
+
+- =Val=; =Hex=, =Oct=
+
+- =Randomize= sets the random seed; =Rnd= returns a the next random number
+  between =[0, 1)=
 
 ** String Operations and Functions
 
