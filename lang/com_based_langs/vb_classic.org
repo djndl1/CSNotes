@@ -470,6 +470,17 @@ End Function
 - Date Format
   + =Format=, =FormatDateTime=, =MonthName=: useless unless for human eyes.
 
+** Files
+
+- =Name= (move); =Kill= (delete); =FileCopy=
+
+- =GetAttr=, =SetAttr= [[https://learn.microsoft.com/en-us/windows/win32/fileio/file-attribute-constants][Windows File Attributes]]
+
+- =CurDir$=; =ChDrive=, =ChDir=: both commands must be used to change the
+  current directory to another drive's.
+
+- =MkDir=, =RmDir=; =Name= (rename only)
+
 * OOP
 
 - No parameterized constructors, initializer methods and factory methods are used.
