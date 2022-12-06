@@ -547,6 +547,47 @@ End Function
 
 - Public variables have default property implemented by the compiler.
 
+** Properties
+
+#+begin_src sql
+Private m_BirthDate As Date
+
+Property Get BirthDate() As Date
+    BirthDate = m_BirthDate
+End Property
+Property Let BirthDate(ByVal newValue As Date)
+    If newValue >= Now Then Err.Raise 1001, , "Future Birth Date !"
+    m_BirthDate = newValue
+End Property
+#+end_src
+
+A property can have an argument:
+
+#+begin_src sql
+Private m_Notes(1 To 10) As String
+
+Property Get Notes(Index As Integer) As String
+    Notes = m_Notes (Index)
+End Property
+Property Let Notes(Index As Integer, ByVal newValue As String)
+    ' Check for subscript out of range error.
+    If Index < LBound(m_Notes) Or Index > UBound(m_Notes) Then Err.Raise 9
+    m_Notes(Index) = newValue
+End Property
+#+end_src
+
+Every =Public= member variables are accessed from outside the class through a pair of hidden
+procedures, which causes the following code invalid
+
+#+begin_src sql
+Sub ToCentimeters (value As Single)
+    ' Value is received by reference, therefore it can be changed.
+    value = value * 2.54
+End Sub
+
+ToCentimeters pers.Height                ' Doesn't work!
+#+end_src
+
 * .NET Interop
 
 **  Issues
