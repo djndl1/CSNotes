@@ -42,9 +42,12 @@ Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself
 
 ** Form Lifecycle
 
-1. =Initialize=: variables are initialized
+1. =Initialize=: triggered where variables are initialized; before the actual window and the
+   controls are created
 
-2. =Load=: properties and controls are references. The windows and its child controls are created
+2. =Load=: triggered when properties and controls are referenced. The windows
+   and its child controls are created. Graphical operations will not work.
+   A form is visible after its =Show= method is called.
 
 3. =Resize=: visible or sized changed
 
@@ -52,11 +55,35 @@ Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself
 
 5. =Deactivate=: end user switches to another form
 
-6. =Paint=: the form refreshes itself
+6. =Paint=: the form refreshes itself (fired only if =AutoRedraw= is =False=)
 
-7. =QueryUnload=
+7. =QueryUnload=: =OnClosing=
 
-8. =Unload=
+#+begin_src sql
+' refuse to unload
+Private Sub Form_QueryUnload(Cancel As Integer, _
+    UnloadMode As Integer)
+    ' Don't let the user close this form.
+    Select Case UnloadMode
+        Case vbFormControlMenu, vbAppTaskManager
+            Cancel = True
+    End Select
+End Sub
+#+end_src
+
+8. =Unload=: a last chance to prevent the closure of the form
+
+#+begin_src sql
+' This is a module-level variable.
+Dim Saved As Boolean
+
+Private Sub Form_Unload(Cancel As Integer)
+    If Not Saved Then
+        MsgBox "Please save data first!"
+        Cancel = True
+    End If
+End Sub
+#+end_src
 
 9. =Terminate=: deallocate the memory for the Form
 
@@ -75,6 +102,10 @@ Forms expose a special property, the =Controls= collection, which contains all t
 
 - =MouseDown=, =MouseUp=, =MouseMove=: mouse button state, Shift/Ctrl/Alt state
   and the cursor's location are passed.
+
+** The =Controls= Collection
+
+Container of all the controls currently loaded on the form itself.
 
 * Basics
 
