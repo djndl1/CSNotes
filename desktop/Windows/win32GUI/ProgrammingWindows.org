@@ -1,0 +1,35 @@
+#+title: Programming Windows
+
+* Windows and Messages
+
+- /window/: a rectangular area on the screen that receives user input and
+  displays output in the form of text and graphics.
+  + /application window/: contains a title bar that shows the program's name, a menu and perhaps a toolbar and a scroll bar.
+  + /dialog window/: may or may not have a title bar.
+  + various windows controls
+
+- /messages/: the window receives the user input in the form of messages to the window. A window also uses messages to communicate with other windows, that is, the OS calls into a function (the window procedure) in the program with proper arguments. The window procedure does some processing based on the
+  message and then returns control to Windows.
+  + a message queue is created for the program per thread, which stores all the messages
+    to windows a program might create.
+  + A windows app includes a message loop to
+    retrieve these messages from the queue and dispatch them the appropriate
+    window procedure.
+  + messages can be /queued/ or /nonqueued/. Nonqueued messages are directly
+    sent to the window procedure. Nonqueued messages often result from calling
+    certain Windows functions (/CreateWindow/, /ShowWindow/, /UpdateWindow/).
+  + a window procedure will not be interrupted. The message loop and the window
+    procedure do not run concurrently. A message loop retrieves a message from
+    its thread's message queue. =DispatchMessage= does not return until the
+    window procedure has returned.
+  + a window procedure may be reentered since the procedure itself may call some
+    function that results in calling the window procedure. This requires the
+    window procedure be reentrant.
+
+- /brush/: a colored pattern of pixels used to fill an area.
+
+A window is always created based on a /window class/, which identifies its
+window procedure.
+
+The basic structure of a Win32 GUI app is pretty much the same for all apps and
+there's no need to write them every time, just copy and paste.
