@@ -33,3 +33,65 @@ window procedure.
 
 The basic structure of a Win32 GUI app is pretty much the same for all apps and
 there's no need to write them every time, just copy and paste.
+
+* Painting the Client Area
+
+** The =WM_PAINT= Message
+
+*** Conditions
+
+Always:
+
+- A previously hidden area of the window is shown again.
+
+- The window with =CW_HREDRAW= and =CW_VREDRAW= sets is resized
+
+- =ScrollWindow=, =ScrollDC=
+
+- =InvlidateRect=, =InvalidateRgn=
+
+- =UpdateWindow=
+
+Sometimes:
+
+- a tooltip is displayed
+
+- a menu is pulled down and then released
+
+- A dialog box or message box that was overlaying the window is removed.
+
+Never (Windows save the covered area and then restores it without an explicit
+redraw call):
+
+- the mouse cursor is moved across the client area
+
+- an icon is dragged across the client area
+
+** Invalid/Update Region
+
+- /invalid rectangle/: the smallest rectangle that encompasses the invalid
+  region.
+  + =BeginPaint= validates the entire client area.
+  + manually invalidate by calling =InvalidateRect=; or validate with =ValidateRect=
+  + Windows does not post two pending paint messages regarding invalid regions.
+    Two invalidations only result in one message and a changed invalid rectangle.
+
+A programmer concerned about performance and speed will want to use the invalid
+rectangle during processing of the =WM_PAINT= message to avoid unnecessary GDI calls.
+
+** Graphics Device Interface (GDI)
+
+*** Device Context
+
+Associated with a particular display device and usually associated with a
+particular window on the display.
+
+Has some /graphics attributes/ that define some particulars of how GDI drawing
+functions work.
+
+**** Enter Device Context Scope
+
+- =BeginPaint= and =EndPaint=: for =WM_PAINT= processing
+
+- =GetDC= and =ReleaseDC=: update the entire area; paint upon messages other
+  than =WM_PAINT= or any other purposes.
