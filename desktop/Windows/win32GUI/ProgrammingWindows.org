@@ -95,3 +95,27 @@ functions work.
 
 - =GetDC= and =ReleaseDC=: update the entire area; paint upon messages other
   than =WM_PAINT= or any other purposes.
+
+** Display Text
+
+- =TextOut=
+
+- The device context defines the font (=SYSTEM_FONT=, the font for title bars is
+  used by default), the background color
+
+- /Character Size/: =GetTextMetrics= (called only once, maybe when processing =WM_CREATE=) returns the font currently selected in the
+  device context.
+  + /ascent/, /descent/: the length above/below the baseline
+  + /height/: the full vertical length
+  + [[https://en.wikipedia.org/wiki/Leading][/internal leading/]]
+
+- =SetTextAlign=: text alignment set the reference point =TextOut= uses to place
+  a string.
+
+** Scroll Bars
+
+Scroll bars have an associated /range/ and /position/.
+
+Windows handles all processing of mouse messages to the scroll bar.
+Scroll bars do not work magically. The programm must act to its state change and
+its other state info is maintained by the programmer.
