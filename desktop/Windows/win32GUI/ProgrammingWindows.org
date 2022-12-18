@@ -81,12 +81,27 @@ rectangle during processing of the =WM_PAINT= message to avoid unnecessary GDI c
 
 ** Graphics Device Interface (GDI)
 
+GDI supports both pixel coordinate system and virtual coordinate system.
+
+*** Functionality Group
+
+- device context creation/release
+
+- device context information retrieval
+  + =GetDeviceCaps()= (get device capabilities)
+
+- device context attribute management
+
+- drawing function
+
+- various functions working with GDI objects.
+
 *** Device Context
 
 Associated with a particular display device and usually associated with a
 particular window on the display.
 
-Has some /graphics attributes/ that define some particulars of how GDI drawing
+A device context has some /graphics attributes/ that define some particulars of how GDI drawing
 functions work.
 
 **** Enter Device Context Scope
@@ -95,6 +110,44 @@ functions work.
 
 - =GetDC= and =ReleaseDC=: update the entire area; paint upon messages other
   than =WM_PAINT= or any other purposes.
+
+**** Private Device Context
+
+- =CS_OWNDC=: each window created based on this window class has its own private
+  device context that continues to exist when the window is destroyed. Use
+  =GetDC= or =BeginPaint= to retrieve it and dispose it with =ReleaseDC()=. Use
+  =SaveDC= to save some changes and =RestoreDC= to restore such changes.
+
+*** Primitives
+
+- /Lines/, /curves/, /rectangles/, /ellipses/, /arcs/ and /Bezier splines/
+
+- /Filled areas/: enclosed area filled with the current GDI brush object.
+
+- /Bitmap/: a rectangular array of bits that correspond to the pixels of a
+  display device.
+
+- /Text/
+
+*** Other Aspects of GDI
+
+- /Mapping Modes and transforms/: how drawing units are mapped; how graphics
+  objects are skewed and transformed.
+
+- /metafile/: a collection of GDI commands stored in a binary form.
+
+- /region/: a complex area of any shape.
+
+- /path/: a collection of straight lines and curves stored internally in GDI.
+
+- /clipping/: drawing can be restricted to a particular section of the client
+  area.
+
+- /palette/:
+  + Windows use a 32-bit unsigned =COLORREF= value  to refere to a particular color.
+  + =RGB(r, g, b)=; =GetRValue=, =GetGValue=, =GetBValue=
+
+- /printing/
 
 ** Display Text
 
@@ -108,6 +161,13 @@ functions work.
   + /ascent/, /descent/: the length above/below the baseline
   + /height/: the full vertical length
   + [[https://en.wikipedia.org/wiki/Leading][/internal leading/]]
+  + /point size/: indicates the size of the character in a font, the distance
+    from the top of the tallest character in the font to the bottom of the
+    descenders in characters such as =j=, =q=, =p= and =y= excluding accent
+    marks (=tmHeight= minus =tmInternalLeading=). A point is 1/72 inch.
+  + The Windows system font (Small 96 DPI or Large 120 DPI, =LOGPIXELSX=, =LOGPIXELSY=) is assumed to be 10-point font with
+    12-point line spacing.
+
 
 - =SetTextAlign=: text alignment set the reference point =TextOut= uses to place
   a string.
