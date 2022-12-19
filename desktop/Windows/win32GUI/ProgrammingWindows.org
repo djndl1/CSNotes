@@ -129,6 +129,34 @@ functions work.
 
 - /Text/
 
+**** Draw Dots and Lines
+
+Several attributes of the device context affect the appearance of lines
+
+- /current pen position/: =MoveToEx()= moves the current position; =GetCurrentPositionEx()=
+
+- /pen/
+
+- /background mode/
+
+- /background color/
+
+- /drawing mode/
+
+drawing using the the following functions
+
+- =SetPixel()=, =GetPixel()=: versatile but not optimized
+
+- =LineTo()=; =Polyline()=, =PolylineTo()=, =PolyPolyLine()=
+
+- =Arc()=, =ArcTo()=, =AngleArc()=
+
+- =PolyBezier()=, =PolyBezierTo()=
+
+- =PolyDraw()=
+
+- =Rectangle()=, =Ellipse()=, =RoundRect()=, =Pie()=, =Chord()=
+
 *** Other Aspects of GDI
 
 - /Mapping Modes and transforms/: how drawing units are mapped; how graphics
