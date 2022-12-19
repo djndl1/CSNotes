@@ -207,3 +207,15 @@ Scroll bars have an associated /range/ and /position/.
 Windows handles all processing of mouse messages to the scroll bar.
 Scroll bars do not work magically. The programm must act to its state change and
 its other state info is maintained by the programmer.
+
+* Window-Bound Timer
+
+An input device that periodically notifies an app when a specified interval of
+time has elapsed by sending =WM_TIMER= messages to signal the intervals.
+
+Windows does not load up the message queue with multiple =WM_TIMER= messages.
+Thus, A clock cannot keep time by count =WM_TIMER= messages it receives. The =WM_TIMER=
+only informs the window that the time is due. A =WM_TIMER= is synchronous to the
+execution of the window procedure.
+
+- =SetTimer()= sets a new/existing timer and stop it with =KillTimer()=
