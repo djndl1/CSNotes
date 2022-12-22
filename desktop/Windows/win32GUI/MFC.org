@@ -40,6 +40,13 @@ Bundled with the call are four input parameters
   implementation does not use a v-table of each message handler and use a chain
   of tables for message handling.
 
+* Shared Classes with ATL
+
+- Datetime: =COleDateTime=, =COleDateTimeSpan= with OLE =DATE= types and
+  =CTime=, =CTimeSpan= for C-style time functionality.
+
+- String: =CString<>=, =CStringW=, =CStringA=
+
 * MFC Collection Classes
 
 MFC comes with its own set of containers (no better than STL though).
