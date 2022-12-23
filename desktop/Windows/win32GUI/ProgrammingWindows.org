@@ -152,12 +152,12 @@ Several attributes of the device context affect the appearance of lines
   + the =LOGPEN= structure can be retrieved using =GetObject()= or
     =GetCurrentObject()=.
 
-- /background mode/
+- /background mode/: =TRANSPARENT= or =OPAQUE=
 
 - /background color/
   + the gap between dotted or dashed segments are painted with the background
-    color. The background color can be =SetBkColor()= or =GetBkColor()=. The
-    =TRANSPARENT= background color is available.
+    color. The background color can be =SetBkColor()= or =GetBkColor()=.
+
 
 - /drawing mode/: Windows may choose not to simply copy (=R2_COPYPEN=) the pen's color to the
   destination pixels. Instead, it can perform /raster operations/ between the
@@ -176,8 +176,18 @@ drawing using the the following functions
 
 - =PolyDraw()=
 
-- =Rectangle()=, =Ellipse()=, =RoundRect()=, =Pie()=, =Chord()=: draw outlines
-  and fill an area with the default brush
+- =Rectangle()=, =Ellipse()=, =RoundRect()=, =Pie()=, =Chord()=, =Polygon()=, =PolyPolygon()=: draw outlines
+  and fill an area with the default brush (also called /pattern/, a 8x8 bitmap
+  that is repeated within the interior area). With dithering, a monochrome
+  display can show 64 different colors.
+  + =WHITE_BRUSH=, =LTGRAY_BRUSH=, =GRAY_BRUSH=, =DKGRAY_BRUSH=, =BLACK_BRUSH=,
+    =NULL_BRUSH= (or =HOLLOW_BRUSH= for no filling).
+  + =CreateSolidBrush()=, =CreateHatchBrush()=; or =CreateBrushIndirect()= a
+    =LOGBRUSH=.
+  + =SetPolyFillMode()=: [[https://www.geeksforgeeks.org/even-odd-method-winding-number-method-inside-outside-test-of-a-polygon/][Point in polygon]], [[https://cs.stackexchange.com/questions/28656/calculate-winding-number][Calculate Winding Number]];
+     /alternate/ between polygon sides along the scan line
+    (horizontal line); /winding/ non-zero winding numbers.
+
 
 *** Other Aspects of GDI
 
