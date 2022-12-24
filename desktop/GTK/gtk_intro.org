@@ -1,3 +1,5 @@
+* GTK and Its Friends
+
 * Hello World
 
 #+include: "gtk_c/helloworld.c" src C
@@ -288,11 +290,33 @@ Use =g_clear_error()= to reset the =GError= values to their initial states befor
 
 * GLib
 
-A general-purpose lbirary that provides many kinds of utility functions, data types and wrappers functions.
+A general-purpose lbirary that provides many kinds of utility functions, data
+types and wrappers functions.
+
+** Basic Data Types
+
+- =gboolean= (=TRUE=, =FALSE=, an =int=); =gchar=, =guchar=, =gconstpointer=,
+  =gdouble=, =gfloat=, =g(u)int=, =g(u)int8=, =g(u)int16= ..., =g(u)long=,
+  =gpointer=, =gsize=, =gssize=
+  + some limit macros are available
+
+- =G_GINT64_CONSTANT()=, =G_GUINT64_CONSTANT()=: 64-bit integer literals
+
+** Standard Macros
+
+- =ABS()=; =CLAMP()=; =MIN()=, =MAX()=
+
+- =G_DIR_SEPARATOR=, =G_DIR_SEPARATOR_S=
+
+- Type Conversions: =GINT_TO_POINTER()=, =GPOINTER_TO_INT()= ...
+
+- Some constants: =G_E=, =G_PI= ...
 
 ** Message Logging
 
-Any type of textual message can be conveyed using =g_log()=. Unless creating a library, use =G_LOG_DOMAIN= as the domain. =g_messsage()=, =g_warning()=, =g_critical()=, =g_error()= and =g_debug()= for the sake of convenience, emitted under the =G_LOG_DOMAIN=. Some types of messages can be set fatal using =g_log_set_always_fatal=. By default, only =G_LOG_LEVEL_ERROR= messages are fatal.
+Any type of textual message can be conveyed using =g_log()=.
+
+- =g_messsage()=, =g_warning()=, =g_critical()=, =g_error()= and =g_debug()= for the sake of convenience, emitted under the =G_LOG_DOMAIN=. Some types of messages can be set fatal using =g_log_set_always_fatal=. By default, only =G_LOG_LEVEL_ERROR= messages are fatal.
 
 ** Memory Management
 
@@ -308,9 +332,20 @@ Use =g_try_malloc()= if the app can recover from an unsuccessful memory allocati
 
 ** Utilities
 
-=g_get_current_dir()=, =g_get_home_dir()=, =g_get_host_name()=, =g_get_real_name()=; =g_get_tmp_dir()=; =g_get_user_name()=; =g_setenv()=; =g_getenv()=; =g_unsetenv()=
+=g_get_current_dir()=, =g_get_home_dir()=, =g_get_host_name()=,
+=g_get_real_name()=; =g_get_tmp_dir()=; =g_get_user_name()=; =g_setenv()=;
+=g_getenv()=; =g_unsetenv()=
 
-=GTimer= keeps time in microsecond.
+- =GDate=: a Julian (starts with 1-1-1 though) and day-month-year representation of the date, ranging from
+  1-1-1 to year 8000 or so.
+
+- =GTimeZone=: time zone structure. With a set of /intervals/ and their abbreviations, a timezone
+  identifier, a daylight saving time flag.
+
+- =GDateTime=: date time structure with timezone info, from 0001-01-01T00:00:00
+  to 9999-12-31T23:59:59.999999. Microsecond precision.
+
+- =GTimer=: more like a stop watch.
 
 ** File Manipulation
 
@@ -371,21 +406,13 @@ A function that will be called when there are no events pending
 
 ** Data Types
 
-- `GString`: `g_string_printf()` constructs the content of a `GString` using a `sprintf` style format.
+- =GString=: a byte array specialized for UTF-8 null-terminated character strings.
 
-```c
-typedef struct {
-    gchar *str;
-    gsize len;
-    gsize allocated_len
-} GString;
-```
-
-- `GTree`: a balanced binary tree
+- =GTree=: a balanced binary tree
 
 ** Input-Output Channels
 
-`GIOChannel`: handle files, pipes and sockets
+- =GIOChannel=: handle files, pipes and sockets
 
 
 * Chap.7 The Text View Widget
