@@ -4,3 +4,6 @@
 [submodule "desktop/GUITutorials"]
 	path = desktop/GUITutorials
 	url = git@github.com:djndl1/GUITutorials.git
+[submodule "cloud/middleware/MiddlewareTutorials"]
+	path = cloud/middleware/MiddlewareTutorials
+	url = git@github.com:djndl1/MiddlewareTutorials.git
