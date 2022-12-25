@@ -1,0 +1,21 @@
+#+title: Zeromq
+
+High-performance asynchronous messaging library used in distributed or
+concurrent applications that provides a message queue without having to run a
+dedicated message broker.
+
+- common messaging patterns
+  + publish-subscribe:
+    - a subscriber can connect to multiple publishers.
+    - if a publisher has no conncted subscribers, messages are simply dropped.
+    - filtering happens on the publisher side or the subscriber side depending
+      on the transport.
+  + request-reply: the classic client/server RPC model
+
+- transports:
+  + TCP
+  + UDP
+  + In-processs
+  + Inter-process
+  + multicast: PGM, EPGM
+  + WebSocket
