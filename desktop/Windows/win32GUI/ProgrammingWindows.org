@@ -192,7 +192,25 @@ drawing using the the following functions
 *** Other Aspects of GDI
 
 - /Mapping Modes and transforms/: how drawing units are mapped; how graphics
-  objects are skewed and transformed.
+  objects are skewed and transformed. All coordinates and dimensions in GDI are
+  /logical units/ and must be transformed into /device units/ (pixels), governed
+  by the /mapping mode/ of the device context: it determines the mapping of the
+  /window/ (logical coordinates, in pixels, inches, millimeters or any other
+  custom unit) to the /viewport/ (device coordinates,
+  specified in terms of device pixels).
+  + eight mapping modes are available in =wingdi.h=; =SetMapMode()=,
+    =GetMapMode()=, default =MM_TEXT=; other mapping modes are simply a
+    convenient way to avoid doing scaling.
+  + mapping modes are an attribute of device contexts: window message parameters
+    always conveys device units.
+  + /device coordinate systems/
+    - the x-axis grows rightward and the y-axis grows downward.
+    - /screen coordinates/ (=CreateWindow()=, =MoveWindow()=, =GetMessagePos()=,
+      =GetCursorPos()=, =GetWindowRect()=, =WindowFromPoint()=), /whole-window coordinates/ (=GetWindowDC()=), /client area coordinate/
+      (=GetDC()=, =BeginPaint()=)
+  + $Coord_{Viewport} = (Coord_{window} - Coord_{WindowOrigin}) \times
+    \frac{Coord_{ViewExtent}}{Coord_{WindowExtent}} + Coord_{ViewOrigin}$ where
+    extents act as scaling factors. =DPtoLP()=, =LPtoDP()=.
 
 - /metafile/: a collection of GDI commands stored in a binary form.
 
