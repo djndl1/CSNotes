@@ -1,92 +1,124 @@
+* Structure
+
+- Source Code (UTF-8 vala source); =.vapi= (API bindings); =.deps= (dependency files that specify
+  the dependencies of a certain binding).
+
 * Basics
   :PROPERTIES:
   :CUSTOM_ID: basics
   :END:
 
-- basic types have =to_string()= and =parse(string str)= methods.
+- identifiers with the same name as keywords are prefixed with =@=.
 
-- All classes are subclasses of =GLib.Object=.
+- C#-style namespaces are available. The =global= namespace is similar to C++'s
+  =::= namespace but is referenced as =global::=
 
-- non-specified fields in =struct= are zero-initialized and constructed
-  with =new=.
+- Enum types are similar to C#'s, with normal enum types and flag types but can
+  contain functions (instance or static).
+  + enum's =to_string()= returns its C identifier: =EnumName.A= is rendered =ENUM_NAME_A=
 
-- =unichar=: 32-bit unicode
+- /basics types/: =char=, =uchar=, =unichar=, =int=, =uint=, =long=, =ulong=,
+  =short=, =ushort=, =(u)int8/16/32/64=, =float=, =double=, =bool=
+  + basic types have =to_string()= and =parse(string str)= methods.
+  + Many basic types have methods for parsing from and converting to strings.
 
-- =string=: UTF-8 string. string templates: ==== and =!== compare the
-  content of two strings. Slicing =[start:end]= is supported. Strings
-  are immutable. Many basic types have methods for parsing from and
-  converting to strings. =in= can be used to determine whether one
-  string contains another.
-
-#+BEGIN_EXAMPLE
-    int a = 6, b = 7;
-    string s = @"$a * $b = $(a * b)";  // => "6 * 7 = 42"
+- =string=: immutable UTF-8 character string.
+  + Similar to C#, ==== and =!== compare the content of two strings.
+  + Python-style slicing =[start:end]= is partially supported (the start and end parameters
+    can not be left out). No run-time bounds checking is implemented.
+  + =in= can be used to determine whether one string contains another.
+  + string templates (interpolation), with implementation similar to =str.printf()=; verbatim string (escape sequences are not
+    interpreted and supports multiline)
+#+BEGIN_EXAMPLE vala
+int a = 6, b = 7;
+// string template
+string s = @"$a * $b = $(a * b)";  // => "6 * 7 = 42"
 #+END_EXAMPLE
 
-- Slicing an array results in a reference to the requested data.
-  Assigning the slice to an owned variable results in a copy.
-  Multi-dimensional arrays are like those in C#. A mono-dimensional
-  array can't be obtained from a multidimensional array.
+- /array/: directly mapped to its C equivalent (not even =GArray=) with no
+  run-time bounds checking.
+  + multidimensional arrays are supported while jagged arrays (array of arrays) are not supported in vala.
+  + Slicing an array results in a reference to the requested data.
+    Assigning the slice to an owned variable results in a copy.
+    Multi-dimensional arrays are like those in C#. A mono-dimensional
+    array can't be obtained from a multidimensional array.
+  + Use =+== to append an element to an array.
 
-- Use =+== to append an element to an array.
+- /struct/: stack-allocated mutable compound value types
+  + all its fields are always public
+  + Structs can contain functions with =private= visibility by default.
+  + =var a = Vector() { x = 1, y = 2, z = 3 }=, constructed without a =new=
+    operator.
+  + non-specified fields in =struct= are zero-initialized and constructed
 
-- All class types are reference types, regardless of whether they are
-  descended from =GLib.Object= or not. Objects are ref-counted
+- /class/
+  + All classes are subclasses of =GLib.Object=.
+  + All class types are reference types, regardless of whether they are
+    descended from =GLib.Object= or not. Objects are ref-counted
+  + Vala supports /named constructors/ with different names. Constructor
+    dispatch is supported. Destructors are there if needed.
 
-- =var= type inference is available.
-
-- =??=: null coalescing
-
-- =in=: works on arrays, strings, collections or any other type that has
+- /operators/
+  + =sizeof=, =is=, =typeof=
+  + =??=: null coalescing
+  + =in=: works on arrays, strings, collections or any other type that has
   an appropriate =contain()= method.
-
-- Operators/functions/methods cannot be overloaded. Choose slightly
-  different names to avoid a name clash. However , default argument is
-  supported. Index access are mapped to=get=/=set= methods.
+  + Operators/functions/methods cannot be overloaded. Choose slightly
+  different names to avoid a name clash. However, default argument is
+  supported.
+  + Index access are mapped to =get(index)=​/​=set(index, item)= methods.
   =[start:end]= is mapped to =slice(long start, long end)=. =in= is
-  mapped to =contains()=; =foreach/in= loop is mapped to =iterator()=
+  mapped to =contains()=; =foreach/in= loop is mapped to =iterator()=;
+  string template is implemented with =to_string()=.
 
-- no fallthrough between cases. Each non-empty case must end with a
-  =break=, =return= or =throw=.
+- /switch clause/
+  + no fallthrough between cases. Each non-empty case must end with a
+    =break=, =return= or =throw=.
+  + applies also to =string=
+
+- /value types/ and /reference types/
+  + the underlying C code uses pointer for passing struct data but somehow
+    maintain the semantics of value types.
 
 - Nullability check can be added to a method parameter by postfixing the
   parameter with =?=. By default these parameters are non-nullable.
 
-- Closures/lambda: =(a) => { stdout.printf("%d\n", a); }=.
+- Structured Error Handling
+  + for handling recoverable run-time errors.
+  + Related errors are grouped into error domains. Vala error domains do not
+    form a class hierarchy (=GError=​s are not =GObject=).
 
-- =using= namespace is supported. =global::= namespace is there.
+#+BEGIN_SRC vala
+public errordomain MathError
+{
+    DivisionByZero,
+    Overflow,
+    //...
+}
 
-- Vala support /named constructors/ with different names. Constructor
-  dispatch is supported. Destructors are there if needed.
-
-* Structured Error Handling
-  :PROPERTIES:
-  :CUSTOM_ID: structured-error-handling
-  :END:
-
-Related errors are grouped into error domains. Vala error domains do not
-form a class hierarchy.
-
-#+BEGIN_SRC C
-    public errordomain MathError 
-    {
-        DIVISION_BY_ZERO,
-        OVERFLOW,
-        //...
+public int division(int dividend, int divisor) throws MathError
+{
+    if (divisor == 0) {
+        throw new MathError.DivisionByZero("divided by zero");
     }
+
+    return dividend / divisor;
+}
+
+try {
+    var x = division(30, 20);
+} catch (MathError.Overflow e) {
+    ...
+} catch (MathError e) {
+    ...
+} finally {
+   ...
+}
 #+END_SRC
 
-* Method Contracts
-  :PROPERTIES:
-  :CUSTOM_ID: method-contracts
-  :END:
-
-Vala has basic support for contract-based programming. Every method can
-specify a boolean expression that it =requires= to be true (a
-precondition checked at runtime) before the control flow enters the code
-block. If evaluated to =false=, a critical warning is emitted that
-usually leads to program termination. Postconditions are specified using
-the =ensures= keyword.
+- /Method Contracts/
+  + for unrecoverable errors
+  + Every method can specify a boolean expression that it =requires= to be true (a precondition checked at runtime) before the control flow enters the code block. If evaluated to =false=, a critical warning is emitted that usually leads to program termination. Postconditions are specified using the =ensures= keyword.
 
 * Signal
   :PROPERTIES:
