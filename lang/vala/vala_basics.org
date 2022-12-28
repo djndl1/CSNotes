@@ -140,120 +140,94 @@ emitted every time a property changes.
   :CUSTOM_ID: oop
   :END:
 
-Only available only for =GLib.Object=, run right after registering the
-class with the underlying glib type system. The static construction
-block runs first but only once, then the per-instance construct block
-and after that the default constructor.
+- A class may or may not (pure/plain/lightweight class and compact class) inherit from
+  =GLib.Object=.
 
-=[Compact]= classes are not registered with the underlying glib type
-system and do not support refcount or private fields. Compact classes
+- Construction
+  + default constructor
+  + named constructor
+  + /construction blocks/ are only available only for =GLib.Object=.
+  + /static construction block/
+  + constructor delegation is supported.
 
-- Interface in vala may not inherit from other interfaces but may
-  declare other interfaces (and classes) to be prerequisites, that is,
-  when a class implements the interface, all the prerequisites must also
-  be specified by the class declaration.
+- Destructor: called by the runtime when an object loses all references.
+  + =~ClassName() { ... }=
 
-- Vala allows method implementation in interfaces.
+- /Signals/ (v. trigger, emit): a device for the loose coupling of
+  unidirectional method calls.
+  + disconnection requires either the returned handler id or the same
+    parameter passed to =.connect()=.
 
-- Vala also allows implementing two interfaces that have methods with
-  the same name.
+#+begin_src vala
+class ... {
+    public signal void ring(int a); // have to be public and everyone can trigger it
 
-#+BEGIN_EXAMPLE
-    interface Foo {
-     public abstract int m();
+    public void trigger()
+    {
+        ring(counter++); // unlike C#, no need for a null check
+    }
+}
+
+t.ring.connect((source, a) => { // the source and any trailing parameters can be omitted
+    stdout.print("%d\n", a);
+});
+#+end_src
+
+- /notification/: every =GLib.Object= has a signal called =notify=, emitted
+  whenever a change of property occurs.
+  + =obj.notify.connect()= or =obj.notify["name"].connect()=
+  + any underscores in the property name is replaced by dashes =-=.
+
+- /Interface/:
+  + Method implementation in interfaces is allowed and a concret one is treated
+    as a virtual method.
+  + Implementing two interfaces that have methods with the same name is allowed.
+
+#+BEGIN_EXAMPLE vala
+interface Foo {
+    public abstract int m();
+}
+
+interface Bar {
+    public abstract string m();
+}
+
+class Cls: Foo, Bar {
+    public int Foo.m() {
+        return 10;
     }
 
-    interface Bar {
-     public abstract string m();
+   public string Bar.m() {
+        return "bar";
     }
+}
 
-    class Cls: Foo, Bar {
-     public int Foo.m() {
-      return 10;
-     }
-
-     public string Bar.m() {
-      return "bar";
-     }
-    }
-
-    void main () {
-     var cls = new Cls ();
-     message ("%d %s", ((Foo) cls).m(), ((Bar) cls).m());
-    }
+void main () {
+    var cls = new Cls();
+    message("%d %s", ((Foo) cls).m(), ((Bar) cls).m());
+}
 #+END_EXAMPLE
 
-- Vala provides =base= keyword to refer to the base class.
+- RTTI
+  + =is=: check type
+  + =get_type()=
+  + =typeof()=
+  + =Object.new(TypeInstance)=
+  + =as= dynamic type casting
 
-- =new= modifier hide an inherited method with a new method of the same
-  name.
-
-* RTTI
-  :PROPERTIES:
-  :CUSTOM_ID: rtti
-  :END:
-
-- =is=: check type
-
-- =get_type()=
-
-- =typeof()=
-
-#+BEGIN_EXAMPLE
-    Type t = typeof(Foo);
-    Foo foo = (Foo) Object.new(t);
+#+BEGIN_EXAMPLE vala
+Type t = typeof(Foo);
+Foo foo = (Foo) Object.new(t);
 #+END_EXAMPLE
 
-* Dynamic Type Casting
-  :PROPERTIES:
-  :CUSTOM_ID: dynamic-type-casting
-  :END:
+- Generics: Vala includes a runtime generics system. Vala's is similar to the system
+  used by Java. There is no restriction on what type may be used in generics.
+  + /generic class/, /generic structure/, /generic interface/
 
-- =as=: =Button b = widget as Button;= dynamic type casting, returning
-  =null= if invalid
-
-* Generics
-  :PROPERTIES:
-  :CUSTOM_ID: generics
-  :END:
-
-Vala includes a runtime generics system. Vala's is similar to the system
-used by Java. There is no restriction on what type may be used in
-generic.
-
-* Files
-  :PROPERTIES:
-  :CUSTOM_ID: files
-  :END:
-
-- =.vapi=: interface file
-
-- =.deps=: depedency specification for interface files
-
-* =linux.vapi=
-  :PROPERTIES:
-  :CUSTOM_ID: linux.vapi
-  :END:
-
-A large number of constants and functions wrapping specific features of
-the Linux OS, including a number of non-POSIX extensions to facilities
-defined by POSIX.
-
-TODO
-
-* Networking
-  :PROPERTIES:
-  :CUSTOM_ID: networking
-  :END:
-
-A server =bind=s a socket with an address and then =listen=s. A client
-=connect=s to the server. The server =accept= the connection.
-
-JSON has pretty much replaced XML as the most popular data exchange
-format for web services.
-
-GIO for higher level networking, a generic I/O library for synchronous
-and asynchronous transfers.
+- /compact class/: =[Compact]=
+  + not registered with the underlying glib type system
+  + no refcount or private fields
+  + reference-based
 
 * DBus
   :PROPERTIES:
