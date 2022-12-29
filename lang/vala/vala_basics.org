@@ -79,9 +79,12 @@ string s = @"$a * $b = $(a * b)";  // => "6 * 7 = 42"
 - /value types/ and /reference types/
   + the underlying C code uses pointer for passing struct data but somehow
     maintain the semantics of value types.
+  + reference types are by default not nullable.
 
 - Nullability check can be added to a method parameter by postfixing the
   parameter with =?=. By default these parameters are non-nullable.
+  + non-nullable objects are asserted non-null. Any violation causes a critical
+    message being emitted or even worse.
 
 - Structured Error Handling
   + for handling recoverable run-time errors.
@@ -120,21 +123,6 @@ try {
   + for unrecoverable errors
   + Every method can specify a boolean expression that it =requires= to be true (a precondition checked at runtime) before the control flow enters the code block. If evaluated to =false=, a critical warning is emitted that usually leads to program termination. Postconditions are specified using the =ensures= keyword.
 
-* Signal
-  :PROPERTIES:
-  :CUSTOM_ID: signal
-  :END:
-
-Defined as a member of a class and appears similar to a method with no
-body. Signal handlers can be added to the signal using the =connect()=
-method (or call =disconnect()= to disconnect an event handler from a
-signal). Signals are emitted by calling them like a method. It is
-possible to connect signal handlers not taking any parameters,
-independent of the actual signal signature.
-
-Every =GLib.Object= instance has a signal called =notify=, which is
-emitted every time a property changes.
-
 * OOP
   :PROPERTIES:
   :CUSTOM_ID: oop
@@ -147,8 +135,10 @@ emitted every time a property changes.
   + default constructor
   + named constructor
   + /construction blocks/ are only available only for =GLib.Object=.
-  + /static construction block/
+  + /static construction block/: exactly once in a program where such a class is used.
   + constructor delegation is supported.
+  + /class construct/: executed once at the first use of its class and once at each
+    subclass of this class.
 
 - Destructor: called by the runtime when an object loses all references.
   + =~ClassName() { ... }=
@@ -157,6 +147,7 @@ emitted every time a property changes.
   unidirectional method calls.
   + disconnection requires either the returned handler id or the same
     parameter passed to =.connect()=.
+  + no need to declare a delegate type before declare a signal, as in C#.
 
 #+begin_src vala
 class ... {
@@ -182,6 +173,8 @@ t.ring.connect((source, a) => { // the source and any trailing parameters can be
   + Method implementation in interfaces is allowed and a concret one is treated
     as a virtual method.
   + Implementing two interfaces that have methods with the same name is allowed.
+  + vala interface may have a class as a prerequisite so that its implementation
+    subclasses that class.
 
 #+BEGIN_EXAMPLE vala
 interface Foo {
