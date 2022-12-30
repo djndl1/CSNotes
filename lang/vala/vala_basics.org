@@ -222,6 +222,50 @@ Foo foo = (Foo) Object.new(t);
   + no refcount or private fields
   + reference-based
 
+* Multithreading and Async
+
+- =lock=: similar to C#'s =lock=, a lock mechanims (usually a recursive lock is
+  used to protect the locked resource).
+
+* Memory Management
+
+- /Weak reference/
+  + historically there is only =weak= but no =unowned= in Vala and mostly they
+    are interchangeable.
+  + use =weak= only to break circular reference.
+
+- /Unowned reference/: a reference that is not recorded and counted, a special
+  type of /weak
+  reference/ whose holder is not responsible for resource management.
+  + an unowned reference should be declared as =unowned=, otherwise a full
+    reference or a duplicate of the instance will be assigned.
+  + a method's return value may be declared =owned= or =unowned=.
+  + a variable may be declared =owned= or =unowned=.
+  + a property always returns an unowned reference unless explictly specified,
+    i.e. properties are meant for accessing the internal state of an object and
+    not as a special form of method syntax.
+     =get { return new Object() }= always ends up with an invalid reference
+    while =public owned Object property { owned get { return new Object(); } }=
+    works safely.
+
+- Compact classes are not refcounted and may have only one strong reference.
+  + when this strong reference goes out of scope, the object is destructed.
+  + all other references to this object must be =unowned=
+  + manual implementation of refcounting for a compact class is supported by the
+    =[CCode]= attribute and is exactly how some glib classes are wrapped in
+    Vala (e.g. see =GLib.Thread<T>=)
+  + a compact class can be =[Immutable]= with a =copy_function=.
+
+- Vala strings are not refcounted and more like a value type.
+
+- the =owner= keyword: used to transfer ownership
+  + as a prefix of a parameter type so that the ownership of the object is
+    transferred into the code context.
+  + a type conversion operator: =Foo foo = (owned) bar= sets =foo= to what
+    =bar= refers to and then sets =bar= to =null=.
+
+- Manual memory management: pointers with similar syntax to C++.
+
 * DBus
   :PROPERTIES:
   :CUSTOM_ID: dbus
