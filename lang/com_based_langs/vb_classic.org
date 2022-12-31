@@ -619,6 +619,59 @@ End Sub
 ToCentimeters pers.Height                ' Doesn't work!
 #+end_src
 
+* Database Programming
+
+- ODBC
+  + Most data access techniques in VB can use ODBC drivers as intermediate
+    layers.
+  + A connection may or may not use the configured DSN (either stored in the
+    registry or in a file). An ODBC connection can
+    be DSN-less with all connection details specified in the connection string.
+
+- Data Access Object (DAO): an OO interface to Microsoft Jet (Access) and ODBC.
+
+- Remote Data Object (RDO): improved upon DAO and designed around ODBC
+
+- OLE DB: based on COM
+  + MSDAAQL: a bridge from OLE DB to ODBC drivers.
+
+- ActiveX Data Object (ADO): the high-level interface to OLE DB
+
+** ADO Programming
+
+*** Object Model
+
+The three core classes are not tightly related.
+
+- =Connection=: =ADODB.Connection=
+  + =.Open()=: open a connection
+  + =.Execute()=
+  + =.BeginTrans()=, =.CommitTrans()=, =.RollbackTrans()=
+  + =.OpenSchema()=: for metadata
+
+- =Command=
+
+- =RecordSet=: =ADODB.RecordSet=
+  + a =RecordSet= can be created independent of a certain =Connection= and can use a
+    =Connection= explicitly or implicitly.
+  + One can retrieve a =Recordset= from a database, close the connection,
+    modify the data in the =Recordset=, and finally reestablish the connection
+    to send all the updates to the server.
+  + =.Source=: the name of the table, the SQL text, the SP name or the
+    =CommandText= of a =Command=
+  + =.Open()=, =.ActiveConnection=, =.ActiveCommand=
+  + Cursor: a set of records that represent the results of query, may contain
+    the actual data (client-side, for optimistic update) or just pointers to records in the database
+    (forward-only server-side, better performance)
+    + =.CursorLocation=: =2-adUseServer= or =3-adUseClient=
+    + =.CursorType=
+    + =.MoveFirst()=, =.MoveNext()=
+  + =.MaxRecords=: a limit to the number of records returned in the
+      =RecordSet=
+  + =.CacheSize=
+  + =.Fields=: the columns of the current record.
+
+
 * .NET Interop
 
 **  Issues
