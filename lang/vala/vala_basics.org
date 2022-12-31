@@ -121,7 +121,13 @@ try {
 
 - /Method Contracts/
   + for unrecoverable errors
-  + Every method can specify a boolean expression that it =requires= to be true (a precondition checked at runtime) before the control flow enters the code block. If evaluated to =false=, a critical warning is emitted that usually leads to program termination. Postconditions are specified using the =ensures= keyword.
+  + Every method can specify a boolean expression that it =requires= to be true
+    (a precondition checked at runtime) before the control flow enters the code
+    block. If evaluated to =false=, a critical warning is emitted that usually
+    leads to program termination. Postconditions are specified using the
+    =ensures= keyword.
+  + Glib also provides a set of check assertions: =assert_not_reached()=,
+    =return_if_fail()=, =return_if_reached()=, =warn_if_fail()=, =warn_if_reached()=
 
 * OOP
   :PROPERTIES:
