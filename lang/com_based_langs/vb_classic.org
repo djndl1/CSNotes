@@ -689,6 +689,39 @@ Property Get DoubleCrLf() As String
     DoubleCrLf = vbCrLf &; vbCrLf
 End Property
 #+end_src
+** Reflection
+
+- =CallByName(object, procname, calltype, [,arguments])=: late binding call
+
+#+begin_src sql
+Function GetProperties(obj As Object, ParamArray props() As Variant) As String()
+    Dim i As Integer, result() As String
+    On Error Resume Next
+    ' Prepare the result array.
+    ReDim result(LBound(props) To UBound(props)) As String
+    ' Retrieve all properties in turn.
+    For i = LBound(props) To UBound(props)
+        result(i) = vbNullChar
+        ' If the call fails, this item is skipped.
+        result(i) = props(i) &; "=" &; CallByName(obj, props(i), vbGet)
+    Next
+    ' Filter out invalid lines.
+    GetProperties = Filter(result(), vbNullChar, False)
+End Function
+
+' Assign a group of properties in one operation.
+' Expects an array in the format returned by GetProperties
+Sub SetProperties(obj As Object, props() As String)
+    Dim i As Integer, temp() As String
+    For i = LBound(props) To UBound(props)
+        ' Get the Name-Value components.
+        temp() = Split(props(i), "=")
+        ' Assign the property.
+        CallByName obj, temp(0), vbLet, temp(1)
+    Next
+End Sub
+#+end_src
+
 * Database Programming
 
 - ODBC
