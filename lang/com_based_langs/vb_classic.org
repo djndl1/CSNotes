@@ -578,6 +578,14 @@ End Function
 
 - Public variables have default property implemented by the compiler.
 
+** Auto Instancing: Created Only When Used
+
+Not recommended for various reasons.
+
+#+begin_src
+Dim pers As New CPerson
+#+end_src
+
 ** Properties
 
 #+begin_src sql
@@ -619,6 +627,68 @@ End Sub
 ToCentimeters pers.Height                ' Doesn't work!
 #+end_src
 
+#+begin_src sql
+Dim m_HomeAddress As CAddress      ' A module-level private variable.
+
+Property Get HomeAddress() As CAddress
+    Set HomeAddress = m_HomeAddress
+End Property
+Property Set HomeAddress(ByVal newValue As CAddress)
+    Set m_HomeAddress = newValue
+End Property
+#+end_src
+
+*** Variant Property
+
+=Property Set= accepts object parameter and =Property Let= accepts value types.
+
+#+begin_src sql
+Private m_CurrentAddress As Variant
+
+Property Get CurrentAddress() As Variant
+    If IsObject(m_CurrentAddress) Then
+        Set CurrentAddress = m_CurrentAddress   ' Return a CAddress object.
+    Else
+        CurrentAddress = m_CurrentAddress       ' Return a string.
+    End If
+End Property
+
+Property Let CurrentAddress(ByVal newValue As Variant)
+    ' Check that it is a string value
+    If VarType(newValue) <> vbString Then Err.Raise 5
+    m_CurrentAddress = newValue
+End Property
+
+Property Set CurrentAddress(ByVal newValue As Variant)
+    ' Check that it is a CAddress object.
+    If TypeName(newValue) <> "CAddress" Then Err.Raise 5
+    Set m_CurrentAddress = newValue
+End Property
+
+' in case only one type of object may be accepted'
+Property Set CurrentAddress(ByVal newValue As CAddress)
+    Set m_CurrentAddress = newValue
+End Property
+#+end_src
+
+*** Property In BAS Module (Undocumented)
+
+#+begin_src sql
+Dim m_Percent As Integer
+
+Property Get Percent() As Integer
+    Percent = m_Percent
+End Property
+Property Let Percent(newValue As Integer)
+    If newValue < 0 Or newValue > 100 Then Err.Raise 5
+    m_Percent = newValue
+End Property
+
+'Implement a special global constant'
+Property Get DoubleCrLf() As String
+    DoubleCrLf = vbCrLf &; vbCrLf
+End Property
+#+end_src
 * Database Programming
 
 - ODBC
