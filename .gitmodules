@@ -7,3 +7,6 @@
 [submodule "cloud/middleware/MiddlewareTutorials"]
 	path = cloud/middleware/MiddlewareTutorials
 	url = git@github.com:djndl1/MiddlewareTutorials.git
+[submodule "database/DatabaseTutorials"]
+	path = database/DatabaseTutorials
+	url = git@github.com:djndl1/DatabaseProgrammingTutorials.git
