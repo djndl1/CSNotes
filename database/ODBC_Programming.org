@@ -1,0 +1,98 @@
+#+title: ODBC Programming
+
+* Background
+
+- [[https://learn.microsoft.com/en-us/sql/odbc/reference/embedded-sql?view=sql-server-ver16][/Embedded SQL/]] (see Oracle Pro*C/C++ for an example): tightly integrating SQL with the host language (C)
+  + the code is first preprocessed, resulting in standard C, with the SQL code
+    transformed into library calls.
+  + since the SQL is transformed into library calls, embedded SQL is static
+    (dynamic embedded SQL does exist) and tightly
+    coupled with the host code, the platform and the DBMS in use.
+  + LINQ-to-SQL, JOO, EntityFramework can be seen as variants of embedded SQL.
+
+- SQL Modules: the host programming language calls into SQL procedures,
+  decoupling the program and SQL.
+
+- Call Level Interface: library API call
+  + nowadays the most common method to access a DBMS.
+  + similar to dynamic SQL in that SQLs are passed to the DBMS at run time.
+  + commonly used in client/server architectures
+
+
+- SQL/CLI: the standardized core part of ODBC. Pure SQL/CLI is rare in practice.
+
+- ODBC abstraction is no longer a strong requirement in the era of web.
+
+- implementations:
+  + the Windows ODBC
+  + iODBC and unixODBC for non-Windows platforms
+
+* Architecture
+
+Abstraction based on device driver model
+
+- Application: calls ODBC functions to submit SQL statements and retrieve results.
+
+- /Driver Manager/
+  + enumerates database client drivers and manages data sources.
+  + processes ODBC function calls
+
+- /Driver/: library that implements the functions in the ODBC API.
+  + handles the actual interaction with a data source.
+
+- /Data Source/: a file or a DBMS or even a live data feed.
+  + /machine data source/ (managed by the driver manager); /file data source/ (a
+    portable DSN configuration file)
+
+- /Bridges/:
+  + ODBC-to-JDBC: uses the services of a JDBC driver to connenct to a database.
+  + JDBC-to-ODBC: the builtin one is drpped from JVM in Java 8
+  + OLE DB-to-ODBC
+  + ADO.NET-to-ODBC
+
+- /Conformance Levels/
+  + Core Interface Conformance
+  + Level 1 Interface Conformance
+  + Level 2 Interface Conformance
+
+* Programming
+
+- /Environment/: a global context in which to access data
+  + any information global in nature: state; diagnostics; connection handles;
+    attribute settings.
+  + =SQLAllocHandle()=, =SQLFreeHandle()=
+
+- /Connection/:
+  + =SQLAllocHandle()=, =SQLFreeHandle()=
+  + =SQLDriverConnect()=, =SQLConnect()=, =SQLBrowseConnect()=
+  + =SQLDisconnect()=
+
+- /Statement/: an SQL statement and all the information associated with it: any
+  result sets and parameters.
+  + =SQLAllocHandle()=, =SQLFreeHandle()=
+
+- /Descriptor/: a collection of metadata that describes the parameters of an SQL
+  statement or the columns of a result set.
+  + /Application Parameter Descriptor/; /Implementation Parameter Descriptor/;
+    /Application Row Descriptor/; /Implementation Row Descriptor/
+  + automatically allocated by its statement.
+
+- /Handles/: opaque 32-bit item IDs for an /environment/, /connection/,
+  /statement/ or /descriptor/.
+
+** Data Types
+
+ODBC defines two sets of type identifiers and corresponding C types: for SQL
+columns and a C buffer. Each SQL data type correspnds to an ODBC C data type.
+
+- /Type identifiers/: used in parameter bindings and the retrieval of result set
+  data
+
+- /SQL Data Types/:
+  + Each DBMS defines its own SQL types. Each ODBC driver exposes only those SQL
+    data types that the associated DBMS defines. A given driver and data source
+    do not necessarily support all the SQL data types
+
+- =SQLGetTypeInfo()= returns a result set, each row of which describes the
+  characteristics of a single data type, such as name, type identifier,
+  precision, scale, and nullability.
