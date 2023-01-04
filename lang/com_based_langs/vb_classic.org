@@ -771,6 +771,32 @@ Sub SetProperties(obj As Object, props() As String)
 End Sub
 #+end_src
 
+- =TypeOf ... Is ...=: test type. Inefficient
+
+#+begin_src basic
+' instead of using TypeOf'
+Dim lst As ListBox, cbo As ComboBox
+On Error Resume Next
+Set lst = obj     ' The assignment that fails will leave
+Set cbo = obj     ' the corresponding variable set to Nothing.
+On Error Goto 0   ' Cancel error trapping.
+#+end_src
+
+- =TypeName()=: the name of an object's class in the form of a string.
+
+- =ByRef= and =ByVal= for object variables: basically in the same way as =ref=
+  and non-=ref= parameters in C#.
+
+#+begin_src basic
+Sub Reset(pers As CPerson)     ' ByRef can be omitted.
+    Set pers = Nothing         ' This actually sets the original
+End Sub                        ' variable to Nothing.
+
+Sub Reset2(ByVal pers As CPerson)
+    Set pers = Nothing         ' This code doesn't do anything.
+End Sub
+#+end_src
+
 * Database Programming
 
 - ODBC
