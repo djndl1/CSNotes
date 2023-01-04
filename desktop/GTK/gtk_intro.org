@@ -66,7 +66,7 @@ Control of the application is managed by signals, timeout functions and various 
 
 ** Signals and Callbacks
 
-/signal/: a notification to the application that the users has performed some action. The callback function will be called when the action has occurred and the signal is emitted or when the signal is explicitly emitted.
+/signal/: a notification (a chain of functions) to the application that the users has performed some action. The callback function will be called when the action has occurred and the signal is emitted or when the signal is explicitly emitted.
 
 =g_signal_connect()=
 
@@ -80,7 +80,8 @@ static void callback_function(GtkWidget *widget,
 
 =g_signal_emit_by_name()=, =g_signal_emit()= (used with a signal identifier) can be used to emit signals. =g_signal_stop_emission_by_name()= 
 
-/Events/ are special tpes of signals that are emitted by the X Window system. They are initially emitted by the X Window System and then sent from the WM to the application to be interpreted by =GLib=. =delete-event= signal is emitted when the user tries to close the window. Connecting events to a callback is done in the same manner with =g_signal_connect= but with a different callback
+/Events/ are special types of signals that are emitted by the X Window system
+(related signals are named with an =event=). They are initially emitted by the X Window System and then sent from the WM to the application to be interpreted by =GLib=. =delete-event= signal is emitted when the user tries to close the window. Connecting events to a callback is done in the same manner with =g_signal_connect= but with a different callback
 
 #+BEGIN_SRC c
 static gboolean callback_function(GtkWidget *widget, GdkEvent *event, gpointer data);
@@ -128,14 +129,17 @@ while (gtk_events_pending())
 
 /accelerator key/: a key or set of keys that can be used to activate a predefined action.
 
-A special type of container that turns its child into a clickable entity, only capable of holding one child. Almost always used with =clicked= signal. Generally used with a label =gtk_button_new_with_label()=; =gtk_button_new_with_mnemonic=
+A special type of container that turns its child (no limited to text labels) into a clickable entity, only capable of holding one child. Almost always used with =clicked= signal. Generally used with a label =gtk_button_new_with_label()=; =gtk_button_new_with_mnemonic=
 
 ** Widget Properties
 
-GObject provides a property system. Every class derived from the =GObject= class can install any number of properties. Use =g_object_get()= to retrieve the current value of a property.
+GObject provides a [[https://discourse.gnome.org/t/property-set-property-and-get-property/2558][property system]]. Every class derived from the =GObject= class
+can install any number of properties. Use =g_object_get()= to retrieve the
+current value of a property. There is a dispatch function in each class's
+implementation that calls its setters/getters to actually sets/gets properties.
 
 #+BEGIN_SRC c
-g_object_get(button, "relief", &value, NULL);
+g_object_get(button, "relief", &value, NULL); // same as gtk_button_get_relief
 g_object_set(button, "relief", GTK_RELIEF_NORMAL, NULL);
 
 // monitor a specific property;
@@ -287,133 +291,6 @@ Use =g_clear_error()= to reset the =GError= values to their initial states befor
 - =GtkAssistant=: A dialog with multiple pages. A page has a type. The first page should always be =GTK_ASSISTANT_PAGE_INTRO=. =GtkAssistant= is not derived from =GtkDialog=.
 
 - =GtkProgressBar=:
-
-* GLib
-
-A general-purpose lbirary that provides many kinds of utility functions, data
-types and wrappers functions.
-
-** Basic Data Types
-
-- =gboolean= (=TRUE=, =FALSE=, an =int=); =gchar=, =guchar=, =gconstpointer=,
-  =gdouble=, =gfloat=, =g(u)int=, =g(u)int8=, =g(u)int16= ..., =g(u)long=,
-  =gpointer=, =gsize=, =gssize=
-  + some limit macros are available
-
-- =G_GINT64_CONSTANT()=, =G_GUINT64_CONSTANT()=: 64-bit integer literals
-
-** Standard Macros
-
-- =ABS()=; =CLAMP()=; =MIN()=, =MAX()=
-
-- =G_DIR_SEPARATOR=, =G_DIR_SEPARATOR_S=
-
-- Type Conversions: =GINT_TO_POINTER()=, =GPOINTER_TO_INT()= ...
-
-- Some constants: =G_E=, =G_PI= ...
-
-** Message Logging
-
-Any type of textual message can be conveyed using =g_log()=.
-
-- =g_messsage()=, =g_warning()=, =g_critical()=, =g_error()= and =g_debug()= for the sake of convenience, emitted under the =G_LOG_DOMAIN=. Some types of messages can be set fatal using =g_log_set_always_fatal=. By default, only =G_LOG_LEVEL_ERROR= messages are fatal.
-
-** Memory Management
-
-The advantage of using memory slices is that they avoid memory waste and fix scalability and performance problems that plagued memory chunks, achieved by using slab allocation. One constraint of memory slices is that the size of the object must be the same size when it was allocated and when it is freed.
-
-Large blocks of memory is allocated using =malloc()=. Use slice allocators for a single object of any size greater than two pointers or allocate multiple objects.
-
-#+include "gtk_c/slice.c" src C
-
-Use =g_try_malloc()= if the app can recover from an unsuccessful memory allocation. Never use =g_free()= on a chunk of memory that was allocated with memory slices.
-
-=g_mem_profile()= provides a simple way to output a summary of memory usage within the app.
-
-** Utilities
-
-=g_get_current_dir()=, =g_get_home_dir()=, =g_get_host_name()=,
-=g_get_real_name()=; =g_get_tmp_dir()=; =g_get_user_name()=; =g_setenv()=;
-=g_getenv()=; =g_unsetenv()=
-
-- =GDate=: a Julian (starts with 1-1-1 though) and day-month-year representation of the date, ranging from
-  1-1-1 to year 8000 or so.
-
-- =GTimeZone=: time zone structure. With a set of /intervals/ and their abbreviations, a timezone
-  identifier, a daylight saving time flag.
-
-- =GDateTime=: date time structure with timezone info, from 0001-01-01T00:00:00
-  to 9999-12-31T23:59:59.999999. Microsecond precision.
-
-- =GTimer=: more like a stop watch.
-
-** File Manipulation
-
-#+BEGIN_SRC C
-#include <glib.h>
-
-gchar *filename, *content;
-gsize bytes;
-GError *error = NULL;
-
-filename = g_build_filename(g_get_home_dir(), "temp", NULL);
-g_file_set_contents(filename, "Hello World", 1 &error);
-handle_error(error);
-
-if (!g_file_test(filename, G_FILE_TEST_EXISTS))
-    g_error("Error: File does not exist!");
-
-g_file_get_contents(filename, &content, &bytes, &error);
-handle_error(error);
-g_print("%s\n", content);
-
-g_free(content);
-g_free(filename);
-#+END_SRC
-
-#+BEGIN_SRC C
-GDir *dir = g_dir_open(g_get_home_dir(), 0, NULL);
-
-if (!g_file_test(g_get_home_dir(), G_FILE_TEST_IS_DIR))
-    g_error(...)
-
-const gchar *file;
-while ((file = g_dir_read_name(dir)))
-    g_print("%s\n", file);
-
-g_dir_close(dir);
-#+END_SRC
-
-=g_rename()=; =g_remove()=; =g_rmdir()=; =g_mkdir()=; =g_chdir()=; =g_chmod()=
-
-
-** The Main Loop
-
-TODO
-
-
-** Timeouts Functions
-
-Methods that are called at certain interval time until =FALSE= is returned.
-
-#+include "gtk_c/timeouts.c" src
-
-** Idle Functions
-
-A function that will be called when there are no events pending
-
-=g_idle_add()=, =g_idle_add_full()=
-
-** Data Types
-
-- =GString=: a byte array specialized for UTF-8 null-terminated character strings.
-
-- =GTree=: a balanced binary tree
-
-** Input-Output Channels
-
-- =GIOChannel=: handle files, pipes and sockets
-
 
 * Chap.7 The Text View Widget
 
