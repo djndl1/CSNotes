@@ -1,0 +1,64 @@
+#+title: Basics
+
+* Quick Started
+
+- =lua -i prog=, =-e= for evaluation of code, =-l= load library
+
+- =dofile("mylua.lua")=: load source file
+
+- =_variableName= is not encouraged
+
+#+begin_src
+-- short comment
+-- [[
+
+]]
+#+end_src
+
+
+
+* Concepts
+
+- /Chunk/: a sequence of statements such as a file or a single line in
+  interactive mode.
+
+- Operators:
+  + all binary operators in Lua are left-associative except for exponentiation
+    and concatenation.
+
+** Types
+
+- =nil=
+
+- =Boolean=
+  + =false= and =nil= are false and anything else is true.
+  + =and=, =or=, =not= work for =Boolean=, =number= and =string= and the result
+    is not restricted to =Boolean=. =and= and =or= work similarly to coalescence.
+  + =if not x then x = v end=
+  + =((a and b) or c)= equivalent to =a ? b : c= provided that =b= is not false.
+
+- number: =integer= (64-bit for Standard Lua and 32-bit for Small Lua) and
+  =float= (double for Standard Lua and single for Small Lua)
+  + =math.type(3)=, =math.type(3.0)=
+  + =0x1p-1=, =0x0.2=
+  + =//= floor division which rounds the quotient towards minus infinity.
+  + =%= modulo always ends up with a nonnegative result.
+  + number comparison is based on the operands' mathematical value.
+
+- =string=: immutable encoding-agnostic sequence of bytes
+  + =#= length()
+  + =..= string concatenation: note the difference between ="10" + 1.0= and =10
+    .. 1.0=
+  + =tostring()=
+  + ='=​-quoted ="=​-quoted
+  + =[[]]= multiline strings, to handle literal =[[]]=, use ~[=[]=]~ to for
+    =[[]]= within the string, also valid
+    for comments.
+  + =\z= for ignore any whitespace after it, useful for multiline string literal.
+
+
+- =function=
+
+- =thread=
+
+- =table=
