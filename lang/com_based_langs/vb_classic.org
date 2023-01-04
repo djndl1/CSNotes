@@ -689,6 +689,55 @@ Property Get DoubleCrLf() As String
     DoubleCrLf = vbCrLf &; vbCrLf
 End Property
 #+end_src
+
+
+
+** Class Events
+
+- =Class_Initialize=
+
+- =Class_Terminate=: finalizer. fired before releasing the data instance block and
+  terminating the object's life.
+  + useful for RAII or debug tracing (a special =Tracer= class created at the
+    entry of a procedure)
+
+** Object Structure and Memory Management
+
+- Reference Counting
+
+- Structure:
+  - VTable pointer: all public instance functions, procedures, properties are
+    virtual (that's how COM works).
+    + /early VTable binding/: The compiler produces VTable offsets that are then
+      efficiently used at run time to access the object's properties and
+      methods.
+    + /early ID binding/: the compiler can't derive the actual offset in the
+      VTable, but at least it can check that the property or method is there. If
+      so, the compiler stores a special ID value in the executable code. At run
+      time, Visual Basic uses this ID for a very quick look in the object's list
+      of methods (used by ActiveX controls).
+    + /late binding/: the compiler can't deduce which type of object such a
+      variable will contain and can therefore store only information about the
+      property's or the method's name and arguments.
+  - refcounter
+  - module variables and static variables.
+
+#+begin_src pascal
+Dim obj As Object
+If n > = 0.5 Then
+    Set obj = New CPerson
+Else
+    Set obj = New CCustomer
+End If
+Print obj.CompleteName 'late binding
+#+end_src
+
+- Termination:
+  + Visual Basic prevents an object from being destroyed while its procedures
+    are being executed.
+
+- =Is=: check object identity
+
 ** Reflection
 
 - =CallByName(object, procname, calltype, [,arguments])=: late binding call
