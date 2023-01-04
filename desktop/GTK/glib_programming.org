@@ -1,1 +1,13 @@
 #+title: Glib_programming
+* Memory Management
+
+** The =g_malloc()= Family
+
+Various typed and untyped wrappers around =malloc= and =realloc=. Must be used
+with =g_free()=.
+
+- =g_clear_pointer()=: a useful helper to clean up a generic resource.
+
+- =g_steal_pointer()=: not very useful for common C scenarios (useful only to
+  save some typing), but typically
+  with =g_autoptr=.
