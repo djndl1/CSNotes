@@ -701,6 +701,26 @@ End Property
   + useful for RAII or debug tracing (a special =Tracer= class created at the
     entry of a procedure)
 
+*** Implementation
+
+#+begin_src basic
+' implementation
+Event FileCopied(file As String, DestPath As String)
+
+Public Sub StartCopy(filespec As String)
+    ...
+    RaiseEvent FileCopied(thisFile, thisDestPath)
+End Sub
+#+end_src
+
+#+begin_src basic
+Dim WithEvents Fop As CFileOp
+
+Private Sub Fop_FileCopied(file As String, DestPath As String)
+    ...
+End Sub
+#+end_src
+
 ** Object Structure and Memory Management
 
 - Reference Counting
