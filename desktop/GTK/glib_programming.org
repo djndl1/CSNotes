@@ -11,3 +11,16 @@ with =g_free()=.
 - =g_steal_pointer()=: not very useful for common C scenarios (useful only to
   save some typing), but typically
   with =g_autoptr=.
+
+** Memory Slices
+
+The advantage of using memory slices is that they avoid memory waste and fix
+scalability and performance problems that plagued memory chunks,
+achieved by using slab allocation. One constraint of memory slices is that
+the size of the object must be the same size when it was allocated and when it
+is freed.
+
+It is recommended to use the new =g_slice= API instead of =g_malloc()= and friends,
+as long as objects are not resized during their lifetime and the object size
+used at allocation time is still available when freeing.
+
