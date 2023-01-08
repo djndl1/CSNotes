@@ -1,4 +1,44 @@
 #+title: Glib_programming
+* Error Reporting and Handling
+
+Using =GError= and a set of conventions for recoverable runtime errors.
+
+- =g_set_error()=, =g_set_error_literal()=: creates an error and assigns it to a
+  variable. this pair is safe in that they check if the destination is actually
+  an error or =NULL=.
+
+- =g_error_matches()=: check for a specific type of error.
+
+- =g_propagate_error()=: transfers the ownership of an error to another
+  variable.
+
+- =g_clear_error()=: free an errror and set the variable to =NULL=.
+
+- When using libc functions, pair with =g_strerror()= to translate =errno=.
+
+** Basic Rules
+
+- A =GError*= must be initialized to =NULL= before passing its address to a
+  function that can report errors to indicate a clear status before any error occurs.
+
+- the last non-varargs argument is the =GError**= type.
+  =NULL= is passed in if the caller ignores any error.
+
+- control flow should not be affected by whether the caller wnats a =GError=.
+
+- if a =GError= is reported, any out arguments are not defined to be valid.
+
+- clear an error before reusing a =GError*= variable.
+
+- =g_return_if_fail(error == NULL || *error == NULL)= should be put at the beginning
+  of a =GError=-reporting function to ensure a valid destination for the
+  =GError*=
+
+- avoid using a boolean return value that indicate some other meaning than
+  success/failure when paired with =GError= (under which case, a =gboolean*=
+  parameter should be used). If a failure =FALSE= is returned, then the =GError=
+  parameter must be set to a non-=NULL= value.
+
 * Memory Management
 
 ** The =g_malloc()= Family
