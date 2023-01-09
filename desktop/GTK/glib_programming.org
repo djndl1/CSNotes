@@ -80,3 +80,16 @@ It is recommended to use the new =g_slice= API instead of =g_malloc()= and frien
 as long as objects are not resized during their lifetime and the object size
 used at allocation time is still available when freeing.
 
+* Threading
+
+** Threads, Mutexes, Conditional Variable, and Others
+
+Modeled on pthreads.
+
+** Thread Pools
+
+a pretty primitive thread pool.
+
+- =g_thread_pool_new()=, =g_thread_pool_free()=
+
+- =g_thread_pool_push()=
