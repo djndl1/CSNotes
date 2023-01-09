@@ -39,6 +39,22 @@ Using =GError= and a set of conventions for recoverable runtime errors.
   parameter should be used). If a failure =FALSE= is returned, then the =GError=
   parameter must be set to a non-=NULL= value.
 
+** Warnings and Assertions
+
+Contract-based Programming: When using contracts, a supplier should not try to
+verify that the contract conditions are satisfied. They simply assume that.
+
+- preconditions (expected), invariants (maintained), postconditions (guaranteed)
+
+- =g_return_if_fail()=; =g_return_val_if_fail()=; =g_return_if_reached()=,
+  =g_return_val_if_reached()=:
+  even with a =return=, these macros try to log messages if failed. A function
+  is guaranteed to return if =G_DISABLE_CHECKS= is defined.
+
+- =g_warn_if_fail()=, =g_warn_if_reached()=
+
+- =g_on_error_query()=, =g_on_error_stack_trace()=, =G_BREAKPOINT()=: for debug only
+
 * Memory Management
 
 ** The =g_malloc()= Family
