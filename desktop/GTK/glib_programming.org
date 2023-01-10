@@ -80,6 +80,14 @@ It is recommended to use the new =g_slice= API instead of =g_malloc()= and frien
 as long as objects are not resized during their lifetime and the object size
 used at allocation time is still available when freeing.
 
+** Reference Counting
+
+- =grefcount=, =gautomicrefcount=: opaque types that implement refcount
+  semantics.
+
+- RcBox and ARcBox: refcounted memory block.
+  + =GRefString=: refcounted string type.
+
 * Threading
 
 ** Threads, Mutexes, Conditional Variable, and Others
