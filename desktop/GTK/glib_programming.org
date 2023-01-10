@@ -88,6 +88,31 @@ used at allocation time is still available when freeing.
 - RcBox and ARcBox: refcounted memory block.
   + =GRefString=: refcounted string type.
 
+* Utilities
+
+=g_get_current_dir()=, =g_get_home_dir()=, =g_get_host_name()=,
+=g_get_real_name()=; =g_get_tmp_dir()=; =g_get_user_name()=; =g_setenv()=;
+=g_getenv()=; =g_unsetenv()=
+
+- =GDate=: a Julian (starts with 1-1-1 though) and day-month-year representation of the date, ranging from
+  1-1-1 to year 8000 or so.
+
+- =GTimeZone=: time zone structure. With a set of /intervals/ and their abbreviations, a timezone
+  identifier, a daylight saving time flag.
+
+- =GDateTime=: date time structure with timezone info, from 0001-01-01T00:00:00
+  to 9999-12-31T23:59:59.999999. Microsecond precision.
+
+- =GTimer=: more like a stop watch.
+
+** String
+
+- ASCII character function
+
+- string copy; string concatenation; string generation; substring search (including prefix/suffix
+  search);
+
+- =g_printf= family
 * Threading
 
 ** Threads, Mutexes, Conditional Variable, and Others
