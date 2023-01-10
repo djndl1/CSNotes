@@ -1,0 +1,63 @@
+#+title: ADO.NET
+
+A family of .NET technologies to interact with data in standard, structured,
+and primarily /disconnected/ ways. ADO.NET concepts are based loosely on their
+relational databvase counterparts.
+
+- The Two Parts
+  + /DataSet/:
+    - =DataTable=: the core; tables can be grouped into =DataSet=
+      + =DataColumn=: defines the data type
+      + =DataRow=: CRUD
+    - =DataRelation=: links between the tables of data
+    - =DataView=: a limited or modified view of the rows in =DataTable=
+    - =Constraint=: unique, foreign key
+  + /Data Provider/: DataAdapter, DataReader: part that
+    provides DataSet.
+    - Connection: communcation with external data sources
+    - Command: SQL queries and data management
+    - DataAdapter: stores standard query defintions for interacting with a
+      database, removing the tedium of constantly needing to build SQL
+      statements.
+    - DataReader: fast, read-only access to the results of a query.
+
+* Data Set
+
+Visual Studio provides a visual DataSet designer that can define and store a =DataSet=
+inside an =.xsd= file rather than using code.
+
+** DataTable
+
+A /logical implementation/ of a table of data.
+
+- =DataTable=
+  + a few events are provided. Triggers can be simulated with these events.
+  + =AcceptChanges()= commits a logical transaction or =RejectChanges()= to roll
+    back. Transcations are automatically started for CRUD methods.
+
+
+- =DataColumn=: included within =DataTable.Columns=. Types allowed are limited,
+  similar to how a RDBMS provides.
+  + =AutoIncrement=, =AutoIncrementSeed=, =AutoIncrementStep=
+
+- =DataRow=:
+  - States are maintained for each row: =Detached=, =Added=, =Unchanged=,
+    =Deleted=, =Modified=. =Rows.Remove()=, =Rows.RemoveAt()= circumvents this
+    state tracking (Use =DataRow.Delete()= for transaction).
+  - be careful when working with items since they are not strongly typed.
+  - =DataTable.NewRow()= only creates a =DataRow=, use =.Add()= to add it to the
+    table.
+  - ADO.NET keeps multiple copies of each changed value of a row =DataRowVersion=
+    + =Proposed=, =Original=
+    + =Current=: based on the state, might be =Proposed= or =Original=
+    + =Default=: based on whether a row is attached to a =DataTable=.
+
+*** Validation
+
+Data exceptions are thrown on =DataRow.EndEdit()=, including type mismatch, data
+length, nullability issues, constraint violation.
+
+The user may also take advantage of =DataTable='s events for data validation.
+The client check =DataRow.HasErrors= and =DataTable.HasErrors= for any error and
+then retrieve them with =DataTable.GetErrors()=, =DataRow.GetColumnsInError()=,
+=DataRow.GetColumnError()=, =DataRow.RowError=
