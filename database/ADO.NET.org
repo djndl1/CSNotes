@@ -69,3 +69,72 @@ then retrieve them with =DataTable.GetErrors()=, =DataRow.GetColumnsInError()=,
 - =DataTable.Select()= with SQL-like syntax
 
 - =DataColumn.Expression= for virtual columns
+
+** =DataSet=
+
+Schema-like object that links multiple tables together.
+
+*** Relations
+
+- One-to-One (the optional one is the child)
+
+- One-to-Many (parent-to-childs). =GetParentRow()=, =GetChildRows()=
+
+- Many-to-Many: there may be a go-between table that has a composite primary key
+  as the child. Or the foreign key
+  may not be unique (mutually one-to-many). =GetParentRows()=
+
+#+begin_src csharp
+DataTable studentTable = new DataTable("Student");
+
+studentTable.Columns.Add("ID", typeof(long));
+DataTable classTable = new DataTable("Class");
+
+classTable.Columns.Add("ID", typeof(long));
+DataTable interimTable = new DataTable("StudentClassInterim");
+
+interimTable.Columns.Add("StudentID", typeof(long));
+interimTable.Columns.Add("ClassID", typeof(long));
+
+// ----- Make the linking fields unique.
+Constraint interimKey = new UniqueConstraint(
+new DataColumn[] { interimTable.Columns["StudentID"],
+                   interimTable.Columns["ClassID"] }, true);
+interimTable.Constraints.Add(interimKey);
+
+// ----- Relations exist within a data set context.
+DataSet registration = new DataSet("Registration");
+registration.Tables.Add(classTable);
+registration.Tables.Add(studentTable);
+registration.Tables.Add(interimTable);
+
+// ----- Add standard joins between the core tables and the interim.
+DataRelation joinPart = new DataRelation("ClassToStudent",
+                                         classTable.Columns["ID"],
+                                         interimTable.Columns["ClassID"], true);
+registration.Relations.Add(joinPart);
+joinPart = new DataRelation("StudentToClass",
+                            studentTable.Columns["ID"],
+                            interimTable.Columns["StudentID"], true);
+registration.Relations.Add(joinPart);
+#+end_src
+
+*** Constraint
+
+- =UniqueConstraint=
+
+- =ForeignKeyConstraint=: by default also sets the linking columns unique.
+
+*** Aggregation
+
+- =DataTable.Compute=
+
+** Indexed View =DataView=
+
+An indexed reference to each row in the linked =DataTable=.
+A =DataView= can be filtered, sorted.
+
+** Serialization With XML
+
+ADO.NET includes full schema definition support using Schema Definition
+Language (XSD).
