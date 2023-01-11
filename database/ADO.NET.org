@@ -61,3 +61,11 @@ The user may also take advantage of =DataTable='s events for data validation.
 The client check =DataRow.HasErrors= and =DataTable.HasErrors= for any error and
 then retrieve them with =DataTable.GetErrors()=, =DataRow.GetColumnsInError()=,
 =DataRow.GetColumnError()=, =DataRow.RowError=
+
+*** Search, Sorting and Expression
+
+- =DataRowCollection.Find()= by primary key
+
+- =DataTable.Select()= with SQL-like syntax
+
+- =DataColumn.Expression= for virtual columns
