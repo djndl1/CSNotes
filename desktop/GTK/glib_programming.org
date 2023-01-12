@@ -113,6 +113,21 @@ used at allocation time is still available when freeing.
   search);
 
 - =g_printf= family
+
+*** Unicode
+
+- Unichar equivalents of =ctype.h= and some Unicode-specific functions
+
+- UTF-8 specific functions
+
+- UTF-8 UTF-16 UTF-32 conversion
+
+*** CharSet Conversion
+
+- =g_convert()= family
+
+- =g_iconv_= family
+
 * Threading
 
 ** Threads, Mutexes, Conditional Variable, and Others
