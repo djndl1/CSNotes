@@ -1,0 +1,63 @@
+#+title: Dos_basics
+
+* Simple Commands
+
+- =help=: with or without an argument
+
+- =ver=: version
+
+- =mem=: show memory status
+
+- =dir=: directory listing
+  + =/P=: paged
+  + =/W=: wide format, i.e. less detailed
+
+- =cd=, =chdir=: change directory
+  + as =pwd= without arguments
+  + =-=: last directory is supported
+  + =\=: the root directory of the drive
+
+- =mkdir=, =md=
+
+- =rmdir=, =rd=: remove empty directory.
+
+- =copy=
+
+- =ren=, =rename=
+
+- =del=: delete files/directories
+
+- =format=: format a drive
+
+- =dosshell=: TUI file manager
+
+* Files
+
+- =.SYS=: device drivers.
+
+* System configuration
+
+- =CONFIG.SYS=, =FDCONFIG.SYS=: hardware configuration
+
+- =AUTOEXEC.BAT=, =FDAUTO.BAT=: commands run after startup
+
+- Press =F5= to bypass the two. =F8= to confirm each command before running them.
+
+BACKUP THEM  IN DRVIE A BEFORE EDITING (it's always possible to just move the disk to another PC to edit them).
+
+** CONFIG.SYS
+
+Some commands are used to configure hardware.
+
+TODO
+
+* Memory
+
+- /Conventional Memory/: the first 640K
+
+- /Upper Memory/: the 384K above the conventional.
+
+- /Extended memory/ (XMS): memory beyond 1MB. Requires an extended-memory manager.
+  + /High Memory Area/ (HMA): the first 64K of extended memory. DOS is automatically placedd in this area if available.
+
+- /Expanded memory/: installed on an expanded memory board.
