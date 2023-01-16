@@ -137,6 +137,30 @@ mov  rax, 0x400921fb...
 
 - =G|LPREFIX=, =G|LPOSTFIX=: mangling symbols to fit specific API conventions.
 
+** Output Formats
+
+*** ELF
+
+**** Position-Independent Code
+
+- =WRT= with
+  + =..gotpc=
+  + =..gotoff=
+  + =..got=
+  + =..plt=: the linker build a procedure linkage table entry for the symbol and the reference goes to the address of the PLT entry.
+  + =..sym=
+
+** AMD64
+
+- The CPU Supports RIP-relative addressing directly with =REL= or =DEFAULT REL=
+
+- The stack is required to be 16-byte aligned at the entry to a function on most platforms.
+
+- Immediates are 32-bit except =MOV reg64, imm64=.
+
+- =MOV= can reference a symbol in the entire 64-bit address space while =LEA= only wihtin 2GB of the instruction itself.
+
+
 ** ndisasm
 
 #+begin_src shell

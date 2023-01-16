@@ -1,0 +1,8 @@
+#+title: Tap_tun
+
+For both TAP and TUN, there exists a virtual network interface for applications to operate on.
+
+
+* TUN
+
+A client program transfers IP packets to and from the =tun= control interface.

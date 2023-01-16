@@ -1,0 +1,7 @@
+#+title: Coreutils
+
+* Write files in formats
+
+- =od -A d -t x=: print in hexadecimal with decimal offsets.
+
+- =base32=, =base64=, =basenc=

@@ -1,0 +1,43 @@
+#+title: Run_qemu
+
+- /System Emulation/: a virtual model of an entire machine. The CPU is either fully emulated or a real CPU managed by a hypervisor.
+
+- /Use Mode Emulation/: launch process compiled for one CPU on another.
+
+- /Virtualization/: execute the guest code directly on the host CPU.
+
+* System Emulation
+
+=qemu-system-=
+
+** Device Emulation
+
+- /Device frontend/: the virtual device the guest sees, =--device=
+
+- /device buses/: most devices exist on a bus of some sort. in some cases, the bus a device is attached to should be specified along with its address.
+
+- /device backend/: how the data from the emulated device will be processed by QEMU. =--chardev=, =--netdev=, =--blockdev=
+
+- /device passthrough/: the device is actually given access to the underlying hardware.
+
+* Networks
+
+The guest part has the virtual network device and the host has backends that interacts with the emulated NIC.
+
+** Backends
+
+configured using =-netdev TYPE,id=NAME,...=
+
+Every virtual network devices needs its own backend. The =id= is used to distinguish backends.
+
+There are several different backends.
+
+*** User Networking (SLIRP)
+
+default and requires no root/administrator privileges.
+
+- poor performance.
+
+- ICMP generally does not work.
+
+- not directly accssible from the host or the external network.

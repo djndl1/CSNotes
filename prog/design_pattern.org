@@ -14,3 +14,137 @@ Using command objects makes it easier to construct general components that need 
     + /Client/: hold and manage the above three, decides which commands to execute at which points.
 
 Typical example: thread pools => Runnable tasks => threads
+
+** Mediator Pattern
+
+*** Problems
+
+- Solve tight coupling between a set of interacting objects. Tight coupling also causes distributed
+  interaction behavior.
+
+- Change the interaction between a set of objects independently
+
+*** Method and Solution
+
+#+begin_quote
+Define an object that encapsulates how a set of objects interact. Mediator promotes loose coupling by keeping objects from referring to each other explicitly, and it lets you vary their interaction independently.
+#+end_quote
+
+The key is that objects interact with each other indirectly through a mediator object that controls and coordinates the interaction. Interaction behavior is thus encapsulated and centralized.
+
+**** Mediator Definition
+
+- Define an interface =Mediator.mediate()= for interacting with objects
+
+- Define classes that implement the interaction behavior by controlling and coordinating the interaction between objects.
+
+Objects delegate interaction to a mediator object =mediator.mediate()=. These objects have no explicit knowledge of each other but only the mediator.
+
+The mediator implementation maintains explicit references to interacting objects (/Collegues/) while these objects
+refer to the mediator only through the interface.
+
+A collegue calls =mediator.mediate()= to start the interaction and passes itself as an argument to the mediator, with which the mediator obtains necessary information from the collegue and acts on the other collegue.
+
+**** Disadvantage
+
+The interaction behavior complexity could increase with the number of interacting objects, making the mediator itself a monolith that is hard to maintain.
+
+**** Examples
+
+***** C#
+
+#+begin_src csharp
+public interface FacebookGroupMediator
+{
+     void SendMessage(string msg, User user);
+     void RegisterUser(User user);
+}
+
+public class ConcreteFacebookGroupMediator : FacebookGroupMediator
+{
+    private List<User> usersList = new List<User>();
+    public void RegisterUser(User user)
+    {
+        usersList.Add(user);
+    }
+    public void SendMessage(string message, User user)
+    {
+        foreach (var u in usersList)
+        {
+            // message should not be received by the user sending it
+            if (u != user)
+            {
+                u.Receive(message);
+            }
+        }
+    }
+}
+
+public abstract class User
+{
+    protected FacebookGroupMediator mediator;
+    protected string name;
+    public User(FacebookGroupMediator mediator, string name)
+    {
+        this.mediator = mediator;
+        this.name = name;
+    }
+    public abstract void Send(string message);
+    public abstract void Receive(string message);
+}
+
+public class ConcreteUser : User
+{
+    public ConcreteUser(FacebookGroupMediator mediator, string name) : base(mediator, name)
+    {
+    }
+    public override void Receive(string message)
+    {
+        Console.WriteLine(this.name + ": Received Message:" + message);
+    }
+    public override void Send(string message)
+    {
+        Console.WriteLine(this.name + ": Sending Message=" + message + "\n");
+        mediator.SendMessage(message, this);
+    }
+}
+#+end_src
+
+**** Existing Implementations
+
+***** MediatR (C#)
+
+Not strictly a mediator implementation but solves some in-process messaging problems.
+
+****** Basic Messages
+
+******* Request-Response
+
+- =IRequest<T>=, =IRequest= (=Unit= response)
+
+- =IRequestHandler<T, U>=: return =Task<U>=
+  + =ReqeustHandler<T, U>=: synchronous
+  + =IRequestHandler<T>=: returns =Task<Unit>=
+  + =AsyncRequesetHandler<T>=: return =Task=
+  + =RequestHandler<T>= sync return =void=
+
+- =Mediator.Send(request)=
+
+******** Streams
+
+- =IStreamRequeset<TResponse>= and =IStreamRequestHandler<TRequest, TResponse>=, which returns an =IAsyncEnumerable<TRespopnse>=
+
+******* Notifications
+
+- =INotification=
+
+- =INotificationHandler<TNotification>=
+  + =Notificationhandler<TNotification>=: a synchronous version
+
+- =Mediator.Publish(notification)=
+
+Handlers are executed one after another by default unless a different publish strategy is used.
+
+******* Contravariant Handlers
+
+=IHandler<BaseRequest>= is a valid =IHandler<DerivedRequest>= and can handle  =DerivedRequest=.

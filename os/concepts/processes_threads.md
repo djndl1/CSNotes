@@ -76,7 +76,8 @@ The main reason for having threads is that in many applications, multiple activi
 
 - **thread**: The abstraction of execution of a process is a _thread of execution_. The thread has a program counter, registers that hold its current working variables, a stack which contains the execution history with one frame for each procedure. Threads are the entities scheduled for execution on the CPU.
 
-What threads add to the process model is to allow multiple executions to take place in the same process environment, to a large degree indepenedent of one another.
+What threads add to the process model is to allow multiple executions to take place in the same process environment, to a large degree indepenedent of one another. 
+Threading separates the concepts of resource grouping and execution. Processes share phsyical hardware resources while threads shared an address space and other resources.
 
 - **multithreading**: used to describe the situation of allowing multiple threads in the same process. Some CPUs have direct hardware support for multithreading and allow thread switches to happen on a nanosecond time scale.
 

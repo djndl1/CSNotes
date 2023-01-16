@@ -1,0 +1,22 @@
+#+title: X86_internals
+
+Resources on CPU internals: various compiler implementation
+
+* Intel Pipeline
+
+#+begin_src
+Branch Prediction -> Fetch -> Decode -> Rename -> Reorder buffer read -> Reservation station -> Execution -> Reorder buffer write -> Retire
+#+end_src
+
+Unlike manufacturing pipeline, instruction in a pipeline have dependency upon each other, resulting in pipeline stalls. Also instruction pipelining is not linear: the execution may branch.
+
+- Branch Prediction: guess what branch will be executed and what destination will be to avoid restarting the pipeline since part of the previous pipeline would be wrong.
+  + Branch Target Buffer (BTB): store recent branch instructions and their destinations (keeps history of previous outcomes) for future prediction.
+  +
+
+- Fetch And Decode with predicted results:
+  + in 16-byte chunks and determine the boundaries between instructions in the byte stream.
+  + x86 instructions are decomposed into microoperations, an internal RISC-like instructions for easy execution.
+  + Micro-fusion (multiple microops as one), Macro-fusion (multiple x86 instructions mapping to a single microop)
+  + microop cache: store the decoded operations for failed branch prediction to short-circuit the restart of the pipeline since the correct branch might be in the cache.
+  + After all this, the program is turned into a linear flow of microops.
