@@ -1,0 +1,103 @@
+#+title: Clean Architecture
+
+* Principles
+
+- Dependency Inversion: high-level modules should not depend on low-level
+  modules. Details should depend on abstractions.
+
+* Basic Rules
+
+- All business rules are in the =Core= project.
+
+- All dependencies flow toward the =Core= project, i.e. other projects should
+  depend on the =core= project and not the reverse.
+
+- inner projects (the =Core=) defines the interfaces so that any other outer
+  interfaces can reference or implement them.
+
+* The Core Project
+
+where domain model types belong.
+
+** What are in the core
+
+- most interfaces
+
+- aggregates, entities (objects with identity)
+
+- value objects (without identity but with only value)
+
+- domain services
+
+- domain exceptions
+
+- domain events; event handlers
+
+- specification (specification pattern)
+
+- enums
+
+- custom guards
+
+- validators
+
+* The Infrastructure Project
+
+Anything that communicates out of the app's process.
+e.g. data access; messages; file I/O; web clients,
+which are also things that are difficult to test.
+
+* The Web Project
+
+- API Endpoints
+
+- Controllers
+
+- Views
+
+- API Models
+
+- ViewModels
+
+- Filters
+
+- Tag Helpers
+
+- Model Binders
+
+- Frontend code
+
+- /Composition Root/
+
+* The Shared Kernel library.
+
+Shared common abstractions or base classes, possibly used by multiple projects.
+
+* Domain Driven Design Concepts
+
+** Anemic Model Anti-Pattern (Tell, Don't Ask)
+
+e.g. DTO
+
+Anemic models are not legitimate domain models. They lack behavior and are
+constantly manipulated by other code in a non-OOP fashion.
+
+** Entity
+
+An object that has some intrinsic identity, apart from the rest of its states.
+
+** Value Object
+
+An immutable type that is distinguished only by the state of its properties,
+compared on the basis of their collective state.
+It doesn't have to be a C# value type and typically not.
+
+Typically, validation is not done within the constructor when dealing with value objects.
+
+** Aggregate Pattern
+
+An aggregate of one or more related entities and possibly value objects, with a
+single root entity as the /aggregate root/ which controls access to all of the
+members of its aggregate so that other parts of the system cannot access
+its members directly. Persistence should apply only at the aggregate level. This
+simplifies the relationships between entities and ensure the consistency between them.
