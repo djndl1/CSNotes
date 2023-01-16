@@ -138,3 +138,9 @@ A =DataView= can be filtered, sorted.
 
 ADO.NET includes full schema definition support using Schema Definition
 Language (XSD).
+
+* External Data Sources
+
+Four crucial classes of an ADO.NET provider: Connection, Command, DataAdapter, DataReader
+
+** Connection
