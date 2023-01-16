@@ -1,0 +1,61 @@
+#+title: Carbon As Successor To C++
+
+* Problems
+
+- Decades of technical debt
+
+- Proritizing backwards compatibility, which prevents fixing technical debt.
+
+- Standarization than improvement
+
+* Existing Langauges
+
+- Too many GC languages
+
+- Rustlang  is not quite compatible with C++'s ecosystem.
+
+- Kotlin has wonderful interoperability with Java
+
+* Carbon as a Successor Languages
+
+- Build on an existing ecosystem, with bi-directional compatibility.
+
+- Learning curve and adoption path
+
+- Migration is assisted by tools.
+
+** Syntax
+
+- Clean up syntax, simpler keywords.
+
+- use expression to represent a type.
+
+- the package is the root namespace.
+
+- Members are public unless declared declared private.
+
+- Explicit object parameter declares a method (=[me: Self]=, =[addr me: Self*]=)
+
+- Single inheritance; classes are final by default.
+  + =abstract class=
+  + =base class=: extensible class.
+
+- defintion-checked generics =[T:! Summary](x: T) { ... }=
+
+- Interfaces provide API extension points: an existing type might implement an interface outside of its original package.
+
+- Memory safety improved upon C++ without breaking interoperability.
+
+** Interop
+
+=iimport Cpp library "circle.h"=
+
+LLVM builds the C++ header module and then use the AST to build a carbon AST for carbon's use.
+
+=#include "geometry.carbon.h"=: include carbon code as-if it were a header.
+
+** Tools
+
+- Batteries-included
+
+- package manager
