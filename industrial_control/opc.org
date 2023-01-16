@@ -122,3 +122,45 @@ Every OPC Server has to support the following interfaces
 1. =IOPCBrowse=: browsing OPC Address Space.
 
 2. =IOPCItemIO=: used for performing OPC Item read and write operations
+
+* OPC DA Automation Interface
+
+An interface used by COM/OLE Automation (Automation as in COM not industrial
+control) Applications. An app accesses an OPC server through an OPC Automation
+Wrapper (wrapping around the Custom Interface) In-Process DLL (=OPCDAAUTO.DLL=,
+OPC Automation 2.0).
+
+** Architecture
+
+- =OPCServer=: the root of all
+  + =OPCGroups=: a OLE collection containing all the OPC groups created by this
+    client in the =OPCServer=
+    + =OPCGroup=: maintain state information and privide data acquisition
+      services for the =OPCItems= object it contains.
+      + =OPCItems=: all of the =OPCItem= objects the client has created in the
+        =OPCServer=
+        + =OPCItem=: maintains the item's definition, current value, status
+          information, last update time. The Custom interface does not provide
+          such an object.
+   + =OPCBrowser=: browses item names in the server's configuration.
+
+- The value, quality and timestamp of an item is guaranteed to be kept in sync.
+
+- Error Handling: an exception is generated, represented in VB as an =Err=
+  object.
+
+- Event notification mechanism is provided.
+
+- Arrays are 1-based (VB arrays are 0-based by default but the lower bound can
+  be specified). A function that accepts an array count handles only as many
+  elements in the array as the count indicates.
+
+- Parameters are passed by value unless =ByRef= is specified.
+
+** Some Notes On the Interface
+
+- While =OPCItem= provides its value, quality and timestmap as properties, the
+  =Read= method reads them in sync.
+  + values are represented by =Variant=.
+
+- =OPCGroups=, =OPCGroup=, =OPCItems= and =OPCItem= know their parent.
