@@ -162,3 +162,37 @@ Full division would be =DIV(U) rdq, rs1, rs2; REM(U) rdr, rs1, rs2=.
 * D Standard Extension: Double-Precision Floating-Point
 
 =f0= through =f32= are widened to 64 bits
+
+* ABI
+
+** Standard ABI
+
+*** Registers
+
+- =x1=: =ra= (return address)
+
+- =x2=: =sp= stack pointer
+
+- =x3=: =gp= global pointer
+
+- =x4=: =tp= Thread pointer
+
+- =x5=-=x7=: =t0=-=t2=, =x28=-=x31=: =t3=-=t6= temporary registers
+
+- =x8=-=x9=: =s0=-=s1=, =x18=-=x27=: =s2=-=s11=: callee-saved registers
+
+- =x10=-=x17=: =a0=-=a7= argument registers
+
+- =f0-f7=, =f28=-=f31=: temporary registers
+
+- =f8=-=f9=, =f18=-=f27=: callee-saved registers
+
+- =f10=-=f17=: argument registers
+
+*** Calling Convention
+
+**** Integer Calling Convetion
+
+- =a0=-=a7=: for scalars smaller than XLEN.
+
+- the stack is empty-descending and the stack pointer is aligned to a 128-bit boundary upon procedure entry.
