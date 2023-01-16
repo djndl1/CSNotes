@@ -104,7 +104,7 @@ Based on VFPv4
 
 ** Data Types
 
-- F16, F32(F), F64(D) for use in floating point instructions as a modifier.freebird
+- F16, F32(F), F64(D) for use in floating point instructions as a modifier.
 
 
 * Instruction sets
