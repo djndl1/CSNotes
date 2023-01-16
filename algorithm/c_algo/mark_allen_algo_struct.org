@@ -1,4 +1,15 @@
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+# -*- coding: utf-8 -*-
+#+LATEX_COMPILER: xelatex
+#+LATEX_HEADER: \usepackage{xeCJK}
+
+* Basic Math
+
+- exponents, logarithms
+
+- geometric sequence and series; arithmetic progression ; sum of i squared;
+
+  harmonic series
+
 
 * Data Structures
   :PROPERTIES:
