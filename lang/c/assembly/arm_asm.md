@@ -690,3 +690,17 @@ smith: .string "Smith"
   mov r1, #88
   str r1, [r0, #s_grade]
 ```
+
+# Vector Floating Point Coprocessor (V4)
+
+- VFP has its own program status `FPSCR`: `N`, `Z`, `C`, `V`, updated only by `fcmp`. Conditonal modifiers only work if the FPSCR flags have been moved to the `CPSR` beforehand.
+
+- VFP supports Full-compliance mode or RunFast mode when dealing with floating-point special cases. GCC has `-ffast-math` for this.
+
+- `FPSID`: contains the version info of the VFP.
+
+- Vector mode deprecated in favor of Neon.
+
+## ABI
+
+- `s16` through `s31` are nonvolatile. `s0` through `s15`are volatile. `d16` through `d31` are also volatile.
