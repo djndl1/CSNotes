@@ -86,7 +86,7 @@ run it with =NULL= as the module handle of these functions.
 
 #+BEGIN_SRC C
   DWORD GetModuleFileNameW(HMODULE hModule, LPWSTR  lpFilename, DWORD   nSize);
-  DWORD GetModuleFileNameExW(HANDLE  hProcess, HMODULE hModule, LPWSTR  lpFilename, DWORD   nSize);
+  DWORD GetModuleFileNameExW(HANDLE  hProcess, HMODULE hModule, LPWSTR  lpFilename, DWORD   nSize); // PSAPI.DLL
 #+END_SRC
 
 #+INCLUDE: "win32/src/processes.cpp" src cpp
@@ -97,10 +97,12 @@ run it with =NULL= as the module handle of these functions.
   :END:
 
 #+BEGIN_SRC C
-  void ExitProcess(UINT uExitCode); // DLL detach calls are made, termination handlers are not executed
+  void ExitProcess(UINT uExitCode); // DLL detach calls are made, termination handlers are not executed, same as return from main function
   BOOL GetExitCodeProcess(HANDLE  hProcess, LPDWORD lpExitCode);
-  BOOL TerminateProcess(HANDLE hProcess, UINT   uExitCode); // not even DllMain
+  BOOL TerminateProcess(HANDLE hProcess, UINT   uExitCode); // Neither SEH nor DLLMain functions are executed
 #+END_SRC
+
+=__finally= and =__except= are not executed when =ExitProcess= is called. Console control handlers are a limited alternative to signal another process to cleanly shutdown.
 
 * Process Sync
   :PROPERTIES:
