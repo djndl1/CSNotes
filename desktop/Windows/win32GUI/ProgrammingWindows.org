@@ -269,3 +269,13 @@ only informs the window that the time is due. A =WM_TIMER= is synchronous to the
 execution of the window procedure.
 
 - =SetTimer()= sets a new/existing timer and stop it with =KillTimer()=
+
+* Child Windows Controls
+
+A child window can =GetParent()= and then =SendMesssage()= to its parent window.
+A specialized child window may always send the same set of messages (and
+parameters).
+
+Windows has a set of predefined/preregistered child windows (controls).
+
+- /button/:
