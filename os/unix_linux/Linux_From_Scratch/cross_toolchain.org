@@ -1,0 +1,14 @@
+#+title: Cross Toolchain
+
+* GCC Canadian Cross
+
+#+begin_src shell
+--build=<where the compiler is compiled> --host=<where the compiler would run> --target=<the code that the compiler should generate>
+#+end_src
+
+The LFS only build three compilers:
+- one that runs on the host and targets the LFS
+  + first pass: binutils, gcc, kernel API headers, glibc, libstdc++ without exception support
+- one that is cross-compiled and runs on the LFS and targets the LFS.
+  + a basic linux environment and gcc is built using the toolchain of the first pass
+- one that is native-compiled on the LFS, runs on the LFS and targets the LFS.
