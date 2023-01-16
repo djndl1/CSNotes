@@ -1,4 +1,28 @@
 #+title: Glib_programming
+
+
+A general-purpose lbirary that provides many kinds of utility functions, data
+types and wrappers functions.
+
+* Basic Data Types
+
+- =gboolean= (=TRUE=, =FALSE=, an =int=); =gchar=, =guchar=, =gconstpointer=,
+  =gdouble=, =gfloat=, =g(u)int=, =g(u)int8=, =g(u)int16= ..., =g(u)long=,
+  =gpointer=, =gsize=, =gssize=
+  + some limit macros are available
+
+- =G_GINT64_CONSTANT()=, =G_GUINT64_CONSTANT()=: 64-bit integer literals
+
+* Standard Macros
+
+- =ABS()=; =CLAMP()=; =MIN()=, =MAX()=
+
+- =G_DIR_SEPARATOR=, =G_DIR_SEPARATOR_S=
+
+- Type Conversions: =GINT_TO_POINTER()=, =GPOINTER_TO_INT()= ...
+
+- Some constants: =G_E=, =G_PI= ...
+
 * Error Reporting and Handling
 
 Using =GError= and a set of conventions for recoverable runtime errors.
@@ -54,6 +78,12 @@ verify that the contract conditions are satisfied. They simply assume that.
 - =g_warn_if_fail()=, =g_warn_if_reached()=
 
 - =g_on_error_query()=, =g_on_error_stack_trace()=, =G_BREAKPOINT()=: for debug only
+
+* Message Logging
+
+Any type of textual message can be conveyed using =g_log()=.
+
+- =g_messsage()=, =g_warning()=, =g_critical()=, =g_error()= and =g_debug()= for the sake of convenience, emitted under the =G_LOG_DOMAIN=. Some types of messages can be set fatal using =g_log_set_always_fatal=. By default, only =G_LOG_LEVEL_ERROR= messages are fatal.
 
 * Memory Management
 
@@ -127,6 +157,73 @@ used at allocation time is still available when freeing.
 - =g_convert()= family
 
 - =g_iconv_= family
+
+* File Manipulation
+
+#+BEGIN_SRC C
+#include <glib.h>
+
+gchar *filename, *content;
+gsize bytes;
+GError *error = NULL;
+
+filename = g_build_filename(g_get_home_dir(), "temp", NULL);
+g_file_set_contents(filename, "Hello World", 1 &error);
+handle_error(error);
+
+if (!g_file_test(filename, G_FILE_TEST_EXISTS))
+    g_error("Error: File does not exist!");
+
+g_file_get_contents(filename, &content, &bytes, &error);
+handle_error(error);
+g_print("%s\n", content);
+
+g_free(content);
+g_free(filename);
+#+END_SRC
+
+#+BEGIN_SRC C
+GDir *dir = g_dir_open(g_get_home_dir(), 0, NULL);
+
+if (!g_file_test(g_get_home_dir(), G_FILE_TEST_IS_DIR))
+    g_error(...)
+
+const gchar *file;
+while ((file = g_dir_read_name(dir)))
+    g_print("%s\n", file);
+
+g_dir_close(dir);
+#+END_SRC
+
+=g_rename()=; =g_remove()=; =g_rmdir()=; =g_mkdir()=; =g_chdir()=; =g_chmod()=
+
+
+* The Main Loop
+
+TODO
+
+
+* Timeouts Functions
+
+Methods that are called at certain interval time until =FALSE= is returned.
+
+#+include "gtk_c/timeouts.c" src
+
+* Idle Functions
+
+A function that will be called when there are no events pending
+
+=g_idle_add()=, =g_idle_add_full()=
+
+* Data Types
+
+- =GString=: a byte array specialized for UTF-8 null-terminated character string.
+
+- =GTree=: a balanced binary tree
+
+* I/O Channels
+
+- =GIOChannel=: handle files, pipes and sockets
 
 * Threading
 
