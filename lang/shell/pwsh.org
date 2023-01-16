@@ -5,6 +5,7 @@
 1. a CLI interpreter, a scripting langguage, a shell
 
 2. Object-based, well integrated with Windows's API-based system
+   + Common Information Model, implemented by MS as /Windows Management Instrumentation/
 
 ** Simple Examples To show what it can do
 
@@ -14,7 +15,7 @@
 $total = 0
 Get-ChildItem | ForEach-Object($total += $_.length)
 
-Get-ChildItem | Sort-Object -Property Length | Select-Object -First 1
+Get-ChildItem | Sort-Object -Property Length | Select-Object -First 1 # there's a default sort property for the object if the sort key is not specified
 #+end_src
 
 *** Control-Flow
