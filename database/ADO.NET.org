@@ -144,3 +144,44 @@ Language (XSD).
 Four crucial classes of an ADO.NET provider: Connection, Command, DataAdapter, DataReader
 
 ** Connection
+
+Connections are pooled. The ODBC provider relies on the underlying ODBC manager to provide pooling capability.
+
+- =Open()= the connection before anything else; =Dispose()= or =Close()= it after using.
+
+** Command
+
+Executes SQL or stored procedures.
+
+A command must be associated with a Connection. It may supports text SQL, stored procedure.
+
+** Parameter
+
+=Command.Parameters= can define the data type for simple data. For ODBC and OLE providers, named parameters are not supported.
+
+** DataAdapter
+
+Links external database tables and local =DataSet=-managed tables by issuing SQL statements.
+
+*** Data Retrieval
+
+- =DataAdapter.Fill()=  requests data using a valid =SELECT= statement or a stored procedure using =DataAdapter.SelectCommand=.
+
+*** Data Modification
+
+- =DataAdapter.InsertCommand=, =DataAdapter.UpdateCommand=, =DataAdapter.DeleteCommand=: the client adds these commands and fills them with appropriate parameters and call =DataAdapter.Update()= to persist the changes back to the data store.
+
+- =DataAdapter= can be used with =CommandBuilder= to automatically generate the three modification commands that handles rows dynamically.
+  + used only with single-table queries
+  + requires the table have at least one primary key or a unique value.
+  + non-standard names (e.g. with space characters) are not supported.
+
+*** Table-Column Name Mapping
+
+- =DataTableMapping= added to =DataAdapter.TableMappings=
+
+- =DataColumnMapping= added to =DataTableMapping=;
+
+Missing mappings can be handled by the adapter automatically
+with =DataAdapter.MissingMappingAction= and =DataAdapter.MissingSchemaAction=
+
