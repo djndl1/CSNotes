@@ -201,3 +201,23 @@ with =DataAdapter.MissingMappingAction= and =DataAdapter.MissingSchemaAction=
    + =System.Transactions.TransactionScope= provides automatic distributed transactions.
 
 
+* Provider-Specific Features
+
+** ODP.NET
+
+*** Parameter Binding
+
+- =OracleCommand.BindByName= defaults to =false=. The DapperLib tries hard to set it.
+
+**** Array Binding
+
+The array bind feature enables applications to bind arrays of a type using the OracleParameter class.
+Using the array bind feature, an application can insert multiple rows into a table in a single database round-trip.
+
+- =OracleParameter.ArrayBindCount=: set to the count of parameters.
+
+- =OracleParameter.ArrayBindSize=: the maximum size for each corresponding value in an array, used only for =Clob=, =Blob=, and =Varchar2=.
+  Inferred from the actual size of the value if not explicitly set.
+
+- =OracleException.Errors=: contains the errors of the related bound parameters.
+
