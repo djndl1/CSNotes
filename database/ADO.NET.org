@@ -185,3 +185,19 @@ Links external database tables and local =DataSet=-managed tables by issuing SQL
 Missing mappings can be handled by the adapter automatically
 with =DataAdapter.MissingMappingAction= and =DataAdapter.MissingSchemaAction=
 
+** Transaction
+
+- Atomicity (unit of work), Consistency (valid state),
+  isolation (from other transactions, often implemented as a record-locking function, not efficient for scalable distributed systems),
+  durability (data are recoverable)
+
+- /Concurrency/
+  + /pessimistic concurrency/: records in question are locked when first accessed and released after modification.
+  + /optimistic concurrency/: lcoked only at the moment of update; good for records that are rarely or neven accessed by two users.
+  + ADO.NET, which focus on disconnected data processing, uses optimistic concurrency.
+
+- .NET Framework supports distributed transactions through Microsoft Distributed Transaction Coordinator, which allows an ACID-enabled
+   transaction to span multiple databases on different servers.
+   + =System.Transactions.TransactionScope= provides automatic distributed transactions.
+
+
