@@ -221,3 +221,69 @@ Using the array bind feature, an application can insert multiple rows into a tab
 
 - =OracleException.Errors=: contains the errors of the related bound parameters.
 
+* EntityFramework
+
+Focus on the conceptual view of how data fits together instead of on the phsical view of how it is stored
+in the database and mmove away from the database-centric reality of independent tables joined in relationship towards a OO model.
+
+EF works with flat, relational and hierarchical data sources.
+
+** EF6
+
+- /Model/
+
+- /entity/: similar to a record, a row but in a more conceptual manner
+
+- /entities/: a generic collection of a specific entity.
+  + /entity set/: the logical container for an entity and any other entities derived form that first entity.
+  + /entity container/: a context, similar to =DataSet= or a database.
+    An entity container includes entity sets and association sets.
+
+- /property/
+  + /navigation property/: exposes the available data at the other end of an association.
+
+- /association/: a relationship between two entities. True bidirectional access points between entity instances.
+  + /association ends/: the properties on the ends of the relationship
+  + /multiplicity/: one-to-one, one-to-many and so on
+  + /association set/: all association instances for a defined association type
+
+*** Layers
+
+- /Conceptual Layer/: entity data model
+  + /Conceptual Schema Definition Language/
+
+- /storage model/ or /logical model/: defines the application-side experience of a database-side logical implementation.
+  + includes entity and association definitions.
+  + /Store Schema Definitiion Language/
+
+- /Model Mapping/: the glue between conceptual model and the storage model.
+  + /Mapping Specification Language/
+
+*** Use
+
+1. Write/Design the XML model. Full XML documentation is available.
+
+2. Generate code from the model. =edmgen.exe=, =EntityObject=
+
+3. Instantiate a context =System.Data.Objects.ObjectContext=
+
+4. Query
+   + Entity SQL language: fully string-based query language with =System.Data.Objects.ObjectQuery=, similar to ADO.NET and primitive
+   + Query builder: partially finished LINQ still with some strings that returns =ObjectQuery<T>=, which implements =IQueryable=
+   + LINQ
+   + queries via HTTP requests using WCF
+
+*** Object Services
+
+**** Entities
+
+- =EntityObject=: base class for all entities
+
+- =ComplexObject=
+
+- =ObjectSet<TEntity>=
+
+- =ObjectQuery<T>=
+
+- =ObjectContext=: entity container
+
