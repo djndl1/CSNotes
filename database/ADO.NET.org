@@ -287,3 +287,45 @@ EF works with flat, relational and hierarchical data sources.
 
 - =ObjectContext=: entity container
 
+*** Code First
+
+No XML schemas with a clean tidy API with domain driven design.
+
+**** Connection
+
+- Connection string passed in =DbContext='s constructor with the default =IDbConnectionFactory=
+
+- configuration file with =DbContext='s parameter-less constructor
+
+- otherwise SQL Server LocalDB.
+
+**** Modeling
+
+- =DbContext=: exposes a number of entity collections in the form of =DbSet<T>=, normally only aggregate roots.
+
+- /Entity/: as in DDD.
+  + /Scalar Property/: simple types
+  + /Identity Property/ =KeyAttribute=: represents the underlying database primary key.
+  + /Complex Type/ =ComplexTypeAttribute=: has no identity property and its own table for persistence. Useful for grouping properties that
+    conceptually appear together.
+    - has no navigation properties.
+  + /References/: a bidirection relation between entities that represents many-to-one, one-to-one relations.
+  + /Collections/: one-to-many, many-to-many relations.
+
+- /identity/: if database-generated identity is not possible, use a client-generated GUID as the identity.
+  Also, for entities spanning over multiple tables, using GUID rather than potentially overlapping integers as identites.
+
+- /Inheritance/: derived classes may choose to use the same table;
+  a table for the base class properties and one table for derived properties of each class;
+  one table for each derived class
+
+***** Mapping
+
+- Use attributes under =System.ComponentModel.DataAnnotations.Schema= and =System.ComponentModel.DataAnnotations=
+  + when configuring relationships, only one endpoint should be configured.
+  + causes domain pollution where namespaces and assemblies are used. Attributes are statistically defined. Not centralized.
+
+- by code in =DbContext.OnModelCreating(DbModelBuilder)= or by inheriting =EntityTypeConfiguration<T>= for each entity.
+
+- EF relies on some conventions when mapping classes to database tables, residing in =System.Data.Entity.ModelConfiguration.Conventions=.
+
