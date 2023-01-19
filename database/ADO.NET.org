@@ -399,3 +399,16 @@ Used with EF. =ObjectSet<T>= and =ObjectQuery<T>= implement =IEnumerable<T>= and
 Only for MSSQL, precursor to EF.
 
 *** Linq-To-XML
+
+* Data Binding: Connect Display and Data Entry Controls With a Data Source
+
+Some basic data binding using ADO.NET can be done completely by using Visual Studio design tools.
+
+- Simple data binding: a control hosts a single value from a single data record. e.g. =TextBox=
+
+- Complex data binding: a single control expresses a list of records. e.g. =DataGridView=, =ListBox=
+
+* WCF Data Services
+
+WCF Data Services uses a set of source providers to express different types of source data
+e.g. EF provider; =IQueryable= data; =IUpdatable= interface.
