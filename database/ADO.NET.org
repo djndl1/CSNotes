@@ -329,3 +329,54 @@ No XML schemas with a clean tidy API with domain driven design.
 
 - EF relies on some conventions when mapping classes to database tables, residing in =System.Data.Entity.ModelConfiguration.Conventions=.
 
+*** Generation and Migration
+
+- =Database.Exists()=, =DbContext.Database.Create()=
+
+- =IDatabaseInitializer<T>=
+
+*** Data Query
+
+- =DbSet<T>.Find()= by identity.
+
+- LINQ, along with =EntityFunctions=
+
+- =DbSet<T>.SqlQuery()=, =DbContext<T>.Database.SqlQuery()=, =DbContext<T>.Database.ExecuteSqlCommand()= and finally =DbContext.Database.Connection= with SQL.
+
+- By default, all references and collections are lazily loaded. A join query is only executed when the client code tries to access the referenced entity.
+  + the entity class must not be sealed, private or internal
+  + all nativation properties meant to be lazily loaded are /virtual/ (so as to be overriden the proxy class to lazily load them)
+  + all navigation properties are implemented as auto properties with no backing field and no custom logic (also for overriding).
+  + if lazy loading is disabled, references are =null= unless explicitly loaded. =ctx.Entry(entityVariable).Reference(x => x.NavigationProperty).Load()=.
+
+- /Eager Loading/: a complex join query from the start.
+  + =DbSet.Include(x => x.ReferenceProperty)=
+
+- Any entity from an EF context (queried, marked as deleted or updated) is stored in a local cache called /identity map/ =DbSet.Local=, tracked by =DbContext.ChangeTracker=
+
+*** Data Modification
+
+- =DbSet<T>.Add()=
+
+- updated entities are tracked and automatically writed back into the data store.
+
+- =DbSet<T>.AddOrUpdate()= for upsert.
+
+- =DbSet<T>.Remove()=
+
+- =DbContext.SaveChanges()= after all these modifications.
+
+- =DbContext.Entry(entityVariable)= retrieves the entity's current tracking information.
+
+- /Refreshing/: =DbContext.Entry().Reload()= otherwise the cached entity is not updated even if a new query is executed.
+
+*** Extending EF
+
+- Create an extension method marked with =EdmFunctionAttribute= to use a custom database function
+
+*** Events
+
+Cast with =(DbContext<T> as IObjectContextAdapter).ObjectContext= and use =ObjectContext='s events.
+e.g. implementing immutable entities that are always detached on materialized or saving changes;
+implementing auditable entities that are recorded when saving; generate the identity value for an entity.
+
