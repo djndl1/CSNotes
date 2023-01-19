@@ -380,3 +380,22 @@ Cast with =(DbContext<T> as IObjectContextAdapter).ObjectContext= and use =Objec
 e.g. implementing immutable entities that are always detached on materialized or saving changes;
 implementing auditable entities that are recorded when saving; generate the identity value for an entity.
 
+** LINQ
+
+*** Linq-To-Objects
+
+The basic form used with arrays, collections and anything that implements =IEnumerable<T>= or =IQueryable<T>=.
+
+*** Linq-To-DataSet =System.Data.DataSetExtensions=
+
+Provides extension methods to =DataTable= and =DataRow= to be used with LINQ and make it strongly typed.
+
+*** Linq-To-Entities
+
+Used with EF. =ObjectSet<T>= and =ObjectQuery<T>= implement =IEnumerable<T>= and =IQueryable<T>=.
+
+*** Linq-To-SQL
+
+Only for MSSQL, precursor to EF.
+
+*** Linq-To-XML
