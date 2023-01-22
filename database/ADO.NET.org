@@ -367,8 +367,64 @@ No XML schemas with a clean tidy API with domain driven design.
 - =DbContext.SaveChanges()= after all these modifications.
 
 - =DbContext.Entry(entityVariable)= retrieves the entity's current tracking information.
+  + an entity may be marked =ctx.Entry(entityVar).State = EntityState.Unchanged=.
 
 - /Refreshing/: =DbContext.Entry().Reload()= otherwise the cached entity is not updated even if a new query is executed.
+
+*** Concurrency and Transaction
+
+=DbContext.SaveChanges()= automatically creates a transaction for wrapping
+all change sets that it will send to the database if no ambient transaction exists.
+If a =TransactionScope= (managed by Distributed Transaction Coordinator) is used,
+then EF uses that transaction.
+
+**** Optimistic Concurrency and Data Change
+
+Multiple transaction may occur concurrently and optimistic concurrency
+does not lock any records before updating which causes data change.
+There are two ways to handle this situation:
+
+- /first one wins/: the second one detects the data change and throws an exception
+
+- /last one wins/: the second one chooses to overwrite it regardless.
+
+#+begin_src csharp
+// first one wins
+try
+{
+    ctx.SaveChanges();
+}
+catch (DbUpdateConcurrencyException)
+{
+    // rollback
+}
+
+// last one wins
+var failed = true;
+//loop until succeeded
+do
+{
+    try
+    {
+        ctx.SaveChanges();
+        //if succeeded, exit the loop
+        failed = false;
+    }
+    catch (DbUpdateConcurrencyException ex) // the original values have changed
+    {
+        var entity = ex.Entries.Single();
+        //get the current values from the database
+        var databaseValues = entity.GetDatabaseValues();
+        //set the current database values as the original values
+        //the original values are the ones that will be compared with the current ones
+        entity.OriginalValues.SetValues(databaseValues);
+    }
+}
+while (failed);
+#+end_src
+
+This concurrency check is done automatically on every property. It needs to be specified using
+=ConcurrencyCheckAttribute= or =.IsConcurrencyToken()=.
 
 *** Extending EF
 
