@@ -1,0 +1,9 @@
+#+TITLE: Timer
+
+- The Windows Timer =System.Windows.Forms.Timer=: desgined for single-threaded environment where UI threads are used to perform processing.
+  This timer requires a Windows UI message pump available and always operate from the same thread or marshal
+  the call onto another thread..
+
+- The Thread Timer =System.Threading.Timer=: where messages are not pumped on the thread.
+
+- The Server Timer =System.TImers.Timer=: designed for use with worker threads in a MT environment.
