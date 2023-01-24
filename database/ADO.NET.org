@@ -426,6 +426,17 @@ while (failed);
 This concurrency check is done automatically on every property. It needs to be specified using
 =ConcurrencyCheckAttribute= or =.IsConcurrencyToken()=.
 
+*** Validation
+
+- =DbContext.Configuration.ValidateOnSaveEnabled=
+
+- =DbContext.GetValidationErrors()=, =DbContext.Entry(v).GetValidationResult()=
+
+- =DbEntityValidationException= is thrown on =.SaveChanges=.
+
+- attributes under =System.ComponentModel.DataAnnotations=; =CustomValidatonAttribute= with a custom validation function;
+  =IValidatableObject= interface with entity class.
+
 *** Extending EF
 
 - Create an extension method marked with =EdmFunctionAttribute= to use a custom database function
