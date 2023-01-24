@@ -13,3 +13,6 @@
 [submodule "os/OSCode"]
 	path = os/OSCode
 	url = git@github.com:djndl1/OSCode.git
+[submodule "lang/web/WebCodes"]
+	path = lang/web/WebCodes
+	url = git@github.com:djndl1/WebCodes.git
