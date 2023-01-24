@@ -1,0 +1,30 @@
+#+TITLE: Components
+
+A class that implements =System.ComponentModel.IComponent= or inherits =System.ComponentModel.Component= or =MarshalByValueComponent=,
+which makes it easier for developers to plug components together to create large programs.
+
+* Containers
+
+Components are hosted by /containers/ (default implementation =Container=), a specialized collection class that tracks components in a FIFO list
+and manages the interaction of them with other components and the external application environment.
+
+A container is a /nexus/ for communication between the client application and the components it contains.
+An application may obtain references to components within the container
+without knowing the actual name or identity of the component.
+
+- The container creates and uses an =ISite= (default implementation =Site=, a logical site of the component,
+  so that the component can obtain a reference to its container) for each contained component to manage the component
+  and is used by the component to communicate with its container.
+  + a component can optionally have a name inside a container and referred by that name string instead of an integer index.
+  + =Component.ISite= is the link between a component and its container.
+    Setting it to =null= (which should only be set by a container) does not necessarily remove the component from the container.
+  + a container may provide service to contained components by implementing the =ISite= with proper =IServiceProvider= implementation.
+
+With containers, a component may contain other components, thus forming a object hierarchy of containment.
+A containing component should either expose contained components as properties (small number) or as a collection (indefinite number)
+
+** Resource Management
+
+A Component should release resources explicitly by calls to its Dispose method,
+without waiting for automatic memory management through an implicit call to the Finalize method.
+When a Container is disposed, all components within the Container are also disposed.
