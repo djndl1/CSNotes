@@ -16,3 +16,6 @@
 [submodule "lang/web/WebCodes"]
 	path = lang/web/WebCodes
 	url = git@github.com:djndl1/WebCodes.git
+[submodule "CP/ProblemCode"]
+	path = CP/ProblemCode
+	url = git@github.com:djndl1/CompetitiveProgrammingCode.git
