@@ -1,0 +1,84 @@
+#+TITLE: MakeFile
+
+* Overview
+
+a makefile consists of rules: how and when to remake certain files
+which are the targets of the particular rule.
+
+#+begin_src makefile
+target ... : [prerequisites] # prerequisite: file used as input to create the target.
+	recipe                 # an action that make carries out, tab indented
+	...
+	...
+#+end_src
+
+by default =make= starts with the first target not prefixed with =.= (the default goal).
+
+The compilation must be done if the prerequisite file is more recent than the target file.
+
+Mkae has an implicit rule for updating a =.o= file from a correspondingly named =.c= file using
+a =cc -c= command.
+
+* The =Makefile= File
+
+** Structure
+
+- /explicit rules/: when and how to remake one or more targets with specified prerequisites
+  using recipes.
+
+- /implicit rules/: when and how to remake a class of files based on their names.
+
+- /variable definitions/: a text string value for a variable that can be substituted into the text later
+
+- /directives/: an special instruction
+  + reading another makefile with the =include= directive.
+  + control flow
+
+- /comments/:
+
+** Process
+
+Make runs in two passes:
+
+1. all makefiles are read: variables and values, implicit and explicit rules. Then a dependency graph is constructed.
+
+2. Make uses these internal structures to determine what targets will need to be rebuilt and what rules to invoke.
+
+This two-phase process has some impact on how variables are expanded: expansion during the first phase is /immediate/ while in the second phase or in a later immediate context is /deferred/.
+
+- the target and prerequisite sections are expanded immediately
+
+- the recipe used to construct the target is always deferred.
+
+** Rules
+
+#+begin_src makefile
+targets : prerequisites [; recipe]
+	recipe
+	...
+#+end_src
+
+- A target is out of date if it does not exist or
+  if it is older than any of the prerequisites (by comparison of last-modification times).
+  + /phony target/: one that is not really the name of a file rather than a name for a recipe
+    to be executed. A phony target should not be the prerequisite of a real target, otherwise
+    it would be unnecessarily executed.
+  + a target without prerequisites and recipes are always considered updated and can be used
+    as a replacement for the =.PHONY= target.
+  + a single rule can contain multiple targets that shares the same recipe with only a different
+    target variable =$@=.
+  + a target can have only one recipe. An extra rule with just prerequisites can be used to give
+    a few extra prerequisites to many files at once.
+
+- rule:
+  - /static pattern rules/: specify multiple targets and construct the prerequisite names for each
+    target based on the target name. =targets: target_pattern : prereq_pattern= with =%= as the matched stem.
+    The two patterns say how to compute the prerequisites of each target. Each target is matched against the
+    target pattern and then generates a stem used to construct its prerequsites with the prerequiste pattern.
+    The =$<= automatic variable is used in the recipe to represent the constructed prerequisite.
+  - /double-colon rules/ (obscure and not useful): rules with the same target are executed independently
+    in the order they appear in the makefile.
+    If a rule has no prerequisites, it always gets executed.
+  - /make depend/: some C compilers provide =-M= or =-MM= to generate a dependency list on included files.
+    Some =Make= generates a =depend= file before compilation. A rule can be written that generates a =source.d=
+    makefile for each source file and include them.
