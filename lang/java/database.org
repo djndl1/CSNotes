@@ -4,9 +4,9 @@
 
 ** JDBC Driver Types
 
-- *type 1*: translates JDBC to ODBC, which requires a ODBC driver and related configuration.
+- *type 1*: translates JDBC to ODBC, which requires a ODBC driver and related configuration. No longer available by default
 
-- *type 2*: partly Jasva nad partly in native code.
+- *type 2*: partly Java and partly in native code.
 
 - *type 3*: pure Java library that uses database-independent protocol to communicate with database requests to a server component, which then translates the requests into a database-specific protocol.
 
@@ -17,12 +17,12 @@
 - Database URLs: ~jdbc:subprotocol:other stuff~ e.g. ~jdbc:derby://localhost:1527/COREJAVA;create=true~
 
 - Registration
-  + automatically if there is a file in ~META-INF/services/java.sql.Driver~.
+  + automatically if there is a file in ~META-INF/services/java.sql.Driver~ in its jar.
   + ~Class.forName("org.postgresql.Driver")~; ~java. -Djdbc.drivers=org.postgresql.Driver ProgramName~; ~System.setProperty("jdbc.drivers", "org.postgresql.Driver")~
 
 ** JDBC Connection
 
-- use =java.sql.DriverManager=
+- use =java.sql.DriverManager.getConnection()= to dynamically get a connection with the appropriate JDBC driver.
 
 - A ~Statement~ has at most one *open* result set. Do not fuss with multiple concurrent result sets (~Statements~) (there's a limit to the number of statements per connection).
 
