@@ -82,3 +82,14 @@ targets : prerequisites [; recipe]
   - /make depend/: some C compilers provide =-M= or =-MM= to generate a dependency list on included files.
     Some =Make= generates a =depend= file before compilation. A rule can be written that generates a =source.d=
     makefile for each source file and include them.
+
+- recipes:
+  + each line must start with a tab.
+  + each line is executed by invoking a new subshell chosen with =SHELL= (the use of =cd= inside a recipe is thus dubious).
+  + For =@=-prefixed lines, the echoing of the content of that line is suppressed
+    since normally each line of a recipe is printed. Typically used only with =echo=.
+  + parallel execution with =-j= executes many recipes simultaneously.
+  + prefix a recipe line with =-= to ignore any error of that line.
+  + to invoke a make inside a makefile, always use the =MAKE= variable. =make= automatically passes down
+    variable values that were defined on the command line by putting them in =MAKEFLAGS=. =-j= is automatically included
+    and only the specified number of jobs are being executed altogether for all running =make=.
