@@ -19,3 +19,6 @@
 [submodule "CP/ProblemCode"]
 	path = CP/ProblemCode
 	url = git@github.com:djndl1/CompetitiveProgrammingCode.git
+[submodule "software/EnterpriseApplicationCode"]
+	path = software/EnterpriseApplicationCode
+	url = git@github.com:djndl1/EnterpriseApplicationCode.git
