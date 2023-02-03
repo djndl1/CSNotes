@@ -1,0 +1,46 @@
+#+title: Spring Core
+
+* Application Context
+
+Any non-trivial application is composed of many components.
+At its core, Spring offers a /container, often referred to as /the Spring
+application context/ , that creates and manages application components (called
+/beans/) and wired together to make a complete application based on a pattern
+called /dependency injection/. This container creates and maintains all
+components and inject them into beans that need them.
+
+On top of this core container, Spring providers related libraries as a /web
+framework/ along with /data persistence options/, a /security framework/,
+/runtime monitoring/, /microservice/, etc.
+
+Java-based bean configuration is now preferred instead of old-school XML
+configuration. =@Configuration= and =@Bean= annotations add the objects returned
+as beans in the application context with the method names as the default bean
+IDs. Spring can perform /automatic configuration/ by discovering components
+form an application's classpath and create them as beans in the container.
+Spring boot enhanced automatic configuration.
+
+* The Spring Landscape
+
+- the core /Spring Framework/: the core container and dependency injection
+  framework
+  + /Spring MVC/: Spring's web framework: HTML and non-HTML output
+  + template-based JDBC supportg
+  + /Spring WebFlux/: Reactive-Style Programming
+
+- /Spring Boot/
+  + starter dependencies and autoconfiguration
+  + /Actuator/: runtime insight into the inner workings of an application.
+  + Flexible specification of environment properties
+  + Spring Boot CLI: an app of a collection of Groovy script
+
+- /Spring Data/: data persistence support by defining interfaces with a
+  naming convention; works with JDBC/JPA, document, graph and others.
+
+- /Spring Security/: authentication, authorization and API security.
+
+- /Spring Integration/ and /Spring Batch/: integrate with other applications.
+
+- /Spring Cloud/:
+
+- /Spring Native/: compilation of Spring Boot projects into native executables.
