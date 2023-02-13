@@ -1,0 +1,10 @@
+#+title: Mvc
+
+* MVVM
+
+- /View/: UI-relevant code
+
+- /ViewModel/: domain-specific code and the processing of data. the ViewModel layer has no reference to concrete UI stacks.
+  It provides an invisible or virtual UI only through properties, linked to the UI at runtime via data binding.
+
+- /Model/:  additional data transport classes,
