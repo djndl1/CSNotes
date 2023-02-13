@@ -44,3 +44,12 @@ Spring boot enhanced automatic configuration.
 - /Spring Cloud/:
 
 - /Spring Native/: compilation of Spring Boot projects into native executables.
+
+* MVC Web Development
+
+- A /controller/ is responsible for fetching and processing data and then passing it to the view;
+
+- A /view/ template renders that data into HTML. View libraries are decoupled from any particular
+  web framework, unware of Spring's model abstraction but they can work with servlet request attributes.
+
+- A /Model/: an object that ferries data between a controller and whatever view is charged with rendering the data.
