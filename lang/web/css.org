@@ -1,0 +1,15 @@
+#+title: Css
+
+Rules that specify the content of an element should appear. CSS applies rules to HTML elements,
+which governs how the content of specified elements should be displayed.
+
+#+begin_src css
+p { /* selector: the elements to which rules are applied, with some advanced rules */
+    font-family: Arial; /* declarations: property: value */
+}
+#+end_src
+
+If two selectors are the same, the last one is applied. If one is more specific,
+it is applied.
+
+Certain properties can be inherited by child elements while some others are not.
