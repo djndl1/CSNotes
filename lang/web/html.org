@@ -1,0 +1,16 @@
+#+title: Html
+
+* Describing the Structure With /Elements/
+
+- /element/: lives between the /opening tag/ and the /closing tag/.
+  + act like containers.
+
+- /Structural markup/: describe headings and paragraphs. .e.g =<h1></H1>= and =<p></p>=
+
+** Text
+
+- /Semantic markup/: extra information such as emphasis. e.g. =<b></b>= and =<i></i>=
+
+- multiple whitespaces are automatically collapsed into one.
+
+- =<br/>= for line breaks and =<hr/>= for horizontal rules (a horizontal line),freebird
