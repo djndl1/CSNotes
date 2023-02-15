@@ -13,3 +13,7 @@ If two selectors are the same, the last one is applied. If one is more specific,
 it is applied.
 
 Certain properties can be inherited by child elements while some others are not.
+
+* Colors
+
+Colors can be specified by RGB values, hex codes, color names or HSLA.
