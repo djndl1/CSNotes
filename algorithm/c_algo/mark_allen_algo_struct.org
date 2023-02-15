@@ -8,7 +8,15 @@
 
 - geometric sequence and series; arithmetic progression ; sum of i squared;
 
-  harmonic series
+- harmonic series
+
+- recursion: recursion has bookkeeping costs; recursion should never be used as
+  a substitute for a simple for loop.
+  + Base Cases
+  + Making Process to reduce the problem to a base case
+  + Design rule. Assume that all the recursive calls work.
+  + Compound interest rule:
+    Never duplicate work by solving the same instance of a problem in separate recursive calls.
 
 
 * Data Structures
