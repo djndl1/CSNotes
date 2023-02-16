@@ -17,3 +17,36 @@ Certain properties can be inherited by child elements while some others are not.
 * Colors
 
 Colors can be specified by RGB values, hex codes, color names or HSLA.
+
+* Text
+
+** Terminology
+
+- Serif, Sans-Serif, Monospace
+
+- /Baseline/: where most letters sit on;
+  - /descender/: below the baseline, such as the lower part of the letter y
+  - /X-height/: height of the letter x
+  - /Cap Height/: top of flat letters
+  - /ascender/: above the cap height
+
+- /weight/: light, medium, bold, black
+
+- /style/: Normal, /italic/, oblique
+
+- /stretch/: Condensed, Regular, Extended
+
+- /typeface/, /font/: a typeface is what is seen and a font is what is used.
+  The term "fonts" has always been used to describe an instance of a particular
+  weight or style of a typeface.
+
+- /kerning/: =letter-spacing=, =word-spacing=
+
+- text alignment: left, right center, justify
+  + =vertical-align=: not really meant for text alignment in a block level element,
+    but with =<img>=, =<em>=, =<strong>=.
+
+- text indentation: =text-indent=
+
+- pseudo-element: =:first-letter=, =:first-line=, =:link=, =:visited= (visited
+  links), =:hover=, =:active=, =:focus=
