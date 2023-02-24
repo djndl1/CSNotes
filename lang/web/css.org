@@ -50,3 +50,35 @@ Colors can be specified by RGB values, hex codes, color names or HSLA.
 
 - pseudo-element: =:first-letter=, =:first-line=, =:link=, =:visited= (visited
   links), =:hover=, =:active=, =:focus=
+
+* Box
+
+Elements are treated like boxes.
+
+- =width=, =height=: by default a box is sized just big enough to hold its contents.
+  + unit by pixel, percentage (relative to the browser window) or em.
+
+- =min-width=, =max-width=, =min-height=, =max-height=,
+
+- =overflow=: overflowing content can be set to =hidden= or =scroll=.
+
+- =border-width=, =border-top-width=, =border-right-width=, =border-bottom-width=, =border-left-width=
+
+- =border[-top/left/right/bottom]-style=: =solid=, =dotted=, =dashed=, =double=, =groove=, =ridge=, =inset=, =outset=, =hidden=, =none=
+
+- =border[-top/left/right/bottom]-color=
+
+- =padding[-top/left/right/bottom]=
+
+- =margin[-top/left/right/bottom]=
+  + setting both the left and right margins to =auto= centers the box.
+
+- =display=: =inline=, =block=, =inline-block=, =none= (hides an element from the page). Often used for displaying a list of menus horizontally.
+
+- =visiblity=: =hidden=, =visible=; a blank space replaces the element
+
+- =border-image=: applies an image to the border of any box
+
+- =box-shadow=: a drop shadow around a box.
+
+- =border[-top/bottom-left/right]-radius=: to specify rounded corners or even more complex shapes
