@@ -18,6 +18,30 @@
   + Compound interest rule:
     Never duplicate work by solving the same instance of a problem in separate recursive calls.
 
+* Algorithm Analysis
+
+** [[https://en.wikipedia.org/wiki/Big_O_notation][Bachman-Landau Asymptotic notations]]
+
+- /Big O Notation/ (ordnung, the upper bound on the growth rate (order) of the function): $f(x) = O(g(x))$ if there exists a positive real number $M$ and a real number $x_{0}$ s.t. $|f(x)| \leq Mg(x)$ for all $x \geq x_{0}$.
+
+The idea of these definitions is to establish a relative order among functions.
+
+- Rules:
+  + If $T_{1}(n) = O(f(n))$ and $T_{2}(n) = O(g(n))$, then
+    - $T_{1}(n) + T_{2}(n) = max(O(f(n)), O(g(n)))$
+    - $T_{1}(n) * T_{2}(n) = O(f(n) * g(n))$
+  + $log^{k}n = O(n)$ for any constant $k$.
+
+
+- Typical growth rate: $c$, $logn$, $log^{2}n$, $n$, $nlogn$, $n^{2}$, $n^{3}$, $2^{n}$.
+
+** Computer Model
+
+- Sequential exeuction
+
+- Infinite memory
+
+- all instructions take the same amount of time
 
 * Data Structures
   :PROPERTIES:
