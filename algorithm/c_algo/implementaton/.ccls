@@ -1,5 +1,0 @@
-clang
-%h -x
-%h c
--I./lib
--L./lib

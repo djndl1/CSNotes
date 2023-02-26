@@ -1,4 +1,0 @@
-clang
-%h -x
-%h c-headers
--I./lib
