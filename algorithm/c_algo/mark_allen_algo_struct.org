@@ -43,6 +43,19 @@ The idea of these definitions is to establish a relative order among functions.
 
 - all instructions take the same amount of time
 
+** General Rules For Analysis
+
+- The running time of a for loop is at most the running time of the statements inside the for loop (including tests) times the number of iterations.
+
+- the running time of an =if=/=else= statement is never more than the running time of the test plus the larger of the running times of S1 and S2.
+
+** Example: the Maximum Subsequence Sum Problem
+
+*** Formulation
+
+Given integers $a_{1}, a_{2}, a_{3}, ..., a_{n}$, find the maximum value of $\sum_{k = i}^{j}a_{k}$. Negative sum not considered zero.
+
+
 * Data Structures
   :PROPERTIES:
   :CUSTOM_ID: data-structures
