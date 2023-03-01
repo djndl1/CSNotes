@@ -82,3 +82,18 @@ Elements are treated like boxes.
 - =box-shadow=: a drop shadow around a box.
 
 - =border[-top/bottom-left/right]-radius=: to specify rounded corners or even more complex shapes
+
+* Lists
+
+- bullet point styles: =list-style-type=, =list-style-image=,
+  =list-style-position= (outside without indentation, or inside along with the
+  text), =list-style= (a shorthand all these properties)
+
+* Tables
+
+- =empty-cell=, =border-spacing= (the distance between adjacent cells),
+  =border-collapse= (if borders of adjacent cells collapse into one)
+
+* Forms
+
+- =cursor=: cursor over a form
