@@ -97,3 +97,36 @@ Elements are treated like boxes.
 * Forms
 
 - =cursor=: cursor over a form
+
+* Layouts
+
+CSS treats HTML elements as if they are in their own boxes. A /block-level/
+starts on a new line and act as the main building blocks of any layout; a
+/inline/ box flow between surrounding text.
+
+** Positioning Schemes =position=
+
+- /Normal Flow/ (the default): Every block-level element appears on a new line, causing each
+  item to appear lower down the page than the previous one. =position: static=
+
+- /Relative Positioning/: Moves an element from the position it would be in
+  normal flow, shifting it to the top, right, bottom, or left of where it would
+  have been placed. =position: relative=, together with offset properties =top=,
+  =bottom=, =left=, =right=
+
+- /Absolute Positioning/: the element is positioned in relation to its
+  containing element. =position: absolute=, with =box-offset= or
+  =top=, =bottom=, =left=, =right=.
+  + /fixed positioning/: a form of absolute positioning that positions the
+    element in relation to the browser window as opposed to the containing
+    element. =position: fixed=
+
+- /floating elements/: an element out of normal flow and positioned on the left
+  or right side of its container, allowing text and inline elements to wrap
+  around it. =float: left/right=
+  + =float= can be used to place multiple elements side-by-side.
+  + =clear=: no element within the same containing element should touch the left
+    or right-hand sides of a box.
+
+- Elements out of normal flow may overlap. Use =z-index= (the /stacking
+  context/) to specify the z-order.
