@@ -127,6 +127,18 @@ starts on a new line and act as the main building blocks of any layout; a
   + =float= can be used to place multiple elements side-by-side.
   + =clear=: no element within the same containing element should touch the left
     or right-hand sides of a box.
+  + e.g. multicolumn content (with each column being a floating container)
 
 - Elements out of normal flow may overlap. Use =z-index= (the /stacking
   context/) to specify the z-order.
+
+** Layouts
+
+- /Fixed Width Layouts/: do no change size as the user increases or decreases the
+  size of the browser window. Works mostly for PCs. Easy to control size and
+  positioning of elements in pixels.
+
+- /Liquid Layouts/: stretch and contract as the user increases or decreases the
+  size of the browser window.
+  + mostly in percentages
+  + having no control over the final view of the page.
