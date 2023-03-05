@@ -1,0 +1,55 @@
+#+title: Data Structures and Algorithms In C
+
+* Data Structures
+
+Data structure is one of the subjects that intrinsically connected with the
+design and implementation of efficient algorithms. It deals with the study of
+methods, techniques, and tools to organize or structure data in computer memory.
+
+** Data Defintion and Data Structure
+
+- /Data/: the basic entity or fact that is used in a calculation or manipulation
+  process.
+  + two types: /numerical/ or /alphanumerical/ data. High level PL can divide
+    numerical data further into integers and floating-point numbers while
+    alphanumerical data are divided into /characters/ and /strings/.
+
+- the difference between data and information: Data are raw facts without
+  context, whereas Information is data with context. Data are an
+  abstraction of Information in a problem-solving system. Data requires
+  interpretation to become an Information.
+
+** Concept
+
+- /Data Structure/: the representation of the logical relationship between
+  individual elements of data. A mathematical or logical model of organizing the
+  data items into computer memory in such a way that they can be used
+  efficiently. The study of data and representation of data objects within the program.
+  + the purpose of studying data structure is to learn how to organize data into
+    memory so that it can be accessed quickly and conveniently.
+  + purposes:
+    - organizing the data (how data items are organized in the main memory)
+    - accessing methods (how data items can be accessed)
+    - specifying the degree of associativity (how the data are interrelated)
+    - processing alternatives for data (how many different ways are there in
+      which these data items can be processed).
+** classification
+
+- /primitive data structure/: can be manipulated or operated by the /machine
+      instruction/.
+- /non-primitive data structure/: derived from the primitive data structure;
+  homogeneous or heterogeneous.
+  - linearity:
+    + *linear*: every data item is related to its previous and next data items.
+        The traversing is exactly one.
+      - *sequential*: objects stored in a sequence of consecutive memory locations
+       e.g. array, stack, queue
+      - *linked*: a set of nodes linked together and organize with links
+      e.g. linked list, linked stack, linked queue.
+    + non-linear: every data item attaches to many other data items in specific
+      ways to reflect relationships. The traversing is always more than one.
+      e.g. graph, tree
+  - static/dynamic: if the data structure can be extended or shrunk during the execution.
+
+
+* Related Algorithms
