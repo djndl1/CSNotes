@@ -33,7 +33,7 @@ methods, techniques, and tools to organize or structure data in computer memory.
     - specifying the degree of associativity (how the data are interrelated)
     - processing alternatives for data (how many different ways are there in
       which these data items can be processed).
-** classification
+** Classification
 
 - /primitive data structure/: can be manipulated or operated by the /machine
       instruction/.
@@ -51,5 +51,21 @@ methods, techniques, and tools to organize or structure data in computer memory.
       e.g. graph, tree
   - static/dynamic: if the data structure can be extended or shrunk during the execution.
 
+** Abstract Data Type
+
+- /Data Object/: an object having a data, whose logical behavior is defined by a
+  set of values and a set of operations.
+
+- /Abstract Data Type/: An ADT describes the data objects which constitute the data structure and
+  the fundamental operations supported on them.
+  + An ADT focuses on data abstraction and data structure behavior instead of
+    implementation. A specification.
+  + a conceptual model of information structure
+  + it specifies the components, the structural relationships and a list of
+    operations allowed.
+  + A data structure is the *design representation* of an ADT.
+  + typical operations includes creation of data structure, insertion, deletion
+    of a data item, traversing, searching, sorting, merging of two different
+    sorted lists into a single sorted one
 
 * Related Algorithms
