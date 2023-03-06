@@ -68,4 +68,19 @@ methods, techniques, and tools to organize or structure data in computer memory.
     of a data item, traversing, searching, sorting, merging of two different
     sorted lists into a single sorted one
 
-* Related Algorithms
+* Related Algorithms Theory
+
+** Basic Concepts
+
+- *Algorithm*: a finite sequence of instructions that transforms externally
+  supplied /input/ into /output/ after completion of the job with
+  /definiteness/ ,/effectiveness/ (elementary instruction) and /feasibility/.
+
+- common types
+  + /divide and conquer/
+  + /dynamic programming/
+  + /greedy method/
+  + /backtracking/
+  + /branch and bound/
+  + /serial or parallel or distributed algorithm/
+  + /deterministic or non-deterministic algorith/
