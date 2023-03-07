@@ -83,4 +83,10 @@ methods, techniques, and tools to organize or structure data in computer memory.
   + /backtracking/
   + /branch and bound/
   + /serial or parallel or distributed algorithm/
-  + /deterministic or non-deterministic algorith/
+  + /deterministic or non-deterministic algorithm/
+
+** Algorithm Analysis
+
+- Theoretical/Apriori Analysis
+
+- Empirical/Posteriori Analysis
