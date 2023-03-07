@@ -142,3 +142,7 @@ starts on a new line and act as the main building blocks of any layout; a
   size of the browser window.
   + mostly in percentages
   + having no control over the final view of the page.
+
+- *Layout Grid*: layout involves the placement or arrangement of visual
+  elements. Grid structure is a helper tool for layout.
+  + 960 pixel-wide 12-column grid: 60 pixels wide column with 10-pixel
