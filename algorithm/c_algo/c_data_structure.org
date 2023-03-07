@@ -68,6 +68,53 @@ methods, techniques, and tools to organize or structure data in computer memory.
     of a data item, traversing, searching, sorting, merging of two different
     sorted lists into a single sorted one
 
+** Array and String
+
+*** Array
+
+A collection of the same type of data items stored in consecutive memory
+locations.
+
+Multi-dimensional arrays are just arrays of arrays (not arrays of pointers),
+implemented in C in the row-major order, i.e. elements are stored row by row.
+
+**** Operations
+
+- /traversing/: linear traversal
+
+- /insertion/, /deletion/: sorted and unsorted arrays require different
+  algorithms. The former requires a search before insertion/deletion.
+
+- /merging/: combining more than one sorted array together so that the resulting
+  array remains sorted. Suppose both arrays are ordered in ascend.
+  Since the front element of both arrays are the smallest in
+  its array, one of them must be the smallest in both arrays. Move this one out and
+  the remaining front pair  are the smallest two. Continue this
+  process and move all elements into the new array.
+  + $O(n)$ time-complexity
+
+**** Applications
+
+- implementation of vectors, matrices (including sparse matrices), polynomials and different kinds of tables
+
+- also implements heaps, hash tables, deques, queues, stacks and strings
+
+***** Polynomial Examples
+
+- Linear array representation: index of the array as the exponent and the
+  element as the coefficient of each term
+
+- array of structure representation: each term is represented by a structure of
+  the exponent and the coefficient and all terms form an array.
+
+***** Sparse Matrices
+
+- /triangular matrices/: since the shape is regular, non-zero elements can be placed in
+  a 1-D array in a specified order, typically at $i \times (i + 1) / 2 + j$ for
+  $A_{i, j}$ for a lower-left triangular matrix.
+
+- /band matrices/:
+
 * Related Algorithms Theory
 
 ** Basic Concepts
