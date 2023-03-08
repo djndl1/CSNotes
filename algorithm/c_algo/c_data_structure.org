@@ -75,7 +75,8 @@ methods, techniques, and tools to organize or structure data in computer memory.
 A collection of the same type of data items stored in consecutive memory
 locations.
 
-Multi-dimensional arrays are just arrays of arrays (not arrays of pointers),
+Multi-dimensional arrays are just arrays of arrays (not arrays of pointers, but
+pointer to array =data_type (*p)[size]=),
 implemented in C in the row-major order, i.e. elements are stored row by row.
 
 **** Operations
@@ -118,6 +119,17 @@ implemented in C in the row-major order, i.e. elements are stored row by row.
   either side. $A_{ij} = 0$ when $\alpha < i – j$ or $\beta < j – i$: where
   $\alpha, \beta \geq 0$ and $i, j= 1 to n$.
   + an array of three-tuples
+
+**** String
+
+In C, arrays of characters with a =\0= character.
+
+***** Operations
+
+- length (=strlen=); copy =strcpy=; concatination =strcat=; comparison =strcmp=;
+
+- substring matching: find the positions of all occurrences of a pattern within a
+  given string or text. =strstr=
 
 
 * Related Algorithms Theory
