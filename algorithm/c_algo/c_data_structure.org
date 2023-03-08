@@ -113,7 +113,12 @@ implemented in C in the row-major order, i.e. elements are stored row by row.
   a 1-D array in a specified order, typically at $i \times (i + 1) / 2 + j$ for
   $A_{i, j}$ for a lower-left triangular matrix.
 
-- /band matrices/:
+- /band matrices/: a sparse matrix whose non-zero entries are confined to a
+  diagonal band, comprising the main diagonal and zero or more diagonals on
+  either side. $A_{ij} = 0$ when $\alpha < i – j$ or $\beta < j – i$: where
+  $\alpha, \beta \geq 0$ and $i, j= 1 to n$.
+  + an array of three-tuples
+
 
 * Related Algorithms Theory
 
