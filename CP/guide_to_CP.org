@@ -1,0 +1,10 @@
+#+title: Guide To Competitive Programming
+
+Competitive programming combines algorithm design with algorithm implementation.
+
+* Resources
+
+- Online Contests: Codeforces, AtCoder, CodeChef, CS Academy, HackerRank,
+  Topcode,
+
+- CSES Problem Set: a collection of problems in the order of difficulty.
