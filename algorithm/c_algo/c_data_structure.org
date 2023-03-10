@@ -132,6 +132,44 @@ In C, arrays of characters with a =\0= character.
   given string or text. =strstr=
 
 
+** Linked List
+
+A linear ordered collection of finite homogeneous data elements (/node/) where
+the linear order is maintained by means of links or pointers.
+
+*** Application
+
+- Polynomials: defined a linked list of term node.
+
+** Stacks
+
+*** Applications
+
+- Hardware memory stack
+
+- Evaluation of arithmetic expressions: reverse polish notation
+
+** Queues
+
+** Dequeues
+
+Queues and stacks can be seen as specializations of dequeue.
+
+** Priority Queue
+
+Not an implementation but a ADT.
+
+The elements are arranged on the basis of priority in which elements with higher
+priority are processed before those of lower priority and elements of the same
+priority are processed in the order of insertion.
+
+*** Implementation
+
+- presorted arrays or linked lists
+
+- a max-heap: in a max heap, for any given node C, if P is a parent node of C,
+  then the key (the value) of P is greater than or equal to the key of C.
+
 * Related Algorithms Theory
 
 ** Basic Concepts
