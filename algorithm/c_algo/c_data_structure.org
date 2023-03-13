@@ -192,3 +192,85 @@ priority are processed in the order of insertion.
 - Theoretical/Apriori Analysis
 
 - Empirical/Posteriori Analysis
+
+** Recursion: Define Anything In Terms of Itself
+
+A technique that allows us to brak down a problem into one or more subproblems
+that are similar in form to the original problem.
+
+- essential parts:
+  + *base criteria*/*base case* which the function stop calling itself.
+  + *inductive clause*
+
+- /infinite regress/: recursive function keeps calling itself infinitely
+
+- /depth of recursion/: the maximum level number of a recursive function during
+  its execution with given set of arguments.
+
+- /types of recursion/:
+  + whether the function calls itself or not
+    - *direct*
+    - *indirect*
+  + how many internal recursive calls are made within the body
+    - *linear recursion*: a single call is performed
+    - *binary recursion*: two recursion calls are performed
+    - *non-linear* or *multiple* recursion
+  + whether there are pending operations or not at each recursive call
+    - *tail* recursion: the last operation of the recursive function is a
+      recursive call
+    - *non-tail* recursion
+
+#+begin_src cpp
+// direct call
+function F()
+{
+    if (base condition) {
+        //...
+    } else {
+        F();
+    }
+}
+
+// indirect call
+function A()
+{
+    //...
+    call to B;
+    //...
+}
+
+function B()
+{
+    //...
+    call to A();
+    //...
+}
+#+end_src
+
+- disadvantages:
+  + uses stack memory without checking
+  + may be slower than its iterative version
+
+*** Tail Call and Iterative
+
+- Convert a non-tail recursive call to a tail recursive by means of an
+  /auxiliary parameter/ used to form the result.
+
+- Given the tail recursive version
+
+#+begin_src c
+F(x)
+{
+    if (P(x)) return G(x);
+    return F(H(x));
+}
+
+// the iterative version
+F(x)
+{
+    while (!P(x)) {
+        x = H(x);
+    }
+    return G(x);
+}
+#+end_src
