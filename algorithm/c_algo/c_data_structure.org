@@ -170,6 +170,82 @@ priority are processed in the order of insertion.
 - a max-heap: in a max heap, for any given node C, if P is a parent node of C,
   then the key (the value) of P is greater than or equal to the key of C.
 
+** Tree
+
+a non-empty fintie set of nodes with a special node called the /root/ and other
+nopdes partitioned into zero or more disjoint trees called the subtrees of the
+root.
+
+*** Terminology
+
+- /Node/, /Vertex/:
+
+- /Root/
+
+- /Parent node/ (/predecessor/), /Children/ (/successor/), /siblings/, /descendant/ and /ancestor/
+
+- the /degree/ of a node: the number of subtrees of a node
+
+- the /degree/ of a tree: the maximum degree of the nodes in the tree
+
+- internal node (/non-terminal node/, with at least one child), external node
+  (/leaf node/, of zero degree)
+
+- /level/: the root of the tree is at level one/zero. If a node is at level $L$, then
+  its children are at level $L+1$
+
+- height/depth of a tree: the maximum level of any node in the tree
+
+- /forest/: a set of zero or more disjoint trees.
+
+- /edge/: the line from a parent to its successor.
+
+- /path/ and /path length/: a sequence of consecutive edges from a source node
+  to the destination node.
+
+- /internal path length/, /external path length/: the sum of the levels of all
+  the internal/external nodes in the tree
+
+- /branch/: a path ending in a leaf node
+
+*** Classification
+
+**** Binary Tree
+
+A tree of degree two at most.
+
+- /strictly binary tree/, /2-ary tree/: every node is of two degrees or of zero degree.
+
+- /extended binary tree/, /2-tree/: external nodes added to leaf nodes and nodes
+  of degree one
+
+- /complete binary tree/: all the levels are filled and the last level possibly
+  are partially filled from left to right.
+
+***** Properties
+
+- Lemma 1: A binary tree with $n$ nodes has exactly $n - 1$ edges.
+  + proof by induction
+  + means there is no cycles and thus only one path from one node to another.
+
+- Lemma 2: the maximum number of nodes on level $i$ of a binary tree is
+  $2^{i-1}$ where $i \geq 1$.
+  + proof by induction
+
+- Lemma 3: the maximum number of nodes in a binary tree of depth $k$ is $2^{i} -
+  1$ where $k \geq 1$.
+  + from Lemma 2
+
+- Lemma 4: for any non-empty binary tree T, if $n_{0}$ is the number of leaves
+  and $n_{2}$ is the number of nodes of degree two, then $n_{0} = n_{2} + 1$.
+  + Proof: the number of edges $E = n + 1$ where $n$ is the number of nodes.
+    let $n_{1}$ be the number of nodes of degree one, then $n = n_{0} + n_{1} +
+    n_{2}$.
+    Also $E = n_{1} + 2n_{2}$. This leads to $n_{0} = n_{2} + 1$.
+
+- Lemma 5: If $n$ is the total number of nodes in a complete binary tree of
+  height $h$, then $h = \lfloor \log_{2} n \rfloor + 1$
+
 * Related Algorithms Theory
 
 ** Basic Concepts
