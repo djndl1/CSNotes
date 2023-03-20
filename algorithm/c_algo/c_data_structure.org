@@ -221,6 +221,19 @@ A tree of degree two at most.
 
 - /complete binary tree/: all the levels are filled and the last level possibly
   are partially filled from left to right.
+  + fully/perfect binary tree: a binary tree of depth $k \geq 1$ and $2^{k} - 1$
+    nodes. All internal nodes have two children and all leaves are at the same
+    level.
+
+- /skewed binary tree/: dominated solely by left child nodes or right child
+  nodes.
+
+***** Applications
+
+- expression tree: inorder traversal produces infix form of the expression
+  without parenthesis, although an infix form may correspond to more than one
+  expression tree, preorder for prefix and postorder for postfix and corresponds
+  to one expression tree.
 
 ***** Properties
 
