@@ -228,6 +228,17 @@ A tree of degree two at most.
 - /skewed binary tree/: dominated solely by left child nodes or right child
   nodes.
 
+- /balanced binary tree/
+  + /weight balanced binary tree/: a binary search tree where for each node, it
+    holds that the number of inner nodes in the left subtree and the number of
+    inner nodes in the right subtree differ by at most one.
+  + /height balanced binary tree/: the heights of the left sub-tree and right
+    sub-tree are guaranteed to be related by a constant factor e.g. AVL tree, RB
+    tree
+
+- /threaded binary tree/
+
+
 ***** Applications
 
 - expression tree: inorder traversal produces infix form of the expression
