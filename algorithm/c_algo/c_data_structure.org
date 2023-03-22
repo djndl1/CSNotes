@@ -270,6 +270,26 @@ A tree of degree two at most.
 - Lemma 5: If $n$ is the total number of nodes in a complete binary tree of
   height $h$, then $h = \lfloor \log_{2} n \rfloor + 1$
 
+***** Representations
+
+****** Array
+
+- Linked representation: three parallel arrays: =DATA=, =LCHILD=, =RCHILD= and a
+  pointer variable =ROOT=, where =LCHILD= and =RCHILD= contains the children's indices of
+  each node.
+
+- Sequential Representation: an efficient way to store a (near-)complete binary
+  tree in a single array.
+  + the root is stored in =TREE[0]=
+  + if a node is stored in =TREE[k]=, then its left child will be stored in
+    =TREE[2*K+1]= and right child in =TREE[2*K+2]=
+  + the parent node is at =Floor((K - 1) / 2)=.
+
+****** Linked
+
+As in a linked list, a node contains the data item and two pointers that points
+to its left and right child.
+
 * Related Algorithms Theory
 
 ** Basic Concepts
