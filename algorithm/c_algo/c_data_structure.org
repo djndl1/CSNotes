@@ -132,16 +132,38 @@ In C, arrays of characters with a =\0= character.
   given string or text. =strstr=
 
 
-** Linked List
+*** Linked List
 
 A linear ordered collection of finite homogeneous data elements (/node/) where
 the linear order is maintained by means of links or pointers.
 
-*** Application
+**** Classification
+
+- Singly linked list
+
+- Doubly linked list
+
+- Circular linked list
+
+**** Application
 
 - Polynomials: defined a linked list of term node.
 
+**** Cursor Implementation
+
+Instead of a global memory pool for nodes, a global array of node structures is
+maintained to keep the nodes. The node pointer is now an index into the array.
+The zero index represents a null pointer.
+
 ** Stacks
+
+A list with the restriction that insertions and deletions can be performed in
+only one position called the /top/.
+
+- Operations:
+  + /push/
+  + /pop/
+  + /top/
 
 *** Applications
 
