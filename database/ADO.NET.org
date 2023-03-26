@@ -479,3 +479,37 @@ Some basic data binding using ADO.NET can be done completely by using Visual Stu
 
 WCF Data Services uses a set of source providers to express different types of source data
 e.g. EF provider; =IQueryable= data; =IUpdatable= interface.
+
+* Provider-Specific
+
+** Oracle ODP.NET
+
+- ODP.NET 19 is the last version that supports Oracle Database 11.2g, but 21
+  seems to work fine.
+
+- Any =OracleCommand= created by a connection in transaction is automatically
+  put into the context of that transaction without explicitly specifying
+  =OracleCommand.Transaction=.
+  This is not the case with many other ADO.NET providers, where an
+  =InvalidOperationException= is thrown if the transaction of command is not
+  specified.
+
+- The return type of an output parameter is dependent on the specified =DbType=
+  or =OracleDbType=
+  of =OracleParameter= where the last set one takes effect.
+
+- =OracleCommand= binds parameters by position with =.BindByName= set to =false=
+  by default.
+
+- =OracleTimeStampTZ= is returned as =DateTime= by default.
+
+- Array binding can insert multiple rows in a single command with =.ArrayBindCount=, that is, use
+  =OracleParameter= with an array of values.
+
+- Guids are handled with =System.Guid='s constructor and =.ToByteArray()=, thus
+  flipping some bytes.
+
+- For numerical values, ODP.NET selects the first .NET type from a list of .NET
+  numerical types based on precision and scale of the column.
+
+- For multiple result sets to return, bind multiple ref cursors.
