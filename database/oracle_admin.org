@@ -1,4 +1,4 @@
-#+TITLE: Oracle_admin
+G#+TITLE: Oracle_admin
 
 * Common Tasks and Tools
 
@@ -40,7 +40,18 @@
 
 - Global database name: =database_name.database_domain=
 
-- Operating System Groups: administrative access to database is granted by membership in certain OS groups.
+- Operating System Groups: administrative access to database is granted by
+  membership in certain OS groups.
+
+** Environment Variables
+
+- =ORACLE_SID=
+
+- On Unix, a profile file for shell, on Windows =HKLM:\Software\Oracle=
+
+- Oracle Base =ORACLE_BASE=: a directory where Oracle software is installed;
+  Oracle database is installed in =ORACLE_HOME=, a subdirectory of the base
+  directory. =ORACLE_HOME/bin= needs to be in =PATH=.
 
 ** Creating A Database
 
@@ -54,16 +65,21 @@
 
 Oracle Net establishes the connection between the client application and the database over a network and exchanges messages between them using industry standard protocols.
 
-- /Service Name/: a logical representation of a database, presented to clients. A single database can be presented as multiple services.
+- /Service Name/: a logical representation of a database, presented to clients.
+  A single database can be presented as multiple services and a single service
+  can have multiple databases behind.
 
 ** Oracle Net Listener
 
 a process that listens for client connection requests and manages the traffic of the requests to the database server.
+A listener is configured with one or more listening protocol addresses,
+information about supported services and parameters that contril its runtime behavior.
 
-A listenere is configured with one or more listening protocol addresses, information about supported services and parameters that contril its runtime behavior.
-The Configuration file: =listener.ora= located in the =network/admin= of the Oracle home directory. The default listener listens on the TCP port 1521 and the database registers with the listener at this protocl address.
+- The Configuration file: =listener.ora= located in the =network/admin= of the
+Oracle home directory. Also configured by /Oracle Net Manager/.
 
-An oracle database registers within a minute or so of starting up. The service names or the database that they represent can be configured in =listener.ora=. Dynamic registration requires no configuration of =listener.ora=. (Dynamic) Service registration provides a load balancing mechanism and connection-time failover in case one instance is down.
+- there is a default listener that listens on the TCP port 1521 and the
+database registers with the listener at this protocol address.
 
 #+begin_src
 lsnrctl status/start/stop
@@ -71,7 +87,10 @@ lsnrctl status/start/stop
 
 *** Service Registration
 
-Listener configuration must be set to listen on the ports named in the database initialization file. An listner alias can be configured inside the =tnsnames.ora= on the database host.
+An oracle database registers within a minute or so of starting up by the
+listener registration process (=LREG=). The service names or the database that they represent can be configured in =listener.ora=. Dynamic registration requires no configuration of =listener.ora=. (Dynamic) Service registration provides a load balancing mechanism and connection-time failover in case one instance is down.
+
+Listener configuration must be set to listen on the ports named in the database initialization file. An listener alias can be configured inside the =tnsnames.ora= on the database host.
 
 **** Local Listener
 
@@ -81,14 +100,15 @@ Listener configuration must be set to listen on the ports named in the database 
 alter system set local_listener=alias_or_actual_protocol_address;
 #+end_src
 
-Beware of the default value of `local_listener`, this might cause the database to fail to find the listener.
+Beware of the default value of =local_listener=, this might cause the database to fail to find the listener.
 
 **** Remote Listener
 
 =REMOTE_LISTENER=
 
 #+begin_src
-alter system set remote_listener=alias_or_actual_protocol_address;
+alter system set remote_listener=alias_or_actual_protocol_address; // may be direct addressing or a naming in listener.ora
+// (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=remote_ip)(PORT=1521)))
 #+end_src
 
 Remote listener might need to disable VNCR (valid_node_checking_registration) to allow remote registration.
@@ -97,4 +117,114 @@ Remote listener might need to disable VNCR (valid_node_checking_registration) to
 
 #+begin_src sql
 dbms_service.create_service
+dbms_service.start_service
 #+end_src
+
+** Client Connections
+
+- Connect Descriptors
+
+#+begin_src
+DESCRIPTION=
+    (ADDRESS=(PROTOCOL=tcp)(HOST=my-server)(PORT=1521))
+    (CONNECT_DATA=
+        (SERVICE_NAME=mydb.us.example.com))
+#+end_src
+
+- Connect String
+  + a connect descriptor
+  + a net service name that resolves to the connect descriptor by /Easy Connect [Plus]
+    Naming/ (no configuration required), /Local Naming/ (in a client configuration file =tnsnames.ora=) or /Directory Naming/ (by an
+    LDAP-compliant directory server).
+
+* Instance Management
+
+- /Oracle instance/: a set of Oracle Database background processes that operate on
+  the stored data and the shared allocated memory.
+  + instance ID known as /system ID/ (/SID/)
+  + configured using an instance /initialization parameters file/.
+
+** Initialization Parameter
+
+- /Initialization Parameter File/
+  + /Server Parameter file/ (spfile): a binary form of init parameter file
+    written and read by the database.
+  + /Text initialization parameter file/: edited manually but not by the
+    database.
+    - a spfile can be created from a text init file or the in-memory values of
+      all init parameters.
+    - a text init parameter file can be created from an spfile.
+
+#+begin_src sql
+alter system set name = value scope=memory/spfile/both;
+#+end_src
+
+** Instance Memory Management
+
+- /Memory Structures/:
+  + /System Global Area/: shared by all server and background processes
+    + database buffer cache: cached data
+    + shared pool: shared SQL statements, data dictionary information, stored
+      procedure
+    + redo log buffer
+    + In-Memory data
+    + Java pool
+    + Result cache
+  + /Program Global Area/: data and control information for a server process
+    + used to process SQL statements and hold logon and other session information.
+
+- /Automatic Memory Management/: dynamically exchanges memory between the SGA
+  and the instance PGA as needed to meet processing demands with a set total
+  memory size used by the instance.
+  + enabled by default
+  + ~MEMORY_TARGET = SGA_TARGET + max(PGA_AGGREGATE_TARGET, maximum PGA
+    allocated)~:
+     the Oracle systemwide usable memory. Total memory usage can grow
+    beyond the value of =MEMORY_TARGET=.
+  + set =MEMORY_MAX_TARGET= for future allocation.
+
+- /Automatic Shared Memory Management/: target and maximum sizes are set for SGA.
+  + set =MEMORY_TARGET= to 0. Set =SGA_TARGET= to a proper size.
+
+- /Manual Shared Memory Management/: memory sizes of several SGA components are
+  set manually.
+  + set =SGA_TARGET= and =MEMORY_TARGET= to 0 and manually sets other memory sizes.
+
+- /Automatic PGA Memory Management/: =PGA_AGGREGATE_TARGET=, used with
+  Automatic/manual shared memory management.
+
+** Background Processes
+
+- /Background processes/
+  + not necessarily OS processes.
+  + /Database writer/ (DBWn): write buffer cache to disk files.
+  + /Log Writer/ (LGWR): writes redo log entries to disk.
+  + /Checkpoint/ (CKPT): checkpoints are times when all modified database
+    buffers in the SGA are written to the data files by DBWn. This process is
+    responsible for managing checkpoints.
+  + /System Monitor/ (SMON): instance recovery
+  + /Archiver/ (ARCn): coopy the online redo log files to archival storage.
+  + /Manageability monitor/ (MMON): various management-related background tasks.
+  + /Job Queue Processes/ (CJQ0 and Jnnn): run user jobs.
+
+- /Server Processes/: a process that handles the connection to the database on
+  behalf of the client program such as parsing and running SQL statements and
+  retrieving and returning results to the client program.
+
+** Startup and Shutdown
+
+- Startup and shutdown
+  + requires =SYSDBA= or =SYSOPER=, by default owned by =SYS= and =SYSTEM=
+  + the database starts up, reads the initialization parameters, allocated SGA
+    and starts the background processes; mounting the database opens the control
+    file but does not open data files. Opening the database opens the online
+    redo log files and data files.
+  + /Normal/ shutdown waits for connections to exit their sessions. /Immediate/
+    disconnects all incoming sessions immediately. /TRANSACTIONAL/ shutdowm
+    waits for each user complete the current transactions. /ABORT/ shuts down
+    the database without waiting for the committed transactions to be written to
+    disk.
+    + cached data and online redo logs are written to disk. A checkpoint is
+      performed on the data files. Data files and online redo files are closed. (MOUNTED)
+    + the control file is then updated to record a clean shutdown. (NOMOUNT)
+    + background processes are stopped and all SGA are deallocated.
