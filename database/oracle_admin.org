@@ -183,7 +183,7 @@ alter system set name = value scope=memory/spfile/both;
     beyond the value of =MEMORY_TARGET=.
   + set =MEMORY_MAX_TARGET= for future allocation.
 
-- /Automatic Shared Memory Management/: target and maximum sizes are set for SGA.
+- /Automatic Shared Memory Management/: targetx and maximum sizes are set for SGA.
   + set =MEMORY_TARGET= to 0. Set =SGA_TARGET= to a proper size.
 
 - /Manual Shared Memory Management/: memory sizes of several SGA components are
@@ -228,3 +228,108 @@ alter system set name = value scope=memory/spfile/both;
       performed on the data files. Data files and online redo files are closed. (MOUNTED)
     + the control file is then updated to record a clean shutdown. (NOMOUNT)
     + background processes are stopped and all SGA are deallocated.
+
+* Database Storage Structure
+
+- /Physical Structure/ and /Logical Structure/: the primary logical structure in
+  a database (a tablespace) contains physical files. The app developer or user
+  may not be aware of the underlying physical structure but aware of the logical
+  structure.
+
+- A CDB has basically the same structure as a non-CDB except that each PDB has
+  its own set of tablespaces including =SYSTEM= and =SYSAUX= and data files.
+  + One /control file/, /online redo log/, one or more sets of /temp files/,
+    one set of /undo data files/, a set of /system data files/ for every
+    container, zero or more sets of /user-created data files/.
+
+** Control File
+
+Tracks the physical components of the database, the root file that the database
+uses to find all the other files used by the database.
+
+- Typically, control files are multiplexed or have multiple identical copies.
+  A default control is file is specified in =CONTROL_FILES= init parameter.
+
+** Online Redo Log Files
+
+a set of groups of files that store a copy of the changes made to data.
+
+- Online redo logs can fill the gap between the backup and the data state before
+  the database failure that requires recovery.
+
+- Oracle Database can multiplex the online redo log files so that two or more
+  identical copies of the online redo log file can be maintained on different disks.
+  A /redo log file group/ consists of an online redo log file and its multiplexed
+  copies.
+
+- LGWR writes redo records from the memory buffer to a redo log group until the
+  log files in that group reach their storage size limit or until a log switch
+  operation is requested.
+
+** Archived Redo Log Files
+
+Online redo logs can be archived for future data recovery.
+
+** Rollback Segments
+
+No longer preferred as a means to track undo information. See Undo tablespace
+
+** Data Files
+
+Filesystem files that store the data within the database.
+
+- /Segment/: contains a specific type of database object. e.g. a table
+  segment, an index segment. A data file can contain many segments.
+
+- /Extent/: a contiguous set of data blocks within a segment. The allocation
+  unit of Oracle Database.
+
+- /Data block/: the smallest unit of I/O to database storage. A new tablespace can
+  have a different block size than the default one.
+
+** Tablespaces
+
+Logical storage units of a database that group related logical structures
+(tables, views and other database objects) into a set of data files.
+
+- A means to physically locate data on storage, a unit of backup and recovery.
+
+- Some default tablespaces
+  + =SYSTEM=: for internal database management
+  + =SYSAUX=: auxiliary tablespace that contains data for some components and
+    products.
+  + =TEMP=: the default temporary tablespace. Used for SQL statements
+    processing.
+  + =UNDOTBS1=: the undo tablespace used by the database to store undo
+    information.
+  + =USERS=: used to store permanent user objects and data.
+
+- By default, Oracle sets all newly created tablespaces to be locally managed
+  (with allocation information in the tablespace itself)
+  with automatic segment management.
+
+- Tablespace types:
+  + /Permanent/: for user and application data.
+  + /Undo/: for transaction rollback, to provide read consistency, to help with
+    database recovery and to enable some other features. Only one for an instance.
+  + /Temporary/: for temporary data. Normally not necessary to create additional
+    temporary tablespaces.
+
+- Tablespace status:
+  + /Read Write/: the default.
+  + /Read Only/
+  + /Offline/: no users can access it.
+
+- Tablespace data files can be set to /autoextending/ so that it autmatically
+  extend itself by a specified amount of size when it reaches its size limit.
+
+- Tablespaces can be encrypted.
+
+** Other Structures
+
+- Initialization Parameter File
+
+- Password File: for authentication of users with =SYSDBA=, =SYSOPER= and
+  =SYSBACKUP= privileges, even when the database is not started.
+
+- Backup files: copies of the database in some form used to recover the database.
