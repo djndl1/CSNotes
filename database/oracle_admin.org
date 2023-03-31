@@ -274,6 +274,23 @@ Online redo logs can be archived for future data recovery.
 
 No longer preferred as a means to track undo information. See Undo tablespace
 
+*** Undo Data
+
+- /Undo Data/: When a transaction modifies data, Oracle Database copies the
+  original data before modifying it.
+  + stored in an undo tablespace, by default =UNDOTBLS1= with a maximum
+    extension size of 32GB.
+  + undo data may be retained for a specified amount of time =UNDO_RETENTION= after committing
+    the data.
+
+- Uses:
+  + rollback uncommitted data changes.
+  + provide /read consistency/, where each user can get a consistent view of data
+    even while other changes may be occurring against the data. A user session
+    does not see uncommitted changes made in other user sessions. A user should
+    have the data state at 10:00 am. if the query starts at 10:00 am even if the
+    data is modified at 10:05 am.
+
 ** Data Files
 
 Filesystem files that store the data within the database.
