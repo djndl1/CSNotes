@@ -1,12 +1,43 @@
-* Terminology
+* Installation
 
-- Primary Key: a unique, identifying value with which only one row is associated
+- make a group =mysql= and system account =mysql=
 
-- Foreign key: a link between two tables
+- untar MySQL binary distribution.
 
-- Composite/compound key: a key that refers to multiple columns
+- Initialize the data directory at the MySQL root directory.
+  + =mkdir mysql-files=
+  + =chown mysql:mysql mysql-files=, =chmod 750 mysql-files=
+  + =bin/mysqld --initialize --user=mysql --basedir=installation_dir
+    --datadir=data_dir= (or these directories can be specified in =my.cnf= used
+    with ~--defaults-file~)
+    - the directory is checked and =mysql= system schema is created along with
+      its tables including data dictionary tables, grant tables, time zone
+      tables and server-side help tables and system tablespace and related data
+      structures to manage InnoDB tables.
+    - a ='root'@'localhost'= superuser is created with other reserved accounts.
+  + =bin/mysql_ssl_rsa_setup=
 
-- Row/tuple/record/entry
+- Starts the server: =bin/mysqld_safe --user=mysql= or with a service manager.
+
+- =mysql -u root -p= with the random generated password or skip the password if
+  the random one is not given after initialization.
+  + =ALTER USER 'root'@'localhost' IDENTIFIED BY 'chosen-password';=
+
+** Testing
+
+- =mysqladmin version=, =mysqladmin variables=, =mysqladmin shutdown=
+
+- =mysqlshow=: Shows the structure of a MariaDB database
+
+** Transferring Databases
+
+#+begin_src shell
+mysqladmin -h 'other_hostname' create db_name
+mysqldump db_name | mysql -h 'other_hostname' db_name
+
+# or store a dumpfil to a file
+mysqldump --quick db_name | gzip > db_name.gz
+#+end_src
 
 * Basics
 
