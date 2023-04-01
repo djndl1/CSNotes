@@ -420,3 +420,37 @@ limit the kinds of SQL statements that users can execute.
    roles may be granted commonly.  users or roles may be granted roles and
    privileges commonly only if the grantees and grantors are both common; and if a role
    is being granted commonly, then the role itself must be common.
+
+* Backup and Recovery
+
+TODO Need ARCHIVELOG mode for online backup
+
+- /Database backup/: make copies of the data files, control file and archived
+  redo log files if any.
+
+- /Database Restore/: copying the physical files of the database from a backup
+  to the original or new locations.
+
+- /Database Recovery/: updating database files restored from a backup with the
+  changes made to the database after the backup by applying incremental backups
+  and redo logs to the restored files.
+
+- /Physical backup/: with =rman= that can backup data files, spfiles, control
+  files and archived redo log files.
+
+- /Logical Backup/: exporting databases are a useful supplements to physical
+  backups.
+
+- /RMAN Repository/: records of database files and backups of each database on
+  which =rman= performs operations.
+  + Used to choose the most efficient backups for restore and recovery.
+
+- /Recovery Catalog/: a second copy of rman repository stored in another
+  separate database.
+
+** Archive Mode
+
+- =NOARCHIVELOG= mode
+
+- =ARCHIVELOG= mode: filled groups of redo logs are archived. Used to protects
+  the database from both instance and media failure.
