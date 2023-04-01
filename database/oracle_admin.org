@@ -421,6 +421,86 @@ limit the kinds of SQL statements that users can execute.
    privileges commonly only if the grantees and grantors are both common; and if a role
    is being granted commonly, then the role itself must be common.
 
+* Managing Schema Objects
+
+- /Schema/: a collection of database objects owned by a user with the same name.
+  + no relationship between a tablespace and a schema.
+
+** Tables
+
+- Tables can be /permanent/ or /temporary/.
+  + /temporary table/: holds session-private data that exists only for the
+    duration of a transaction or session.
+
+- Tables can be of /relational/ type, /object/ type or /XMLType/ type.
+
+- After dropping a table, the table and its content are put into the /Recycle Bin/.
+
+*** Data types
+
+- VARCHAR2: can be used with =CHAR= (code point) instead of the default =BYTE=
+  to specify its length. Otherwise =NLS_LANG_SEMANTICS= will be used.
+
+** Indexes
+
+Schema objects that associated with tables to improve query performance. Indexes
+are managed and maintained by the database, transparent to the users.
+
+*** Attributes
+
+- Standard B-Tree (default) or Bitmap
+
+- Ascending (default) or descending: how the search is done with the index
+
+- Column or Functional: based on a column or the result of a column.
+
+- single column or concatenated: index on one or multiple columns
+
+- partitioning: the same concept as table partitioning
+
+** View
+
+Customized presentations of data in one or more tables or other views or
+regarded as stored queries.
+
+*** Data Dictionary View
+
+**** Static Data Dictionary View
+
+Many data dictionary tables have three corresponding views
+
+- =DBA_*=: all relevant information in the entire database. Intended only for
+  administrators.
+
+- =ALL_*=: all the info accessible to the current user.
+
+- =USER_*=: all the info from the user's schema.
+
+*** Dynamic Performance Views
+
+Only for administrators. Starts with =V$=
+
+** Program Code
+
+PL/SQL or Java Source Code (not recommended), written by the app developers.
+
+*** Validation/Compilation
+
+Schema objects such as triggers, procedures and views may become invalid.
+Compile these objects to revalidate them.
+
+** Sequence
+
+Concurrency-safe number sequence generator.
+
+** Synonyms
+
+An alias for any schema object such as a table or view.
+
+** Database Link
+
+A schema object that points to another database.
+
 * Backup and Recovery
 
 TODO Need ARCHIVELOG mode for online backup
