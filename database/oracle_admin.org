@@ -350,3 +350,73 @@ Logical storage units of a database that group related logical structures
   =SYSBACKUP= privileges, even when the database is not started.
 
 - Backup files: copies of the database in some form used to recover the database.
+
+* Users and Security
+
+- /user account/: identified by a /user name/ with the following attributes
+  + /authentication method/
+  + /password for authentication/
+  + /default tablespaces/
+  + /tablespace quotas/
+  + /account status/ (locked or unlocked)
+  + /password status/ (expired or not)
+  + a user schema
+  + a user also needs approprivate system privileges, object privileges and
+    roles for its job.
+
+- Predefined users
+  + =SYS=: with =SYSDBA= privilege. can perform all administrative functions. All data dictionary objects are stored
+    in the  =SYS= schema.
+  + =SYSTEM=: all privileges except backup/recovery, database upgrade. A new
+    administrator user is recommended instead of =SYSTEM= for daily
+    administrative tasks.
+  + =DBSNMP=
+  + other internal accounts used by Oracle and its other components.
+
+** Users in a CDB
+
+- /Common User/: a user that has the same identity in the root and in every PDB.
+  + can log in to any container in which it has =CREATE SESSION= privilge.
+  + may not have the same privilege in every container.
+  + its name must begin with =COMMON_USER_PREFIX= and contains only ASCII,
+    uniquely named across all containers.
+  + its schemas in containers can differ
+
+- /Local User/: a user that can operate only within a single PDB, owns a single
+  schema in a specific PDB.
+  + cannot be created in a CDB and cannot connect to another PDB.
+  + its name cannot begin with =COMMON_USER_PREFIX=
+
+** User Privileges
+
+Basic level of database security, designed to control user access to data and to
+limit the kinds of SQL statements that users can execute.
+
+- /System Privileges/: the privilege to perform a particular action or an action
+  on any schema objects of a particular type.
+  + =SYSDBA=: for fully empowered database administrators
+  + =SYSOPER=: basic operational tasks without the ability to look at user data.
+  + =SYSDBA= and =SYSOPER= allow access to database without opening the
+    database. They are connections that perform certain database operations for
+    which privileges cannot be granted in any other way.
+
+- /Object privileges/: the privilege to perform a particular action on a
+  specific schema object.
+
+*** /Roles/ Named groups of related privileges.
+
+- Predefined Roles
+  + =CONNECT=: enables a user to connect to the database
+  + =RESOURCE=: enables a user to create, modify and delete certain types of
+    schema objects.
+  + =DBA=: enable a user to perform most administrative functions.
+  + =DATAPUMP_EXP_FULL_DATABASE=, =DATAPUMP_IMP_FULL_DATABASE=
+
+- Common Roles/Local Roles in a CDB
+ + *Both common and local phenomena may grant and be granted locally*:
+   Roles and privileges may be granted locally to users and roles regardless of whether
+   the grantees, grantors, or roles being granted are local or common.
+ + *Only common phenomena may grant or be granted commonly*: Privileges and common
+   roles may be granted commonly.  users or roles may be granted roles and
+   privileges commonly only if the grantees and grantors are both common; and if a role
+   is being granted commonly, then the role itself must be common.
