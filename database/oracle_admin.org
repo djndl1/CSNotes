@@ -354,7 +354,16 @@ Logical storage units of a database that group related logical structures
 * Users and Security
 
 - /user account/: identified by a /user name/ with the following attributes
-  + /authentication method/
+  + /authentication method/:
+    - account passwords (through the data dictionary)
+    - OS authentication: through local connections and secure remote connections
+      as a privileged user. Normally the OS username of the database is placed
+      in a special group =OSDBA=, =OSOPER=, =OSBACKUPDBA= =OSKMDBA=, =OSRACDBA=
+      (different actual names are used on Unix and Windows).
+    - password files (kerberos, SSL authentication services): through nonsecure
+      connection as a privileged user
+    - directory-based authentication service.
+    + The latter three do not requires an open database.
   + /password for authentication/
   + /default tablespaces/
   + /tablespace quotas/
@@ -370,8 +379,14 @@ Logical storage units of a database that group related logical structures
   + =SYSTEM=: all privileges except backup/recovery, database upgrade. A new
     administrator user is recommended instead of =SYSTEM= for daily
     administrative tasks.
+  + =SYSBACKUP=: for RMAN backup and recovery operations
+  + =SYSDG=: Data Guard operations
+  + =SYSKM=: Transparent Data Encryption keystore operations
+  + =SYSRAC=: for Oracle RAC operations
   + =DBSNMP=
   + other internal accounts used by Oracle and its other components.
+  + do not use =SYS= or =SYSTEM= for daily tasks, create a custom user with
+    appropriate privileges.
 
 ** Users in a CDB
 
@@ -399,6 +414,8 @@ limit the kinds of SQL statements that users can execute.
   + =SYSDBA= and =SYSOPER= allow access to database without opening the
     database. They are connections that perform certain database operations for
     which privileges cannot be granted in any other way.
+  + =SYSBACKUP=, =SYSDG=, =SYSKM=, =SYSRAC=: these privileges have their
+    synonymous users.
 
 - /Object privileges/: the privilege to perform a particular action on a
   specific schema object.
