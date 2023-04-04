@@ -154,10 +154,27 @@ DESCRIPTION=
     - a spfile can be created from a text init file or the in-memory values of
       all init parameters.
     - a text init parameter file can be created from an spfile.
+  + default location: =initORACLE_SID.ora= (PFILE), =spfileORACLE_SID.ora= (SPFILE) under =$ORACLE_HOME/database= or
+    =$ORACLE_HOME/dbs=. There is a sample pfile =init.ora= under =ORACLE_HOME=.
+  + =STARTUP= first searches for an SPFILE and then a text PFILE if ~PFILE=~ is
+    not specified.
+
+- initialization parameters can be /static/ or /dynamic/ depending on whether
+  they can be changed after startup.
+
+- =CREATE PFILE= to export and =CREATE SPFILE= to import.
 
 #+begin_src sql
 alter system set name = value scope=memory/spfile/both;
+alter system reset parname
 #+end_src
+
+- to view parameters
+  + =SHOW PARAMTER= (memory), =SHOW PARAMETERS= (the current spfile) in SQL Plus
+  + =CREATE PFILE=
+  + =V$PARAMTER=, =V$PARAMTERS= (for the current session)
+  + =V$SYSTEM_PARAMTER=, =V$SYSTEM_PARAMETER2=
+  + =V$SPPARAMTER= (the current spfile)
 
 ** Instance Memory Management
 
