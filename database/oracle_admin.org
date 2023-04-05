@@ -61,6 +61,8 @@ G#+TITLE: Oracle_admin
   + Dedicated Server mode: default. each user process gets a server process. typical for persistent long running requests to the database.
   + Shared server mode: all client connections share a database-allocated pool of resources.
 
+- =DATABASE_PROPERTIES=, =GLOBAL_NAME=, =V$DATABASE=
+
 ** Database Service
 
 A named representation of one or more database instances, either a
@@ -259,7 +261,9 @@ alter system reset parname
   + the database starts up, reads the initialization parameters, allocated SGA
     and starts the background processes; mounting the database opens the control
     file but does not open data files. Opening the database opens the online
-    redo log files and data files.
+    redo log files and data files. =NOMOUNT= (no database access, for database
+    creation or recreation of control files), =MOUNT=, =OPEN=, =FORCE=, =OPEN
+    RECOVER=, =RESTRICT= (restricted to only administrators)
   + /Normal/ shutdown waits for connections to exit their sessions. /Immediate/
     disconnects all incoming sessions immediately. /TRANSACTIONAL/ shutdowm
     waits for each user complete the current transactions. /ABORT/ shuts down
@@ -269,6 +273,21 @@ alter system reset parname
       performed on the data files. Data files and online redo files are closed. (MOUNTED)
     + the control file is then updated to record a clean shutdown. (NOMOUNT)
     + background processes are stopped and all SGA are deallocated.
+
+** Quiesced State
+
+A state that only DBA transactions, queries, fetches or PL/SQL statements are
+allowed. This state decreases downtime compared to restricted mode.
+
+Any pending non-DBA sessions continue to exist but appear to be blocked until
+the database becomes unquiesced.
+
+#+begin_src sql
+ALTER SYSTEM QUIESCE RESTRICTED;
+ALTER SYSTEM UNQUIESCE.
+#+end_src
+
+- =V$INSTANCE=, =V$BLOCKING_QUIESCE=
 
 * Database Storage Structure
 
