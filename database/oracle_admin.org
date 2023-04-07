@@ -253,6 +253,48 @@ alter system reset parname
 - /Server Processes/: a process that handles the connection to the database on
   behalf of the client program such as parsing and running SQL statements and
   retrieving and returning results to the client program.
+  + dedicated/shared: a server can service one/multiple user progresses.
+  + With shared processes, the user connects to a dispatcher which supports
+    multiple client connections concurrently. Each client is bound to a /virtual
+    circuit/, handled by real server processes. To use shared servers, set
+    =SHARED_SERVERS= and =DISPATCHERS= (note the default service restriction).
+  + Typically one shared process for every ten connections. =SHARED_SERVERS= is
+    a dynamic parameter that can be set according to server loads.
+  + =V$DISPATCHER=, =V$DISPATCHER_CONFIG=, =V$QUEUE=, =V$CIRCUIT=,
+    =V$SHARED_POOL_RESERVED=, =V$SHARED_SERVER=, =V$DISPATCHER_RATE=
+
+
+- Database Resident Connection Pooling (DRCP): for web applications where the
+  application acquires a connection and works on it for a short duration. DRCP
+  pools dedicated servers and thus has as many sessions as the server processes.
+  It enabled sharing of database connection across
+  middle-tier processes. Useful for multi-process single-threaded application
+  servers that cannot perform middle-tier connection pooling.
+  + =DRCP_DEDICATED_OPT=: DRCP optimization; =MAX_AUTH_SERVERS=,
+    =MIN_AUTH_SERVERS=
+  + =DBMS_CONNECTION.START_POOL()= to start the default connection pool.
+    =DBMS_CONNECTION.STOP_POOL()= stops the pool.
+  + The =DBMS_CONNECTION_POOL= package configures the pool.
+  + =DBA_CPOOL_INFO=, =V$CPOOL_CONN_INFO=, =V$CPOOL_STATS=, =V$CPOOL_CC_INFO=,
+    =V$CPOOL_CC_STATS=
+
+- the database can be set to =THREADED_EXECUTION= mode to prespawn processes for
+  reduced creation time.
+
+- parallel SQL execution
+  + =PARALLEL= clause, parallel hint in the statement or a default determined by
+    the database. Enabled by default with =PARALLEL_MAX_SERVERS= greater than
+    zero.
+    By default, parallel execution is enabled for DDL and query statements.
+
+- =V$PROCESS=, =V$SESSION=, =V$SESS_IO=, =V$SESSION_LONGOPS=, =V$SESSION_WAIT=,
+  =V$WAIT_CHAINS=, =V$SESSTAT=, =V$RESOURCE_LIMIT=, =V$SQLAREA=
+
+- Terminating session
+  =ALTER SYSTEM KILL SESSION 'SID,SERIAL#'=
+
+- Terminating SQL
+  =ALTER SYSTEM CANCEL SQL 'SID, SERIAL, @INST_ID, SQL_ID'=
 
 ** Startup and Shutdown
 
