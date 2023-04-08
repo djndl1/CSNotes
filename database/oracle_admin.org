@@ -213,6 +213,11 @@ alter system reset parname
     + In-Memory data
     + Java pool
     + Result cache
+    + All SGA components allocate and deallocate space in units of granules, of
+      which the size is determined by the overall size of SGA memory
+      =SGA_MAX_SIZE=.
+    + the entire SGA memory should reside in the physical memory for performance
+      reason.
   + /Program Global Area/: data and control information for a server process
     + used to process SQL statements and hold logon and other session information.
 
@@ -223,11 +228,16 @@ alter system reset parname
   + ~MEMORY_TARGET = SGA_TARGET + max(PGA_AGGREGATE_TARGET, maximum PGA
     allocated)~:
      the Oracle systemwide usable memory. Total memory usage can grow
-    beyond the value of =MEMORY_TARGET=.
+    beyond the value of =MEMORY_TARGET= (dynamic parameter).
   + set =MEMORY_MAX_TARGET= for future allocation.
+  + =V$MEMORY_TARGET_ADVICE=
 
-- /Automatic Shared Memory Management/: targetx and maximum sizes are set for SGA.
-  + set =MEMORY_TARGET= to 0. Set =SGA_TARGET= to a proper size.
+- /Automatic Shared Memory Management/: target and maximum sizes are set for SGA.
+  + set =MEMORY_TARGET= to 0. Set =SGA_TARGET= (dynamic parameter) to a proper size.
+  + Recommended for database instances with memory greater than 4GB.
+  + =V$SGAINFO=, =V$SGA_TARGET_ADVICE= (tuning advice)
+  + When automatic shared memory management is enabled, the manually specified sizes of
+    automatically sized components serve as a lower bound for the size of the components.
 
 - /Manual Shared Memory Management/: memory sizes of several SGA components are
   set manually.
