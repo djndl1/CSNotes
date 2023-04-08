@@ -663,3 +663,25 @@ TODO Need ARCHIVELOG mode for online backup
 
 - =ARCHIVELOG= mode: filled groups of redo logs are archived. Used to protects
   the database from both instance and media failure.
+
+* Monitoring System
+
+** Errors and Alerts
+
+- /Trace files/: error dump;
+  + =MAX_DUMP_FILE_SIZE=
+  + =SQL_TRACE= for the whole instance or a certain session to enable SQL
+    performance tracing. =ALTER SESSION SET SQL_TRACE TRUE;=
+
+- /Alert log/: chronological log of messages and errors
+  + internal errors, block corruption errors, deadlock errors
+  + administrative operations
+  +  messages/errors of shared server and dispatcher
+  + nondefault init parameters
+  + an alternative to console output
+
+- Server-Generated Alerts: notification from the Oracle Database server of an
+  impending problem.
+  + =DBMS_SERVER_ALERT=
+
+- Automatic Diagnostic Repository
