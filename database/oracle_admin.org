@@ -685,3 +685,18 @@ TODO Need ARCHIVELOG mode for online backup
   + =DBMS_SERVER_ALERT=
 
 - Automatic Diagnostic Repository
+
+** Performance
+
+- /Locks/: mechanisms that prevent destructive interaction between transactions
+  accessing the same resource.
+  + Oracle Database automatically detects deadlock situations and resolves them
+    by rolling back one of the statements involved in the deadlock, thereby
+    releasing one set of the conflicting row locks.
+  + Most often deadlocks occur when transactions explicitly override the default
+    locking of the database.
+
+- /Wait Events/: statistics incremented by a server process to indicate that it
+  has to wait for an event to complete before being able to continue processing.
+
+TODO Performance Tuning
