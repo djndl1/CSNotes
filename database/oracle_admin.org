@@ -700,3 +700,88 @@ TODO Need ARCHIVELOG mode for online backup
   has to wait for an event to complete before being able to continue processing.
 
 TODO Performance Tuning
+
+* Diagnosing and Resolving Problems
+
+** Fault Diagnosability Infrastructure
+
+A critical error is assigned an /incident number/, and its diagnostic data along
+with its incident number is stored in a file-based repository outside the
+database called the /Automatic Diagnostic Repository/.
+
+- Automatic capture of diagnostic data upon first failure.
+  + An always-on memory-based tracing system proactively collects diagnostic
+    data from many database components, and can help isolate root causes of
+    problems and stores in the ADR, similar to an airplane black box.
+
+- Standardized trace formats.
+
+- Health Checks: deeper analysis of a critical error.
+  + data block corruption,
+  + undo and redo corruption
+  + data dictionary corruption
+
+- Incident Packaging Service and Incident Packages: collecting diagnostic data
+  into a zip file for transmission to Oracle Support.
+
+- Data Recovery Advisor
+
+- SQL Test Case Builder
+
+** Problems and Incidents
+
+- /Problem/: a critical error in a database instance
+  + /incident/: an occurrence of such a problem.
+
+- Incidents can be flood-controlled, that is, after certain incidents of the
+  same problem occur within a certain interval, the incident is no longer
+  recorded but only a single message.
+
+** Components
+
+- /Automatic Diagnostic Repository/: file-based repository for database
+  diagnostic data
+  + for /traces/, /dumps/, /alert log/, /health monitor reports/ etc.
+  + used by the database, Oracle ASM, the listener, Oracle Clusterware among others.
+
+- /Alert log/: an XML file of chronological log of messages and errors.
+  + one alert log in each ADR home.
+
+- /Trace Files/ =.trc=: each process writes to an associated trace file.
+  + sometimes accompanied by a trace metadata =.trm= file.
+
+- /Dumps/: one-time output of diagnostic data in response to an event.
+
+- /Core Files/: memory core dump; only for Oracle engineers
+
+- /DDL Log/: records for each DDL statement by the database. Controlled by the
+  init parameter =ENABLE_DDL_LOGGING=.
+
+- /Debug Log/:
+
+- Health monitor reports, data repair records, SQL test cases, incident packages
+  and more.
+
+- /ADR Command Interpreter (ADRCI)/: investigate problems, view health check
+  reports and package first-failure diagnostic data.
+
+** Structure, Contents and Location of ADR
+
+- ADR base: =DIAGNOSTIC_DEST=
+  + if not set, and =ORACLE_BASE= is set, it defaults to =ORACLE_BASE=; if not,
+    set to =ORACLE_HOME/log=
+  + =V$DIAG_INFO=, =V$DIAG_CRITICAL_ERROR=
+  + =ADR_BASE/diag/=
+    - =asm=
+    - =rdbms=
+    - =tnslsnr=
+    - =clients=
+    - =crs=
+    - others
+      - =/product_type/product_id/instance_id=
+        + =alert=: XML-formatted alert log
+        + =cdump=: core files
+        + =incident=: dumps pertaining to that incident
+        + =trace=: process trace files, SQL trace files and text-formatted alert
+          log
+        + others
