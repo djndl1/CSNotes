@@ -352,3 +352,21 @@ Big Data is designed to handle a huge amount of data of various formats arriving
 2. Variety: data might always be structured: videos, emails, photos, audio files
 
 3. Velocity
+
+* Database Design
+
+** Analysis
+
+- Understand the organization structure of the system
+  + different structures requires different designs.
+
+- Define any problems, possibilities or constraints
+  + what the problems and needs are
+  + hardware constraints; maintenance restriction; limitations on data values;
+    the scale and amount of data.
+  + top management and lower-level users should both be asked.
+
+- Define the objectives
+
+- Agree on the scope and formalize it.
+  + the database cannot fulfill everything.
