@@ -43,22 +43,22 @@ mysqldump --quick db_name | gzip > db_name.gz
 
 The user name in MariaDB is not a OS user name.
 #+begin_src shell
-mysql -u user_name -p -h host_name -P port_number db_name
+mysql -u user_name -p -h host_name -P port_number
 #+end_src
 
 ** Initialization and Configuration
 
 **** Setup
 
-MariaDB needs the data in `mysql` database to manage privileges, roles, plugins and help info. Use =mysql_install_db= to set up the database
+MariaDB needs the data in `mysql` database to manage prvileges, roles, plugins and help info. Use =mysql_install_db= to set up the database
 
 #+begin_src shell
 mysql_install_db --user=mysql --basedir=/path/to/basedir --datadir=/path/to/datadir
 #+end_src
 
-**** Use =systemd=
+**** Use `systemd`
 
-The service is started by =mysqld= not =mysqld_safe=. The startup script has a timeout, when the startup takes too long, systemd kills it. Use a template unit file `mariadb@` to start multiple instances.
+The service is started by `mysqld` not `mysqld_safe`. The startup script has a timeout, when the startup takes too long, systemd kills it. Use a template unit file `mariadb@` to start multiple instances.
 
 https://mariadb.com/kb/en/systemd/#interacting-with-the-mariadb-server-process
 
@@ -190,20 +190,10 @@ MariaDB date types store no timezone info.
 - =YEAR[(4)]=: the range is very limited
 
 - =DATE=: YYYY-MM-DD
-  + =current_date=, =curdate()=
 
 - =TIME [(microsecond precision 0-6)]=:
-  + =current_time=, =curtime()=
-  + =HOUR()=, =MINUTE()=, =SECOND()=
-  + =EXTRACT()=
 
-- =DATETIME [(microsecond precision 0-6)]=: no automatic time zone conversions
-  are performed.
-  + =sysdate()=, =now()=, =current_timestamp()=, =current_timestamp=
-  + =YEAR()=, =MONTH()=, =DAYOFMONTH()=, =DAYOFWEEK()=, =DAYOFYEAR()=,
-    =QUARTER()=
-  + =HOUR()=, =MINUTE()=, =SECOND()=
-  + =EXTRACT()=
+- =DATETIME [(microsecond precision 0-6)]=: no automatic time zone conversions are performed.
 
 - =TIMESTAMP [(microsecond precision 0-6)]=:: generally used to define at which moment in time a row was added or updated, internally as the number of seconds since the UNIX epoch. Can be set to =CURRENT_TIMESTAMP= on creation or update
 
@@ -324,11 +314,7 @@ inner join largest_economies
 	using (country_id);
 #+end_src
 
-- =INSERT=:
-  + =IGNORE=
-  + =LOW_PRIORITY=
-  + =DELAYED=: delayed asynchronous insertion
-  + =ON DUPLICATE KEY UPDATE=: an update is performed if a duplicate is found
+- `INSERT`:
 
  #+begin_src sql
 --- default insertion
@@ -340,30 +326,6 @@ insert into contacts
 set first_name = 'Jonathan',
     last_name = 'Van';
  #+end_src
-
- - =REPLACE=: MySQL =MERGE= counterpart but not quite, with the same syntax as =INSERT= but
-   effectively =INSERT= combined with =DELETE= on duplicate key.
-
-- =UPDATE=
-  + =ORDER BY=
-  + =LIMIT=
-  + =UPDATE t1, t2 SET t1.col = t2.col WHERE t1.id = t2.id=: a join and an
-    update.
-
-- =ALTER TABLE=
-  + =CHANGE=: column name specified
-  + =MODIFY=: column name omitted
-  + =ALTER ... SET/DROP DEFAULT=
-
-#+begin_src sql
-/* to change the key column, drop the key first */
-alter table clients
-drop primary key,
-change cust_id client_id int primary key;
-#+end_src
-
-- =RENAME TABLE=: rename or move table
-
 
 *** Temporary Table
 
@@ -385,27 +347,3 @@ now();
 * Minor Details
 
 MariaDB is case-insensitive with regards to reserved words. Database and table names are case-sensitive on Linux as they reference the related directories and files on the filesystem.
-
-* Stored Procedure
-
-#+begin_src sql
-show procedure status;
-
-SELECT * FROM INFORMATION_SCHEMA.ROUTINES
-WHERE ROUTINE_TYPE='PROCEDURE';
-
-# show procedure definition
-show create procedure procedure_name;
-#+end_src
-
-#+begin_src sql
-begin not atomic
-	declare sum int default 0;
-	for i in 1..10
-	do
-		set sum = sum + i;
-	end for;
-
-	select sum;
-end
-#+end_src
