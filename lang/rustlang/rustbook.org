@@ -101,6 +101,7 @@ whenever building. =cargo update= bypasses this.
 
 #+BEGIN_SRC rust
   // src/front_of_house.rs
+
   pub mod hosting; // declared its submodule
 #+END_SRC
 
@@ -355,30 +356,29 @@ are expressions.
 system of ownership with a set of rules that the compiler checks at
 compile time.
 
+** Basic Rules
+
 - Each value has a variable called its /owner/;
 
 - There can only be one owner at a time;
 
-- When the owner goes out of scope, the value will be dropped.
+- When the owner goes out of scope, the value will be /dropped/.
 
-Assignment in Rust by default moves a value (Stack-only data are
-copied). Rust will never automatically create deep copies of data. If
-deep copy is needed, use a common method =clone=.
+- Assignment by default moves a value
+  - Stack-only data are copied. =Copy= trait indicates that a type is placed on
+    stack only. If a type has the =Copy= trait, an older variable
+    is still usable after assignment. All basic numeral types, =bool=,
+    =char=, tuples of =Copy= types are of =Copy= trait.
+  - =clone= if deep copy is needed.
 
-Rust has a special annotation =Copy= trait that indicates that a type is
-placed on stack only. If a type has the =Copy= trait, an older variable
-is still usable after assignment. All basic numeral types, =bool=,
-=char=, tuples of =Copy= types are of =Copy= trait.
+- Passing a variable to a function will move or copy in a similar way to
+  assignment. Returning values can
+  also transfer ownership, which follows the same pattern.
 
-Passing a variable to a function will move or copy. Returning values can
-also transfer ownership, which follows the same pattern.
-
-References allow for referring to some value without taking ownership of
-it. =&var= creates a reference that refers to =var=. The value will not
-be dropped when the reference goes out of scope. The signature of the
-function uses =&= to indicate the type of the parameter is a reference.
-Having references as function parameters is called /borrowing/.
-References are immutable by default.
+- To refer to some value without taking ownership, use /references/. The value
+  will not be dropped when the reference goes out of scope.
+  + Having references as function parameters is called /borrowing/.
+  + References are immutable by default.
 
 #+BEGIN_SRC rust
   fn calculate_length(s: &String) -> usize {
@@ -390,11 +390,12 @@ References are immutable by default.
   }
 #+END_SRC
 
-However, you can have only one mutable reference to a particular piece
-of data in a particular scope. This can prevent data races. Also, we
-cannot have a mutable reference while we have an immutable one. A
-reference's scope starts from where it is introduced and continues
-through the last time that reference is used (not just block scope).
+- A reference's scope starts from where it is introduced and continues
+  through the last time that reference is used (not just block scope).
+
+- One mutable reference to a particular piece of data in a
+  particular scope to prevent data races or multiple immutable ones but not
+  both.
 
 #+BEGIN_SRC rust
   // totally legal
@@ -429,9 +430,9 @@ through the last time that reference is used (not just block scope).
   }
 #+END_SRC
 
-In Rust, the compiler guarantees that references will never be dangling
-references. The compiler will ensure that the data a reference points to
-will not go out of scope before the reference to the data does.
+- In Rust, the compiler guarantees that references will never be dangling
+  references. The compiler will ensure that the data a reference points to
+  will not go out of scope before the reference to the data does.
 
 #+BEGIN_SRC rust
   fn no_dangle() -> String {
@@ -447,6 +448,10 @@ will not go out of scope before the reference to the data does.
 #+END_SRC
 
 - A /string slice/ is a reference to part of a =String=:
+  + String slice range indices must occur at valid UTF-8 character boundaries.
+    Creating a string slice in the middle of a multibyte character causes the
+    program to exit with an error.
+  + string literals are referred to as string slices.
 
 #+BEGIN_SRC rust
   let mut s = String::from("hello world");
