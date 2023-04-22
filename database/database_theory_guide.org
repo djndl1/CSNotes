@@ -1,0 +1,51 @@
+#+title: Database_theory_guide
+
+Based on [[https://link.springer.com/book/10.1007/978-1-4471-5601-7][Concise Guide to Databases: A Practical Guide]]
+
+* Data As an Organizational Asset
+
+- Ancient taxation systems requires data records.
+
+- Middle age monastries kept records in multisites.
+
+- Colonial trading companies employed redundant data storage and transmission.
+
+- Modern industry requires high-quality information on the
+  market and its own production process.
+
+- Modern air travel and computerized reservation system.
+
+- Telegraph; ticker tape machine; telephone; radio; electronic computers
+
+- the basis of banking is records and data, also true for insurance companies.
+
+- A company that takes over another has to somehow integrate their data.
+
+** Paper-based Data Storage and Card Processing
+
+- Data are held in paper ledgers and journals. Supplemented by indexed files
+  (small cards arranged in some order containing information for easy retrieval
+  of actual data).
+  + limited by designed fields and orders.
+
+- Punched cards that can be processed by machines.
+  + the Hollerith card
+    - cannot be updated, only remade.
+    - hard to sort.
+    - sensitive to environmental conditions.
+
+** Electronic Storage and Processing
+
+- magnetic tape:
+  + 5MB - 140MB
+  + easy to wear
+  + bulky and prone to damage
+  + sequential access limits.
+
+- magnetic disk
+
+- main memory
+
+- Big Data that grew out of data warehousing
+
+- Cloud Storage
