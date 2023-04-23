@@ -1,0 +1,166 @@
+#+TITLE: Opc
+
+https://www.codeproject.com/Articles/12441/OPC-Technology
+
+* Why OPC
+
+1. Standardized protocol
+
+2. Reduced load on devices
+
+3. Scalability
+
+4. OPC provides caching
+
+* OPC Classic
+
+** Scope
+
+The specification include a set of custom COM interfaces (and a set of OLE Automation interfaces) for use by client and server writers
+
+1. Online Data Access (OPC DA): reading and writing o f data between an app and a process control device
+
+2. Alarm and Event Handling (OPC A&E): the mechanisms for OPC clients to be notified of the occurrence of specified events and alarm conditions
+
+3. Historical Data Access (OPC HDA): the reading, processing and editing of data of a historian engine
+
+*** OPC Fundamentals
+
+**** OPC DataAccess (Companion architectures include OPC COmmon Definitions and Interfaces, OPC Complex Data and OPC Data Exchange)
+
+- DA Custom Interface
+
+- DA Automation Interface: for the use of VB, Delphi and other Automation enabled products to interface with OPC servers.
+
+The primary intent is to provide the interfaces for data acquisition in support of the vertical architecture.
+
+- *OPC Server*: maintains information about the server and serves as a container for OPC group objects
+
+- *OPC Group*: a way for clients to logically orgainize data.
+  + can be activated and deactivated as a unit
+  + public OPCGroup: for sharing across multiple clients
+  + local OPCGroup: local to a client
+
+- *OPC Item*: connections to data sources within the server, must be in a group, no external interface.
+  + a variant
+  + contains a *Value*, *Quality* and *Time Stamp*
+
+A server configuration address space may be managed and persistently stored using the =IPersistFile= interface. The server address might be entirely fixed, configured outside the OPC environment, automatically configured at starrtup by poll the existing system for installed hardware or interfaces, or automatically configured on the fly based on the client request. /It is expected that the server address space is stable and is managed within the server/.
+
+All client configuration information (Group and Item Definitions) must be persistently stored by the respective client application.
+
+***** Network Node
+
+In order to access data, the client need to specify
+
+1. the name of the OPC DA Server
+
+2. The name of the host machine
+
+3. The vendor specific OPC Item definition
+
+***** Synchronization and Serialization
+
+*Synchronization*: the ability of a client to read or write values and attributes in a single transaction
+
+The OPC Server should
+
+1. In general, try to preserve synchronization of data items and attributes that are read or written in a single operation. Synchronization of items read or written individually in separate is not required.
+
+2. Reads and writes of data items which can be accessed by more than one thread must be implemented to by thread safe
+
+*Serialization*: the ability of the client to control the order in which writes are performed
+
+1. It is strongly recommended that write requrests to the same device be handled in order by any server implementation.
+
+2. Where a client can both read values explicitly or receive updates via a callback attention must begiven to defining exactly when a callback will or will not occur.
+
+***** Programming Practice
+
+See another repo OPCLearning
+
+**** OPC Alarm and Events
+
+- *Condition*: a named state of the OPC Event Server of one of its contained objects
+
+- *Alarm*: an abnormal conditon
+
+- *Event*: a detectable occurrence, may or may not be associated with a condition.
+
+=IOPCEventServer=: determine the types of events, enter subscriptions to specified events, access and manipulate conditions.
+
+**** OPC Historical Data Access
+
+Most historical systems use(d) their own proprietary interfaces for dissemination of data.
+
+The specs support simple trend data servers that simply store raw data, and complex data compress and analysis servers.
+
+*** OPC Server Browser
+
+=OPCEnum.exe= resides on any machine, access the local Component Categories Manager and provides a new interface =IOPCServerList= which can be marshaled and used by remote clients.
+
+* Concepts and Terminology
+
+- *OPC Server*: any server that provides OPC interfaces
+
+- *OPC Address Space*: hierarchical
+
+- *OPC Items/Tags*: leaf nodes, sensor attributes
+
+- *folders, subfolders*: can map to some physical configuration or even geographical setup
+
+- *OPC Group*: a set of OPC items: every client can create a logical entity called a group inside a OPC server. A client can maintain multiple groups. Every group has a unique name and has update rate, active flag, deadband, IO mode (sync/async), time bias(local time w.r.t GMT)
+
+OPC provides sync and async reading and writing on hardware devices.
+
+* COM Interfaces & Component Categories
+
+=OPCEnum.exe=: a Windows Service that provides OPC server enumeration. The client application can query available OPC servers on local as well as remote networked machines.
+
+Every OPC Server has to support the following interfaces
+
+1. =IOPCBrowse=: browsing OPC Address Space.
+
+2. =IOPCItemIO=: used for performing OPC Item read and write operations
+
+* OPC DA Automation Interface
+
+An interface used by COM/OLE Automation (Automation as in COM not industrial
+control) Applications. An app accesses an OPC server through an OPC Automation
+Wrapper (wrapping around the Custom Interface) In-Process DLL (=OPCDAAUTO.DLL=,
+OPC Automation 2.0).
+
+** Architecture
+
+- =OPCServer=: the root of all
+  + =OPCGroups=: a OLE collection containing all the OPC groups created by this
+    client in the =OPCServer=
+    + =OPCGroup=: maintain state information and privide data acquisition
+      services for the =OPCItems= object it contains.
+      + =OPCItems=: all of the =OPCItem= objects the client has created in the
+        =OPCServer=
+        + =OPCItem=: maintains the item's definition, current value, status
+          information, last update time. The Custom interface does not provide
+          such an object.
+   + =OPCBrowser=: browses item names in the server's configuration.
+
+- The value, quality and timestamp of an item is guaranteed to be kept in sync.
+
+- Error Handling: an exception is generated, represented in VB as an =Err=
+  object.
+
+- Event notification mechanism is provided.
+
+- Arrays are 1-based (VB arrays are 0-based by default but the lower bound can
+  be specified). A function that accepts an array count handles only as many
+  elements in the array as the count indicates.
+
+- Parameters are passed by value unless =ByRef= is specified.
+
+** Some Notes On the Interface
+
+- While =OPCItem= provides its value, quality and timestmap as properties, the
+  =Read= method reads them in sync.
+  + values are represented by =Variant=.
+
+- =OPCGroups=, =OPCGroup=, =OPCItems= and =OPCItem= know their parent.
