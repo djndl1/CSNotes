@@ -532,8 +532,8 @@ parameter.
       user1.email = String::from("someother@email.com");
 
       let user2 = build_user(String::from("another"), String::from("another@email.com"));
-      let user3 = User {
-          ..user2
+      let user3 = User {    // struct update syntax
+          ..user2           // assignment here involves moving strings
       };
       let user4 = User {
           username: String::from("user4"),
@@ -551,8 +551,10 @@ parameter.
   }
 #+END_SRC
 
-Structs can be defined in a similar way to tuples, called /tuple
-structs/.
+- Rust doesn't allow only certain fields marked as mutable.
+  + Accessing fields of a borrowed struct instance does not move the field values.
+
+- /Tuple structs/
 
 #+BEGIN_SRC rust
   struct Pixel(u8, u8, u8);
@@ -560,7 +562,7 @@ structs/.
       let Pixel(red, green, blue) = blackpoint; // destructuring
 #+END_SRC
 
-- Unit-like struct: structs without any data, used to implement a trait.
+- Unit-like struct: structs without any data, used to implement a trait. =struct AlwaysEqual;=
 
 It's possible for structs to store references to data owned by something
 else, but to do so requires the use of /lifetimes/.
@@ -598,6 +600,7 @@ else, but to do so requires the use of /lifetimes/.
       height: u32,
   }
 
+  // associated functions
   impl Rectangle {
       fn area(&self) -> u32{
           self.height * self.width
