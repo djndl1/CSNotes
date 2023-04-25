@@ -623,6 +623,8 @@ It is possbile to separate these methods into multiple =impl= blocks.
   :CUSTOM_ID: enums-and-pattern-matching
   :END:
 
+  Rust enums can contain data.
+
 #+BEGIN_SRC rust
   enum IpAddr {
       V4(String),
@@ -667,7 +669,7 @@ check whether a case is handled the way it should be. Rust doesn't have
 the null feature that many other languages have. Rust does not have
 nulls, but it does have an enum that can encode the concept of a value
 being present or absent. This enum is =Option<T>=. Everywhere that a
-value has a type that isn't an =Option<T>=, you can safely assume that
+value has a type that isn't an =Option<T>=, it can be safely assumed that
 the value isn't null.
 
 ** =match= Control Flow Operator
@@ -741,14 +743,23 @@ possible values and =()= (unit value) when doing nothing.
    :CUSTOM_ID: if-let
    :END:
 
-The =if let= syntax combines =if= and =let= into a less verbose way to
-handle values that match one pattern while ignoring the rest.
+The =if let= syntax tries to match a pattern and assigns the value to a variable
+if successful.
 
 #+BEGIN_SRC rust
   if let Some(3) = some_u8_value { // not an assignment
       println!("three);
   }
 #+END_SRC
+
+ a similar example but more restricted in C# would be
+
+#+begin_src csharp
+if (a is Some s)
+{
+   ...
+}
+#+end_src
 
 #+BEGIN_SRC rust
   let mut count = 0;
