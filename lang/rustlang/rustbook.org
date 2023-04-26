@@ -798,7 +798,7 @@ The data that collections point to is stored on the heap.
       let v3 = vec![1, 2, 3, 4, 5];
       let v4 = vec![1; 5];
 
-      let third: &i32 = &v[2]; // unsafe
+      let third: &i32 = &v[2]; // unsafe, might be out of bound
       println!("{}", third);
 
       match v3.get(2) {   // safe access, return None if not available
@@ -806,7 +806,13 @@ The data that collections point to is stored on the heap.
           None => println!("There is no third element.", );
       }
       
-      
+    let v = vec![100, 32, 57];
+    for i in &v {
+        println!("{i}");
+    }
+    for i in &mut v {
+        *i += 50;
+    }
 #+END_SRC
 
 With =enum=, we can store multiple types in a vector:
@@ -838,13 +844,18 @@ each element.
 
 =String= is growable, mutable, owned, UTF-8 encoded string type.
 
-=push_str()= does not take ownership of another string. =+=
+=push_str()= does not take ownership of another string (it copies). =+=
+(=fn add(self, s: &str) -> String=, it actually appends and returns the original
+=self= String)
 concatenation is hard to use and has an ugly syntax.
 
 Rust strings don't support indexing. Internally, =String= is a wrapper
-over a =Vec<u8>=. Using string slicings may not be safe, either. The
-best way to perform operations on individual Unicode scalar values is to
-use =s.chars()= method.
+over a =Vec<u8>=. Using string slicings may not be safe, either since it returns
+bytes and might cause panic when sliced at a wrong boundary. The
+best way to perform operations on individual Unicode/byte scalar values is to
+use =s.chars()=/=s.bytes()= method
+
+code unit - code point - grapheme (actual character)
 
 #+BEGIN_SRC rust
       let mut s = String::from("foo");
@@ -876,7 +887,7 @@ use =s.chars()= method.
    :CUSTOM_ID: hashmap
    :END:
 
-=insert= an owned value into a =HashMap= moves the data. However, we can
+=insert=-ing an owned value into a =HashMap= moves the data. However, we can
 move references, but the references must be valid at least as long as
 the hash map is valid. By default, HashMap uses a "cryptographically
 strong" hashing function that can provide resistance to Denial of
