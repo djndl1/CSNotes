@@ -1025,23 +1025,29 @@ Error propagating is done by returning =Result<T, E>=.
   fn read_username_from_file() -> Result<String, io::Error> {
       fs::read_to_string("hello.txt")
   }
+
+fn last_char_of_first_line(text: &str) -> Option<char> {
+    text.lines().next()?.chars().last()
+}
 #+END_SRC
 
+freebird
 Error values that have the =?= operator called on them go through the
 =from= function. The error type received is converted into the error
 type defined in the return type of the current function. The =?=
-operator can only be used in functions that have a return type of
-=Result<T, E>=. One valid return type for =main= is =()=, and another
-valid type is =Result<T, E>=.
+operator can only be used in functions that have a return type that implements =FromResidual= (=Result<T, E>= or =Option<T>=).
 
-Returning Result is a good default choice when you're defining a
-function that might fail. Call =unwrap= or =expect= during prototyping
+One valid return type for =main= is =()=, and another
+valid type is =Result<(), E>=.
+
+Returning Result is a good default choice when a
+function might fail. Call =unwrap= or =expect= during prototyping
 and testing. Even if sometimes it's impossible to fail in a certain
 situation, the compiler will insists that the error be handled (it
 doesn't have enough information). The solution is to add a =unwrap= to
 ensure this.
 
-It's advisable to have your code panic when it's possible that your code
+It's advisable to have the code panic when it's possible that the code
 could end up in a bad state.
 
 TODO
