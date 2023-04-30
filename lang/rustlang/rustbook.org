@@ -1050,7 +1050,45 @@ ensure this.
 It's advisable to have the code panic when it's possible that the code
 could end up in a bad state.
 
-TODO
+** Error Handling Principles
+
+- In situations such as examples, prototype code and tests, it's more
+  appropriate to write code that panics instead of returning a =Result=.
+
+- Use =unwrap()= or =expect()= in case where the result will certainly be an
+  =Ok()=.
+
+- It’s advisable to have the code panic when it’s possible that the code could
+  end up in a bad state.
+
+- library code should return a =Result= unless it is impossible or harmful to
+  continue.
+
+- Panic if the contract is violated.
+
+- Take advantage of the type system to validate input parameters. Make a new
+  custom type if necessary.
+
+#+begin_src rust
+pub struct Guess {
+    value: i32,
+}
+
+impl Guess {
+    pub fn new(value: i32) -> Guess {
+        if value < 1 || value > 100 {
+            panic!("Guess value must be between 1 and 100, got {}.", value);
+        }
+
+        Guess { value }
+    }
+
+    pub fn value(&self) -> i32 {
+        self.value
+    }
+}
+#+end_src
+
 
 * Generics, Traits and Lifetimes
   :PROPERTIES:
