@@ -40,18 +40,26 @@ A process may be in
 3. blocked (unable to run until some external event happens)
 
 ```
-           +----------+
-  +--------+ Running  +--------+
-  |        +--------|-+        |
-  |                 ^          |
-  |                 +---+      |
-  |                     |      |
-  |                     |      |
-  |                     |      |
-  v                     |      v
-+-|------+            +-|------++
-| Blocked+----------->+  Ready  |
-+--------+            +---------+
+             ┌─────────────┐
+             │             │
+     ┌───────┤   Running   │
+     │       │             ◄─────┐
+     │       └─────────────┘     │
+     │                           │
+     │                           │
+     │                           │
+     │                           │
+     │                           │
+     │                           │
+     │                           │
+     │                           │
+     │                           │
+     │                           │
+┌────▼───────┐              ┌────▼──────┐
+│            │              │           │
+│   Blocked  ├─────────────►│   Ready   │
+│            │              │           │
+└────────────┘              └───────────┘
 ```
 
 The process scheduler handles all these process state changes.
@@ -68,7 +76,7 @@ $$
 
 With high I/O accesses, more processes are favored in order to better utilize the CPU.
 
-A better modeling should be constrcted using __queuing theory_.
+A better modeling should be constrcted using _queuing theory_.
 
 # Threads
 
@@ -93,19 +101,29 @@ A thread can be in:
 
 There are two main places to implement threads:
 
-- user space: can be implemented on an OS that does not support threads. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Makeing a local call into the runtime is much more efficient than calling a kernel call. User-level threads allow each process to have its own scheduling algorithm. Some major problems with user-level threads are: 1. blocking syscalls blocks the whole process, which defeats one of the major goals of having multiple threads. The whole process is blocked when a page fault occurs. 2. within a single process, there are no clock interrupts, making it impossible to schedule processes round-robin fashion. The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
+- user space: can be implemented on an OS that does not support threads. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Makeing a local call into the runtime is much more efficient than calling a kernel call. User-level threads allow each process to have its own scheduling algorithm. Some major problems with user-level threads are: 1. blocking syscalls blocks the whole process, which defeats one of the major goals of having multiple threads. The whole process is blocked when a page fault occurs. 2. within a single process, there are no clock interrupts, making it impossible to schedule processes round-robin fashion (preemptively). The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
 
 - kernel: the kernel handles all the threads in the system. In some systems, in order to save some overhead, when a thread is destroyed, it is marked as not runnable, but its kernel data structures are not affected. Later when a new thread must be created, an old thread is reactivated. The main disadvantage is that the cost of a syscall is substantial.
 
 - hybrid: use kernel-level threads and then multiplex user-level onto some or all of them.
 
-Scheduler activations TODO http://polaris.imag.fr/vincent.danjean/papers/anderson.pdf
+- [Scheduler activations](http://polaris.imag.fr/vincent.danjean/papers/anderson.pdf): 
 
-Pop-up threads TODO
+- **pop-up thread**: start up a new thread in a distributed system when an incoming message is received.
 
-Accessing global variables can cause problems from different threads. Many library procedures are not reentrant (they are not designed to have a second call made to any given procedure while a previous call has not yet finished). Signals are hard to handle in multhreading.
+## Make Existing Code Multithreaded
 
-`errno` is thread-local.
+### Global Variables
+
+Accessing global variables can cause problems from different threads.Thread-local storage is one way to handle this. Either create a storage area for each thread and pass it to every procedure of the thread or implement it with library procedure calls.
+
+### Reentrancy
+
+Many library procedures are not reentrant (they are not designed to have a second call made to any given procedure while a previous call has not yet finished). 
+
+### POSIX Signals
+
+Signals are hard to handle in multithreading as they are not designed for this. 
 
 # IPC
 

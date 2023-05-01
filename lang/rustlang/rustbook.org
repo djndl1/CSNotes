@@ -1025,26 +1025,70 @@ Error propagating is done by returning =Result<T, E>=.
   fn read_username_from_file() -> Result<String, io::Error> {
       fs::read_to_string("hello.txt")
   }
+
+fn last_char_of_first_line(text: &str) -> Option<char> {
+    text.lines().next()?.chars().last()
+}
 #+END_SRC
 
+freebird
 Error values that have the =?= operator called on them go through the
 =from= function. The error type received is converted into the error
 type defined in the return type of the current function. The =?=
-operator can only be used in functions that have a return type of
-=Result<T, E>=. One valid return type for =main= is =()=, and another
-valid type is =Result<T, E>=.
+operator can only be used in functions that have a return type that implements =FromResidual= (=Result<T, E>= or =Option<T>=).
 
-Returning Result is a good default choice when you're defining a
-function that might fail. Call =unwrap= or =expect= during prototyping
+One valid return type for =main= is =()=, and another
+valid type is =Result<(), E>=.
+
+Returning Result is a good default choice when a
+function might fail. Call =unwrap= or =expect= during prototyping
 and testing. Even if sometimes it's impossible to fail in a certain
 situation, the compiler will insists that the error be handled (it
 doesn't have enough information). The solution is to add a =unwrap= to
 ensure this.
 
-It's advisable to have your code panic when it's possible that your code
+It's advisable to have the code panic when it's possible that the code
 could end up in a bad state.
 
-TODO
+** Error Handling Principles
+
+- In situations such as examples, prototype code and tests, it's more
+  appropriate to write code that panics instead of returning a =Result=.
+
+- Use =unwrap()= or =expect()= in case where the result will certainly be an
+  =Ok()=.
+
+- It’s advisable to have the code panic when it’s possible that the code could
+  end up in a bad state.
+
+- library code should return a =Result= unless it is impossible or harmful to
+  continue.
+
+- Panic if the contract is violated.
+
+- Take advantage of the type system to validate input parameters. Make a new
+  custom type if necessary.
+
+#+begin_src rust
+pub struct Guess {
+    value: i32,
+}
+
+impl Guess {
+    pub fn new(value: i32) -> Guess {
+        if value < 1 || value > 100 {
+            panic!("Guess value must be between 1 and 100, got {}.", value);
+        }
+
+        Guess { value }
+    }
+
+    pub fn value(&self) -> i32 {
+        self.value
+    }
+}
+#+end_src
+
 
 * Generics, Traits and Lifetimes
   :PROPERTIES:
@@ -1103,7 +1147,7 @@ Specialization is possible:
 
 Generic type parameters in a struct definition aren't always the same as
 those used in that struct's method signatures. Some generic parameters
-are declared with impl and some are declared with the method definition.
+are declared with =impl= and some are declared with the method definition.
 
 #+BEGIN_SRC rust
   struct Point<T, U> {
@@ -1126,11 +1170,9 @@ are declared with impl and some are declared with the method definition.
       let p3 = p1.mixup(p2);
 #+END_SRC
 
-Rust accomplishes this by performing monomorphization of the code that
-is using generics at compile time. Monomorphization is the process of
-turning generic code into specific code by filling in the concrete types
-that are used when compiled. When the code runs, it performs just as it
-would if we had duplicated each definition by hand.
+- /Monomorphization/: the process of turning generic code into specific code by
+  filling in the concrete types that are used when compiled. When the code runs,
+  it performs just as it would if we had duplicated each definition by hand.
 
 ** Traits
    :PROPERTIES:
