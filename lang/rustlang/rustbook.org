@@ -1182,7 +1182,9 @@ are declared with =impl= and some are declared with the method definition.
 A trait tells the compiler about functionality a particular type has and
 can share with other types. Traits define shared behavior in an abstract
 way. Traits are similar to a feature often called /interfaces/ in other
-languages. A type's behavior consists of the methods we can call on that
+languages.
+
+A type's behavior consists of the methods we can call on that
 type. Trait definitions are a way to group method signatures together to
 define a set of behaviors necessary to accomplish some purpose.
 
@@ -1237,7 +1239,7 @@ Default implementations can call other methods in the same trait, even
 if those other methods don't have a default implementation.
 
 #+BEGIN_SRC rust
-  pub fn notify(item: impl Summary) {
+  pub fn notify(item: impl Summary) { // trait as a parameter type
       print!("Breaking news! {}", item.summarize());
   }
 
@@ -1255,7 +1257,7 @@ if those other methods don't have a default implementation.
   //...
   }
 
-  fn return_summarizable() -> impl Summary {       // however, this `impl Summary` is only one type that implements `Summary`
+  fn return_summarizable() -> impl Summary {       // however, this `impl Summary` is only one type that implements `Summary, this is no runtime polymorphism.
       Tweet {
           username: String::from("horse_ebooks"),
           content: String::from("of course as ou probably already know, people"),
@@ -1293,6 +1295,12 @@ Traits bounds can be used to conditionally implement methods:
           }
       }
   }
+
+// blanket implementation
+impl<T: Display> ToString for T {
+    // --snip--
+}
+
 #+END_SRC
 
 ** Lifetimes
