@@ -933,8 +933,8 @@ Service (DoS) attacks.
   :CUSTOM_ID: error-handling
   :END:
 
-Rust groups errors into two major categories: recoverable and
-unrecoverable errors. Rust doesn't have exceptions. Instead, it has the
+Rust groups errors into /recoverable/ and
+/unrecoverable/ errors. Rust doesn't have exceptions. it has the
 type =Result<T, E>= for recoverable errors and the =panic!= macro that
 stops execution when the program encounters an unrecoverable error.
 

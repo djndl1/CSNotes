@@ -1,0 +1,49 @@
+#+title: Modbus_basics
+
+
+A de factor standard protocol and a commonly available means of connecting
+industrial electronic devices.
+
+* Transport
+
+- Character serial communication lines
+  + /Modbus RTU/: compact binary representation. Framed by silent periods. uses
+    CRC checksums. Only one device can act as the client.
+  + /Modbus ASCII/: use ASCII characters for communication.
+
+- IP suite: any device cna send out a Modbus command.
+  + Modbus TCP/IP: communication over TCP/IP 502 port; no checksum
+  + Modbus over TCP/IP: checksummed variant
+
+* Limitations
+
+- Large binary objects are not supported.
+
+- no metadata about a data object.
+
+- no event mechanism except open-mbus. The client must poll each field device
+  and look for changes in the data.
+
+- Restricted to addressing 247 devices on one data link (except for Ethernet
+  TCP/IP).
+
+- no security mechanism.
+
+* Object Types
+
+- /Coil/ (1-bit RW)
+
+- /Discrete input/ (1-bit RO)
+
+- /Input Register/ (16-bit RO)
+
+- /Holding Register/ (16-bit RW)
+
+* Command
+
+A Modbus command reads or writes to a data object on a device.
+
+* Format
+
+- ADU = Address + PDU + Error check
+  + PDU = Function code + Data
