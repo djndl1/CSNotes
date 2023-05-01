@@ -1,0 +1,73 @@
+#+title: Concurrency, Coroutines and Threading
+
+* Threading
+
+In CPython, due to the Global Interpreter Lock, only one thread can execute
+Python code at once (even though certain performance-oriented libraries might
+overcome this limitation). Better use =multiprocessing= or
+=concurrent.future.ProcessPoolExecutor= for CPU-intensive work.
+For I/O bound tasks, threading is still appropriate.
+
+* Multiprocessing
+
+In CPython, processes can make better of multi-core processors and better at
+handling CPU-intensive tasks and also make the program more robust. The downside
+is some of IPC has to be implemented.
+
+* Coroutines
+
+** PEP 492
+
+Introduction of native coroutines that separate itself from the existing generator, whose
+keyword =yield= and =yield from= cause some ambiguities and limit its usefulness.
+
+*** Background
+
+To make asynchronous, concurrent Python code easier to write
+and to satisfy the need for responsive and scalable code.
+
+The asynchronous tasks are scheduled and coordinated by an event loop.
+
+The existing form of coroutines is generator.
+
+*** Syntax
+
+#+begin_src python
+async def read_data(db):
+    pass
+#+end_src
+
+- =yield= and =yield from= are not allowed in a coroutine.
+
+- A coroutine returns a =coroutine= object.
+
+- =RuntimeError= is thrown from a coroutine.
+
+- =types.coroutine= turns a generator-based coroutine into an awaitable.
+
+#+begin_src python
+await db.fetch("SELECT ...")
+#+end_src
+
+- =await= suspends execution of the current function until =db.fetch()=
+  completes and returns the result data.
+
+- =await= only applies to a native coroutine, a generator-based coroutine
+  decorated with =types.coroutine()=, an object with an =__await__= method
+  returning an iterator.
+
+#+TODO async for, async with
+
+*** Types
+
+=collections.abc.Coroutine=, =collections.abc.Awaitable=
+
+*** Coroutine Objects
+
+=CO_COROUTINE=,
+
+- Native coroutines are not generators and they cannot used in typical cases such
+  as the =for..in= loop, =iter()=, =next()=, =yield from=.
+
+- Implemented internally based on generators and thus share the implementation,
+  with =send()=, =throw()= and =close()= methods.
