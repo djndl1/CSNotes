@@ -6,13 +6,17 @@ Autotools provides protability across POSIX platforms, well supported by various
 
 - =Automake=: generate complete Maekfile.in templates from =Makefile.am= templates.
 
+- =autoheader=: generating the configuration header template =config.h.in=
+
+- =autoreconf=: always use this one rather than =autoconf=, =automake= =autoheader=, =aclocal= separately.
+
 * Project Structure
 
 - =src=: the source code directory
 
 - =NEWS=, =README=, =AUTHORS=, =ChangeLog=
 
-- =configure.ac= at the root directory: used by =autoconf= to create the =configure= shell script.
+- =configure.ac= (formerly =configure.in=) at the root directory: written in m4 and shell scripts, used by =autoconf= to create the =configure= shell script.
 
 - =Makefile.am=: used by automake when constructing a Makefile.
 
@@ -22,11 +26,81 @@ Autotools provides protability across POSIX platforms, well supported by various
 
 ** Write Autoconf scripts
 
+- In M4sh, =AS_IF= and =AS_CASE= replaces =if..then..elif..else..fi= and =case..esac= for portability.
+
+#+begin_src autoconf
+AS_IF([test], [true], [false])
+
+if test; then
+  true
+else
+  false
+fi
+
+AS_IF([test1], [true], [test2], [true2], [false])
+if test1; then
+  true
+elif test2; then
+  true2
+else
+  false
+fi
+
+AS_CASE([$variable], [foo*], [run1], [bar*], [run2], [catchall])
+
+case $variable in
+  foo*) run1 ;;
+  bar*) run2 ;;
+  *) catchall ;;
+esac
+#+end_src
+
+- quote macro arguments with =[]=.
+
+- System Defintions: identify the actors in the build process
+  + =host(CHOST)=: the system that executes the software built.
+  + =build(CBUILD)=: where the build process is being executed
+  + =target(CTARGET)=: the system against which the software being built will run on. The referenced system used to build the software.
+  + e.g. a PowerPC machine (build) making a compiler that  will run on an x86 machine (host) that will make binaries that run on an ARM (target).
+  + =AC_CANONICAL_HOST=, =AC_CANONICAL_BUILD=, =AC_CANONICAL_TARGET= provide to the configure script the sh variables with the name of the actor (=$host=, =$build= and =$target=),
+  + System Definition Tuples: architecture[-vendor]-OS[-gnu/uclibc/userland/kernel]
+
+*** basic Macros
+
+- =AC_INIT=, =AC_OUTPUT=: minimal for a project
+
+- =AC_PREREQ=: autoconf version requirement
+
+- =AC_CONFIG_SRCDIR=: check a source file to ensure the source directory exists.
+
+- =AC_CONFIG_AUX_DIR=: configure a different directory for auxililiary build tools rather than the one of =configure.ac=.
+
+- =AC_PROG_CC=, =AC_PROG_CXX=, =AC_PROG_AWK=, =AC_PROG_GREP=, =AC_PROG_LEX=, =AC_PROG_YACC=
+
+- =AC_CONFIG_FILES=: create each file by copying an template file and substitute the output variable values.
+  + output variables in the form of =@variable@=, including a long list of standard variables.
+  + =AC_SUBST=
 
 ** Write Makefile.am
 
 A few variable definitions are usually enough to indicate what files are to be built and where to install.
 
+- =bin_PROGRAMS=: binary targets
+
+- =target_name_SOURCES=: source files of the named target.
+
+*** Subdirectories
+
+Recursive make by setting =SUBDIRS= is not recommended due to performance for parallel building and other reasons. Use a single =makefile.am= and =include= to split it.
+
 * Build script generation
 
 - =autoreconf --install=, =make dist=: make a source tarball.
+
+- the generated scripts should not be version-controlled.
+
+* Build the Project
+
+- =DESTDIR= (when invoking =make install=), =--prefix=: the location where built artefacts are placed and the location where the built software will be installed on the host.
+
+- =config.log=  where =autoconf= keeps a log of all the tests it runs.
