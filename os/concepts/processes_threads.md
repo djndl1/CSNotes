@@ -131,7 +131,9 @@ Two main issues:
 
 1. how to pass information to another process/thread
 
-2. how processes/threads do not get in the way of others
+2. how processes/threads do not interfere with others
+
+3. Proper sequencing when dependencies are present among processes/threads.
 
 To overcome race conditions, mutual exclusion is needed. The choice of appropriate primitive operations for achieving mutual exclusion is a major design issue in any operating system. 
 
@@ -155,7 +157,7 @@ To achieve mutual exclusion
 
 - disabling interrupts: have each process disable all interrupts just after entering its critical region and reenable them just before leaving it. Disabling interupts is undesired and does not work for multiprocessor systems. Disabling interrupts is often a useful technique within the operating system itself but is not appropriate as a general mutual exclusion mechanism for user processes.
 
-- strict alternation: not suitable for two processes at different execution rate. A process may be blocked by the other process even if the other is not in its critical region.
+- strict alternation: not suitable for two processes at different execution rate. A process may be blocked by the other process even if the other is not in its critical region (it is one process' turn to enter its critical region while it is still in its non-critical region). There is no read-test-write race condition since the acquire-release mechanism is done by the other process/thread.
 
 ```c
 int turn;
@@ -180,7 +182,7 @@ void process_1(void)
 }
 ```
 
-- Peterson's solution: lock variables and warning variables; A software solution. `enter_region` will ensure a process enters the region safely. If both processes try to enter the region, the first one that set `turn` will enter region while the second one busily waits.
+- Peterson's solution: lock variables and warning variables; A software solution. `enter_region` will ensure a process enters the region safely. If both processes try to enter the region, the last one that sets `turn` will enter region while the second one busily waits. No read-test-write here. A simple assignment is atomic.
 
 ```c
 #include <stdbool.h>
@@ -210,6 +212,8 @@ void leave_region(int process)
 
 ```asm
 ; a spin lock, fast if the wait is short
+; if lock is 1, any process is guaranteed to wait since tsl is tsl read-write is indivisible
+; and the process will definitely read the current value of lock into rx.
 enter_region:
     tsl rx, lock
     cmp rx, #0
@@ -224,7 +228,7 @@ leave_region:
 ```asm
 enter_region:
     mov, rx, #1
-    xchg rx, lock
+    xchg rx, lock ; the set-one operation replaced by exchanging but the mechanism is the same.
     cmp rx, #0
     jne enter_region
     ret
@@ -234,7 +238,13 @@ leave_region:
     ret
 ```
 
-Busy waiting may encounter the _priority inversion problem_.
+In essence, what these solutions do is this: when a process wants to enter its
+critical region, it checks to see if the entry is allowed. If it is not, the
+process just sits in a tight loop waiting until it is.
+
+
+Busy waiting may encounter the _priority inversion problem_ (the lower-priority
+process in its critical section may not be scheduled to run while the higher-priority process is busy waiting).
 
 ### IPC that blocks
 
