@@ -248,7 +248,30 @@ process in its critical section may not be scheduled to run while the higher-pri
 
 ### IPC that blocks
 
-- **semaphore**: using an integer variable to count the number of wakeups saved for future use. Two atomic actions that check the value, change it and possibly go to sleep/wake up are P (down) and V (up). This atomicity is essential to solving synchronization problems and avoiding race conditions. e.g. semaphore used on I/O devices and interrupt.
+- /The Producer-Consumer Problem/: Two processes share a common, fixed-size
+  buffer. One of them, the producer, puts information into the buffer, and the
+  other one, the consumer, takes it out. The Producer process must not produce
+  an item if the shared buffer is full. The Producer process must not produce an
+  item if the shared buffer is full. At any given instance, only one process
+  should be able to access the shared buffer and make changes to it.
+
+#### Semaphore
+
+- **semaphore**: using an integer variable to count the number of wakeups saved
+  for future use. Two atomic actions that check the value, change it and
+  possibly go to sleep/wake up are P (down, wait) and V (up, signal). This
+  atomicity is essential to solving synchronization problems and avoiding race
+  conditions.
+  
+- /P/, /down/, /wait/: Decrements the value of semaphore variable by 1. 
+  If the new value of the semaphore variable is negative, the process executing
+  wait is blocked. Otherwise, the process continues execution,
+  having used a unit of the resource.
+  
+- /V/, /up/, /signal/: Increments the value of semaphore variable by 1. After
+  the increment, if the pre-increment value was negative (meaning there are
+  processes waiting for  a resource), it transfers a blocked process from the
+  semaphore's waiting queue to the ready queue.
 
 ```c
 #include <stdbool.h>
@@ -261,11 +284,12 @@ void down(semaphore*);
 
 void up(semaphore*);
 
-semaphore mutex = 1;    
+semaphore mutex = 1; // protect the buffer, use of a binary semaphore for mutual exclusion
 
 // empty + full <= N always holds
 semaphore empty = N;    // synchronization, ensure that the produce/consumer stops under certain conditions
 semaphore full = 0;
+// the reason why a full semaphore is required is that the up operation does not automatically block the producer
 
 void producer(void)
 {
@@ -296,6 +320,10 @@ void consumer(void)
 }
 ```
 
+ e.g. semaphore used on I/O devices and interrupt: a process waiting on an empty
+ semaphore after starting an I/O operation until the interrupt comes in and
+ signals that semaphore to allow the process to handle the interrupt.
+
 - **mutex**: a simplified version of the semaphore, in two states: locked, or unlocked. This may not need a kernel call.
 
 ```asm
@@ -316,7 +344,7 @@ mutex_unlock:
 
 
 - **futex** (fast userspace mutex, actually a mechanism to implement such a mutex): Efficient synchronization and locking is very important for performance.  A wait queue for processes is in the kernel. Suppose the lock variable is 1, a thread at
-omically decrements and tests the lock and inspects the result to see whether the lock was free. If it was not locked, the thread has claimed the lock, otherwise, a syscall puts the thread on the wait queue and the thread is blocked. When the locks released, if there's no blocked thread, the kernel is not involved. Here, the lock variable is a userspace data structure and can be modified in user mode. See `man 7/2 futex`. The Linxu futex is not a mutex, but a kernel syscall as a general building block for mutex and semaphore implementation.
+omically decrements and tests the lock and inspects the result to see whether the lock was free. If it was not locked, the thread has claimed the lock, otherwise, a syscall puts the thread on the wait queue and the thread is blocked. When the locks released, if there's no blocked thread, the kernel is not involved. Here, the lock variable is a userspace data structure and can be modified in user mode. See `man 7/2 futex`. The Linux futex is not a mutex, but a kernel syscall as a general building block for mutex and semaphore implementation.
 
 ```c
 // 
