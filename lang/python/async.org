@@ -14,6 +14,18 @@ In CPython, processes can make better of multi-core processors and better at
 handling CPU-intensive tasks and also make the program more robust. The downside
 is some of IPC has to be implemented.
 
+* Reactive Programming
+
+Similar to event-driven but focuses on data stream and reacts to specific data change.
+
+* GPU Programming
+
+GPUs are highly parallelizable and built for maximum throughput.
+
+* Global Interpreter Lock
+
+A mutual exclusive lock that prevents multiple threads from executing Python code in parallel.
+
 * Coroutines
 
 ** PEP 492
