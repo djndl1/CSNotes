@@ -342,9 +342,20 @@ mutex_unlock:
 
 - **condition variable**: allows threads to block due to some condition not being met. Almost always mutexes and condition variables are used together. Condition variables, unlike semaphores, have no memory. The key point is that releasing the lock and going to sleep or obtaining the lock and waking up) must be an atomic operation so that the condition is still the same as when it was checked. 
 
+#### Futex
 
-- **futex** (fast userspace mutex, actually a mechanism to implement such a mutex): Efficient synchronization and locking is very important for performance.  A wait queue for processes is in the kernel. Suppose the lock variable is 1, a thread at
-omically decrements and tests the lock and inspects the result to see whether the lock was free. If it was not locked, the thread has claimed the lock, otherwise, a syscall puts the thread on the wait queue and the thread is blocked. When the locks released, if there's no blocked thread, the kernel is not involved. Here, the lock variable is a userspace data structure and can be modified in user mode. See `man 7/2 futex`. The Linux futex is not a mutex, but a kernel syscall as a general building block for mutex and semaphore implementation.
+- **futex** (fast userspace mutex, actually a mechanism to implement such a mutex): Efficient synchronization and locking is very important for performance.
+
+In most cases, a lock is not contended and so a simple atomic operation is enough for locking. In case of contension, the thread may busily wait if it finds the atomic variable is already in a locked state, which is totally in userspace but not efficient. It may sleep and so requires the kernel to step in.
+
+A wait queue for processes is in the kernel. Suppose the lock variable is 1, a thread atomically decrements and tests the lock and inspects the result to see whether the lock was free. 
+If it was not locked, the thread has claimed the lock, 
+otherwise, a syscall puts the thread on the wait queue and the thread is blocked. 
+When the locks released, if there's no blocked thread, the kernel is not involved. 
+Here, the lock variable is a userspace data structure and can be modified in user mode. 
+See `man 7/2 futex`. The Linux futex is not a mutex, but a kernel syscall as a general building block for mutex and semaphore implementation.
+
+The linux futex is a 32-bit integer with atomic operations and associated with a kernel queue that records blocked threads. It lets userspace code ask the kernel to suspend the thread until a certain condition is satisfied and lets other userspace code to signal the condition and wake up waiting processes. The `futex` syscall does not assign any meaning to the value.
 
 ```c
 // 
@@ -353,12 +364,11 @@ omically decrements and tests the lock and inspects the result to see whether th
                  int *uaddr2, int val3);
 ```
 
->  The  futex() system call provides a method for waiting until a certain condition becomes true. It is typically used as a blocking construct in the context of shared-memory  synchronization. When  using  futexes,  the  majority  of  the synchronization operations are performed in user space.  A user-space program employs the futex() system call only when it is likely  that  the program has to block for a longer time until the condition becomes true. 
-
-[Basics of Futuxes](https://eli.thegreenplace.net/2018/basics-of-futexes/)
+[Basics of Futuxes With a mutex implementation](https://eli.thegreenplace.net/2018/basics-of-futexes/)
 
 [Futex Overview](https://lwn.net/Articles/360699/)
 
+#### Monitor
 
 - **monitor**: a higher-level synchronization primitive rather than the hard-to-use-and-easy-to-make-a-mistake mutexes and semaphores. A monitor is a colletion of procedure, variables and data structures that are all grouped together in a special kind of module or package. Only one task can be active in a monitor at any instant. Monitors are a programming-language construct. It is up to the compiler to implement mutual exclusion on monitor entries. The automatic mutual exclusion on monitor procedures guarantees that if the producer inside a monitor procedure discovers that the buffer is full, it will be able to complete the `wait` operation without having to worry about the possibility that the scheduler may switch to the consumer just before the `wait` completes.
 
