@@ -324,7 +324,7 @@ void consumer(void)
  semaphore after starting an I/O operation until the interrupt comes in and
  signals that semaphore to allow the process to handle the interrupt.
 
-- **mutex**: a simplified version of the semaphore, in two states: locked, or unlocked. This may not need a kernel call.
+- **mutex**: a special version of binary semaphore, in two states: locked, or unlocked. This may not need a kernel call. Also, a mutex has a owner, a specific thread/process.
 
 ```asm
 mutex_lock:
@@ -340,7 +340,8 @@ mutex_unlock:
   ret
 ```
 
-- **condition variable**: allows threads to block due to some condition not being met. Almost always mutexes and condition variables are used together. Condition variables, unlike semaphores, have no memory. The key point is that releasing the lock and going to sleep or obtaining the lock and waking up) must be an atomic operation so that the condition is still the same as when it was checked. 
+- **condition variable**: allows threads to block due to some condition not being met. Almost always mutexes and condition variables are used together. Condition variables, unlike semaphores, have no memory since it is not a counter unlike a semaphore. 
+The key point is that releasing the lock and going to sleep or obtaining the lock and waking up must be an atomic operation so that the condition is still the same as when it was checked .The mutex ensures that no one can change the condition before being blocked or after waking up to check the condition again. A consumer about to sleep will not be siganled since it holds the lock, and will only be signaled after being blocked since the lock is now released and possibly taken by the producer.
 
 #### Futex
 
@@ -370,7 +371,10 @@ The linux futex is a 32-bit integer with atomic operations and associated with a
 
 #### Monitor
 
-- **monitor**: a higher-level synchronization primitive rather than the hard-to-use-and-easy-to-make-a-mistake mutexes and semaphores. A monitor is a colletion of procedure, variables and data structures that are all grouped together in a special kind of module or package. Only one task can be active in a monitor at any instant. Monitors are a programming-language construct. It is up to the compiler to implement mutual exclusion on monitor entries. The automatic mutual exclusion on monitor procedures guarantees that if the producer inside a monitor procedure discovers that the buffer is full, it will be able to complete the `wait` operation without having to worry about the possibility that the scheduler may switch to the consumer just before the `wait` completes.
+- **monitor**: a higher-level synchronization primitive rather than the hard-to-use-and-easy-to-make-a-mistake mutexes and semaphores. A monitor is a colletion of procedure, variables and data structures that are all grouped together in a special kind of module or package. Only one task can be active in a monitor at any instant. 
+
+Monitors are a programming-language construct. It is up to the compiler to implement mutual exclusion on monitor entries. The automatic mutual exclusion on monitor procedures guarantees that if the producer inside a monitor procedure discovers that the buffer is full, it will be able to complete the `wait` operation without having to worry about the possibility that the scheduler may switch to the consumer just before the `wait` completes, that is, a signal is never lost (in case where a consumer is about to wait after knowing the condition is not met).
+
 
 ```basic
 monitor ProducerConsumer
@@ -419,9 +423,21 @@ end;
 // Java version TODO
 ```
 
-- **message passing**: low-level synchronization primitives don't work on distributed systems. Message passing is commonly used in parallel programming systems. Message loss, duplicates, authentication and performance are issues with message passing. Consider the producer-consumer problem without using shared memory. _If no message is available, the receiver can block until one arrives._ There is no race condition since they don't manipulate shared resource. Both the producer and the consumer operate on messages that they have received and suspend when there's no more messages to handle.
+#### Message Passing
+
+- **message passing**: low-level synchronization primitives don't work on distributed systems. Message passing is commonly used in parallel programming systems. Message loss, duplicates, authentication and performance are issues with message passing.  Two primitives are available: `send(destination, message)` and `receive(source, message)`. 
+
+Consider the producer-consumer problem without using shared memory. _If no message is available, the receiver can block until one arrives._ The producer also blocks on full. 
+There is no race condition since they don't manipulate shared resource. Both the producer and the consumer operate on messages that they have received and suspend when there's no more messages to handle.
+
+- **mailbox**: a place to buffer a certain number of messages. Both `send` and `receive` uses a mailbox as its address. A producere process blocks on a full mailbox and a consumer blocks on an empty mailbox.
+
+- **rendezvous**: no buffer is required: both `send` and `receive` block waiting and run in locksteps.
 
 ```c
+/*
+ * tow mailboxes are used, one for producer and another for consumer, with a size of N.
+ */
 #include <stdio.h>
 
 #define N 100
@@ -458,11 +474,17 @@ void consumer(void)
 }
 ```
 
-Addressing can be done by assigning each process an identifier. A different way is to use a new data structure call a _mailbox_ to place a certain number of messages. When a process tries to send to a mailbox that is full, it is suspended until a message is removed from the mailbox.
+e.g. the **Message Passing Interface** standard protocol.
 
-- **barrier**: When a thread reaches the barrier, it is blocked until all processes have reached the barrier. This allows groups of threads to synchronize. e.g. multiple threads computing a matrix transformation iteratively.
+#### Barrier
 
-- **avoiding lock - read-copy-update**: the key is to ensure that each reader either reads the old version of the data or the new one entirely. **RCU** decouples the removal and reclamation of the update.
+- **barrier**: When a thread reaches the barrier, it is blocked until all processes have reached the barrier. This allows groups of threads to synchronize. 
+e.g. multiple threads computing a matrix transformation *iteratively*, that is, no thread should proceed to the next iteration before others.
+
+#### Lock-free
+
+- **read-copy-update**: properly design an algorithm to ensure that each reader either reads the old version of the data or the new one entirely. 
+  **RCU** decouples the removal and reclamation phases of the update.
 
 # Scheduling
 
