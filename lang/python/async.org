@@ -1,5 +1,15 @@
 #+title: Concurrency, Coroutines and Threading
 
+* Computer Architecture
+
+- Flynn's Taxomony
+
+- Memory Architecture:
+  + UMA: a shared memory space utilized in a uniform manner by any number of processing cores; one memory bus for all CPUs.
+  + NUMA: some memory access may be faster than others. Each node has its own
+    cache, memory bus and I/O and the nodes are connected to the interconnection
+    network.
+
 * Threading
 
 In CPython, due to the Global Interpreter Lock, only one thread can execute
