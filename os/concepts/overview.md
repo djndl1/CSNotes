@@ -28,7 +28,9 @@ Hardware  |  |     Microarchitecture     |
           +  +---------------------------+
 ```
 
-Operating systems perform two essentially unrelated functions: 
+Operating systems perform two essentially unrelated functions:
+
+- an interface to the user
 
 - extended machine/control program: providing application programmers a clean abstract set of resources instead of the messy hardware ones; OS works as an extended machine. The abstract is the key to managing all the complexity.
 
@@ -247,4 +249,40 @@ Practical hypervisors use a hybrid strategy. They add a kernel module to do the 
 
 ### Exokernels
 
+# Services
 
+## For Users
+
+- User Interface: GUI, CLI
+
+- Program Execution
+
+- I/O operations
+
+- Filesystem manipulation
+
+- Communication
+
+- Error Detection
+
+## For Efficiency
+
+- Resource Allocation
+
+- Logging, performance counting
+
+- Protection and security
+
+## System Calls: Interface to the OS Services
+
+- Process Control: create process; terminate process; load, execute; get/set process attributes; wait event, signal event; allocate/free memory
+
+- File Management: create/delete/open/close/read/write/ file; retrieve/set file attributes
+
+- Device management: request/release/read/write/ device; attach/detach devices
+
+- information maintenance: date, time, manage system data;
+
+- commnications: create/close communication; send/receive messages; transfer status information; attach/detach remote devices
+
+- protection
