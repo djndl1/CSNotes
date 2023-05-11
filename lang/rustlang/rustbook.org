@@ -1182,7 +1182,9 @@ are declared with =impl= and some are declared with the method definition.
 A trait tells the compiler about functionality a particular type has and
 can share with other types. Traits define shared behavior in an abstract
 way. Traits are similar to a feature often called /interfaces/ in other
-languages. A type's behavior consists of the methods we can call on that
+languages.
+
+A type's behavior consists of the methods we can call on that
 type. Trait definitions are a way to group method signatures together to
 define a set of behaviors necessary to accomplish some purpose.
 
@@ -1237,7 +1239,7 @@ Default implementations can call other methods in the same trait, even
 if those other methods don't have a default implementation.
 
 #+BEGIN_SRC rust
-  pub fn notify(item: impl Summary) {
+  pub fn notify(item: impl Summary) { // trait as a parameter type
       print!("Breaking news! {}", item.summarize());
   }
 
@@ -1255,7 +1257,7 @@ if those other methods don't have a default implementation.
   //...
   }
 
-  fn return_summarizable() -> impl Summary {       // however, this `impl Summary` is only one type that implements `Summary`
+  fn return_summarizable() -> impl Summary {       // however, this `impl Summary` is only one type that implements `Summary, this is no runtime polymorphism.
       Tweet {
           username: String::from("horse_ebooks"),
           content: String::from("of course as ou probably already know, people"),
@@ -1293,6 +1295,12 @@ Traits bounds can be used to conditionally implement methods:
           }
       }
   }
+
+// blanket implementation
+impl<T: Display> ToString for T {
+    // --snip--
+}
+
 #+END_SRC
 
 ** Lifetimes
@@ -1300,18 +1308,20 @@ Traits bounds can be used to conditionally implement methods:
    :CUSTOM_ID: lifetimes
    :END:
 
-We must annotate lifetimes when the lifetimes of references could be
-related in a few different ways. The main aim of lifetimes is to prevent
-dangling references. The Rust compiler has a /borrow checker/ that
-compares scopes to determine whether all borrows are valid.
+Lifetimes must be annotated when the lifetimes of references could be
+related in a few different ways.
 
-Lifetime annotations don't change how long any of the references live.
+The main aim of lifetimes is to prevent
+dangling references. The /borrow checker/ compares scopes to determine whether
+all borrows are valid.
+
+Lifetime annotations *don't change how long any of the references live*.
 One lifetime annotation by itself doesn't have much meaning. Lifetime
-annotations describe the relationships of the lifetimes of multiple
+annotations describe *the relationships of the lifetimes* of multiple
 references to each other without affecting the lifetimes.
 
 #+BEGIN_SRC rust
-  fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+  fn longest<'a>(x: &'a str, y: &'a str) -> &'a str { // lifetime is also a generic
       if x.len() > y.len() {
           x
       } else {
@@ -1324,10 +1334,16 @@ The function signature also tells Rust that the string slice returned
 from the function will live at least as long as lifetime ='a=. In
 practice, it means that the lifetime of the reference returned by the
 =longest= function is the same as the smaller of the lifetimes of the
-references passed in. The borrow checker should reject any values that
-don't adhere to these constraints. When we pass concrete references to
-=longest=, the concrete lifetime that is substituted for ='a= is the
+references passed in.
+
+The borrow checker should reject any values that
+don't adhere to these constraints. When concrete references to
+=longest= are passed in, the concrete lifetime that is substituted for ='a= is the
 part of the scope of =x= that overlaps with the scope of =y=.
+
+The lifetime annotation is part of the *contract* of the function, like the
+types in the signature. The lifetime annotation facilitates the analysis of the
+borrow checker.
 
 #+BEGIN_SRC rust
   fn main() {
@@ -1345,6 +1361,12 @@ Had we not annotated =longest=, the compiler could not have known that
 =result= had a lifetime as long as =string2=. It might well assume that
 =result='s lifetime is the outer scope.
 
+When returning a reference from a function, the lifetime parameter for the
+return type needs to match the lifetime for one of the parameters.
+
+
+*** Lifetime Annotations in Struct Definitions
+
 It's possible for structs to hold references
 
 #+BEGIN_SRC rust
@@ -1357,12 +1379,16 @@ It's possible for structs to hold references
       let first_sentence = novel.split('.')
           .next()
           .expect("Could not find a '.'");
-      let i = ImportantExcerpt { part: first_sentence };
+      let i = ImportantExcerpt { part: first_sentence }; // i cannot outlive first_sentence
   }
 #+END_SRC
 
-The patterns programmed into Rust's analysis of references are called
-the /lifetime elision rules/. Lifetimes on function or method parameters
+*** Lifetime Elision Rules
+
+A set of particular cases of reference lifetime that the compiler will consider without
+the author explicit specifies the annotation.
+
+Lifetimes on function or method parameters
 are called /input lifetimes/, and lifetimes on return values are called
 /output lifetimes/:
 
@@ -1376,9 +1402,9 @@ are called /input lifetimes/, and lifetimes on return values are called
    =self= is assigned to all output lifetime parameters.
 
 If the three rules are applied and the return parameter lifetime is
-still not determined, there is a compiler error.
+still not determined, there is a compiler error (hence in the case of the =longest= method).
 
-One special lifetime we need to discuss is `='static=, which means that
+One special lifetime we need to discuss is ='static=, which means that
 this reference can live for the entire duration of the program.
 
 #+BEGIN_SRC rust

@@ -131,7 +131,9 @@ Two main issues:
 
 1. how to pass information to another process/thread
 
-2. how processes/threads do not get in the way of others
+2. how processes/threads do not interfere with others
+
+3. Proper sequencing when dependencies are present among processes/threads.
 
 To overcome race conditions, mutual exclusion is needed. The choice of appropriate primitive operations for achieving mutual exclusion is a major design issue in any operating system. 
 
@@ -155,7 +157,7 @@ To achieve mutual exclusion
 
 - disabling interrupts: have each process disable all interrupts just after entering its critical region and reenable them just before leaving it. Disabling interupts is undesired and does not work for multiprocessor systems. Disabling interrupts is often a useful technique within the operating system itself but is not appropriate as a general mutual exclusion mechanism for user processes.
 
-- strict alternation: not suitable for two processes at different execution rate. A process may be blocked by the other process even if the other is not in its critical region.
+- strict alternation: not suitable for two processes at different execution rate. A process may be blocked by the other process even if the other is not in its critical region (it is one process' turn to enter its critical region while it is still in its non-critical region). There is no read-test-write race condition since the acquire-release mechanism is done by the other process/thread.
 
 ```c
 int turn;
@@ -180,7 +182,7 @@ void process_1(void)
 }
 ```
 
-- Peterson's solution: lock variables and warning variables; A software solution. `enter_region` will ensure a process enters the region safely. If both processes try to enter the region, the first one that set `turn` will enter region while the second one busily waits.
+- Peterson's solution: lock variables and warning variables; A software solution. `enter_region` will ensure a process enters the region safely. If both processes try to enter the region, the last one that sets `turn` will enter region while the second one busily waits. No read-test-write here. A simple assignment is atomic.
 
 ```c
 #include <stdbool.h>
@@ -210,6 +212,8 @@ void leave_region(int process)
 
 ```asm
 ; a spin lock, fast if the wait is short
+; if lock is 1, any process is guaranteed to wait since tsl is tsl read-write is indivisible
+; and the process will definitely read the current value of lock into rx.
 enter_region:
     tsl rx, lock
     cmp rx, #0
@@ -224,7 +228,7 @@ leave_region:
 ```asm
 enter_region:
     mov, rx, #1
-    xchg rx, lock
+    xchg rx, lock ; the set-one operation replaced by exchanging but the mechanism is the same.
     cmp rx, #0
     jne enter_region
     ret
@@ -234,11 +238,40 @@ leave_region:
     ret
 ```
 
-Busy waiting may encounter the _priority inversion problem_.
+In essence, what these solutions do is this: when a process wants to enter its
+critical region, it checks to see if the entry is allowed. If it is not, the
+process just sits in a tight loop waiting until it is.
+
+
+Busy waiting may encounter the _priority inversion problem_ (the lower-priority
+process in its critical section may not be scheduled to run while the higher-priority process is busy waiting).
 
 ### IPC that blocks
 
-- **semaphore**: using an integer variable to count the number of wakeups saved for future use. Two atomic actions that check the value, change it and possibly go to sleep/wake up are P (down) and V (up). This atomicity is essential to solving synchronization problems and avoiding race conditions. e.g. semaphore used on I/O devices and interrupt.
+- /The Producer-Consumer Problem/: Two processes share a common, fixed-size
+  buffer. One of them, the producer, puts information into the buffer, and the
+  other one, the consumer, takes it out. The Producer process must not produce
+  an item if the shared buffer is full. The Producer process must not produce an
+  item if the shared buffer is full. At any given instance, only one process
+  should be able to access the shared buffer and make changes to it.
+
+#### Semaphore
+
+- **semaphore**: using an integer variable to count the number of wakeups saved
+  for future use. Two atomic actions that check the value, change it and
+  possibly go to sleep/wake up are P (down, wait) and V (up, signal). This
+  atomicity is essential to solving synchronization problems and avoiding race
+  conditions.
+  
+- /P/, /down/, /wait/: Decrements the value of semaphore variable by 1. 
+  If the new value of the semaphore variable is negative, the process executing
+  wait is blocked. Otherwise, the process continues execution,
+  having used a unit of the resource.
+  
+- /V/, /up/, /signal/: Increments the value of semaphore variable by 1. After
+  the increment, if the pre-increment value was negative (meaning there are
+  processes waiting for  a resource), it transfers a blocked process from the
+  semaphore's waiting queue to the ready queue.
 
 ```c
 #include <stdbool.h>
@@ -251,11 +284,12 @@ void down(semaphore*);
 
 void up(semaphore*);
 
-semaphore mutex = 1;    
+semaphore mutex = 1; // protect the buffer, use of a binary semaphore for mutual exclusion
 
 // empty + full <= N always holds
 semaphore empty = N;    // synchronization, ensure that the produce/consumer stops under certain conditions
 semaphore full = 0;
+// the reason why a full semaphore is required is that the up operation does not automatically block the producer
 
 void producer(void)
 {
@@ -286,7 +320,11 @@ void consumer(void)
 }
 ```
 
-- **mutex**: a simplified version of the semaphore, in two states: locked, or unlocked. This may not need a kernel call.
+ e.g. semaphore used on I/O devices and interrupt: a process waiting on an empty
+ semaphore after starting an I/O operation until the interrupt comes in and
+ signals that semaphore to allow the process to handle the interrupt.
+
+- **mutex**: a special version of binary semaphore, in two states: locked, or unlocked. This may not need a kernel call. Also, a mutex has a owner, a specific thread/process.
 
 ```asm
 mutex_lock:
@@ -302,11 +340,23 @@ mutex_unlock:
   ret
 ```
 
-- **condition variable**: allows threads to block due to some condition not being met. Almost always mutexes and condition variables are used together. Condition variables, unlike semaphores, have no memory. The key point is that releasing the lock and going to sleep or obtaining the lock and waking up) must be an atomic operation so that the condition is still the same as when it was checked. 
+- **condition variable**: allows threads to block due to some condition not being met. Almost always mutexes and condition variables are used together. Condition variables, unlike semaphores, have no memory since it is not a counter unlike a semaphore. 
+The key point is that releasing the lock and going to sleep or obtaining the lock and waking up must be an atomic operation so that the condition is still the same as when it was checked .The mutex ensures that no one can change the condition before being blocked or after waking up to check the condition again. A consumer about to sleep will not be siganled since it holds the lock, and will only be signaled after being blocked since the lock is now released and possibly taken by the producer.
 
+#### Futex
 
-- **futex** (fast userspace mutex, actually a mechanism to implement such a mutex): Efficient synchronization and locking is very important for performance.  A wait queue for processes is in the kernel. Suppose the lock variable is 1, a thread at
-omically decrements and tests the lock and inspects the result to see whether the lock was free. If it was not locked, the thread has claimed the lock, otherwise, a syscall puts the thread on the wait queue and the thread is blocked. When the locks released, if there's no blocked thread, the kernel is not involved. Here, the lock variable is a userspace data structure and can be modified in user mode. See `man 7/2 futex`. The Linxu futex is not a mutex, but a kernel syscall as a general building block for mutex and semaphore implementation.
+- **futex** (fast userspace mutex, actually a mechanism to implement such a mutex): Efficient synchronization and locking is very important for performance.
+
+In most cases, a lock is not contended and so a simple atomic operation is enough for locking. In case of contension, the thread may busily wait if it finds the atomic variable is already in a locked state, which is totally in userspace but not efficient. It may sleep and so requires the kernel to step in.
+
+A wait queue for processes is in the kernel. Suppose the lock variable is 1, a thread atomically decrements and tests the lock and inspects the result to see whether the lock was free. 
+If it was not locked, the thread has claimed the lock, 
+otherwise, a syscall puts the thread on the wait queue and the thread is blocked. 
+When the locks released, if there's no blocked thread, the kernel is not involved. 
+Here, the lock variable is a userspace data structure and can be modified in user mode. 
+See `man 7/2 futex`. The Linux futex is not a mutex, but a kernel syscall as a general building block for mutex and semaphore implementation.
+
+The linux futex is a 32-bit integer with atomic operations and associated with a kernel queue that records blocked threads. It lets userspace code ask the kernel to suspend the thread until a certain condition is satisfied and lets other userspace code to signal the condition and wake up waiting processes. The `futex` syscall does not assign any meaning to the value.
 
 ```c
 // 
@@ -315,14 +365,16 @@ omically decrements and tests the lock and inspects the result to see whether th
                  int *uaddr2, int val3);
 ```
 
->  The  futex() system call provides a method for waiting until a certain condition becomes true. It is typically used as a blocking construct in the context of shared-memory  synchronization. When  using  futexes,  the  majority  of  the synchronization operations are performed in user space.  A user-space program employs the futex() system call only when it is likely  that  the program has to block for a longer time until the condition becomes true. 
-
-[Basics of Futuxes](https://eli.thegreenplace.net/2018/basics-of-futexes/)
+[Basics of Futuxes With a mutex implementation](https://eli.thegreenplace.net/2018/basics-of-futexes/)
 
 [Futex Overview](https://lwn.net/Articles/360699/)
 
+#### Monitor
 
-- **monitor**: a higher-level synchronization primitive rather than the hard-to-use-and-easy-to-make-a-mistake mutexes and semaphores. A monitor is a colletion of procedure, variables and data structures that are all grouped together in a special kind of module or package. Only one task can be active in a monitor at any instant. Monitors are a programming-language construct. It is up to the compiler to implement mutual exclusion on monitor entries. The automatic mutual exclusion on monitor procedures guarantees that if the producer inside a monitor procedure discovers that the buffer is full, it will be able to complete the `wait` operation without having to worry about the possibility that the scheduler may switch to the consumer just before the `wait` completes.
+- **monitor**: a higher-level synchronization primitive rather than the hard-to-use-and-easy-to-make-a-mistake mutexes and semaphores. A monitor is a colletion of procedure, variables and data structures that are all grouped together in a special kind of module or package. Only one task can be active in a monitor at any instant. 
+
+Monitors are a programming-language construct. It is up to the compiler to implement mutual exclusion on monitor entries. The automatic mutual exclusion on monitor procedures guarantees that if the producer inside a monitor procedure discovers that the buffer is full, it will be able to complete the `wait` operation without having to worry about the possibility that the scheduler may switch to the consumer just before the `wait` completes, that is, a signal is never lost (in case where a consumer is about to wait after knowing the condition is not met).
+
 
 ```basic
 monitor ProducerConsumer
@@ -371,9 +423,21 @@ end;
 // Java version TODO
 ```
 
-- **message passing**: low-level synchronization primitives don't work on distributed systems. Message passing is commonly used in parallel programming systems. Message loss, duplicates, authentication and performance are issues with message passing. Consider the producer-consumer problem without using shared memory. _If no message is available, the receiver can block until one arrives._ There is no race condition since they don't manipulate shared resource. Both the producer and the consumer operate on messages that they have received and suspend when there's no more messages to handle.
+#### Message Passing
+
+- **message passing**: low-level synchronization primitives don't work on distributed systems. Message passing is commonly used in parallel programming systems. Message loss, duplicates, authentication and performance are issues with message passing.  Two primitives are available: `send(destination, message)` and `receive(source, message)`. 
+
+Consider the producer-consumer problem without using shared memory. _If no message is available, the receiver can block until one arrives._ The producer also blocks on full. 
+There is no race condition since they don't manipulate shared resource. Both the producer and the consumer operate on messages that they have received and suspend when there's no more messages to handle.
+
+- **mailbox**: a place to buffer a certain number of messages. Both `send` and `receive` uses a mailbox as its address. A producere process blocks on a full mailbox and a consumer blocks on an empty mailbox.
+
+- **rendezvous**: no buffer is required: both `send` and `receive` block waiting and run in locksteps.
 
 ```c
+/*
+ * tow mailboxes are used, one for producer and another for consumer, with a size of N.
+ */
 #include <stdio.h>
 
 #define N 100
@@ -410,11 +474,17 @@ void consumer(void)
 }
 ```
 
-Addressing can be done by assigning each process an identifier. A different way is to use a new data structure call a _mailbox_ to place a certain number of messages. When a process tries to send to a mailbox that is full, it is suspended until a message is removed from the mailbox.
+e.g. the **Message Passing Interface** standard protocol.
 
-- **barrier**: When a thread reaches the barrier, it is blocked until all processes have reached the barrier. This allows groups of threads to synchronize. e.g. multiple threads computing a matrix transformation iteratively.
+#### Barrier
 
-- **avoiding lock - read-copy-update**: the key is to ensure that each reader either reads the old version of the data or the new one entirely. **RCU** decouples the removal and reclamation of the update.
+- **barrier**: When a thread reaches the barrier, it is blocked until all processes have reached the barrier. This allows groups of threads to synchronize. 
+e.g. multiple threads computing a matrix transformation *iteratively*, that is, no thread should proceed to the next iteration before others.
+
+#### Lock-free
+
+- **read-copy-update**: properly design an algorithm to ensure that each reader either reads the old version of the data or the new one entirely. 
+  **RCU** decouples the removal and reclamation phases of the update.
 
 # Scheduling
 
