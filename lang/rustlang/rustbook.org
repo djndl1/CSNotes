@@ -1609,13 +1609,18 @@ An implementation:
   :CUSTOM_ID: automated-tests
   :END:
 
-Rust includes support for writing automated software tests within the
-language. Tests are functions that verify that the non-test code is
-functioning in the expected manner. The bodies of test functions
-typically perform three actions:
+Test module code is annotated with =#[cfg(test)]= and test methods are marked
+with =#[test]=.
 
-1. Set up any needed data or state;
+Each test is run in a new thread.
 
-2. Run the code to test;
+Assertions are made with =assert!=, =assert_ne!=, =assert_eq!= or marked with
+=#[should_panic]= or the method may return a =Result<T, E>=.
 
-3. Assert the results are what are expected.
+Integration tests go into =test= directory as separate crates, next to =src=.
+Files in subdirectories of the tests directory don’t get compiled as separate
+crates or have sections in the test output. These files can be common helper methods.
+
+
+If any test in a section (unit test, integration test, doc test) fails, the
+following sections will not be run. Each integration file has its own section.
