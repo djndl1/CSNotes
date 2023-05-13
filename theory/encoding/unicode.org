@@ -14,11 +14,32 @@ In computing, endianness refers to the ordering of a sequence of storage cells (
 
 Some architectures uses different byte endianness for integers and floating-point numbers. Some even has different endianness conventions for words and bytes inside a double-precision number.
 
-Side note: in C, the index of an array member increases with its pointer (virtual memory address).
+Side note: in C, the index of an array member increases with its pointer
+(virtual memory address).
+
+** Writing Systems
+
+- /Alphabetic scripts/
+
+- /Consonant scripts/, /abjads/
+
+- /Abugida scripts/
+
+- /Syllabic scripts/
+
+- /Ideographic scripts/
 
 ** Character Encodings
 
-The process of /assigning numbers (code points) to graphical characters/. All these code points make up a /code space/, /code page/ (originally coded in graphics hardware in IBM PC) or a /character map/.
+The process of /assigning numbers (code points) to graphical characters/. All
+these code points make up a /code space/, /code page/ (originally coded in
+graphics hardware in IBM PC) or a /character map/.
+
+- /grapheme/: the smallest functional unit of a writing system in linguistics.
+  Not every grapheme is represented in Unicode as a single code point. Some are
+  represented by a sequence of two or more Unicode characters.
+
+- /glyph/: a specific shape that represents any particular grapheme in a given typeface.
 
 - /character/:  a minimal unit of text with semantic value
 
@@ -32,11 +53,72 @@ The process of /assigning numbers (code points) to graphical characters/. All th
 
 - /code unit/ or /code value/: a bit sequence to encode each character of a repertoire (the abstract set of characters of concern) within a given encoding form.
 
-* Unicode
+* [[https://home.unicode.org/][Unicode]]
 
 A standard for the consistent encoding, representation, and handling of text expressed in most of the world's writing systems. Maintained by the Unicode Consortium.
 
-Unicode can be implemented by different character encodings: UTF-8, UTF-16, UTF-32 and even GB18030.
+Unicode can be implemented by different character encodings: UTF-8, UTF-16,
+UTF-32 and even GB18030.
+
+** Abstract Character
+
+A Unicode character is an abstract concept, not defined by a glyph, a name, a
+phoneme but a symbol whose various representations are understood to mean the
+same thing by a community of people.
+
+- Has no particular stylistic appearance as long as the designs can be
+  recognized by the same character.
+
+- Has an official name but no fixed name across languages.
+
+- Has no fixed pronunciation.
+
+- May have very specific usage or a broad range of different uses.
+
+The intuitive concept of character varies by language and cultural background.
+Similar characters in different writing systems are not merged and some special
+forms in shape are not considered the same character.
+
+A character is ultimately rendered by an image, but an image is not necessarily
+encoded into a Unicode character.
+
+Encoding a character is not just about assigning a number to it: it is about
+giving it an /identity/. The unicode name of a character is also its unique
+identity. Such identities can be extended to traditional text processing so that
+a character can be unmistakenly specified.
+
+*** Character Processing Operations
+
+- searching, replacing, sorting, copying, indexing, modifying, computing
+  statistics, spelling and grammar checks; automatic translation
+
+- rendering with fonts; bolding, italics and other features; forming ligature;
+  adjusting spacing;
+
+** Notation
+
+Uppercase for Unicode names; =U+XXXX= for code points.
+
+** Character definition
+
+- [[https://unicode.org/charts/][Code Charts]]
+
+Many different characters may look similar, but mixing them may cause issues
+with computerized text processing. Unicode sometimes even uses the same glyph for
+different characters.
+
+
+
+** Terminology
+
+- /Code plane/: divided into seventeen planes.
+  + /Basic Multilingual Plane/ (BMP): accessed as a single code unit in UTF-16.
+  + the latter planes are encoded in four bytes in UTF-8 and surrogate pairs in
+    UTF-16.
+  + /block/: further division within a plane.
+
+- /General Category/: a property of code points.
+  + Letter, Mark, Number, Punctuation, Symbol, Separator, Other
 
 ** Issues
 
@@ -44,11 +126,11 @@ Unicode can be implemented by different character encodings: UTF-8, UTF-16, UTF-
 
 - Combining characters are often not rendered correctly.
 
-* ISO 10464 (UCS)
+** ISO 10464 (UCS)
 
 A standard set of character originally defined by ISO, later synchronized with Unicode, currently a subset of Unicode.
 
-* UTF-16
+** UTF-16
 
 The original Unicode encoding scheme (UCS-2) was not sufficient and UCS-4 was too space-inefficent.
 
@@ -62,7 +144,7 @@ U+10437
 3. take the lower 10 bits and add 0xDC00 = 0xDC37
 #+end_quote
 
-* UTF-8
+** UTF-8
 
 The one-byte part are the same as US-ASCII.
 
@@ -74,7 +156,7 @@ A # 0_1100001
 中 # 1110_0100 10_111000 10_101101
 #+end_src
 
-** Advantages
+*** Advantages
 
 - Backward compatibility with ASCII and thus related technology. ASCII-related algorithms can be easily applied to UTF-8 (character searching in UTF-8 is just a word-searching of the ASCII version)
 
@@ -88,7 +170,11 @@ A # 0_1100001
 
 - No special locale and language settings needed
 
-** Disadvantages
+*** Disadvantages
 
 - Less space efficient than specilized local encodings.
 
+** UTF-32
+
+Mainly used where the data is a single code units or glyph rather than string of
+characters.
