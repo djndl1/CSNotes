@@ -29,6 +29,41 @@ Side note: in C, the index of an array member increases with its pointer
 
 - /Ideographic scripts/
 
+** Font
+
+An organized set of glyphs.
+
+A font may have the same glyph for different characters or multiple glyphs for
+the same character.
+
+Font data may be embedded into a document so that the document can be presented
+as designed.
+
+- *typeface*: the basic design of glyphs, the word "font" for particular
+  implementations and variants.
+
+*** Classification
+
+- *Serif*
+
+- *Sans Serif*
+
+- *Monospace*, contrast with *proportional*
+
+- *Cursive*
+
+- *Fantasy*
+
+*** Implementations
+
+- Bitmap/raster fonts
+
+- Postscript Type 1
+
+- TrueType =ttf=
+
+- OpenType: unicode oriented and more platform-independent.
+
 ** Character Encodings
 
 The process of /assigning numbers (code points) to graphical characters/. All
@@ -39,7 +74,8 @@ graphics hardware in IBM PC) or a /character map/.
   Not every grapheme is represented in Unicode as a single code point. Some are
   represented by a sequence of two or more Unicode characters.
 
-- /glyph/: a specific shape that represents any particular grapheme in a given typeface.
+- /glyph/: a specific shape that represents any particular grapheme in a given
+  typeface, a visible manifestation of a character.
 
 - /character/:  a minimal unit of text with semantic value
 
@@ -103,11 +139,12 @@ Uppercase for Unicode names; =U+XXXX= for code points.
 
 - [[https://unicode.org/charts/][Code Charts]]
 
-Many different characters may look similar, but mixing them may cause issues
-with computerized text processing. Unicode sometimes even uses the same glyph for
-different characters.
+- Many different characters may look similar, but mixing them may cause issues
+  with computerized text processing. Unicode sometimes even uses the same glyph for
+  different characters.
 
-
+- Some characters are defined to be variants of other characters e.g.
+  compatibility equivalence.
 
 ** Terminology
 
