@@ -66,9 +66,13 @@ as designed.
 
 ** Character Encodings
 
-The process of /assigning numbers (code points) to graphical characters/. All
-these code points make up a /code space/, /code page/ (originally coded in
+The process of presenting characters in digital form as sequences of octets.
+
+All these code points make up a /code space/, /code page/ (originally coded in
 graphics hardware in IBM PC) or a /character map/.
+
+The word /character set/ should be understood as the set of internal
+representation of characters, a.k.a character encoding instead of character repertoire.
 
 - /grapheme/: the smallest functional unit of a writing system in linguistics.
   Not every grapheme is represented in Unicode as a single code point. Some are
