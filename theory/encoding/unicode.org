@@ -150,6 +150,28 @@ Uppercase for Unicode names; =U+XXXX= for code points.
 - Some characters are defined to be variants of other characters e.g.
   compatibility equivalence.
 
+** [[https://www.rfc-editor.org/rfc/rfc2130.txt][IAB Model]]
+
+- Coded Character Set
+
+- Character Encoding Scheme
+
+- Transfer Encoding Syntax: e.g. Base64, BinHex, Quoted Printable, uuencode, since the recipient may not be able to
+  handle all octets properly (having inappropriate assumptions about the underlying charsets).
+
+** Unicode Model
+
+- Abstract Character Repertoire
+
+- Coded Character Set
+
+- Character Encoding Form
+
+- Character Encoding Scheme
+
+/Character Map/: A mapping of character strings (sequences of abstract
+characters) to sequences of octets, ignoring the intermediate levels.
+
 ** Terminology
 
 - /Code plane/: divided into seventeen planes.
