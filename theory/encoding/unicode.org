@@ -100,6 +100,42 @@ A standard for the consistent encoding, representation, and handling of text exp
 Unicode can be implemented by different character encodings: UTF-8, UTF-16,
 UTF-32 and even GB18030.
 
+** Design Principles
+
+- /Universality/: incorporate different languages and writing systems; acting as
+  an intermediate code.
+
+- /Efficiency/: ease of character processing with a single mapping from numbers
+  to characters; some tradeoff has to be made.
+
+- /Characters, not glyphs/
+
+- /Semantics/: characters have well-defined meanings, mostly the properties of characters.
+
+- /plain text/: Unicode does not deal with formatting or structuring information
+
+- /Logical order/ rather visually: a diacritic is placed after the character it
+  modifies even if it's visually on top of the character.
+
+- /unification/: encodes duplicates of a character as a single code point even
+  if they might be from different languages. e.g. Han Unification.
+  + across glyph variation
+  + no unification across scripts
+  + unified diacritics
+  + across different usages (=.=)
+  + category difference may prevent unification.
+  + limited by convertibility from/to other character standards since they may
+    not have unified these characters.
+  + Han unification
+
+- /Dynamic composition/: Characters with diacritic marks can be composed
+  dynamically, using characters designated as combining marks.
+
+- /Equivalent sequences/: precomposed forms and their decompositions are seen equivalent.
+
+- /Convertibility/: accurate conversion between Unicode and other character
+  standards and specifications.
+
 ** Abstract Character
 
 A Unicode character is an abstract concept, not defined by a glyph, a name, a
