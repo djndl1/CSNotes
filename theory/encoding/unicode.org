@@ -186,6 +186,16 @@ Uppercase for Unicode names; =U+XXXX= for code points.
 - Some characters are defined to be variants of other characters e.g.
   compatibility equivalence.
 
+*** Identity
+
+- /Unicode number/ (code point): a 21-bit integer
+  + not necessarily the criteria for comparison
+
+- /Unicode name/
+
+- /Named character sequence/: Some character sequence are defined and named by UCS and Unicode so that composed characters
+  may have their individual identity.
+
 ** [[https://www.rfc-editor.org/rfc/rfc2130.txt][IAB Model]]
 
 - Coded Character Set
