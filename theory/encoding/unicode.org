@@ -135,6 +135,8 @@ UTF-32 and even GB18030.
 
 - /Convertibility/: accurate conversion between Unicode and other character
   standards and specifications.
+  + an extension of ISO-8859-1 and therefore also an extension of ASCII (not in
+    encoded forms since ISO-8859-1 uses only one octet).
 
 ** Abstract Character
 
@@ -218,13 +220,34 @@ Uppercase for Unicode names; =U+XXXX= for code points.
 /Character Map/: A mapping of character strings (sequences of abstract
 characters) to sequences of octets, ignoring the intermediate levels.
 
-** Terminology
+** Coding Space (Codespace)
 
-- /Code plane/: divided into seventeen planes.
+The range of integers that can be used as character numbers. Although not of
+interest to others, the Unicode coding space are structurally organized.
+
+- /code point/: a character number in Unicode coding space.
+
+- /Code plane/: divided into seventeen planes. The first 5-bit specifying the
+  plane and the rest inside a plane, with each plane of 0x10000 characters, in
+  total 1114112 characters in Unicode. Only three are used and the others are
+  currently not assigned.
   + /Basic Multilingual Plane/ (BMP): accessed as a single code unit in UTF-16.
   + the latter planes are encoded in four bytes in UTF-8 and surrogate pairs in
     UTF-16.
-  + /block/: further division within a plane.
+
+- /row/: a set of 256 characters inside a plane. =U+1234= is inside the 12th row
+  in the 0th plane.
+
+- /block/: logical/semantic division inside a plane.
+  + e.g. Basic Latin (ASCII), Arrows, Mathematical Operators
+
+- /Surrogate/: part of the BMP plane is reserved for surrogates to represent
+  characters outside the BMP in UTF-16 so that a surrogate code unit does not conflict with
+  a real Unicode character in UTF-16.
+
+** Terminology
+
+
 
 - /General Category/: a property of code points.
   + Letter, Mark, Number, Punctuation, Symbol, Separator, Other
