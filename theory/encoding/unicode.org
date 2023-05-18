@@ -234,6 +234,10 @@ interest to others, the Unicode coding space are structurally organized.
   + /Basic Multilingual Plane/ (BMP): accessed as a single code unit in UTF-16.
   + the latter planes are encoded in four bytes in UTF-8 and surrogate pairs in
     UTF-16.
+  + classification: graphic, format, control, private use, surrogate,
+    noncharacter, reserved
+  + =U+FEFF= (BOM) and =U+FFFE= (in case of byte reversal, 0xFEFF becomes
+    0xFFFE)
 
 - /row/: a set of 256 characters inside a plane. =U+1234= is inside the 12th row
   in the 0th plane.
@@ -246,8 +250,6 @@ interest to others, the Unicode coding space are structurally organized.
   a real Unicode character in UTF-16.
 
 ** Terminology
-
-
 
 - /General Category/: a property of code points.
   + Letter, Mark, Number, Punctuation, Symbol, Separator, Other
