@@ -251,6 +251,11 @@ interest to others, the Unicode coding space are structurally organized.
 
 ** Terminology
 
+- /Text element/: a sequence of characters treated as a unit in some processing
+  e.g. a word, a token.
+
+- /Unicode string/: a string of Unicode code units.
+
 - /General Category/: a property of code points.
   + Letter, Mark, Number, Punctuation, Symbol, Separator, Other
 
