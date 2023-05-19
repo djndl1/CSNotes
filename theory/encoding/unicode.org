@@ -259,6 +259,17 @@ interest to others, the Unicode coding space are structurally organized.
 - /General Category/: a property of code points.
   + Letter, Mark, Number, Punctuation, Symbol, Separator, Other
 
+** Fonts
+
+- /Variation Selectors/: some characters are defined in Unicode to indicate some
+  glyph variation in a generic way.
+
+- /ligature/: not to be confused with characters that originate from ligatures;
+  handled by fonts. Also, Unicode defines some characters to indicate ligature.
+
+Various font tricks are unnecessary with Unicode and are often risky since they
+don't change the identities of these characters.
+
 ** Issues
 
 - Han Unification, alternative CJK encoding, Unicode variation sequences.
