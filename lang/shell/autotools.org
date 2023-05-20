@@ -1,14 +1,36 @@
 #+title: Autotools
 
+The primary purpose of the Autotools is not to make life simpler for the package maintainer (although it really does in the long run). The primary purpose of the Autotools is to make life simpler for the end user.
+
 Autotools provides protability across POSIX platforms, well supported by various packaging tools.
 
-- =Autoconf=: generate the configure script from a template called =configure.ac=
+- =Autoconf=: generate the configure script from a template called
+  =configure.ac=
+
+- =autoscan=: generates a default =configure.ac= for a new project.
+
+- =autoupdate=: update the =configure.ac= script to the syntax of newer
+  Autotools.
+
+- =ifnames=: scans and shows C-preprocessor definitions
 
 - =Automake=: generate complete Maekfile.in templates from =Makefile.am= templates.
 
-- =autoheader=: generating the configuration header template =config.h.in=
+- =autoheader=: generating the configuration header template =config.h.in= from
+  the configuration scripts.
 
-- =autoreconf=: always use this one rather than =autoconf=, =automake= =autoheader=, =aclocal= separately.
+- =autoreconf=: a perl script that runs all the required Autotools in the right
+  order. Always use this one rather than =autoconf=, =automake= =autoheader=,
+  =aclocal= separately.
+
+- =aclocal=: generates a =aclocal.m4= script from various user-defined macro scripts
+  and all required Automake macros so that =autoconf= can make use of.
+
+- =libtool=: handles naming difference and dynamic loader functionality across
+  platforms to build portable shared library.
+  + =libtool=: a project script
+  + =libtoolize=: prepares the project to use libtool.
+  + =ltdl=: the Libtool C API
 
 * Project Structure
 
@@ -101,6 +123,15 @@ Recursive make by setting =SUBDIRS= is not recommended due to performance for pa
 
 * Build the Project
 
-- =DESTDIR= (when invoking =make install=), =--prefix=: the location where built artefacts are placed and the location where the built software will be installed on the host.
+- =DESTDIR= (when invoking =make install=), =--prefix=: the location where built
+  artefacts are placed and the location where the built software will be
+  installed on the host.
 
-- =config.log=  where =autoconf= keeps a log of all the tests it runs.
+- =config.status=: the only product of running =configure= which will in turn
+  generates =Makefile= and =config.h= as well as other output files.
+
+- =config.log=  where =configure= keeps a log of all the tests it runs.
+
+- =config.site=: a script placed in a specific prefix for =configure= scripts of
+  different packages
+  to source in order to configure the same build parameters.
