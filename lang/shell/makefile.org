@@ -2,10 +2,15 @@
 
 * Overview
 
+Make acts according to the relationships between the elements of the program and
+the timestamps of source files, intermediate files and final products to redo
+and produce the desired output.
+
 a makefile consists of rules: how and when to remake certain files
 which are the targets of the particular rule.
 
 #+begin_src makefile
+# target is by default a file to be made, not a target status unless it is a phony target
 target ... : [prerequisites] # prerequisite: file used as input to create the target.
 	recipe                 # an action that make carries out, tab indented
 	...
@@ -16,8 +21,8 @@ by default =make= starts with the first target not prefixed with =.= (the defaul
 
 The compilation must be done if the prerequisite file is more recent than the target file.
 
-Mkae has an implicit rule for updating a =.o= file from a correspondingly named =.c= file using
-a =cc -c= command.
+Make has an implicit rule for updating a =.o= file from a correspondingly named =.c= file using
+a =cc -c= command. It also supports the =-l= dependency to find appropriate libraries.
 
 * The =Makefile= File
 
@@ -61,16 +66,35 @@ targets : prerequisites [; recipe]
 - A target is out of date if it does not exist or
   if it is older than any of the prerequisites (by comparison of last-modification times).
   + /phony target/: one that is not really the name of a file rather than a name for a recipe
-    to be executed. A phony target should not be the prerequisite of a real target, otherwise
-    it would be unnecessarily executed.
+    to be executed. Otherwise, if a file with the target name is present, no
+    action will be performed. A phony target should not be the prerequisite of a
+    real target since it's always out of date, otherwise it would be
+    unnecessarily executed.
+    + use cases: cleanup, message output
+  + /empty target/: does have an output file so that it is not always updated
+    but the main purpose is still to take
+    some action.
   + a target without prerequisites and recipes are always considered updated and can be used
     as a replacement for the =.PHONY= target.
   + a single rule can contain multiple targets that shares the same recipe with only a different
-    target variable =$@=.
+    target variable =$@=. It does not mean these two targets are the same but
+    just a shorthand to avoid defining the same rule multiple times.
   + a target can have only one recipe. An extra rule with just prerequisites can be used to give
     a few extra prerequisites to many files at once.
 
+#+begin_src makefile
+# an empty target that only reprints if the source changes
+print: *.[hc]
+        lpr $?
+        touch $@
+#+end_src
+
 - rule:
+  - rules can be /explicit rules/, /implicit rules/ (builtin pattern rules or
+    suffix rules) or /pattern rules/ (target matching are based on
+    wildcards instead of explicit filenames)
+  - wildcard may seem useful but may be misleading: e.g. =*.o: abc.h= doesn't
+    work as expected if no object files are there.
   - /static pattern rules/: specify multiple targets and construct the prerequisite names for each
     target based on the target name. =targets: target_pattern : prereq_pattern= with =%= as the matched stem.
     The two patterns say how to compute the prerequisites of each target. Each target is matched against the
@@ -93,3 +117,24 @@ targets : prerequisites [; recipe]
   + to invoke a make inside a makefile, always use the =MAKE= variable. =make= automatically passes down
     variable values that were defined on the command line by putting them in =MAKEFLAGS=. =-j= is automatically included
     and only the specified number of jobs are being executed altogether for all running =make=.
+
+** Variables
+
+=$(variable)=, =${variable}= and =$variable= work but =$(variable)= has been the norm.
+
+*** Automatic Variables
+
+Variables that are set by =make= after a rule is matched, which provides access
+to elements from the target and prerequisite lists.
+
+- =$@=: the target
+
+- =$<=: the first prerequisite
+
+- =$^=: the filenames of all prerequisites separated by spaces with duplicates
+  removed. =$+= retains the duplicates. =$?= are those of the updated prerequisites.
+
+- =$*=: the stem of the target filename (without its suffix).
+
+They have the =D= variant and the =F= variant that extract the
+directory/filename portion of the filename.
