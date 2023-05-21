@@ -1,0 +1,63 @@
+#+title:Modern C
+
+* Language Features
+
+- Identifiers can be unicode characters (but with restriction) written in
+  escaped notation (support for non-escaped raw characters are
+  implementation-defined, but they do work in recent GCC and Clang).
+  + See https://github.com/rurban/libu8ident/blob/master/doc/c11.md
+
+** Data Types
+
+- (C99) =_Bool= and its macro =bool=: any nonzero value is =true= (=nullptr= is zero)
+
+- (C99) =(unsigned) long long=: guaranteed to be at least 64-bit
+
+- (C99) Optional Complex number: =_Complex= (=complex=), =_Imaginary= (=imaginary=) in
+  =<complex.h>=
+
+** Syntax
+
+- (C99) non-constant and designated initialization for array, struct and union.
+
+- (C99) hexadecimal floats
+
+- (C99) compound literals: *unnamed* objects of a specified array/struct/union type used typically in place
+  so that the user does not have to first define a variable and initialize it
+  just to use its value but it's also an *lvalue*. Somewhat similar to C#'s
+  initializer list but with automatic storage and lvalue semantics.
+
+#+begin_src c
+void drawline1(struct point from, struct point to);
+void drawline2(struct point *from, struct point *to);
+
+    drawline1(
+        (struct point){.x=1, .y=1},  // creates two structs with block scope and
+        (struct point){.x=3, .y=4}); // calls drawline1, passing them by value
+    drawline2(
+        &(struct point){.x=1, .y=1},  // creates two structs with block scope and
+        &(struct point){.x=3, .y=4}); // calls drawline2, passing their addresses
+#+end_src
+
+** Keywords
+
+- (C99) =inline=: hint about inlining. The compiler may use it to prevent the
+  author from writing code that cannot be inlined.
+  + =static inline=: used internally, not so much different from a pure
+    =static=. Using =static inline= in a header may cause every translation unit
+    to contain a copy of the function if not inlined.
+  + Bare =inline=: used only in the same translation and not externally visible
+    (undefined but has a symbol)
+    unless an =extern inline= declare/definition is written somewhere else.
+    but it has =external= linkage.
+    typically used in headers along with a full function definition.
+  + =extern inline=: used to provide an extern-linkage implementation of the
+    same function with bare =inline=.
+  + the typical usage is to combine a bare =inline= and an =extern inline=,
+    =static inline= or =extern inline= are not something special, but they
+    provide some hint so that the compiler may catch some errors that makes them
+    unable to inline the functions like an =extern inline= calls some =static= function.
+
+* Library
+
+- =gets= is removed in C23 due to potential buffer overflow.
