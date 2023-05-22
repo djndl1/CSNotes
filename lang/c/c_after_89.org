@@ -9,12 +9,23 @@
 
 ** Data Types
 
-- (C99) =_Bool= and its macro =bool=: any nonzero value is =true= (=nullptr= is zero)
+- (C99) =_Bool= and its macro =bool=: any nonzero value is =true= (=nullptr= is
+  zero)
+  + (C23): =bool=, =true=, =false= are keywords now.
 
 - (C99) =(unsigned) long long=: guaranteed to be at least 64-bit
 
 - (C99) Optional Complex number: =_Complex= (=complex=), =_Imaginary= (=imaginary=) in
   =<complex.h>=
+
+- (C99): integers with exact width =intN_t= and =uintN_t=.
+
+- (C99): integers that can hold a pointer. =intptr_t=, =uintptr_t=
+
+** Operators
+
+- (C99): division are defined to be /truncated/ division: the quotient rounds
+  to zero and the remainder =r = a - n * (a / n)=.
 
 ** Syntax
 
@@ -46,17 +57,36 @@ void drawline2(struct point *from, struct point *to);
   + =static inline=: used internally, not so much different from a pure
     =static=. Using =static inline= in a header may cause every translation unit
     to contain a copy of the function if not inlined.
-  + Bare =inline=: used only in the same translation and not externally visible
-    (undefined but has a symbol)
-    unless an =extern inline= declare/definition is written somewhere else.
-    but it has =external= linkage.
+  + Bare =inline=: intended for inlining only; used only in the same translation
+    and not externally visible (undefined but has a symbol), and requires an
+    external version in case the compiler decides not to inline it.
     typically used in headers along with a full function definition.
   + =extern inline=: used to provide an extern-linkage implementation of the
     same function with bare =inline=.
   + the typical usage is to combine a bare =inline= and an =extern inline=,
     =static inline= or =extern inline= are not something special, but they
     provide some hint so that the compiler may catch some errors that makes them
-    unable to inline the functions like an =extern inline= calls some =static= function.
+    unable to inline the functions like an =extern inline= calls some =static=
+    function.
+
+- (C99) =restrict=: used only for non-function lvalue pointers. During each
+  execution of a block in which a restricted pointer =P= is declared (typically
+  each execution of a function body in which =P= is a function parameter), if some
+  object that is accessible through =P= (directly or indirectly) is modified, by
+  any means, then all accesses to that object (both reads and writes) in that
+  block must occur through =P= (directly or indirectly), otherwise the behavior is
+  undefined. If the object is never modified, it may be aliased and accessed
+  through different restrict-qualified pointers
+  + The intended use of the restrict qualifier (like the register storage class)
+    is to promote optimization. The compiler is then free to optimize or do
+    whatever it can with this assumption.
+  + In general, it is best to explicitly annotate all non-aliasing pointers in a
+    function's prototype with restrict.
+
+
+** Special Variables/Constants
+
+- (C99) =__func__=: function name constant within a function.
 
 * Library
 
