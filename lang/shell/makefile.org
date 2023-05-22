@@ -138,3 +138,16 @@ to elements from the target and prerequisite lists.
 
 They have the =D= variant and the =F= variant that extract the
 directory/filename portion of the filename.
+
+*** VPATH
+
+- the =VPATH= variable: a list of directories to search when =make= needs a file
+  (targets and prerequisites). Different directories may contains synonymous files.
+
+- the =vpath= directive: works with patterns
+
+#+begin_src makefile
+vpath %.c src
+vpath %.l src
+vpath %.h include
+#+end_src
