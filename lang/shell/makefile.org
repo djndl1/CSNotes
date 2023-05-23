@@ -63,6 +63,44 @@ targets : prerequisites [; recipe]
 	...
 #+end_src
 
+- rule:
+  - rules can be /explicit rules/, /implicit rules/ (builtin pattern rules or
+    suffix rules) or /pattern rules/ (target matching are based on
+    wildcards instead of explicit filenames)
+  - wildcard may seem useful but may be misleading: e.g. =*.o: abc.h= doesn't
+    work as expected if no object files are there.
+  - /static pattern rules/: =targets : target_pattern : preq_pattern=; differ
+    from normal pattern rules only in that the rule is limited to the specified targets.
+  - /double-colon rules/ (obscure and not useful): rules with the same target are executed independently
+    in the order they appear in the makefile.
+    If a rule has no prerequisites, it always gets executed.
+  - /suffix rules/: legacy rules, apply to only a list of suffixes =.SUFFIXES=.
+    + double suffix rule: =.c.o= means =%.o : %.c=
+    + single suffix rule: =.p:= means =%: %.p=
+  - /make depend/: some C compilers provide =-M= or =-MM= to generate a dependency list on included files.
+    Some =Make= generates a =depend= file before compilation. A rule can be written that generates a =source.d=
+    makefile for each source file and include them.
+
+#+begin_src makefile
+# The built-in rules are all instances of pattern rules.
+%.o: %.c
+        $(COMPILE.c) $(OUTPUT_OPTION) $<
+%.c: %.l
+        @$(RM) $@
+        $(LEX.l) $< > $@
+%: %.o
+        $(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+
+#+end_src
+
+*** Pattern
+
+- =%=: any number of any characters; =%= in the prerequisites refers to the
+  matching stem.
+
+*** Target
+
 - A target is out of date if it does not exist or
   if it is older than any of the prerequisites (by comparison of last-modification times).
   + /phony target/: one that is not really the name of a file rather than a name for a recipe
@@ -89,23 +127,7 @@ print: *.[hc]
         touch $@
 #+end_src
 
-- rule:
-  - rules can be /explicit rules/, /implicit rules/ (builtin pattern rules or
-    suffix rules) or /pattern rules/ (target matching are based on
-    wildcards instead of explicit filenames)
-  - wildcard may seem useful but may be misleading: e.g. =*.o: abc.h= doesn't
-    work as expected if no object files are there.
-  - /static pattern rules/: specify multiple targets and construct the prerequisite names for each
-    target based on the target name. =targets: target_pattern : prereq_pattern= with =%= as the matched stem.
-    The two patterns say how to compute the prerequisites of each target. Each target is matched against the
-    target pattern and then generates a stem used to construct its prerequsites with the prerequiste pattern.
-    The =$<= automatic variable is used in the recipe to represent the constructed prerequisite.
-  - /double-colon rules/ (obscure and not useful): rules with the same target are executed independently
-    in the order they appear in the makefile.
-    If a rule has no prerequisites, it always gets executed.
-  - /make depend/: some C compilers provide =-M= or =-MM= to generate a dependency list on included files.
-    Some =Make= generates a =depend= file before compilation. A rule can be written that generates a =source.d=
-    makefile for each source file and include them.
+*** Recipes
 
 - recipes:
   + each line must start with a tab.
