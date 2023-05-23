@@ -905,3 +905,34 @@ Powershell gallery and =PowerShellGet= Module.
 1. Use aliases for interactive input and full names for scripting
 
 - =Set-StrictMode=: use this to enforce good practice
+
+* Cookbook
+
+** Create a scheduled task
+
+[[https://stackoverflow.com/questions/13965997/powershell-set-a-scheduled-task-to-run-when-user-isnt-logged-in][powershell-set-a-scheduled-task-to-run-when-user-isnt-logged-in]]
+
+#+begin_src shell
+# requires SeBatchLogonRight
+
+# a cmd.exe is spawn to run the task; be careful of the quotes
+$action = New-ScheduledTaskAction -Execute 'powershell' -Argument '-NoProfile -ExecutionPolicy RemoteSigned -File C:\Users\Administrator\bin\db_backup.ps1'
+$trigger  = New-ScheduledTaskTrigger -Daily -At (New-Object datetime 2023,5,23,21,0,0)
+
+# Password means we can log on as we want without a user session; use limited instead of elevated privileges
+$principal = New-ScheduledTaskprincipal -UserId 'Administrator' -LogonType Password -RunLevel Limited
+
+$cred = Get-Credential -userName Administrator -Message 'Input Administrator credential'
+
+$task = New-ScheduledTask -Action $action -Trigger $trigger  -Principal $principal
+
+# the password needs to be plan text
+$pwd = [System.Net.NetworkCredential]::new("", $cred.Password).Password
+
+Register-Scheduledtask -TaskName db_backup -InputObject $task -User 'Administrator' -Password $pwd
+
+# to modify a task, retrieve it, modify it and set it with the correct credential again
+$Task = Get-ScheduledTask -TaskName 'Collect Telemetry' -TaskPath '\Awesome App'
+$Task.Actions[0].WorkingDirectory = 'C:\AwesomeApp'
+$Task | Set-ScheduledTask -User 'CONTOSO\AppTelemetry' -Password 'ShhD0ntT3ll4ny0n3!'
+#+end_src
