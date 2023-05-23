@@ -359,3 +359,15 @@ characters.
 
 UTF-32 does not use surrogate values and they should always be in the range of
 =U+0000= to =U+D7FF= and =U+E000= to =U+10FFF=.
+
+*** Byte Order
+
+- Use metadata to indicate the byte order
+
+- the data itself can indicate the byte order (byte order mark =U+FEFF= since
+  =U+FFFE= is a "noncharacter", not assigned or used in Unicode).
+
+*** Conversions
+
+Conversions from/to UTF-32 are basically how UTF-8 and UTF-16 algorithms works.
+Conversion between UTF-8 and UTF-16 requires an intermediate UTF-32 form.
