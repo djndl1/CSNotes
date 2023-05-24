@@ -18,14 +18,20 @@
 - (C99) Optional Complex number: =_Complex= (=complex=), =_Imaginary= (=imaginary=) in
   =<complex.h>=
 
-- (C99): integers with exact width =intN_t= and =uintN_t=.
+- (C99) integers with exact width =intN_t= and =uintN_t=.
 
-- (C99): integers that can hold a pointer. =intptr_t=, =uintptr_t=
+- (C99) integers that can hold a pointer. =intptr_t=, =uintptr_t=
 
-** Operators
+- (C11) =char16_t= (UTF-16), =char32_t= (UTF-32)
+
+- (C23) =char8_t= (UTF-8), defined as =unsigned char=
+
+** Operators and Expressions
 
 - (C99): division are defined to be /truncated/ division: the quotient rounds
   to zero and the remainder =r = a - n * (a / n)=.
+
+- (C11): =static_assert=
 
 ** Syntax
 
@@ -50,7 +56,10 @@ void drawline2(struct point *from, struct point *to);
         &(struct point){.x=3, .y=4}); // calls drawline2, passing their addresses
 #+end_src
 
-** Keywords
+- (C11/C23): =u8''= (UTF-8), =u''= and =U''= 16-bit (UTF-16) and 32-bit (UTF-32) string/character
+  literals
+
+** Keywords, Attributes
 
 - (C99) =inline=: hint about inlining. The compiler may use it to prevent the
   author from writing code that cannot be inlined.
@@ -82,6 +91,16 @@ void drawline2(struct point *from, struct point *to);
     whatever it can with this assumption.
   + In general, it is best to explicitly annotate all non-aliasing pointers in a
     function's prototype with restrict.
+
+- (C11) =_Noreturn= (=noreturn= in =<stdnoreturn.h>=); =[[noreturn]]= attribute
+  (C23)
+
+- (C11) =_Generic=: compile-time switch expression based on type.
+
+- (C11) =_Alignof= (=alignof=): queries the alignment requirement of its operand
+  type
+
+- (C11) =_Alignas= (=alignas=): modify alignment
 
 
 ** Special Variables/Constants
