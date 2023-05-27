@@ -284,6 +284,72 @@ TODO
 - =C-x 0=: =delete-window=; =C-x 1=: =delete-other-window=;
 
 - =C-x ~=; =C-x }=; =C-x {=; =C-x -=; =C-x +=
+
+* International Support
+
+=view-hello-file= shows various characters that Emacs supports.
+
+- =current-language-environment=: combination of various language-related and character
+  coding settings including a coding system, character sets and input methods.
+
+** Input
+
+- =insert-char=: insert unicode characters.
+
+- various input methods.
+  + =describe-input-method=
+  + =toggle-input-method=
+  + =set-input-method=
+  + =quail-show-key=
+
+** Displayed Characters
+
+- =describe-character=
+
+- =what-cursor-position=
+
+** Character Coding System
+
+Emacs internally uses UTF-8 to handle string.
+
+When reading a file, Emacs tries to recognize its coding system (and succeeds
+most of the time).
+
+- =buffer-file-coding-system=: the default coding system to use on saving.
+
+- =describe-coding-system=
+
+- =list-coding-systems=
+
+- =set-buffer-file-coding-system= (save as, for output), =revert-buffer-with-coding-system=
+  (reopen as, for input)
+
+- =recode-region=: convert character coding of a region from one to another
+
+=unix=, =dos= and =mac= indicates EOL marker schemes.
+
+=raw-text= show charaters as ASCII characters and byte values.
+=no-conversion= does nothing to convert bytes to characters. Both set
+=enable-multibyte-characters= to =nil=.
+
+** Fontsets
+
+The entire range of scripts requires /a collection of many fonts/ (fontset),
+defined by Emacs itself.
+
+** Charsets
+
+Different concept from a coding system. Emacs has a preference for fonts
+depending on charsets.
+
+- =list-character-sets=
+
+- =list-charset-chars=
+
+** Further Reading
+
+[[https://nullprogram.com/blog/2014/06/13/][Emacs Unicode Pitfalls]]
+
 * Major and Minor Modes
 
 - *Major Mode*: specialized facilities for working on a specialized file type. Major modes are mutually exclusive.
