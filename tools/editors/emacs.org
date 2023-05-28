@@ -600,6 +600,10 @@ variables.
 (global-set-key (kbd "C-c y") 'clipboard-yank)
 #+end_src
 
+* Emacs Server
+
+Emacs server is meant only for local use, even if a TCP socket is used.
+
 * Emacs Lisp Packages
 
 - =list-packages=: =h=, =?= =RET= etc. This menu can be operated on.
