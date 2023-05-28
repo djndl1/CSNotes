@@ -475,6 +475,131 @@ Emacs is responsible for reindenting the source code buffer.
 
 - =C-x C-a=-series of commands to control the debugger.
 
+* Configuration and Custimization
+
+- =customize=: an interactive mechanism to configure emacs
+
+** Init File
+
+An =init.el= at =~/.emasc.el=, =~/.emacs.d/init.el= or
+=~/.config/emacs/.init.el=.
+=user-emacs-directory= is set to indicate which
+directory is used.
+
+=init.el= consists of one or more Elisp expressions. An =early-init.el= is an
+init file that is read before package initialization.
+
+** Variables
+
+Elisp variables are for internal record keeping but also user customization.
+
+- =describe-variable=: show the variable's value and documentation
+
+- =set-variable=: change the value of a customizable variable. Use =setq= for
+  any variable.
+
+*** Hooks
+
+A variable holding a list of functions that are called on some well-defined
+occasion.
+
+- /normal hooks/ =-hook=: functions without arguments are run in turn in the
+  order they appear in the hook list.
+
+- /abnormal hooks/ =-functions=:
+
+Use =add-hook= to add a hook function to a hook variable.
+
+#+begin_src elisp
+(add-hook 'org-mode-hook 'auto-fill-mode)
+#+end_src
+
+*** [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Locals.html][Buffer-Local (Per-Buffer) Variables]]
+
+After setting a variable to local, any assignment would be local.
+To set the global value, use =setq-default= and =default-value= access the
+value.
+
+*** [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Locals.html][File-Local Variable]]
+
+Variables that are automatically applied to a file.
+
+#+begin_src elisp
+-*- mode: org; var: value; ... -*- ;; at the first line
+#+end_src
+
+Or =add-file-local-variable-prop-line=.
+Or near the end of the file with a local variables list (within a comment block
+if necessary)
+
+#+begin_src elisp
+Local Variables:
+mode: c
+comment-column: 0
+End
+#+end_src
+
+Some special variables are defined
+
+- =mode=: the specified major mode (use =eval= for minor modes, not recommended
+  though since this forces other uses to use the same minor modes).
+
+- =eval=: evaluates the specified Lisp expression
+
+- =coding=: the character coding system
+
+- =unibyte=: if =t=, load or compile an Elisp file in unibyte mode (texts are
+  viewed as pure bytes instead of character).
+
+File variables may be unsafe and emacs prompts the user to accept these variables.
+
+*** [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html][Directory-Local Variables]]
+
+For customization in a directory.
+
+#+begin_src elisp
+;; basically an alist of alists
+;; alist with mode or a directory name as the the key and an alist of variable-value or mode-variable_alist as the value
+;; the more specific modes take priority
+((mode-name-or-nil-for-all-modes . ((variable-name-one . variable-one-value)
+                                    (variable-name-two . variable-two-value)))
+ (mode-two . ((variable-name-three . variable-one-value)
+              (subdirs . nil))) ; a special keyword that indicates the setting does not apply to subdirectories
+ ("directory" . (nil . ((variable-n-name . variable-n-value))))) ; applies only to "directory"
+#+end_src
+
+=coding=, =eval=, =unibyte=, =mode= are also accepts as directory-local
+variables.
+
+** Key Bindings
+
+- /key binding/: a mapping between a key and a command.
+
+- /key sequence/: a sequence of input events that have a meaning (from the
+  binding) as a unit.
+
+- /keymaps/: data strctures that store the key binding between key sequences and
+  command functions.
+  + /the global keymap/: always in effect. =global-set-key=, =global-unset-key=
+  + /local keymaps/: each major or minor mode can have its own keymap which
+    overrides the global definitions of some keys. The definitions for a prefix
+    in local keymaps and the global keymap are combined. =local-set-key=,
+    =local-unset-key=, =define-key=
+  + the minibuffer has its own set of local keymaps.
+  + interpreting a key sequence of multiple events involves a chain of keymaps:
+    the first keymap gives a definition for the first event, which is another
+    keymap, which is used to look up the second event in the sequence, and so
+    on. A keymap definition may be a function that returns the map.
+  + Emacs supports modifier keys other than /control/ and /meta/, including
+    /Super/, /Hyper/ and /Alt/, not defined by default though.
+  + Emacs can treat control characters and corresponding keys differently but
+    normally they are automatically mapped to each other.
+  + disable a command instead of undefine a mapping.
+
+#+begin_src elisp
+(global-set-key (kbd "C-c y") 'clipboard-yank)
+#+end_src
+
 * Emacs Lisp Packages
 
 - =list-packages=: =h=, =?= =RET= etc. This menu can be operated on.
