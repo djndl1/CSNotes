@@ -371,3 +371,24 @@ UTF-32 does not use surrogate values and they should always be in the range of
 
 Conversions from/to UTF-32 are basically how UTF-8 and UTF-16 algorithms works.
 Conversion between UTF-8 and UTF-16 requires an intermediate UTF-32 form.
+
+** Conformance
+
+- not every unicode character is required to be included. However, every
+  included character should be interpreted according the standard.
+  Canonical-equivalent characters may be interpreted as the same or different.
+
+- if a program does not intend to modify the interpretation of the character
+  data, then the data itself must not be modified except by replacing a string
+  with a canonical equivalent string or removing noncharacters. It should not
+  modify characters it does not understand.
+
+- surrogates, noncharacters, unassigned code points should not be treated as characters.
+
+- a program is supposed to interpret a code unit sequence of a certain encoding
+  form according to that encoding scheme and generate a code unit of such a
+  encoding form without emitting ill-formed code unit sequences. It shall treat
+  ill-formed code unit sequence as an error condition while interpreting. Byte
+  order shall be properly handled.
+
+-
