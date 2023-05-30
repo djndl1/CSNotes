@@ -249,6 +249,46 @@ interest to others, the Unicode coding space are structurally organized.
   characters outside the BMP in UTF-16 so that a surrogate code unit does not conflict with
   a real Unicode character in UTF-16.
 
+*** Composition/Decomposition
+
+Unicode allows an unlimited number of combining diacritic marks combined with a
+/base character/.
+
+A precomposed character (/composite/ character, /decomposable/ character) may be
+formed visually, defined by Unicode, by combining certain other
+characters (/canonical decomposition/), forming a /canonical equivalence/
+relationship. In Unicode, such diacritics always follow the base character.
+
+- /decomposition mapping/: associates another character or a sequence of
+  characters with the given character.
+  + /canonical mapping/: different way to encode the same symbol in Unicode,
+    should normally be rendered the same but not forced to.
+    - If combing diacritic marks belong to different combining classes, their
+      order are fixed by combining class number. However, if they belong to the
+      same class, the order of composition does matter.
+  + /compatibility mapping/: fundamentally similar characters which may differ
+    in rendering as well as in scope of usage and in practice in meaning as
+    well. It includes /canonical mapping/.
+
+A character that is canonical equivalent to something other than itself is said
+to be /canonical decomposable/ . Similarly, if a character is compatibility
+equivalent to something other than itself, it is /compatibility decomposable/.
+
+- /compatibility character/: Compatibility characters were included into
+  Unicode for compatibility with other character codes.
+  + The overall tone of the standard is that compatibility characters should be
+   avoided, except in legacy data or, if unavoidable, in plain text. In formats
+    other than plain text, it is often possible and suitable to avoid
+    compatibility characters by using markup or other tools.
+  + not all compatibility characters have compatibility decompositions (e.g.
+    U+212B Å is such while U+00C5 Å is not even a compatibility character).
+    However, wider concept of compatibility character is basically just
+    descriptive; rules and algorithms operate on the decompositions.
+
+Precomposed ligature are not recommended since most programs cannot properly
+treat them as their decomposed sequences. Instead, zero-width joiner and
+non-joiner should be used.
+
 ** Terminology
 
 - /Text element/: a sequence of characters treated as a unit in some processing
