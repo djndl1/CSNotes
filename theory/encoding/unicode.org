@@ -280,14 +280,53 @@ equivalent to something other than itself, it is /compatibility decomposable/.
    avoided, except in legacy data or, if unavoidable, in plain text. In formats
     other than plain text, it is often possible and suitable to avoid
     compatibility characters by using markup or other tools.
-  + not all compatibility characters have compatibility decompositions (e.g.
-    U+212B Å is such while U+00C5 Å is not even a compatibility character).
+  + not all compatibility characters have compatibility decompositions, of which
+    compatibility decomposition differs from its canonical decomposition.
+    e.g. U+212B Å is such while U+00C5 Å is not even a compatibility character.
     However, wider concept of compatibility character is basically just
     descriptive; rules and algorithms operate on the decompositions.
 
 Precomposed ligature are not recommended since most programs cannot properly
 treat them as their decomposed sequences. Instead, zero-width joiner and
 non-joiner should be used.
+
+*** Normalization
+
+Some forms are defined as /normal forms/ and other forms can be converted to
+them. processing of data becomes easier if the variation is reduced.
+
+- /Normalization/: deal with canonical and compatibility decompositions and
+  compositions, in contrast with /folding/.
+
+- /Normalization Forms/:
+  + NF + D (Canonical Decomposition)/C (canonical Composition)/KD (Compatibility decomposition)/KC
+    (compatibility decomposition, canonical composition). Here composition
+    implies prior decomposition to ensure a uniform manner of diacritic handling.
+  + No normalization form performs any "compatibility composition."
+  + Normalization Form C (NFC) is favored as the basic form by W3C.
+
+Strings consisting of Basic Latin characters only are not changed in any
+normalization.
+
+**** NFC
+
+- /Starter/: a character of combining class 0
+
+- /Blocked/: a character C is blocked from the starter S if there is another
+  character B between them such that B is starter or has a combining class value
+  higher than C.
+
+- /Primary composite/: a character is a /primary composite/ if it has a
+  canonical mapping not is not explicitly excluded from composition (Common
+  Exclusion property).
+
+Procedure:
+
+1. Construct the canonical decomposition of the string with consecutive
+   nonspacing marks reordered.
+
+2. Process the result by successively composing each character with the nearest
+   preceding starter if not blocked from it.
 
 ** Terminology
 
