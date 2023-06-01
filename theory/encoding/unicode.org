@@ -328,6 +328,36 @@ Procedure:
 2. Process the result by successively composing each character with the nearest
    preceding starter if not blocked from it.
 
+*** Sorting and Collation
+
+- /Collating order/: the order by which sorting of character data takes place.
+  + language-dependent and may vary even within a language, depends on a
+    /locale/, defined in a cultural environment: *Common Locale Data Repository*
+    (CLDR).
+  + Collating order should meet user expectations.
+  + the modern approach to collation is based on a layered model, where each
+    layer may modify or replace the rules set on lower layers.
+    - application-specific; company-specific; locale-specific; rule common to
+      manyu locales by tradition; universal default rules
+
+Unicode itself does not define collation. Using code point order as collating
+order is unnatural and impractical.
+
+**** Unicode Collation Algorithm
+
+- Multilevel comparison
+  + alphabetic ordering
+  + diacritic ordering
+  + case ordering: lowercase precedes uppercase
+
+UCA is described as an algorithm that takes as input a string and a *Collation
+Element Table*, which contains mapping data for characters, and outputs a sort
+key.
+
+- *Collation Element Table*: maps characters (code points) to collation
+  elements, a sequence of three or more weights in the order of levels and priority.
+
+
 ** Terminology
 
 - /Text element/: a sequence of characters treated as a unit in some processing
