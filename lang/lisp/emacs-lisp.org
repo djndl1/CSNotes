@@ -79,6 +79,25 @@ A symbol bound to a function definition.
 ;; Emacs unexpectedly moves the point around when executing certain functions
 #+end_src
 
+** Control Structures
+
+*** [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Conditionals.html][Sequencing]]
+
+- =(progn)= special form: similar to a C block. A function body and many other
+  forms are implicit =progn=​s.
+
+- =(prog1)=, =(prog2)=: similar to =progn= but returns value of the first/second form.
+
+*** [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Conditionals.html][Conditionals]]
+
+- =if=: the original special form; if not selected, that branch is not
+  evaluated, hence a special form.
+  + =when= (macro of if) a variant that executes a sequence of then-forms without the
+  else-form
+  + =unless=: the opposite of =when=
+
+- =cond= (special form): chooses among an arbitrary number of alternatives. Only
+  the first true branch is evaluated. Add a true clause to the end to implement the default branch.
 
 * Common Functions
 
