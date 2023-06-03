@@ -1,0 +1,104 @@
+#+title: Emacs Lisp
+
+* List
+
+In Lisp, both data and programs are represented the same way; that is, they are both lists of words, numbers, or other lists, separated by whitespace and surrounded by parentheses.
+
+#+begin_src elisp
+'(rose violet diasy buttercup)
+(+ 1 2)
+
+'(this list has (a list inside of it))
+#+end_src
+
+- /atom/: certain atoms such as arrays are divisible; the atoms of a list are
+  not.
+  + numbers, string, symbols: Lisp programming is mostly about symbols (and
+    sometimes numbers) within lists.
+  + a function name symbol is not the function itself, but a way to locate the
+    function definition.
+
+- /s(ymbolic)-expression/: the printed representation of both atoms and lists or
+  its internal representation.
+
+- =quote=, ='=: do nothing with the lists; otherwise evaluate the list with the
+  first symbol as a function.
+
+* Evaluation
+
+Evaluating a symbolic expression most commonly causes the Lisp interpreter to
+return a value and perhaps carry out a side effect; or else produce an error.
+
+- quote: if a list is not quoted, it is evaluated.
+
+- a symbol out of any parentheses is treated as a variable.
+
+- there are special forms and macros.
+
+- if a part of a list is not a special form, then the interpreter tries
+  evaluating it as a list. Inner lists are evaluated before the outer ones.
+
+* Variables
+
+A symbol with a value attached to it.
+
+#+begin_src elisp
+(set 'flowers '(rose violet daisy buttercup)) ; bind the list to the symbol flowers
+(setq flowers '(rose violet daisy buttercup))
+(setq a 1
+      b 2) ;; used with multiple variables
+#+end_src
+
+* Functions and Special Forms
+
+A symbol bound to a function definition.
+
+#+begin_src elisp
+(defun func-name(argument-list)
+  "mydocs"
+  ;(interactive) ; interactive has an argument that specifies how the user may specify the arguments
+  body)
+
+;; let speical form
+;; creates a name for a local variable
+;; that overshadows any us of the same name
+;; outside of the let expresion
+(let ((variable value)
+      variable ; default initial value `nil`
+      …)
+  body…)
+
+;; if special form
+(if predicate-exp
+    action-body-when-true
+  [else-action])
+
+;; save-excursion
+;; saves the location of point and restores this position after the code
+;; within the body of the special form is evaluated by the Lisp interpreter.
+;; Emacs unexpectedly moves the point around when executing certain functions
+#+end_src
+
+
+* Common Functions
+
+** Buffer
+
+- =(buffer-name)=, =(buffer-file-name)=
+
+- =(current-buffer)=, =(other-buffer)=: real buffer objects
+
+- =(switch-to-buffer)= (for humans and for computers); =(set-buffer)= (for
+  computers only)
+
+- =(buffer-size)=, =(point)=, =(point-min)=, =(point-max)=
+
+** Equality
+
+- =<=, =>=, =<==, =>==, ===: numbers or markers
+
+- =eq=: identity test
+
+- =equal=: content test
+
+- =string<=, =string-lessp=, =string-equal=, =string==: for strings or symbols
