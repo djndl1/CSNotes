@@ -99,8 +99,15 @@ A symbol bound to a function definition.
 - =cond= (special form): chooses among an arbitrary number of alternatives. Only
   the first true branch is evaluated. Add a true clause to the end to implement the default branch.
 
-* Common Functions
+* Common Functions, Special Forms and Macros
 
+** Boolean Logic
+
+- =not=, =null= (F.): completely the same but with different semantics in name
+
+- =and=, =or= (SF.): short-circuit
+
+- =xor= (F.): both arguments are always evaluated
 ** Buffer
 
 - =(buffer-name)=, =(buffer-file-name)=
