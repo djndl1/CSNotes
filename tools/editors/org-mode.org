@@ -1,0 +1,66 @@
+#+title: Org Mode
+#+author: djndl1
+
+* Layout and Structures
+
+** Headlines
+
+Headlines start with stars or indents combined with a single star. =org-num-mode= displays outline numbering on top of headlines.
+
+#+begin_src org
+,* Top level headline             |    * Top level headline
+,** Second level                 |      * Second level
+,*** Third level                |        * Third level
+some text                  |          some text
+**,* Third level                |        * Third level
+more text                  |          more text
+,* Another top level headline     |    * Another top level headline
+#+end_src
+
+** Org Cycle (Folding)
+
+- =org-cycle= :: rotate current subtree among the states
+
+- =org-global-cycle= :: rotate the entire buffer among the states
+
+- =org-show-all= ::
+
+- =org-reveal= ::
+
+- =org-show-children= ::
+
+** Motion
+
+- =org-next-visible-heading=, =org-previous-visible-heading= ::
+
+- =org-forward-heading-same-level=, =org-backward-heading-same-level= ::
+
+- =outline-up-heading= ::
+
+- =org-goto= ::
+
+** Editing
+
+- =org-meta-return= :: the exact operation depends on the context
+
+- =org-narrow-to-subtree= ::
+
+- =org-copy-subtree=; =org-paste-subtree=, =org-cut-subtree=,  =org-mark-subtree=; =org-yank= ::
+
+- =org-do-promote=, =org-do-demote=; =org-promote-subtree=, =org-demote-subtree=  ::
+
+** Lists
+
+Items belonging to the same list must have the same indentation on the first
+line. An item ends before the next line that is less or equally indented than
+its bullet/number. It also ends before two blank lines.
+Indentation is what governs the structure of lists: blocks and text can be indented to indicate that they belong to a certain item.
+
+** Drawers
+
+Stores meta information or info that the author does not intend to store in the
+main article.
+
+** Sparse Trees
+
+- =org-sparse-tree= :: selectively show certain trees.
