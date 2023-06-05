@@ -1,5 +1,68 @@
 #+title: Org Mode
 #+author: djndl1
+#+OPTIONS: ^:{}
+
+* Rich Text
+
+Paragraphs are separated by at least one empty line. A line break can be forced
+with =\\=.
+
+To write literal text
+
+#+begin_verse
+This paragraph should be
+now complete literal.
+#+end_verse
+
+#+begin_quote
+My Quote
+#+end_quote
+
+#+begin_center
+Centered Text
+#+end_center
+
+#+begin_example
+Example blocks are typeset in monospace.
+#+end_example
+
+=*=, =#+= must be prefixed with a =,= in the blocks above to avoid conflicts.
+Example block and source code blocks can be used with a =-n= number switch.
+
+
+=^= and =_= are used to indicate superscripts and subscripts (along with ={}=
+as in LaTeX). These behaviors may get in the way. Use =OPTIONS: ^:{}= to limit
+them only to the LaTeX-style notation or simply use LaTeX.
+
+Special symbols can be inserted using LaTeX-like syntax. See [[elisp:org-entities-help][org-entities-help]].
+
+=-----= is exported as a horizontal line.
+
+** LaTeX
+
+LaTex fragments can be inserted without special marking as long as they are
+enclosed with =\begin= and =\end=. Inline math can be inserted with
+=$=​/​=\(...\)= or =$$=​/​=\[...\]=.
+
+\begin{equation}
+a = b
+\end{equation}
+
+** Images
+
+a link to an image file, probably with a caption and a name.
+
+** Captions
+
+Used with a table, a source block, an image and many others.
+
+** Footnotes[fn:foo]
+
+org-mode can have footnotes.
+
+[fn:foo] https://orgmode.org/manual/Creating-Footnotes.html
+
+
 
 * Layout and Structures
 
@@ -114,10 +177,10 @@ spreadsheet-like capabilities with elisp or =Calc= expressions.
 Plot org tables graphically using Gnuplot or in ASCII art.
 
 * Links
-#+NAME: LinkSection
 :PROPERTIES:
 :CUSTOM_ID: links_section
 :END:
+#+NAME: LinkSection
 <<links_target>>
 
 
