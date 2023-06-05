@@ -112,3 +112,44 @@ spreadsheet-like capabilities with elisp or =Calc= expressions.
 ** Plotting
 
 Plot org tables graphically using Gnuplot or in ASCII art.
+
+* Links
+#+NAME: LinkSection
+:PROPERTIES:
+:CUSTOM_ID: links_section
+:END:
+<<links_target>>
+
+
+
+#+begin_src org
+[[LINK][DESCRIPTION]]
+# or
+[[LINK]]
+#+end_src
+
+=[=, =]=, at some =\= needs to be escaped. Use the =org-link-escape= function to
+escape a link. Edit the link part with =org-insert-link=.
+
+A link may be
+  + /External Link/: [[https://orgmode.org/manual/External-Links.html][many schemes]] are supported.
+  + /internal link/ that refers to [[*Links][somewhere in the current document]].
+  [[*Links][Links Section]]
+  [[#links_section][Links Section By ID]]
+  [[links_target][Links by dedicated target]]
+  [[LinkSection][Link Section by name]]
+
+  Links are created for <<<radio targets>>>. See radio targets.
+
+Link abbreviation can be defined with =+LINK:=.
+
+- =org-store-link= :: save the current point as a link to a =org-stored-link= to
+  be used later with =org-insert-link=.
+
+- =org-mark-ring-push= ::
+
+- =org-mark-ring-goto= :: go backup the a recorded position
+
+- =org-open-at-point= :: open link at point
+
+- =org-next/previous-link= ::
