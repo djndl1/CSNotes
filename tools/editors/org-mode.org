@@ -64,3 +64,51 @@ main article.
 ** Sparse Trees
 
 - =org-sparse-tree= :: selectively show certain trees.
+
+* Tables
+
+Org-mode has a built-in table editor.
+
+A table is re-aligned automatically each time =TAB=, =RET= or =C-c C-c= is
+pressed inside the table.
+
+** Operations
+
+- =org-table-create-or-convert-from-region= :: convert CSV text to a table or
+  create a new one.
+
+- =org-table-align= ::
+
+- =org-table-blank-field= :: clear the field
+
+- =org-table-move-left/right=, =org-table-beginning/end-of-field=,  =org-table-move-row-up/down= ::
+
+- =org-table-delete/insert-column=, =org-table-kill/insert-row= ::
+
+- =org-table-edit-field= :: edit the current field in a separate window
+
+- =org-table-import/export= :: import/export CSV-like (tab mostly) files
+
+- =org-table-toggle-column-width=, =org-table-shrink/expand= ::
+
+- =/=, =<=, =>= :: group columns and show vertical lines
+
+** Spreadsheet Calculations
+
+The table editor makes use of the Emacs Calc package to implement
+spreadsheet-like capabilities with elisp or =Calc= expressions.
+
+*** References
+
+- =@Row$Column= :: Field reference
+  + may be absolute or relative
+
+- =REF..REF= :: range reference
+
+- =$name= :: named reference
+
+- =remote(NAME, REF)= :: references in another table
+
+** Plotting
+
+Plot org tables graphically using Gnuplot or in ASCII art.
