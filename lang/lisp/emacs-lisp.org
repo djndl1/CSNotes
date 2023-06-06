@@ -138,6 +138,106 @@ A symbol bound to a function definition.
 
 - =(buffer-size)=, =(point)=, =(point-min)=, =(point-max)=
 
+- =(with-current-buffer)=: in place of =save-excursion= and =set-buffer=
+  combined.
+
+- =(erase-buffer)=
+
+*** Moving Around
+
+- =(beginning-of-buffer)=, =(end-of-buffer)=: save mark at the point and go to the beginning/end of the
+  buffer
+
+#+begin_src elisp
+(defun simplified-beginning-of-buffer ()
+  "Move point to the beginning of the buffer;
+leave mark at previous position."
+  (interactive)
+  (push-mark)
+  (goto-char (point-min)))
+
+(defun mark-whole-buffer ()
+  "Put point at beginning and mark at end of buffer.
+You probably should not use this function in Lisp programs;
+it is usually a mistake for a Lisp function to use any subroutine
+that uses or sets the mark."
+  (interactive)
+  (push-mark (point))
+  (push-mark (point-max) nil t)
+  (goto-char (point-min)))
+
+
+
+(defun append-to-buffer (buffer start end)
+  "Append to specified buffer the text of the region.
+It is inserted into that buffer before its point.
+
+
+When calling from a program, give three arguments:
+BUFFER (or buffer name), START and END.
+START and END specify the portion of the current buffer to be copied."
+  (interactive
+   (list (read-buffer "Append to buffer: " (other-buffer
+                                            (current-buffer) t)) ; use other visible buffer if no one is specified
+         (region-beginning) (region-end)))
+  (let ((oldbuf (current-buffer)))
+    (save-excursion
+      (let* ((append-to (get-buffer-create buffer)) ; * sets each variable in sequence
+             (windows (get-buffer-window-list append-to t t))
+             point)
+        (set-buffer append-to) ; make this buffer the one to operate on
+        (setq point (point))
+        (barf-if-buffer-read-only)
+        (insert-buffer-substring oldbuf start end)
+        (dolist (window windows) ; move all points to the point after insertion
+          (when (= (window-point window) point)
+            (set-window-point window (point)))))))) ;
+;; insert-buffer
+  (push-mark
+   (save-excursion
+     (insert-buffer-substring (get-buffer buffer))
+     (point)))
+
+   nil
+
+;; beginning-of-buffer definition
+
+
+(defun beginning-of-buffer (&optional arg)
+  "Move point to the beginning of the buffer;
+leave mark at previous position.
+With \\[universal-argument] prefix,
+do not set mark at previous position.
+With numeric arg N,
+put point N/10 of the way from the beginning.
+
+If the buffer is narrowed,
+this command uses the beginning and size
+of the accessible part of the buffer.
+
+
+Don't use this command in Lisp programs!
+\(goto-char (point-min)) is faster
+and avoids clobbering the mark."
+  (interactive "P") ; a raw prefix argument
+  (or (consp arg) ; a pure C-u passes a (4)
+      (and transient-mark-mode mark-active)
+      (push-mark))
+
+  (let ((size (- (point-max) (point-min))))
+    (goto-char (if (and arg (not (consp arg)))
+                   (+ (point-min)
+                      (if (> size 10000)
+                          ;; Avoid overflow for large buffer sizes!
+                          (* (prefix-numeric-value arg) ; convert the raw prefix to a number
+                             (/ size 10))
+                        (/ (+ 10 (* size (prefix-numeric-value arg)))
+                           10))) ;; avoid precision error and better locate the target line
+                 (point-min))))
+  (if (and arg (not (consp arg))) (forward-line 1)))
+#+end_src
+
+
 ** Equality
 
 - =<=, =>=, =<==, =>==, ===: numbers or markers
