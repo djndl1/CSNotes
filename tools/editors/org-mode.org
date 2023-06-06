@@ -1,6 +1,7 @@
 #+title: Org Mode
 #+author: djndl1
 #+OPTIONS: ^:{}
+#+FILETAGS: :org:orgmode:org-mode:
 
 * Rich Text
 
@@ -216,3 +217,50 @@ Link abbreviation can be defined with =+LINK:=.
 - =org-open-at-point= :: open link at point
 
 - =org-next/previous-link= ::
+
+* Tags :tag:
+
+Used to implement labels and contexts for cross-correlating information.
+Tags occur at the end of the headlines.
+
+Tags are inherited by subtrees by default.
+
+- =org-set-tags-command= ::
+
+A file can have tags by setting =#+FILETAGS:=.
+
+Tags can be defined in hierarchies. A tag can be defined as a group tag for a
+set of other tags.
+
+** Search
+
+- =org-match-sparse-tree= :: narrow to a sparse tree of headlines matching the
+  tag
+
+* Properties
+:PROPERTIES:
+:CUSTOM_ID: property_section
+:END:
+
+A key-value pair associated with an entry or the whole buffer. Used as a tag with a value or a
+simple database.
+
+Properties are inserted into a special drawer =:PROPERTIES:= located right below
+a headline or =#+PROPERTY: propertyName propertyValue= with the whole buffer.
+
+A property may or may be be inherited by its subtree depending on =org-use-property-inheritance=.
+The allowed values of a property can be defined with =:propertyName_ALL: value1
+value2 value3=. Use =propertyName+= to add values to an existing property.
+
+** Search
+
+- =org-match-sparse-tree= ::
+
+- =org-sparse-tree= ::
+
+** Editing
+
+- =org-columns= ::
+
+- =org-columns-quit= ::
+
