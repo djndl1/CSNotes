@@ -238,6 +238,33 @@ and avoids clobbering the mark."
 #+end_src
 
 
+*** Narrowing and Widening
+
+Narrowing is as useful to the Lisp interpreter as to a human. A lisp function
+may not be designed to work on part of a buffer, narrowing can make it happen.
+
+- =(save-restriction)=: save and restore whatever narrowing that is in effect.
+  =(save-excursion)= should be called at the location where the cursor can be
+  restored under the same narrowing.
+
+#+begin_src elisp
+(defun what-line ()
+  "Print the current line number (in the buffer) of point."
+  (interactive)
+  (save-restriction
+    (widen)
+    (save-excursion
+      (beginning-of-line)
+      (message "Line %d"
+               (1+ (count-lines 1 (point))))))) ; number of line between 1 and the current point plus the current line
+
+(defun show-first-n (n)
+  (save-restriction
+    (widen)
+    (message (buffer-substring 1 n))))
+(show-first-n 60)
+#+end_src
+
 ** Equality
 
 - =<=, =>=, =<==, =>==, ===: numbers or markers
