@@ -24,6 +24,17 @@ In Lisp, both data and programs are represented the same way; that is, they are 
 - =quote=, ='=: do nothing with the lists; otherwise evaluate the list with the
   first symbol as a function.
 
+** [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Cons-Cells.html][Cons Cell and List]]
+
+An ordered pair of two objects =(car . cdr)=, also called /dotted pair/;
+
+- /proper list/: a series of cons cells
+  chained together, in which the =cdr= of a cons points to the next cons cell
+  while the =car= holds an element, with the =cdr= last cons cell in the list
+  being =nil=, that is, a series of pairs of pointers.
+
+- /dotted list/: a list whose last =cdr= is not =nil=. e.g. circular list
+
 * Evaluation
 
 Evaluating a symbolic expression most commonly causes the Lisp interpreter to
@@ -100,6 +111,14 @@ A symbol bound to a function definition.
   the first true branch is evaluated. Add a true clause to the end to implement the default branch.
 
 * Common Functions, Special Forms and Macros
+
+** Lists
+
+- =nthcdr=: repeatedly takes the =cdr= of a list
+
+- =nth=: repeated takes the =car= of a list, i.e. the nth element (zero-based).
+
+- =setcar=, =setcdr=: in-place modification
 
 ** Boolean Logic
 
