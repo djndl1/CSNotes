@@ -64,12 +64,13 @@ org-mode can have footnotes.
 [fn:foo] https://orgmode.org/manual/Creating-Footnotes.html
 
 
-
 * Layout and Structures
-
 ** Headlines
 
-Headlines start with stars or indents combined with a single star. =org-num-mode= displays outline numbering on top of headlines.
+Headlines start with stars or indents combined with a single star.
+=org-num-mode= displays outline numbering on top of headlines.
+
+A headline named with =org-footnote-section= is treated as a subtree of footnotes.
 
 #+begin_src org
 ,* Top level headline             |    * Top level headline
@@ -81,11 +82,20 @@ more text                  |          more text
 ,* Another top level headline     |    * Another top level headline
 #+end_src
 
+#+RESULTS:
+: * Top level headline             |    * Top level headline
+: ** Second level                 |      * Second level
+: *** Third level                |        * Third level
+: some text                  |          some text
+: **,* Third level                |        * Third level
+: more text                  |          more text
+: * Another top level headline     |    * Another top level headline
+
 ** Org Cycle (Folding)
 
-- =org-cycle= :: rotate current subtree among the states
+- =org-cycle= :: rotate the current subtree among the states, can be used with =C-u=.
 
-- =org-global-cycle= :: rotate the entire buffer among the states
+- =org-global-cycle=, =org-shifttab= :: rotate the entire buffer among the states
 
 - =org-show-all= ::
 
