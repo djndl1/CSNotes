@@ -1,0 +1,8 @@
+#+title: Todo
+
+* Reading
+
+** Emacs Lisp
+
+*** TODO [[https://www.gnu.org/software/emacs/manual/html_mono/eintr.html#Cutting-_0026-Storing-Text][Cutting and Storing Text]]
+SCHEDULED:  <2023-06-08 四>
