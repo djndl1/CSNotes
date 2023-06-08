@@ -103,6 +103,8 @@ more text                  |          more text
 
 - =org-show-children= ::
 
+- =org-move-item-up/down= ::
+
 ** Motion
 
 - =org-next-visible-heading=, =org-previous-visible-heading= ::
@@ -121,7 +123,21 @@ more text                  |          more text
 
 - =org-copy-subtree=; =org-paste-subtree=, =org-cut-subtree=,  =org-mark-subtree=; =org-yank= ::
 
-- =org-do-promote=, =org-do-demote=; =org-promote-subtree=, =org-demote-subtree=  ::
+- =org-do-promote=, =org-do-demote=; =org-promote-subtree=,  =org-demote-subtree= ::
+
+- =M-TAB= :: org-mode completion
+  + TeX symbols
+  + Tags, property after a =:=
+  + After =#+=
+
+- =org-insert-structure-template= :: insert block structures
+
+- =C-c C-c= :: heavily-overloaded
+  + realign tables
+  + renumber the ordered list
+  + toggle a checkbox
+  + switch between a footnote reference and its definition
+  
 
 ** Lists
 
@@ -274,3 +290,14 @@ value2 value3=. Use =propertyName+= to add values to an existing property.
 
 - =org-columns-quit= ::
 
+* In-Buffer Settings
+
+#+begin_src org
+,#+CATEGORY:  # agenda file category
+,#+CONSTANTS: n=v # define variables
+,#+FILETAGS: :tag1:tag2:tag3: # file-local tags inherited by all entries
+,#+PROPERTY: propName propValue # a default inheritance value for entries in the current buffer
+,#+SETUPFILE: file # a URL or a path to a file for additional in-buffer settings
+,#+STARTUP: #startup options
+,#+TAGS: TAG1(c1) TAG2(c2) # tags available
+#+end_src
