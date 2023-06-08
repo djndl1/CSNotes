@@ -2,7 +2,7 @@
 
 * Hello World
 
-#+include: "gtk_c/helloworld.c" src C
+#+include: "../GUITutorials/GTK/gtk_c/src/helloworld.c" src C
 
 =gtk_init()= to initialize GTK, before any other GTK+ function, not needed when using =GtkApplication=. Use =gtk_init_check()= if a textual interface is available.
 
@@ -199,15 +199,15 @@ A recursive process of communication between the widget, its ancestors and its c
 
 - =GtkBox=: an abstract container widget that allows multiple children to be packed into one-dimensional rectangular area.
 
-#+include: "gtk_c/gtkbox.c" src C
+#+include: "../GUITutorials/GTK/gtk_c/src/gtkbox.c" src C
 
 - =GtkPaned=: holds exactly two widgets
 
-#+include "gtk_c/panes.c" src C
+#+include "../GUITutorials/GTK/gtk_c/src/panes.c" src C
 
 - =GtkGrid=:
 
-#+include "gtk_c/tables.c" src C
+#+include "../GUITutorials/GTK/gtk_c/src/tables.c" src C
 
 - =GtkFixed=: a type of layout container that allows you to place widgets by the pixel. Use variable-sized containers instead of `GtkFixed`.
 
@@ -258,13 +258,13 @@ A special type of =GtkWindow= that is used to supplement the top-level window. I
 
 A dialog widget has a horizontal separator, which divides the widget into the /action area/ (=GtkHButtonBox=) that contains a collection of buttons and the top main part, which is a =GtkVBox=.
 
-#+include: "gtk_c/SimpleDialog.c" src C
+#+include: "../GUITutorials/GTK/gtk_c/src/SimpleDialog.c" src C
 
 ** Built-in Dialogs
 
 - =GtkMessageDialog=: give one of four types of informational messages: general information, error messages, warnings and questions.
 
-#+include "gtk_c/MessageDialog.c" src C
+#+include "../GUITutorials/GTK/gtk_c/src/MessageDialog.c" src C
 
 - =GtkAboutDialog=
 
@@ -312,7 +312,7 @@ Text in GTK is in UTF-8. One character can be encoded as multiple bytes:
   + /offset/: character counts
   + /indexes/: byte counts
 
-#+include "src/textview2.c" src C
+#+include "../GUITutorials/GTK/gtk_c/src/textview2.c" src C
 
 - =GtkTextIter=: a position between two characters in a buffer for text manipulation, a struct designed to be allocated on the stack, copiable by value. Whenever the buffer is modified in a way that affects the number of characters in the buffer, all outstanding iterators become invalid.
 

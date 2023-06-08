@@ -207,7 +207,7 @@ TODO
 
 Methods that are called at certain interval time until =FALSE= is returned.
 
-#+include "gtk_c/timeouts.c" src
+#+include "../GUITutorials/GTK/gtk_c/src/timeouts.c" src c
 
 * Idle Functions
 

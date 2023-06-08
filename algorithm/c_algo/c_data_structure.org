@@ -67,10 +67,21 @@ methods, techniques, and tools to organize or structure data in computer memory.
   + typical operations includes creation of data structure, insertion, deletion
     of a data item, traversing, searching, sorting, merging of two different
     sorted lists into a single sorted one
+  + e.g. lists, sets, graphs
 
-** Array and String
+** Lists
 
-*** Array
+A finite number of ordered values.
+
+- operations:
+  + search: find the position of the first occurrence of an item
+  + insert
+  + delete
+  + find_kth: access by index
+
+*** Array and String
+
+**** Array
 
 A collection of the same type of data items stored in consecutive memory
 locations.
@@ -79,7 +90,7 @@ Multi-dimensional arrays are just arrays of arrays (not arrays of pointers, but
 pointer to array =data_type (*p)[size]=),
 implemented in C in the row-major order, i.e. elements are stored row by row.
 
-**** Operations
+***** Operations
 
 - /traversing/: linear traversal
 
@@ -94,13 +105,13 @@ implemented in C in the row-major order, i.e. elements are stored row by row.
   process and move all elements into the new array.
   + $O(n)$ time-complexity
 
-**** Applications
+***** Applications
 
 - implementation of vectors, matrices (including sparse matrices), polynomials and different kinds of tables
 
 - also implements heaps, hash tables, deques, queues, stacks and strings
 
-***** Polynomial Examples
+****** Polynomial Examples
 
 - Linear array representation: index of the array as the exponent and the
   element as the coefficient of each term
@@ -108,7 +119,7 @@ implemented in C in the row-major order, i.e. elements are stored row by row.
 - array of structure representation: each term is represented by a structure of
   the exponent and the coefficient and all terms form an array.
 
-***** Sparse Matrices
+****** Sparse Matrices
 
 - /triangular matrices/: since the shape is regular, non-zero elements can be placed in
   a 1-D array in a specified order, typically at $i \times (i + 1) / 2 + j$ for
@@ -120,11 +131,11 @@ implemented in C in the row-major order, i.e. elements are stored row by row.
   $\alpha, \beta \geq 0$ and $i, j= 1 to n$.
   + an array of three-tuples
 
-**** String
+***** String
 
 In C, arrays of characters with a =\0= character.
 
-***** Operations
+****** Operations
 
 - length (=strlen=); copy =strcpy=; concatination =strcat=; comparison =strcmp=;
 
@@ -311,6 +322,16 @@ A tree of degree two at most.
 
 As in a linked list, a node contains the data item and two pointers that points
 to its left and right child.
+
+***** Traversal
+
+****** Depth-First Search
+
+- Left-Data-Right: inorder (infix)
+
+- Left-Right-Data: postorder (postfix)
+
+- Data-Left-Right: preorder (preorder)
 
 * Related Algorithms Theory
 

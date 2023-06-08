@@ -18,7 +18,7 @@
   );
 #+END_SRC
 
-#+INCLUDE: "win32/src/processes.cpp" src cpp
+#+INCLUDE: "../../OSCode/win32/lib/src/processes.cpp" src cpp
 
 A proess handle is more than just an identifier: it also contains security access rights. It is a channel through which a process is manipulated.
 
@@ -89,7 +89,7 @@ run it with =NULL= as the module handle of these functions.
   DWORD GetModuleFileNameExW(HANDLE  hProcess, HMODULE hModule, LPWSTR  lpFilename, DWORD   nSize); // PSAPI.DLL
 #+END_SRC
 
-#+INCLUDE: "win32/src/processes.cpp" src cpp
+#+INCLUDE: "../../OSCode/win32/lib/src/processes.cpp" src cpp
 
 * Process Termination
   :PROPERTIES:

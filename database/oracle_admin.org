@@ -461,7 +461,12 @@ Logical storage units of a database that group related logical structures
 - Password File: for authentication of users with =SYSDBA=, =SYSOPER= and
   =SYSBACKUP= privileges, even when the database is not started.
 
-- Backup files: copies of the database in some form used to recover the database.
+- Backup files: copies of the database in some form used to recover the
+  database.
+
+** Transporting Data
+
+
 
 * Users and Security
 
@@ -783,5 +788,5 @@ database called the /Automatic Diagnostic Repository/.
         + =cdump=: core files
         + =incident=: dumps pertaining to that incident
         + =trace=: process trace files, SQL trace files and text-formatted alert
-          log
+          logpp
         + others

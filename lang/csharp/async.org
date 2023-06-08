@@ -36,8 +36,6 @@ One mental model of an async operation is to think of it as a message that is pa
    :CUSTOM_ID: typical-usage
    :END:
 
-#+INCLUDE: "async/ProgramWithAPM.cs" src csharp
-
 1. Blocking execution by ending an async operation: the app cannot
    continue to do other work without getting the result of the async
    operation.
@@ -69,8 +67,6 @@ An asynchronous method
 may also support multiple pending calls (multiple concurrent invocations), allowing your code to call it any number of times before
 it completes other pending operations (/multiple-invocation/, which can
 be queried through an extra parameter =UserState=).
-
-#+INCLUDE: "async/ProgramWithEvents.cs" src csharp
 
 ** Basic Model
 
