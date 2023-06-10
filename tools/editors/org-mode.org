@@ -301,3 +301,10 @@ value2 value3=. Use =propertyName+= to add values to an existing property.
 ,#+STARTUP: #startup options
 ,#+TAGS: TAG1(c1) TAG2(c2) # tags available
 #+end_src
+
+
+* Include Files
+
+#+begin_src org
+#+INCLUDE: quoted_path_string [block_type] [source_code_lang]
+#+end_src
