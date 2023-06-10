@@ -317,6 +317,21 @@ are not marked done after one of them is done.
 
 - =.+duration= :: due based on the last time done.
 
+* Source Code (Org Babel)
+
+Source code blocks can be edited, extracted, exported, published and even
+compiled and executed. Emacs major modes are used for source code blocks.
+Org mode can pass variables, functions and results to one another using a common
+syntax.
+
+Typing =<s= and then pressing =TAB= generates a source code block.
+
+#+begin_src org
+my org mode block
+#+end_src
+
+An inline code block goes with a structure src_elisp{(+ 1 3)}
+
 * In-Buffer Settings
 
 #+begin_src org
