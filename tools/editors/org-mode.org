@@ -290,6 +290,33 @@ value2 value3=. Use =propertyName+= to add values to an existing property.
 
 - =org-columns-quit= ::
 
+** Refiling and Archiving
+
+Information needs to be moved around.
+
+- /refiling/ :: copy/cut some of the entries into a different list. The refiled item
+  is placed below the target heading as a subitem.
+  + =org-refile-targets= :: by default these targets are scanned.
+  + =org-refile= :: cut-refile
+  + =org-refile-copy= :: copy-refile
+  + =org-refile-goto-last-stored= ::
+
+- /archiving/ :: a finished subtree is moved into an archive file and is no longer in
+  the agenda.
+  + =#+ARCHIVE:= :: set the archive location
+  + =org-archive-subtree= ::
+
+** Scheduling and Deadlines
+
+*** Repeated Tasks
+
+A repeated =+duration= is added to the end of a timestamp. Multiple due tasks
+are not marked done after one of them is done.
+
+- =++duration= :: the next due date is always in the future.
+
+- =.+duration= :: due based on the last time done.
+
 * In-Buffer Settings
 
 #+begin_src org
