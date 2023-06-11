@@ -6,3 +6,13 @@
 
 *** TODO [[https://www.gnu.org/software/emacs/manual/html_mono/eintr.html#Cutting-_0026-Storing-Text][Cutting and Storing Text]]
 SCHEDULED:  <2023-06-08 四>
+
+* Next Action
+** TODO Learn about Orgzly
+* Projects
+** TODO Learn about PGP
+- [ ] PGP and OpenPGP Standard
+- [ ] GnuPG and its normal use/usage
+- [ ] Emacs and GnuPG Encryption
+** TODO Learn Cryptography
+- [ ] basic overview
