@@ -357,6 +357,10 @@ key.
 - *Collation Element Table*: maps characters (code points) to collation
   elements, a sequence of three or more weights in the order of levels and priority.
 
+*** Text Boundaries
+
+Unicode defines some rules for text boundaries, used mainly for text editing
+rather than advanced syntactic analysis.
 
 ** Terminology
 
