@@ -1,0 +1,35 @@
+#+PROPERTY: CUSTOM_ID 7a5dfa96-09ed-11ee-b017-43831de17439
+#+title: Zettelkasten Basics
+#+FILETAGS: :Zettlekasten:
+
+[[https://zettelkasten.de/posts/overview/][Methodology to organize personal knowledge]].
+
+* Main Ideas
+:PROPERTIES:
+:CUSTOM_ID: 56d3ac82-09f3-11ee-abfc-d36873b6e9c6
+:END:
+
+- *Hypertextual* :: connections among zettels (basic units of knowledge). Wikis
+  are hypertextual but each page is essentially an article, not a Zettel.
+
+- *Addressable* :: each Zettel should have an identifier. Books have chapters,
+  sections and pages but these do not indicate their content.
+
+- *Atomic* :: Zettle bodies should be transformed, organized units of knowledge
+  with context and relevance instead
+  of raw information dump. Make compromise between taking broad notes and the current
+  project. Byproducts are not waste but keep them out of the Zettels of the main course.
+
+* Implementation Issues
+:PROPERTIES:
+:CUSTOM_ID: 37660610-09f3-11ee-b0c2-b31a6cdb2f0d
+:END:
+
+** Structure
+
+Structure can be established by using /structure notes/: meta-notes about the
+relationships between Zettels, be it hierarchical or sequential or whatever.
+
+** Media
+
+For full text search, use software-agnostic tools and formats. Plain texts are preferred.
