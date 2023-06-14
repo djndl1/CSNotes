@@ -1,0 +1,35 @@
+#+title: [[https://www.orgroam.com/][Org Roam]]
+#+FILETAGS: :org-roam:
+
+* [[id:56d3ac82-09f3-11ee-abfc-d36873b6e9c6][Zettel]] Node in Org-roam
+:PROPERTIES:
+:ID: c6d7e55d-12d3-4bd2-9abf-e31a170fb6a0
+:CUSTOM_ID: c6d7e55d-12d3-4bd2-9abf-e31a170fb6a0
+:END:
+
+A node is any headline or top level file with an =ID= property (via
+=org-id-get-create=).
+
+Useful node properties
+
+- =:ROAM_EXCLUDE: t= :: excluded from org-roam's caching
+
+- =:ROAM_ALIASES: = :: an alias to the node in addition to the title.
+
+- =:ROAM_REFS: = :: a unique identifier other than the =ID= property
+
+* Org-roam Commands
+:PROPERTIES:
+:ID:       8b681681-40b2-4015-a365-3da4e5e4d6a4
+:CUSTOM_ID:     8b681681-40b2-4015-a365-3da4e5e4d6a4
+:END:
+
+- =org-roam-node-find= :: visit the node, create if none
+
+- =org-roam-node-insert= :: insert a link to the node, create if none
+
+- =org-roam-buffer-toggle= :: relationships buffer of the current node with
+  magit-section keybindings.
+
+- =org-roam-graph= :: generate a Graphviz image that depicts the
+  interconnections between nodes.

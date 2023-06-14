@@ -1,12 +1,12 @@
-#+PROPERTY: CUSTOM_ID 7a5dfa96-09ed-11ee-b017-43831de17439
 #+title: Zettelkasten Basics
 #+FILETAGS: :Zettlekasten:
 
 [[https://zettelkasten.de/posts/overview/][Methodology to organize personal knowledge]].
 
-* Main Ideas
+* Zettlekasten Main Ideas
 :PROPERTIES:
 :CUSTOM_ID: 56d3ac82-09f3-11ee-abfc-d36873b6e9c6
+:ID: 56d3ac82-09f3-11ee-abfc-d36873b6e9c6
 :END:
 
 - *Hypertextual* :: connections among zettels (basic units of knowledge). Wikis
@@ -23,6 +23,7 @@
 * Implementation Issues
 :PROPERTIES:
 :CUSTOM_ID: 37660610-09f3-11ee-b0c2-b31a6cdb2f0d
+:ID: 37660610-09f3-11ee-b0c2-b31a6cdb2f0d
 :END:
 
 ** Structure
