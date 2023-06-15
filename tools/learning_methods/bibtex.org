@@ -1,0 +1,24 @@
+#+title: Bibtex
+
+* BibTex
+:PROPERTIES:
+:ID:       3643a1ae-87e4-4e97-8141-e41b1e4511f6
+:END:
+
+** [[https://www.bibtex.org/Format/][File Format]]
+
+- =@STRING= :: define abbreviations
+
+- =@PREAMBLE= ::
+
+- =@COMMENT= ::
+
+- Reference Entries
+
+#+begin_src
+@article{ key,
+    tag1 = value1,
+    tag2 = value2,
+...
+}
+#+end_src

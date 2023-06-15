@@ -1,0 +1,36 @@
+#+title: Org Citation
+#+bibliography: ../../resources/root.bib
+
+* [[https://blog.tecosaur.com/tmio/2021-07-31-citations.html][org-cite]]
+:PROPERTIES:
+:ID:       c01ebe55-8fb7-4967-b6c0-d518c23ab2f1
+:END:
+
+Included in standard org-mode.
+
+** Basic Capabilities
+
+- Inserting and editing citations
+
+- Following citations
+
+- Fontification
+
+- Exporting citations
+
+** Architecture
+
+- =oc.el= :: the basic syntax and machinery
+
+- /Citation Processors/ :: external modules
+  + =basic= :: builtin
+  + =csl= :: =citeproc.el=
+
+** Usage
+
+Take this document as an example, I include the [[../../resources/root.bib]] file
+and cite [cite:@org-manual]. To print the bibliography, use =#+print_bibliography:=.
+
+* Bibliography
+
+#+print_bibliography: basic
