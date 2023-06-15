@@ -1,0 +1,52 @@
+#+title: [[https://vimium.github.io/][Vimium]]: Vim In the Browser
+
+* Vimium
+:PROPERTIES:
+:ID:       9508ba76-77fc-471e-9354-8c176436e617
+:END:
+
+** Commands
+
+- =?= :: help
+
+- =H=, =L= :: backward, forward in history
+
+- =J=, =K= :: left/right tab-move
+
+- =^= :: previous tab
+
+- =>>=, =<<= :: move tab
+
+- =v=, =V= :: visual mode, visual line mode
+
+- =t= :: new tab
+
+- =x=, =X= :: close/restore a tab
+
+- =o=, =O= :: open a page in the current/new tab
+
+- =b=, =B= :: open a bookmark
+
+- =f=, =F= :: open a link in the current tab
+
+- =r= :: reload
+
+- =i= :: enter insert mode to avoid Vimium commands until =ESC= is pressed
+
+- =yy= :: yank (copy) the current url
+
+- =yf= :: yank (copy)
+
+- =gf=, =gF= :: focus on frames
+
+- =gi= :: focus on input
+
+- =pattern\r= in find mode :: use Javascript regex
+
+- =T= :: search through open tabs
+
+** Issues
+
+- Use =about:blank= for new tab to avoid breaking Vimium UX.
+
+- The browser's extension page and page source pages disable all extensions.
