@@ -1,6 +1,7 @@
 #+title: Latex Basic
+#+bibliography: latex.bib
 
-* TeX Ecosystem
+* TeX Ecosystem[cite:@TeXLevels;@TeXOverview]
 :PROPERTIES:
 :ID:       8656b469-9d27-4966-88dd-9fdc8f2ed662
 :END:
@@ -14,14 +15,34 @@ primitives and commands.
 - the official implementation by Knuth is programmed in WEB, a mixture of TeX
   and a Pascal subset, converted to C with =web2c= sometimes.
 
+- *pdfTeX* :: generates pdf files as output; supports =.png=, =.jpg= and =.pdf= images
+  with no support for =.eps=.
+
+- *XeTeX* :: support for modern font technologies (OpenType, AAT, TrueType) and Unicode.
+
+- *LuaTeX* :: extend with Lua, rewritten in C and Lua.
+
 ** Extensions
 
 *** LaTeX
 
 a macro package written in TeX that provides high-level descriptive markup
-language. TeX in LaTeX mainly handles the layout while LaTeX handles the
+language with a standardized pacakge system. TeX in LaTeX mainly handles the layout while LaTeX handles the
 content. /Presentation/ is seperated from /content/.
 
+*** ConTeXt
+
+An easy interface to advanced typography features.
+
+*** AMSTeX
+
+An extension to Plain TeX with its legacy in AMS-LaTeX packages.
+
+** Distributions
+
+- [[https://miktex.org/][MiKTeX]] ::
+
+- [[https://tug.org/texlive/][TeX Live]] ::
 
 * LaTeX Outline
 :PROPERTIES:
