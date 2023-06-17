@@ -1,0 +1,49 @@
+#+title: Plain TeX
+#+bibliography: latex.bib
+
+* Plain TeX Document Fundamentals[cite:@StartWithPlainTeX]
+:PROPERTIES:
+:ID:       2cabd949-30b2-4d02-8717-c8d55a71f944
+:END:
+
+Unlike LaTeX, TeX requires does not requires an outline. It only requires a
+=\bye= to mark the end of the document.
+
+** Control Sequences
+
+Some characters have special purposes:  =^=, =_=, =%=, =~=, =#=, =&=, which must
+be prefixed with =\= when used literally.
+
+- =\= :: starts a control sequence, e.g. =\alpha=, =\it=
+
+- ={=, =}= :: for grouping, everything in between is regarded as a single unit.
+
+- =$= :: math mode
+
+** Normal Document
+
+- Paragraphs are separated by a blank line.
+
+- Normal EOLs are treated as blank spaces. Multiple blank spaces are collapsed
+  into one. Blank spaces at the beginning of end of a line are trimmed. Use =\ =
+  or even =\hskip=
+  to force a blank space.
+
+- Double quotes are represented by two
+  single quotes. The ="= and ='= quotes should not be used since TeX has no
+  knowledge of its direction (use =\lq= and =\rq=).
+
+- =\beginsection= followed by a section title produces a section heading.
+
+- font markup: =\rm=, =\sl=, =\it=, =\tt=, =\bf= set the global font. Use ={}=
+  to set the local font.
+
+- Accents can be produced with control sequences. (nowadays probably with Unicode).
+
+** Mathematics Mode
+
+Most control sequences are similar to those in LaTeX.
+
+- =$= for inline math and =$$= for displayed math
+
+- Use =\eqno= and =\leqno= to number equations
