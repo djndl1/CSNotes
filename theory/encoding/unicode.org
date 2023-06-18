@@ -249,6 +249,37 @@ interest to others, the Unicode coding space are structurally organized.
   characters outside the BMP in UTF-16 so that a surrogate code unit does not conflict with
   a real Unicode character in UTF-16.
 
+** Properties of Characters
+
+Character properties are normative, unlike informative character description,
+defined in an /exact/, /objective/ and /formalized/ manner. Character properties
+are not guaranteed to be stable. Properties can be /basic/ or /derived/ (from
+other properties)
+
+*** Property Values
+
+- /name/
+
+- /type/
+
+- /abbreviation/
+
+- /description of the meaning/
+
+- /status/:
+  + normative: the property, if implemented, must be used as specified in the
+    standard.
+  + informative: used as you like.
+
+*** Common Properties
+
+- /General Category/: a classification of Unicode characters, with a major class
+  and a subclass. e.g. Letter, uppercase; Mark, nonspacing; Punctuation,
+  connector;
+
+- /Common Exclusion/: the character is excluded from composition in
+  normalization due to certain reasons.
+
 *** Composition/Decomposition
 
 Unicode allows an unlimited number of combining diacritic marks combined with a
@@ -338,7 +369,7 @@ Procedure:
   + the modern approach to collation is based on a layered model, where each
     layer may modify or replace the rules set on lower layers.
     - application-specific; company-specific; locale-specific; rule common to
-      manyu locales by tradition; universal default rules
+      many locales by tradition; universal default rules
 
 Unicode itself does not define collation. Using code point order as collating
 order is unnatural and impractical.
