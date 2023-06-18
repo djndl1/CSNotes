@@ -1,0 +1,25 @@
+[
+	{
+		"id": "WZA6T2FP",
+		"type": "book",
+		"ISBN": "978-0-596-80502-9",
+		"language": "English",
+		"publisher": "O'Reilly",
+		"title": "DocBook 5.1: The Definitive Guide",
+		"URL": "https://tdg.docbook.org/tdg/5.1/",
+		"author": [
+			{
+				"literal": "Norman Walsh"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2020",
+					4,
+					26
+				]
+			]
+		}
+	}
+]

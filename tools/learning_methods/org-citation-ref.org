@@ -1,5 +1,6 @@
 #+title: Org Citation
-#+bibliography: ../../resources/root.bib
+#+bibliography: ../..//resources/root.bib
+#+cite_export: csl ../../resources/gb7714-2005-numeric.csl
 
 * [[https://blog.tecosaur.com/tmio/2021-07-31-citations.html][org-cite]]
 :PROPERTIES:
@@ -22,8 +23,9 @@ Included in standard org-mode.
 
 - =oc.el= :: the basic syntax and machinery
 
-- /Citation Processors/ :: external modules
+- /Citation Processors/ :: external modules, set by =#+cite_export:= or =org-cite-export-processors=.
   + =basic= :: builtin
+  + =biblatex=, =natbib= :: Biber and natbib, only for LaTeX
   + =csl= :: =citeproc.el=
 
 ** Usage
@@ -31,6 +33,17 @@ Included in standard org-mode.
 Take this document as an example, I include the [[../../resources/root.bib]] file
 and cite [cite:@org-manual]. To print the bibliography, use =#+print_bibliography:=.
 
+
+* [[https://citationstyles.org/][Citation Style Language]]
+
+** [[https://github.com/citation-style-language/schema][CSL Schema]]
+
+- [[https://citeproc-js.readthedocs.io/en/latest/csl-json/markup.html][CSL-JSON]]
+
+** [[https://github.com/andras-simonyi/citeproc-el][citeproc.el]]
+
+Supports CSL-JSON, Bib(La)TeX and org-bibtex formats for bibliographic information.
+
 * Bibliography
 
-#+print_bibliography: basic
+#+print_bibliography:
