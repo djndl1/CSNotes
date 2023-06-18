@@ -1,0 +1,15 @@
+#+title: Gnulib
+
+* libunistring: Unicode string functions
+
+** Character Coding Conversion
+
+- =u8_uctomb(-aux)= (unicode to UTF-8 multibyte): encode a Unicode code point in a UTF-8 sequence.
+  + the code follows the UTF-8 encoding process that first determines the
+     number of bytes and then encodes in the corresponding format by working
+    from the least significant digits.
+    from .
+  + code points not encodable by UTF-16 (surrogates, from =0xD800= to =0xDFFF=,
+    which are always used in pairs) and thus Unicode are excluded.
+  + the fallthrough in the switch statement somehow manages to properly prefixes
+    the first byte.
