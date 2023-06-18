@@ -1,9 +1,12 @@
 #+title: Bibtex
+#+bibliography: bibtex.bib
 
-* BibTex
+* [[https://tug.org/bibtex/][BibTex]]
 :PROPERTIES:
 :ID:       3643a1ae-87e4-4e97-8141-e41b1e4511f6
 :END:
+
+The ultimate reference is BIBTEXing [cite:@BibTeXing].
 
 ** [[https://www.bibtex.org/Format/][File Format]]
 
@@ -13,12 +16,42 @@
 
 - =@COMMENT= ::
 
-- Reference Entries
+- Reference Entries :: Various referenced materials
 
-#+begin_src
-@article{ key,
-    tag1 = value1,
-    tag2 = value2,
-...
-}
-#+end_src
+  #+begin_src
+  @article{ key,
+      tag1 = value1,
+      tag2 = value2,
+  ...
+  }
+  #+end_src
+
+** [[https://www.bibtex.com/e/entry-types/][Entry Types]]
+
+- *articles* :: article from a journal, magazine, newspaper or periodical
+
+- *book* :: a book with the publisher
+
+- *booklet* ::
+
+- *inbook* :: a part of a book
+
+- *incollection* :: a titled section of a book that is a collection of similar material.
+
+- *conference*, *inproceedings* :: a paper published in conference proceedings.
+
+- *manual* :: a techincal manual for a machine
+
+- *techreport* :: an institutionally published report.
+
+- *unpublished* :: paper draft or manuscript
+
+- *mastersthesis* :: A master's thesis
+
+- *phdthesis* :: a PhD thesis
+
+- *misc* :: everythin else
+
+* Bibliography
+
+#+print_bibliography: basic
