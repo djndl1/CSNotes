@@ -158,3 +158,30 @@ This is false
 =\empty= and =\relax= do nothing and are used to separate control sequences to
 avoid undesired behaviors.
 
+* TeX Characters
+:PROPERTIES:
+:ID:       b27630e1-70d1-473a-9d4e-28a3cda07cfe
+:END:
+
+- =\char{charcode}= ::
+
+- =\chardef=, =\mathchardef= :: defines control sequences to expand to expand to
+  a character.
+
+* TeX Macros
+:PROPERTIES:
+:ID:       abc62116-60cb-4f51-991a-9313a3175338
+:END:
+
+Macro definitions can be global (=\global=) or local (default).
+
+- =\def<macroname>#1<sep1>#2<sep2>{macro content, use of argument #1, blah, #2
+  ...}=
+  + pay attention to the final separator, otherwise only only the shortest
+    possible input sequence will be matched as the parameter.
+
+- =\edef=: expand at point without being executed.
+
+- =\long= allow multi-paragraph arguments.
+
+TODO
