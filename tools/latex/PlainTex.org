@@ -75,3 +75,51 @@ Most control sequences are similar to those in LaTeX.
   + Lengths are defined in terms of /units/, e.g. =pt= (default), =mm=, =cm=,
     =in= etc.
 
+* TeX Registers (Typed Variables)
+:PROPERTIES:
+:ID:       c92c28d2-e3ec-4020-9ed2-ea7c54e9c720
+:END:
+
+Registers range from 0 to 255. Some registers are reserved for the TeX engine.
+
+** (Data) Types
+
+- *box* :: an object for printing, e.g. letters, paragraphs, pages.
+
+- *count* :: an integer
+
+- *dimen* :: holding a length
+
+- *skip*, *muskip* :: glue (certain amount of space put between boxes)
+
+- *toks* :: a sequence of tokens
+
+** Declarations
+
+#+begin_src tex
+% only in macros
+\newbox
+\newcount
+\newdimen
+\newmuskip
+\newskip
+\newtoks
+#+end_src
+
+** Assignment
+
+#+begin_src tex
+\count255 = 17
+setbox\mybox = \hbox{blah}
+#+end_src
+
+** Arithmetic
+
+Very limited and only for some types.
+
+#+begin_src tex
+\advance <register> by <number>
+\multiply <register> by <number>
+\divide <register> by <number>
+#+end_src
+
