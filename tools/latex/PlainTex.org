@@ -25,8 +25,8 @@ be prefixed with =\= when used literally.
 - Paragraphs are separated by a blank line.
 
 - Normal EOLs are treated as blank spaces. Multiple blank spaces are collapsed
-  into one. Blank spaces at the beginning of end of a line are trimmed. Use =\ =
-  or even =\hskip=
+  into one Unless =\obeylines= and =\obeyspacs= are used. Blank spaces at the
+  beginning of end of a line are trimmed. Use =\ = or even =\hskip=
   to force a blank space.
 
 - Double quotes are represented by two
@@ -47,3 +47,31 @@ Most control sequences are similar to those in LaTeX.
 - =$= for inline math and =$$= for displayed math
 
 - Use =\eqno= and =\leqno= to number equations
+
+* TeX Concepts
+:PROPERTIES:
+:ID:       5c23f4ef-97fa-447e-bf17-9e2677bd80ba
+:END:
+
+- *Category code* (*catcode*) :: Characters with special meanings are
+  split into 16 categories by their meanings.
+  + =\catcode= redefines characters' category.
+  + *active characters* :: a category of single characters that expand before other command.
+
+- *token* :: a character, a control sequence or a group.
+
+- *group* :: everything within a pair of braces ={}=
+
+- *control sequence* :: anything that begins with a =\=
+
+- *command* :: a control sequence that may expand to text, definition of control
+  sequences etc.
+  + *primitive* :: a builtin command
+
+- *register* :: variables
+
+- *length* :: metric that specifies physical printing length. e.g. =3.5pt plus
+  1pt minus 2pt=, =1.7\textwidth=.
+  + Lengths are defined in terms of /units/, e.g. =pt= (default), =mm=, =cm=,
+    =in= etc.
+
