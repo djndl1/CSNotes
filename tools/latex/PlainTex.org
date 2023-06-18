@@ -123,3 +123,38 @@ Very limited and only for some types.
 \divide <register> by <number>
 #+end_src
 
+* TeX Control Structures
+:PROPERTIES:
+:ID:       33d9f5f1-5631-479b-ab86-3429fd8e5284
+:END:
+
+*** Conditionals and Loops
+
+#+begin_src tex
+%\if* <test><true action>\fi
+%\if* <test><true action>\else<false action>\fi
+% where \if* are conditional commands which can be self-defined by users
+\ifnum 5>6
+This is true
+\else
+This is false
+\fi
+
+% \ifcase <number><case0>\or<case1>\or...\else<defaultcase>\fi
+\ifcase 2 a\or b\or c\or d\else e\fi % the case number 2 is c
+
+% \loop <content> \if*<condition><true action>\repeat
+% prints \TeX 10 times
+\count255 = 1
+\loop
+  \TeX
+\ifnum\count255 < 10
+\advance\count255 by 1
+\repeat
+#+end_src
+
+*** Others
+
+=\empty= and =\relax= do nothing and are used to separate control sequences to
+avoid undesired behaviors.
+
