@@ -1,0 +1,23 @@
+= https://asciidoc.org/[AsciiDoc] Note
+
+Here is the preamble, which is commonly stylized.
+This document should be processed by `asciidoctor`
+since it uses some `asciidoctor`-specific features.
+Also `asciidoc.py` is now a legacy project.
+
+== Paragraphs
+
+[.lead]
+Paragraphs are separated by blank lines.
+
+[%hardbreaks]
+[%hardbreaks]
+To achieve hard breaks, use [%hardbreaks] to achieve it.
+
+== Text Formatting
+
+Use *bold* for significance, _italic_ for emphasis, or *_both_*.
+
+The even **stronger** version can be __italic__ and **__both__** for ``AsciiDoc``.
+
+^Super^scripts and ~sub~scripts are handled like this.
