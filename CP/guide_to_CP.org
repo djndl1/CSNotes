@@ -8,3 +8,23 @@ Competitive programming combines algorithm design with algorithm implementation.
   Topcode,
 
 - CSES Problem Set: a collection of problems in the order of difficulty.
+
+* Some Techniques
+
+In case some integers are too large to work with modular arithmetic, use the
+following equations.
+
+$$
+(a + b) mod m = (a mod m + b mod m) mod m
+(a − b) mod m = (a mod m − b mod m) mod m
+(a · b) mod m = (a mod m · b mod m) mod m
+$$
+
+To obtain non-negative remainder
+
+#+begin_src cpp
+r = x % m;
+if (r < 0) r += m; // one division, one subtraction and possibly one more addition
+// or
+r = ((x % m) + m) % m; // two divisions and one addition
+#+end_src
