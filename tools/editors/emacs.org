@@ -771,3 +771,73 @@ A project interaction library for easy project management and navigation.
 - =dap-debug=: use a debug template to start the debugging
 
 - =dap-debug-edit-template=: prepare a template declaration inside a temporary buffer.
+
+** Useful Language Servers
+
+*** Java
+
+**** [[https://projects.eclipse.org/projects/eclipse.jdt.ls/downloads][Jdtls]]
+
+***** Use with =lsp-mode=
+
+#+begin_src elisp
+
+
+;; to use with lombok
+(add-to-list 'lsp-java-vmargs
+               (concat "-javaagent:" lsp-java-lombok--jar-path))
+#+end_src
+
+*** C#
+
+**** [[https://github.com/OmniSharp/omnisharp-roslyn][Omnisharp]]
+
+A .NET development platform based on Roslyn that provides project dependencies
+and C# language services to various IDEs and plugins.
+
+***** Use with =lsp-mode=
+
+#+begin_src elisp
+(setq lsp-csharp-server-path
+      "/media/djn/opt/software/omnisharp/OmniSharp")
+#+end_src
+
+
+**** Debugging
+
+#+begin_src elisp
+(require 'dap-netcore)
+(setq dap-netcore-install-dir "/media/djn/opt/software/netcoredbg/)"
+#+end_src
+
+=dap-mode= requires a vscode =launch.json= configuration.
+
+Refer to [[https://www.yvesdennels.com/posts/dotnet_debugging_with_vscodium/][Dotnet debugging with VSCodium on Linux]]
+Works but hard to use.
+
+#+begin_src json
+{
+    "version": "0.2.0"
+    "configurations": [
+        {
+            "name": ".NET Core Attach (console)",
+            "type": "coreclr",
+            "processId": "${command:pickProcess}",
+            "request": "attach", // use launch to start a process and "program" to specify the compiled assembly
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "bash",
+                "pipeArgs": ["-c"],
+                "debuggerPath": "/media/djn/opt/software/netcoredbg/netcoredbg",
+                "quoteArgs": true
+            }
+        }
+    ,]
+}
+#+end_src
+
+To debug tests, set =VSTEST_HOST_DEBUG=1= when launching the test on the CLI and
+attach to the test host.
