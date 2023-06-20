@@ -290,6 +290,22 @@ value2 value3=. Use =propertyName+= to add values to an existing property.
 
 - =org-columns-quit= ::
 
+* TODO Items
+
+TODO items usually come up while taking notes.
+
+** Dates and Times
+
+The presence of a timestamp causes an entry to be shown on specific dates in the
+agenda.
+
+*** Timer
+
+- =org-timer-start= :: a relative timer that counts up, possibly with an initial
+  value.
+
+- =org-timer-set-timer= :: start a countdown timer
+
 ** Refiling and Archiving
 
 Information needs to be moved around.
@@ -316,6 +332,19 @@ are not marked done after one of them is done.
 - =++duration= :: the next due date is always in the future.
 
 - =.+duration= :: due based on the last time done.
+
+** Org-Capture
+
+The idea comes from GTD, basically a way to quickly capture and write down some
+ideas on paper.
+
+- =org-default-notes-file= ::
+
+- =org-capture= ::
+
+- =org-capture-refile= ::
+
+- =org-capture-kill= :: abort the capture process
 
 * Source Code (Org Babel)
 
