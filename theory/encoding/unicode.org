@@ -536,3 +536,7 @@ Conversion between UTF-8 and UTF-16 requires an intermediate UTF-32 form.
   order shall be properly handled.
 
 -
+
+* Software Implementations
+
+** ICU: International Components for Unicode
