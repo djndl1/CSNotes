@@ -1,9 +1,11 @@
 #+title: Emacs
 
-
-- *keymaps*: Emacs binds keys to named commands, a special type of Lisp function.
+* Overview
 
 - =C-h= to invoke help
+
+  Informative messages are not only echoed in the echo area, but also in the
+  =*Message*= buffer.
 
 * File Handling
 
@@ -576,6 +578,8 @@ variables.
 
 ** Key Bindings
 
+Emacs assign meanings to keys by binding them to commands (interactive elisp functions).
+
 - /key binding/: a mapping between a key and a command.
 
 - /key sequence/: a sequence of input events that have a meaning (from the
@@ -674,6 +678,8 @@ Implemented as a collection of minor modes.
 
 ** Ivy
 
+A minubuffer completion framework.
+
 - =ivy=: provides a basic framework and UI for listing/search/filtering/completion while
   typing in more details
   + =ivy-read=
@@ -698,7 +704,9 @@ Managing directories as workspaces
 
 ** Projectile
 
-A project interaction library for easy project management and navigation.
+- =projectile-mode=: a minor mode that needs to be enabled.
+
+A portable project interaction library for easy project management and navigation.
   + searching/replace in the directory
 
 - *project*: a folder containing some special file (a VCS marker or a project
