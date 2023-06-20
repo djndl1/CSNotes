@@ -1,6 +1,8 @@
 #+title: Autotools
 
 The primary purpose of the Autotools is not to make life simpler for the package maintainer (although it really does in the long run). The primary purpose of the Autotools is to make life simpler for the end user.
+Manually written Makefiles can be hard to maintain and to achieve parity with
+Autotools.
 
 Autotools provides protability across POSIX platforms, well supported by various packaging tools.
 
