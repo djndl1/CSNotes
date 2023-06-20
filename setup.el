@@ -52,3 +52,5 @@
          <script type=\"text/javascript\" src=\"https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js\"></script>
          <script type=\"text/javascript\" src=\"https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js\"></script>"
         :with-sub-superscript nil)))
+
+(org-publish "CSNotes" t)
