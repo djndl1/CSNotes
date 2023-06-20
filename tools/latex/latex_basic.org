@@ -49,8 +49,9 @@ An extension to Plain TeX with its legacy in AMS-LaTeX packages.
 :ID:       23aecf54-2fa4-4de5-b380-3bfdc13e0ce3
 :END:
 
-Typesetting comamnds start with =\= and arguments are placed inside ={}=. =\\=
-starts a newline.
+Typesetting comamnds start with =\= and mandatory arguments are placed inside
+={}= while optional arguments are placed in =[]=. =\\=
+starts a newline (use =\textbackslash= for a backslash).
 
 #+begin_src tex
 \documentclass{}
