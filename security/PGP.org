@@ -1,0 +1,16 @@
+#+title: Pretty Good Privacy, OpenPGP and Similar Software
+
+Encryption program that provides crytographic privacy and authentication for
+data communication, used for signing, encrypting and decrypting texts, files,
+directories and whole disk partitions.
+
+* Basic Cryptography Concepts
+
+- /Asymmetric Cryptography/ :: with two keys so that key transfer is safe. An
+  encrypted message is only read by the private key holder. Conversely, if the
+  message is encrypted with the private key, the public key holders can be
+  assured that the message is from the private key holder since no one else has
+  the private key. With two pairs of keys, one party has two keys: the private
+  for authentication and the public for encryption.
+
+- /Diffie-Hellman Key Exchange/ :: Keys are not exchanged but created in both parties.
