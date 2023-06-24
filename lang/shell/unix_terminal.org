@@ -1,5 +1,7 @@
 #+title: Unix Terminal
 
+* Teletypes
+
 * Software Flow Control
 :PROPERTIES:
 :ID:       7de5377b-ff18-4f47-8c60-2c6f49d6e5c8
@@ -34,3 +36,6 @@ There is an anecdote about software flow control on [[https://unix.stackexchange
 #+begin_quote
 Back in 1987 I made the last teletype that had survived in my university go up in flames. Used it as a serial printer and didn't realize it would overheat if forced to print 35 pages continuously. The overheating just smelled bad, but then the paper caught fire because of the heat. Only then did they tell me I should have given a Ctrl-S every 2 pages or so to let it cool down for a couple of minutes.
 #+end_quote
+
+The programmatic way of terminal flow control is /blocking I/O/ operations. The
+writer process is blocked until the terminal buffer is cleared.
