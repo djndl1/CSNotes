@@ -1,0 +1,36 @@
+#+title: Unix Terminal
+
+* Software Flow Control
+:PROPERTIES:
+:ID:       7de5377b-ff18-4f47-8c60-2c6f49d6e5c8
+:END:
+
+An in-band (control information within the same band or channel for data) method
+ of flow control over the primary communications channel used
+in computer data links.
+
+The recipient sends an XOFF to notify the sender that it is now unable to
+receive any more data and the sender suspends transmission. The recipient sends an XON when it is ready to receive
+more data.
+
+Software flow control has the problem of information delay since the channel is
+shared with data and the implementation is done by software. Also, these control
+codes cannot
+appear in the data.
+
+/Robust XON/: Some devices periodically sends XON to indicate that they are ready to start communication.
+
+** Terminal
+
+Software flow control has already been obsolete thirty years ago. No one uses a
+real terminal or even a teletypewriter anymore.
+
+#+begin_src shell
+stty -ixon # disable XON/XOFF flow control since I really need Ctrl-S
+#+end_src
+
+There is an anecdote about software flow control on [[https://unix.stackexchange.com/questions/137842/what-is-the-point-of-ctrl-s][StackExchange]]:
+
+#+begin_quote
+Back in 1987 I made the last teletype that had survived in my university go up in flames. Used it as a serial printer and didn't realize it would overheat if forced to print 35 pages continuously. The overheating just smelled bad, but then the paper caught fire because of the heat. Only then did they tell me I should have given a Ctrl-S every 2 pages or so to let it cool down for a couple of minutes.
+#+end_quote
