@@ -1,0 +1,12 @@
+#+title: Emacs Tricks
+
+* Execute Shell Commands and Display the Results in the Buffer
+:PROPERTIES:
+:ID:       0e8fdf47-c89a-4bcd-a982-e71e429b5fe2
+:END:
+
+Use =shell-command= and =shell-command-on-region= with or without prefix
+argument (in the current buffer). Note that =shell-command-on-region= reads the
+region into the standard input, not the region as the command to execute.
+
+Use =+eval/= commands when using Doom Emacs with =sh-mode= (Shell Script mode).
