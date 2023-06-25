@@ -1,0 +1,49 @@
+#+title: Linux_syscall_misc
+
+* Unimplemented Syscalls
+:PROPERTIES:
+:ID:       7467a029-5d99-48a8-b3f4-a5abf8b3bd47
+:END:
+
+See man page at [[Unimplemented(2)]].
+
+Some syscalls are implemented as library functions, some available only on
+certain architectures, some available when they are specifically built with
+support for them.
+
+* the =errno= Variable
+:PROPERTIES:
+:ID:       bd6a3819-1d70-4497-b21e-4b85384183dd
+:END:
+
+A lvalue (not necessarily a variable, mostly a macro wrapping a function) of
+ =int= defined the ISO C standard in =<errno.h>=,
+set by syscalls and some library functions in the event of an error.
+
+- Significant only when the function call finished with an error.
+  + A successful call may change it.
+  + no function call sets it to zero (so that the user is free to set it to zero).
+
+- in case some functions may not return a zero upon a successful call,
+  set =errno= to zero  and check if after the call to see if the function succeeds.
+
+- all valid error numbers are positive, with portable symbolic names defined in =<errno.h>=.
+
+- thread-local
+
+The =errno= program in =moreutils= can be used to look up =errno= names and
+descriptions.
+Here we can see all of them are positive.
+
+#+begin_src shell
+errno -l # lists all errno
+#+end_src
+
+** The Use of =errno= in User Code
+
+Using =errno= seems old-fashioned but is idiomatic and easy to do without adding
+any opaque data types, option types or some special error structures. One of the problem is that using =errno=
+does not force or even remind the user to handle the error. Also, =errno= is a
+thread-local state and the user has to copy =errno= in time and the library
+author has to set it at a proper place where it won't get overwritten by another
+function call.
