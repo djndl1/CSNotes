@@ -1,0 +1,77 @@
+#+title: Linux_terminal
+
+* Terminal Incompatibility
+:PROPERTIES:
+:ID:       a7ed193a-fa86-49e2-9778-3f8e5658bae1
+:END:
+
+Character sequences for terminal operations are not standardized on different
+terminals. Software requires a standarized way to access terminal features, and
+thus =termcap=, =terminfo=, =curses= are created.
+
+* Software Architecture
+:PROPERTIES:
+:ID:       8be550b3-3ad7-4510-a1da-cf20d5aa84dc
+:END:
+
+#+begin_src
+      Terminal                                             Computer
+┌────────┬────────┬──────┐                  ┌─────────┬───────────┬───────────────┐
+│        │ Input  │      │                  │         │           │               │
+│     ◄──┼───◄────┼───   │◄──────┐ ┌────────►         │   Input   │               │
+│ Output │ Buffer │      │       │ │        │    ─────┼──►Buffer──┼──►            │
+│        │        │ IO   │       │ │        │ IO HW   │           │     App       │
+│        ├────────┤ HW   │       │ │        │         ├───────────┤               │
+│        │ Output │      │       │ │        │         │           │    Shell      │
+│ Device │ Buffer │      │       └─┼────────┤◄────────┼─┐ Output  │               │
+│        │   ▲────┼──►   ├─────────┘        │         │ │ Buffer◄─┼─              │
+│        │   │    │      │                  │         │           │               │
+│        │   │    │      │                  │         │           │               │
+└────────┴───┼────┴──────┘                  └─────────┴───────────┴───────────────┘
+             │
+             │
+         Input Device
+#+end_src
+
+A terminal device (native or pseudo) has an associated terminal driver
+that handles input and output on the device that works in two modes:
+
+- /Canonical mode/: line-oriented, where =read()= reads at most one line.
+
+- /Noncanonical mode/: the app is able to read single characters without the
+  user needing to press =Enter=.
+
+The terminal driver also handles special characters such as the interrupt
+character or the end-of-file character and possibly generates a signal
+for the foreground process group.
+
+The terminal driver maintains two queues, one for input and the other for
+output. The driver may automatically appends a copy of any input character to
+the output queue to echo. The kernel handles the output flow control in itself.
+
+* Terminal Configuration
+:PROPERTIES:
+:ID:       9ec05ffd-50db-4e1d-abe5-2d4f0b8291a4
+:END:
+
+** Programmatic
+
+#+begin_src c
+       int tcgetattr(int fd, struct termios *termios_p);
+
+       int tcsetattr(int fd, int optional_actions,
+                     const struct termios *termios_p);
+#+end_src
+
+These two functions are the programmatic way to configure various aspects
+and behaviors of a terminal.
+
+The user is supposed to retrieve the attributes and modify it with =tcsetattr=
+and then retrieve again to check and ensure all modifications are applied.
+
+** Command Line =stty=
+
+A util program that calls =tcgetattr= and =tcsetattr=.
+
+To restore the terminal to a sane configuration, use =Ctrl-J stty sane Ctrl-J=
+in case some other program has changed the terminal but fails to restore it.
