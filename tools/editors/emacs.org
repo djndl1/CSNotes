@@ -480,7 +480,7 @@ Emacs is responsible for reindenting the source code buffer.
 
 - =C-x C-a=-series of commands to control the debugger.
 
-* Configuration and Custimization
+* Configuration and Customization
 
 - =customize=: an interactive mechanism to configure emacs
 
@@ -607,6 +607,77 @@ Emacs assign meanings to keys by binding them to commands (interactive elisp fun
 (global-set-key (kbd "C-c y") 'clipboard-yank)
 #+end_src
 
+* Emacs Version Control
+:PROPERTIES:
+:ID:       50216106-c18d-4dee-b773-e1eb660e859b
+:END:
+
+Software systems that are responsible for managing changes to computer programs,
+documents, large web sites or other collections of information.
+
+Version Control in Emacs supports multiple backends (Bazaar, CVS, Git,
+Mercurial, Monotone, RCS, Subversion). It provides a uniform interface for
+common operations in many version control operations.
+
+** Emacs VC Concepts
+
+- /Registration/, /register/: the state of a file  under version control
+
+- /Repository/: where the present state and the change history of the files are
+  stored
+
+- /log entries/: change description
+
+- /work file/: the current version of the file being worked on; a directory of
+  work files is a /working tree/.
+
+- /commit/ , /check in/: a change is recorded in the repository.
+
+- /revision/: a commit/check-in creates a revision.
+
+- /merge-based/ and /lock-based/: how the VCS handles concurrent modification on
+  files. Merge-based mechanism merges different versions of a file from
+  different users while a lock-based system allows only one user to work on the
+  work file until it is committed.
+  + Decentralized version control systems, such as Git and Mercurial, are
+    exclusively merging-based.
+  + Experience has shown that merging is superior to locking, both in
+    convenience to developers and in minimizing the number and severity of
+    conflicts that actually occur.
+  + Older lock-based systems use the terms "check in" and "check out".
+
+- /Changeset-based/ and /file-based/: how changes are organized as a unit. Newer
+  systems are changeset-based and allow for more flexible control.
+
+- /Decentralized/ and /Centralized/: in a decentralized VCS, a project may have
+  several different repositories. Different repositories can be merged to
+  reconcile their change histories. In a centralized VCS, the user only gets a
+  copy of a certain version of the project, not the entire repository.
+
+** Basic Operations
+
+- =vc-register= :: register the file in the repository
+
+- =vc-diff=, =vc-ediff=, =vc-root-diff= :: compare two revisions. Without a prefix argument, it defaults to
+  the work files and the last revision.
+
+- =vc-revision-other-window= :: show a revision of the current file in another
+  window
+
+- =vc-annotate= :: for each line, show the latest revision in which it was
+  modified.
+
+- =vc-print-log=, =vc-print-root-log=, =vc-log-incoming=, =vc-log-outgoing=, =vc-region-history= ::
+
+- =vc-revert= :: revert the work file to its last revision.
+
+- =vc-ignore= :: ignore a file under the current VCS.
+
+** VC Directory Mode
+
+=vc-dir= enables the VC Directory buffer.
+
+TODO
 * Emacs Server
 
 Emacs server is meant only for local use, even if a TCP socket is used.
