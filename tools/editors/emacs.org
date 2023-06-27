@@ -260,10 +260,27 @@ TODO
 
 * Searching and Replacement
 
-- =C-s=, =C-r=: =isearch-forward=, =isearch-backward=, ends with a =RET=. After enter the search mode, =C-w= (=isearch-yank-word=or-char=), =M-s C-e= (=isearch-yank-line=), =C-y=, =M-y= and many isearch yanking commands yank text into the search minibuffer.
+- =C-s=, =C-r= =isearch-forward=, =isearch-backward=, ends with a =RET=. After
+  enter the search mode, =C-w= (=isearch-yank-word=or-char=), =M-s C-e=
+  (=isearch-yank-line=), =C-y=, =M-y= and many isearch yanking commands yank
+  text into the search minibuffer.
+  
+ To return to where the search starts (saved in the mark ring), =C-u C-SPC=.
+  =C-s C-s=/=C-r C-r= starts the previous search again. =C-s M-n=/=C-s M-p=
+  chooses from the search ring. =M-e= to enter the minibuffer to modify the
+  search string.
 
- To return to where the search starts (saved in the mark ring), =C-u C-SPC=. =C-s C-s=/=C-r C-r= starts the previous search again. =C-s M-n=/=C-s M-p= chooses from the search ring. =M-e= to enter the minibuffer to modify the search string.
+** Grepping
 
+- =grep=, =lgrep= ::
+
+- =grep-find=, =find-grep=, =rgrep= :: use =grep= via =find=
+
+- =zgrep= ::
+
+- =kill-grep= ::
+
+Any shell command is allowed when grepping.
 * Buffers and Windows
 
 ** Buffers
