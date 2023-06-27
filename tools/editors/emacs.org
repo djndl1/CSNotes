@@ -656,6 +656,8 @@ common operations in many version control operations.
 
 ** Basic Operations
 
+- =vc-next-action= :: confusing command but unavoidable.
+
 - =vc-register= :: register the file in the repository
 
 - =vc-diff=, =vc-ediff=, =vc-root-diff= :: compare two revisions. Without a prefix argument, it defaults to
@@ -673,11 +675,24 @@ common operations in many version control operations.
 
 - =vc-ignore= :: ignore a file under the current VCS.
 
+- =vc-retrieve-tag= :: check out a branch or a tagged revision
+
+- =vc-create-tag= :: create a tagged revision. With a prefix argument, creates a branch.
+
+- =vc-delete-file=, =vc-rename-file= ::
+
+- =vc-push=, =vc-update= :: push/pull; =vc-push= does not exist in a centralized
+  VCS, where a changeset commit includes a push.
+
+- =vc-merge= :: merge changes from another branch into the current one.
+
 ** VC Directory Mode
 
-=vc-dir= enables the VC Directory buffer.
+=vc-dir= enables the VC Directory buffer, optionally with a prefix argument.
 
-TODO
+Somewhat similar to Dired Mode. Files can be marked or unmarked.
+
+
 * Emacs Server
 
 Emacs server is meant only for local use, even if a TCP socket is used.
@@ -693,6 +708,9 @@ Emacs server is meant only for local use, even if a TCP socket is used.
 Emacs searches =package-user-dir= and =package-directory-list= for installed packages.
 
 * Packages
+** [[https://www.gnu.org/software/emacs/manual/html_mono/ido.html][Ido]]: Interactive Do
+
+TODO
 
 ** TRAMP: Transparent Remote Access Multiple Protocol
 
