@@ -480,6 +480,21 @@ Emacs is responsible for reindenting the source code buffer.
 
 - =C-x C-a=-series of commands to control the debugger.
 
+* Shell and Terminal in Emacs
+:PROPERTIES:
+:ID:       8f9ff977-9c69-4b1b-9e1f-5f079fda92c9
+:END:
+
+** Basic Commands
+
+- =shell-command=, =async-shell-command=, =shell-command-on-region= ::
+
+- =shell= :: interactive subshell in =shell-mode=. Still like a typical Emacs buffer. New
+  commands must be entered at the end of the buffer.
+
+- =term= :: full VT100-style terminal emulation in =Term-mode=.
+  + supports =term-line-mode= and =term-char-mode=
+
 * Configuration and Customization
 
 - =customize=: an interactive mechanism to configure emacs
