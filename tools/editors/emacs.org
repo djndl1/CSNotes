@@ -495,6 +495,19 @@ Emacs is responsible for reindenting the source code buffer.
 - =term= :: full VT100-style terminal emulation in =Term-mode=.
   + supports =term-line-mode= and =term-char-mode=
 
+** Eshell
+
+A command shell written Elisp, an Emacs REPL.  It never uses =exec= but Elisp functions.
+The command can be an Elisp function or an externa command. There is no job
+control.
+
+Some common Unix commands are implemented in elisp in Eshell.
+
+- =grep= family :: Emacs's internal =grep=
+
+- =jobs= :: =list-processes=
+
+- =su=, =sudo= :: TRAMP's =su= or =sudo=.
 * Configuration and Customization
 
 - =customize=: an interactive mechanism to configure emacs
