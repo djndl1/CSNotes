@@ -692,7 +692,49 @@ common operations in many version control operations.
 
 Somewhat similar to Dired Mode. Files can be marked or unmarked.
 
+* Projects in Emacs
+:PROPERTIES:
+:ID:       328872db-f464-4fca-b9ac-4fc428e7b3ed
+:END:
 
+Emacs supports project management.
+
+#+begin_quote
+A project is a collection of files used for producing one or more programs.
+#+end_quote
+
+Two backends [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Version-Control.html][VC]] and [[https://www.gnu.org/software/emacs/manual/html_node/emacs/EDE.html][Emacs Development Environment]] determine whether a directory
+is a /project root/.
+
+
+** Commands
+
+- =project-find-file=, =project-find-regexp=, =project-search= ::
+
+- =project-dired= ::
+
+- =project-vc-dir= ::
+
+- =project-eshell=, =project-shell= ::
+
+- =project-compile= ::
+
+-  =project-shell-command=, =project-async-shell-command= ::
+
+- =project-switch-to-buffer= ::
+
+- =project-kill-buffers= ::
+
+- =project-switch-project=, =project-forget-project= ::
+
+** Emacs Development Environment
+
+Not used much, not recommended.
+
+#+begin_quote
+A package that simplifies the task of creating, building and debugging large
+programs with Emacs.
+#+end_quote
 * Emacs Server
 
 Emacs server is meant only for local use, even if a TCP socket is used.
