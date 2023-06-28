@@ -484,18 +484,59 @@ Emacs is responsible for reindenting the source code buffer.
 
 ** Find Identifier References
 
-- *identifier*: a syntactical subunit of the program: a function, a subroutine, a method, a class, a data type, a macro.
+- *identifier*, *tags* :: a syntactical subunit of the program: a function, a
+  subroutine, a method, a class, a data type, a macro.
 
-- *xref*: the unified interface for dealing with identifiers. The backend for the major mode is responsible for gathering the information of identifiers: either using builtin means or through an external program (=etags=).
+- *xref* :: a unified interface for dealing with identifiers. The backend for
+  the major mode is responsible for gathering the information of identifiers:
+  either using builtin means or through an external program (=etags=).
 
-- =M-.= =xref-find-definition=; =xref-find-apropos=, =xref-find-defintions-other-window=; =M-,=: =xref-go-back=
+- =xref-find-definitions=, =xref-find-apropos=,  =xref-find-defintions-other-window=, =xref-go-back=  ::
 
-- =M-?=: =xref-find-references=
+- =xref-etags-mode= :: force =xref= to use etags again.
 
-- =xref-query-replace-in-results=
+*** Search and replace
 
-- =C-M-i=: =complete-symbol=
+- =M-?= :: find all references for the identifier at point.
 
+- =xref-find-references= ::
+
+- =tags-search= ::
+
+- =tags-query-replace= ::
+
+- =fileloop-continue= :: continue the search
+
+- =xref-query-replace-in-results= ::
+
+*** Inquiries
+
+- =complete-symbol= (=C-M-i=) :: perform completion on the text around point
+
+- =list-tags= ::
+
+- =tags-next-file= ::
+
+*** Tags
+
+#+begin_quote
+A tags table records the tags extracted by scanning the source code of a certain
+program or a certain document.
+Emacs uses the tags tables via the etags package as one of the supported backends for xref.
+#+end_quote
+
+Typically, tags are function names, type names, macro definitions, global
+variables, member variables/fields.
+
+To generate tag tables
+
+#+begin_src shell
+find . -name "matching_files" -print | etags -
+#+end_src
+
+Emacs at any time uses only one /selected/ tags table.
+
+- =visit-tags-table= :: set the tags table.
 ** Programming Documentation Lookup
 
 - =C-h S=: =info-lookup-symbol= to view the Info doc for a symbol used in the program.
