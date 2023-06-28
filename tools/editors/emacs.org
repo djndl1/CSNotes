@@ -259,16 +259,51 @@ There are two ways to do rectangle operations.
 TODO
 
 * Searching and Replacement
+:PROPERTIES:
+:ID:       5d1a488b-cc8f-4c26-9de8-3b6daabcc142
+:END:
 
-- =C-s=, =C-r= =isearch-forward=, =isearch-backward=, ends with a =RET=. After
-  enter the search mode, =C-w= (=isearch-yank-word=or-char=), =M-s C-e=
-  (=isearch-yank-line=), =C-y=, =M-y= and many isearch yanking commands yank
-  text into the search minibuffer.
-  
- To return to where the search starts (saved in the mark ring), =C-u C-SPC=.
-  =C-s C-s=/=C-r C-r= starts the previous search again. =C-s M-n=/=C-s M-p=
-  chooses from the search ring. =M-e= to enter the minibuffer to modify the
-  search string.
+** Incremental and Nonincremental Search
+
+By /incremental/, it means the user do no have to type the entire search string
+before any searching and matching takes place.
+
+- =isearchx-forward=, =isearch-backward= :: the search ends with a =RET= (=isearch-exit=) when the
+  user decides that the target item is found. =isearch-cancel= or
+  =isearch-abort= abandon the search and returns to the original point.
+  + the original point is marked after exiting the search. =C-u C-SPC= goes back
+    to the previous mark.
+  + double type searches the previous item.
+  + forward and backward search can switch to each other without changing the
+    keyword.
+  + Previously searched strings are saved in the /search ring/, which can be
+    retrieved with =isearch-ring-retreat= and =isearch-ring-advance=.
+  + =isearch-yank-word-or-char=, =isearch-yank-symbol-or-char=, =isearch-yank-line= appends the next
+    word/rest of the line at point to the current search string.
+  + =isearch-forward-thing-at-poinit= searches the thing found near point.
+  + =M-e= edit the search string during searching, =C-M-d= deletes the current
+    search string.
+  + =M-c= changes case sensitivity.
+  + =M-r= toggles regex search, or with =isearch-forward/backword-regexp=. Regex
+    search has independent defaults, search rings.
+  + =C-h C-h= for help during searching.
+  + =RET= with no search strings starts */nonincremental search/* (not of much
+    use and inconvenient to use), or with
+    =(re-)search-forward= and =(re-)search-backward=.
+
+- =isearch-query-replace= :: search and replace with a yes/no query
+
+** Word and Symbol Search =M-s=
+
+- =isearch-forward/backward-word= :: the type of punctuation and the number of
+  white spaces between words are ignored. Useful for text documents where white
+  spaces exists only for formatting reason. Major modes may alter the definition
+  of a word.
+
+- =isearch-forward/backward-symbol= :: the boundaries of the search must match
+  the boundaries of a symbol. The meaning of symbol in this context depends on
+  the major mode, and usually refers to a source code token.
+
 
 ** Grepping
 
