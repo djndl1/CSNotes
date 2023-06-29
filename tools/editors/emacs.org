@@ -447,6 +447,18 @@ Emacs determines the major mode by first finding a =; -*- mode: my-mode ;-*-= st
   + =fill-region=
   + =M-o M-s= Center a line
 
+** Spell Check
+
+Hunspell, Aspell, Ispell and Enchant are supported.
+
+- =ispell= (interactive spell, not the ispell program) ::
+
+- =ispell-word=, =ispell-buffer=, =ispell-region=, =i ::
+
+- =flyspell-mode= :: highlights misspelled words
+
+- =flyspell-prog-mode= :: highlights misspelled words for comments and strings only
+
 * Source Code Editing
 
 - =prog-mode-hook= is run before the PL's major mode.
