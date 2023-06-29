@@ -563,7 +563,9 @@ Emacs at any time uses only one /selected/ tags table.
 
 ** Compilation
 
-=compile=, =recompile=
+- =compile=, =recompile= :: basically starts a noninteractive subshell and run some custom
+  command and show the output in a special =*compilation*= buffer which cna
+  direct the user to where the error takes place.
 
 ** Debugging
 
