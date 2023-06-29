@@ -573,6 +573,47 @@ Emacs at any time uses only one /selected/ tags table.
 
   TODO
 
+
+** Linting
+
+*** =flymake-mode= On-The-Fly Syntax Checking (Make On-The-Fly to Check)
+
+#+begin_quote
+Flymake collects diagnostic information from multiple sources,
+called backends, and visually annotates the buffer with the
+results.
+
+It periodically compiles an active buffer when the minor mode is enabled, and then flags or highlights lines that cause errors or warnings during the compile as you edit.
+#+end_quote
+
+The overall approach is primitive, compared to integration with a language parser
+or a linter.
+
+Only a few languages are supported with builtin checkers (mostly compilers). A few third-party
+checkers are available.
+
+The buffer-checking service is done via the hook =flymake-diagnostic-functions=.
+
+*** [[https://www.flycheck.org/en/latest/index.html][Flycheck]] Syntax Checker
+
+#+begin_quote
+Flycheck is a modern on-the-fly syntax checking extension for GNU Emacs,
+intended as replacement for the older Flymake extension which is part of GNU
+Emacs.
+
+It uses various syntax checking and linting tools to automatically check the
+contents of buffers while you type, and reports warnings and errors directly in
+the buffer, or in an optional error list.
+
+Out of the box Flycheck supports over 40 different programming languages with more than 80 different syntax checking tools, and comes with a simple interface to define new syntax checkers.
+
+Many 3rd party extensions provide new syntax checkers and other features like
+alternative error displays or mode line indicators.
+
+The Emacs community has produced a number of extensions to Flycheck.
+#+end_quote
+
+Enable =global-flycheck-mode= and install external checkers. Use =C-c !=.
 ** Compilation
 
 - =compile=, =recompile= :: basically starts a noninteractive subshell and run some custom
