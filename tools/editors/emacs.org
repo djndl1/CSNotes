@@ -614,6 +614,9 @@ The Emacs community has produced a number of extensions to Flycheck.
 #+end_quote
 
 Enable =global-flycheck-mode= and install external checkers. Use =C-c !=.
+Flycheck can have =lsp-mode= support and uses lsp as a backend.
+
+
 ** Compilation
 
 - =compile=, =recompile= :: basically starts a noninteractive subshell and run some custom
