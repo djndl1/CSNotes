@@ -1,0 +1,71 @@
+#+title: Emacs Magit
+
+* Magit: an Emacs Interface to Git
+:PROPERTIES:
+:ID:       0d21437c-1caf-4303-a1a1-d9c1411fa5f9
+:END:
+
+#+begin_quote
+Magit is a complete text-based user interface to Git. It fills the glaring gap
+between the Git command-line interface and various GUIs, letting you perform
+trivial as well as elaborate version control tasks with just a couple of
+mnemonic key presses. Magit looks like a prettified version of what you get
+after running a few Git commands but in Magit every bit of visible information
+is also actionable to an extent that goes far beyond what any Git GUI provides
+and it takes care of automatically refreshing this output when it becomes
+outdated. In the background Magit just runs Git commands and if you wish you can
+see what exactly is being run, making it possible for you to learn the git
+command-line by using Magit.
+#+end_quote
+
+** Basic Operations
+
+- =C-x M-g= :: a transient page of basic operations, by default =magit-dispatch=
+  + when invoked in a buffer, it's =magit-file-dispatch=
+
+Normally, the entry is =magit-status=, which is similar to the Dired mode,
+single-character key bindings are preferred.
+
+Every section/file/hunk can be expanded/collapsed to show/hide diffs. Most
+tree-like magit sections (see various =magit-section-*= commands) are like this.
+
+If not sure, use =?= for help in a transient buffer. The magit manual is also
+included as =magit-info=.
+
+- =magit-section-forward/backword[-sibling]= :: moving around
+
+- Pressing =ENTER= on a file/hunk/line goes to the corresponding point in the
+  file.
+
+- =magit-diff-less/more-context= :: show more/less context lines around  the hunk.
+
+- =magit-stage= (=s=), =magit-unstage= (=u=) ::
+  + if a hunk is not granular enough, mark the region and stage it.
+
+- =magit-discard= (=k=) ::
+
+- =magit-commit= (=c=) :: shows a popup window for commit.
+  + in the =COMMIT_EDITING= buffer
+    - =git-commit-prev/next-message= cycle through commit message history.
+    - =C-c C-c=, =with-editor-finish= :: commits with the message in buffer.
+      =C-c C-k= cancel the commit.
+
+- =magit-log=
+  + in the log buffer
+    - =RET= pops open the full commit log entry at point.
+    - =magit-copy-section-value= :: copies the hash value
+    - =magit-reset-quickly= (=x=) :: reset the HEAD and index to a particular commit.
+    - =magit-revert-no-commit=, =v= :: revert the selected commit.
+    - =d= :: show the diff of the particular commit
+    - =A= :: cherrypick
+    - =r= :: rebase
+
+- =magit-branch=, =b= in the status buffer
+  + =magit-branch-spinoff= (switch to the new one), =magit-branch-spinout=
+    (remain on the original branch) :: creates a new branch from the unpushed commits and
+    set the original branch to the last commit it shares with the upstream.
+
+- =magit-blame= :: the blame/annotate in hunks, unlike =vc-annotate=, which
+  shows the default output by Git.
+
+In case a shell git command is in need, type =!= in the status buffer.
