@@ -63,3 +63,71 @@ developers have built by using DCOM.
     client failures and release resources.
     + .NET Remoting: lease-based lifetimes and sponsors instead of refcounting
       and are configurable.
+
+* .NET Remoting Architecture
+:PROPERTIES:
+:ID:       79a33aac-bd7b-4ce7-ab81-653c9a8788c7
+:END:
+
+** Remoting Boundaries
+
+.NET Framework (no longer in new .NET) is able to host multiple applications
+within a single process and still provide the same isolation benefits as the
+unmanaged application-per-process model.
+
+.NET Remoting enables objects executing within the logical subdivisions of /application domains/ and /contexts/ to interact with one another across .NET Remoting boundaries.
+
+- /Application Domains/ :: a logical process in .NET. Code and objects executing
+  in one application domain cannot directly access code and objects executing in
+  another application domain.
+
+- /Contexts/ :: a further division within an application domain where a common
+  set of constraints and usage semantics will govern all access to the objects
+  within it.
+
+A remotable object can be either *marshal-by-value* (=SerializableAttribute=),
+*marshal-by-reference* (=System.MarshalByRefObject= subtypes)
+or *context-bound* (=System.ContextBoundObject=).
+
+** Object Activation
+
+- /Object Activation/ :: Before an object instance of a remotable type can be accessed, it must be created and initialized by a process.
+  + Marshal-by-reference types support [[#server_activation][*server activation*]] and [[#client_activation][*client activation*]].
+  + Marshal-by-value types are copied via serialization and acivated upon
+    deserialization.
+
+*** Server Activation
+:PROPERTIES:
+:CUSTOM_ID: server_activation
+:END:
+
+By MS .NET Remoting[cite:@scott_mclean_microsoft_2002], the mechanism works like this.
+
+#+begin_quote
+The .NET Remoting infrastructure refers to server-activated types as well-known object types because the server application publishes the type at a well-known Uniform Resource Identifier (URI) before activating object instances. The server process hosting the remotable type is responsible for configuring the type as a well-known object, publishing it at a specific well-known endpoint or address, and activating instances of the type only when necessary.
+#+end_quote
+
+Objects can be either activated in /singleton-mode/ or /single-call mode/.
+
+- /Singleton/ :: This singleton instance is activated when first accessed by a
+  client if no other instance exists. A singleton does not mean it lives as long
+  as the application.
+  + stateful
+  + lifetime can be configured.
+
+- /Single Call/ :: a new instance of that type for every method invocation a
+  client makes.
+  + stateless, but still an OOP object though with a very limited lifetime.
+
+*** Client Activation
+:PROPERTIES:
+:CUSTOM_ID: client_activation
+:END:
+
+This type of remotable objects works like a real client object (stateful,
+different identities, URIs for different objects) but with lifetime
+managed by the .NET remoting infrastructure.
+
+* Bibliography
+
+#+print_bibliography:
