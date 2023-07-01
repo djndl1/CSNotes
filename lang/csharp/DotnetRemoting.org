@@ -1,0 +1,65 @@
+#+title: .NET Remoting
+#+bibliography: dotnet_remoting.bib
+#+cite_export: csl
+
+A cohesive object model with extensibility hooks to support the kinds of systems
+developers have built by using DCOM.
+
+* The Ideas and Technologies Behind .NET Remoting
+:PROPERTIES:
+:ID:       a5858e22-40cd-4932-b996-66ae714aaa4b
+:END:
+
+- Ideas
+  - *Modular Programming*: separating the functionality of a program into
+    independent, interchangeable modules
+  - *Distributed Architectures*
+  - *Client/Server*
+  - *N-Tier* e.g. Three tier, presentation tier - business tier - data tier
+  - *Peer-to-Peer*: the Internet is traditionally organized with C/S architecture,
+    but now also with some P2P applications, usually achieved by broadcast
+    techniques or some predefined configuration settings.
+
+- Technologies
+  + *Socket*
+  + *RPC*
+    - /Interface Definition Language/
+    - /Marshaling/, the process of passing parameters from one context to another.
+    - /stub/
+
+- Distributed Objects
+  + have /identity/ and may have state. Virtually the same semantics as local
+    objects.
+  + component-based programming (a separate, binary-deployable unit of
+    functionality, the evolution of object-oriented practice from white-box reuse to black-box reuse).
+  + easily integrated with enterprise service support such as transactions,
+    object pooling, concurrency management and object location that are commonly
+    implemented separately as distributed objects.
+
+- Benefits of Distributed Applications
+  + *Fault tolerance* since redundancy can be achieved more easily.
+  + *scalability* since functional components can be distributed to separate
+    nodes and allow for parallel work.
+  + *easy administration* since business rules are now centralized.
+
+- Challenges of Distributed Applications
+  + /Performance/: communication tends to be chunky. Properties access and
+    callbacks require roundtrips and are expensive.
+    - .NET Remoting: comparable to that of DCOM
+  + /Network and Firewall/: the message should be easily passed across the
+    Internet and various firewalls.
+  + /Security/: authentication, cryptography, access control.
+    - .NET Remoting: IIS can handle everything
+  + /Location Independence/
+  + /Interoperability/: interact with various other RPC technologies.
+    - .NET Remoting supports various open standards (HTTP, SOAP, WSDL and XML). Extensible and pluggable with HTTP and TCP channels, binary
+      or SOAP formatters or custom ones.
+    - integrated with =System.EnterpriseServices.ServicedComponent= and thus .NET COM+  objects are automatically remotable.
+  + /Configuration/: should be both programmatic and administratively.
+    - .NET Remoting: XML-based configuration files instead of the Windows
+      Registry; Programmatic;
+  + /Object Lifetime Management/: networks are unreliable and client
+    applications may crash. Server-side resources should be able to detect
+    client failures and release resources.
+    + .NET Remoting: lease-based lifetimes and sponsors instead of refcounting
+      and are configurable.
