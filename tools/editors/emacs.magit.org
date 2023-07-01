@@ -34,7 +34,7 @@ included as =magit-info=.
 
 - =magit-section-forward/backword[-sibling]= :: moving around
 
-- Pressing =ENTER= on a file/hunk/line goes to the corresponding point in the
+- =RET= :: Pressing =ENTER= on a file/hunk/line goes to the corresponding point in the
   file.
 
 - =magit-diff-less/more-context= :: show more/less context lines around  the hunk.
@@ -45,14 +45,17 @@ included as =magit-info=.
 - =magit-discard= (=k=) ::
 
 - =magit-commit= (=c=) :: shows a popup window for commit.
-  + in the =COMMIT_EDITING= buffer
-    - =git-commit-prev/next-message= cycle through commit message history.
+  + /reword/ :: change the HEAD's messagee without adding any changes to it.
+  + /extend/ :: amending the previous commit without changing the message.
+  + /squash/, /Augment/ :: squash without/with editing the message
+  + in the =COMMIT_EDITING= buffer ::
+    - =git-commit-prev/next-message= :: cycle through commit message history.
     - =C-c C-c=, =with-editor-finish= :: commits with the message in buffer.
       =C-c C-k= cancel the commit.
 
-- =magit-log=
+- =magit-log= ::
   + in the log buffer
-    - =RET= pops open the full commit log entry at point.
+    - =RET= :: pops open the full commit log entry at point.
     - =magit-copy-section-value= :: copies the hash value
     - =magit-reset-quickly= (=x=) :: reset the HEAD and index to a particular commit.
     - =magit-revert-no-commit=, =v= :: revert the selected commit.
@@ -60,9 +63,9 @@ included as =magit-info=.
     - =A= :: cherrypick
     - =r= :: rebase
 
-- =magit-branch=, =b= in the status buffer
-  + =magit-branch-spinoff= (switch to the new one), =magit-branch-spinout=
-    (remain on the original branch) :: creates a new branch from the unpushed commits and
+- =magit-branch=, =b= in the status buffer ::
+  + =magit-branch-spinoff= (switch to the new one), =magit-branch-spinout= (remain on the original branch) :: creates
+     a new branch from the unpushed commits and
     set the original branch to the last commit it shares with the upstream.
 
 - =magit-blame= :: the blame/annotate in hunks, unlike =vc-annotate=, which
