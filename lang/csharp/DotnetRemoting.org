@@ -49,7 +49,8 @@ developers have built by using DCOM.
   + /Network and Firewall/: the message should be easily passed across the
     Internet and various firewalls.
   + /Security/: authentication, cryptography, access control.
-    - .NET Remoting: IIS can handle everything
+    - .NET Remoting: IIS can handle everything. .NET Remoting itself does not
+      deal with any authentication or encryption.
   + /Location Independence/
   + /Interoperability/: interact with various other RPC technologies.
     - .NET Remoting supports various open standards (HTTP, SOAP, WSDL and XML). Extensible and pluggable with HTTP and TCP channels, binary
@@ -127,6 +128,49 @@ Objects can be either activated in /singleton-mode/ or /single-call mode/.
 This type of remotable objects works like a real client object (stateful,
 different identities, URIs for different objects) but with lifetime
 managed by the .NET remoting infrastructure.
+
+** Lease-based Object Lifetime Management
+
+#+begin_quote
+.NET Remoting uses a lease-based form of distributed garbage collection to
+manage the lifetime of remote objects.
+The lease-based lifetime management system uses a combination of leases,
+sponsors, and a lease manager.
+
+Each application domain contains a lease manager. The lease manager holds
+references to a lease object for each server-activated Singleton or each
+client-activated remote object activated within the lease manager's application
+domain. Each lease can have zero or more associated sponsors that are capable of
+renewing the lease when the lease manager determines that the lease has expired.
+#+end_quote
+
+If a lease expires and is not renewed by any sponsor, the lease itself and its associated
+remotable object are eligible for GC.
+
+- *Lease Manager* :: the lease manager of each appdomain is responsible for
+  managing the leases of each remotable object.
+  + the lease manager polls periodically to manage all the leases: check if any
+    lease has expired, remove any expired leases, dereference related remotable
+    objects.
+  + after all the references to a remotable object have been removed, it is eligible
+    for GC.
+
+- *Lease*, =ILease= :: basically a policy object that manages the lifetime of a
+  remotable object.
+  + Each =MarshalByRefObject= gives an =ILease= to the lease manager on
+    activation for lifetime management.
+  + A lease object has its remaining time (=CurrentLeaseTime=) set to
+    =InitialLeaseTime= when its remotable object is activated.
+  + its remaining time is renewed on a client call if it's below
+    =RenewOnCallTime=.
+  + A sponsor is assumed dead and removed from the list if it does not respond
+    to a renewal request within =SponsorshipTimeout=.
+
+- *Sponsor*, =ISponsor= :: an object that is able to renew a lease (possibly on
+  clients and thus a =MarshalByRefObject=)
+  + a sponsor registers itself on a lease.
+  + the lease calls its sponsors to renew itself on expiration.
+  + there is a simple =ClientSponsor= for clients to use.
 
 * Bibliography
 
