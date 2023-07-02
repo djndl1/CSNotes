@@ -1,5 +1,3 @@
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
-
 * Forward/move helpers
   :PROPERTIES:
   :CUSTOM_ID: forwardmove-helpers

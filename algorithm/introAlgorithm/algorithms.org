@@ -1,5 +1,3 @@
-#+SETUPFILE: ./setup/theme-readtheorg-local.setup
-
 * Introduction
 
 ** Peak Finding (1D Version)

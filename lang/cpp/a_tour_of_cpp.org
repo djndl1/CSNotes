@@ -1,5 +1,3 @@
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
-
 An overview of C++17
 
 Advice about what constitutes good modern C++ can be found in the C++

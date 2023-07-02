@@ -1,6 +1,4 @@
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
-
-One reason to use pointers is to have reference semantics outside the usual boundaries 
+One reason to use pointers is to have reference semantics outside the usual boundaries
 of scope. A smart pointer knows whether it is the last pointer to an object and delete
 an associated object only when the last owner get destroyed.
 

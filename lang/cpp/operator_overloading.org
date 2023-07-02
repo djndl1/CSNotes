@@ -1,5 +1,3 @@
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
-
 * overloading =operator[]()=
   :PROPERTIES:
   :CUSTOM_ID: overloading-operator
