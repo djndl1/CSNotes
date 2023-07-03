@@ -172,6 +172,65 @@ remotable object are eligible for GC.
   + the lease calls its sponsors to renew itself on expiration.
   + there is a simple =ClientSponsor= for clients to use.
 
+** Messages =IMessage=
+
+An in-process method call puts arguments on registers and stacks and expects
+that the
+callee understands the convention and takes the arguments. This can be
+understood as some form of transport. .NET Remoting models method calls as *messages*.
+
+#+begin_quote
+Encapsulating the information about the method call in a message object
+abstracts and models the method-call-as-message concept in an object-oriented
+way. The message object conveys the method name, arguments, and other
+information about the method call from the caller to the callee. .NET Remoting
+uses such a scheme to enable distributed objects to interact with one another.
+Message objects encapsulate all method calls, input arguments, constructor
+calls, method return values, output arguments, exceptions, and so on.
+#+end_quote
+
+Everything placed in an =IMessage=, including object references, has to be serializable.
+
+** Proxies
+
+The client uses the proxy object to interact with the remote object.
+
+Remotable =MarshalByRefObject= are represented and serialized as =ObjRef= to
+cross .NET Remoting boundaries. The server sends an =ObjRef= to the client and
+the client constructs a proxy based on the information (remotable object URI,
+remotable type metadata including type name and the containing assembly's
+identity info and the transport channel info)
+provided in the =ObjRef= instance.
+The receiver is expected to have access to the assembly defining the type's
+implementation since only metadata is sent.
+
+- *Transparent Proxy* ::  the one that the client directly access, generated on
+  the fly with an =ObjRef=.
+  + a transparent proxy converts a method call on itself to a message to =RealProxy=.
+
+- =RealProxy= :: eventually deliver the message to the remote object.
+
+** Transport Channels
+
+A highly extensible communications transport mechanism that potentially can
+support a wide variety of protocols and wire formats.
+
+- =TcpChannel= ::
+  + supports both sending and receiving data across .NET Remoting boundaries.
+  + using binary wire format =BinaryFormatter= by default.
+
+- =HttpChannel= ::
+  + using SOAP wire format =SoapFormatter= by default
+
+- *Channel Sinks* :: plug-in points that allow access to the underyling messages
+  flowing through the channel as well as the stream used by the transport
+  mechanism to send messages to a remote object.
+  + a sink receives a stream and the message from the previous sink in the
+    chain; performs some action on the message or stream and passes the result
+    to the next sink in the chain.
+  + the first sink (viewed from inside) in the chain handles the formatting and the last one handles
+    transport protocol (sends headers, copies the serialized message stream to the wire).
+
 * Bibliography
 
 #+print_bibliography:
