@@ -207,6 +207,7 @@ implementation since only metadata is sent.
 - *Transparent Proxy* ::  the one that the client directly access, generated on
   the fly with an =ObjRef=.
   + a transparent proxy converts a method call on itself to a message to =RealProxy=.
+  + =Activator.GetObject()= (*NOT* =CreateInstance()= creates such proxies even with only an interface type.
 
 - =RealProxy= :: eventually deliver the message to the remote object.
 
