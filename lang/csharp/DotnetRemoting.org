@@ -232,6 +232,58 @@ support a wide variety of protocols and wire formats.
   + the first sink (viewed from inside) in the chain handles the formatting and the last one handles
     transport protocol (sends headers, copies the serialized message stream to the wire).
 
+* Authoring .NET Remoting Applications
+:PROPERTIES:
+:ID:       403a89e0-f26b-4c4c-a1c5-4425e685e030
+:END:
+
+** Events
+
+A remote event is basically a method call from the server back to the client,
+thus requiring that the client be itself a server, i.e., the client must have a
+channel that is able to receive messages. Also,
+both sides should be able to deserialize delegates, i.e.
+with a binary formatter provider of =TypeFilterLevel.Full=.
+
+Event handlers may be executed on the server or on the client depending on
+whether the object is on the client or on the server. If the server knows
+the handler's definition and the handler can be directly instantiated on the
+server (for example, a static method), then the handler is actually executed on
+the server. Otherwise, if the method is an instance method and that instance is
+created on the client, the server calls back to the client and
+the handler is executed on the client.
+
+For both sides not to reference each other, create an [[event_wrapper][event wrapper]] in the
+interface assembly and let both sides know the definition. The client creates
+such wrappers and subscribes to the wrapper's event and the wrapper subscribes
+its own wrapper handler to the server's event and thus marshals itself to the server.
+When the server triggers the event, the wrapper's handler is called and in turns
+triggers the wrappers event and calls the client's handler. The wrapper needs to
+live indefinitely until GCed so that the server may call it as long as the
+subscription is not removed.
+
+#+NAME: event_wrapper
+#+begin_src csharp
+// server event => RaiseEvent => EventName => client handlers
+public class EventWrapper : MarshalByRefObject
+{
+    // event source of client handlers
+    public event EventDelegateType EventName;
+
+    // a wrapper handler of the server event
+    public void RaiseEvent(...)
+    {
+        EventName?.Invoke(...);
+    }
+
+    // lives forever
+    public override object InitializeLifetimeService()
+    {
+        return null;
+    }
+}
+#+end_src
+
 * Bibliography
 
 #+print_bibliography:
