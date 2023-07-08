@@ -917,3 +917,27 @@ The three core classes are not tightly related.
   + - =For Each ... Next= works for =[DispId(-4)]=
 
 - =Queue=, =HashTable=, =Stack=
+
+* P-Code, Compiler, Linker and Optimization[cite:@vbMinutiae]
+:PROPERTIES:
+:ID:       16923a7f-e53a-400f-ab29-4e6c954e7333
+:END:
+
+** P-Code (PseudoCode)[cite:@MSPCodeTech]
+
+A RISC-like stack machine instruction.
+An intermediate step between the high-level instructions in VB programs and the
+low-level machine code. The sizes of P-code executables are smaller by 50 percent than that of
+native compilation and the process of compilation is much faster.
+
+MS P-code was made to reduce the size of programs. It can be applied globally to
+the program or a certain functions. From a systemic view, the final result may
+not be as slow as imagined. [[https://en-academic.com/dic.nsf/enwiki/464666][Historically]], both MSVC and VB supported P-code generation.
+
+** Code Generation and =C2.EXE=
+
+=C2.EXE= is the backend code generator for VB6, invoked by =VB6.EXE=.
+
+* Bibliography
+
+#+print_bibliography:
