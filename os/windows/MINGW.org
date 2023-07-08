@@ -1,5 +1,25 @@
 #+title: Mingw
 
+* Windows XP Support
+
+- a modified MSYS2 is available [[https://archive.org/details/msys2xp][here]], with many userland utils replaced by =busybox=. Another way to get proper Bash support
+  is =Git= v2.10.0.
+
+- [[https://sourceforge.net/projects/mingwbundle/][mingwbundle]]: a bundled MSYS with legacy MinGW toolchains.
+
+- [[https://github.com/niXman/mingw-builds-binaries/releases][Mingw Builds]]: the official MinGW-w64 builds work before v12. Its bundled gdb
+  does not. Some versions of [[https://github.com/ssbssa/gdb][this]] unofficial Windows build of gdb may
+  complement.
+
+- [[https://github.com/brechtsanders/winlibs_mingw][Winlibs]]: working builds include
+  + GCC 7.5.0 + MinGW-w64 7.0.0 (release 1), =gdb= works
+  + GCC 8.4.0 + MinGW-w64 7.0.0 (release 1), =gdb= fails
+  + GCC 9.2.0 + MinGW-w64 7.0.0 (release 4), =gdb= fails
+
+** LLVM
+
+the last support version is 3.7.1, which is only better than GCC 4.
+
 * Unicode
 
 - =wmain=: UTF-16 environment and command line arguments, as well as a MBCS version.
