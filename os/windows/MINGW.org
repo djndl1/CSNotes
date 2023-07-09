@@ -11,7 +11,8 @@
   does not. Some versions of [[https://github.com/ssbssa/gdb][this]] unofficial Windows build of gdb may
   complement.
 
-- [[https://github.com/brechtsanders/winlibs_mingw][Winlibs]]: working builds include =mingw32-make=
+- [[https://github.com/brechtsanders/winlibs_mingw][Winlibs]]: working builds include =mingw32-make= (the most common one used by various
+  build tools on Windows)
   + GCC 7.5.0 + MinGW-w64 7.0.0 (release 1), =gdb= works
   + GCC 8.4.0 + MinGW-w64 7.0.0 (release 1), =gdb= fails
   + GCC 9.2.0 + MinGW-w64 7.0.0 (release 4), =gdb= fails
@@ -36,7 +37,63 @@ the last support version is 3.7.1, which is only better than GCC 4.
 
 Visual Studio 2010; Windows SDK 7.1 (MSVC 16.00)
 
-* Unicode
+* [[https://www.mingw-w64.org/][MinGW-w64]]
+
+The current de-factor standard GCC on Windows.
+
+- Support from Windows 2000
+
+- Has DDK and DirectX support from other projects.
+
+- provides optional secured C-runtime API and headers
+
+** Binary Distributions
+
+- [[https://sourceforge.net/projects/mingw-w64/][Official SourceForge]]: binary releases are unmaintained.
+
+- [[https://github.com/niXman/mingw-builds-binaries][Mingw-builds]]: After GCC v11.2
+
+- [[https://winlibs.com/][WinLibs]]: actively maintained comprehensive toolchains that includes GCC, LLVM
+  and various other tools.
+  + has support for [[https://github.com/lhmouse/mcfgthread/][MCF threading library]]
+  + with MSVCRT and UCRT as CRTs.
+
+- [[https://github.com/skeeto/w64devkit][w64devkit]]: GCC, GDB, GNU Make, NASM, Vim, Ctags, busybox
+
+- [[https://www.msys2.org/][MSYS2]]: provides not only GCC toolchains, but a whole Unix-like environment.
+  + rolling-release.
+
+- [[https://gcc-mcf.lhmouse.com/][GCC-MCF]]: GCC with the MCF threading library (a reimplementation of the gthread
+  interface set, requires Windows 7 or later)
+
+- [[https://jmeubank.github.io/tdm-gcc/][TDM-GCC]]: provides both MinGW.org and MinGW-w64 versions with various patches.
+   None work with Windows XP anymore.
+   + uses =winpthreads= for POSIX threading support.
+
+- the famous Cygwin provides native MinGW-w64 GCC.
+
+- [[https://github.com/mstorsjo/llvm-mingw][llvm-mingw]]: not GCC.
+
+** Components
+
+*** [[https://sourceforge.net/p/mingw-w64/wiki2/gendef/][gendef]]
+
+TODO
+
+*** genidl
+
+TODO
+
+*** widl
+
+
+** Cross Compilation
+
+- Build triplets: =i686-w64-mingw32= and =x86_64-w64-mingw32=.
+
+TODO
+
+** Unicode
 
 - =wmain=: UTF-16 environment and command line arguments, as well as a MBCS version.
   +  =-municode= is necessary and the macros =_UNICODE= (for =tchar.h=) and =_UNICODE= (for Win32 API functions) should be defined.
