@@ -3,22 +3,38 @@
 * Windows XP Support
 
 - a modified MSYS2 is available [[https://archive.org/details/msys2xp][here]], with many userland utils replaced by =busybox=. Another way to get proper Bash support
-  is =Git= v2.10.0.
+  is =Git= v2.10.0 (relased on 2026-09-03).
 
 - [[https://sourceforge.net/projects/mingwbundle/][mingwbundle]]: a bundled MSYS with legacy MinGW toolchains.
 
-- [[https://github.com/niXman/mingw-builds-binaries/releases][Mingw Builds]]: the official MinGW-w64 builds work before v12. Its bundled gdb
+- [[https://github.com/niXman/mingw-builds-binaries/releases][Mingw Builds]]: the official MinGW-w64 builds work before v12 (2022). Its bundled gdb
   does not. Some versions of [[https://github.com/ssbssa/gdb][this]] unofficial Windows build of gdb may
   complement.
 
-- [[https://github.com/brechtsanders/winlibs_mingw][Winlibs]]: working builds include
+- [[https://github.com/brechtsanders/winlibs_mingw][Winlibs]]: working builds include =mingw32-make=
   + GCC 7.5.0 + MinGW-w64 7.0.0 (release 1), =gdb= works
   + GCC 8.4.0 + MinGW-w64 7.0.0 (release 1), =gdb= fails
   + GCC 9.2.0 + MinGW-w64 7.0.0 (release 4), =gdb= fails
 
+** Powershell
+
+v2, lacking too many functionalities, not of much use.
+
+** Notepad++
+
+The last working version is v7.9.2
+
+** CMake
+
+The last working version is v3.13.5.
+
 ** LLVM
 
 the last support version is 3.7.1, which is only better than GCC 4.
+
+** MSVC
+
+Visual Studio 2010; Windows SDK 7.1 (MSVC 16.00)
 
 * Unicode
 
