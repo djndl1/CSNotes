@@ -1,4 +1,13 @@
 #+TITLE: Vb Classic
+#+bibliography: vb_classic.bib
+#+cite_export: csl
+
+*Visual Basic Application (VBA)* is the name of the language. A glue language
+that interfaces with various objects that make up an application via the host
+application's object model.
+
+VB5 introduces the Visual Basic IDE. VBA programs and the VBA developement
+environment itself both execute in the same process before compilation.
 
 In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rapid Application Development]]
 
@@ -16,7 +25,100 @@ In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rap
 
 7. It is possible to reference any COM-visible objects in VB6, including those in CLR.
 
-* Language Variants
+* VBA Development
+
+** Project Structure
+
+- =.vbp= :: the [[#projectfile][project file]]
+
+- =.frm= :: a form file
+
+- =.frx= :: binary data (images etc.) of a form
+
+- =.bas= :: standard code module
+
+- =.cls= :: Class module
+
+- =.res= :: resource files, bitmaps, text strings and other data.
+
+- =.vbw= :: not part of a project, used by the IDE to position the window.
+
+** [[https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa231236(v=vs.60)][VB6.exe]]
+
+This executable is the IDE for Visual Basic Classic but also a command line tool
+for VB compilation.
+
+#+begin_src shell
+# compile a VB6 project
+# output as filename
+# to output directory
+# compilation definition, like C's macro
+vb6.exe /make project.vbp [/out filename] [/outdir path] [/d const=value]
+
+# to make a console app
+# use MS linker to edit the subsystem
+link /edit /subsystem:console app.exe
+#+end_src
+
+** Project File =.vbp=
+:PROPERTIES:
+:CUSTOM_ID: projectfile
+:END:
+
+Here is an example with comments;
+The bare minimum requires =Type=, =Reference= to =stdole=.tlb=, =Module=, =Startup=
+
+#+begin_src ini
+Type=[Exe for Standard Exe,OleExe for ActiveX EXE,OleDll for ActiveX DLL,Control for ActiveX Control]  # project type
+Reference=*\G{COM Library UUID}#Version#0#PathToDllOrTypeLib#Library Helpstring name
+Module=ModuleName; ModuleFile.bas # module source file
+Form=FormName.frm  # form source file
+From=MDIForm.frm
+Class=ClassName; ClassName.cls # class source file
+UserControl=UserControlName.ctl # UserControl source file
+Startup="Sub Main" # Startup object
+HelpFile="" # a help file for the project
+[Description=Project Description] # optional
+Title="MyAppName"
+ExeName32="ExecutableName.exe"
+Command32=""
+Name="MyProjectName"
+MajorVer=1
+MinorVer=0
+RevisionVer=0
+AutoIncrementVer=0
+CompilationType=[-1 for P-code, 0 for native]
+Unattended=[0 for false, -1 for true] # unattended execution
+...
+#+end_src
+
+Here is a VB module source file
+
+#+begin_src sql
+' a VB module metainfo
+Attribute VB_Name = "ModuleName"
+Option Explicit
+#+end_src
+
+And a class source file
+
+#+begin_src fortran
+VERSION 1.0 CLASS
+BEGIN 'properties
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "Class1"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+#+end_src
+
+** Language Variants
 
 1. VBA: for application scripting, still COM/OLE based
 
@@ -24,122 +126,76 @@ In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rap
 
 3. GAMBAS: a FOSS variant mainly on Linux
 
-* GUI Programming
-
-in VB6, controls can be classified into (1) /Standard Controls/, managed by the
-Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself.
-
-** Form Properties
-
-- =Tag=: VB extender properties that is always available, no specific use,
-  stores any object related to that control.
-
-- =hWnd=: the internal handle used by Windows to identify a control, available
-  only to standard Windows controls.
-
-- =Enabled=, =Visible=: disabled controls don't react to user's actions.
-  Invisible controls are automatically disabled. All mouse events for disabled or invisible controls are passed to the underlying container or to the form itself.
-
-** Form Lifecycle
-
-1. =Initialize=: triggered where variables are initialized; before the actual window and the
-   controls are created
-
-2. =Load=: triggered when properties and controls are referenced. The windows
-   and its child controls are created. Graphical operations will not work.
-   A form is visible after its =Show= method is called.
-
-3. =Resize=: visible or sized changed
-
-4. =Activate=: ready to accept user input
-
-5. =Deactivate=: end user switches to another form
-
-6. =Paint=: the form refreshes itself (fired only if =AutoRedraw= is =False=)
-
-7. =QueryUnload=: =OnClosing=
-
-#+begin_src sql
-' refuse to unload
-Private Sub Form_QueryUnload(Cancel As Integer, _
-    UnloadMode As Integer)
-    ' Don't let the user close this form.
-    Select Case UnloadMode
-        Case vbFormControlMenu, vbAppTaskManager
-            Cancel = True
-    End Select
-End Sub
-#+end_src
-
-8. =Unload=: a last chance to prevent the closure of the form
-
-#+begin_src sql
-' This is a module-level variable.
-Dim Saved As Boolean
-
-Private Sub Form_Unload(Cancel As Integer)
-    If Not Saved Then
-        MsgBox "Please save data first!"
-        Cancel = True
-    End If
-End Sub
-#+end_src
-
-9. =Terminate=: deallocate the memory for the Form
-
-Forms expose a special property, the =Controls= collection, which contains all the controls that are currently loaded on the form itself.
-
-** Form Events
-
-- =Click=, =DblClick=: triggered not only by actual mouse clicks.
-
-- =GetFocus=, =LostFocus=
-
-- =Change=: its behavior is not consistent across VB controls. Not available for =CheckBox= and =OptionButton=, which fires a
-  =Click= event when its content is changed.
-
-- =KeyPress=, =KeyDown= (the key translated into ANSI numeric code), =KeyUp=: Only keys that correspond to control keys (Ctrl+x, BackSpace, Enter, and Escape) and printable characters activate the =KeyPress= event.
-
-- =MouseDown=, =MouseUp=, =MouseMove=: mouse button state, Shift/Ctrl/Alt state
-  and the cursor's location are passed.
-
-** The =Controls= Collection
-
-Container of all the controls currently loaded on the form itself.
-
 * Basics
 
-- Case-Insensitive
+VB keywords and identifiers are Case-Insensitive.
 
-** Modules
+** Program Entry Point
 
-- Form Module: basically class module with GUI controls
+Every global variables and constants are loaded before the entry point
+(Form-level global variables are not since the form hasn't been loaded).
+A form or a code module function can be the entry point of a program.
 
-- Class Module: OOP-like
+- /Form/: the form is loaded and several events are fired
+  + =Initialize=: if the code references a control, =Load= is immediately fired
+    before the end of =Initialize=.
+  + =Load=
 
-- BAS Module: C-like compilation unit
+- /code module/: the =Main= procedure (=Public= or =Private= or none).
+  + a form can be instantiated and shown in =Main=, the recommended alternative
+    to a startup form.
 
-Module are made a of a /declaration section/ (types, constants and variables)
-plus a collection of procedures.
+** Program Exit
 
-** Variables
+- The program exits the =Main= procedure returns.
 
-- /Global/: application long lifetime; application-wide scope
+- the =End= statement aborts the program without cleanup.
+
+- ActiveX components shouldn't exit by themselves: they should be managed by the
+  OS since they may be referenced by other apps.
+
+** Variable and Constants
+
+*USE* =Option Explicit= *TO FORCE EXPLICIT DECLARATION OF VARIABLES AND CONSTANTS*.
+
+*** Constants
+
+#+begin_src vba
+[ Public | Private ] Const constname [ As type ] = expression
+#+end_src
+
+*** Object Variable
+
+- In general terms, late binding is slightly more efficient for out-of-process
+  ActiveX EXEs, and early binding is vastly more efficient for in-process DLLs.
+
+*** Scopes and Lifetimes
+
+*Scope* is the visibility of a variable; *lifetime* is the period of program
+execution when the variable is live and available for use.
+
+- /Global/ :: BAS module =Public= variables. application long lifetime; application-wide scope
   + best practice: define all variables in a UDT and declare such a UDT in one
     place. =Public MyPublicVar As Long= in BAS modules.
 
-- /Private/ module-level: =Dim= or =Private= statement in the declaration
-  section of a module.
+- /Private/ module-level :: =Dim= or =Private= statement in the declaration
+  section of a module. Module-long lifetime
 
-- /Public/ module-level (except in BAS modules where /Public/ variables are
-  global): or called /property/; module-long lifetime.
+- /Public/ module-level :: except in BAS modules where /Public/ variables are
+  global or called /property/; module-long lifetime.
 
-- /Dynamic Local/: defined within a procedure; procedure-wide scope/lifetime.
+- /Dynamic Local/ :: =Dim= defined within a procedure; procedure-wide scope/lifetime.
 
-- /Static Local/: procedure-wide scope; module-level lifetime.
-  =Static InProgress As Boolean=; useful for preventing procedure reentry.
+- /Static Local/ :: procedure-wide scope; module-level lifetime.
+  =Static InProgress As Boolean=; useful for preventing procedure reentry. VB6
+  apps are single-threaded, no need to worry about thread safety.
 
-** Types
+- /Project/ :: =Friend= inside an object (class or form) module. Project-wide
+  scope.
+
+** Data Types
+
+*** Simple Types
 
 - =Integer= (16-bit) and =Long= (32-bit, the preferred type for integer values):
   =&= prefixed forces a literal integer into a =Long= value.
@@ -164,29 +220,58 @@ plus a collection of procedures.
   Missing =Set= might lead to unexpected results (the value might be assigned to
   the object's default property). =Nothing= for null reference.
 
-- =Variant= (=VARIANT= defined by OLE, 16 bytes with 2 bytes for typing and 14
+- =Currency= (=CURRENCY=, 8-byte number in an integer format scaled down by
+  10000, i.e. =2^63 / 10000=)
+
+*** =Variant=
+
+the default data type in VBA if no type is not specified.
+=Variant= is basically a dynamic type.
+
+- =VARIANT= defined by OLE, 16 bytes with 2 bytes for typing and 14
   bytes for actual data; most types except =Decimal= use only the upper 8
-  bytes): the default data type that can store any type of data. =Variant= is
-  basically a dynamic type, also the /default type/ for VB if not specified.
-  + A =Variant= variable can be =Empty= and checked using =IsEmpty()=; It can also
-  be =Null=, useful for database programming.
-  + =Variant= can be useful when returning a result of different types on some
-    condition, especially as a =Result<T, E>= type since it can contains a =vbError=
-    type, checked using =IsError=. Use =IsObject= to test for an object within a
-    =Variant=.
-  + Use =VarType= and =TypeName= to get the type information of a =Variant= variable.
+  bytes.
+
+- Special values
+  + =Empty= (the uninitialized =Variant= variable value), =IsEmpty()=;
+  + =Null= (no valid data), =IsNull=
+  + =Error= (an error code)
+
+- =Variant= can be useful when returning a result of different types on some
+  condition, especially as a =Result<T, E>= type since it can contains a
+  =vbError= type, checked using =IsError=.
+
+- Use =IsObject= to test for an object within a  =Variant=.
+
+- Use =VarType= and =TypeName= to get the type information of a =Variant= variable.
 
 - [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/decimal-data-type][Decimal]] (12-byte unsigned integer with a scaling factor): not declarable, used
   only as a =Variant= with =CDec=
 
-- =Currency= (=CURRENCY=, 8-byte number in an integer format scaled down by
-  10000, i.e. =2^63 / 10000=)
+There are several different null/empty values, some of which are commonly used
+with =Variant=.
 
-- /UDT/: basically a structure or record type.
-  + Fixed-length strings are stored directly in a UDT while variable strings are stored as pointers.
-  + Structures can contain substructures.
+- =Nothing= :: null object reference value.
 
-#+begin_src sql
+- =vbEmpty= :: uninitialized =Variant= value.
+
+- =Null= :: special =Variant= value that denotes "no value", =DBNull.Value=
+  + =Null = Null= returns =False=, use =IsNull(var)=.
+  + =vbNull= :: =Null= variant's type enum.
+
+- =vbNullChar= :: C's ='\0'=.
+
+- =vbNullString= :: empty string literal =""=.
+
+*** User-Defined Type
+
+basically a structure or record type.
+
++ Fixed-length strings are stored directly in a UDT while variable strings are stored as pointers.
+
++ Structures can contain substructures.
+
+#+begin_src vba
 Private Type EmployeeUDT
     Name As String
 	DepartmentID As Long
@@ -196,22 +281,29 @@ End Type
 emp1 = emp2 ' copy one UDT to another
 #+end_src
 
-- /Arrays/: ordered sets of homogeneous items.
-  + can be static or dynamic. Dynamic arrays can be first declared =Dim arr() As
-    Type= then defined using =ReDim arr(N) As Type= or with only =ReDim=.
-  + The lower index is assumed to be =0= by default or explicitly with
+*** Arrays: Ordered sets of homogeneous items.
+
+
++ can be static or dynamic. Dynamic arrays can be first declared =Dim arr() As
+  Type= then defined using =ReDim arr(N) As Type= or with only =ReDim=.
+
++ The lower index is assumed to be =0= by default or explicitly with
     =ReDim Customer(1 To 1000) As String=. Also created by =Array()=
-  + To resize an array, use =ReDim= again. Only the last dimension can resized.
+
++ To resize an array, use =ReDim= again. Only the last dimension can resized.
     To destroy an array, use the =Erase= statement.
-  + Use =LBound=, =UBound= for bounds and length.
-  + Array can be assigned to a =Variant= with =var = arr()= by physically
+
++ Use =LBound=, =UBound= for bounds and length.
+
++ Array can be assigned to a =Variant= with =var = arr()= by physically
     copying. Array assignment only works if the target is a dynamic array.
      =b() = a()=
-  + Byte Array: a string can be assigned to a byte array with all its Unicode
+
++ Byte Array: a string can be assigned to a byte array with all its Unicode
     characters converted to its proper binary representation. The opposite is
     also possible. =LenB=
 
-#+begin_src sql
+#+begin_src vba
 ' Dynamically polymorphism, slow execution
 Function ArraySum(arr As Variant) As Variant
     Dim i As Long, result As Variant
@@ -222,15 +314,92 @@ Function ArraySum(arr As Variant) As Variant
 End Function
 #+end_src
 
-** Basic Keywords
+*** Type Conversions
 
-- =Dim=: declare variable
+**** Implicit
 
-- =Dictionary= belongs to an external library: Microsoft Scripting Runtime
+Various data types are converted automatically, even from string to integers.
 
-- [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/with-statement][=With=]] statement: not related to Python's context manager.
+#+begin_src vba
+   Dim s As String
+   s = "123"
+   Dim i As Long
+   i = s            'i = 123
+#+end_src
 
-#+begin_src sql
+**** Explicit
+
+- legacy functions: =Int=, =Str= ...
+
+- the =C*= series locale-aware functions
+  + =CBool=, =CByte=, =CDec=, =CDate=, =CCur=, =CDbl=, =CSng=, =CInt=, =CLng=,
+    =CStr=, =CVar=,
+
+
+** Source Code Organization
+
+*** Modules
+
+Module are made a of a /declaration section/ (types, constants and variables)
+plus a collection of procedures.
+
+- Form Module: basically class module with GUI controls
+
+- Class Module: OOP-like
+
+- BAS Module: C-like compilation unit
+
+*** Procedure/Function
+
+- Public procedures of a public module can be called through COM. =Public= is
+  the default scope attribute for procedures.
+
+- All event procedures are =Private=
+
+- =Friend= is project-level scope.
+
+#+begin_src vba
+Private/Public Sub SubName
+...
+End Sub
+
+Private/Public Function FuncName
+...
+End Function
+#+end_src
+
+**** Invoking Functions/Procedures
+
+There are some weird rules about parentheses with subroutine call.
+
+If a function is used in an expression, parameters must be enclosed within
+parentheses. Otherwise, =Call= must be used with parentheses. To avoid all these
+rules, one may use =Call= if possible.
+
+- Unnecessary parentheses causes problems especially for subroutines with a
+  single parameter. The parameter is evaluated (either into a rvalue or a
+  default property value) in the parentheses before being
+  passed into the subroutine.
+
+*** Parameters and Return Values
+
+- Parameters can be pased =ByVal= or =ByRef= (by default even for basic types
+  like =Long=, which can lead to undetected bugs). A =ByRef= =Variant= accepts
+  arguments of any types.
+
+- /Optional/ parameters: after all other arguments, checked by =IsMissing()=
+  ( A =Missing= value is pushed onto the stack for an optional argument.
+  =IsMissing= would not work if the the type is not =Variant= since the missing value is a
+  =Err= value) and
+  can be used with a default value =Optional color As Long = vbWhite=; A
+  non-Variant optional parameter receives its default value if no default value
+  is assigned (not missing).
+
+- /Named/ arguments: ~NamedArg := paramVal~
+
+- =ParamArray args() As Variant=: any number of arguments as a =Variant= array.
+
+#+begin_src vba
 With Emp
     Print .Name
     Print .Salary
@@ -239,6 +408,76 @@ With Emp
         Print .City & "  " & .Zip & "  " & .State
     End With
 End Type
+#+end_src
+
+** Programming Construct
+
+*** Branch
+
+- Logical operator with ===, =<>=; =And=, =Or=, =Xor=, =Not= bitwise operator
+  (for boolean there's no difference)
+
+- =If () Then ... ElseIf () Then ... Else ...=; multi-line branch statement
+   requires a =End If=.
+   + any non-zero value in =IF= is considered =True=
+   + =IF= is not short-circuited
+
+- =Select Case= supports short-circuited evaluation
+  + Case subexpressions are evaluated only until they return True, after which
+    all the remaining expressions on the same line are skipped.
+
+#+begin_src vba
+Select Case Mid$(Text, i, 1)
+    Case "0" To "9"
+        ' It's a digit.
+    Case "A" To "Z", "a" To "z"
+        ' It's a letter.
+    Case ".", ",", " ", ";", ":", "?"
+        ' It's a punctuation symbol or a space.
+    Case Else
+        ' It's something else.
+End Select
+#+end_src
+
+- =GoTo= is there but not advised. Use sparingly.
+
+**** Functions
+
+All expressions are always evaluated which might lead to unexpected bugs.
+
+- =IIF()=: basically =IF ... Else ... End If=
+
+- =Choose()=: choose a candidate based on the index expression
+
+- =Switch()=: a simple replacement for =Select Case=
+
+*** Loop
+
+There is no =continue= in VB, use =IF= with =GOTO=
+
+#+begin_src vba
+For Each item In Col
+...
+Next item
+
+For i = 0 To N [Step Increment]
+...
+Next i
+#+end_src
+
+#+begin_src vba
+While (expr) ' break is not available
+...
+Wend
+
+' break out of the loop by `Exit Do`
+Do While (expr) ''
+...
+Loop
+
+Do
+...
+Loop Until (expr)
 #+end_src
 
 ** Event
@@ -283,114 +522,6 @@ End Type
 
 - =Chr= an ASCII code integer
 
-** Programming Construct
-
-*** Branch
-
-- Logical operator with ===, =<>=; =And=, =Or=, =Xor=, =Not= bitwise operator
-  (for boolean there's no difference)
-
-- =If () Then ... ElseIf () Then ... Else ...=; multi-line branch statement
-   requires a =End If=.
-   + any non-zero value in =IF= is considered =True=
-   + =IF= is not short-circuited
-
-- =Select Case= supports short-circuited evaluation
-  + Case subexpressions are evaluated only until they return True, after which
-    all the remaining expressions on the same line are skipped.
-
-#+begin_src sql
-Select Case Mid$(Text, i, 1)
-    Case "0" To "9"
-        ' It's a digit.
-    Case "A" To "Z", "a" To "z"
-        ' It's a letter.
-    Case ".", ",", " ", ";", ":", "?"
-        ' It's a punctuation symbol or a space.
-    Case Else
-        ' It's something else.
-End Select
-#+end_src
-
-- =GoTo= is there but not advised. Use sparingly.
-
-**** Functions
-
-All expressions are always evaluated which might lead to unexpected bugs.
-
-- =IIF()=: basically =IF ... Else ... End If=
-
-- =Choose()=: choose a candidate based on the index expression
-
-- =Switch()=: a simple replacement for =Select Case=
-
-*** Loop
-
-There is no =continue= in VB, use =IF= with =GOTO=
-
-#+begin_src sql
-For Each item In Col
-...
-Next item
-
-For i = 0 To N [Step Increment]
-...
-Next i
-#+end_src
-
-#+begin_src sql
-While (expr) ' break is not available
-...
-Wend
-
-' break out of the loop by `Exit Do`
-Do While (expr) ''
-...
-Loop
-
-Do
-...
-Loop Until (expr)
-#+end_src
-
-** Procedure/Function
-
-- Public procedures of a public module can be called through COM. =Public= is
-  the default scope attribute for procedures.
-
-- All event procedures are =Private=
-
-- =Friend= is project-level scope.
-
-#+begin_src sql
-Private/Public Sub SubName
-...
-End Sub
-
-Private/Public Function FuncName
-...
-End Function
-#+end_src
-
-*** Parameters and Return Values
-
-- Parameters can be pased =ByVal= or =ByRef= (by default even for basic types
-  like =Long=, which can lead to undetected bugs). A =ByRef= =Variant= accepts
-  arguments of any types.
-
-- /Optional/ parameters: after all other arguments, checked by =IsMissing()=
-  ( A =Missing= value is pushed onto the stack for an optional argument.
-  =IsMissing= would not work if the the type is not =Variant= since the missing value is a
-  =Err= value) and
-  can be used with a default value =Optional color As Long = vbWhite=; A
-  non-Variant optional parameter receives its default value if no default value
-  is assigned (not missing).
-
-- /Named/ arguments: ~NamedArg := paramVal~
-
-- =ParamArray args() As Variant=: any number of arguments as a =Variant= array.
-
-
 * Error Handling
 
 Primitive with =GoTo= but better than C's =errno= check.
@@ -415,159 +546,8 @@ Primitive with =GoTo= but better than C's =errno= check.
 If any error inside an event handler goes unhandled, the program terminates.
 Error that go unhandled in event procedures terminates the program immediately.
 
-#+begin_src basic
+#+begin_src vba
 Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
-#+end_src
-
-* VBA and VB Libraries
-
-** Numbers
-
-- =/= always converts its operands into =Double=; Use =\= for pure integer
-  division.
-
-- =^=: exponentiation.
-
-- =MOD= works only for integers.
-
-- Common math functions are available: =Abs=, =Sgn=, =Sqr=, =Exp=, =Log=
-
-- =Int=: round to the lower integer, a ceiling function; =Fix=: truncates the decimal part; =Round=
-  to the specified number of digits.
-
-#+begin_src sql
-Function Ceiling(number As Double) As Long
-    Ceiling = -Int(-number)
-End Functio
-#+end_src
-
-- =Val=; =Hex=, =Oct=
-
-- =Randomize= sets the random seed; =Rnd= returns a the next random number
-  between =[0, 1)=
-
-** String Operations and Functions
-
-- =&=: concatenation
-
-- =Left$=, =Right$=, =Mid$=: substring; =Mid$= also returns a string slice,
-  which can be assigned. =Mid$(Text, 3, 4) = "abcd";
-
-- =Len=: string length;
-
-- =LTrim$=, =RTrim$=, =Trim$=: discard unwanted trailing or leading blanks.
-
-- =Asc=, =Chr$=: ASCII-string conversion
-
-- =Space$=, =String$=: construct a string out of repeated characters.
-
-- =StrComp=: case-insensitive string comparison
-
-- =UCase$=, =LCase$=;
-
-- =StrConv= multi-functionality string conversion
-  + case conversion with =vbUpperCase=, =vbLowerCase=, =vbProperCase=
-  + ANSI-Unicode conversion with =vbUnicode=, =vbFromUnicode=
-
-- =Val=: string to decimal representation; locale-independent
-
-- =CInt=, =CLng=, =CSng=, =CDbl=, =CCur=, =CDate=: locale-aware conversion from
-  string
-
-- =Str$=: converts a number into its representation, with a leading space if the
-  number is positive.
-
-- =InStr=, =InStrRev=: =IndexOf=, =IndexOfLast= substring position search
-
-- =Like=: regex-like pattern matching =?= (any single character), =*= (zero or
-  more), =#= (any single digit), =[A-Z]=, =[0-9]=
-
-#+begin_src sql
-value Like "[A-C]###"
-value Like "[AEIOU][A-Z][A-Z]"
-value Like "[!0-9]??*"
-#+end_src
-
-- =Replace=
-
-- =strReverse=
-
-- =Split=, =Join=
-
-- =Filter=: return an array of items (not) containing a certain substring.
-
-- =Format=: string format
-
-** Date and Times
-
-- Date literal =#8/15/1998 9:20:57 PM#=
-
-- =DateSerial=, =TimeSerial=
-
-#+begin_src sql
-Function IsLeapYear(year As Integer) As Boolean
-    ' Are February 29 and March 1 different dates?
-    IsLeapYear = DateSerial(year, 2, 29) <> DateSerial(year, 3, 1)
-End Function
-#+end_src
-
-- =Date=, =Time= property: the current date and time.
-
-- =Now=, =Timer=: the current date and time.
-
-- =DateValue=, =TimeValue=: returns the Date/Time component of the argument.
-  + =Year=, =Month=, =Day=, =Hour=, =Minute=, =Second= returns the corresponding
-    component
-  + =DatePart=
-
-- =Weekday=: locale-dependent; Use =Weekday(arg, vbMonday)= to force locale independence.
-
-- Date Arithmetic
-  + =+=: =Now + 2 + #12:00#=
-  + =DateAdd=, =DateDiff=: addition/difference with the specified time unit.
-
-- Date Format
-  + =Format=, =FormatDateTime=, =MonthName=: useless unless for human eyes.
-
-** Files
-
-- =Name= (move); =Kill= (delete); =FileCopy=
-
-- =GetAttr=, =SetAttr= [[https://learn.microsoft.com/en-us/windows/win32/fileio/file-attribute-constants][Windows File Attributes]]
-
-- =CurDir$=; =ChDrive=, =ChDir=: both commands must be used to change the
-  current directory to another drive's.
-
-- =MkDir=, =RmDir=; =Name= (rename only)
-
-** Interoperation With the System
-
-- =App=: the current app's
-  + =ExeName=, =Path=
-  + =PrevInstance=: if there's another instance already running
-
-- =Shell=: asynchronously starts a process; returns the PID of the new process.
-
-#+begin_src sql
-Private Declare Function WaitForSingleObject Lib "kernel32" _
-    (ByVal hHandle As Long, ByVal dwMilliseconds As Long) As Long
-Private Declare Function OpenProcess Lib "kernel32" (ByVal dwAccess As _
-    Long, ByVal fInherit As Integer, ByVal hObject As Long) As Long
-Private Declare Function CloseHandle Lib "kernel32" _
-    (ByVal hObject As Long) As Long
-
-' Wait for a number of milliseconds, and return the running status of a
-' process. If argument is omitted, wait until the process terminates.
-Function WaitForProcess(taskId As Long, Optional msecs As Long = -1) _
-    As Boolean
-    Dim procHandle As Long
-    ' Get the process handle.
-    procHandle = OpenProcess(&H100000, True, taskId)
-    ' Check for its signaled status; return to caller.
-    WaitForProcess = WaitForSingleObject(procHandle, msecs) <> -1
-    ' Close the handle.
-    CloseHandle procHandle
-End Function
 #+end_src
 
 * OOP
@@ -582,13 +562,13 @@ End Function
 
 Not recommended for various reasons.
 
-#+begin_src
+#+begin_src vba
 Dim pers As New CPerson
 #+end_src
 
 ** Properties
 
-#+begin_src sql
+#+begin_src vba
 Private m_BirthDate As Date
 
 Property Get BirthDate() As Date
@@ -602,7 +582,7 @@ End Property
 
 A property can have an argument:
 
-#+begin_src sql
+#+begin_src vba
 Private m_Notes(1 To 10) As String
 
 Property Get Notes(Index As Integer) As String
@@ -618,7 +598,7 @@ End Property
 Every =Public= member variables are accessed from outside the class through a pair of hidden
 procedures, which causes the following code invalid
 
-#+begin_src sql
+#+begin_src vba
 Sub ToCentimeters (value As Single)
     ' Value is received by reference, therefore it can be changed.
     value = value * 2.54
@@ -627,7 +607,7 @@ End Sub
 ToCentimeters pers.Height                ' Doesn't work!
 #+end_src
 
-#+begin_src sql
+#+begin_src vba
 Dim m_HomeAddress As CAddress      ' A module-level private variable.
 
 Property Get HomeAddress() As CAddress
@@ -642,7 +622,7 @@ End Property
 
 =Property Set= accepts object parameter and =Property Let= accepts value types.
 
-#+begin_src sql
+#+begin_src vba
 Private m_CurrentAddress As Variant
 
 Property Get CurrentAddress() As Variant
@@ -673,7 +653,7 @@ End Property
 
 *** Property In BAS Module (Undocumented)
 
-#+begin_src sql
+#+begin_src vba
 Dim m_Percent As Integer
 
 Property Get Percent() As Integer
@@ -703,7 +683,7 @@ End Property
 
 *** Implementation
 
-#+begin_src basic
+#+begin_src vba
 ' implementation
 Event FileCopied(file As String, DestPath As String)
 
@@ -713,7 +693,7 @@ Public Sub StartCopy(filespec As String)
 End Sub
 #+end_src
 
-#+begin_src basic
+#+begin_src vba
 Dim WithEvents Fop As CFileOp
 
 Private Sub Fop_FileCopied(file As String, DestPath As String)
@@ -725,7 +705,7 @@ End Sub
 
 *** Class Module Attributes
 
-#+begin_src sql
+#+begin_src vba
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
@@ -773,7 +753,7 @@ strongly discouraged.
   - refcounter
   - module variables and static variables.
 
-#+begin_src pascal
+#+begin_src vba
 Dim obj As Object
 If n > = 0.5 Then
     Set obj = New CPerson
@@ -793,7 +773,7 @@ Print obj.CompleteName 'late binding
 
 - =CallByName(object, procname, calltype, [,arguments])=: late binding call
 
-#+begin_src sql
+#+begin_src vba
 Function GetProperties(obj As Object, ParamArray props() As Variant) As String()
     Dim i As Integer, result() As String
     On Error Resume Next
@@ -824,7 +804,7 @@ End Sub
 
 - =TypeOf ... Is ...=: test type. Inefficient
 
-#+begin_src basic
+#+begin_src vba
 ' instead of using TypeOf'
 Dim lst As ListBox, cbo As ComboBox
 On Error Resume Next
@@ -838,7 +818,7 @@ On Error Goto 0   ' Cancel error trapping.
 - =ByRef= and =ByVal= for object variables: basically in the same way as =ref=
   and non-=ref= parameters in C#.
 
-#+begin_src basic
+#+begin_src vba
 Sub Reset(pers As CPerson)     ' ByRef can be omitted.
     Set pers = Nothing         ' This actually sets the original
 End Sub                        ' variable to Nothing.
@@ -900,6 +880,246 @@ The three core classes are not tightly related.
   + =.CacheSize=
   + =.Fields=: the columns of the current record.
 
+* GUI Programming
+
+in VB6, controls can be classified into (1) /Standard Controls/, managed by the
+Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself.
+
+** Form Properties
+
+- =Tag=: VB extender properties that is always available, no specific use,
+  stores any object related to that control.
+
+- =hWnd=: the internal handle used by Windows to identify a control, available
+  only to standard Windows controls.
+
+- =Enabled=, =Visible=: disabled controls don't react to user's actions.
+  Invisible controls are automatically disabled. All mouse events for disabled or invisible controls are passed to the underlying container or to the form itself.
+
+** Form Lifecycle
+
+1. =Initialize=: triggered where variables are initialized; before the actual window and the
+   controls are created
+
+2. =Load=: triggered when properties and controls are referenced. The windows
+   and its child controls are created. Graphical operations will not work.
+   A form is visible after its =Show= method is called.
+
+3. =Resize=: visible or sized changed
+
+4. =Activate=: ready to accept user input
+
+5. =Deactivate=: end user switches to another form
+
+6. =Paint=: the form refreshes itself (fired only if =AutoRedraw= is =False=)
+
+7. =QueryUnload=: =OnClosing=
+
+#+begin_src vba
+' refuse to unload
+Private Sub Form_QueryUnload(Cancel As Integer, _
+    UnloadMode As Integer)
+    ' Don't let the user close this form.
+    Select Case UnloadMode
+        Case vbFormControlMenu, vbAppTaskManager
+            Cancel = True
+    End Select
+End Sub
+#+end_src
+
+8. =Unload=: a last chance to prevent the closure of the form
+
+#+begin_src vba
+' This is a module-level variable.
+Dim Saved As Boolean
+
+Private Sub Form_Unload(Cancel As Integer)
+    If Not Saved Then
+        MsgBox "Please save data first!"
+        Cancel = True
+    End If
+End Sub
+#+end_src
+
+9. =Terminate=: deallocate the memory for the Form
+
+Forms expose a special property, the =Controls= collection, which contains all the controls that are currently loaded on the form itself.
+
+** Form Events
+
+- =Click=, =DblClick=: triggered not only by actual mouse clicks.
+
+- =GetFocus=, =LostFocus=
+
+- =Change=: its behavior is not consistent across VB controls. Not available for =CheckBox= and =OptionButton=, which fires a
+  =Click= event when its content is changed.
+
+- =KeyPress=, =KeyDown= (the key translated into ANSI numeric code), =KeyUp=: Only keys that correspond to control keys (Ctrl+x, BackSpace, Enter, and Escape) and printable characters activate the =KeyPress= event.
+
+- =MouseDown=, =MouseUp=, =MouseMove=: mouse button state, Shift/Ctrl/Alt state
+  and the cursor's location are passed.
+
+** The =Controls= Collection
+
+Container of all the controls currently loaded on the form itself.
+
+* VBA and VB Libraries
+
+** Numbers
+
+- =/= always converts its operands into =Double=; Use =\= for pure integer
+  division.
+
+- =^=: exponentiation.
+
+- =MOD= works only for integers.
+
+- Common math functions are available: =Abs=, =Sgn=, =Sqr=, =Exp=, =Log=
+
+- =Int=: round to the lower integer, a ceiling function; =Fix=: truncates the decimal part; =Round=
+  to the specified number of digits.
+
+#+begin_src vba
+Function Ceiling(number As Double) As Long
+    Ceiling = -Int(-number)
+End Functio
+#+end_src
+
+- =Val=; =Hex=, =Oct=
+
+- =Randomize= sets the random seed; =Rnd= returns a the next random number
+  between =[0, 1)=
+
+** String Operations and Functions
+
+- =&=: concatenation
+
+- =Left$=, =Right$=, =Mid$=: substring; =Mid$= also returns a string slice,
+  which can be assigned. =Mid$(Text, 3, 4) = "abcd";
+
+- =Len=: string length;
+
+- =LTrim$=, =RTrim$=, =Trim$=: discard unwanted trailing or leading blanks.
+
+- =Asc=, =Chr$=: ASCII-string conversion
+
+- =Space$=, =String$=: construct a string out of repeated characters.
+
+- =StrComp=: case-insensitive string comparison
+
+- =UCase$=, =LCase$=;
+
+- =StrConv= multi-functionality string conversion
+  + case conversion with =vbUpperCase=, =vbLowerCase=, =vbProperCase=
+  + ANSI-Unicode conversion with =vbUnicode=, =vbFromUnicode=
+
+- =Val=: string to decimal representation; locale-independent
+
+- =CInt=, =CLng=, =CSng=, =CDbl=, =CCur=, =CDate=: locale-aware conversion from
+  string
+
+- =Str$=: converts a number into its representation, with a leading space if the
+  number is positive.
+
+- =InStr=, =InStrRev=: =IndexOf=, =IndexOfLast= substring position search
+
+- =Like=: regex-like pattern matching =?= (any single character), =*= (zero or
+  more), =#= (any single digit), =[A-Z]=, =[0-9]=
+
+#+begin_src vba
+value Like "[A-C]###"
+value Like "[AEIOU][A-Z][A-Z]"
+value Like "[!0-9]??*"
+#+end_src
+
+- =Replace=
+
+- =strReverse=
+
+- =Split=, =Join=
+
+- =Filter=: return an array of items (not) containing a certain substring.
+
+- =Format=: string format
+
+** Date and Times
+
+- Date literal =#8/15/1998 9:20:57 PM#=
+
+- =DateSerial=, =TimeSerial=
+
+#+begin_src vba
+Function IsLeapYear(year As Integer) As Boolean
+    ' Are February 29 and March 1 different dates?
+    IsLeapYear = DateSerial(year, 2, 29) <> DateSerial(year, 3, 1)
+End Function
+#+end_src
+
+- =Date=, =Time= property: the current date and time.
+
+- =Now=, =Timer=: the current date and time.
+
+- =DateValue=, =TimeValue=: returns the Date/Time component of the argument.
+  + =Year=, =Month=, =Day=, =Hour=, =Minute=, =Second= returns the corresponding
+    component
+  + =DatePart=
+
+- =Weekday=: locale-dependent; Use =Weekday(arg, vbMonday)= to force locale independence.
+
+- Date Arithmetic
+  + =+=: =Now + 2 + #12:00#=
+  + =DateAdd=, =DateDiff=: addition/difference with the specified time unit.
+
+- Date Format
+  + =Format=, =FormatDateTime=, =MonthName=: useless unless for human eyes.
+
+** Files
+
+- =Name= (move); =Kill= (delete); =FileCopy=
+
+- =GetAttr=, =SetAttr= [[https://learn.microsoft.com/en-us/windows/win32/fileio/file-attribute-constants][Windows File Attributes]]
+
+- =CurDir$=; =ChDrive=, =ChDir=: both commands must be used to change the
+  current directory to another drive's.
+
+- =MkDir=, =RmDir=; =Name= (rename only)
+
+** Interoperation With the System
+
+- =App=: the current app's
+  + =ExeName=, =Path=
+  + =PrevInstance=: if there's another instance already running
+
+- =Shell=: asynchronously starts a process; returns the PID of the new process.
+
+#+begin_src vba
+Private Declare Function WaitForSingleObject Lib "kernel32" _
+    (ByVal hHandle As Long, ByVal dwMilliseconds As Long) As Long
+Private Declare Function OpenProcess Lib "kernel32" (ByVal dwAccess As _
+    Long, ByVal fInherit As Integer, ByVal hObject As Long) As Long
+Private Declare Function CloseHandle Lib "kernel32" _
+    (ByVal hObject As Long) As Long
+
+' Wait for a number of milliseconds, and return the running status of a
+' process. If argument is omitted, wait until the process terminates.
+Function WaitForProcess(taskId As Long, Optional msecs As Long = -1) _
+    As Boolean
+    Dim procHandle As Long
+    ' Get the process handle.
+    procHandle = OpenProcess(&H100000, True, taskId)
+    ' Check for its signaled status; return to caller.
+    WaitForProcess = WaitForSingleObject(procHandle, msecs) <> -1
+    ' Close the handle.
+    CloseHandle procHandle
+End Function
+#+end_src
+
+
+** External Libaries
+
+*** Microsoft Scripting Runtime
+
+Windows-builtin COM library.
 
 * .NET Interop
 
