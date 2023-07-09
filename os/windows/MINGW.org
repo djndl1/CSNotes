@@ -99,7 +99,22 @@ TODO
   +  =-municode= is necessary and the macros =_UNICODE= (for =tchar.h=) and =_UNICODE= (for Win32 API functions) should be defined.
   + =wmain= should be marked as =extern "C"= under C++.
 
-* [[https://reactos.org/wiki/PSEH][PSEH]]: SEH Handling
+** C Standard Conformance
+
+*** =printf= family
+
+- The [[https://mingw.osdn.io/][Old MinGW]] seems to accept =%s= with =wchar_t*=, the standard way
+  is to use =%ls=, to which MinGW-w64 complies (with =%s= and =wchar_t*=
+  the output is completely blank).
+
+- MinGW by default uses the builtin old =MSVCRT.DLL=, which does not have a C99
+  implementation of =printf=.
+
+- MinGW-w64 provides its own =__mingw_printf= (enabled with
+  =__USE_MINGW_ANSI_STDIO=1=) as a conformant replacement for =printf=.
+  + as MinGW-w64 v8.0.0, =USE_MINGW_ANSI_STDIO= is enabled automatically with MSVCRT.
+
+** [[https://reactos.org/wiki/PSEH][PSEH]]: SEH Handling
 
 #+begin_src cpp
 #include <pseh/pseh.h>
@@ -125,7 +140,7 @@ int wmain(int argc, wchar_t *argv[]) {
 }
 #+end_src
 
-* =__try1=
+*** =__try1=
 
 Sorta works, but limited
 
