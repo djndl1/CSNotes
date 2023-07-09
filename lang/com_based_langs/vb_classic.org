@@ -925,6 +925,8 @@ The three core classes are not tightly related.
 
 ** P-Code (PseudoCode)[cite:@MSPCodeTech]
 
+The name p-code was common before Java's bytecode and used in Pascal,
+
 A RISC-like stack machine instruction.
 An intermediate step between the high-level instructions in VB programs and the
 low-level machine code. The sizes of P-code executables are smaller by 50 percent than that of
@@ -934,9 +936,58 @@ MS P-code was made to reduce the size of programs. It can be applied globally to
 the program or a certain functions. From a systemic view, the final result may
 not be as slow as imagined. [[https://en-academic.com/dic.nsf/enwiki/464666][Historically]], both MSVC and VB supported P-code generation.
 
+There are some VB P-Code dissemblers available: [[https://github.com/bontchev/pcodedmp][pcodedmp]], [[https://github.com/bontchev/pcodedmp][pcode2code]].
+
 ** Code Generation and =C2.EXE=
 
-=C2.EXE= is the backend code generator for VB6, invoked by =VB6.EXE=.
+=C2.EXE= is the backend code generator for VB6, invoked by =VB6.EXE= (which does
+some preprocessing before generating native code).
+
+By hooking a logger program (printing all the arguments and then invoking the
+real =C2.EXE=), the command line arguments of invoking =C2.EXE= can be dumped.
+=C2.EXE= is a modified version of =C2.EXE= used in VC++ 6.
+
+#+begin_src shell
+C2.EXE
+-il C:\DOCUME~1\Admin\LOCALS~1\Temp\VB886942 # undocumented, used for C programs as well
+-f Program.bas
+-W 3
+-Gy
+-G5
+-Gs4096
+-dos # undocumented, used for C programs as well
+-Zl
+-Fo Program.OBJ
+-Zi
+-QIfdiv
+-ML
+-basic # visual basic, undocumented
+#+end_src
+
+** Linking
+
+Only =VBAEXE6.LIB= is linked against. COM references are resolved at runtime.
+
+#+begin_src shell
+LINK
+Program.OBJ
+Console.OBJ
+ConsoleApp.OBJ
+C:\Program Files\Microsoft Visual Studio\VB98\VBAEXE6.LIB
+/ENTRY:__vbaS
+/OUT:ConsoleApp.exe
+/BASE:0x400000
+/SUBSYSTEM:WINDOWS,4.0
+/VERSION:1.0
+/DEBUG
+/DEBUGTYPE:CV
+/INCREMENTAL:NO
+/OPT:REF
+/MERGE:.rdata=.text
+/IGNORE:4078
+#+end_src
+
+
 
 * Bibliography
 
