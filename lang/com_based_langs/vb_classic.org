@@ -169,6 +169,9 @@ A form or a code module function can be the entry point of a program.
 - In general terms, late binding is slightly more efficient for out-of-process
   ActiveX EXEs, and early binding is vastly more efficient for in-process DLLs.
 
+- Setting an =Object= variable requires a =Set=. The value assignment might
+  causes the right-side to use its default property and thus unexpected behavior.
+
 *** Scopes and Lifetimes
 
 *Scope* is the visibility of a variable; *lifetime* is the period of program
@@ -241,11 +244,13 @@ the default data type in VBA if no type is not specified.
   condition, especially as a =Result<T, E>= type since it can contains a
   =vbError= type, checked using =IsError=.
 
-- Use =IsObject= to test for an object within a  =Variant=.
+- Use =IsObject= instead of =VarType= to test for an object within a  =Variant=.
+  The latter may evaluates to its default property before passed to =VarType=.
 
 - Use =VarType= and =TypeName= to get the type information of a =Variant= variable.
 
-- [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/decimal-data-type][Decimal]] (12-byte unsigned integer with a scaling factor): not declarable, used
+- [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/decimal-data-type][Decimal]] (12-byte unsigned integer with a scaling factor): not declarable (not
+  a variable type but a data type), used
   only as a =Variant= with =CDec=
 
 There are several different null/empty values, some of which are commonly used
@@ -259,7 +264,7 @@ with =Variant=.
   + =Null = Null= returns =False=, use =IsNull(var)=.
   + =vbNull= :: =Null= variant's type enum.
 
-- =vbNullChar= :: C's ='\0'=.
+- =vbNullChar= :: C's ='\0'= (the actual =Variant= value seems a =String=)
 
 - =vbNullString= :: empty string literal =""=.
 
