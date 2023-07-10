@@ -1,0 +1,18 @@
+#+title: Sdk Style Projects
+
+* WinForms and Resources
+
+- Dotnet SDK 3.0 introduces a new [[https://github.com/dotnet/msbuild/issues/4704][way]] to embed a resource file. If the project
+  targets the old netframework, without
+  =<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>=
+  and referencing =System.Resources.Extensions=, it won't build with =dotnet
+  (ms)build= and The old =msbuild.exe= would use the old way to embed a file.
+
+- There is another [[https://github.com/dotnet/runtime/issues/39078][problem]] that causes no =System.Resources.Extensions.dll= not
+  found at runtime. This requires binding autoredirects.
+
+- The old Netframework project uses =DependentUpon= for each resource file. If
+  this is not set, then a convention is used. In Sdk-style projects, a new
+  [[https://learn.microsoft.com/en-us/dotnet/core/resources/manifest-file-names#embeddedresourceusedependentuponconvention-property][default convention]] is introduced. Without setting
+  =<EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>=,
+  the app may not be able to find resources during runtime. Also see this [[https://github.com/dotnet/msbuild/issues/5793][issue.]]
