@@ -288,6 +288,8 @@ emp1 = emp2 ' copy one UDT to another
 
 *** Arrays: Ordered sets of homogeneous items.
 
+Creating an array is called *dimensioning* (defining the size of) the array,
+hence =Dim= and =ReDim=.
 
 + can be static or dynamic. Dynamic arrays can be first declared =Dim arr() As
   Type= then defined using =ReDim arr(N) As Type= or with only =ReDim=.
@@ -297,6 +299,7 @@ emp1 = emp2 ' copy one UDT to another
 
 + To resize an array, use =ReDim= again. Only the last dimension can resized.
     To destroy an array, use the =Erase= statement.
+    - =ReDim Preserve= tries to preserve the orginal values
 
 + Use =LBound=, =UBound= for bounds and length.
 
