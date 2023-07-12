@@ -298,8 +298,8 @@ hence =Dim= and =ReDim=.
     =ReDim Customer(1 To 1000) As String=. Also created by =Array()=
 
 + To resize an array, use =ReDim= again. Only the last dimension can resized.
-    To destroy an array, use the =Erase= statement.
-    - =ReDim Preserve= tries to preserve the orginal values
+    - To destroy an array, use the =Erase= statement.
+    - =ReDim Preserve= tries to preserve the original values
 
 + Use =LBound=, =UBound= for bounds and length.
 
