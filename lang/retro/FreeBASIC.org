@@ -1,0 +1,8 @@
+#+title: FreeBASIC
+
+Unfortunately, FB has a C-style header system.
+
+The reason why =False= is =-1= is because (Free)BASIC uses bitwise operator
+=Not=. The complement of full =0=​s is full =1=​, which is =-1=.
+
+By default, string literals are not escaped unless prefixed with =!=.
