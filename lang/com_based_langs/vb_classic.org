@@ -297,15 +297,20 @@ hence =Dim= and =ReDim=.
 + The lower index is assumed to be =0= by default or explicitly with
     =ReDim Customer(1 To 1000) As String=. Also created by =Array()=
 
-+ To resize an array, use =ReDim= again. Only the last dimension can resized.
++ To resize an array, use =ReDim= again.
     - To destroy an array, use the =Erase= statement.
-    - =ReDim Preserve= tries to preserve the original values
+    - =ReDim Preserve= tries to preserve the original values.
+      Only the last dimension can resized with =Preserve=
 
 + Use =LBound=, =UBound= for bounds and length.
 
-+ Array can be assigned to a =Variant= with =var = arr()= by physically
-    copying. Array assignment only works if the target is a dynamic array.
-     =b() = a()=
++ Array can be assigned to a =Variant= with =var = arr()= by physically copying.
+    - an array and an =Variant= can be assigned to each other.
+    - an array in =Variant= has its =VarType(v) = vbArray + vbElementType=.
+    - an array passed into a procedure as an =Variant= by ref while assignment
+      makes an array copy itself.
+
++ Array assignment only works if the target is a dynamic array. =b() = a()=.
 
 + Byte Array: a string can be assigned to a byte array with all its Unicode
     characters converted to its proper binary representation. The opposite is
