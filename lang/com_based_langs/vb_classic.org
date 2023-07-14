@@ -349,6 +349,14 @@ Various data types are converted automatically, even from string to integers.
     =CStr=, =CVar=,
 
 
+*** [[https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa231021(v=vs.60)][Collection]]
+
+A heterogeneous collection of =Variant= items, indexed one-based by =Long= with optional
+=String= keys.
+
+=Collection= supports the =For Each= enumeration by implementing a =NewEnum=
+method that returns an enumerator, which can be access by =collectionVar.[_NewEnum]=
+
 ** Source Code Organization
 
 *** Modules
