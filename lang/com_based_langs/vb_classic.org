@@ -1180,18 +1180,34 @@ Windows-builtin COM library.
 - By default, .NET =ComVisible= types' generated class interfaces derive from =IDispatch=
   + Exposed .NET interfaces are by default dual unless overriden by =InterfaceTypeAttribute=;
 
+- =System.Object= has a default property =ToString=
+
 - [[https://learn.microsoft.com/en-us/visualstudio/code-quality/ca1402?view=vs-2022&tabs=csharp][Method overloading]]
 
+- [[https://marc.info/?l=ms-dcom&m=103440425612266&w=2][IUnknown Support]]
+  + VBA supports holding an =IUnknown= pointer with =Variant= (=vbDataObject=)
+  + =CreateObject= can return an =IUnknown= pointer to a =Variant= variable.
+  + These pointers are not of much use except for passing around.
+
 ** Useful =mscorlib= classes
+
+- =System.Random=.
+
+- =System.Type= is returned as =mscorlib.[_Type]=
+
+- =ArrayList=, =Queue=, =HashTable=, =Stack=, =SortedList=
+  + - =For Each ... Next= works as long as the object variable is an
+    =IEnumerable=. The enumerating element has to be a =Variant= as
+    =System.Collections.IEnumerator= is marshaled as =IEnumVARIANT=,
+    see [[https://learn.microsoft.com/en-us/dotnet/standard/native-interop/type-marshalling][Type Marshaling]].
+
+- Various =*Calendar=
 
 - =UTF8Encoding=, =ASCIIEncoding=
 
 - =StringBuilder= works but overloading makes it hard to find the correct method name.
 
-- =ArrayList=
-  + - =For Each ... Next= works for =[DispId(-4)]=
-
-- =Queue=, =HashTable=, =Stack=
+- Various crytographic classes
 
 * P-Code, Compiler, Linker and Optimization[cite:@vbMinutiae]
 :PROPERTIES:
