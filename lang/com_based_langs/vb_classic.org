@@ -1142,9 +1142,43 @@ End Function
 
 Windows-builtin COM library.
 
-* .NET Interop
+* .NET Interop and COM
 
 **  Issues
+
+- Somehow, VBA loads .NET 2-3.5 even if .NET 4 typelib is referenced. It needs a
+  =appname.exe.config= with the following configuration.
+
+  #+begin_src xml
+  <configuration>
+    <startup useLegacyV2RuntimeActivationPolicy="true">
+      <supportedRuntime version="v4.0"/>
+    </startup>
+  </configuration>
+  #+end_src
+
+  See [[http://web.archive.org/web/20130128072944/http://www.marklio.com/marklio/PermaLink,guid,ecc34c3c-be44-4422-86b7-900900e451f9.aspx][What is useLegacyV2RuntimeActivationPolicy for?]]. This disables in-process
+  side-by-side of different .NET versions and uses the specified version.
+
+  #+begin_quote
+  All these have a “single runtime per process” view of the world, so we try to
+  make those codepaths believe they still exist in that world by “unifying” the
+  version that they see.  After a given version has been chosen by one of these
+  codepaths, that’s the version that all of them see for the remainder of the
+  process lifetime.  Additionally, all of these activation paths had some kind of
+  roll-forward semantics associated with them.
+  #+end_quote
+
+  This reason why by default .NET 2.0 is loaded is backward compatiblity:
+
+  #+begin_quote
+  We “cap” those semantics at v2,
+  meaning by default none of these codepaths see v4 at all.  This allows us to
+  claim that installing v4 is “non-impactful”.
+  #+end_quote
+
+- By default, .NET =ComVisible= types' generated class interfaces derive from =IDispatch=
+  + Exposed .NET interfaces are by default dual unless overriden by =InterfaceTypeAttribute=;
 
 - [[https://learn.microsoft.com/en-us/visualstudio/code-quality/ca1402?view=vs-2022&tabs=csharp][Method overloading]]
 
