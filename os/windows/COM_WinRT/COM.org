@@ -1,67 +1,110 @@
-* The Problem of C++
+* The Basic Idea Behind COM
+
+COM emphasizes *interface inheritance*, which provides support for polymorphism,
+rather than *implementation inheritance*, simply a mechanism for reusing an
+existing implementation that increases coupling between different components
+(especially from different vendors) and causes information leak of the base
+class.
+
+Implementation inheritance should be restricted within
+a component. COM provides *black-box binary reuse* suitable for the component marketplace.
+
+The core concepts of COM are *interfaces*, *classes*, *apartments*, *security*.
+
+* How C++ Library Can Be Binary Reusable
   :PROPERTIES:
   :CUSTOM_ID: the-problem-of-c
   :END:
 
-C++: built on UNIX for monolithic applications using the compiler and
+C++, built on UNIX for monolithic applications using the compiler and
 linker technology. Libraries does not always seem to be reusable and
 sometimes requires the client user to understand the source code.
 
-Traditionally, C++ libraries have been distributed in source code form
-and are expected to be linked into the executable code. Dynamic linking
-for C++ lacks standardization at the binary level, making it hard to
-distribute C++ libraries as DLLs:
+** Software Distribution: Not Used to Binary Reuse
 
-1. Different name mangling schemes between compiler vendors prevent
+Traditionally, C++ libraries have been distributed in source code form
+and are expected to be linked into the executable code. The users may choose to
+statistically link the code or even compile the code along with the client code.
+
+*Use dynamic linking*!
+
+** Dynamic Linking and Portability: No Standard Binary Reuse
+
+Dynamic linking for C++ lacks standardization at binary level, making it hard to
+distribute C++ libraries as dynamic shared libraries:
+
+- *Different name mangling* schemes between compiler vendors prevent
    dynamic linking using different compilers for client code and
    libraries. (Might be worked around using aliases)
 
-2. Different compiler vendors implement language features in their own
-   ways. e.g. exceptions.
+- Different compiler vendors implement *language features* in their own
+   ways. e.g. exceptions.
 
-3. C++ has no notion of binary encapsulation. The compilation of C++
-   requires the client's compiler to have access to all the information
-   w.r.t. object layout in order to instantiate an instance of a class
-   or to make nonvirtual method calls, which includes info about the
-   size and order of the the object's privte and protected data members.
-   Versioning on naming causes system bloat. Simply exporting C++ class
-   definitions from DLLs does not provide a reasonable binary component
-   architecture
+** Encapsulation: Binary Reuse Failure Due to Implementation Leaking
 
-4. Interface encapsulation does not work at the binary level, especially
-   vtable. (Assuming all compilers on a given platform implement the
-   virtual function call mechanism in the same manner) One way to
-   implement an interface is to use /Pimpl/ (pointer to implementation)
-   as a class member. The C++ interface class should not contain any of
-   the data members that will be used in the implementation of the
-   object. The interface class simply contains an opaque pointer whose
-   type would never be fully defined in the client's scope. This ensures
-   that the size of the interface class never changes. Forward
-   declaration means the class definition for the implementation is
-   hided from the client's compiler. However, this adds some performance
-   penalty.
+C++ has no notion of *binary encapsulation*, only *syntactic encapsulation*.
+Object layouts are exposed to the client code.
 
-5. Pure virtual abstract class as an interface requires its derived
-   class to expose its class definition unless using a global factory
-   method. All this still does not save binary compatibility since the
-   destructor must be virtual and thus pollutes the compiler
-   independence of the interface class. A /Delete/ method must be
-   introduced and explicitly called after using the object. Virtual
-   calls are immuned to name mangling since they are called through
-   function pointers and the factory method is exposed as a C function.
-   Combined with dynamic loading, this creates a runtime polymorphism.
+The compilation of C++ requires the client's compiler to have access to all the
+information w.r.t. object layout in order to *instantiate an instance* of a class (e.g. the
+change of size but the client code wouldn't know due to the use of
+explicit/implicit =sizeof=)
+or to *make nonvirtual method calls* (?), which includes info about the size and order
+of the the object's private and protected data members.
 
-6. Directly extending the interface by adding another virtual function
-   breaks compatibility. The solution is to add an extension interface.
-   =dynamic_cast<>()= should be prohibited here as it is dependent on
-   compiler implemention in favor of a semantically equivalent virtual
-   function =Dynamic_Cast()= (which navigates the type hierarchy and
-   =static_cast= the pointer. An old implementation will return a null
-   pointer for a new interface). Note that casting to virtual base is
-   another binary compatibility breaker. Resource management can be done
-   via explicit manual refcounting. The client simply calls
-   =DuplicatePointer=/=DestroyPointer=, which can be easily wrapped into
-   a smart pointer.
+Working around this with versioning on naming causes system bloat.
+
+Simply exporting C++ class definitions from DLLs does not provide a reasonable
+binary component architecture due to /lack of a /standard binary reuse convention/.
+
+** Separating Interface From Implementation
+
+One class as the interface and the other as the implementation. The interfaces
+holds a pointer to the implementation (*Pimpl*). The interface class's layout
+does not change.
+
+- This approach has some performance implication.
+
+- Pimpl may work for small classes, but may be error-prone in large projects due to the amount of
+delegate functions.
+
+- Pimpl does not solve the compiler/linker compatibility issue: non-virtual
+  calls require symbol resolution.
+
+To solve compiler incompatibilities (language feature implementation, name
+mangling), we may use an *abstract class with pure virtual functions* as the
+interface and let *the implementation inherit this interface*
+The implementation is *created from a factory function*. An explicit special
+*delete* function should be called manually instead of the compiler-dependent destructor.
+
+Virtual calls are *immuned to name mangling* since they are called through
+function pointers and the factory method is exposed as a C function.
+
+Combined with dynamic loading, this creates a runtime polymorphism.
+
+** Extensibility: Multiple Facades and Runtime Cast
+
+Directly extending the interface by adding another virtual function breaks
+compatibility because the newer client code may be using older library and cannot
+find the newer functions.
+
+The solution is to add an extension interface. =dynamic_cast<>()= should be
+ prohibited here as it is dependent on
+ compiler implemention, in favor of a semantically equivalent virtual
+ function =Dynamic_Cast()=, which navigates the type hierarchy and
+ =static_cast= the =this= pointer. An old implementation will return a =null= pointer for
+ a new interface.
+
+Note that casting to virtual base is another binary compatibility breaker.
+
+** Resource Management: Use Refcount
+
+With multiple multiple interface pointers (owners) to the same object, resource
+management becomes error-prone.
+
+Resource management can be done via explicit manual refcounting.
+The client simply calls =DuplicatePointer=/=DestroyPointer=,
+which can be easily wrapped into a smart pointer.
 
 * Intefaces
   :PROPERTIES:
