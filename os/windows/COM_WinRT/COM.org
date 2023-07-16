@@ -159,7 +159,6 @@ Each interface (=IID_*=) and each class =CLSID_*= have a unique physical name,
 annotated by =uuid()=.
 
 - =CoCreateGuid()=, =GUIDGEN.EXE= in SDK are used to generate this GUID.
-
 - COM provides constant reference aliases for each GUID types
 
   #+begin_src cpp
@@ -205,36 +204,43 @@ S_OK 	            Success.
 S_FALSE 	        Success. logical false.
 #+end_src
 
-** Resource Management
+** =IUnknown=
+
+The base interface of all COM interfaces (=import "unknwn.idl"=). The implementation is required to
+provide an =IUnknown= implementation.
+
+*** Resource Management
    :PROPERTIES:
    :CUSTOM_ID: resource-management
    :END:
 
-Resource management of =IUnknown= is straightforward:
+**** Basic Refcount Rules
 
-1. Call =AddRef= when a non-null interface pointer is copied.
+- Call =AddRef= when a non-null interface pointer is copied.
 
-2. Call =Release= prior to overwriting memory location that contains a
+- Call =Release= prior to overwriting memory location that contains a
    non-null interface pointer.
 
-3. Redundant calls to =AddRef= and =Release= can be optimized away if
+- Redundant calls to =AddRef= and =Release= can be optimized away if
    there is special knowledge about the relationship between two or even
    more memory locations.
 
-The return refcount by =AddRef= and =Release= are not thread-safe, only
-for debugging. =Release= does not nullify the pointer, so the object
-might still be valid, even if it shouldn't be used. A zero return from
-=Release= guarantees the object is invalid.
+**** Returned RefCount
 
-** =QueryInterface= Type coercion
-   :PROPERTIES:
-   :CUSTOM_ID: queryinterface-type-coercion
-   :END:
+The return refcount by =AddRef= and =Release= are not thread-safe (remote-safe), only
+for debugging. =Release= does not nullify the pointer, so the object
+might still be valid (due to other interface pointers), even if the interface pointer shouldn't be used.
+
+A zero return from =Release= guarantees the object is invalid.
+
+**** Interface RefCount
 
 =QueryInterface= can only return pointers to the same COM object.
 =AddRef= and =Release= are opertions on /an interface pointer/ so that
 an object may elect to perform per-interface reference counting to allow
-aggressive reclamation of resources. Use =IID_PPV_ARG(Type, Expr)= to
+aggressive reclamation of resources.
+
+=QueryInterface= has a type-unsafe =out= =void**=, use =IID_PPV_ARG(Type, Expr)= to
 reduce type errors.
 
 ** Implementing =IUnknown=
