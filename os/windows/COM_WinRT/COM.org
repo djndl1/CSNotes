@@ -111,47 +111,99 @@ which can be easily wrapped into a smart pointer.
   :CUSTOM_ID: intefaces
   :END:
 
-Use an indepedent interface description language: IDL, which generates
-C/C++ headers (type definitions), type library for other languges.
-/Attributes/ (annotations) precede the definition of the subjet of the
-attribute.
+** Interface Definition Language
 
-Method defintions in IDL are simply annoted C function prototypes.
+An indepedent interface description language (IDL) that generates
+*C/C++ headers* (type definitions), *type library for other languges*.
+
+IDL defines the logical (methods and operations) and physical part (network,
+memory, stack frames) of an interface.
+
+#+begin_src idl
+[
+    object,    // object is required for COM interface
+    uuid(4af2d676-23c1-11ee-91bd-8780e5365440) // uuid as a physical name for the interface
+]
+interface IThisInterface : IBaseInterface {
+    typedef1;
+    typedef2;
+    ..
+    method1;
+    method2;
+    ..
+}
+#+end_src
+
+*** Syntax
+
+The basic syntax is C-like with annotations, supporting structures, unions, arrays, enums and
+typedefs.
+
+*** MIDL/WIDL
+
+*** Result
+
+- =*.h= :: C/C++ type definitions
+
+- =*_i.c= :: GUID defintions
+
+- =*_p.c= :: interface marshaler defintions
+
+- =dlldata.c= :: interface marshaler in-process server code
+
+- =*.tlb= :: type library, for VBA, etc.
+
+** Physical Name
+
+Each interface (=IID_*=) and each class =CLSID_*= have a unique physical name,
+annotated by =uuid()=.
+
+- =CoCreateGuid()=, =GUIDGEN.EXE= in SDK are used to generate this GUID.
+
+- COM provides constant reference aliases for each GUID types
+
+  #+begin_src cpp
+  #define REFGUID const CUID&
+  #define REFIID const IID&
+  #define REFCLSID const CLSID&
+  #+end_src
+
+- Equivalence functions and C++ equivalence operator overloading
+
+  #+begin_src cpp
+  BOOL IsEqualGUID(rguid1, rguid2);
+  BOOL IsEqualCLSID(rclsid1, rclsid2);
+  BOOL IsEqualIID(riid1, riid2);
+  #+end_src
+
+** Parameters
+
+Method parameter directions must be annotated with attributes =[in]=, =[out]=,
+=[in, out]=, =[out, retval]= (return value).
+
+** =HRESULT=
 
 Virtually all COM methods return an error number of type =HRESULT=
 (32-bit signed integer), which is partitioned by bit into
-Severity-Reserved-Facility-Information. =MAKE_HRESULT= is there to
-define a custom =HRESULT=.
+*Severity-Reserved-Facility-Information*.
 
-#+BEGIN_EXAMPLE
-  HRESULT Method2([in] short arg1,
-                  [out, retval] short *parg2);
-#+END_EXAMPLE
+=HRESULT= return values are converted exceptions in certain langauges.
 
-#+BEGIN_SRC C++
-  virtual HRESULT __stdcall Method2(short arg1)
-#+END_SRC
+- =MAKE_HRESULT= :: define a custom =HRESULT=
 
-The interface definition has /the interface name/, /the base interface
-name/, /the interface body/, and /the interface atrributes/.
+- =SUCEEDED=, =FAILED= :: test marcros
 
-#+BEGIN_EXAMPLE
-  [object, uuid(...)]
-  interface IThisInterface : IBaseInterface {
-      typedef1;
-      typedef1;
-      ...
-      method1;
-      method2;
-      ...
-  }
-#+END_EXAMPLE
-
-UUIDs are the runtime representations of interface names.
-
-=IUnknown= is the root of all COM interfaces. Every other legal COM
-interface must derive from =IUnknown= directly or indirectly. COM
-interfaces cannot derive directly from more than one interfac
+#+begin_src
+E_ACCESSDENIED  	Access denied.
+E_UNEXPECTED        Method Not Implemented
+E_FAIL 	      	Unspecified error.
+E_INVALIDARG 	    Invalid parameter value.
+E_OUTOFMEMORY 	    Out of memory.
+E_POINTER 	        NULL was passed incorrectly for a pointer value.
+E_UNEXPECTED 	    Unexpected condition.
+S_OK 	            Success.
+S_FALSE 	        Success. logical false.
+#+end_src
 
 ** Resource Management
    :PROPERTIES:
