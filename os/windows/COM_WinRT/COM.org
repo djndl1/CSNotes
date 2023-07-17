@@ -1,3 +1,6 @@
+#+bibliography: COM.bib
+#+cite_export: csl
+
 * The Basic Idea Behind COM
 
 COM emphasizes *interface inheritance*, which provides support for polymorphism,
@@ -248,12 +251,52 @@ reduce type errors.
    :CUSTOM_ID: implementing-iunknown
    :END:
 
-Use =STDMETHODIMP= and =STDMETHODIMP_= to produce COM-compliant stack
-frames.
+Use =STDMETHODIMP= and =STDMETHODIMP_(type)= to produce COM-compliant stack
+frames for each methods.
 
-Use atomic operations for =AddRef= and =Release=. Traverse the type
-hierarchy of the object and use static typecasts to return the correct
-pointer type for all supported interfaces.
+- Use atomic operations for src_cpp{AddRef()} and src_cpp{Release()}.
+
+  #+begin_src cpp
+  STDMETHODIMP_(ULONG) Release(void)
+  {
+      LONG res = InterlockedDecrement(&refcount);
+      if (res == 0) delete this; // equality not <= to avoid double free.
+      return res;
+  }
+  #+end_src
+
+  + A COM object may not be allocated on the heap. =delete this= is
+    thus not advised for non-heap-based objects.
+
+  #+begin_src cpp
+  // for non-heap-based objects. Non resource management is required here
+  STDMETHODIMP_(ULONG) GlobalVar: :AddRef(void) {
+      return 2; // any non-zero value is legal
+  }
+
+  STDMETHODIMP_(ULONG) GlobalVar::Release(void) {
+      return 1; // any non-zero value is legal
+  }
+  #+end_src
+
+- =QueryInterface=: Traverse the type hierarchy of the object and use =static_cast<>= to return
+  the correct pointer type for all supported interfaces.
+  + cast =this= to =IUnknown*= may not compile as it forms a diamond.
+  + =QueryInterface= can be implemented as table-driven, see Don Box's example[cite:@EssentialCOM].
+  #+begin_src c++
+  // a rigid implementation of QueryInterface
+  if (riid == IID_A)
+      ,*ppv = static_cast<IID_A*>(this);
+  else if (riid == IID_B)
+      ,*ppv = static_cast<IID_B*>(this);
+  ...
+  else {
+      ,*ppv = nullptr;
+      return E_NOIMTERFACE;
+  }
+  reinterpret_cast<IUnknown*>(*ppv)->AddRef();
+  return S_OK;
+  #+end_src
 
 ** Data Types
    :PROPERTIES:
