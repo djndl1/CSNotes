@@ -327,6 +327,9 @@ Function ArraySum(arr As Variant) As Variant
 End Function
 #+end_src
 
++ to use array of arrays, each array element should be a =Variant= that actually
+  contains an array.
+
 *** Type Conversions
 
 **** Implicit
@@ -355,7 +358,37 @@ A heterogeneous collection of =Variant= items, indexed one-based by =Long= with 
 =String= keys.
 
 =Collection= supports the =For Each= enumeration by implementing a =NewEnum=
-method that returns an enumerator, which can be access by =collectionVar.[_NewEnum]=
+method that returns an enumerator, which can be access by
+=collectionVar.[_NewEnum]=
+
+=Collection= does not support replacing an element in place. One has to
+=.Remove= and then =.Add Item, , beforeThisIndex=.
+
+One trick to store UDT types in =Collection= is to store a UDT as an array.
+
+#+begin_src vba
+' Filter out all duplicate entries in any Variant-compatible array.
+' On entry, NUMELS should be set to the number of items to be examined.
+' On exit, NUMELS holds the number of nonduplicate items.
+Sub FilterDuplicates(arr As Variant, numEls As Long)
+    Dim col As New Collection, i As Long, j As Long
+    On Error Resume Next
+    j = LBound(arr) - 1
+    For i = LBound(arr) To numEls
+        ' Add a dummy zero value, but use the array's value as the key.
+        col.Add 0, CStr(arr(i))
+        If Err = 0 Then
+            j = j + 1
+            If i <> j Then arr(j) = arr(i)
+        Else
+            Err.Clear
+        End If
+    Next
+    ' Clear all remaining items.
+    For i = j + 1 To numEls: arr(i) = Empty: Next
+    numEls = j
+End Sub
+#+end_src
 
 ** Source Code Organization
 
@@ -477,6 +510,7 @@ All expressions are always evaluated which might lead to unexpected bugs.
 There is no =continue= in VB, use =IF= with =GOTO=
 
 #+begin_src vba
+' item must be a Variant or an Object type if elements are of certain object type
 For Each item In Col
 ...
 Next item
