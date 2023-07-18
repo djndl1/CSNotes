@@ -109,6 +109,77 @@ Resource management can be done via explicit manual refcounting.
 The client simply calls =DuplicatePointer=/=DestroyPointer=,
 which can be easily wrapped into a smart pointer.
 
+
+* COM Data Types
+   :PROPERTIES:
+   :CUSTOM_ID: data-types
+   :END:
+
+| IDL               | C++               | VB             |
+|-------------------+-------------------+----------------|
+| boolean           | unsigned char     | N/A            |
+| byte              | unsigned char     | N/A            |
+| small             | char              | N/A            |
+| short             | short             | Integer        |
+| long              | long              | Long           |
+| hyper             | __int64           | N/A            |
+| float             | float             | Single         |
+| double            | double            | Double         |
+| char              | unsigned char     | N/A            |
+| wchar_t           | wchar_t           | Integer        |
+| enum              | enum              | Enum           |
+| Interface Pointer | Interface Pointer | Interface Ref. |
+| VARIANT           | VARIANT           | Variant        |
+| BSTR              | BSTR              | String         |
+| VARIANT_BOOL      | short             | Boolean        |
+
+- =OLECHAR= :: =wchar_t=
+  + =[string]= is required to indicate that =OLECHAR*= is a null-terminated
+    array of characters, not simply a pointer to =OLECHAR=.
+  + =OLESTR(string_literal)=
+
+- =BSTR= (automation type) :: length-prefixed (four bytes) null-terminated =OLECHAR= string
+  + VB's =String= type.
+  + it is legal to pass a =null= pointer as a =BSTR= to indicate an empty string.
+  + =SysAllocString()=, =SysReAllocString()=, =SysFreeString()=,
+    =SysStringLen()=, =SysStringByteLen()=
+
+- structures ::
+  + VB can access interfaces that use structures but cannot implement such interfaces.
+
+- Union :: a value that may have any of several representations or formats
+  within the same position in memory.
+  + an integral discriminator is expected at the same logical level (e.g. in the same
+    =struct=) so that the actual interpretation is unambiguous.
+
+    #+begin_src idl
+    // encapsulated
+    struct UNUMBER {
+        short t;
+        [switch_is(t)] union VALUE {
+            [case(1)] long i;
+            [case(2)] float f;
+        };
+    };
+
+    // nonencapsulated union
+    union NUMBER {
+        [case(1)] long i;
+        [case(2)] float f;
+    }
+
+    HRESULT Add([in, switch_is(t)] union NUMBER *pn, [in] short t);
+    #+end_src
+  + =VARIANT= :: a common discriminated (tagged) union
+
+- COM interface ::
+  + type can be specified either statistically or dynamically with a =REFIID= aside
+    #+begin_src idl
+    HRESULT GetObject([in] REFIID riid, [out, iid_is(riid)] IUnknown/void **ppUnk);
+    #+end_src
+    Dynamic typed interface pointers are preferred since it reduces additional
+    client object method calls.
+
 * Intefaces
   :PROPERTIES:
   :CUSTOM_ID: intefaces
@@ -298,25 +369,12 @@ frames for each methods.
   return S_OK;
   #+end_src
 
-** Data Types
-   :PROPERTIES:
-   :CUSTOM_ID: data-types
-   :END:
-
-- =OLECHAR=: =wchar_t=
-
-- =BSTR=: length-prefixed =OLECHAR= string
-
-- =string=: pointer to a null-terminated array of characters
-
-- =VARIANT=: a common discriminated union
-
 ** Attributes and Properties
    :PROPERTIES:
    :CUSTOM_ID: attributes-and-properties
    :END:
 
-- =[propget]=, =[progput]=: =get= =set=
+Object properties can be defined with =[propget]= and =[progput]= on methods.
 
 ** Exceptions
    :PROPERTIES:
