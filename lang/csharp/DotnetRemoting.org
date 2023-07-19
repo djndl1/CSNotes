@@ -94,8 +94,17 @@ or *context-bound* (=System.ContextBoundObject=).
 
 - /Object Activation/ :: Before an object instance of a remotable type can be accessed, it must be created and initialized by a process.
   + Marshal-by-reference types support [[#server_activation][*server activation*]] and [[#client_activation][*client activation*]].
-  + Marshal-by-value types are copied via serialization and acivated upon
+  + Marshal-by-value types are copied via serialization and activated upon
     deserialization.
+
+- Metadata distribution
+  + The client may reference the server assembly directly to obtain the metadata.of remotable objects.
+  + create a metadata assembly of stand-in class definitions with the same name as the server's implementation
+    assembly's.
+  + both sides reference the same contract assembly that contains only
+    interfaces and parameter/retval/​=EventArgs= type definitions. This requires the use of
+    =Activator.GetObject= and server-activated factory objects for object activation.
+
 
 *** Server Activation
 :PROPERTIES:
@@ -120,6 +129,9 @@ Objects can be either activated in /singleton-mode/ or /single-call mode/.
   client makes.
   + stateless, but still an OOP object though with a very limited lifetime.
 
+A server-activated object can be created with =new= after registration
+(instantiable object), or with =Activator.GetObject()= if it is returned as an interface.
+
 *** Client Activation
 :PROPERTIES:
 :CUSTOM_ID: client_activation
@@ -128,6 +140,11 @@ Objects can be either activated in /singleton-mode/ or /single-call mode/.
 This type of remotable objects works like a real client object (stateful,
 different identities, URIs for different objects) but with lifetime
 managed by the .NET remoting infrastructure.
+
+A client activated object can be created with the =new= operator after
+registration (instantiable object)
+or by a server-activated factory object, especially when the client-activated object
+is returned as an interface.
 
 ** Lease-based Object Lifetime Management
 
