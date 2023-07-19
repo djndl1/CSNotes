@@ -381,10 +381,19 @@ Object properties can be defined with =[propget]= and =[progput]= on methods.
    :CUSTOM_ID: exceptions
    :END:
 
+- =IErrorInfo=: contextual error.
+  + The VB =Err= object.
+  + =CreateErrorInfo()= provides a default error implementation.
+  + =SetErrorInfo= throws it and =GetErrorInfo= catches and clears it.
+
 The objects that throw COM exceptions must implement the
-=ISupportErrorInfo= interface to indicate which interfaces support
-exceptions. Create an error using =ICreateErrorInfo=, call
-=SetErrorInfo= to throw it and =GetErrorInfo= to catch and clear it.
+=ISupportErrorInfo= interface to indicate /which interfaces/ support
+exceptions. The client code that receives an error return value
+should =QueryInterface= the object to =ISupportErrorInfo= and see if the interface
+supports exception or not to decide whether it is =SetErrorInfo= the exception returned by
+=GetErrorInfo()=. In short, =IErrorInfo= is used alongside with =HRESULT=.
+
+*Do not let pure C++ exception to be propagated beyond the method boundary*.
 
 * Classes
   :PROPERTIES:
