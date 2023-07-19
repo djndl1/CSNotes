@@ -394,8 +394,8 @@ End Sub
 
 *** Modules
 
-Module are made a of a /declaration section/ (types, constants and variables)
-plus a collection of procedures.
+Module are made a of a *declaration section* (types, constants and variables)
+plus *a collection of procedures*.
 
 - Form Module: basically class module with GUI controls
 
@@ -437,21 +437,44 @@ rules, one may use =Call= if possible.
 
 *** Parameters and Return Values
 
-- Parameters can be pased =ByVal= or =ByRef= (by default even for basic types
-  like =Long=, which can lead to undetected bugs). A =ByRef= =Variant= accepts
-  arguments of any types.
+- Parameters can be passed =ByVal= or =ByRef= (by default even for basic types
+  like =Long=, which can lead to undetected bugs).
+  + =ByVal= performs possible type conversion for values passed in
+  + A =ByRef Variant= accepts arguments of any types.
+    #+begin_src vba
+    ' Swap values of any type.
+    Sub Swap(first As Variant, second As Variant)
+        Dim temp As Variant
+        temp = first: first = second: second = temp
+    End Sub
+    #+end_src
+  + Use =ByVal= whenever possible.
 
-- /Optional/ parameters: after all other arguments, checked by =IsMissing()=
-  ( A =Missing= value is pushed onto the stack for an optional argument.
-  =IsMissing= would not work if the the type is not =Variant= since the missing value is a
-  =Err= value) and
-  can be used with a default value =Optional color As Long = vbWhite=; A
-  non-Variant optional parameter receives its default value if no default value
-  is assigned (not missing).
+- Passing User Defined Types is restricted
+  + a =Public= UDT defined in a =BAS= module cannot be only be passed into
+    =Public= procedures defined in BAS modules. (Such UDT types are unknown to COM)
+  + Define a COM-aware UDT in a class module or a form module.
 
-- /Named/ arguments: ~NamedArg := paramVal~
+- A type private to a project can be used as a parameter or the return value of
+  procedure that can be called from outside the project.
+
+- /Optional/ parameters
+  + If the type is =Variant= (an =Err= value), it can checked by =IsMissing()=.
+    A =Missing= value is pushed onto the stack for an optional argument.
+    =IsMissing= only works with an optional parameter once, the second time it
+    would return =False=.
+  + Can be used with a default value. ~Optional color As Long = vbWhite~;
+  + A non-Variant optional parameter receives its default value if no default value
+    is assigned (not =Missing=).
+  + a UDT type cannot be used with =Optional=.
+
+- /Named/ arguments: ~NamedArg := paramVal~.
+  + Better than multiple commas with optional parameters in between before a
+    final parameter.
 
 - =ParamArray args() As Variant=: any number of arguments as a =Variant= array.
+  + (undocumented) =IsMissing= can be used with =ParamArray= =args= to check if
+    =args= is an empty array=. The legal syntax is to check if =LBound(args) > UBound(args)=.
 
 #+begin_src vba
 With Emp
