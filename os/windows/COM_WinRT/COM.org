@@ -400,20 +400,32 @@ supports exception or not to decide whether it is =SetErrorInfo= the exception r
   :CUSTOM_ID: classes
   :END:
 
-- /Interfaces/: abstract protocol for communicating with an object
+- /Interfaces/: abstract protocol for communicating with an concrete meaningful implementation. Not to
+  replace objects themselves.
 
 - /Classes/ are named (after =CLSID=) implementations that represent
-  concrete instantiable types. =ProgID=s are text-based aliases for
+  concrete instantiable types. =ProgID=​s are text-based aliases for
   =CLSID=, unique only by convention.
 
-#+BEGIN_SRC C
+  #+BEGIN_SRC C
   HRESULT CLSIDFromProgID();
   HRESULT ProgIDFromCLSID();;
-#+END_SRC
+  #+END_SRC
 
-A class object acts as the metaclass for a given implementation and the
-methods it implements fill the role of static member functions. Class
-objects are often used as brokers to create new instances of a class to
+- /Component Category/: a semantic grouping of coclasses that implement a shared
+  set of interfaces.
+
+** Class Object
+
+All COM classes must have a *class object*, a per-class singleton that
+implements the /instanceless functionality of the class/, the *metaclass* for a
+given implementation and the methods it implements fill the role of
+static member functions.
+
+Since class objects are singletons, they are /well-known/ in th sense that their
+CLSIDs refer to the objects.
+
+Class objects are often used as brokers to /create new instances of a class/ (*factory*) or
 find existing instances based on some well-known object name.
 
 ** Object Activation
@@ -421,25 +433,49 @@ find existing instances based on some well-known object name.
    :CUSTOM_ID: object-activation
    :END:
 
-/Object Activation/: Clients need a mechanism for finding class objects,
-which may involve loading a DLL or starting a server process, to bring
-an object to life.
+- *Object Activation* :: the process of bringing an object to life.
 
-Object activation is done by sending requests to the COM Service Control
-Manager, a central rendezvous point for all activation requests, the
-interface of which, called the COM library, is implemented in
-=OLE32.DLL= on WinNT.
+- *Activation Models* ::
+  + binding to the class object of a given class (the ultimate primitive)
+    - =CoGetClassObject()= creates a class object which can be used to create
+      class instances, most likely through =IClassFactory=.
+  + create new instances of a class based on CLSID
+    - =CoCreateInstance(Ex)=
+  + bring a persistent object to life based on the persistent state of the object.
+    - =CoGetInstanceFromFile()=
 
-In-Process COM calls are mostly just virtual calls. Out-of-process COM
-calls are called upon /proxies/, which translates between method
-invocations and RPC requests.
+- *COM Service Control Manager* (in =RPCSS.EXE=) ::
+  + Object activation is done by sending requests to the COM SCM,
+    a central rendezvous point for all activation requests.
+  + its interface API (*the COM library*) is implemented on WinNT as
+    =OLE32.DLL=.
+  + COM SCM only handles the activation.
+  + COM SCM hides the details about where the activated object resides.
 
-*** Using SCM
-    :PROPERTIES:
-    :CUSTOM_ID: using-scm
-    :END:
+In-Process COM calls are mostly just virtual calls with compatible threading
+requirements. Out-of-process COM calls are called upon /proxies/, which
+translates between method invocations and RPC requests.
 
-- =CoGetClassObject=: creates a class object, which in turn can be used
-  to create instances of the class, most likely through =IClassFactory=.
-  The function locates t he code associated with the =CLSID=. This
-  function underlies all ofthe instance creation functions.
+- *COM Server* :: a binary file that contains the code for one or more COM classes.
+  + either a normal executable or a DLL
+  + A DLL-based version can be loaded into the client's address space or in a
+    surrogate process as an out-of-process server;
+    An executable is started as a process in response to a request of
+    out-of-process or off-host activation.
+
+- *COM Class Store* :: the NT directory maintains COM class configuration
+  information across machines.
+  + a *local cache* (the *Windows Registry*) is queried before the NT directory.
+    + =HKLM:\Software\Classes= (aliased as =HKEY_CLASSES_ROOT=) machine-wide and
+      =HKCU:\Software\Classes= per-user configuration. =HKCR\MyCoClassProgID\CLSID= is
+      required to support =CLSIDFromProgID()=.
+    + =HKCR:\CLSID= and =HKCU:\Software\Classes\CLSID\= information about
+      CLSIDs, its activation models and server paths, its ProgID to support
+      =ProgIDFromCLSID()=
+    + All well-implemented COM servers are required to support
+      *self-registration*, that is, registering itself in the Registry on
+      calling certain functions.
+      - DLLs must implement and export =DllRegisterServer()= and =DllUnregisterServer()=.
+    + Class objects are exposed by DLLs via a private =DllGetClassObject()=.
+      =CoGetClassObject= finds the registered DLL and loads it into memory and
+      then resolve =DllGetClassObject()=.
