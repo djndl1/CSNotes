@@ -493,6 +493,7 @@ End Type
 
 - Logical operator with ===, =<>=; =And=, =Or=, =Xor=, =Not= bitwise operator
   (for boolean there's no difference)
+  + be careful when using these operators with integers in conditional expressions.
 
 - =If () Then ... ElseIf () Then ... Else ...=; multi-line branch statement
    requires a =End If=.
@@ -509,7 +510,7 @@ Select Case Mid$(Text, i, 1)
         ' It's a digit.
     Case "A" To "Z", "a" To "z"
         ' It's a letter.
-    Case ".", ",", " ", ";", ":", "?"
+    Case ".", ",", " ", ";", ":", "?" ' connected by OR
         ' It's a punctuation symbol or a space.
     Case Else
         ' It's something else.
@@ -604,7 +605,8 @@ Loop Until (expr)
 
 Primitive with =GoTo= but better than C's =errno= check.
 
-- =On Error Resume Next=: ignore any error
+- =On Error Resume Next=: ignore any error.
+  + can be used to test if an object has certain properties.
 
 - =On Error Resume=: retry the erring line. Error is not cleared after the
   control returns to the calling code.
@@ -617,7 +619,6 @@ Primitive with =GoTo= but better than C's =errno= check.
   + =Resume <label>=
   + =Err.Raise=: errs out again
   + =Exit Sub= or =Exit Function= with the calling code receiving a zero error code.
-
 
 - =On Error Goto 0=: disable any previous =On Error=
 
