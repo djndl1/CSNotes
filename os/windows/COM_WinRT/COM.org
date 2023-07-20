@@ -439,14 +439,16 @@ find existing instances based on some well-known object name.
   + binding to the class object of a given class (the ultimate primitive)
     - =CoGetClassObject()= creates a class object which can be used to create
       class instances, most likely through =IClassFactory=.
+    - Class objects are exposed by DLLs via a private symbol =DllGetClassObject()=.
+      =CoGetClassObject= finds the registered DLL and loads it into memory and
+      then resolve =DllGetClassObject()=.
   + create new instances of a class based on CLSID
     - =CoCreateInstance(Ex)=
   + bring a persistent object to life based on the persistent state of the object.
     - =CoGetInstanceFromFile()=
 
-- *COM Service Control Manager* (in =RPCSS.EXE=) ::
+- *COM Service Control Manager* (in =RPCSS.EXE=) :: a central rendezvous point for all activation requests.
   + Object activation is done by sending requests to the COM SCM,
-    a central rendezvous point for all activation requests.
   + its interface API (*the COM library*) is implemented on WinNT as
     =OLE32.DLL=.
   + COM SCM only handles the activation.
@@ -476,6 +478,3 @@ translates between method invocations and RPC requests.
       *self-registration*, that is, registering itself in the Registry on
       calling certain functions.
       - DLLs must implement and export =DllRegisterServer()= and =DllUnregisterServer()=.
-    + Class objects are exposed by DLLs via a private =DllGetClassObject()=.
-      =CoGetClassObject= finds the registered DLL and loads it into memory and
-      then resolve =DllGetClassObject()=.
