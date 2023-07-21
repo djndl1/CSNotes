@@ -536,7 +536,7 @@ There is no =continue= in VB, use =IF= with =GOTO=
 #+begin_src vba
 ' item must be a Variant or an Object type if elements are of certain object type
 For Each item In Col
-...
+...  ' Exit For
 Next item
 
 For i = 0 To N [Step Increment]
@@ -545,7 +545,8 @@ Next i
 #+end_src
 
 #+begin_src vba
-While (expr) ' break is not available
+' While Wend is limited in VBA
+While (expr) ' break is not available, use Do While Loop
 ...
 Wend
 
@@ -556,7 +557,7 @@ Loop
 
 Do
 ...
-Loop Until (expr)
+Loop [Until (expr)]
 #+end_src
 
 ** Event
