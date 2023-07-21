@@ -211,6 +211,9 @@ execution when the variable is live and available for use.
 - =Single= and =Double=
 
 - =String= (=BSTR=):
+  + Unicode is supported but Unicode String literals are not due to the IDE's
+    non-Unicodeness. The IDE doesn't even recognize support UTF-16.
+    Use =ChrW= instead
   + =Dim VarLenStr As String= (variable-length);
     =Dim FixedLenStr As String * 40= fixed-length (not well-supported by VB's
     string functions and causes low performance);
