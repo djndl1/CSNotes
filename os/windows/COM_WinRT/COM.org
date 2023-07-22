@@ -428,6 +428,8 @@ CLSIDs refer to the objects.
 Class objects are often used as brokers to /create new instances of a class/ (*factory*) or
 find existing instances based on some well-known object name.
 
+For uniformity, a class object should implement =IClassFactory=.
+
 ** Object Activation
    :PROPERTIES:
    :CUSTOM_ID: object-activation
@@ -446,6 +448,18 @@ find existing instances based on some well-known object name.
     - =CoCreateInstance(Ex)=
   + bring a persistent object to life based on the persistent state of the object.
     - =CoGetInstanceFromFile()=
+  + The primitive way of object activation is to first =CoGetClassObject= and
+    use that class object to =CreateInstance()= of the class and then
+    =QueryInterface= to the appropriate interface. =CoCreateInstance(Ex)= merges
+    the three steps together semantically and ensures that all operations are executed in the
+    server process (if out-of-process) to reduce unnecessary round-trips.
+    =CoCreateInstanceEx= does not actually internally call =CoGetClassObject=.
+  + However, if a large amount of objects need to be created, caching a class
+    object and =CreateInstance()= would be faster as it does not go through the
+    COM SCM. In essence, COM does not really relies on the COM SCM. The
+    centralized object activation mechanism is just a handy
+    facility .One can even create a COM object through a pure C API without
+    going through =CoGetClassObject=, =CoCreateInstanceEx= etc..
 
 - *COM Service Control Manager* (in =RPCSS.EXE=) :: a central rendezvous point for all activation requests.
   + Object activation is done by sending requests to the COM SCM,
