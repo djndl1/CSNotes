@@ -219,8 +219,11 @@ execution when the variable is live and available for use.
     string functions and causes low performance);
   + =""""= for embedding a quote inside a string.
   + String constants such as =vbTab= and =vbCrLf= are available.
+  + =NULL= and =""= are equivalent for =BSTR=. See
+    [[https://nolongerset.com/check-for-empty-strings-in-vba/][Check for Empty Strings in VBA]].
 
-- =Date= (=DATE=, 8-bytes): =#12/3/2013#
+- =Date= ([[https://learn.microsoft.com/en-us/cpp/atl-mfc-shared/date-type?view=msvc-170][OLE =DATE=]], 8-bytes): =#12/3/2013#
+  + actually a DateTime
 
 - =Object=: stores references. Object variables are assigned using =Set=.
   Missing =Set= might lead to unexpected results (the value might be assigned to
@@ -1060,7 +1063,7 @@ Container of all the controls currently loaded on the form itself.
 - Common math functions are available: =Abs=, =Sgn=, =Sqr=, =Exp=, =Log=
 
 - =Int=: round to the lower integer, a ceiling function; =Fix=: truncates the decimal part; =Round=
-  to the specified number of digits.
+  to the specified number of digits and uses banker's rounding.
 
 #+begin_src vba
 Function Ceiling(number As Double) As Long
@@ -1074,6 +1077,8 @@ End Functio
   between =[0, 1)=
 
 ** String Operations and Functions
+
+Use the =$= version, they return a string instead of =Variant=.
 
 - =&=: concatenation
 
@@ -1129,7 +1134,7 @@ value Like "[!0-9]??*"
 
 - Date literal =#8/15/1998 9:20:57 PM#=
 
-- =DateSerial=, =TimeSerial=
+- =DateSerial=, =TimeSerial=: may be used added together to create a DateTime
 
 #+begin_src vba
 Function IsLeapYear(year As Integer) As Boolean
@@ -1138,9 +1143,9 @@ Function IsLeapYear(year As Integer) As Boolean
 End Function
 #+end_src
 
-- =Date=, =Time= property: the current date and time.
+- =Date=, =Time=, =Timer= (subsecond precision) property: the current date and the current time.
 
-- =Now=, =Timer=: the current date and time.
+- =Now=: the current date and time.
 
 - =DateValue=, =TimeValue=: returns the Date/Time component of the argument.
   + =Year=, =Month=, =Day=, =Hour=, =Minute=, =Second= returns the corresponding
@@ -1155,6 +1160,12 @@ End Function
 
 - Date Format
   + =Format=, =FormatDateTime=, =MonthName=: useless unless for human eyes.
+
+#+begin_src vba
+Public Function DateTimeAsISO8601(ByRef d As Date) As String
+   DateTimeAsISO8601 = Format(d, "yyyy-mm-ddThh:nn:ss")
+End Function
+#+end_src
 
 ** Files
 
