@@ -1171,7 +1171,7 @@ End Function
 
 - =Name= (move); =Kill= (delete); =FileCopy=
 
-- =GetAttr=, =SetAttr= [[https://learn.microsoft.com/en-us/windows/win32/fileio/file-attribute-constants][Windows File Attributes]]
+- =GetAttr=, =SetAttr= [[https://learn.microsoft.com/en-us/windows/win32/fileio/file-attribute-constants][Windows File Attributes]], =FileLen=, =FileDateTime=
 
 - =CurDir$=; =ChDrive=, =ChDir=: both commands must be used to change the
   current directory to another drive's.
