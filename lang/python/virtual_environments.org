@@ -1,0 +1,22 @@
+#+title: Virtual Environments
+
+* =venv=
+:PROPERTIES:
+:ID:       7ab6e1c0-5340-4b85-8a17-2f62ce605321
+:END:
+
+#+begin_src shell
+python -m venv /path/to/env/directory
+#+end_src
+
+=venv= creates a virtual environment directory tree similar to that of a typical
+python installation with a few special scripts that activate/deactivate the
+environment.
+
+On activation, it points =sys.prefix= and =sys.exec_prefix= to the virtual
+environment
+while keeping =sys.base_prefix= and =sys.base_exec_prefix= where it used to be.
+
+A =venv= environment is not portable.
+
+Do use =python -m pip= on Windows for safety.
