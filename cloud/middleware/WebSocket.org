@@ -1,0 +1,25 @@
+#+title: RFC 6455 WebSocket
+
+
+Layer 7 Full-duplex communication protocol over a TCP connection.
+
+* Software Support
+
+All mainstream browsers and web servers supports WebSockets.
+
+* Protocol
+
+The connection starts with a HTTP handshake and then switches to a duplex binary
+communication.
+
+TODO
+
+* Programming
+
+** Web
+
+TODO
+
+** Library
+
+TODO
