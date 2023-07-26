@@ -409,7 +409,7 @@ supports exception or not to decide whether it is =SetErrorInfo= the exception r
 
   #+BEGIN_SRC C
   HRESULT CLSIDFromProgID();
-  HRESULT ProgIDFromCLSID();;
+  HRESULT ProgIDFromCLSID();
   #+END_SRC
 
 - /Component Category/: a semantic grouping of coclasses that implement a shared
@@ -492,3 +492,30 @@ translates between method invocations and RPC requests.
       *self-registration*, that is, registering itself in the Registry on
       calling certain functions.
       - DLLs must implement and export =DllRegisterServer()= and =DllUnregisterServer()=.
+
+** Moniker
+
+A factory class creates an object of initial state while an =IMoniker= can
+provide addition information.
+Originally monikers are used in OLE as a marshalable reference (locator) to some
+non-interchangeable object.
+A compound document file can get a moniker to an Excel file and bind it =IMoniker:BindToObject= to the
+spreadsheet it displays.
+Later monikers became a general abstraction of an object creation algorithm that
+allows a client to specify arbitrary initialization data. A new coclass object
+is created without initialization since neither a coclass constructor nor its factory
+class takes any parameter. Custom initialization is required and it is hardly
+general or abstract. Monikers should hide the initialization algorithm or the
+data requirement.
+
+- /display name/ :: the textual representation of a moniker
+  + =IMoniker::GetDisplayName()=
+  + =MkParseDisplayName()= matches the display name's prefix to a registered
+    ProgID of the designated moniker.
+  + e.g. class moniker =clsid:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:=, builtin
+    moniker type that can connect to a class object. =CreateClassMoniker=
+
+*** Use Monikers
+
+- =MkParseDisplayName()= and then =IMoniker::BindToObject()=
+  + =CoGetObject()= in one step (remember =Activator.GetObject()= in .NET)
