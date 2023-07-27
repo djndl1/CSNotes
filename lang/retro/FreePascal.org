@@ -1,0 +1,64 @@
+#+title: Free Pascal
+
+* Pascal Ecosystem
+
+- Turbo Pascal, Delphi
+
+- GNU Pascal seems dead
+
+- Free Pascal
+  + Highly compabible with Turbo Pascal and Delphi.
+
+* Free Pascal Dialects and Modes
+
+FPC supports many different Pascal dialects and feature switches to remain
+compatible with many different PASCAL compilers and standards, either by the
+=-M= compiler switch or a per-unit ={$MODE }= directive, of which the directive
+takes priority.
+
+** Turbo Pascal Mode (TP)
+
+32/64-bit Turbo Pascal 7.0
+
+** Default Mode (FPC)
+
+Turbo Pascal dialect cleaned of DOSism and 16-bit-ism, few differences to TP.
+
+** Object Pascal (objfpc)
+
+Free Pascal version of the Delphi dialect. (incompatible extensions), used by
+Lazarus by default, probably the most used dialect nowadays.
+
+** Delphi Mode (DELPHI and DELPHIUNICODE)
+
+the unicode versions supports all Delphi 2009 and above features.
+
+** MACPAS
+
+** ISO
+
+ISO 7185 Mode
+
+** ExtendedPascal
+
+ISO 10206
+
+* Unicode Support
+
+** Source File Codepage and String Literals
+
+Source file codepage determines how string literals are interpreted and if they
+are converted when assigning one string type to another. They are determined in
+the order by
+
+- =${codepage xxx}= directive
+
+- UTF-8 BOM
+
+- =${modeswitch systemcodepage}= uses the =DefaultSystemCodePage= of the
+  computer of the compiler.
+
+- otherwise =CP_ACP=
+
+A string constant is interpreted according to its source file codepage and
+converted when assigned to a string type.
