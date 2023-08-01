@@ -644,14 +644,6 @@ Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
 
 - Public variables have default property implemented by the compiler.
 
-** Auto Instancing: Created Only When Used
-
-Not recommended for various reasons.
-
-#+begin_src vba
-Dim pers As New CPerson
-#+end_src
-
 ** Properties
 
 #+begin_src vba
