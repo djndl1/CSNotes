@@ -1170,6 +1170,45 @@ End Function
 
 - =MkDir=, =RmDir=; =Name= (rename only)
 
+- =Dir=: iterate through files, something similar to C's =strtok= that maintains a global state.
+#+begin_src vba
+Function FileExists(filename As String) As Boolean
+    On Error Resume Next
+    FileExists = (Dir$(filename) <> "")
+End Function
+
+Function DirExists(path As String) As Boolean
+    On Error Resume Next
+    DirExists = (Dir$(path & "\nul") <> "") ' check for nul device
+End Function
+
+Function GetFiles(filespec As String, Optional Attributes As _
+    VbFileAttribute) As String()
+    Dim result() As String
+    Dim filename As String, count As Long, path2 As String
+    Const ALLOC_CHUNK = 50
+    ReDim result(0 To ALLOC_CHUNK) As String
+    filename = Dir$(filespec, Attributes)
+    Do While Len(filename)
+        count = count + 1
+        If count > UBound(result) Then
+            ' Resize the result array if necessary.
+            ReDim Preserve result(0 To count + ALLOC_CHUNK) As String
+        End If
+        result(count) = filename
+        ' Get ready for the next iteration.
+        filename = Dir$
+    Loop
+    ' Trim the result array.
+    ReDim Preserve result(0 To count) As String
+    GetFiles = result
+End Function
+#+end_src
+
+*** =FileSystemObject= : the OOP Way
+
+- =FileExists()=, =DriveExists()=, =FolderExists()=
+
 ** Interoperation With the System
 
 - =App=: the current app's
