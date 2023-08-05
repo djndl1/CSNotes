@@ -759,20 +759,26 @@ End Property
   + useful for RAII or debug tracing (a special =Tracer= class created at the
     entry of a procedure)
 
-*** Implementation
+*** Custom Event Implementation
 
 #+begin_src vba
 ' implementation
+' define an event
 Event FileCopied(file As String, DestPath As String)
 
 Public Sub StartCopy(filespec As String)
     ...
-    RaiseEvent FileCopied(thisFile, thisDestPath)
+    RaiseEvent FileCopied(thisFile, thisDestPath) ' raise the event
 End Sub
 #+end_src
 
+To subscribe to an event, declare the event source with =WithEvents=,
+the event handler should be named as =EventSourceVariable_EventName=.
+Raising events are not asynchronous.
+
 #+begin_src vba
-Dim WithEvents Fop As CFileOp
+' subscribe to an event
+Dim WithEvents Fop As CFileOp ' declare the event source object with WithEvents
 
 Private Sub Fop_FileCopied(file As String, DestPath As String)
     ...
