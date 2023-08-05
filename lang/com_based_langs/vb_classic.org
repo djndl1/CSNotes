@@ -658,7 +658,9 @@ Property Let BirthDate(ByVal newValue As Date)
 End Property
 #+end_src
 
-A property can have an argument:
+To implement a init-once property, use =Variant= and =IsEmpty=.
+
+A property can take an argument:
 
 #+begin_src vba
 Private m_Notes(1 To 10) As String
@@ -673,8 +675,9 @@ Property Let Notes(Index As Integer, ByVal newValue As String)
 End Property
 #+end_src
 
-Every =Public= member variables are accessed from outside the class through a pair of hidden
-procedures, which causes the following code invalid
+Every =Public= member variables are accessed through a pair of hidden
+procedures from outside the class or with
+=Me.property=, which causes the following code invalid
 
 #+begin_src vba
 Sub ToCentimeters (value As Single)
@@ -682,7 +685,7 @@ Sub ToCentimeters (value As Single)
     value = value * 2.54
 End Sub
 
-ToCentimeters pers.Height                ' Doesn't work!
+ToCentimeters pers.Height                ' pers.Height returns a rvalue, not a reference
 #+end_src
 
 #+begin_src vba
