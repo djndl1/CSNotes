@@ -203,6 +203,8 @@ execution when the variable is live and available for use.
 - =Integer= (16-bit) and =Long= (32-bit, the preferred type for integer values):
   =&= prefixed forces a literal integer into a =Long= value.
   + =&H1234=, =&O011064=
+  + an =enum= type can have a maximum sentinel value to guard against invalid
+    integer assigned to a variable of such a =enum= type.
 
 - =Boolean= (2-byte): =0= for =False= and =-1= for =True=
 
