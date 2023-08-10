@@ -917,6 +917,18 @@ Sub Reset2(ByVal pers As CPerson)
 End Sub
 #+end_src
 
+
+** OLE Automation
+
+Use as few 'dots' as possible and cache COM object references
+to avoid expensive COM calls.
+
+*** Late Binding Creation Of OLE Objects
+
+- =CreateObject()=
+
+- =GetObject()=
+
 * Database Programming
 
 - ODBC
