@@ -925,6 +925,8 @@ to avoid expensive COM calls.
 
 *** Late Binding Creation Of OLE Objects
 
+Declare a variable to the =Object= type forces late binding call on that variable.
+
 - =CreateObject()=
 
 - =GetObject()=
