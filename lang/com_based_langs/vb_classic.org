@@ -917,6 +917,18 @@ Sub Reset2(ByVal pers As CPerson)
 End Sub
 #+end_src
 
+** Inheritance
+
+Not natively supported.
+
+*** Through Delegation
+
+Initialize the base object in the =Class_Initialize= handler and delegate
+behaviors and property access to the base object. A second interface or the base
+object can be accessed through a second variable.
+
+Inheritance through delegation gives the subclass freedom to use the base
+implementation or override the behavior.
 
 ** OLE Automation
 
