@@ -15,3 +15,8 @@ An element is identified by its key values, not by positions. A query against a 
 A client connects to the database with a /Login/ (instance-level authentication
 object), possibly with a credential. A user (database-level authorization
 principal) can be associated with a login.
+
+* Backup and Restore
+
+Use =BACKUP= to export a backup file. To =RESTORE= as another database, add
+=WITH MOVE ... to ...=.
