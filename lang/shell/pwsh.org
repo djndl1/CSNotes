@@ -2,7 +2,7 @@
 
 * What Pwsh is, what it can do
 
-1. a CLI interpreter, a scripting langguage, a shell
+1. a CLI interpreter, a easy-to-use interactive scripting language, a shell, an automation engine.
 
 2. Object-based, well integrated with Windows's API-based system
    + Common Information Model, implemented by MS as /Windows Management Instrumentation/
