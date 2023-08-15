@@ -9,3 +9,9 @@
 DDL; DML (=SELECT=, =INSERT=, =UPDATE=, =DELETE=, =MERGE=, =TRUNCATE=); DCL (control): deals with permissions and includes =GRANT= and =REVOKE=
 
 An element is identified by its key values, not by positions. A query against a table can return table rows in any order unless explicitly requested.
+
+* Users, Logins and Roles
+
+A client connects to the database with a /Login/ (instance-level authentication
+object), possibly with a credential. A user (database-level authorization
+principal) can be associated with a login.
