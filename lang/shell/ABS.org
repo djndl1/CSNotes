@@ -1,4 +1,4 @@
-In the simplest case, a script is nothing more than a lsit of system
+In the simplest case, a script is nothing more than a list of system
 commands stored in a file.
 
 she-bang is actually a two-byte magic number, see =man magic=.
