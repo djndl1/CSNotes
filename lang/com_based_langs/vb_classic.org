@@ -930,6 +930,79 @@ object can be accessed through a second variable.
 Inheritance through delegation gives the subclass freedom to use the base
 implementation or override the behavior.
 
+** Polymorphism
+
+VBA supports polymophisim either through late binding (=Object= type variable)
+or through interfaces.
+
+*** Interfaces
+
+There is no dedicated interface type in VBA. Each VBA class module defines an implicit
+COM interface thus also acts as an *abstract class*.
+Class modules can include one or more *secondary* interfaces.
+An interface is defined as an *abstract* class with no executable code.
+Interfaces never include =Event= declarations. A concrete class is an
+interface itself and can be implemented by another class module, possibly with
+inheritance through delegation.
+
+#+begin_src vba
+' The IShape class module
+Public Hidden As Boolean
+
+Sub Draw(pic As Object)
+    ' (Empty comment to prevent automatic deletion of this routine)
+End Sub
+
+Sub Move(stepX As Single, stepY As Single)
+    '
+End Sub
+
+Sub Zoom(ZoomFactor As Single)
+    '
+End Sub
+#+end_src
+
+#+begin_src vba
+Implements IShape
+
+Public Property Let IShape_Hidden(ByVal rhs As Boolean)
+'''
+End Property
+
+Public Property Get IShape_Hidden() As Boolean
+'''
+End Property
+
+Sub IShape_Draw(pic As Object)
+  '''
+End Sub
+
+Sub IShape_Move(stepX As Single, stepY As Single)
+  '''
+End Sub
+
+Sub IShape_Zoom(ZoomFactor As Single)
+  '''
+End Sub
+#+end_src
+
+To access a secondary interface, declare a variable of such an interface type
+and assign an object to it. To avoid constant declaration of interface
+variables, define a =QI_MyInterface()= function to cast a variable object to
+proper interface type.
+
+#+begin_src vba
+QI_IShape(rect).Move 10, 20
+
+With QI_IShape(rect)
+     .Move 10, 20
+     .Zoom 1.2
+End With
+#+end_src
+
+A class that implements a secondary interface comes with a secondary VTable
+structure, which of course points to the procedures of that secondary interface.
+
 ** OLE Automation
 
 Use as few 'dots' as possible and cache COM object references
