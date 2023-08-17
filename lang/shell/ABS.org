@@ -8,25 +8,39 @@ she-bang is actually a two-byte magic number, see =man magic=.
   :CUSTOM_ID: basics
   :END:
 
-- =;;=: terminator in a case option
+** Special Characters
 
-- =,=: comma operator links together a series of arithmetic operations.
-  All are evaluted, but only the last one is returned.
+- =#= :: comment
 
-#+BEGIN_EXAMPLE
+- =;= :: command separator that permits putting two or more commands on the same line.
+
+- =;;=, =;;&=, =;&= :: terminator in a case option
+
+- =.= :: =source=; regex special character;
+
+- ="= :: partial quoting
+
+- ='= :: full quoting
+
+- =,= :: As in C, comma operator links together a series of arithmetic operations. All
+  are evaluated, but only the last one is returned.
+
+  #+BEGIN_SRC shell
   let "t2 = ((a = 9, 15 / 3))"
-#+END_EXAMPLE
+  #+END_SRC
 
-The comma can also concatenate strings.
+- ="'= :: lowercase conversion in parameter substitution
 
-- ="'=: lowercase conversion in parameter substitution
+- =\= :: escape character, a quoting mechanism for a single characters.
 
-- ```: command substitution, also known as backquotes, or backticks.
+- =`= :: command substitution, also known as *backquotes*, or *backticks*.
 
-- =:=: null command, NOP. Its exit status is true, thus can be
+- =/= :: path seperator;
+
+- =:= :: null command, NOP. Its exit status is true, thus can be
   considered a synonym for the shell builtin true.
 
-#+BEGIN_SRC sh
+  #+BEGIN_SRC sh
   while : // while true
   do 
       op-1
@@ -34,31 +48,30 @@ The comma can also concatenate strings.
       ...
       op-n
   done
-#+END_SRC
+  #+END_SRC
 
-#+BEGIN_SRC sh
+  #+BEGIN_SRC sh
   if condition
   then : # do nothing
   else
       take-some-action
   fi
-#+END_SRC
+  #+END_SRC
 
-Also a placeholder where a binary operation is expected.
+  Also *a placeholder where a binary operation is expected*.
 
-#+BEGIN_SRC sh
+  #+BEGIN_SRC sh
   : ${username=`whoami`}
   : ${1?"Usage: $0 ARUGMENT"}
 
   : ${HOSTNAME?} ${USER?} ${MAIL?}
   : > data.xxx // truncate a file same as `cat /dev/null > data.xxx` without forking a process
   : >> target.xxx // create if not present, otherwise nothing
-#+END_SRC
+  #+END_SRC
 
-Also a field separator, as in =$PATH= or in =/etc/passwd=.
+  Also a *field separator*, as in =$PATH= or in =/etc/passwd=.
 
-- =!=: reverse or negate the sense of a test or exit status [bang]. Or
-  indirect variablre references.
+- =!= :: reverse or negate the sense of a test or exit status [bang]. Or indirect variable references.
 
 - =*=: wildcard in globbing; =?=: single character in globbing.
 
