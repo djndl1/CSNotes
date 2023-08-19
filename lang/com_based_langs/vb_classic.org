@@ -917,6 +917,17 @@ Sub Reset2(ByVal pers As CPerson)
 End Sub
 #+end_src
 
+** Collection
+
+Not only can a wrapped collection object provides type safety and other niceties,
+the wrapper is itself a factory that encapsulates the object activation logic.
+The collection keeps an account of all the created objects.
+
+A contained object may keep a reference to its containing collection, which
+inevitably introduces circular reference, which can not be easily solved by VBA
+itself unless a weak reference type is available or the user would have to
+manually break the cycle.
+
 ** Inheritance
 
 Not natively supported.
