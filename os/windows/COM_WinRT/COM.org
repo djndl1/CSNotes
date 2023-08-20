@@ -584,3 +584,29 @@ data requirement.
 
 - =MkParseDisplayName()= and then =IMoniker::BindToObject()=
   + =CoGetObject()= in one step (remember =Activator.GetObject()= in .NET)
+
+
+* Apartments and Threading
+
+COM treats concurrency and reentrancy constraints as implementation details with
+an abstraction called *apartment*, a logical grouping of objects that share a
+common set of concurrency and reentrancy constraints. Each objects belongs to
+exactly one apartment and one apartment can be shared by multiple objects.
+An apartment is contained in exactly one process and thus a process must have at
+least one aparment.
+
+
+An OS thread is initially not associated with a COM apartment.
+In COM, a thread executes in exactly one apartment at a time by first
+entering the apartment with =CoInitialize(Ex)= or =OleInitialize()= and exits
+the aparment with =CoUninitialize()= and =OleUninitialize()=.
+
+** STA
+
+Each thread that enters a STA are in different STAs, that is, a STA contains
+only one thread so that a COM object in that STA is never accessed concurrently,
+as the name indicates.
+
+** MTA
+
+A process has a MTA and a single one, shared by multiple threads.
