@@ -283,6 +283,34 @@ S_FALSE 	        Success. logical false.
 The base interface of all COM interfaces (=import "unknwn.idl"=). The implementation is required to
 provide an =IUnknown= implementation.
 
+*** Symmetric/Transitive/Reflexive =QueryInterface=
+
+These properties define the relationship between all of an object's interface
+pointers and the notion of object identity in COM.
+
+- *Symmetry* :: If =QI(A) -> B= is satisfied, then =QI(QI(A) -> B) -> A= must succeed.
+
+- *Transitivity* :: If =QI(QI(A) -> B) -> C= is true, then =QI(A) -> C= is true
+  + all interfaces of an object are equivalent peers and do not need to be
+    acquired in any particular sequence.
+
+- *Reflexivity* :: =QI(A) -> A= must always be true.
+  + an interface pointer shouldn't lose its type.
+
+  The type hierarchy of an object is a simple graph in which all nodes are
+  directly connected to one another by explicit vertices.
+
+*** Static Typing
+
+The set of interfaces supported by an object cannot change over time. Two
+objects of the same coclass may support different sets of interfaces but one of
+them, once created, cannot change its type hierarchy.
+
+*** Identity
+
+- All results of =QI(IUnknown)= of interface pointers of the same object must
+  always return exactly the same pointer value for each request.
+
 *** Resource Management
    :PROPERTIES:
    :CUSTOM_ID: resource-management
