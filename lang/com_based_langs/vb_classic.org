@@ -826,7 +826,8 @@ strongly discouraged.
 - Reference Counting
 
 - Structure:
-  - VTable pointer: all public instance functions, procedures, properties are
+  - *VTable pointer*: The first seven entries are =IUnknown= and =IDispatch=
+    methods. All public instance functions, procedures, properties are
     virtual (that's how COM works).
     + /early VTable binding/: The compiler produces VTable offsets that are then
       efficiently used at run time to access the object's properties and
