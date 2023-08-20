@@ -1,4 +1,4 @@
-#+TITLE: Com Prog
+#+TITLE: COM Programming
 
 * COM Objects
 
@@ -28,7 +28,7 @@ another.
 
 ** Use
 
-*** Create a CoClass
+*** Create a COM Object
 
 1. Through some custom function to return a certain interface of a CoObject
 
@@ -45,9 +45,10 @@ another.
 
 Cross-process calls are done through automatically generated proxy/stub pairs. =OLE32.DLL= provides the standard proxy/stub. The objects referenced by pointers are serialized to and from the server.
 
-*** Destroy a CoClass
+*** Destroy a COM object
 
-The object itself uses a reference counter scheme. Decrement its refcount after using a CoClass. An EXE COM server also checks the refcount by sending messages its client and decrement the refcount if no response is made.
+The object itself uses a reference counter scheme. Decrement its refcount after
+using a COM object. An EXE COM server also checks the refcount by sending messages its client and decrement the refcount if no response is made.
 
 *** Example-1: Simple Creation and Deletion of a COM Component
 
