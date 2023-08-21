@@ -34,9 +34,9 @@ Core: =Invoke-Command= invokes a block of pwsh script on one or more local/remot
 
 ** Core Concepts
 
-Based KornShell POSIX shell and aligned with C#
+Based on KornShell POSIX shell and aligned with C#
 
-- Case-Insensitive but Case-Sensitive Code easy to read
+- Case-Insensitive but Case-Sensitive Code is easy to read
 
 *** Commands and cmdlets
 
@@ -46,23 +46,27 @@ The common pwsh format:
 command -SwitchParameter -ParameterWithArgument arg1 PositionalArgument
 #+end_src
 
-- Pwsh has a smart parameter binder system, which can identify arguments by types, or convert if necessary. Pwsh respect POSIX end-of-parameter =--=
+- Pwsh has a smart parameter binder system, which can identify arguments by
+  types, or convert if necessary. Pwsh respect POSIX end-of-parameter =--=
 
 **** Categories
 
-1. /Cmdlets/: implemented by a .NET class derived from =Cmdlet=, specific to the Pwsh environment, in the form of a DLL library.
+- /Cmdlets/ :: implemented by a .NET class derived from =Cmdlet=, specific to the Pwsh environment, in the form of a DLL library.
 
-2. /Functions/
+- /Functions/ ::
 
-3. /Scripts/: code inside a text file
+- /Scripts/ :: code inside a text file
 
-4. /Native commands/
+- /Native commands/ :: a subprocess is started
 
-5. /Device State Configuration/: a configuration management platform in Windows PowerShell
+- /Device State Configuration/ :: a configuration management platform in Windows
+  PowerShell. A configuration with Powershell-like syntax.
 
 *** Aliases and Elastic Syntax
 
-Various command aliases can be defined (no arguments though). Parameters can also have aliases, defined by their authors.
+Various command aliases can be defined (no arguments though). Parameters can
+also have aliases, defined by their authors.
+Pwsh aliases cannot include parameters.
 
 *** Quoting
 
