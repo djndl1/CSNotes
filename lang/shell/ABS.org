@@ -73,103 +73,107 @@ she-bang is actually a two-byte magic number, see =man magic=.
 
 - =!= :: reverse or negate the sense of a test or exit status [bang]. Or indirect variable references.
 
-- =*=: wildcard in globbing; =?=: single character in globbing.
+- =*= :: wildcard in globbing; =?=: single character in globbing.
 
-- =$=: variable substitution.
+- =**= :: exponentiation
 
-- =${}=: parameter substitution.
+- =?= :: C-style ternary conditional expression =condition?resuult-if-true:result-if-false=
 
-- =$'...'=: quoted string expansion.
+- =$= :: variable substitution.
 
-- =$*=, =$@=: positional parameter.
+- =${parameterName}= :: parameter substitution.
 
-- =$?=: exit status
+- =$'...'= :: quoted string expansion.
 
-- =$$=: process ID variable of the script itself
+- =$*=, =$@= :: positional parameter.
 
-- =$!=: PID of last job running in background
+- =$?= :: exit status
+
+- =$$= :: process ID variable of the script itself
+
+- =$!= :: PID of last job running in background
 
 #+BEGIN_SRC sh
   eval 'kill -9 $!' &> /dev/null
 #+END_SRC
 
-- =()=: command group; a listing of commands within parentheses starts a
-  subshell.
+- =()= :: command group, a listing of commands within parentheses starts a subshell.
 
 #+BEGIN_SRC sh
   (a=hello; echo $a)
+  # a is not defined
 #+END_SRC
 
-- ={xxx,yyy,zzz}=: brace expansion
+- =(elm1 elm2 elm3)= :: array initialization
+
+- ={xxx,yyy,zzz}= :: brace expansion
 
 #+BEGIN_SRC sh
   > echo ab{1,2,3,4}cd
   ab1cd ab2cd ab3cd ab4cd
 #+END_SRC
 
-- ={a...z}=: extended brace expansion
+- ={a...z}= :: extended brace expansion
 
 #+BEGIN_SRC sh
   > echo a{1..3}b
   a1b a2b a3b
 #+END_SRC
 
-- ={}=: block of code; inline group, which creates an anonymous
-  function. The variable inside a code block remain visible to the
-  remainder of the script.
+- ={}= :: block of code; inline group, which creates an anonymous function. The
+  variable inside a code block remain visible to the remainder of the script.
 
-- =[]=: test
+- =[]= :: test
 
-- =[[]]=: test
+- =[[]]= :: test
 
-- =(())=: integer expansion, expand and evaluate integer expression
-  within.
+- =(())=, =$[...]= :: integer expansion, expand and evaluate integer expression within.
 
-- => &> >& >> < <>=: redirection;
+- => &> >& >> < <>= :: redirection;
 
-#+BEGIN_SRC sh
+  #+BEGIN_SRC sh
   scriptname >filename # redirects the output of `scriptname` to `filename`
   command &>filename # redirects both stdout and stderr of command to filename
   command >&2 # redirects stdout of command to stderr
   scriptnam >>filename # appends the output of scripname to filename
   [i]<>filename # opens filename for reading and writing and assigns file descriptor i to it. If filename does not exist, it is created.
-#+END_SRC
+  #+END_SRC
 
-- =<= =>= ascii comparison
+- =<= =>= :: ascii comparison
 
-#+BEGIN_SRC sh
+  #+BEGIN_SRC sh
   if [[ "$veg1" < "$veg2" ]]
   then
       ...
   else
       ...
   fi
-#+END_SRC
+  #+END_SRC
 
-- =<<=: redirectionin a here document
+- =<<= :: redirectionin a here document
 
-- =<<<=: redirection in a here string
+- =<<<= :: redirection in a here string
 
-- =|=: A pipe runs as a child process, and therefore cannot alter script
+- =|= :: A pipe runs as a child process, and therefore cannot alter script
   variables. If one of the commands in the pipe aborts, this prematurely
   terminates execution of the pipe, called a /broken pipe/, sending a
   =SIGPIPE= signal.
 
-- =>|=: force redirection.
+- =>|= :: force redirection.
 
 - =-=: redirection from/to stdin or stdout, not a bash builtin. Where a
   filename is expected, =-= redirects output to stdout or accepts input
   from stdin.
 
-#+BEGIN_SRC sh
+  #+BEGIN_SRC sh
    $ file -
   #!/usr/bin/env python
   /dev/stdin: Python script, ASCII text executable
-#+END_SRC
+  #+END_SRC
 
-- =~+=: current working directory, =$PWD=
+- =~+= :: current working directory, =$PWD=
 
-- =~-=: previous working directory, =$OLDPWD=, ???
+- =~-= :: previous working directory, =$OLDPWD=, ???
 
 ** Control characters
    :PROPERTIES:
