@@ -1053,10 +1053,13 @@ Declare a variable to the =Object= type forces late binding call on that variabl
 The three core classes are not tightly related.
 
 - =Connection=: =ADODB.Connection=
+  + if no provider is specified in the connection string, =MSDASQL= is used which is the OLE DB provider
+    for ODBC drivers.
   + =.Open()=: open a connection
   + =.Execute()=
   + =.BeginTrans()=, =.CommitTrans()=, =.RollbackTrans()=
   + =.OpenSchema()=: for metadata
+  + =.ConnectionTimeout=, =CommandTimeout=
 
 - =Command=
 
