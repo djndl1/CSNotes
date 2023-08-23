@@ -1061,7 +1061,14 @@ The three core classes are not tightly related.
   + =.OpenSchema()=: for metadata
   + =.ConnectionTimeout=, =CommandTimeout=
 
-- =Command=
+- =Command=: a command or query that can be executed on a data source.
+  + =.CommandText=, =.CommandType=:  SQL command/query or the name of a table or
+    the name of a stored procedure.
+  + =.ActiveConnection=: associated DB connection.
+  + =.Prepared=:
+  + =.CommandTimeout=:
+  + =.Execute() As RecordSet=: in case of an action, the returned =RecordSet= is closed.
+  + =.CreateParameter() As Parameter=:
 
 - =RecordSet=: =ADODB.RecordSet=
   + a =RecordSet= can be created independent of a certain =Connection= and can use a
