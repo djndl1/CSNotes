@@ -70,16 +70,46 @@ Pwsh aliases cannot include parameters.
 
 *** Quoting
 
-Unlike bash, pwsh escapes using =`= instead of =\=
+Turning a token with special meaning into a simple string value.
+
+Unlike bash, pwsh escapes using =`= instead of =\=: =`n= for newline.
+
+A backtick =`= before a variable disable its substitution.
 
 *** Command-Mode and Expression-Mode
 
 In expression mode, strings must be quoted, numbers are always numbers.
-In command mode, everything except numbers is treated as strings unless they start with =$=, =@=, ='=, ="=.
+In command mode, everything except numbers is treated as strings unless they
+start with =$=, =@=, ='=, ="= or =(=.
+
+#+begin_src powershell
+Write-Output (2+2) # expression mode
+Write-Output 2+2 # command mode
+#+end_src
+
+If a parameter-like token =-NotAParameter= is not valid parameter of a cmdlet,
+it is treated as an argument.
 
 *** Statement Termination
 
-A newline can end a syntatically complete statement. If not complete, the newline is treated like any other whitespace. =`=  continues a non-extensible line. Strings are not terminated by a newline character.
+- A newline can end a syntatically complete statement. If not complete, the
+  newline is treated like any other whitespace.
+
+- =`=  continues a non-extensible line.
+
+- Strings are not terminated by a newline character. A string can span over
+  multiple lines.
+
+*** Comment
+
+#+begin_src powershell
+# a comment
+<#
+    multi-
+    line
+    comment
+#>
+#+end_src
 
 ** Pipeline
 
