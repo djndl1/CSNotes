@@ -593,13 +593,34 @@ an abstraction called *apartment*, a logical grouping of objects that share a
 common set of concurrency and reentrancy constraints. Each objects belongs to
 exactly one apartment and one apartment can be shared by multiple objects.
 An apartment is contained in exactly one process and thus a process must have at
-least one aparment.
+least one apartment.
 
 
 An OS thread is initially not associated with a COM apartment.
 In COM, a thread executes in exactly one apartment at a time by first
 entering the apartment with =CoInitialize(Ex)= or =OleInitialize()= and exits
-the aparment with =CoUninitialize()= and =OleUninitialize()=.
+the apartment with =CoUninitialize()= and =OleUninitialize()=.
+
+As an implementation detail, the apartment of an activated object is determined
+automatically by the runtime and the requirement of the object author.
+    + an out-of-process server object's apartment is decided its host process.
+    + an in-process server object have its own threading model specified in the
+      registry by the =ThreadingModel= named value.
+      + =Free= :: MTA
+      + =Aparment= :: STA
+      + =Both= :: STA and MTA
+      + None :: the main STA
+      + If the object is compatible with the client's apartment, then it is
+        activated in there. Otherwise, it is created in a compatible apartment
+        and if necessary a new STA thread is created for the object.
+      + It may seem =Both= is better than =Free= considering compatibility.
+        However, =Free= ensures that the object is always created in the MTA and the
+        benefit of multi-threading is guaranteed.
+
+If a pointer to the object is returned to the
+caller, then the object resides in the same apartment as the caller. Otherwise,
+a pointer to the proxy object is returned to the caller. In both cases, however, they
+should appear the same to all threads in the caller's apartment.
 
 ** STA
 
