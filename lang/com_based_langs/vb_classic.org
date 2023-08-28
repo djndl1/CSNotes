@@ -1070,6 +1070,13 @@ The three core classes are not tightly related.
   + =.Execute() As RecordSet=: in case of an action, the returned =RecordSet= is closed.
   + =.CreateParameter() As Parameter=:
 
+- =Parameter=:
+  + =.Name=, =.Type=, =.Precision=, =.NumericScale=
+  + =.Value=: the default property of a parameter object
+  + =.Direction=:
+  + =.Size=: must be set for variable-length data type.
+  + =.Attributes=: bit-field value
+
 - =RecordSet=: =ADODB.RecordSet=
   + a =RecordSet= can be created independent of a certain =Connection= and can use a
     =Connection= explicitly or implicitly.
@@ -1089,6 +1096,9 @@ The three core classes are not tightly related.
       =RecordSet=
   + =.CacheSize=
   + =.Fields=: the columns of the current record.
+
+- =.Properties= of =Connection=, =RecordSet=, =Command=, =Field=: contains all the dynamic properties that the ADO provider has
+  added to the built-in properties.
 
 * GUI Programming
 
