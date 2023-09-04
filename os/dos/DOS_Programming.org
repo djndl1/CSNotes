@@ -200,3 +200,15 @@ of which the default handler is to terminate the current process. DOS also
 maintains a break flag, with the value of which being 0, DOS only checks for a
 Ctrl-Break during certain I/O operations.
 
+* DOS ABI
+
+** Binary File Format
+
+- *COM* :: CP/M =.COM=
+  + no header, only code and data in a single segment, loaded at a preset
+    address of offset 0x100 following the PSP.
+  + maximum size of 0xFF00 bytes
+
+- *MZ* :: DOS =.EXE=
+  + supports multiple segments to be loaded at arbitrary memory addresses and
+    executables greater than 64KB.
