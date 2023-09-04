@@ -176,7 +176,27 @@ events instead of busy waiting or occasion polling.
       commands and executing them.
   + can be replaced
 
-* DOS Interrupt Programming
+* DOS API Programming
 :PROPERTIES:
 :ID:       91dd13c3-9b3f-435a-a5ab-4c3c6c546865
 :END:
+
+Most calls to the DOS API are invoked using the =INT 21H= software interrupt
+with a subfunction number in the =ah= register, basically a kernel syscall.
+
+** Keyboard
+
+Whenever a key is pressed or released, a scan code is generated and the 0x09
+interrupt is generated. Normally, the BIOS is responsible for handling the
+interrupt by setting some flags (e.g. =Ctrl=, =Alt=, =Shift=), generating
+another interrupt (=Ctrl-Break=, =Ctrl-C= to Int 23H, =Alt-SysReq=), or set the keyboard buffer.
+
+DOS kernel keyboard APIs are sensitive to input redirection (=stdin= and =stdout=).
+
+*** =Ctrl-C=, =Ctrl-Break=
+
+Upon pressing =Ctrl-C= or =Ctrl-Break=, DOS reads in and generates an =INT 23H=,
+of which the default handler is to terminate the current process. DOS also
+maintains a break flag, with the value of which being 0, DOS only checks for a
+Ctrl-Break during certain I/O operations.
+
