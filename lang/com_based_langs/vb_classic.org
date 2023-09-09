@@ -1052,7 +1052,15 @@ Declare a variable to the =Object= type forces late binding call on that variabl
 
 *** Object Model
 
-The three core classes are not tightly related.
+The three core classes (=Connection=, =Command= and =RecordSet=) are not tightly
+related.
+Some of their functionalities overlap due to implicit use of the other types of
+objects but only one specializes. =Connection= represents a physical
+connection/session to the database, =Command= utilizes an =ActiveConnection= to
+execute a database command (possibly a SQL command, be it a normal SQL text
+statement, a stored procedure or something else). A =RecordSet= is a handle to
+the result of a query, which can be modified/updated and propagated back to the
+database.
 
 - =Connection=: =ADODB.Connection=
   + if no provider is specified in the connection string, =MSDASQL= is used which is the OLE DB provider
@@ -1074,6 +1082,9 @@ The three core classes are not tightly related.
   + =Command.Parameters.Refresh()= can even retrieve provider-specific parameter
     information for a stored procedure.
   + =.NamedParameter=: may not be supported by a provider (e.g. Oracle, ODBC).
+  + =.Name=: a command can have a name and then its associated
+    =.ActiveConnection= can call this named command =conn.NamedCommandName= like
+    a custom method.
 
 - =Parameter=:
   + =.Name=, =.Type=, =.Precision=, =.NumericScale=: precision and numeric scale
@@ -1104,6 +1115,11 @@ The three core classes are not tightly related.
   + =.CacheSize=
   + =.Fields=: the columns of the current record.
   + =.Requery=: refresh data result set with the same command
+  + =.NextRecordset=: a query may return multiple record sets just like a cursor
+    may point to multiple rows after moving.
+  + =.BOF= and =.EOF= to delineate the beginning and end of the dataset. Both
+    combined, a record set can be determined empty or not in case =.RecordCount=
+    is not reliable.
 
 - =.Properties= of =Connection=, =RecordSet=, =Command=, =Field=: contains all the dynamic properties that the ADO provider has
   added to the built-in properties.
