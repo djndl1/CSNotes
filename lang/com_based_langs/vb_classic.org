@@ -1042,7 +1042,9 @@ Declare a variable to the =Object= type forces late binding call on that variabl
 - Remote Data Object (RDO): improved upon DAO and designed around ODBC
 
 - OLE DB: based on COM
-  + MSDAAQL: a bridge from OLE DB to ODBC drivers.
+  + the =MSDASQL= provider (Microsoft OLE DB Provider for ODBC): a bridge from
+    OLE DB to ODBC drivers.
+    - the default provider if not specified.
 
 - ActiveX Data Object (ADO): the high-level interface to OLE DB
 
@@ -1069,13 +1071,18 @@ The three core classes are not tightly related.
   + =.CommandTimeout=:
   + =.Execute() As RecordSet=: in case of an action, the returned =RecordSet= is closed.
   + =.CreateParameter() As Parameter=:
+  + =Command.Parameters.Refresh()= can even retrieve provider-specific parameter
+    information for a stored procedure.
+  + =.NamedParameter=: may not be supported by a provider (e.g. Oracle, ODBC).
 
 - =Parameter=:
-  + =.Name=, =.Type=, =.Precision=, =.NumericScale=
+  + =.Name=, =.Type=, =.Precision=, =.NumericScale=: precision and numeric scale
+    must be specified for =adNumeric= and =adDecimal=.
   + =.Value=: the default property of a parameter object
   + =.Direction=:
   + =.Size=: must be set for variable-length data type.
   + =.Attributes=: bit-field value
+  + note that ODBC does not support named parameters except in stored procedures.
 
 - =RecordSet=: =ADODB.RecordSet=
   + a =RecordSet= can be created independent of a certain =Connection= and can use a
@@ -1096,6 +1103,7 @@ The three core classes are not tightly related.
       =RecordSet=
   + =.CacheSize=
   + =.Fields=: the columns of the current record.
+  + =.Requery=: refresh data result set with the same command
 
 - =.Properties= of =Connection=, =RecordSet=, =Command=, =Field=: contains all the dynamic properties that the ADO provider has
   added to the built-in properties.
