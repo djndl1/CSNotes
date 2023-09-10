@@ -1,0 +1,139 @@
+#+title: Basics
+
+* Zig Overview
+:PROPERTIES:
+:ID:       41764b60-6d5d-4706-a55e-621d9591b2e1
+:END:
+
+Simple small language with no hidden control flow (property function, operator
+overloading, throw/catch), no hidden memory allocations,
+no preprocessor, and no macros.
+
+- perform runtime check only on certain build modes.
+
+- Order independent top level declarations.
+
+** Why Not C++, Go, Rust, D
+
+- No hidden control flow ::
+  + no property function, operator overloading, stack-unwinding exception
+
+- No hidden allocations :: the heap is managed by library and application code,
+  decoupled from the language itself.
+  + GC languages allocate memory implicitly
+  + coroutines have implicit memory allocation.
+  + Rust's stdlib panic on OOM conditions.
+  + Every standard library feature that needs to allocate heap memory accepts an
+    =Allocator= parameter in order to do it.
+
+- The Standard library is completely optional.
+
+- A build system and package manager even for C/C++
+
+- Simple language design.
+
+** Runtime Safety
+
+- Out-of-bounds
+
+- integer overflow
+
+** Error Handling
+
+Errors are defined in terms of *error set types*, similar to an enum.
+Error sets coerce to their supersets.
+A normal type can be combined with an error set type with
+=[ErrorSetType]!NormalType= to form an error union type.
+
+Errors are propagated by error return trace.
+The caller may choose to =catch= (*payload capturing*) a potential returned trace (possibly combined
+with =switch=),
+=try= (=catch |err| return err=) to immediately return the trace without
+handling it or mark as
+=unreachable= to assert that no errors will occur.
+
+** Resource Management
+
+- Manual memory management and allocation failure handling
+  + any function that need to allocate memory accepts an allocator parameter.
+
+- =defer= and =errdefer= to make all resource management on scope exit.
+
+- Optional type instead of null pointers. The syntax seems like =null= but the
+  compiler would refuse an access.
+  + =if=, =while= are designed to unwrap an optional type.
+
+** Generics
+
+- generics are based compile-time reflection and code execution.
+
+- Types are values that must be known at compile-time, which works like a compile-time variable.
+
+- A generic data structure is simply a function that returns a type.
+
+** Integration with C
+
+- does not depend on libc and ships with libc.
+
+- a C compiler itself.
+
+- =@cImport= directly imports types, variables, functions and simple macros for
+  use in Zig.
+
+** Cross Compilation
+
+Built-in support.
+
+** Zig Build System
+
+A build-in build system.
+
+#+begin_src shell
+zig init-exe
+zig build
+#+end_src
+
+* Important Syntax
+
+- =switch= can be a statement or an expression.
+
+  #+begin_src zig
+  // statement
+  switch (x) {
+      -1...1 => {
+          x = -x;
+      },
+      10, 100 => {
+          ...
+      }
+      else => {},
+  }
+  // expression
+  x = switch (x) {
+     -1...1 => -x,
+     10, 100 => @divExact(x, 10),
+     else => x,
+  };
+  #+end_src
+
+* Pointers
+
+Pointers are never =null= or 0.
+
+- Notation :: =*T=
+
+- reference :: =&variable=
+
+- dereference :: =variable.*=
+
+** Many-Item Pointers
+
+A pointer to an unknown amount of elements.
+
+- Notation :: =[*]T=
+
+- Additional feature :: indexing syntax, pointer arithmetic and slicing.
+
+* Enum
+
+Enums can have methods and static member constants and variables.
