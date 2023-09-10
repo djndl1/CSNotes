@@ -1109,13 +1109,19 @@ database.
     (forward-only server-side, better performance)
     + =.CursorLocation=: =2-adUseServer= or =3-adUseClient=
     + =.CursorType=
-    + =.MoveFirst()=, =.MoveNext()=
+    + =.MoveFirst()=, =.MoveNext()=, =.Move()=, =MoveLast()=,
+      =.MovePrevious()=: moving forward/backward
+    + =.Bookmark=: get/restore where previously moved to, unique to a record set.
+    + =PageSize=, =PageCount=, =AbsolutePage= (current page): paging functionality support
   + =.MaxRecords=: a limit to the number of records returned in the
       =RecordSet=
   + =.CacheSize=
-  + =.Fields=: the columns of the current record.
+  + =.Fields=: the field/column collection of the current record.
+    + =.Count=, =.Item= (indexed by integers or column names)
+    + a field may be =.Append= to the collection by the client code before a
+      query is made.
   + =.Requery=: refresh data result set with the same command
-  + =.NextRecordset=: a query may return multiple record sets just like a cursor
+  + =.NextRecordset=: multiple result set support. A query may return multiple record sets just like a cursor
     may point to multiple rows after moving.
   + =.BOF= and =.EOF= to delineate the beginning and end of the dataset. Both
     combined, a record set can be determined empty or not in case =.RecordCount=
