@@ -49,6 +49,32 @@ command -SwitchParameter -ParameterWithArgument arg1 PositionalArgument
 - Pwsh has a smart parameter binder system, which can identify arguments by
   types, or convert if necessary. Pwsh respect POSIX end-of-parameter =--=
 
+**** Parameter Binding
+
+The binding process is controlled by declaration information on the command
+itself: the *type*, the *optional/mandatory* and the *pipeline attribute*.
+There is an involved algorithm under the hood to make the binding do what the
+user wants.
+
+1. *Named parameters* are first bound. Any tokens starts with a dash are examined
+   and determined if they should have an argument.
+
+2. The Remaining arguments are tested for
+   *positional binding*.
+
+3. Bind from the pipeline *by value* first with exact type match and then with conversion
+   - =ByValue=: by the type of the object passed in, only one parameter can be passed via =ByValue=
+
+5. bind from the pipeline *by name* with exact matched type and then with conversion, that is, look for a property
+   on the input object that matches the name.
+   - =ByPropertyName=: if the passed object has properties matching certain parameter names
+
+Use =Trace-Command= to debug parameter binding.
+
+#+begin_src powershell
+Trace-Command -Name ParameterBinding -Option All -Expression { 123 | Write-Output } -PSHost
+#+end_src
+
 **** Categories
 
 - /Cmdlets/ :: implemented by a .NET class derived from =Cmdlet=, specific to the Pwsh environment, in the form of a DLL library.
@@ -113,19 +139,15 @@ it is treated as an argument.
 
 ** Pipeline
 
-Unlike most shells where separate processes are used for elements in the pipeline, in pwsh, pipelining is implemented in a way similar to a real production line, in which one output object by the last command is immediately pushed to the next command, without waiting for to the entire process to finish.
+Unlike most shells where separate processes are used for elements in the
+pipeline, in pwsh, pipelining is implemented in a way similar to a real
+production line, in which one output object by the last command is immediately
+pushed to the next command, without waiting for to the entire process to finish,
+in a single process and by default a single thread.
 
-*** Parameter Binding
-
-**** How parameters are bound when pipelining:
-
-The binding process is controlled by declaration information on the command itself: the type, the optional/mandatory and the pipeline attribute. There is an involved algorithm under the hood to make the binding do what the user wants.
-
-A cmdlet must explicitly build in pipeline support for one or more parameters. =Accept pipeline input?= in the help article describes if this parameter can be bound to pipelined input.
-
-- =ByValue=: by the type of the object passed in, only one parameter can be passed via =ByValue=
-
-- =ByPropertyName=: if the passed object has properties matching certain parameter names
+A cmdlet must explicitly build in pipeline support for one or more parameters.
+=Accept pipeline input?= in the help article describes if this parameter can be
+bound to pipelined input.
 
 ** Display Formatting
 
