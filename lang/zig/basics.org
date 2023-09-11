@@ -134,6 +134,17 @@ A pointer to an unknown amount of elements.
 
 - Additional feature :: indexing syntax, pointer arithmetic and slicing.
 
+** Slices
+
+A pointer =[*]T= combined with a size.
+
+- Notation :: =[]T=
+  + Slicing =x[n..m]=, =x[n..]= (close-open)
+
+- string literals coerce to =[]const u8=.
+
+- Arrays, many pointers and slices can be sliced.
+
 * Enum
 
 Enums can have methods and static member constants and variables.
