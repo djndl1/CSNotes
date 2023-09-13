@@ -1137,6 +1137,8 @@ database.
     + =.Count=, =.Item= (indexed by integers or column names)
     + a field may be =.Append= to the collection by the client code before a
       query is made.
+    + Each field has a =.Name= and =.Value= (the current row value), =.Type=,
+      =.Precision=, =.NumericScale=, =.DefinedSize=, =.ActualSize=
   + =.Requery=: refresh data result set with the same command
   + =.NextRecordset=: multiple result set support. A query may return multiple record sets just like a cursor
     may point to multiple rows after moving.
