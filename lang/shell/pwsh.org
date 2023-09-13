@@ -151,7 +151,9 @@ bound to pipelined input.
 
 ** Display Formatting
 
-Formatting is managed by pwsh with an XML database, detailing how each object should be formatted on screen. A list of =Format-*= commands are at users' disposal.
+Formatting is managed by pwsh with an XML database (=$PSHOME/*format*=), detailing how each object
+should be formatted on screen. A list of =Format-*= commands are at users'
+disposal.
 
 - =Format-Table= and =Format-List= are most used.
 
@@ -159,13 +161,26 @@ Formatting is managed by pwsh with an XML database, detailing how each object sh
 
 - =Format-Custom= display objects while preserving its basic structure
 
-Several =Out-*= cmdlets are responsible for finding the correct formatter for objects and output them in different ways (not just to terminals).
+Several =Out-*= cmdlets are responsible for finding the correct formatter for
+objects and output them in different ways (not just to terminals).
 
 - =Out-File=: sending output to a file, also used by IO redirection
+  + Encodings are available.
 
 - =Out-String=: output as a string (or a stream of strings)
+  + Or =-Stream= as a stream of lines
+  + for integration with existing API and commands.
 
-- =Out-GridView=: a new grid window
+- =Out-GridView=: a new grid window (Windows-Only)
+
+- =Out-Host=: output to the host application of Powershell engine (e.g. the
+  conhost, the PowerShell ISE).
+
+- =Out-Null=: equivalent to redirecting to =$null= but slower
+
+- =Out-Printer=: output to the default printer
+
+- =Out-Default=: the default outputter knows how to finda proper outputter
 
 ** Help
 
