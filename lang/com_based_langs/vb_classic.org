@@ -1107,7 +1107,8 @@ database.
   + Cursor: a set of records that represent the results of query, may contain
     the actual data (client-side, for optimistic update) or just pointers to records in the database
     (forward-only server-side, better performance)
-    + =.CursorLocation=: =2-adUseServer= or =3-adUseClient=
+    + =.CursorLocation=: =2-adUseServer= or =3-adUseClient= (client-side cursor
+      implementation provided by Microsoft Cursor Service for OLE DB)
     + =.CursorType=:
       + *dynamic* =adOpenDynamic=: able to view additions, changes and deletions by other users.
       + *keyset* =adOpenKeySet=: built from unique keys that identify the rows in the result
@@ -1122,7 +1123,7 @@ database.
         other users are not visible. *forward-only* cursors are *dynamic by
         default*, meaning any change is detected as the current row is processed.
       + use *forward-only* or =static* cursor to go through data; use *keyset*
-        to select a few rows fro a large result set; use *dynamic* to
+        to select a few rows from a large result set; use *dynamic* to
         synchronize a result set with recent adds.
     + =.MoveFirst()=, =.MoveNext()=, =.Move()=, =MoveLast()=,
       =.MovePrevious()=: moving forward/backward
@@ -1131,8 +1132,10 @@ database.
   + =.MaxRecords=: a limit to the number of records returned in the
       =RecordSet=
   + =.CacheSize=
-  + =.Update=, =.AddNew= (immediate update); =UpdateBatch=: batch update with
-    =.AddNew()=, =.Update()=, =.Delete()=
+  + *Update, Insertion, Delete*:
+    - /Immediate Update/: =.Update()=, =.AddNew()=. A field is =.Update()=-ed
+      when the record set moves to the next one;
+    - /Batch Update/: =UpdateBatch=: batch update with =.AddNew()=, =.Update()=, =.Delete()=
   + =.Fields=: the field/column collection of the current record.
     + =.Count=, =.Item= (indexed by integers or column names)
     + a field may be =.Append= to the collection by the client code before a
