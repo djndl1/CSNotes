@@ -40,7 +40,7 @@ she-bang is actually a two-byte magic number, see =man magic=.
 - =:= :: null command, NOP. Its exit status is true, thus can be
   considered a synonym for the shell builtin true.
 
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC shell
   while : // while true
   do 
       op-1
@@ -50,7 +50,7 @@ she-bang is actually a two-byte magic number, see =man magic=.
   done
   #+END_SRC
 
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC shell
   if condition
   then : # do nothing
   else
@@ -60,7 +60,7 @@ she-bang is actually a two-byte magic number, see =man magic=.
 
   Also *a placeholder where a binary operation is expected*.
 
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC shell
   : ${username=`whoami`}
   : ${1?"Usage: $0 ARUGMENT"}
 
@@ -71,19 +71,26 @@ she-bang is actually a two-byte magic number, see =man magic=.
 
   Also a *field separator*, as in =$PATH= or in =/etc/passwd=.
 
-- =!= :: reverse or negate the sense of a test or exit status [bang]. Or indirect variable references.
+- =!= :: reverse or negate the sense of a test or exit status. Or indirect variable references.
 
-- =*= :: wildcard in globbing; =?=: single character in globbing.
+- =*= :: wildcard in globbing;
+
+- =?= :: single character in globbing.
 
 - =**= :: exponentiation
 
-- =?= :: C-style ternary conditional expression =condition?resuult-if-true:result-if-false=
+- =?= :: C-style ternary conditional expression =condition?result-if-true:result-if-false=
 
 - =$= :: variable substitution.
 
-- =${parameterName}= :: parameter substitution.
+- =${parameterName}= :: parameter substitution, basically the same as
+  =$variable= but applies to more contexts.
 
-- =$'...'= :: quoted string expansion.
+- =$'...'= :: quoted string expansion. Constructs characters from octal or hex
+  values.
+  #+begin_src shell
+  echo $'\u6587\u5B57' # 文字
+  #+end_src
 
 - =$*=, =$@= :: positional parameter.
 
@@ -93,13 +100,13 @@ she-bang is actually a two-byte magic number, see =man magic=.
 
 - =$!= :: PID of last job running in background
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   eval 'kill -9 $!' &> /dev/null
 #+END_SRC
 
 - =()= :: command group, a listing of commands within parentheses starts a subshell.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   (a=hello; echo $a)
   # a is not defined
 #+END_SRC
@@ -108,14 +115,14 @@ she-bang is actually a two-byte magic number, see =man magic=.
 
 - ={xxx,yyy,zzz}= :: brace expansion
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   > echo ab{1,2,3,4}cd
   ab1cd ab2cd ab3cd ab4cd
 #+END_SRC
 
 - ={a...z}= :: extended brace expansion
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   > echo a{1..3}b
   a1b a2b a3b
 #+END_SRC
@@ -125,13 +132,13 @@ she-bang is actually a two-byte magic number, see =man magic=.
 
 - =[]= :: test
 
-- =[[]]= :: test
+- =[[]]= :: test, more flexible than single-bracket test.
 
-- =(())=, =$[...]= :: integer expansion, expand and evaluate integer expression within.
+- =$(())= (deprecated), =$[...]= (preferred) :: integer expansion, expand and evaluate integer expression within.
 
 - => &> >& >> < <>= :: redirection;
 
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC shell
   scriptname >filename # redirects the output of `scriptname` to `filename`
   command &>filename # redirects both stdout and stderr of command to filename
   command >&2 # redirects stdout of command to stderr
@@ -139,9 +146,10 @@ she-bang is actually a two-byte magic number, see =man magic=.
   [i]<>filename # opens filename for reading and writing and assigns file descriptor i to it. If filename does not exist, it is created.
   #+END_SRC
 
-- =<= =>= :: ascii comparison
+- =<= =>= :: string comparison within =[]= or =[[]]=, integer comparison within
+  =(("$a" < "$b"))=
 
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC shell
   if [[ "$veg1" < "$veg2" ]]
   then
       ...
@@ -150,7 +158,7 @@ she-bang is actually a two-byte magic number, see =man magic=.
   fi
   #+END_SRC
 
-- =<<= :: redirectionin a here document
+- =<<= :: redirectionn a here document
 
 - =<<<= :: redirection in a here string
 
@@ -165,7 +173,7 @@ she-bang is actually a two-byte magic number, see =man magic=.
   filename is expected, =-= redirects output to stdout or accepts input
   from stdin.
 
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC shell
    $ file -
   #!/usr/bin/env python
   /dev/stdin: Python script, ASCII text executable
@@ -218,7 +226,7 @@ she-bang is actually a two-byte magic number, see =man magic=.
 =$VAR= is a simplified form of =${VAR}=. Undeclared/uninitialized
 variable has a null value. Quoted strings exists as a whole.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   a=15+5     # a 15+5
   let b=20+1 # b 21
   read a     # implicitly set a
@@ -235,7 +243,7 @@ context, Bash permits arithmetic operations and comparsions on
 variables. The determining factor is whether the value of a variable
 contains only digits.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   a=2345
   let "a += 5" # a is now 2350
   b=${a/23/BB} # However, it's still a string and can be substituted.
@@ -258,7 +266,7 @@ contains only digits.
 
 The last argument is obtained using indirect reference:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   args=$#
   lastarg=${!args}
 #+END_SRC
@@ -267,7 +275,7 @@ The =shift= command reassigns the positional parameters, in effect
 shifting them to the left one notch. A numerical parameter indicates how
 many positions to shift.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   $1 <-- $2, $2 <-- $3, $3 <-- $4, ...
 #+END_SRC
 
@@ -306,7 +314,7 @@ many positions to shift.
   fields, or word boundaries. Defaults to whitespace (space, tab and
   newline).
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
    djn  debian  ~  echo "$IFS"  | cat -vte
    ^I$ # single space, horizontal tab, newline
   $
@@ -324,14 +332,14 @@ many positions to shift.
 
 - =SECONDS=: the number of seconds the script has been running
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   rm .[A-Za-z0-9]*  # delete dotfiles
   rm -f .[^.]* ..?* # remove filenames beginning with multiple dots
 #+END_SRC
 
 - =REPLY=: the default value when a variable is not supplied to =read=.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
    djn  debian  ~  read
   fadfa
    djn  debian  ~  echo $REPLY
@@ -350,7 +358,7 @@ very weak form of typing.
 
 - =-r=: readonly, =declare -r var1= = =readonly var1=;
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
    djn  debian  ~/FOSS/playground  declare -r a=5
 
    djn  debian  ~/FOSS/playground  a=3
@@ -380,7 +388,7 @@ itneger in the range 0 - 32767
 
 Mod a range to limit its upper bound.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   # generate a binary truth value
   BINARY=2
   number=$RANDOM
@@ -413,7 +421,7 @@ command.
   position can be parenthesized negative (from the right end). Also, it
   can be used to extract positional parameters.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   echo $(*:2) # the second and following
   echo $(@:2) # same as above
   echo $(*:2:3) # #2 #3 #4 three positional parameters
@@ -452,7 +460,7 @@ an alternative to using its built-in operations.
 
 - =${parameter}=: may be used to concatenating variables with strings
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   echo ${USER}-${HOSTNAME}
   //djn-debian
 #+END_SRC
@@ -461,7 +469,7 @@ an alternative to using its built-in operations.
   only when =parameter= has been declared but is null): if =parameter=
   not set (=:= adds null), /return/ =default=.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   $ echo ${abd-$USER}
   djn
   $ echo ${HOME-$USER}
@@ -514,15 +522,15 @@ splitting.
 
 =$'abc'= is string expansion.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   $ echo $'afd\nbcd'
   afd
   bcd
 #+END_SRC
 
-#+BEGIN_SRC sh
+#+begin_src shell
       case "$key" in
-          $'x\1b\x5b\x32\x7e')
+          '$'x\1b\x5b\x32\x7e')
               echo Insert Key
               ;;
 
@@ -534,9 +542,9 @@ splitting.
               echo
               exit 0
       esac
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   echo "foo\
   bar"
   #foobar
@@ -577,7 +585,7 @@ The exit status of an arithmetic expression is not an error value.
 An =if= can test any command, not just conditions enclosed within
 brackets.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   if cmp a b &> /dev/null
   then 
   if cmp a b &> /dev/null
@@ -588,7 +596,7 @@ brackets.
   fi
 #+END_SRC
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   if echo "$word" | grep -q "$letter_sequence"
   then
       echo "$letter_sequence found in $word"
@@ -613,7 +621,7 @@ work within a =[[ ]]= test, despite giving an error within a =[ ]=
 construct. Arithmetic evaluation of octal / hexadecimal constants takes
 place automatically within a =[[ ... ]]= construct.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   if [[ 15 -eq 0x0f ]] // [] error
   then
       echo "Equal"
@@ -626,14 +634,14 @@ place automatically within a =[[ ... ]]= construct.
 A condition within test brackets may stand alone without an =if=, when
 used in combination with a list construct.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   [[ 15 -eq 0xfd ]] && echo "Equal" # Equal
 #+END_SRC
 
 Arithmatic expansion has the property of returning an exit status 0 when
 evaluating to nonzero, which is exactly what =if= needs.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   if (( "5 > 2" ))
   then
       echo "5>2"
@@ -662,7 +670,7 @@ evaluating to nonzero, which is exactly what =if= needs.
 
 - =-p=: pipe file
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   echo "Input" | [[ -p /dev/fd/0 ]] && echo PIPE || echo STDIN
   PIPE
 #+END_SRC
@@ -709,7 +717,7 @@ evaluating to nonzero, which is exactly what =if= needs.
 - ===; ====; ==== behaves diffferently within a double-bracket test than
   within single brackets
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   [[ $a == z* ]] # True if $a starts with an "z" (pattern matching).
   [[ $a == "z*" ]] # True if $a is equal to z* (literal matching).
   [ $a == z* ]  # File globbing and word splitting take place.
@@ -747,7 +755,7 @@ Condition tests using the =if/then= may be nested.
 - =+=; =-=; =*=; =/=; =**= (exponentiation); =+==; =-==; =*==; =/==;
   =%==;
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   let "n = $n + 1"
   : $((n = $n + 1))
   (( n = n + 1))
@@ -770,7 +778,7 @@ strings.
 
 - logical operator: =!=; =&&=; =||=
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   if [ $condition1 ] && [ condition2 ]
   if [ $condition1 -a $condition1 ]
   if [[ $condition1 && $condition1 ]]
@@ -780,7 +788,7 @@ strings.
 The comma operator chains together two or more arithmetic operations and
 returns the last one.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   let "dec=32" # base 10
   let "oct=032" # base 8, 26
   let "hex=0x32" # base 16, 50
@@ -810,7 +818,7 @@ returns the last one.
 
 =for arg in [list]=: the basic looping construct.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   for arg in [list] # may contain wild cards, entire list enclosed in quotes creates a single variable
   do
       commands...
@@ -822,14 +830,14 @@ Omitting the =in [list]= part causes the loop to operate on =$@=.
 =seq= is a useful range command when using with =for=-loop, or use
 ={m..n}=
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   for a in {1..10}
   for a in `seq 10`
 #+END_SRC
 
 It is possible to use C-like =for=-loop:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   for ((a=1; a <= LIMIT ; a++))
   do
       echo -n "$a"
@@ -839,7 +847,7 @@ It is possible to use C-like =for=-loop:
 =do= and =done= can even be replaced by curly brackets in certain
 contexts
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   for ((n=1; n<=10; n++))
   {
       echo -n "$n "
@@ -851,7 +859,7 @@ contexts
     :CUSTOM_ID: while-loop
     :END:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   while [ condition ]
   do
       commands
@@ -861,7 +869,7 @@ contexts
 A =while=-loop may have multiple conditions. Only the final condition
 determines when the loop terminates.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   var1=unset
   previous=$var1
   while echo "previous-variable = $previous"
@@ -878,7 +886,7 @@ determines when the loop terminates.
 A =while=-loop may employ C-style syntax by using the double-parentheses
 construct.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   ((a = 1))
   while ((a <= LIMIT))
   do
@@ -889,7 +897,7 @@ construct.
 
 Inside its test brackets, a =while=-loop can call a function
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   t=0
   condition ()
   {
@@ -909,7 +917,7 @@ Inside its test brackets, a =while=-loop can call a function
 
 =while= has similar behavior of condition test to =if=
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   while read line
   do
       ...
@@ -921,7 +929,7 @@ Inside its test brackets, a =while=-loop can call a function
     :CUSTOM_ID: until-loop
     :END:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   until[ condition is true ]
   do 
       commands
@@ -930,19 +938,18 @@ Inside its test brackets, a =while=-loop can call a function
 
 An =until=-loop permits C-like test constructs
 
-#+BEGIN_SRC sh
-  until [ "$var" = "end" ]
+#+begin_src shell
+until [ "$var" = "end" ]
   do
       read var
       echo "var = $var"
   done
-
   until (( var > LIMIT ))
   do
       echo -n "$var "
       ((var++))
   done
-#+END_SRC
+#+end_src 
 
 Bash =for=-loop is more loosely structured and more flexible than its
 equivalent in other languages. Therefore, feel free to use whatever type
@@ -960,7 +967,7 @@ all remaining iterations at its loop and continues with the next
 iteration at the loop N levels above (however, it's tricky to use in any
 meaningful context, better to avoid).
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   for outer in I II III IV V
   do
       echo; echo -n "Group $outer"
@@ -986,7 +993,7 @@ meaningful context, better to avoid).
     :CUSTOM_ID: case
     :END:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   case "$var" in
       "$condition1")
       commands...
@@ -998,7 +1005,7 @@ meaningful context, better to avoid).
   esac
 #+END_SRC
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   case "$Kerpress" in 
       [[:lower:]] ) echo "lowercase"
       [[:upper:]] ) echo "uppercase"
@@ -1009,7 +1016,7 @@ meaningful context, better to avoid).
 
 A use of =case= involves testing for command line parameters.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   while [ $# -gt 0 ]
   do
       case "$1" in
@@ -1037,7 +1044,7 @@ A use of =case= involves testing for command line parameters.
 =select= prompts the user to enter one of the choices presented in the
 variable list.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   select var [ in list ]
   do
       commands
@@ -1057,7 +1064,7 @@ construct.
 Command substitution reassigns the output of a command or even multiple
 commands; it literally plugs the command output into another context.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   `command` # classic form
   $(command) # alternative form
 #+END_SRC
@@ -1068,7 +1075,7 @@ newlines. Using =echo= to output an unquoted variable set with command
 substitution removes trailing newlines characters from the output of the
 reassigned commands.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   echo `ls -lh`
   echo "`ls -lh`"
 #+END_SRC
@@ -1077,14 +1084,14 @@ Command substitution permits setting a variable to the contents of a
 file using either redirections or the =cat= command. However, this is
 not recommended.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   variable1=`<file1`
   variable2=`cat file2`
 #+END_SRC
 
 Command substitution permits setting a variable to the output of a loop.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   a="`for i in $(seq 10); do echo $((i++)); done`"
   echo $a
   1 2 3 4 5 6 7 8 9 10
@@ -1097,7 +1104,7 @@ The =$(...)= form permits nesting.
   :CUSTOM_ID: arithmetic-expansion
   :END:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   z=`expr $z + 3` # not recommended
   z=$(($z+3))
   z=$((z+3))
@@ -1161,7 +1168,7 @@ More usage TODO
   Invoking =set= without arguments or options lists all the environment
   variables and other variables that have been initialized.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   set `uname -a` # sets the positional parameter to the output of the command `uname -a`
   set -- $var    # sets the contents of var to positional parameters
   set --         # unsets all positional parameters
@@ -1176,7 +1183,7 @@ More usage TODO
 - =getopts=: parses command-line arguments passed to the script. It uses
   two implicit variables =$OPTIND= and =$OPTARG=.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   while getopts ":abcde:fg" Option
   do
       case $Option in
@@ -1315,7 +1322,7 @@ Between nohup disown]]
 
 - =find=: =-exec= carries out command on each file that find matches.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   find . -maxdepth 1 -name '*.md' -exec lsattr {} \;
   find "$DIR" -type f -atime +5 -exec rm {} \;
   find /etc -exec grep '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*' {} \;
@@ -1328,14 +1335,14 @@ More usage TODO
   delimited by blanks or newlines and executes the command with any
   initial arguments followed by items read from stdin by =xargs=.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   ls | xargs -p gzip # gzips every file in pwd
 #+END_SRC
 
 The =-P= option to =xargs= permits running processes in parallel. A
 curly bracket servers as a placeholder for replacement text.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   ls | xargs -i echo {} # two echoes instead of one
   ls | xargs -i wc -l {}
 #+END_SRC
@@ -1349,7 +1356,7 @@ curly bracket servers as a placeholder for replacement text.
 
 - =zdump=: echoes the time in a specified time zone
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   zdump UTC-8
   zdump EST
 #+END_SRC
@@ -1381,7 +1388,7 @@ tip: use =touch= to stop =cp -u= overwriting a file.
 
 - =uniq=: removes duplicates
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   cat list-1 list-2 list-3 | sort | uniq
 #+END_SRC
 
@@ -1389,7 +1396,7 @@ tip: use =touch= to stop =cp -u= overwriting a file.
 
 - =cut=: extracts fileds from files
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   cut /etc/passwd -d':' -f1 # extracts all user names
   awk -F'[:]' '{ print $1 }' /etc/passwd
 #+END_SRC
@@ -1403,7 +1410,7 @@ tip: use =touch= to stop =cp -u= overwriting a file.
 - =head=/=tail=: list the beginning/end of a file to =stdout=. The
   default is 10 lines.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   head -c2 /etc/profile.d/proxy.sh = '#!'
   tail -f # follow
 #+END_SRC
@@ -1440,7 +1447,7 @@ one method is to pipe the result of =grep pattern1= to =grep pattern2=.
   instance of a string of consecutive characters, useful for remove
   excess whitespaces.; =-c=: inverts the character set to match.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   tr '[[:lower:]]' '[[:upper:]]' # convert all lowercase letter to uppercase
 #+END_SRC
 
@@ -1486,7 +1493,7 @@ one method is to pipe the result of =grep pattern1= to =grep pattern2=.
 
 - =sum=/=cksum=/=md5sum=/=sha1sum=
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   md5sum hello_grid.py | tr 3 1 | md5sum -c 
   md5sum hello_grid.py | md5sum -c
 #+END_SRC
@@ -1516,7 +1523,7 @@ TODO
 - =host=: searches for information about an internet host by name or IP,
   using DNS
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
    djn  debian  ../Documents/CSNotes  host www.tencent.com
   www.tencent.com is an alias for upfile.wj.qq.com.cloud.tc.qq.com.
   upfile.wj.qq.com.cloud.tc.qq.com is an alias for ssd.tcdn.qq.com.
@@ -1527,7 +1534,7 @@ TODO
 
 - =ipcalc=
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
    djn  debian  ../Documents/CSNotes  ipcalc 192.168.1.1
   Address:   192.168.1.1          11000000.10101000.00000001. 00000001
   Netmask:   255.255.255.0 = 24   11111111.11111111.11111111. 00000000
@@ -1542,7 +1549,7 @@ TODO
 
 - =nslookup=: name server lookup
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
    djn  debian  ../Documents/CSNotes  host www.tencent.com
   www.tencent.com is an alias for upfile.wj.qq.com.cloud.tc.qq.com.
   upfile.wj.qq.com.cloud.tc.qq.com is an alias for ssd.tcdn.qq.com.
@@ -1553,7 +1560,7 @@ TODO
 
 - =dig=: Domain Information Groper
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
    djn  debian  ../Documents/CSNotes  dig www.tencent.com
 
   ; <<>> DiG 9.11.5-P4-5.1-Debian <<>> www.tencent.com
@@ -1618,7 +1625,7 @@ TODO
 
 - =bc=: arbitrary precision calculator
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   echo "sqrt(2)" | bc -l
 #+END_SRC
 
@@ -1681,7 +1688,7 @@ TODO
 
 - =logname=: logging name. Different than =whoami= after =sudo=.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   sudo whoami
   sudo logname
 #+END_SRC
@@ -1752,7 +1759,7 @@ TODO
 - =logger=: appends a user-generated message to the system log
   =/var/log/messages=.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   logger -t $0 -i Logging at line "$LINENO"
 #+END_SRC
 
@@ -1777,7 +1784,7 @@ TODO
 
 - =pidof=: idenfies PID of a running job
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   pidof plasmashell
 #+END_SRC
 
@@ -1816,7 +1823,7 @@ TODO
 - =mount=/=umount=: mount/unmount a filesystem
 
 - =sync=: forces an immediate write of all updated data from buffers to
-  hard drive
+
 
 - =losetup=: sets up and configures loopback devices
 
@@ -1913,7 +1920,7 @@ The =/proc= directory is actually a pseudo-filesystem. The files in
 /proc mirror currently running system and kernel processes and contain
 information and statistics about them.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   cat /proc/devices 
   cat /proc/interrupts
   cat /proc/partitions
@@ -1939,7 +1946,7 @@ then outputs the result to stdout or to a file.
 Sed determines which lines of its input that it will operate on from the
 address range passed to it.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   3d # delete line 3
   /window/d # delete every line containing `window`
   /^$/d # delete empty line
@@ -1976,7 +1983,7 @@ redirection to feed a command list to an interactive program or a
 command, such as =ftp=, =cat=, or the =ex= text editor. =<<= precedes
 the limit string. A limit string delineates (frames) the command list.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   cat <<EOF
   fadfas
 
@@ -1988,7 +1995,7 @@ the limit string. A limit string delineates (frames) the command list.
 
 A here document supports parameter and command substitution.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   export RESPONDENT=djn
   cat <<EndOfMessage
   Hello, $USER
@@ -2000,7 +2007,7 @@ Quoting or escaping the "limit string" at the head of a here document
 disables parameter substitution within its body. Here documents may be
 used to generate another script.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   GetPersonalData() {
       read firstname
       read lastname
@@ -2022,7 +2029,7 @@ used to generate another script.
 
 Also, there is the anonymous here document:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   : << TESTVAR
   ${HOSTNAME?} ${USER?} ${MAIL?}
   TESTVAR
@@ -2036,21 +2043,21 @@ opening and are not accessible to any other process.
 A here string can be considered as a stripped-down form of a here
 document. =COMMAND <<< $WORD=
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   if grep -q "txt" <<< "$VAR"
   then
       echo ...
   fi
 #+END_SRC
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   read -r -a Words <<< "This is a string of words"
 #+END_SRC
 
 It is possible to feed the output of a here string into the =stdin= of a
 loop.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC shell
   ArrayVar=(elm0 elm1 elm2 elm3)
 
   while read element; do
