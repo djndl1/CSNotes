@@ -2,22 +2,32 @@
 
 * [[https://peps.python.org/pep-0249][DBAPI]]
 
+The =Connection= object represents a database connection and the =Cursor= class
+is not just a cursor and it performs various other database operations.
+
 - ~Connection~: created by the ~.connect()~ method
   + closeable
-  + support transactions
+  + support transactions; Transactions may be autocommitted, always call
+    =.commit()= after operations.
   + create a ~cursor~ to perform database operations.
 
-- ~cursor~: a database cursor used to perform database operations
+- ~cursor~: a database cursor used to perform database operations; the basic
+  cursor is forward-only.
   + closeable
   + cursors are not isolated from each other.
-  + has the ~.description~ of columns and ~.rowcount~ of affected rows.
+  + has ~.description~ of columns and ~.rowcount~ of affected rows.
   + ~callproc()~, ~.execute()~ query or command, ~executemany()~ a query or command with a set of parameters.
-  + ~fetch*()~ results in a variety of ways.
+  + ~fetch*()~ may return a variety of data structures (list, dict).
   + some databases support multiple result sets ~.nextset()~
 
 - parameter styles:
+  + =pymysql=: format or pyformat (=%(named)s= only)
+  + =cx_Oracle=: named
+  + =pymssql=: pyformat
+  + =pyodbc=: qmark
+  + =sqlite3=: qmark, named, numeric
 
-- database data types
+- database data types converter
   + ~Date()~, ~Time()~, ~Timestamp()~, ~Binary()~, ~DateFromTicks()~, ~TimeFromTicks()~, ~TimestampFromTicks()~ creates various objects mapping to their corresponding database types.
   + ~STRING~, ~BINARY~, ~NUMBER~, ~DATETIME~, ~ROWID~ type codes are provided
   + database null is represented by ~None~
