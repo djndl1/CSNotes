@@ -1,4 +1,5 @@
 #+title: ODBC Programming
+#+bibliography: ODBC.bib
 
 * Background
 
@@ -9,6 +10,7 @@
     (dynamic embedded SQL does exist) and tightly
     coupled with the host code, the platform and the DBMS in use.
   + LINQ-to-SQL, JOO, EntityFramework can be seen as variants of embedded SQL.
+    + dynamic in nature, emitted by the framework.
 
 - SQL Modules: the host programming language calls into SQL procedures,
   decoupling the program and SQL.
@@ -18,8 +20,8 @@
   + similar to dynamic SQL in that SQLs are passed to the DBMS at run time.
   + commonly used in client/server architectures
 
-
 - SQL/CLI: the standardized core part of ODBC. Pure SQL/CLI is rare in practice.
+  + no implementation-specific transformations on source code
 
 - ODBC abstraction is no longer a strong requirement in the era of web.
 
@@ -45,8 +47,8 @@ Abstraction based on device driver model
     portable DSN configuration file)
 
 - /Bridges/:
-  + ODBC-to-JDBC: uses the services of a JDBC driver to connenct to a database.
-  + JDBC-to-ODBC: the builtin one is drpped from JVM in Java 8
+  + ODBC-to-JDBC: uses the services of a JDBC driver to connect to a database.
+  + JDBC-to-ODBC: the builtin one is dropped from JVM in Java 8
   + OLE DB-to-ODBC
   + ADO.NET-to-ODBC
 
@@ -55,35 +57,54 @@ Abstraction based on device driver model
   + Level 1 Interface Conformance
   + Level 2 Interface Conformance
 
-* Programming
+* Core Programming Concepts
 
-- /Environment/: a global context in which to access data
-  + any information global in nature: state; diagnostics; connection handles;
+There is an introductory article[cite:@SQLAGCLI] of SQL/CLI which gives a code
+snippet about how it typically works.
+
+- /Handles/ :: opaque 32-bit item IDs for an /environment/, /connection/,
+  /statement/ or /descriptor/.
+  + =SQLAllocHandle()= creates data structures behind these handles, only then can
+    these handles be used. =SQLFreeHandle()=
+  + Handles are local and thread-safe.
+  + Handle inputs are used with a type argument as handles of different types
+    may not be unique in value. Handles of the same type always have different values.
+
+- /Attributes/ :: defined for environments, connections and statements
+  + some are intrinsic properties of the implementation; some affect the
+    subsequence behavior of the implementation (configuration).
+
+- /Environment/ :: a context global to the application for data access
+  + any information global in nature: *state*; *diagnostics*; *connection
+    handles*, *attributes* (e.g. =SQL_ATTR_OUTPUT_NTS= for null-terminated output string);
     attribute settings.
-  + =SQLAllocHandle()=, =SQLFreeHandle()=
 
-- /Connection/:
-  + =SQLAllocHandle()=, =SQLFreeHandle()=
-  + =SQLDriverConnect()=, =SQLConnect()=, =SQLBrowseConnect()=
-  + =SQLDisconnect()=
+- /Connection/ :: the application's access to a particular server; general
+  status information, transaction state and certain diagnostics information.
+  + allocated in the context of a single /environment/.
 
-- /Statement/: an SQL statement and all the information associated with it: any
-  result sets and parameters.
-  + =SQLAllocHandle()=, =SQLFreeHandle()=
+- /Statement/ :: a data structure that tracks the execution of a single SQL
+  statement and all the information associated with it: dynamic arguments,
+  bindings for dynamic parameters and columns, result values and status information.
+  + allocated within the context of a single connection
+  + the information associated with the handle reflects the most recent
+    execution of the statement.
 
-- /Descriptor/: a collection of metadata that describes the parameters of an SQL
+- /Descriptor/ :: a collection of metadata that describes the parameters of an SQL
   statement or the columns of a result set.
   + /Application Parameter Descriptor/; /Implementation Parameter Descriptor/;
     /Application Row Descriptor/; /Implementation Row Descriptor/
-  + automatically allocated by its statement.
+  + automatically allocated/freed by its statement.
 
-- /Handles/: opaque 32-bit item IDs for an /environment/, /connection/,
-  /statement/ or /descriptor/.
+- /Cursor/ :: a movable pointer into a derived table by which the application
+  can retrieve, update and delete rows.
+  + cursors within are named uniquely.
+  + In CLI, cursors are not explicitly declared, but associated with a result set.
 
 ** Data Types
 
 ODBC defines two sets of type identifiers and corresponding C types: for SQL
-columns and a C buffer. Each SQL data type correspnds to an ODBC C data type.
+columns and a C buffer. Each SQL data type corresponds to an ODBC C data type.
 
 - /Type identifiers/: used in parameter bindings and the retrieval of result set
   data
@@ -96,3 +117,8 @@ columns and a C buffer. Each SQL data type correspnds to an ODBC C data type.
 - =SQLGetTypeInfo()= returns a result set, each row of which describes the
   characteristics of a single data type, such as name, type identifier,
   precision, scale, and nullability.
+
+
+* Bibliography
+
+#+print_bibliography: basic
