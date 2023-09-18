@@ -91,7 +91,8 @@ snippet about how it typically works.
     execution of the statement.
 
 - /Descriptor/ :: a collection of metadata that describes the parameters of an SQL
-  statement or the columns of a result set.
+  statement or the columns of a result set; a conceptual table with a header
+  record (table info) and one or more detail records (column or dynamic parameter).
   + /Application Parameter Descriptor/; /Implementation Parameter Descriptor/;
     /Application Row Descriptor/; /Implementation Row Descriptor/
   + automatically allocated/freed by its statement.
@@ -99,7 +100,16 @@ snippet about how it typically works.
 - /Cursor/ :: a movable pointer into a derived table by which the application
   can retrieve, update and delete rows.
   + cursors within are named uniquely.
-  + In CLI, cursors are not explicitly declared, but associated with a result set.
+  + In CLI, cursors are not explicitly declared, but associated with a result
+    set by a /cursor specification/ (a statement that generates a result set and
+    implicitly open a cursor for the application to fetch).
+  + by default forward-only
+
+- /Diagnostics/ :: a rich model to handle error conditions.
+  + each function returns a return code of =SQL_SUCCESS=,
+    =SQL_SUCCESS_WITH_INFO= or =SQL_ERROR=.
+  + a *diagnostics area* is associated with each handle, consisting of a header
+    record and one or more detail records.
 
 ** Data Types
 
