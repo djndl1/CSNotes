@@ -29,7 +29,12 @@
   + the Windows ODBC
   + iODBC and unixODBC for non-Windows platforms
 
-* Architecture
+* Design and Architecture
+
+Designed with SQL and relational database model in mind.
+An application
+
+** Architecture
 
 Abstraction based on device driver model
 
