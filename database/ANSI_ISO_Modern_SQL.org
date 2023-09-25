@@ -1,13 +1,32 @@
 #+TITLE: Ansi_iso_modern_sql
 
-# SQL92
+SQL is not simply for data retrieval; it's for data transform.
 
-# SQL99
+* SQL-99
+
+Relational database concept is dead.
+Non-relational operations are introduced.
+
+#+begin_quote
+Domains (types) can contain anything.
+#+end_quote
 
 - Nested tables, arrays
 
 - recursive query
 
-# SQL16
+** General Concepts
+
+*** Relational Database
+
+A relational database consists of tables, a table is not a relation, but the
+only difference between them is that a table may have rows with duplicate row
+values, duplicates should be avoided regardless, therefore
+all relational databases should consist of relations. (a table is
+sometimes called a multiset to distinguish it from a regular set).
+
+* Later Standards
+
+** SQL-16
 
 - SQL now understands JSON. SQL/JSON path query language
