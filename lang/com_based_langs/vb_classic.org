@@ -1186,6 +1186,28 @@ A command or query that can be executed on a data source.
 - =.Properties= of =Connection=, =RecordSet=, =Command=, =Field=: contains all the dynamic properties that the ADO provider has
   added to the built-in properties.
 
+
+**** Transactions
+
+- Concurrency control or *Locks*
+  + =adLockReadOnly=: read-only
+  + =adLockPessimistic=: pessimistic locking by locking records at the data
+  source immediately before editing.
+  + =adLockOptimistic=: optimistic locking by assuming no other user may change
+  the data between the time of editing and committing and thus does not lock on
+  the data source. If any modification is detected, the transaction is rolled back.
+  + =adLockBatchOptimistic=:
+
+- *Isolation levels*
+  + =adXactChaos=: pending changes from more highly isolated transactions cannot
+    be overwritten
+  + =adXactBrowse=, =adXactReadUncommitted=: uncommitted changes from one transaction can be viewed in another
+  + =adXactCursorStability=, =adXactReadCommitted=: changes from one transaction
+    can only be viewed from another after committing the changes
+  + =adXactIsolated=, =adXactSerializable=: transactions are conducted in
+    isolation of other transactions.
+  + =adXactRepeatableRead=: ReadUncommitted after requerying.
+
 * GUI Programming
 
 in VB6, controls can be classified into (1) /Standard Controls/, managed by the
