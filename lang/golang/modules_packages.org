@@ -1,0 +1,76 @@
+#+title: Modules Packages
+
+* Go Packages
+:PROPERTIES:
+:ID:       85b21065-6f67-4db0-87f3-af9b888ea1e4
+:END:
+
+Go packages work somewhat like a Java package, by grouping related source files
+together in a directory, not organized hierarchically in the filesystem though.
+The special =main= package (placed at the root) is the package that contains the =main()= function
+and builds an executable.
+
+#+begin_src go
+package my_package_name
+
+import "another_package" // as another_package
+import third "third_package" // as third
+import . "third_package" // directly into the current file scope
+
+import _ "for_side_effect" // import for side effect but not using it
+#+end_src
+
+An *uppercase* symbol declared in the package block or is a field or method name
+is exported automatically.
+
+* Go Modules
+:PROPERTIES:
+:ID:       df12a8ee-36f9-43af-a4cd-6045be25f53f
+:END:
+
+** Motivation
+
+- =GOROOT= :: where the Go SDK is located.
+
+- =GOPATH= :: the root the Go workspace, typically in =$HOME/go= and has
+  subdirectories such as =src=, =pkg= and =bin=
+
+Before there is no package management for Go and the build system relied on
+=GOPATH= to determine the current workspace and the locations of various
+dependencies, which requires every projects to use the same local environments
+and lacks versioning.
+
+Go module is introduced in Go 1.11 as an official dependency management solution
+built into the go command.
+
+** Basic Concept
+
+A versioned collection of Go packages stored in a file tree with a =go.mod= as
+its root to support reproducible builds.
+
+A module has its own name, and its packages are located in the subdirectories, with
+their import path being the module path plus the subdirectory path.
+
+- =go.mod=
+  + defines the module's *module name*, *module version*, the *import path* used for the root
+    directory, and its *dependency requirements* with a module path and a
+    specific semantic version.
+  + =go build=, =go test= and other package-building commands add new
+    dependencies to =go.mod= as needed. A =go.sum= is created to ensure the future downloads of the modules same bits as the first download.
+
+  #+begin_src shell
+  go mod init my_module_name
+
+  go list -m all
+
+  go get # changes the required version of a dependency or add a new dependency
+
+  go mod tidy # add necessary deps and removes unused deps
+
+  go mod download
+  go mod vendor # copies the dependencies into a vendor directory within the project to achieve self containing
+  go mod graph
+  #+end_src
+
+
+- [[https://research.swtch.com/vgo-import][semantic import versioning]]: Each different major versions of a Go module uses a different path: the path must end in the major version starting at =v2=, i.e. different major versions of a module can be seen as different modules.

@@ -1,0 +1,28 @@
+#+title: Lang Basics
+
+- =for= may act as =while= in Go
+  + without any conditions as an infinite loop
+
+- =if= may have an init statement before the condition
+  and the variables declared in there are visible inside any of the =else= blocks.
+
+- =break= is not required in =switch= clause
+  + switch cases need not to be constants.
+  + an init statement is allowed
+  + switch without a condition is =switch true= and is used to write long
+    =if-then-else= since cases need not to be constants.
+
+    #+begin_src go
+	switch {
+	case t.Hour() < 12:
+		fmt.Println("Good morning!")
+	case t.Hour() < 17:
+		fmt.Println("Good afternoon.")
+	default:
+		fmt.Println("Good evening.")
+	}
+    #+end_src
+
+- =defer= statement defer the execution of a function until the containing
+  function returns but evaluates the arguments on the spot.
+  + pushed onto a stack; executed in a LIFO order
