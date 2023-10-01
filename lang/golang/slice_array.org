@@ -1,3 +1,29 @@
 #+title: Slice Array
 
+* Go Arrays
+
+The size of an array is part of its type.
+
+Arrays are values: array assignment are copy assignment and passing an array as
+a parameter is copying the array into the function.
+
 * Go Slices
+
+A descriptor for a contiguous segment of an underlying array, similar to a
+pointer with the length (=len=) and the underlying capacity (=cap=).
+A general interface to sequences of data and is the goto type rather than simple
+arrays.
+Slices are a solution to C's array and length argument and dynamic arrays.
+
+A slice is not necessarily an alias for a named array. =make([]T, length,
+capacity)= allocates an underlying array and makes a new slice out of this array
+but the underlying array is not directly accessible.
+
+Internally, a slice consists of a *pointer to the array*, the *length* of the
+segment and its *capacity* (the length of the underlying array segment, not the
+entire array since the slice may not start at the beginning of the array).
+
+=copy= and =append= turn slices into dynamic arrays. =nil= works as an empty slice.
+
+Since a slice references its underlying data, it may be
+kept around for a long time. Make a copy of the slice to GC the possibly large data.
