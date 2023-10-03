@@ -134,6 +134,12 @@ columns and a C buffer. Each SQL data type corresponds to an ODBC C data type.
   precision, scale, and nullability.
 
 
+* Drivers
+
+** Oracle
+
+=DBQ= should be used to specify EasyConnect name or TNS name.
+
 * Bibliography
 
 #+print_bibliography: basic
