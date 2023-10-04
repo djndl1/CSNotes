@@ -25,6 +25,8 @@ values, duplicates should be avoided regardless, therefore
 all relational databases should consist of relations. (a table is
 sometimes called a multiset to distinguish it from a regular set).
 
+- Prepared statement: https://stackoverflow.com/questions/36367555/confusion-between-prepared-statement-and-parameterized-query-in-python
+
 * Later Standards
 
 ** SQL-16
