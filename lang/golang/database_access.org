@@ -1,0 +1,9 @@
+#+title: Database Access
+
+* Relation DBMS
+
+Normally, =sql.DB= (connection pool) manages read/write without using an explicit connection.
+The user specifies a driver and connection information (often in the form of a
+connection string) and open such a =sql.DB=. Use =sql.Conn= for dedicated connections.
+
+Use =defer= to close =sql.DB=, =sql.Rows=, =sql.Conn= and rollback =sql.Tx=.
