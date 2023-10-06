@@ -1,6 +1,9 @@
 #+title: Lang Basics
 
-- =for= may act as =while= in Go
+- Constant expressions perform arithmetic with arbitrary precision;
+  + a numeric constant has no type until it is specified or used in a context.
+
+- =for= may act as =while= in Go, there is only one loop keyword in golang.
   + without any conditions as an infinite loop
 
 - =if= may have an init statement before the condition
@@ -26,3 +29,29 @@
 - =defer= statement defer the execution of a function until the containing
   function returns but evaluates the arguments on the spot.
   + pushed onto a stack; executed in a LIFO order
+
+- *type embedding*: embedding of structs and interfaces to express a more
+  seamless and automated composition of types, and also a way to implement inheritance.
+
+  #+begin_src go
+type base struct {
+	num int
+}
+
+type container struct {
+	base
+	str string
+}
+
+co := container {
+	base: base{
+		num: 1,
+	},
+	str: "some time"
+}
+
+co.num // num can be accessed directly
+co.str
+
+co.base_method() // base methods can be used directly
+  #+end_src
