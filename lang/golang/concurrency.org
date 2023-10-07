@@ -1,0 +1,69 @@
+#+title: Concurrency
+
+* Basic scenarios
+
+- synchronization
+
+  #+begin_src go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func worker(done chan<- bool) { // send only
+    fmt.Print("working...")
+    time.Sleep(time.Second)
+    fmt.Println("done")
+
+    done <- true
+}
+
+func main() {
+
+    done := make(chan bool, 1)
+    go worker(done)
+
+    <-done // join a goroutine
+}
+  #+end_src
+
+- timed wait on a channel
+
+  #+begin_src go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func main() {
+
+    c1 := make(chan string, 1)
+    go func() {
+        time.Sleep(2 * time.Second)
+        c1 <- "result 1"
+    }()
+
+    select {
+    case res := <-c1:
+        fmt.Println(res)
+    case <-time.After(1 * time.Second):
+        fmt.Println("timeout 1")
+    }
+
+    c2 := make(chan string, 1)
+    go func() {
+        time.Sleep(2 * time.Second)
+        c2 <- "result 2"
+    }()
+    select {
+    case res := <-c2:
+        fmt.Println(res)
+    case <-time.After(3 * time.Second):
+        fmt.Println("timeout 2")
+    }
+}
+  #+end_src
