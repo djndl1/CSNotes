@@ -34,7 +34,6 @@ Lazarus by default, probably the most used dialect nowadays.
 the unicode versions supports all Delphi 2009 and above features.
 
 ** MACPAS
-
 ** ISO
 
 ISO 7185 Mode
@@ -62,3 +61,45 @@ the order by
 
 A string constant is interpreted according to its source file codepage and
 converted when assigned to a string type.
+
+* Numeric Types
+
+- literals of different bases: =%1010= (binary), =&644= (octal), =$2A= (hexadecimal)
+
+- a variety of integral types are supported
+  + =Boolean=: byte sized; =ByteBool=, =WordBool=, =LongBool=
+  + =shortInt= (=int8=), =byte= (=uInt8=)
+  + =smallInt= (=int16=), =word= (=uInt16=)
+  + =longInt= (=int32=), =longWord=, =cardinal=, =dWord=
+  + =int64=, =qWord= (=uInt64=)
+  + =NativeInt=, =NativeUInt=: architecture-native word
+
+- =integer= is an alias depending on
+  compatibility mode, either =smallInt= (=int16=, turbo pascal, macPascal or
+  the default FPC mode) or =longInt= (=int32=).
+
+- =Real=: maps to =double= or =single=.
+
+- =Single=, =Double=, =Extended=, =Comp=, =Currency=
+
+* Text Types
+
+- =Char= (=AnsiChar=), =WideChar=
+
+- =PChar=, =PWideChar=: a pointer to a character array ending with =#0=, null-terminated strings
+
+- =ShortString=: 8-byte length byte character string
+  + =PShortString=
+
+- =AnsiString= (of =AnsiChar=; there's =UTF8String=, the UTF8 version), =UnicodeString= (=WideChar=): refcounted null-terminated length-prefixed character string
+  + =PAnsiString=, =PUnicodeString=
+
+- =WideString=: OLE =BSTR= on Windows
+  + =PWideString=
+
+- =UTF16String=: alias for =WideString= or =UnicodeString=
+
+- =Short=: alias for  =ShortString=, =AnsiString= or =UnicodeString=
+
+Assigning an =AnsiString= (including =UTF8String=) to another =AnsiString=
+converts what is in the source to match the code page of the target string.
