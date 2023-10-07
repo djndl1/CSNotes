@@ -1,0 +1,51 @@
+#+title: System Components
+
+* Toolchains
+
+- =m4= ::
+
+- =tic= ::
+
+- =ncurses= ::
+
+- =bash= ::
+
+- =coreutils= ::
+
+- =diffutils= ::
+
+- =file= ::
+
+- =findutils= ::
+
+- =gawk= ::
+
+- =grep= ::
+
+- =gzip= ::
+
+- =make= ::
+
+- =patch= ::
+
+- =sed= ::
+
+- =tar= ::
+
+- =xz= ::
+
+- =binutils= ::
+
+- =gcc= ::
+
+- =gettext= ::
+
+- =bison= ::
+
+- =perl= ::
+
+- =python= ::
+
+- =texinfo= ::
+
+- =util-linux= ::
