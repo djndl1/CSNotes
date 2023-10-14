@@ -56,4 +56,6 @@ After chrooting, create various directories for LFS.
 Add =/etc/hosts= and =etc/passwd=, =/etc/group= and various files.
 
 Then some libraries are built and a complete LFS toolchain is now ready to build
-the final system.
+the final LFS core system.
+
+After all userspace programs are built and installed, they are stripped of debug symbols.

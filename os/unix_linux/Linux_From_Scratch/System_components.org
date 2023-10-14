@@ -49,3 +49,236 @@
 - =texinfo= ::
 
 - =util-linux= ::
+
+* LFS System Components
+
+- =man-pages= ::
+
+- =iana-etc= :: data for network services and protocols
+  + =/etc/protocols= :: various DARPA protocols available from the TCP/IP subsystem
+  + =/etc/services= :: mapping between textual internet service name to port
+    number and protocol types
+
+- =glibc= :: libc along with the dynamic loader; It is not simply a libc, it is
+  the =kernel32.dll= and =ntdll= of Linux.
+  + Single Unix Specification POSIX support
+  + ISO C11/C99
+  + BSD interfaces
+  + System V Interface Definition
+  + X/Open Portability Guide
+  + glibc is not a simple library. It contains a large number of libraries ,
+    executable binaries, data files and configuration files
+    - =libc=, =libm, =libmvec=, =libpthread=, =librt= (POSIX real-time extension),
+    =libcrypt=, =libresolv=, =libnss_*= etc.
+    - =locale=, =iconv=, =ldd=, =ld.so=, =mtrace=
+  + time zone info should be installed and configured after glibc is installed.
+  + =ld.so.conf= should be configured too.
+
+- =zlib= :: compression/decompression library
+  + =libz.so=
+
+- =bzip2= ::
+  + =libbz2.so=, =bzip2=, =bunzip2=, =bzcat=, =bzcmp= ...
+
+- =xz= ::
+  + =lzma-=, =xz=, =unxz=, =unlzma=
+  + =liblzma=
+
+- =zstd= :: real-time compression algorithm
+  + =zstd=, =libzstd=
+
+- =file= :: determining the type of a given file or files
+  + =file=, =libmagic.so=
+
+- =readline= :: a set of libraries that offer command-line editing and history capabilities
+  + =libhistory=, =libreadline=
+
+- =m4= :: macro processor
+
+- =bc= :: =bc= and =dc= calculator
+
+- =flex= :: a utility for generating programs that recognizes patterns in text
+  + =flex=, =flex++=, =lex=
+  + =libfl=
+
+- =Tcl= :: the Tcl language
+  + for test suites of GCC and binutils
+  + =tclsh=, =libtcl8.6=
+
+- =Expect= :: tools via scripted dialogues to automate interactive applications
+  such as =telnet=, =ftp=, =passwd=, =rlogin= and =tip=.
+  + =expect=, =libexpect=
+
+- =DejaGnu= :: a framework for running test suites on GNU tools using Tcl
+  + =dejagnu=, =runtest=
+
+- =binutils= :: a linker, assembler and other tools for handling object files
+  + =addr2line=, =ar=, =as=, =c++filt=, =dwp=, =elfedit=, =gprof=, =gprofng=,
+    =ld=, =ld.gold=, =ld.bfd=, =nm=, =objcopy=, =objdump=, =ranlib=, =readelf=,
+    =ranlib= (object archive indexer), =size=, =strings=, =strip=
+  + =libbfd=, =libctf=, =libctf=nobfd=, =libopcodes=
+
+- =GMP= :: arbitrary precision math library
+  + =libgmp=, =libgmpxx=
+
+- =MPFR= :: multiple precision math library
+  + =libmpfr.so=
+
+- =MPC= :: complex math library
+  + =libmpc.so=
+
+- =attr= :: administer the extended attributes on filesystem objects
+  + =getattr=, =setattr=, =attr=, =libattr.so=
+
+- =acl= :: administer Access Control Lists
+  + =chacl=, =-getfacl=, =setfacl=
+  + =libacl.so=
+
+- =libcap= :: user-space interface to the POSIX 1003.1e capabilities
+  + =capsh=, =getcap=, =getpcaps=, =setcap=, =libcap.so=, =libpsx.so=
+
+- =shadow= :: handling passwords in a secure way
+  + =chage=, =chfn=, =chgpasswd=, =chsh=, =useradd=, =userdel=, =usermod=, =login=
+  + =libsubid.so=
+
+- =GCC= ::
+  + =c++=, =cc=, =cpp=, =g++=, =gcc=, =gcc-ar=, =gcc-nm=, =gcc-ranlib=, =gcov=,
+    =gcov-dump=, =gcov-tool=, =lto-dump=
+  + =libasan=, =libatomic=, =libcc1=, =libgcc= (runtime support for gcc),
+    =libgcov=, =libgomp= (OpenMP), =libitm= (transactional memory), =liblsan=,
+    =libquadmath= (quad precision math), =libssp=,
+    =libstdc++=,
+    =libstdc++fs=, =libsupc++= (C++ supporting routines), =libtsan=, =libubsan=
+
+- =pkg-config= ::
+
+- =ncurses= ::
+  + =captoinfo=, =clear=, =infocmp=, =infotocap=, =tabs=, =reset=, =tic=, =toe=,
+    =tput=, =tset=
+  + =libcursesw=, =libncursesw=, =libformw=, =libmenuw=, =libpanelw=
+
+- =psmisc= :: information about running process
+  + =killall=, =fuser=, =peekfd=, =prtstat=, =pslog=, =pstree=, =pstree.x11=
+
+- =gettext= :: utilities and libraries for internationalization and localization that provides
+  programs with NLS support to output messages in the user's native language.
+
+- =bison= :: parse generator
+  + =bison=, =yacc=, =liby=
+
+- =grep= ::
+  + =egrep=, =fgrep=, =grep=
+
+- =bash= ::
+
+- =libtool= :: generic library support script
+
+- =GDBM= :: GNU database manager
+  + =gdbm_dump=, =gdbm_load=, =gdbmtool=, =libgdbm=, =libgdbm_compat=
+
+- =gper= :: generates a perfect key function from a key set
+
+- =expat= :: a stream oriented C library for parsing XML.
+
+- =inetutils= :: programs for basic networking
+  + =ftp=, =hostname=, =ifconfig=, =ping=, =ping6=, =talk=, =telnet=, =tftp=,
+    =traceroute=, =dnsdomainname=
+
+- =less= ::
+
+- =perl= ::
+
+- =XML::Parse= :: a perl interface to Expat
+
+- =Intl= :: an internationalization tool used for extracting translatable strings from
+    source files
+  + =intltoolize=
+
+- =autoconf= ::
+
+- =automake= ::
+
+- =openssl= :: management tools and libraries relating to cryptography.
+  + =libcrypto=, =libssl=, =openssl=
+
+- =kmod= :: libraries and utilities for loading kernel modules
+  + =insmod=, =depmod=, =kmod=, =lsmod=, =modinfo=, =modprobe=, =rmmod=, =libkmod=
+
+- =elfutils= :: handles ELF files
+  + =libelf=
+
+- =libffi= :: a portable high level programming interface to various calling conventions.
+  + =libffi=
+
+- =Python= ::
+
+- =Wheel= :: python wheel packaging standard library
+
+- =Ninja= :: a small build system
+
+- =meson= ::
+
+- =coreutils= ::
+
+- =check= :: a unit testing framework for C
+  + =check=, =libcheck.so=
+
+- =diffutils= ::
+  + =cmp=, =diff=, =diff3=, =sdiff=
+
+- =gawk= ::
+  + =awk=, =gawk=
+
+- =findutils= ::
+
+- =groff= :: processing and formatting text
+
+- =grub= :: =grub-*=
+
+- =gzip= ::
+  + =gunzip=, =uncompress=, =gzip=, =gzexe=
+
+- =iproute= :: programs for basic and advanced IPV4-based networking
+  + =bridge=, =ctstat=, =genl=, =ifcfg=, =ifstat=, =ip=, =lnstat=, =nstat=,
+    =routef=, =routel=, =rtmon=, =rtacct=, =rtpr=, =ss=, =-tc=
+
+- =kbd= :: key-table files, console fonts and keyboard utilities
+  + =chvt=, =deallocvt=, =dumpkeys=, =fgconsole=, =getkeycodes=, =kbdinfo=,
+    =kbdrate=, =openvt=, =showkey=
+
+- =libpipeline= :: a library for manipulating pipelines of subprocesses in a
+  flexible and convenient way.
+
+- =make= ::
+
+- =patch= ::
+
+- =texinfo= ::
+  + =info=, =install-info=, =makeinfo=, =texi2*=, =pdftexi2dvi=
+
+- =vim= ::
+
+- =eudev= :: programs for dynamic creation of device nodes
+  + =udevadm=, =udevd=, =libudev=, =/etc/udev=
+
+- =Man-DB= ::
+  + =accessdb=, =apropos=, =catman=, =lexgrog=, =man=, =man-recode=, =manpath=,
+    =whatis=
+  + =libman=, =libmandb=
+
+- =procsng= :: programs for monitoring processes
+  + =free=, =pgrep=, =pidof=, =pkill=, =ps=, =pmap=, =pwait=, =pwdx=, =sysctl=,
+    =tload=, =top=, =uptime=, =vmstat=, =w=, =watch=
+  + =libproc-2=
+
+- =util-linux= :: miscellaneous utility programs
+
+- =e2fsprogs= :: ext filesystem utilities
+  + =e2fsck=, =e2freefrag=, =dumpe2fs=, etc.
+
+- =sysklogd= :: logging system messages
+  + =klogd=, =syslogd=
+
+- =sysvinit= :: controlling startup, running and shutdown of the system
+  + =halt=, =init=, =killall5=, =poweroff=, =reboot=, =runlevel=, =shutdown=,
+    =telinit=, =bootlogd=, =fstab-decode=
