@@ -208,3 +208,19 @@ until BooleanExpression;
 * Subrange
 
 =lowest_value .. highest_value=
+
+* Units
+
+#+begin_src pascal
+unit myUnitName;
+
+interface
+
+[implementation]
+
+[initialization]
+
+[finalization]
+
+end.
+#+end_src
