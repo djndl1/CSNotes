@@ -64,6 +64,15 @@ converted when assigned to a string type.
 
 * Numeric Types
 
+- Enums can be scoped with =${SCOPEDENUMS ON}=.
+  + enums can be used to create sets
+
+    #+begin_src pascal
+type
+    TAnimalKind = (akDuck, akCat, akDog);
+    TAnimals = set of TAnimalKind;
+    #+end_src
+
 - literals of different bases: =%1010= (binary), =&644= (octal), =$2A= (hexadecimal)
 
 - a variety of integral types are supported
@@ -137,6 +146,11 @@ Lazarus]].
 
 * Control
 
+- logical operators act as bitwise operators as well.
+  + logical operators have a higher precedence than relational operators and
+    parentheses should be used.
+  + Short-circuit evaluation of boolean evaluation is enabled by default.
+
 - =If-then-else= is a single statement and cannot be interrupted by a half-colon
   =;= after =then= and before =else=.
   + use a =begin-end= block to insert multiple statements.
@@ -144,6 +158,7 @@ Lazarus]].
     nested =if=. Use a =begin-end= block just in case.
 
 - =case= statement is Pascal's =switch=
+  + no fallthrough is allowed.
 
   #+begin_src pascal
 case selector of
@@ -188,6 +203,7 @@ until BooleanExpression;
 - Better use =Result= variable in a function as return value instead of the
   function name.
   + use =Exit()= for an early return
+  + always call parameter-less procedures with parentheses to avoid confusion.
 
 * Subrange
 
