@@ -282,3 +282,41 @@
 - =sysvinit= :: controlling startup, running and shutdown of the system
   + =halt=, =init=, =killall5=, =poweroff=, =reboot=, =runlevel=, =shutdown=,
     =telinit=, =bootlogd=, =fstab-decode=
+
+- =LFS-Bootstripts= :: various configuration files for system startup
+
+* Devices and Kernel Modules
+
+The =sysfs= filesystem (data about detected devices exported by drivers) is mounted on
+=/sys=. The =devtmpfs= filesystem (device files) are created by the kernel and
+populated by drivers and then mounted on =/dev=, later further configured by
+=udevd= according to some rules.
+
+Every kernel module has an alias and then provided in the =sysfs= filesystem,
+which is then used by =udevd= to =modprobe= any modules that match that alias
+and load them. Unwanted modules are blacklisted in =/etc/modprobe.d/blacklist.conf=.
+
+Hot-plugged devices are detected by the kernel and a =uevent= is generated and
+handled by =udevd=.
+
+Device names are never fixed across system boots. Use various IDs to identify a
+device instead of a device node name.
+
+* Networking
+
+** Naming
+
+The new naming scheme (e.g. =enp5s0=, =wlp3s0=) enables persistent naming so that device names are not
+changed across booting.
+
+** Network Interface Configuration
+
+=ifconfig.iterfacename= files under =/etc/sysconfig= bring up and down network interfaces.
+
+** Hostname
+
+- DNS servers are configured in =/etc/resolv.conf= (manually or by =NetworkManager=)
+
+- System's hostname is stored in =/etc/hostname=.
+
+- Local domain names and aliases are configured in =/etc/hosts=
