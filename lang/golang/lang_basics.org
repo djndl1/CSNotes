@@ -26,3 +26,13 @@
 - =defer= statement defer the execution of a function until the containing
   function returns but evaluates the arguments on the spot.
   + pushed onto a stack; executed in a LIFO order
+
+* How-to
+
+** Formatted I/O
+
+Use =fmt= package.
+
+- one-based indexed argument is supported with =[n]= after =%=.
+
+- =fmt.Sprintf= :: formatted string
