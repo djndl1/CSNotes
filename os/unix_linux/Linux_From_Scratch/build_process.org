@@ -1,0 +1,62 @@
+#+title: Build Process
+
+The detailed process is described in the LFS book.
+
+* Install an Existing Linux System
+
+Use an existing one or LiveCD. This host system requires
+bash, binutils, coreutils, bison, diffutils, gawk, GCC, grep, Gzip, sed, tar
+m4, Make etc.
+
+* Make LFS Partitions and Filesystems
+
+A swap partition and a root partition at least
+
+* Download Software Packages
+
+* Create a Directory Layout for LFS
+
+- =mkdir= =/etc=, =/var=, =/usr/bin=, =/usr/lib/=, =/usr/sbin=
+
+- link =/usr/{bin,lib,sbin}= to =/=
+
+- make a =/lib64= if necessary
+
+- Make a =/tools= for the cross toolchain
+
+* Create a LFS User on the Host System For Build Operations
+
+Assign each directory's owner in =$LFS= to user =lfs=.
+Switch to user =lfs= with =su - lfs= (login shell).
+
+* Build the LFS Cross Toolchain and Temporary Tools
+
+Use the host system's toolchain to build a LFS cross toolchain and tools
+so that the LFS system can be built using this new isolated toolchain.
+
+Cross compilation is not strictly necessary for LFS but it isolates the product
+from the host system.
+
+Binutils - GCC - glibc
+
+This host-built cross toolchain is installed in =$LFS/tools=, not used by the
+LFS itself.
+
+GCC is built twice; the first time as a cross compiler from the host; the second
+time built by the pass-1 compiler to run on LFS to targets LFS.
+
+After the pass-2 toolchain is built, enter the chroot environment for further compilation.
+
+* Enter the Chroot Environment
+
+Change the filesystem owner to =root=; create virtual directories used by the
+kernel and mount them.
+
+After chrooting, create various directories for LFS.
+Add =/etc/hosts= and =etc/passwd=, =/etc/group= and various files.
+
+Then some libraries are built and a complete LFS toolchain is now ready to build
+the final LFS core system.
+
+After all userspace programs are built and installed, they are stripped of debug
+symbols. Then various configuration files for startup are installed.

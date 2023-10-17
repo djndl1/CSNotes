@@ -42,6 +42,7 @@ no preprocessor, and no macros.
 
 Errors are defined in terms of *error set types*, similar to an enum.
 Error sets coerce to their supersets.
+
 A normal type can be combined with an error set type with
 =[ErrorSetType]!NormalType= to form an error union type.
 
@@ -95,7 +96,18 @@ zig build
 
 * Important Syntax
 
-- =switch= can be a statement or an expression.
+- =0x=, =0o=, =0b= for hexadecimal, octal and binary integer literals
+
+- =_= connects digits of a numeric literal
+
+- =undefined= for declared but unassigned variables/constants
+
+- Like Go, use =_= to ignore a variable or const declaration.
+
+- integer overflows are illegal and detected; to force an overflow, use
+  operators like =+%=, =-%=, =*%=, ~+%=~, ~-%=~, ~*%=~.
+
+- =switch=, =if= can be a statement or an expression.
 
   #+begin_src zig
   // statement
@@ -114,6 +126,41 @@ zig build
      10, 100 => @divExact(x, 10),
      else => x,
   };
+
+  x += if (a) 1 else 2;
+  #+end_src
+
+- =@as()= for typecast
+
+- =[N]T=, =[_]T= array type
+
+- =while=, like a C =for= loop, supports an after/continue expression
+
+  #+begin_src zig
+var i: u8 = 1;
+while (i <= 10) : (i += 1) {
+    sum += i;
+}
+  #+end_src
+
+- =for= is a for-each loop construct
+
+  #+begin_src zig
+for (str) |ch| {
+    ...
+}
+
+for (str, 0..) |ch, idx| {
+   ...
+}
+
+for (str, 0..) |_, idx| {
+    ...
+}
+
+for (str) |_| {
+    ...
+}
   #+end_src
 
 * Pointers

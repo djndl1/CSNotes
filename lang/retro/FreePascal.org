@@ -34,7 +34,6 @@ Lazarus by default, probably the most used dialect nowadays.
 the unicode versions supports all Delphi 2009 and above features.
 
 ** MACPAS
-
 ** ISO
 
 ISO 7185 Mode
@@ -62,3 +61,166 @@ the order by
 
 A string constant is interpreted according to its source file codepage and
 converted when assigned to a string type.
+
+* Numeric Types
+
+- Enums can be scoped with =${SCOPEDENUMS ON}=.
+  + enums can be used to create sets
+
+    #+begin_src pascal
+type
+    TAnimalKind = (akDuck, akCat, akDog);
+    TAnimals = set of TAnimalKind;
+    #+end_src
+
+- literals of different bases: =%1010= (binary), =&644= (octal), =$2A= (hexadecimal)
+
+- a variety of integral types are supported
+  + =Boolean=: byte sized; =ByteBool=, =WordBool=, =LongBool=
+  + =shortInt= (=int8=), =byte= (=uInt8=)
+  + =smallInt= (=int16=), =word= (=uInt16=)
+  + =longInt= (=int32=), =longWord=, =cardinal=, =dWord=
+  + =int64=, =qWord= (=uInt64=)
+  + =NativeInt=, =NativeUInt=: architecture-native word
+
+- =integer= is an alias depending on
+  compatibility mode, either =smallInt= (=int16=, turbo pascal, macPascal or
+  the default FPC mode) or =longInt= (=int32=).
+
+- =Real=: maps to =double= or =single=.
+
+- =Single=, =Double=, =Extended=, =Comp=, =Currency=
+
+* Text Types
+
+- =Char= (=AnsiChar=), =WideChar=
+
+- =PChar=, =PWideChar=: a pointer to a character array ending with =#0=, null-terminated strings
+
+- =ShortString=: 8-byte length byte character string
+  + =PShortString=
+  + In Delphi, =ShortString= lives on the stack.
+
+- =AnsiString= (of =AnsiChar=; there's =UTF8String=, the UTF8 version),
+  =UnicodeString= (=WideChar=): refcounted null-terminated length-prefixed
+  copy-on-write character string
+  + =PAnsiString=, =PUnicodeString=
+
+- =WideString=: OLE =BSTR= on Windows
+  + =PWideString=
+
+- =UTF16String=: alias for =WideString= or =UnicodeString=
+
+- =Short=: alias for  =ShortString=, =AnsiString= or =UnicodeString=
+
+Assigning an =AnsiString= (including =UTF8String=) to another =AnsiString=
+converts what is in the source to match the code page of the target string.
+
+** Unicode Conversion Test
+
+The compiler has some peculiar logic when handling literal constants;
+
+The default =widestringmanager= under Unix simply converts the widechars to chars,
+destroying any non ASCII character.
+One must use a =widestringmanager= like the unit =cwstring= to get correct conversion.
+On Unix, if widestringmanager is used, =DefaultSystemCodePage= is set to
+=LC_CTYPE= or =LANG=, otherwise =CP_ACP=. A wide string manager is required for
+proper conversion between wide string and ANSI string.
+
+After some experiment and probe into the generated code, some interesting facts
+are discovered:
+
+With =${CODEPAGE UTF8}$, =AnsiString= and =UTF8String= are assigned the same
+ANSI literal while =UnicodeString= and =ShortString= uses the same UTF16 literal.
+Both literals are correct.
+
+Without =${CODEPAGE UTF8}=, each string seems to be using a different literal: =UTF8String=
+uses a messed up one and =UnicodeString='s literal remains ANSI (a bug perhaps?) and after
+conversion as UTF-16 to UTF-8 it is messed up as the UTF8's.
+
+In both cases, without a wide string manager,
+the conversion and I/O would be messed up though.
+
+The behavior above is in accordance with the report in [[https://wiki.freepascal.org/Unicode_Support_in_Lazarus#Why_does_UTF8String_show_strange_characters_and_String_works][Unicode Support in
+Lazarus]].
+
+* Control
+
+- logical operators act as bitwise operators as well.
+  + logical operators have a higher precedence than relational operators and
+    parentheses should be used.
+  + Short-circuit evaluation of boolean evaluation is enabled by default.
+
+- =If-then-else= is a single statement and cannot be interrupted by a half-colon
+  =;= after =then= and before =else=.
+  + use a =begin-end= block to insert multiple statements.
+  + The =else= is always matched with the most recent =if= so be careful with
+    nested =if=. Use a =begin-end= block just in case.
+
+- =case= statement is Pascal's =switch=
+  + no fallthrough is allowed.
+
+  #+begin_src pascal
+case selector of
+  List1:    Statement1;
+  List2:    Statement2;
+  ...
+  Listn:    Statementn;
+  otherwise Statement
+end;
+  #+end_src
+
+- fixed repetition loop
+
+  #+begin_src pascal
+for index := Starting to/downto Ending do { where index is an ordinal data }
+    statement; { index cannot be changed inside the loop! }
+  #+end_src
+
+- pretest =while-do= loop
+
+  #+begin_src pascal
+while booleanExpression do
+  statement;
+  #+end_src
+
+-  posttest loop; no =begin-end= required for multiple statements.
+
+  #+begin_src pascal
+repeat
+  statement1;
+  statement2;
+until BooleanExpression;
+  #+end_src
+
+- =for-in= loop, used with a collection (including =string=, =array= and =set=). This loop requires the collection
+  implements an enumerator for it (the design is a straightforward imitation of
+  C#).
+  + loop variables are temporary copies of the container value.
+  + the collection variable may call its enumerator generator method in =in ...=
+    to traverse in a different way.
+
+- Better use =Result= variable in a function as return value instead of the
+  function name.
+  + use =Exit()= for an early return
+  + always call parameter-less procedures with parentheses to avoid confusion.
+
+* Subrange
+
+=lowest_value .. highest_value=
+
+* Units
+
+#+begin_src pascal
+unit myUnitName;
+
+interface
+
+[implementation]
+
+[initialization]
+
+[finalization]
+
+end.
+#+end_src

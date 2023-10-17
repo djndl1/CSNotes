@@ -7,8 +7,8 @@
 #+end_src
 
 The LFS only build three compilers:
-- one that runs on the host and targets the LFS
+- one that runs on the host and targets the LFS =pc-pc-lfs=
   + first pass: binutils, gcc, kernel API headers, glibc, libstdc++ without exception support
-- one that is cross-compiled and runs on the LFS and targets the LFS.
+- one that is cross-compiled and runs on the LFS and targets the LFS. =pc-lfs-lfs=
   + a basic linux environment and gcc is built using the toolchain of the first pass
-- one that is native-compiled on the LFS, runs on the LFS and targets the LFS.
+- one that is native-compiled on the LFS, runs on the LFS and targets the LFS. =lfs-lfs-lfs=

@@ -7,3 +7,13 @@ The user specifies a driver and connection information (often in the form of a
 connection string) and open such a =sql.DB=. Use =sql.Conn= for dedicated connections.
 
 Use =defer= to close =sql.DB=, =sql.Rows=, =sql.Conn= and rollback =sql.Tx=.
+
+Transactions should be used if a set of operations (use temporary tables,
+setting variables) requires running on the same
+connection as a transaction holds the same connection throughout the lifetime.
+
+A prepared statement is bound to a database connection under the hood, but
+=sql.DB= will try to reprepare it if the prepared one has lost its connection.
+Frequent repreparation of statements may consume too many resources and reach
+the limit of the database. Prepare a statement and use it immediately and avoid
+any form of repreparation.
