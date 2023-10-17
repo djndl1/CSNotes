@@ -209,6 +209,28 @@ until BooleanExpression;
 
 =lowest_value .. highest_value=
 
+* Classes
+
+The overall design of OOP class is similar to C# but as in C++, interface code and
+implementation code are separate.
+
+- =reintroduce= hides a parent method without overriding it.
+
+- =is= and =as= work like in C#.
+
+- Unlike in C#, properties are declared with getter and setter methods, not
+  directly implemented.
+
+- =Self= instead of =this=.
+
+- =TObject= is implicitly inherited.
+
+- =private=: unit-level visibility, =strict private=: class-level visibility;
+  similar for =protected=
+  + visibility defaults to =public=
+
+- to call a parent class's method, use =inherited methodName()=.
+
 * Units
 
 #+begin_src pascal
