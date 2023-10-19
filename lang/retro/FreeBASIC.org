@@ -12,3 +12,15 @@ By default, string literals are not escaped unless prefixed with =!=.
 * OOP
 
 The OOP part of the language is basically a C++03 imitation.
+
+- In addition to normal constructors, there are default constructor (with no
+  arguments) and copy constructors.
+
+- a =This= parameter is available in a member procedure/function.
+
+- an object is destroyed (with its destructor called) upon going out of scope.
+
+- =Public=, =Private=, =Protected= work the same way as in C++ to the point of
+  syntax similarity.
+
+- VB-style properties are allowed in FreeBASIC, including indexed properties.
