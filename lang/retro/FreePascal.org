@@ -232,6 +232,10 @@ implementation code are separate.
 - to call a parent class's method, use =inherited methodName()= or even
   =Inherited;= alone.
 
+- to implement cloning, inherit =TPersistent= and override =.Assign= (and
+  =.AssignTo()= if necessary) to copy all
+  the source fields.
+
 ** Resource Management
 
 Class instance variables are under the hood instance pointers that must be freed
