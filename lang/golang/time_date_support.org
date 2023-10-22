@@ -1,0 +1,12 @@
+#+title: Time Date Support
+
+* =time= Package
+
+The standard =time= pacakge revolves around =Time=, =Duration= and =Location= and meets
+basic needs.
+
+=Time= is a combination of Gregorian wall clock time without leap seconds and monotonic time with reasonable
+utility methods and supports time zone, UTC and local time. However, it is an
+time instant, not a date or a clock time.
+
+=Duration= (=int64=) has a limit of around 290 years.
