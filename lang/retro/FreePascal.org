@@ -229,7 +229,21 @@ implementation code are separate.
   similar for =protected=
   + visibility defaults to =public=
 
-- to call a parent class's method, use =inherited methodName()=.
+- to call a parent class's method, use =inherited methodName()= or even
+  =Inherited;= alone.
+
+** Resource Management
+
+Class instance variables are under the hood instance pointers that must be freed
+manually. Use =FreeAndNil()= and =instance.Free()=, preferrably inside a =finally= block.
+Setting a freed instance variable to =Nil= prevents double freeing.
+
+- Inheriting =TComponent= or managing resources with =TFPGObjectList= or
+  =TObjectList= takes advantage of the concept of ownership and frees all
+  resources in one go.
+
+- =TComponent= provides a "free notification" mechanism: one component can be
+  notified when another component is freed and thus set its references to =nil=.
 
 * Units
 
