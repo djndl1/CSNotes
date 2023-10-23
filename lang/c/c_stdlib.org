@@ -325,3 +325,9 @@ In STD C, memory is interpreted as an array of objects of type
 - =memset=: copies a value into a certain number of bytes beginning at a
   memory location.
 
+* Time Support
+
+=time_t= is not necessarily the number of seconds (calendar time) since the Unix epoch but is
+almost always the case (even On Windows). C11 provides =struct timespec= and =timespec_get()= for
+high resolution calendar time (without any utility functions. One has to resort
+to =time_t='s).
