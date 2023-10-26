@@ -186,19 +186,24 @@ with a subfunction number in the =ah= register, basically a kernel syscall.
 
 ** Keyboard
 
-Whenever a key is pressed or released, a scan code is generated and the 0x09
-interrupt is generated. Normally, the BIOS is responsible for handling the
+Whenever a key is pressed or released, a scan code is generated and the =0x09=
+interrupt is generated. A release scan code is the press scan code with bit 7 set to 1.
+
+Normally, the BIOS is responsible for handling the
 interrupt by setting some flags (e.g. =Ctrl=, =Alt=, =Shift=), generating
-another interrupt (=Ctrl-Break=, =Ctrl-C= to Int 23H, =Alt-SysReq=), or set the keyboard buffer.
+another interrupt (=Ctrl-Break=, =Ctrl-C= to Int 23H, =Alt-SysReq=),
+or setting the keyboard buffer by placing the key's ASCII code (0 if none) and then scan code.
 
 DOS kernel keyboard APIs are sensitive to input redirection (=stdin= and =stdout=).
 
 *** =Ctrl-C=, =Ctrl-Break=
 
-Upon pressing =Ctrl-C= or =Ctrl-Break=, DOS reads in and generates an =INT 23H=,
-of which the default handler is to terminate the current process. DOS also
-maintains a break flag, with the value of which being 0, DOS only checks for a
-Ctrl-Break during certain I/O operations.
+Upon pressing =Ctrl-C= or =Ctrl-Break= (higher priority), DOS reads in and generates an =INT 23H=,
+of which the default handler is to terminate the current process.
+
+DOS also maintains a break flag, with the value of which being 0,
+DOS only checks for a =Ctrl-Break= during certain I/O operations while the value
+1 causes DOS to check every time a DOS service is called.
 
 * BIOS Interrupt Call
 
