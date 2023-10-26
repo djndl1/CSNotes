@@ -206,7 +206,7 @@ The IBM PC BIOS sets up its interrupt handlers and provides basic hardware
 control to the software running on the
 machine, even though one may access hardware directly.
 
-Modern OSes by pass any OS interrupt calls at all after startup due to real-mode
+Modern OSes bypass any BIOS interrupt calls at all after startup due to real-mode
 switch, limited memory address space, BIOS code performance issue, limited
 functionality and compatibility issue of BIOS calls: a modern OS takes matters
 in its own hands.
