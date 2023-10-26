@@ -331,3 +331,12 @@ In STD C, memory is interpreted as an array of objects of type
 almost always the case (even On Windows). C11 provides =struct timespec= and =timespec_get()= for
 high resolution calendar time (without any utility functions. One has to resort
 to =time_t='s).
+
+=ctime= and =asctime= format time in a fixed format, use =strftime= and
+=wcsftime= instead.
+
+- To break down a time, use =gmtime_*= (for UTC) and =localtime_*= (for local
+  time)
+  + there is no way in ISO C to convert a broken down UTC time back into a Unix time.
+
+- Unix time -> local time, use =localtime_*=, use =mktime()= for the other way around.
