@@ -259,9 +259,12 @@ implementation code are separate.
   + class reference can be obtained by an instance variable's =.ClassType=
     property (=class of TObject=), which can be further cast to a more specific
     class type.
+  + class variables/properties (or static variables/properties) can be defined.
 
 - in case that an exception is raised from a constructor, the destructor is
   called, thus requiring the destructor to be robust.
+
+- class helper is similar to C#'s extension methods.
 
 ** Resource Management
 
