@@ -1,0 +1,23 @@
+#+title: Doxygen
+
+A tool that generates documentation from annotated source files.
+
+Not just for C/C++, also used with Java, C#, Python, IDL, PHP, Fortran and even VHDL.
+
+a command line =doxygen= program and a GUI frontend =doxywizard=.
+
+* Quickstart
+
+#+begin_src shell
+doxygen -g <myconfig> # generate a doxygen config file
+
+doxygen <myconfig> # generate docs
+#+end_src
+
+* Configuration
+
+- =EXTRACT_ALL=: mark all entities for which documentation may be generated.
+
+* Documenting the Code
+
+- Markdown is permitted.
