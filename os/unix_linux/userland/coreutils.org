@@ -1,0 +1,9 @@
+#+title: Coreutils
+
+* Library Functions
+
+** =getopt=, =getopt_long()=
+
+The client code should specify the command line argument source variables =argc=
+, =argv= and viable options (long and short) and then call the function repeated
+until all options are exhausted.
