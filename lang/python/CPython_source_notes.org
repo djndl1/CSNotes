@@ -1,0 +1,19 @@
+#+title: CPython Source Notes
+
+* Data Models
+
+** The static constructor =__new__=
+
+=__new__= is good for immutable object as they cannot be changed once they are
+assigned. So we can return new instance which has new state.
+
+Since =__new__= controls object creation, it can be used to implement the
+Singleton pattern.
+
+#+begin_src python
+class SingletonClass(object):
+  def __new__(cls):
+    if not hasattr(cls, 'instance'):
+      cls.instance = super(SingletonClass, cls).__new__(cls)
+    return cls.instance
+#+end_src
