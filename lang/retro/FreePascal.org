@@ -236,7 +236,38 @@ implementation code are separate.
   =.AssignTo()= if necessary) to copy all
   the source fields.
 
+- Advanced =Record=​s are similar to C#'s structs, with methods and visibility
+  specifiers available but without inheritance support, virtual methods, constructor/destructor.
+
+- Turbo Pascal =object=​s are like =Record=​s but with inheritance, virtual
+  methods, constructor/destructor.
+  + Virtual methods cannot be used without calling the constructor first on the object.
+  + *Deprecated*
+
+- Inner types can be defined inside a class.
+
+- destructors are by default virtual; constructors may be virtual but not by default.
+
+- class methods are methods are methods that takes an =Self= class reference
+  variable (of =class of TType=).
+  + a class method needs not to be accessed through a class reference, but a
+    class type name.
+  + marking as =static= removes that =Self= class reference and makes it a
+    limited normal routine.
+  + a constructor is actually a class method.
+  + class methods can be virtual or abstract.
+  + class reference can be obtained by an instance variable's =.ClassType=
+    property (=class of TObject=), which can be further cast to a more specific
+    class type.
+
+- in case that an exception is raised from a constructor, the destructor is
+  called, thus requiring the destructor to be robust.
+
 ** Resource Management
+
+Manual memory allocation/deallocation are done with =New= (not used with =class=
+since class instance variables are already pointers), =Dispose= and =System.GetMem=​
+=System.AllocMem=, =System.MemSize=, ​=System.FreeMem=.
 
 Class instance variables are under the hood instance pointers that must be freed
 manually. Use =FreeAndNil()= and =instance.Free()=, preferrably inside a =finally= block.
@@ -264,3 +295,39 @@ interface
 
 end.
 #+end_src
+
+* Generics
+
+- classes, records, arrays, functions, procedures, interfaces can be generic.
+
+- =specialize= is required when defining a specialized type or declaring a
+  variable. =specialize= is part of the type name of a specialized type.
+
+  #+begin_src pascal
+  { nested generic specialization is allowed }
+  generic TList<_T>=class(TObject, specialize IList<_T>);
+  generic TPointSet<t> = array of specialize PlanarCoordinate<t>;
+  #+end_src
+
+- generic type identifier can be constrained by other types.
+
+* Other Features
+
+- local named closure can be defined inside another routine. A variable captured
+  by a local routine has to be declared before the definition of the local routine.
+
+- method types are defined by appending =of object= to the definition.
+
+- =Record= supports =case=, which work like unions in C.
+
+- Operator overloading is similar to C++'s;
+  + global operator overloading is not regarded as a class method and thus not
+    used by code that requires an operator, use =class
+    operator= to overload it.
+
+    #+begin_src pascal
+class operator TMyType.+ (const C1, C2: TMyType) : TMyType;
+begin
+   { ... }
+end;
+    #+end_src
