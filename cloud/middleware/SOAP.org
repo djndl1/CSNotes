@@ -1,0 +1,8 @@
+#+title: Simple Object Access Protocol
+
+A mechanism of exchange structured and typed information in a platform-independent and
+language-independent manner by using a data-encoding scheme based on XML.
+
+A mechanism of expressing RPC as messages.
+
+Theoretically, SOAP can use various transport protocols such as SMTP, MSMQ aside from HTTP.
