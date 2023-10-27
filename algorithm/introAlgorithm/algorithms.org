@@ -960,12 +960,21 @@ Three commonly used techniques to compute the probe sequences:
 
 * Sorting and Trees
 
+** Formulation
+
 Input: array =A[1...n]= of numbers
 
 Output: permutation =B[1...n]= of =A= such that 
-$B[1] \leq B[2] \leq \cdots \leq B[n]$
+$B[1] \leq B[2] \leq \cdots \leq B[n]$.
 
-A sorting algorithm sorts /in place/ if only a constant number of  elements 
+A real sorting problem sorts a collection of /records/, which can be further
+divided into /keys/ (sorted value) and /satellite data/.
+
+** Overview
+
+Sorting is essential to many practical problems and algorithms.
+
+A sorting algorithm sorts /in place/ if only a constant number of elements
 of the input array are ever stored outside the array.
 
 Insertion sort, merge sort, heap sort and quick sort are all comparison sorts:

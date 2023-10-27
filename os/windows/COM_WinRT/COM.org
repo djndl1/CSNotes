@@ -557,6 +557,9 @@ translates between method invocations and RPC requests.
       *self-registration*, that is, registering itself in the Registry on
       calling certain functions.
       - DLLs must implement and export =DllRegisterServer()= and =DllUnregisterServer()=.
+      - Out-of-process EXEs should implement command-line switches =/RegServer=,
+        =-RegServer=, =/UnregServer=, =-UnregServer=. The SCM will start a new
+        server process on request for a server object.
 
 ** Moniker
 
@@ -631,3 +634,12 @@ as the name indicates.
 ** MTA
 
 A process has a MTA and a single one, shared by multiple threads.
+
+* Out-Of-Process COM Server
+
+In-process servers lacks isolation from the client and share the same security
+context with the client. Also, in-process activation does not enable distributed computing.
+
+COM allows classes to be activated in distinct processes. The class
+implementor is in control of which set of security credentials the process
+should use.
