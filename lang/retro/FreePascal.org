@@ -380,3 +380,11 @@ begin
    { ... }
 end;
     #+end_src
+
+* Unit Test
+
+** fpcunit
+
+A test unit should inherit =TTestCase= and implement test methods.
+The main code block should then use a test runner unit (=consoletestrunner= for
+example) and create a test runner instance and run it.
