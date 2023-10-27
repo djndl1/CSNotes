@@ -266,6 +266,52 @@ implementation code are separate.
 
 - class helper is similar to C#'s extension methods.
 
+** Interface
+
+Interfaces in Object Pascal can be a pure language feature (bare interfaces, ={$interfaces corba}=)
+or Windows COM interfaces (={$interfaces com}=, by default)
+
+- =as= typecast causes an exception to raise if it fails.
+
+- a class that implements a child interface is not an instance of its parent interface.
+
+- a class may implement an interface method using another method, but not mixed
+  with interface delegation (a mechanism that implements an interface with
+  an instance of the interface).
+
+  #+begin_src pascal
+TMyClass = Class(IMyInterface)
+    Function OtherFunc : Integer;
+    Function IMyInterface.ItFunc = OtherFunc;
+  #+end_src
+
+- *interface delegation*
+  + interface delegation can be used to specify that a class implements parent interfaces
+
+  #+begin_src pascal
+type
+TMyClass = class(TInterfacedObject, IMyInterface, IMyInterface1)
+private
+    FMyInterface: TDelegateClass;  { class type }
+    property MyInterface: TDelegateClass
+      read FMyInterface implements IMyInterface,IMyInterface1; { delegation }
+end;
+  #+end_src
+
+*** COM
+
+COM objects has to be used as a COM interface type so that it is freed when going out
+of scope.
+
+When using interfaces on Windows which should be available to the COM subsystem, the calling convention should be stdcall – this is not the default Free Pascal calling convention, so it should be specified explicitly.
+
+All COM interfaces use reference counting. This means that whenever an interface is assigned to a variable, its reference count is updated. Whenever the variable goes out of scope, the reference count is automatically decreased. When the reference count reaches zero, usually the instance of the class that implements the interface, is freed.
+
+- Inherit =TInterfacedObject= to implement COM refcounting mechanism.
+
+- Inherit =TComponent=, =TNonRefCountedInterfacedObject=,
+  =TNonRefCountedInterfacedPersistent= to disable refcounting.
+
 ** Resource Management
 
 Manual memory allocation/deallocation are done with =New= (not used with =class=
