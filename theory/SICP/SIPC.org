@@ -1,0 +1,19 @@
+#+title: Structure and Interpretation of Computer Programs
+
+#+begin_quote
+Every computer program is a model, hatched in the
+mind, of a real or mental process. These processes, arising from human
+experience and thought, are huge in number, intricate in detail, and at
+any time only partially understood.
+#+end_quote
+
+#+begin_quote
+as programs get large and complicated, as they almost always do, the
+adequacy, consistency, and correctness of the specifications themselves
+become open to doubt, so that complete formal arguments of correctness
+seldom accompany large programs. Since large programs grow from
+small ones, it is crucial that we develop an arsenal of standard program
+structures of whose correctness we have become sure-we call them
+idioms-and learn to combine them into larger structures
+using organizational techniques of proven value.
+#+end_quote
