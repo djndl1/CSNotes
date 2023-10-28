@@ -9,4 +9,9 @@ basic needs.
 utility methods and supports time zone, UTC and local time. However, it is an
 time instant, not a date or a clock time.
 
-=Duration= (=int64=) has a limit of around 290 years.
+=Duration= (=int64= nanoseconds) has a limit of around 290 years. Duration constants smaller
+than a day are available.
+
+=Location= denotes timezone info. =time.Local=, =time.UTC= static locations are available.
+
+There are also =Month=, =Weekday= enum.
