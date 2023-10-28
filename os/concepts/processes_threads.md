@@ -488,6 +488,12 @@ e.g. multiple threads computing a matrix transformation *iteratively*, that is, 
 
 # Scheduling
 
+The scheduler is responsible for making the decision of which ready thread should run next.
+
+Early batch systems scheduled the next job in line. Later time-sharing systems have many users and processes competing for CPU resources.
+Most PCs does not require an efficient CPU scheduling since it has enough CPU resources for its day-to-day tasks. However, servers, smartphones
+still require better scheduling due to scarce CPU resources.
+
 Process switching is expensive: a switch from user mode to kernel mode must occur; the state of the current process must be saved; in some systems the memory map must be saved as well; the MMU must be reloaded with the memory map of the new process; the new process must be started; the memory cache and related tables may be invalidated.
 
 Processes may have different bahaviors: 
@@ -496,9 +502,9 @@ Processes may have different bahaviors:
 
 - I/O-bound
 
-The scheduler must decide whether to run the parent processes or the child processes; which process to run when a process is blocks; which process to run when an I/O interrupt service has finished.
+The scheduler must decide whether to run the parent processes or the child processes; which process to run when a process exits; which process to run when a process blocks; which process to run when an I/O interrupt service has finished.
 
-Scheduling algorithms can be divided into two categories depending on how they handle clock interrupts: 
+Scheduling algorithms can be divided into two categories depending on how they utilize clock interrupts: 
 
 - _nonpreemptive scheduling_:  a process runs until it blocks or voluntarily releases the CPU;
 
@@ -506,20 +512,48 @@ Scheduling algorithms can be divided into two categories depending on how they h
 
 In different environments different scheduling algorithms are needed: 
 
-1. batch: still in widespread use in the businesses world for doing payroll, inventory, accounts receivable, accounts payable, interest calculation, claims processing and other periodic tasks. Nonpreemptive algorithms or preemptive algorithms with long time periods for each process are often acceptable.
+1. _batch_: still in widespread use in the businesses world for doing payroll, inventory, accounts receivable, accounts payable, interest calculation, claims processing and other periodic tasks. Nonpreemptive algorithms or preemptive algorithms with long time periods for each process are often acceptable.
 
-2. interactive: server
+2. _interactive_: interactive systems; server systems that serve multiple users/clients.
 
-3. real time
+3. _real time_
 
-On all systems, each process should be given a fair share of the CPU; all parts of the system should be kept busy. 
+On all systems, each process should be given a fair share of the CPU (fairness); all parts of the system should be kept busy (balance). 
 
-- batch systems: throughput, turnaround time (the time between submission and termination)  and CPU utilization are major metrics: first-come, first-served; shortest job first (assuming the run times are known in advance, only optimal (turnaround time) only when all the jobs are available simultaneously); shortest remaining time next; 
+- batch systems: 
+  - _throughput_ 
+  - _turnaround time_: the time between submission and termination
+  - _CPU utilization_: not a good indicator
+  - Common scheduling algorithms:
+    - first-come, first-served, blocked processes are put to the end of the queue. Fair, but not ideal for a large number of I/O-bound processes.
+    - shortest job first: assuming the run times are known in advance, the mean turnaround time is $(na + (n-1)b + (n-2)c + \cdots + e) / n$.
+      optimal (turnaround time) only when all the jobs are available simultaneously; 
+      - shortest remaining time next, a preemptive version of shortest job first, where the run time has to be known in advance. This allows a new short job to get   
+        good service.
 
-- interactive systems: response time should be minimized. Proportionality (the expected time for a certain task) should be taken care of: round-robin scheduling (each processs is assigned a quantum. If the process has blocked or finished before the quantum has elapsed, the CPU switching is done); pr
-iority scheduling (priority can change after each clock tick. Round robin can be used inside a priority class); multiple queues (priority class 1 gets one quantum, priorty class gets 2 gets two quanta..., whenever a process used up all the quanta allocated to it, it was moved down one class); shortest process next (make estimates based on past behavior and run the process with the shortest estimated running time); guaranteed scheduling (make promises to the users about running time and live up to those promises); lottery scheduling (give processes lottery tickets for various system resources such as CPU time. a lottery ticket is chosen at random, and the process holding that ticket gets the resource. A high-priorty process gets more tickets so more likely to gain CPU time; cooperating processes may exchange tickets if they wish); fair-share scheduling (each user is allocated some fraction of the CPU and the scheduler picks processes in such a way as to enforce it)
+- interactive systems: 
+  - _response time_ should be minimized. 
+  - _proportionality_: the expected time for a certain task
+  - scheduling algorithms:
+    - round-robin scheduling: each processs is assigned an equal quantum (equal importance). 
+    If the process has blocked or finished before the quantum has elapsed, the CPU switching is done.
+    A short quantum causes constant context switches while a long quantum results in poor response time for processes at the end of the waiting list.
+    20-50 msec is often reasonable.
+    - priority scheduling: processes are assgined priority and the process with the highest priority gets to run first. 
+    Changing priority after each clock tick or allocating different quanta to different processes prevents some processes hog the CPU. 
+    IO-bound processes may get a higher CPU priority to start its next I/O operation.
+    Round robin may be used inside a priority class; 
+    Unix `nice` allows a user to voluntarily reduce the priority of his process to be *nice* to other users.
+    - multiple queues: priority class 1 gets one quantum, priorty class gets 2 gets two quanta..., whenever a process used up all the quanta allocated to it, it was moved down one class; 
+    - shortest process next: make estimates based on past behavior and run the process with the shortest estimated running time; 
+    - guaranteed scheduling: make promises to the users about running time and live up to those promises; 
+    - lottery scheduling: give processes lottery tickets for various system resources such as CPU time. a lottery ticket is chosen at random, and the process holding that ticket gets the resource. A high-priorty process gets more tickets so more likely to gain CPU time; cooperating processes may exchange tickets if they wish; 
+    - fair-share scheduling: each user is allocated some fraction of the CPU and the scheduler picks processes in such a way as to enforce it
 
-- real-time systems: deadlines should be met, scheduling should be highly predictable and regular. Typically, one or more physical devices external to the computer generate stimuli, and the computer must react appropriately to them within a fixed amount of time. The events that a real-time system may have to respond to can be _periodic_ or _aperiodic_. Some periodic events are not _schedulable_ since handling them requires more than the CPU time available. Real-time scheduling algorithms can static (scheduling decisions made before the system starts running) or dynamic (making decisions at runtime)
+- real-time systems: 
+  - deadlines should be met, 
+  - scheduling should be highly predictable and regular. 
+  - Typically, one or more physical devices external to the computer generate stimuli, and the computer must react appropriately to them within a fixed amount of time. The events that a real-time system may have to respond to can be _periodic_ or _aperiodic_. Some periodic events are not _schedulable_ since handling them requires more than the CPU time available. Real-time scheduling algorithms can static (scheduling decisions made before the system starts running) or dynamic (making decisions at runtime)
 
 Policy-mechanism separation is an important idea. A parent can control its children's priority (policy), the scheduling is done by the kernel (mechanism).
 
