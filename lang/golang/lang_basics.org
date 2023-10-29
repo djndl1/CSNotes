@@ -2,6 +2,29 @@
 
 - Constant expressions perform arithmetic with arbitrary precision;
   + a numeric constant has no type until it is specified or used in a context.
+  + without an expression, the latter constant identifier repeats the first preceding expression.
+
+- Golang has no concept of enum, but =const= block's implicit repetition of the last
+  non-empty expression list, combined with the =iota=
+  constant generator, which produces successive untyped integer constants
+  starting from zero and increasing one per definition in a const declaration block.
+
+  #+begin_src go
+const (
+	January Month = 1 + iota
+	February // implicitly, = 1 + iota, 1 + 1
+	March // = 1 + iota, 1 + 2
+	April
+	May
+	June
+	July
+	August
+	September
+	October
+	November
+	December
+)
+  #+end_src
 
 - =for= may act as =while= in Go, there is only one loop keyword in golang.
   + without any conditions as an infinite loop
