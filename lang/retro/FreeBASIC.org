@@ -7,6 +7,25 @@ The reason why =False= is =-1= is because (Free)BASIC uses bitwise operator
 
 By default, string literals are not escaped unless prefixed with =!=.
 
+* Basics
+
+- Java/C#/Javascript =Var= type inference is supported.
+
+- to access a shadowed variable in the outer scope, use =..OuterVar=
+
+- =Extern= (external linkage, declaration only, C's =extern=): added in order to support C libraries
+  + Not available in QB, new to FreeBASIC.
+
+- =Common=: (external linkage) shared among code modules
+  + inherited from QB
+  + confusing feature, especially as in =Common Shared=
+
+- =Static= (storage class, lifetime): lifetime starts at program creation and end with program termination
+  + internal linkage by default unless =Extern= or =Common=
+
+- =Shared= (visibility) is meant to make a variable visible to all code in the module and
+  thus implicitly =Static=.
+
 * QuickBASIC
 
 * OOP
