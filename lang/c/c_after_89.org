@@ -75,8 +75,7 @@ void drawline2(struct point *from, struct point *to);
   + the typical usage is to combine a bare =inline= and an =extern inline=,
     =static inline= or =extern inline= are not something special, but they
     provide some hint so that the compiler may catch some errors that makes them
-    unable to inline the functions like an =extern inline= calls some =static=
-    function.
+    unable to inline the functions e.g. an =extern inline= calls some =static= function.
 
 - (C99) =restrict=: used only for non-function lvalue pointers. During each
   execution of a block in which a restricted pointer =P= is declared (typically
