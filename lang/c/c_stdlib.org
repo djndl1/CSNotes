@@ -327,8 +327,36 @@ In STD C, memory is interpreted as an array of objects of type
 
 * Time Support
 
-=time_t= is not necessarily the number of seconds (calendar time) since the Unix epoch but is
-almost always the case (even On Windows). C11 provides =struct timespec= and =timespec_get()= for
+** Concept
+
+Defined by glibc documentation.
+
+- *calendar time*, *absolute time* :: a point in the time continuum.
+
+- *interval*, :: a contiguous part of the time continuum between two
+  calendar times
+  + *elapsed time* :: the length of an interval
+  + *period* :: an interval between two events
+
+- *simple calendar time* :: a calendar time represented as an elapsed time since
+  a fixed, implementation-specific calendar time (the *epoch*).
+
+- *broken-down time* :: a calendar time represented by its components in the
+  Gregorian calendar, relative to a specific time zone.
+
+- *CPU time* :: the amount of time that a single process has actively used a CPU
+  to perform computations.
+
+- *processor time* :: the amount of /any/ CPU has been in use by /any/ process.
+  + a basic system resource indicator
+
+** ISO
+
+=time_t= (simple calendar time) is not necessarily the number of seconds since
+the Unix epoch (mandated by the POSIX) but is
+almost always the case (even On Windows).
+
+C11 provides =struct timespec= (a simple calendar time or an elapsed time) and =timespec_get()= for
 high resolution calendar time (without any utility functions. One has to resort
 to =time_t='s).
 
@@ -340,3 +368,11 @@ to =time_t='s).
   + there is no way in ISO C to convert a broken down UTC time back into a Unix time.
 
 - Unix time -> local time, use =localtime_*=, use =mktime()= for the other way around.
+
+- Note that =clock()= returns a processor/CPU time, not a monotonic clock time.
+
+** Unix
+
+*** glibc
+
+- =struct timeval= :: an older simple calendar time with microsecond resolution
