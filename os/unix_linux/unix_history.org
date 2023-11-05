@@ -1,0 +1,92 @@
+#+title: Unix History
+
+* Unix, BSD and others
+
+Ken Thompson developed the original Unix at Bell laboratories, and the C
+programming language with Dennis Ritchie, which filled the void of system programming.
+The original Unix had six editions and then it was distrbuted to various
+universities with documentation and kernel source code included at around 1975,
+which then gained enormous popularity.
+
+The 7th edition of Unix (Jan. 1979) was released with various tools and features developed
+at Berkeley. Later, there came 3BSD (Dec. 1979), 4.2BSD (1983, with TCP/IP and socket API),
+4.3BSD (1986) and the final release 4.4BSD (1993). 386/BSD (Feb. 1992) was the first
+complete open source rewrite of BSD for x86. NetBSD (Apr. 1993), FreeBSD
+(Dec. 1993) and OpenBSD (1996) continue the development BSD Unix. The lawsuit
+between AT&T and UC Berkeley, setteled in Jan. 1994, required BSD implementations to remove some
+copyrighted source code and add some modifications (4.4BSD-lite), which caused some delay in
+BSD derivative release but made them to resynchronize with work done at UC Berkeley.
+
+AT&T also developed and sold their own versions of Unix: System Ⅲ (1981), System Ⅴ
+(1983), System Ⅴ Release 4 (1989, POSIX 1003.1 conformant), which incorporated many features from BSD.
+
+Various commercial Unix implementations begin to emerge in the '80s, causing
+incompatibilties and the Unix war and later the Unix standardization.
+
+** Standardization
+
+The C programming langauge was standardized by ANSI (1989) and then ISO (1990),
+independent of Unix.
+
+** Portable Operating System Interface
+
+IEEE standardized Unix by developing the POSIX specification in the late '80s
+and the '90s:
+
+- POSIX.1 (POSIX 1003.1, 1988, revise in 1996) :: UNIX system call and C library API
+
+- POSIX 1003.1b (1993) :: realtime extensions
+  + file synchronization; async I/O; process scheduling; high-precision clocks
+    and timers
+  + IPC: semaphores, shared memory, and message queues (new POSIX ones,
+    distinguished from SysV's).
+
+- POSIX 1003.1c (1995) :: POSIX threads
+
+- POSIX 1003.1g (2000) :: networking APIs
+
+- POSIX 1003.1d, 1003.1j (2000) :: additional realtime extensions
+
+- POSIX.2 (1992) :: shell and various UNIX utilties.
+
+** X/Open, The Open Group and the Single UNIX Specification
+
+X/Open Company, later the Open Group after merging with the Open Software
+ Foundation in 1996 developed *X/Open Portability Guide* and later
+ *the Single UNIX Specification* based on POSIX:
+
+- XPG3 (1989), XPG4 (1992), XPG4v2 (1994)
+
+- the UNIX trademark was tranferred by Novell to the X/Open and XPG was
+  repackaged as SUS.
+  + SUSv1 (1995), UNIX 95
+  + SUSv2 (1997), UNIX 98
+
+** Unification
+
+POSIX and SUS were later consolidated into one specifiction that is divided into
+POSIX part and a stricter X/Open System Interface part (UNIX).
+
+- POSIX 1003.1-2001, SUSv3
+
+- POSIX 1003.1-2008 SUSv4
+
+- POSIX 1003.1-2017
+
+** Implementations
+
+Nowadays most common implementations are almost POSIX-conformant and provide most XSI
+optional features.
+
+* Linux
+
+Richard Stallman started the GNU project in hope of a free Unix. Ultimately,
+everything except the kerel was ready. Linux Torvalds wrote his own Minix-like
+kernel with various GNU tools ported.
+
+GNU/Linux distributions try to conform to various POSIX and SUS standard with
+best effort.
+
+** Standardization
+
+Thee Linux Standard Base try to unify various distributions.
