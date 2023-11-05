@@ -20,18 +20,18 @@ BSD derivative release but made them to resynchronize with work done at UC Berke
 AT&T also developed and sold their own versions of Unix: System Ⅲ (1981), System Ⅴ
 (1983), System Ⅴ Release 4 (1989, POSIX 1003.1 conformant), which incorporated many features from BSD.
 
-Various commercial Unix implementations begin to emerge in the '80s, causing
-incompatibilties and the Unix war and later the Unix standardization.
+Various commercial Unix implementations began to emerge in the '80s, causing
+incompatibilties and the Unix war as well as later the Unix standardization.
 
 ** Standardization
 
-The C programming langauge was standardized by ANSI (1989) and then ISO (1990),
+The C programming language was standardized by ANSI (1989) and then ISO (1990),
 independent of Unix.
 
 ** Portable Operating System Interface
 
 IEEE standardized Unix by developing the POSIX specification in the late '80s
-and the '90s:
+and throughout the '90s:
 
 - POSIX.1 (POSIX 1003.1, 1988, revise in 1996) :: UNIX system call and C library API
 
@@ -89,4 +89,12 @@ best effort.
 
 ** Standardization
 
-Thee Linux Standard Base try to unify various distributions.
+The Linux Standard Base try to unify various distributions. Most linux distros
+do not comply with LSB, even Debian.
+
+The Filesystem Hierarchy Standard (FHS) is a reference describing the
+conventions used for the layout of Unix-like systems. It has been made popular
+by its use in Linux distributions, but it is used by other Unix-like systems as
+well. Most Linux distributions follow the Filesystem Hierarchy Standard and
+declare it their own policy to maintain FHS compliance with deviations of
+various degree.
