@@ -37,3 +37,43 @@ Always check on returned status of any important function call.
 - library functions may act like system calls in terms of error status, with
   some deviations (returning other negative values on failure), or don't use
   =errno= at all.
+
+* Portability Issues
+
+** Feature Test Macros
+
+[[man:feature_test_macros][feature test macros]]
+
+A set of macros to define before including system headers to enable or disable certain features of libc.
+A confusing name but makes sense from the library: the library tests these
+macros to determine features available.
+
+- =_POSIX_C_SOURCE= (defined by default) :: POSIX 1003.1 feature set
+  + may disable BSD and SVID features unless they are explicitly defined
+
+- =_XOPEN_SOURCE= :: SUS
+
+- =_GNU_SOURCE= :: a combination of various feature sets including GNU-specific extensions.
+
+- =_BSD_SOURCE=, =_SVID_SOURCE= :: BSD and SysV-derived definitions (deprecated,
+  use =_DEFAULT_SOURCE=)
+
+- =_DEFAULT_SOURCE= (defined by default unless some other macros are defined) :: POSIX.1, C99, BSD, SVID
+
+Some macros may be defined with different values to enable different versions of
+the feature set. These macros are not independent of each other and may
+influence each other.
+
+** System Data Types
+
+[[man:system_data_types][System Data Types Manpage]]
+
+SUS defines a few standard data types to represent system data structures
+to improve portability.
+
+To print such opaque types, try casting them to =long= or even =long long= and
+use =%ld=, or use any other larger integer types.
+
+** Other Issues
+
+- struct member order is not defined by SUS.
