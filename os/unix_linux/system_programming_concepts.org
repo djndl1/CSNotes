@@ -1,0 +1,39 @@
+#+title: System Programming Concepts
+
+* System Calls
+
+The OS kernel provides service in the form of system calls. A system call
+differs from a purely user-mode library call in that a context switch from
+user mode to processor is required to branch to kernel code, typically initiated by a special CPU
+instruction
+while a normal library call simply requires a jump to a certain address in the
+process's user-mode address space. Calling conventions, error handling are
+relatively minor difference.
+
+The kernel retrieves the syscall number as an index into the dispatch table to
+find the corresponding handler's address, performs some check on the arguments
+and calls the handler. The result and error number is returned to the user mode
+wrapper to transform by another convention.
+
+On Unixes, system calls are provided as wrapper functions in libc, unlike on
+Windows NT, where system service calls are typically hidden behind the Win32
+subsystem library functions and various other C library functions. POSIX
+functions are not required to be system calls and may be implemented as user-mode library functions.
+
+* Error Handling
+
+Always check on returned status of any important function call.
+
+- system calls typically returned a =-1= to indicate a failure and sets the
+  global =errno= (a modifiable thread-local lvalue) to a positive value to identify the specific error.
+  + =errno= is never reset to zero by function calls under any circumstances
+    and may be set to positive values by successful calls. The result is
+    undefined on success.
+  + some syscalls even return =-1= on success then only an =errno= change from
+    zero can detect any failures.
+  + =errno= can be interpreted by =perror()= and =strerror*()=.
+  + there is also a util program =errno= that describes an =errno=.
+
+- library functions may act like system calls in terms of error status, with
+  some deviations (returning other negative values on failure), or don't use
+  =errno= at all.
