@@ -383,3 +383,7 @@ The system may have several clocks of different resolutions, epochs and mechanis
   - used with =clock_gettime()=​/​=clock_settime()= and =clock_getres()=
   - =CLOCK_REALTIME= :: since the POSIX epoch
   - =CLOCK_MONOTONIC= :: useful for measuring elapsed times
+
+=clock_settime()= sets the time of a certain clock. To avoid discontinuous
+change in the calendar time of =CLOKC_REALTIME=, use =ntp_*= API to monitor and
+discipline the clock.
