@@ -369,10 +369,17 @@ to =time_t='s).
 
 - Unix time -> local time, use =localtime_*=, use =mktime()= for the other way around.
 
-- Note that =clock()= returns a processor/CPU time, not a monotonic clock time.
+- Note that =clock()= returns a CPU time, not a monotonic clock time.
 
 ** Unix
 
 *** glibc
 
 - =struct timeval= :: an older simple calendar time with microsecond resolution
+
+The system may have several clocks of different resolutions, epochs and mechanisms.
+
+- =clockid_t= :: system clock ID that represents several system clocks
+  - used with =clock_gettime()=​/​=clock_settime()= and =clock_getres()=
+  - =CLOCK_REALTIME= :: since the POSIX epoch
+  - =CLOCK_MONOTONIC= :: useful for measuring elapsed times
