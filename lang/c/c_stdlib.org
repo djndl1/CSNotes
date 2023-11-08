@@ -387,3 +387,8 @@ The system may have several clocks of different resolutions, epochs and mechanis
 =clock_settime()= sets the time of a certain clock. To avoid discontinuous
 change in the calendar time of =CLOKC_REALTIME=, use =ntp_*= API to monitor and
 discipline the clock.
+
+glibc's =struct tm= is extended with an offset and a timezone name. It also
+offers =timelocal()=, =timegm()= to extende ISO C.
+
+In addition to =sleep()=, there is a thread-safe high-precision =nanosleep()=.
