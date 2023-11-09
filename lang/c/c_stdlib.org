@@ -393,3 +393,16 @@ offers =timelocal()=, =timegm()= to extende ISO C.
 
 In addition to =sleep()=, there is a thread-safe high-precision =nanosleep()=.
 The [[man:time(1)][time]] program probably uses =times()= to measure CPU time.
+
+** Windows
+
+*** UCRT
+
+=clock()= under UCRT does not conform to ISO C's CPU time requirement. It
+returns wall clock time. Very limited on Windows, use =GetProcessTimes()= and
+=QueryPerformanceCounter()= instead.
+
+=_ftime*()= returns millisecond-level local time with timezone info.
+=_mkgmtime()= is basically the Windows version of =timegm()=.
+
+=_tzset()= is similar to POSIX =tzset()= but does not support the same =TZ= format.
