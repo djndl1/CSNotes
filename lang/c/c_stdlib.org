@@ -392,3 +392,4 @@ glibc's =struct tm= is extended with an offset and a timezone name. It also
 offers =timelocal()=, =timegm()= to extende ISO C.
 
 In addition to =sleep()=, there is a thread-safe high-precision =nanosleep()=.
+The [[man:time(1)][time]] program probably uses =times()= to measure CPU time.
