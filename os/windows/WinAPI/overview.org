@@ -1,0 +1,11 @@
+#+title: Overview
+
+On Windows, many systme resources are represented as a *kernel object*
+identified and referenced by a *handle* and manipulated by Windows API,
+including files, processes, threads, pipes for interprocess communication,
+memory mapping, events and many more. Objects have *security attributes*.
+
+Windows API function names tend to be long and descriptive. A few predefined
+data types (=BOOL=, =HANDLE=, =DWORD=, =LPTSTR=, =LPSECURITY_ATTRIBUTES=) are
+specific to Windows, although many feel anachronism and many are obsolet but
+never removed.
