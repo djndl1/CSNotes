@@ -1,5 +1,35 @@
 #+title:Modern C
 
+
+C may be everywhere and known by many but its modern features and advanced usage
+are not well-known. C++ should not be mixed up with a superset of C even though
+they both share and borrow features and ideas from each other.
+
+* Grammar
+
+Lexical, syntax, semantics
+
+Lexically, C has directives, keywords, punctuations, comments, literals,
+identifiers, functions and operators.
+
+Identifiers are names given to certain entities (data objects, type aliases,
+functions, constants) in the program. Variables are named data objects, the
+values of variables.
+
+Declarations specify what identifiers are supposed to represent, the properties
+of the represented concept.
+Variable declaration specifies what kind of data object an identifer will
+represent.
+Declarations are bound to the scope in which they appear (*visibility*).
+
+Declarations specify *identifiers*, whereas definitions specify *objects*.
+Initialization provides an initial value for an object. A declaration with an
+initializer *defines* the object with the corresponding name.
+Each object or function must have exactly one definition.
+
+Statements are instructions that tell the compiler what to do with identifiers
+that have been declared.
+
 * Language Features
 
 - Identifiers can be unicode characters (but with restriction) written in
