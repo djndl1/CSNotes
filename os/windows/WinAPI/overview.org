@@ -8,4 +8,5 @@ memory mapping, events and many more. Objects have *security attributes*.
 Windows API function names tend to be long and descriptive. A few predefined
 data types (=BOOL=, =HANDLE=, =DWORD=, =LPTSTR=, =LPSECURITY_ATTRIBUTES=) are
 specific to Windows, although many feel anachronism and many are obsolet but
-never removed.
+never removed. =windows.h= is always necesary and contains all Windows function definitions and
+data types.
