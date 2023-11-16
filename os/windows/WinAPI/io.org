@@ -1,43 +1,37 @@
-* [[https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file][File
-Naming]]
+* [[https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file][File Naming]]
   :PROPERTIES:
   :CUSTOM_ID: file-naming
   :END:
 
-Full naming or Universal Naming Convention starts with a double
-backslash =\\= indicating the global root. =/= also works in low-level
-API but better use =/=. File and directory names used as API has a
-length limit of 255.
+
+A full pathname is either a DOS-style disk name (=DiskName:=) prefixed or a *Universal Naming
+Convention* (=\\ServerName\sharename=) name. Both backslash and forward slash
+are legal path separator. File names are case-insensitive but case-retaining.
+Base names are seperated by a period from its extension (file type name).
+Certain filenames are not allowed due to DOS compatibility.
+
+Pathnames are subject to =MAX_PATH= length (260 currently, and the limitation may be removed
+since Window 10 1607 through [[https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry][some configuration]]). Extended-length paths are
+prefixed with a =\\?\= (=\\?\UNC\server\share= for UNC paths).
+Extended-length paths are absolute paths and do not use forward slashes as
+separators, or periods to denote the current or parnent directory.
+
+A file name is not relative if:
+- UNC =\\=
+- starts with a disk designator =C:\=. =C:tmp.txt= is a relative path
+   on =C:\=.
+- a single backslash
+
+A directory path cannot be longer than =MAX_PATH - 12=,
 
 #+BEGIN_QUOTE
-  it is acceptable to specify a period as the first character of a name.
-  For example, ".temp".
+it is acceptable to specify a period as the first character of a name.
+For example, ".temp".
 #+END_QUOTE
 
 Windows may also create a short 8.3 alias form of name for a file.
 Windows stores the long file names on disk in Unicode.
 
-A file name is not relative if:
-
-1. UNC =\\=
-
-2. starts with a disk designator =C:\=. =C:tmp.txt= is a relative path
-   on =C:\=.
-
-3. a single backslash
-
-#+BEGIN_SRC C
-  #include <windows.h>
-
-  #include <stdio.h>
-
-  int main(int argc, char *argv[])
-  {
-          printf("Long path %d\n", MAX_PATH);
-          return 0;
-  }
-  // returns Long path 260, use \\?\ to specify a path up to 32767 characters long,  \\?\C:\ and \\?\UNC\, which actually turns off automatic expansion of the path string.
-#+END_SRC
 
 ** /namespaces/
    :PROPERTIES:
