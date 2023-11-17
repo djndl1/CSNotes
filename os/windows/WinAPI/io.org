@@ -63,49 +63,24 @@ runtime, MFC etc.)
   :CUSTOM_ID: opening-reading-writing-and-closing
   :END:
 
-[[https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew][CreateFile]]
+Windows File API can specify share mode while Unix files are always shareable.
 
-[[https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle][CloseHandle]]:
-close nearly all handle objects.
+[[https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew][CreateFile]], =ReOpenFile= (returns a new handle with different flags, access
+rights etc.)
+
+[[https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle][CloseHandle]]: closes and invalidates nearly all handle objects.
 
 [[https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile][ReadFile]]:
 
 [[https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile][WriteFile]]:
 
-** Generic Characters for handling Unicode
-   :PROPERTIES:
-   :CUSTOM_ID: generic-characters-for-handling-unicode
-   :END:
-
-#+BEGIN_SRC C
-  TCHAR
-  LPTSTR
-  LPCTSTR
-#+END_SRC
-
-Define =UNICODE= and =_UNICODE_= before =<windows.h>=to get unicode
-support.
-
-Use the collection of generic C library string and character I/O
-functions in =<tchar.h>=.
-
 =GetLastError= (set by =SetLastError=) rather than =errno= ensures that
 system errors are unique to the threads. =FormatMessage= turns the
 message number into a meaning message.
 
-A Windows process has three standard devices:
-
-#+BEGIN_SRC C
-  HANDLE WINAPI GetStdHandle(
-    _In_ DWORD nStdHandle
-  );
-
-  // for redirection
-  BOOL WINAPI SetStdHandle(
-    _In_ DWORD  nStdHandle,
-    _In_ HANDLE hHandle
-  );
-#+END_SRC
+A Windows process has three standard devices =STD_INPUT_HANDLE=,
+=STD_OUTPUT_HANDLE=, =STD_ERROR_HANDLE=, retrieved by =GetStdHandle= and
+redirected by =SetStdHandle=.
 
 There are two reserved pathnames =CONIN$= and =CONOUT$= for console
 input and output. Use =CreateFile= on them.
