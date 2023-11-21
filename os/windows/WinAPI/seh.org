@@ -1,42 +1,42 @@
-SEH provides a robust mechanism that allows applications to respond to
-unexpected asynchronous events. SEH allows specification of a code block
-or /exception handler/. Normally, an exception indicate a fatal error
+A builtin mechanism that respond to unexpected asynchronous events, typically
+in C.
+C++ under Windows may or may not build its exception mechanism on SEH.
+Normally, an exception indicate a fatal error
 with no recovery. SEH is supported through a combination of Windows
 functions, compiler-supported language extension and run-time support.
-
-#+BEGIN_SRC C
-  __try {
-      /* Block of monitored code */
-  }
-  __except (filter_expression) { // usually a literal constant, a call to filter function or a conditional expression
-      /* Exception handling block */
-  }
-#+END_SRC
-
 The runtime support unwinds the stack to find the exception handler and
 then gives control to the handler.
-
-=__try= can be used with any code blocks.
 
 Exceptions are asynchronous. It is not possible or practical to test for
 an exception. Exception handlers provide a convenient mechanism for
 exiting from inner blocks or functions under program control without
 resorting to a =goto=, SJLJ or some other control.
 
-* Filter Expression
-  :PROPERTIES:
-  :CUSTOM_ID: filter-expression
-  :END:
+#+BEGIN_SRC C
+// __try may be used with any block, even after if or while, unlike C++'s try,
+  __try {
+      /* Block of monitored code */
+  }
+// usually a literal constant, a call to filter function or a conditional expression
+  __except (filter_expression) {
+      /* Exception handling block */
+  }
+#+END_SRC
 
-1. =EXCEPTION_EXECUTE_HANDLER=: executes the except block
-
-2. =EXCEPTION_CONTINUE_SEARCH=: ignores the exception handler and
+The filter expression should return one of the following:
+1. =EXCEPTION_EXECUTE_HANDLER=: (like C++'s normal situation)
+   it executes the except block
+2. =EXCEPTION_CONTINUE_SEARCH=: (rethrow) ignores the exception handler and
    searches for an exception handler in the enclosing block until it
-   finds one
-
+   finds one.
 3. =EXCEPTION_CONTINUE_EXECUTION=: immediately returns control to the
    point at which the exception occurred. Not always possible and
    inadvisable.
+
+To catch the exact exception, =GetExceptionCode()=, =GetExceptionInformation= (inside the filter
+expression but not in the filter function's stack frame)
+
+
 
 * Exception Codes
   :PROPERTIES:
