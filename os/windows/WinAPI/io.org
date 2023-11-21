@@ -85,16 +85,11 @@ redirected by =SetStdHandle=.
 There are two reserved pathnames =CONIN$= and =CONOUT$= for console
 input and output. Use =CreateFile= on them.
 
-* File Management
-  :PROPERTIES:
-  :CUSTOM_ID: file-management
-  :END:
+A number of filesystem management high-level (command-line tool level) functions
+are also provided by Win32. =DeleteFile=, =CopyFile=, =CreateHardLink=,
+=CreateSymbolicLink=, =MoveFile=, =MoveFileEx, =CreateDirectory=,
+=RemoveDirectory=, =SetCurrentDirectory=, =GetCurrentDirectory=
 
-#+BEGIN_SRC C
-  BOOL DeleteFile(
-    LPCSTR lpFileName
-  );
-#+END_SRC
 
 * Console and unicode
   :PROPERTIES:
