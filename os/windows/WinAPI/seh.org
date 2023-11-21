@@ -38,21 +38,6 @@ expression but not in the filter function's stack frame)
 
 
 
-* Exception Codes
-  :PROPERTIES:
-  :CUSTOM_ID: exception-codes
-  :END:
-
-The =__except= block or the filter expression can determine the exact
-exception using
-
-#+BEGIN_SRC C
-  // literal constants
-  DWORD GetExceptionCode(void);
-  // detailed info about the exception
-  LPEXCEPTION_POINTERS GetExceptionInformation(void);
-#+END_SRC
-
 * Raise An Exception
   :PROPERTIES:
   :CUSTOM_ID: raise-an-exception
