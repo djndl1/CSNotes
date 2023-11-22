@@ -1,5 +1,10 @@
 #+title: Signals
 
+* Basic Concept
+:PROPERTIES:
+:ID:       440ee55e-7913-4050-8740-4bc44d689b27
+:END:
+
 A signal is a notification *delivered* to a process that an event has occurred. It may
 be *generated* by a hardware exception, a user operation, a software event. It could be
 used as a synchronization technique or a primitive form of IPC.
@@ -14,6 +19,9 @@ generate a coredump file), suspended or resumed. The process may also set the
 executing a *signal handler* (a function as a response to the signal).
 
 * Common Signals
+:PROPERTIES:
+:ID:       936c12c3-6f0b-4b31-8229-1020419c5ce6
+:END:
 
 Standard signals are numbered from 1 to 31 on Linux. Some are aliases for others
 while some are not used.
@@ -68,3 +76,16 @@ while some are not used.
 
 - =SIGWINCH= :: sent to a program when the terminal window size changes to
   notify the foreground process to redraw itself.
+
+* Signal Handling
+:PROPERTIES:
+:ID:       2926e49d-7fe7-4b75-b89b-51ac6f7f998e
+:END:
+
+A *signal handler* is a function that is called upon delivery of a signal to a
+process. Invocation of a signal handler may interrupt the main program flow at
+any time; the kernel calls the handler on the process's behalf and when the
+handler returns, execution of the program contines where it has been interrupted.
+
+The old and standardized =signal()= sets the disposition of a signal, although
+new preferred =sigaction()= should be used.
