@@ -1,0 +1,70 @@
+#+title: Signals
+
+A signal is a notification *delivered* to a process that an event has occurred. It may
+be *generated* by a hardware exception, a user operation, a software event. It could be
+used as a synchronization technique or a primitive form of IPC.
+
+A process is supposed to *handle* a signal somehow. A signal that has been sent but has not
+reached the process is a *pending* signal. A process may choose to *mask* a
+signal to block, pending the signal further.
+
+By default, a process may ignore a signal, terminate itself (and optionally
+generate a coredump file), suspended or resumed. The process may also set the
+*disposition* of a signal by taking the *default action*, *ignoring* the signal or
+executing a *signal handler* (a function as a response to the signal).
+
+* Common Signals
+
+Standard signals are numbered from 1 to 31 on Linux. Some are aliases for others
+while some are not used.
+
+- =SIGABRT= :: sent to a process when the process  calls =abort()=, which by
+  default causes the the process to terminate with a core dump.
+
+- =SIGALRM= :: upon the expiration of a real-time timer set by a call to
+  =alarm()= or =settimer()=
+
+- =SIGHUP= :: sent to the controlling process of a terminal (and by default
+  causes termination of a process) when the terminal is
+  disconnected (hang up). Some daemons reinitialize themselves upon receiving =SIGHUP=.
+
+- =SIGINT= :: the terminal sends this signal to the foreground process group
+  upon an interrupot character.
+
+- =SIGIO= :: sent when an IO event occur on certain types of open file
+  descriptors.
+
+- =SIGTERM= :: request a process to gracefully terminate itself.
+
+- =SIGKILL= :: the sure kill signal that cannot be blocked or caught by a
+  handler and always terminates a process.
+
+- =SIGPIPE= :: sent to a writer process when a pipe, a FIFO, or a socket does
+  not have a reader process.
+
+- =SIGPWR= :: power failure that indicates a low power state on a system with
+  UPS.
+
+- =SIGQUIT= :: =Ctrl-\=. sent to the foreground process group. By default
+  terminates a process with a core dump for debugging.
+
+- =SIGSEGV= :: segmentation violation. sent when a program makes an invalid memory
+  reference (accessing an invalid page, updating a read-only address, accessing
+  kernel memory by a user-mode program).
+
+- =SIGTSTP= :: the job-contorl stop signal, terminal stop. stops the foreground
+  process group =Ctrl-Z=.
+
+- =SIGSTOP= :: sure stop that always stops a process
+
+- =SIGCONT= :: causes the receiving stopped process to resume. The affected
+  process may catch this signal to perform some action on resuming.
+
+- =SIGCHLD= :: sent to the parent process when a child process terminates.
+
+- =SIGTTIN= (terminal input stop), =SIGTTOU= (terminal output stop) :: sent to a background process when it attempt to read/write.
+
+- =SIGUSR1=, =SIGUSR2= :: reserved for user programs and never sent by hte kernel.
+
+- =SIGWINCH= :: sent to a program when the terminal window size changes to
+  notify the foreground process to redraw itself.
