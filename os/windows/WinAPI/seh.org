@@ -12,6 +12,11 @@ an exception. Exception handlers provide a convenient mechanism for
 exiting from inner blocks or functions under program control without
 resorting to a =goto=, SJLJ or some other control.
 
+When an exception is thrown, the process's debugger, if any, is notified. If the
+process has no debugger attached, the system attempts to find a frame-based
+exception handler. If none, the system tries again to notify the debugger. If
+still no debugger is found, the default handling (mostly =ExitProcess=) is taken.
+
 #+BEGIN_SRC C
 // __try may be used with any block, even after if or while, unlike C++'s try,
   __try {
@@ -33,56 +38,47 @@ The filter expression should return one of the following:
    point at which the exception occurred. Not always possible and
    inadvisable.
 
-To catch the exact exception, =GetExceptionCode()=, =GetExceptionInformation= (inside the filter
-expression but not in the filter function's stack frame)
+An exception has a code, flags that indicate whether it may be ignored and a list
+of arguments that describe the exception further (see =EXCEPTION_RECORD=).
+Microsoft does not mandate the exact structure of exception codes, but the 28th
+bit is reserved for the system. Better use something like COM error codes.
 
+To catch the exact exception, =GetExceptionCode()=, =GetExceptionInformation=
+(only inside the filter
+expression but not in the filter function's stack frame). The user may throw
+their =RaiseException()=.
 
+Unlike Unix's signals, SEHs cannot be raised in another process except by
+console control handlers.
 
-* Raise An Exception
-  :PROPERTIES:
-  :CUSTOM_ID: raise-an-exception
-  :END:
+#+begin_src c
+__try {
 
-#+BEGIN_SRC C
-  __analysis_noreturn VOID RaiseException(
-    DWORD           dwExceptionCode,
-    DWORD           dwExceptionFlags,
-    DWORD           nNumberOfArguments,
-    const ULONG_PTR *lpArguments
-  );
-#+END_SRC
+} __finally {
 
-* Termination Handler
-  :PROPERTIES:
-  :CUSTOM_ID: termination-handler
-  :END:
+}
 
-Termination handlers are a convenient way to close handles, release
-resources, restore masks and otherwise restore the process to a known
-state when leaving a block.
+// Chaining __try, __catch and __finally is not allowed,
+// embedding one in another somehow is possible.
 
-#+BEGIN_SRC C
-  __try {
+// nested with __except
+__try {
+    __try {
 
-  }
-  __finally {
-     
-  }
-#+END_SRC
+    } __except {
+
+    }
+} __finally
+#+end_src
 
 The termination handler is executed when falling through, =return=,
-=break=, =goto=, =longjmp=, =continue=, =__leave=(directly go to the
-termination handler) or an exception is raised.
-
-=BOOL AbnormalTermination(void)= determines how the block terminates.
-
-Although chaining =__try=, =__catch= and =__finally= is not allowed,
-embedding one in another somehow is possible.
+=break=, =goto=, =longjmp=, =continue=, =__leave= (directly go to the
+termination handler) or an exception is raised. =AbnormalTermination(void)=
+determines how the block terminates.
 
 Termination handlers do not execute if a process or thread terminates
-whether the process or thread terminates itself by using =ExitProcess=
-or =ExitThread= or whether the termination is caused externally by
-=TerminateProcess= or =TerminateThread=.
+itself by using =ExitProcess=, =ExitThread=, =exit=, return from the main function,
+or the termination is caused externally by =TerminateProcess= or =TerminateThread=.
 
 SEH is not encouraged to use with C++. A Windows exception or
 termination handler will not call destructors to destroy C++ object
@@ -104,8 +100,8 @@ console-related signals.
   );
 #+END_SRC
 
-* [[https://docs.microsoft.com/en-us/archive/msdn-magazine/2001/september/under-the-hood-new-vectored-exception-handling-in-windows-xp][Vectored
-Exception Handling]]
+
+* [[https://docs.microsoft.com/en-us/archive/msdn-magazine/2001/september/under-the-hood-new-vectored-exception-handling-in-windows-xp][Vectored Exception Handling]]
   :PROPERTIES:
   :CUSTOM_ID: vectored-exception-handling
   :END:
