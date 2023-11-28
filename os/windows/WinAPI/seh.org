@@ -73,7 +73,7 @@ __try {
 
 The termination handler is executed when falling through, =return=,
 =break=, =goto=, =longjmp=, =continue=, =__leave= (directly go to the
-termination handler) or an exception is raised. =AbnormalTermination(void)=
+termination handler without causing abnormal termination) or an exception is raised. =AbnormalTermination(void)=
 determines how the block terminates.
 
 Termination handlers do not execute if a process or thread terminates
