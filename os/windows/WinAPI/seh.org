@@ -106,18 +106,20 @@ console-related signals.
   :CUSTOM_ID: vectored-exception-handling
   :END:
 
-Unlike frame-based SEH, VEH is process-wide. The behavior is similar to
-POSIX signals.
-
-When an exception occurs, the VEHs are called first, before the system
+VEHs are an extension to SEHs and not frame-based but process-wide,
+similar to POSIX signals. When an exception occurs,
+the VEHs are called first, before the system
 unwinds the stack to look for structured exception handlers.
 
-#+BEGIN_SRC C
-  PVOID AddVectoredExceptionHandler(
-    ULONG                       First,
-    PVECTORED_EXCEPTION_HANDLER Handler
-  );
-#+END_SRC
+VEHs (of [[https://learn.microsoft.com/en-us/windows/win32/api/winnt/nc-winnt-pvectored_exception_handler][PvectoredExceptionHandler]]) are registered (=AddVectoredExceptionHandler()=) and
+chained in order. A VEH function may either return control to the point of exception or
+continue to search for another handler.
 
-The returned value is a handle to the exception handler and used to
-remove the handler with =RemoveVectoredExceptionHandler=.
+#+begin_quote
+The handler should not call functions that acquire synchronization objects or
+allocate memory, because this can cause problems. Typically, the handler will
+simply access the exception record and return.
+#+end_quote
+
+There is also a *Vectored continue handler* mechanism that handles exceptions
+after SEH. See [[https://reverseengineering.stackexchange.com/questions/14992/what-are-the-vectored-continue-handlers][What are the Vectored Continue Handlers]].
