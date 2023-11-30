@@ -89,17 +89,11 @@ instances.
   :CUSTOM_ID: console-control-handlers
   :END:
 
-=SetConsoleCtrlHandler= allows one or more specified functions to be
-executed on receipt of a Ctrl-C, Ctrl-break or one othree other
-console-related signals.
-
-#+BEGIN_SRC C
-  BOOL WINAPI SetConsoleCtrlHandler(
-    _In_opt_ PHANDLER_ROUTINE HandlerRoutine,
-    _In_     BOOL             Add
-  );
-#+END_SRC
-
+Windows does not have Unix signals. Windows emulate similar
+behavior with console handlers when running console apps. Each console process
+has its own list of handler functions that initially contains only a default
+handler that calls =ExitProcess()=. A console process adds or removes handlers
+by calling =SetConsoleCtrlHandler()=.
 
 * [[https://docs.microsoft.com/en-us/archive/msdn-magazine/2001/september/under-the-hood-new-vectored-exception-handling-in-windows-xp][Vectored Exception Handling]]
   :PROPERTIES:
