@@ -392,3 +392,6 @@ glibc's =struct tm= is extended with an offset and a timezone name. It also
 offers =timelocal()=, =timegm()= to extende ISO C.
 
 In addition to =sleep()=, there is a thread-safe high-precision =nanosleep()=.
+
+Timezone info is set by the =TZ= environment variable and =tzset()= into the
+=tzname= variable. The timezone settings are process-global.
