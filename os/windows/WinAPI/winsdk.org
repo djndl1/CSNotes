@@ -1,0 +1,67 @@
+#+title: Winsdk
+
+[[https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/][Windows SDK and emulator archive]]
+
+* Development Toolkit
+
+The last MS toolchain that supports WinXP are Visual Studio 2010 (MSVC 16.0), or
+Microsoft Windows SDK 7.1 (tools, compilers, headers, libraries, code samples
+and a help system for managed and native apps). These days MS also provides *Tools for
+Visual Studio*
+
+* Headers and Macros
+
+Define =_WIN32_WINNT=, =WINVER= and =NTDDI_VERSION= (used with =_WIN32_WINNT=)
+to choose a target OS version. See [[https://learn.microsoft.com/en-us/windows/win32/winprog/using-the-windows-headers][Using the windows Headers]].
+
+Define =WIN32_LEAN_AND_MEAN= to exclude APIs such as cryptographym, DDE, RPC,
+Shell and WinSocks.
+
+* [[https://learn.microsoft.com/en-us/windows/win32/winprog/header-annotations][Annotations]]
+
+Windows API are often annotated to describe how a function uses its parameters
+and return values.
+
+Be careful that
+
+- =__out= (=_Out_=) does not indicate that the buffer is provided by the callee:
+  it only means that the callee may write to the buffer.
+
+- =__deref= indicates the parameter is a pointer to to an outer variable and has to be
+    derferenced to access to the buffer.
+- =__out_deref= (=_Outptr_=) means the callee does not read the data provided by the caller
+  and the callee can assign to the outer variable, and it somehow (!) implies
+  the buffer is provided by the callee.
+
+- =__opt= means the parameter may be =NULL= or =0=. It seems MS treats =NULL=
+  more than a pointer value, even used with the =HANDLE= type, for which
+  =INVALID_HANDLE_VALUE= is the invalid value.
+
+- =__reserved= means the parameter must be =NULL= or =0=.
+
+- Annotating non pointer parameters and return values are meaningless since they
+  are implicitly =_In_= or =_Out_=.
+
+GObject has [[https://gi.readthedocs.io/en/latest/annotations/giannotations.html][a set of annotations]] with a similar aim where they have different
+rules for =nullable= and =optional=
+
+* [[https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types][Data Types]]
+
+For historical and platform-specific reasons, Windows defines a set of types and
+macros for
+Win32 development, many of which may be replaced by standard C types.
+
+- =WORD= are 16-bit unsigned integers.
+
+- =VOID=, =WCHAR=, =CHAR=, =CCHAR=, =CONST=, =FLOAT=, =(U)INT=, =(U)INT8=, =(U)INT16=,
+  =(U)INT32=, =(U)INT64=, =(U)LONG=, =(U)LONGLONG=, =(U)LONG32=, =(U)LONG64=, =SHORT=, =SIZE_T=,
+  =UCHAR= may be replaced by standard C types.
+
+- =P*= and =LP*= types are pointers.
+
+- =LP/P*STR= are null-terminated C strings.
+
+- =H*= are handle types.
+
+- =BOOL= C int as a boolean type; =BOOLEAN= OS/2 NT team; =VARIANT_BOOL= Visual
+  Basic's =Bool= (=VARIANT_TRUE= 0, =VARIABLE_FALSE= is =-1=)

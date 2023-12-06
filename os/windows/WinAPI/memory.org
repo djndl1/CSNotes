@@ -43,29 +43,27 @@
   :CUSTOM_ID: heap
   :END:
 
-Use C library to allocate heap memory if one heap is sufficient.
-
+Use C library to allocate heap memory
+if one heap (process heap =GetProcessHeap()=) is sufficient.
 Heaps are Windows objects (non-kernel objects): they have handles.
-
 Heap separation has several benefits:
 
-- multithreaded performance: each thread can have its own heap
-
+- multithread performance: each thread can have its own heap
 - allocation efficiency and low fragmentation, simplifies
   synchronization
-
 - deallocation efficiency: an entire heap can be freed with a single
   function call
-
 - locality of reference efficiency, reducing page faults
 
-Use =HeapCreate= to create a new heap, specifying the initial heap size.
+Use =HeapCreate()= to create a new heap, specifying the initial heap size.
+Heaps allocation always rounds up to a multiple of the page size.
+
 Heaps are not kernel objects so they have no security attributes.
-Destroy a heap with =HeapDestroy=. Do not destroy the process heap.
+Destroy a heap with =HeapDestroy()=. Do not destroy the process heap.
 Destroying a heap eleminate the need to write the data structure
 traversal code and deallocate each individual code.
 
-=HeapAlloc=; =HeapFree=; =HeapReAlloc=; =HeapSize= (which determines the
+=HeapAlloc()=; =HeapFree()=; =HeapReAlloc()=; =HeapSize()= (which determines the
 size of an allocated block)
 
 * Memory Mapped Files

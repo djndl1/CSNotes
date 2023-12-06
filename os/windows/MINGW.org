@@ -3,7 +3,7 @@
 * Windows XP Support
 
 - a modified MSYS2 is available [[https://archive.org/details/msys2xp][here]], with many userland utils replaced by =busybox=. Another way to get proper Bash support
-  is =Git= v2.10.0 (relased on 2026-09-03).
+  is =Git= v2.10.0 (relased on 2016-08-25).
 
 - [[https://sourceforge.net/projects/mingwbundle/][mingwbundle]]: a bundled MSYS with legacy MinGW toolchains.
 
@@ -17,6 +17,9 @@
   + GCC 8.4.0 + MinGW-w64 7.0.0 (release 1), =gdb= fails
   + GCC 9.2.0 + MinGW-w64 7.0.0 (release 4), =gdb= fails
 
+- [[https://github.com/skeeto/w64devkit][w64devkit]]: very nice build that includes Windows XP support and the latest GCC
+  and a simple Unix environment.
+
 ** Powershell
 
 v2, lacking too many functionalities, not of much use.
@@ -29,13 +32,18 @@ The last working version is v7.9.2
 
 The last working version is v3.13.5.
 
+** Ninja
+
+The last official build runnable on XP is v1.6.0 (2015-01-30)
+
 ** LLVM
 
-the last support version is 3.7.1, which is only better than GCC 4.
+the last supported version is 3.7.1, which is only better than GCC 4.
 
 ** MSVC
 
 Visual Studio 2010; Windows SDK 7.1 (MSVC 16.00)
+
 
 * [[https://www.mingw-w64.org/][MinGW-w64]]
 
@@ -58,7 +66,8 @@ The current de-factor standard GCC on Windows.
   + has support for [[https://github.com/lhmouse/mcfgthread/][MCF threading library]]
   + with MSVCRT and UCRT as CRTs.
 
-- [[https://github.com/skeeto/w64devkit][w64devkit]]: GCC, GDB, GNU Make, NASM, Vim, Ctags, busybox
+- [[https://github.com/skeeto/w64devkit][w64devkit]]: GCC, GDB, GNU Make, NASM, Vim, Ctags, busybox with Windows XP
+  backwards compatibility
 
 - [[https://www.msys2.org/][MSYS2]]: provides not only GCC toolchains, but a whole Unix-like environment.
   + rolling-release.
@@ -99,7 +108,7 @@ TODO
   +  =-municode= is necessary and the macros =_UNICODE= (for =tchar.h=) and =_UNICODE= (for Win32 API functions) should be defined.
   + =wmain= should be marked as =extern "C"= under C++.
 
-** C Standard Conformance
+** C Standard Confornmance
 
 *** =printf= family
 
