@@ -3,67 +3,39 @@
   :CUSTOM_ID: process-creation
   :END:
 
-#+BEGIN_SRC C
-  BOOL CreateProcessW(
-    LPCWSTR               lpApplicationName,
-    LPWSTR                lpCommandLine,        // non-constant
-    LPSECURITY_ATTRIBUTES lpProcessAttributes,
-    LPSECURITY_ATTRIBUTES lpThreadAttributes,
-    BOOL                  bInheritHandles,
-    DWORD                 dwCreationFlags,
-    LPVOID                lpEnvironment,
-    LPCWSTR               lpCurrentDirectory,
-    LPSTARTUPINFOW        lpStartupInfo,
-    LPPROCESS_INFORMATION lpProcessInformation
-  );
-#+END_SRC
-
 #+INCLUDE: "../../OSCode/win32/lib/src/processes.cpp" src cpp
 
-A proess handle is more than just an identifier: it also contains security access rights. It is a channel through which a process is manipulated.
+A process handle is more than just an identifier: it also contains security
+access rights. It is a channel through which a process is manipulated.
 
-** Specifying the Executable and the Command Line
-   :PROPERTIES:
-   :CUSTOM_ID: specifying-the-executable-and-the-command-line
-   :END:
+=CreateProcess()= creates a process on Windows.
+Non-null =lpApplicationName= specifies the executable path, if =NULL=,
+the first token in =lpCommandLine= is the program name. The command line
+argument is a not constant and the function call may modify it.
 
-non-null =lpApplicationName= specifies the executable path, if =NULL=,
-the first token in =lpCommandLine= is the program name.
+=CreateProcess()= returns both process/thread handles and IDs because
+handles are not identifiers: they are means to manipulate resources and thus
+a process may have multiple handles (e.g. through =DuplicateHandle()=) to the same resource.
 
 ** Inheritable Handles
    :PROPERTIES:
    :CUSTOM_ID: inheritable-handles
    :END:
 
-1. =bInheritHandles=: A master switch applying to all handles.
+1. =bInheritHandles=: A prerequisite master switch.
+   This does not make any particular handle inheritable
+2. To make a handle inheritable, use a =SECURITY_ATTRIBUTES=
+   structure and set =bInheritHandle= in it at creation time of the handle or
+   =DuplicateHandle()= an existing handle.
 
-2. To make an individual handle inheritable, use a =SECURITY_ATTRIBUTES=
-   structure at creation time of the handle or duplicate an existing
-   handle.
-
-3. The two security attributes passed in are used to configure the two handles returned.
-
-#+BEGIN_SRC C
-// handle duplication creates a different way to access the same object.
-  BOOL DuplicateHandle(
-    HANDLE   hSourceProcessHandle,
-    HANDLE   hSourceHandle,
-    HANDLE   hTargetProcessHandle,
-    LPHANDLE lpTargetHandle,
-    DWORD    dwDesiredAccess,
-    BOOL     bInheritHandle,
-    DWORD    dwOptions
-  );
-#+END_SRC
-
-The handle values are communicated to the child using an IPC mechanism
+Handle values are communicated to the child using an IPC mechanism
 or assigning the handle to stdio in the =STARTUPINFO= structure (which
 is the preferred way to use I/O redirection). Non-file handles and
 handles that are not used to redirect stdio can be converted to text and
 placed in a command line argument or in an environment variable.
 
-The inherited handles are distinct copies (but with the same value), a parent and child might be
-accessing the same file using different file pointers.
+The inherited handles are distinct copies (but with the same value), a parent
+and child might be accessing the same file using different file pointers.
 
 ** Process Information
    :PROPERTIES:
@@ -75,13 +47,13 @@ accessing the same file using different file pointers.
   DWORD GetCurrentProcessId();
 #+END_SRC
 
-To get a real process handle, get the PID and =OpenProcess= it or duplicate the current pseudohandle.
+To get a real process handle, get the PID and =OpenProcess()= it or duplicate the current pseudohandle.
 
 #+BEGIN_SRC C
   HANDLE OpenProcess(DWORD dwDesiredAccess, BOOL  bInheritHandle, DWORD dwProcessId);
 #+END_SRC
 
-A running process can determine the full pathnames of the exe used to
+A running process can determine the full pathnames of the executable used to
 run it with =NULL= as the module handle of these functions.
 
 #+BEGIN_SRC C
@@ -97,12 +69,18 @@ run it with =NULL= as the module handle of these functions.
   :END:
 
 #+BEGIN_SRC C
-  void ExitProcess(UINT uExitCode); // DLL detach calls are made, termination handlers are not executed, same as return from main function
+ // DLL detach calls are made,
+ // termination handlers are not executed, same as return from main function
+  void ExitProcess(UINT uExitCode);
+  // Neither SEH nor DLLMain functions are executed
+  BOOL TerminateProcess(HANDLE hProcess, UINT   uExitCode);
+
   BOOL GetExitCodeProcess(HANDLE  hProcess, LPDWORD lpExitCode);
-  BOOL TerminateProcess(HANDLE hProcess, UINT   uExitCode); // Neither SEH nor DLLMain functions are executed
 #+END_SRC
 
-=__finally= and =__except= are not executed when =ExitProcess= is called. Console control handlers are a limited alternative to signal another process to cleanly shutdown.
+=__finally= and =__except= are not executed when =ExitProcess()= is called.
+Console control handlers are a limited alternative to signal another process to
+cleanly shutdown.
 
 * Process Sync
   :PROPERTIES:
