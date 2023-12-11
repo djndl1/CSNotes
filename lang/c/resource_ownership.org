@@ -2,23 +2,21 @@
 
 Three Rules
 
-1. Each value has a variable called it's /owner/.
-
-2. There can only be one owner at a time
+- Each value has a variable called its /owner/.
+- There can only be one owner at a time
    + by default Rust moves value to another owner when assigning unless
-     the object has implemented the =Copy= trait
-
-3. When the owner goes out of scope, the value will be dropped
-
+     the object has implemented the =Copy= trait.
+- When the owner goes out of scope, the value will be dropped
 
 #+begin_src rust
   fn main() {
       let s1 = String::from("hello");
       let s2 = s1; // by default move the resource of s1 to s2,
-      // a consequence of rule 2, even if deep-copy, 
-      // is safe here, it // is expensive after all
+      // a consequence of rule 2, even if deep-copy,
+      // is safe here, it is expensive after all
 
-      println!("{}, world!", s1); // compile error
+      // compile error, s1 is not the owner of the string and thus invalid
+      println!("{}, world!", s1);
   }
 #+end_src
 
@@ -37,11 +35,10 @@ rule for the assignment.
 
 - At any given time, you can have either one mutable reference
   or any number of immutable references.
- 
+
 - References must always be valid.
 
-
-1. Reference is by default immutable (to the pointed value).
+1. a reference is by default immutable (to the pointed value).
 
 2. unless specified both in the signature and the user's code
 
@@ -56,6 +53,37 @@ rule for the assignment.
 This keeps variables about part of a collection in sync with the collection's owner:
 slices are references to a contiguous sequence.
 
+
+** [[https://www.ralismark.xyz/posts/ownership][How to Pretend to Be Writing Rust When in C]]
+
+- One reference per resource :: allowing a single variable, struct field, or
+  array element to hold each resource.
+
+- *ownership transfer* :: still, references (pointers, handles, mutexes and
+  other copyable resources) must be assignable so that functions
+  can be used. References are assigned in a restricted way.
+  + when a pointer is assigned, the old one is discarded (set to a default
+    invalid value) and no
+    longer used. Thus, all pointers are either valid or =NULL=.
+  + as long as a reference is passed into a function, that resource is no longer
+    managed by the caller and in theory shouldn't be worried over.
+
+- *borrowing* :: to simplify access to a resource without having to invalidate a
+  variable first and then reacquire that reference, non-owning
+  references are allowed. Creating a non-owning reference to a resource is called
+  *borrowing*. A reference may be either *owning* or *borrowing* a resource.
+  + =&= may be seen as an indication of borrowing except when creating the first
+    reference – if the address is taken, then that resource must already exist
+    and hence be owned.
+  + =&*= may be used when borrow-assign a pointer to indicate a borrowing.
+  + the borrowed resource may be assumed to be valid for the duration of the
+    borrower.
+  + Borrows are weak references and should never outlive the value that they
+    points to.
+  + one may typedef a pair of =resource_reftype_owned= and =resource_reftype_borrowed= for a reference
+    type to explicit indicate such difference.
+
+
 * [[https://resources.sei.cmu.edu/asset_files/WhitePaper/2013_019_001_55008.pdf][Pointer Ownership Model]]
 
 [[https://insights.sei.cmu.edu/blog/using-the-pointer-ownership-model-to-secure-memory-management-in-c-and-c/][Using the Pointer Ownership Model to Secure Memory Management in C and C++]]
@@ -69,7 +97,7 @@ the pointers whose objects must be explicitly freed
 before the pointers themselves may be destroyed. POM
 can be statically analyzed to ensure that the design is
 consistent and secure, and that the code correctly
-implements the design. 
+implements the design.
 #+end_quote
 
 ** Pointer/Resource Categories
@@ -147,13 +175,13 @@ implements the design.
 
   char *irp = irp_init_val;
   free(irp);
-  
+
   char *rp;
   char *irp = irp_init_val;
   rp = irp; // bad
   memcpy(&rp, &irp, sizeof(rp)); //bad
 #+end_src
-  
+
 - A responsible pointer can only be assign the following value:
   + =NULL= (nullify the pointer after ownership transfer, being freed or for proper initialization)
   + another responsible pointer (ownership transfer)
