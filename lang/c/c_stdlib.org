@@ -243,13 +243,34 @@ possibility that several locales will be supported.
 - =O(n)= cost to find the length.
 - functions are duplicated to handle text strings and binary data differently.
 
-** Encoding
+** Encoding and Character Set
 
 =char= are uninterpreted bytes and =wchar_t= are implementation-defined and they
 are subject to compiler options. Recent
 C has added =char8_t= (UTF-8, C23), =char16_t= (16-bit character, typically UTF-16
 but not necessarily, C11; C23 mandates UTF-16), =char32_t= (32-bit character, typically UTF-32 but not
 necessarily, C11; C23 mandates UTF-32), along with their literal prefix =u8=, =u=, =U= (C11).
+
+Character sets are discussed in terms of input character set (of the source
+file), source character set (of the internal representation before feeding into
+the compiler), execution character set (how characters are stored in the
+binary). String and character literals stored in the input character set are
+first converted into the source character set after reading, preprocessed and
+then converted into the execution character set during compilation.
+
+ISO C requries a C program start with the "C" locale, which is meant to be the
+simplest locale may or may not support UTF-8 and is probably restricted to ASCII.
+
+** String Types
+
+- Byte string :: each byte is assumed to be one character in some encoding.
+
+- Multibyte string :: an extension to byte string. Locale-dependent character
+  string that is layout-compatible with byte strings and uses the same
+  facilities except for length calculation.
+
+- Wide string :: implementation-defined wide-length character string, typically
+  UTF-16 or UTF-32.
 
 - =strcat= =strncat= (n characters ('\0' excluded)) and their wide
   character counterparts: semantically, =dest = dest + src=;
