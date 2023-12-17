@@ -225,10 +225,31 @@ possibility that several locales will be supported.
 
 - =tolower=, =toupper= and their wide character counterparts
 
-* String Processing =string.h=, =stdlib.h=
+* String and Character Processing
   :PROPERTIES:
   :CUSTOM_ID: string-processing-string.h-stdlib.h
   :END:
+
+** Null Terminated String
+
+ Due to historical consideration of performance, C chose to use null-terminated
+ character array as the default string type (in constrast to alternatives such
+ as length-prefixed Pascal P-String). In retrospect, this caused a few
+ memory-related security, performance and design issues:
+- no memory is allocated for the final =NUL= character and the =NUL= is written
+  over adjacent memory, potentially causing data corruption or invalid memory access.
+- no =NUL= is written.
+- Inability to store zeros within a string.
+- =O(n)= cost to find the length.
+- functions are duplicated to handle text strings and binary data differently.
+
+** Encoding
+
+=char= are uninterpreted bytes and =wchar_t= are implementation-defined and they
+are subject to compiler options. Recent
+C has added =char8_t= (UTF-8, C23), =char16_t= (16-bit character, typically UTF-16
+but not necessarily, C11; C23 mandates UTF-16), =char32_t= (32-bit character, typically UTF-32 but not
+necessarily, C11; C23 mandates UTF-32), along with their literal prefix =u8=, =u=, =U= (C11).
 
 - =strcat= =strncat= (n characters ('\0' excluded)) and their wide
   character counterparts: semantically, =dest = dest + src=;
