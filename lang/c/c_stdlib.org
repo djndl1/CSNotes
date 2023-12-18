@@ -174,56 +174,6 @@ function and check it afterwards. =strerror=, =perror= interpretes
 
 =va_copy= can be used to retain a pointer into the argument list
 
-* Character Processing =<ctype.h>= =<wctype.h>=
-  :PROPERTIES:
-  :CUSTOM_ID: character-processing-ctype.h-wctype.h
-  :END:
-
-There are two kinds of facilities for handling characters:
-classification (=is*=)and conversion (=to*=). Every character conversion
-facility has a name beginning with =to= and returns a value of type
-=int= representing a character or =EOF=. =EOF= is not necessarily
-distinguishable form a real character if nonstandard character values
-appear (Standard character values are always non-negative even if the
-type =char= is signed).
-
-The formulation of the facilities in C STDLIB takes into account the
-possibility that several locales will be supported.
-
-- =isalnum=, =isalpha=, =iscntrl= and their wide character counterparts,
-  =isascii= (a BSD and SVID extension).
-
-#+BEGIN_SRC C
-  bool is_legal_cid(const char *s)
-  {
-      char ch;
-      if ((ch = *s++) == '\0') return true;
-      if (!(isalpha(ch) || ch == '_')) return false;
-      while ((ch = *s++) != '\0') {
-          if (!(isalpha(ch) || ch == '_')) return false;
-      }
-      
-      return true;
-  }
-#+END_SRC
-
-- =isdigit=, =isxdigit= and their wide character counterparts
-
-- =isgraph=, =ispunct=, =isprint= (any character that is not a control
-  character) and their wide character counterparts. A space is a
-  printing character. =isprint= and =isgraph= differ only in how they
-  handle the space character.
-
-- =islower=, =isupper= and their wide character counterparts
-
-- =isblank=, =isspace= and their wide character counterparts. Space
-  characters are =\t=, =\v=, =\r=, =\n=, =\f=, =' '=. Blank characters
-  are characters used to separate words within a line of text, including
-  standard blank characters, space and horizontal tab, and they may
-  include additional locale-specific characters for which =isspace= is
-  true.
-
-- =tolower=, =toupper= and their wide character counterparts
 
 * String and Character Processing
   :PROPERTIES:
@@ -241,6 +191,7 @@ possibility that several locales will be supported.
 - no =NUL= is written.
 - Inability to store zeros within a string.
 - =O(n)= cost to find the length.
+  + e.g. performance issue with =strcat=.
 - functions are duplicated to handle text strings and binary data differently.
 
 ** Encoding and Character Set
@@ -272,8 +223,42 @@ simplest locale may or may not support UTF-8 and is probably restricted to ASCII
 - Wide string :: implementation-defined wide-length character string, typically
   UTF-16 or UTF-32.
 
-- =strcat= =strncat= (n characters ('\0' excluded)) and their wide
-  character counterparts: semantically, =dest = dest + src=;
+** Character Processing =<ctype.h>= =<wctype.h>=
+  :PROPERTIES:
+  :CUSTOM_ID: character-processing-ctype.h-wctype.h
+  :END:
+
+There are two kinds of facilities for handling characters:
+classification (=is*=)and conversion (=to*=).
+
+Every character conversion facility has a name beginning with =to= and returns a
+value of type =int= representing a character or =EOF=. =EOF= is not necessarily
+distinguishable form a real character if nonstandard character values
+appear (Standard character values are always non-negative even if the
+type =char= is signed). The narrow version accepts =int= but accepts only byte characters.
+
+Character utiltity functions are dependent on the current locale.
+
+** String Concatenation
+
+=strcat= and =strncat= are both dangerous to use since it is easy to write across
+the end of the =dest= buffer and inefficient in performance
+due to constant length searching to find the end of =dest= to append the =src=
+($O(n^2)$ for n times of concatenation).
+For a simple concatenation, this is acceptable but not for multiple string
+concatenation since we already know the end of the last concatenation result.
+Track the end of the intermediate result string and =memcpy= the next string to
+the end of the imtermediate result to avoid constant searching from the start.
+Think twice before using =strcat=.
+
+BSD's =strlcat()= and the C11 extension =strcat_s= prevent writing off the end
+of the destination buffer with different behavior.
+
+Another approach to concantenate strings is to use =snprintf()=.
+More automatic approaches include using string IO e.g. =open_memstream()=, which
+handles memory allocation automatically.
+
+** String Comparison
 
 - =strcmp=, =strncmp=
 
