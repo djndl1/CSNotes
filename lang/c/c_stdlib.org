@@ -44,8 +44,7 @@ implementations even the other libraries are not provided.
 
 - =stddef.h=: Fundamental types defined by the language, additional
   basic types and convenience macros.
-  [[https://unix.stackexchange.com/questions/451232/where-is-stddef-h-defined-in-linux][On
-  why I cannot find stddef.h]]
+  [[https://unix.stackexchange.com/questions/451232/where-is-stddef-h-defined-in-linux][On why I cannot find stddef.h]]
 
 #+BEGIN_SRC C
   #ifdef __cplusplus
@@ -174,12 +173,17 @@ function and check it afterwards. =strerror=, =perror= interpretes
 
 =va_copy= can be used to retain a pointer into the argument list
 
+* Standard I/O
+
+- for =printf=-family functions
+  #+begin_quote
+If any argument is not the correct type for the corresponding conversion specification, the behavior is undefined.
+  #+end_quote
 
 * String and Character Processing
   :PROPERTIES:
   :CUSTOM_ID: string-processing-string.h-stdlib.h
   :END:
-
 ** Null Terminated String
 
  Due to historical consideration of performance, C chose to use null-terminated
