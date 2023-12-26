@@ -207,11 +207,14 @@ but not necessarily, C11; C23 mandates UTF-16), =char32_t= (32-bit character, ty
 necessarily, C11; C23 mandates UTF-32), along with their literal prefix =u8=, =u=, =U= (C11).
 
 Character sets are discussed in terms of input character set (of the source
-file), source character set (of the internal representation before feeding into
-the compiler), execution character set (how characters are stored in the
+file), *source* character set (of the internal representation before feeding into
+the compiler), *execution* character set (how characters are stored in the
 binary). String and character literals stored in the input character set are
 first converted into the source character set after reading, preprocessed and
 then converted into the execution character set during compilation.
+
+Each character set further contains the *basic* character set (basically ASCII)
+and the *extended* character set.
 
 ISO C requries a C program start with the "C" locale, which is meant to be the
 simplest locale may or may not support UTF-8 and is probably restricted to ASCII.
@@ -223,6 +226,10 @@ simplest locale may or may not support UTF-8 and is probably restricted to ASCII
 - Multibyte string :: an extension to byte string. Locale-dependent character
   string that is layout-compatible with byte strings and uses the same
   facilities except for length calculation.
+  + multibyte strings may be state-dependent encoding: beginning in an *initial
+    shift* and enters *shift states* when specific multibyte characters are
+    encountered in the sequence. The interpretation for subsequent bytes in the
+    sequence is a function of the current shift state.
 
 - Wide string :: implementation-defined wide-length character string, typically
   UTF-16 or UTF-32.
