@@ -16,3 +16,8 @@
   [[https://learn.microsoft.com/en-us/dotnet/core/resources/manifest-file-names#embeddedresourceusedependentuponconvention-property][default convention]] is introduced. Without setting
   =<EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>=,
   the app may not be able to find resources during runtime. Also see this [[https://github.com/dotnet/msbuild/issues/5793][issue.]]
+
+* VSTest
+
+- Runsettings's =DotNetHostPath= is misspelled in the documentation due to source code naming.
+  + This is required to be set under PRoot distros.
