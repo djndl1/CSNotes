@@ -24,27 +24,6 @@ the `Main` method returns either `void` or `int` and takes either no parameters 
 
 Local variable names are camelCase and do not include underscores. C# requires that local variables be determined by the compiler to be “definitely assigned” before they are read.
 
-Console I/O is done through `System.Console`
-
-
-- string interpolation:
-
-```csharp
-string firstName = "Hans";
-System.Console.WriteLine($"The first name is {firstName}");
-```
-
-or we can use _composite formatting_, which requires a format string:
-
-```csharp
-System.Console.WriteLine("The first name is {0}", firstName);
-```
-
-```csharp
-/** XML delimited comments **/
-/// XML single line comments
-```
-
 Code that is readable without comments is more valuable than that which requires comments to clarify what it does. If developers find it necessary to enter comments to clarify what a particular code block is doing, they should favor rewriting the code more clearly over commenting it.
 
 # Data Types
@@ -53,44 +32,7 @@ Code that is readable without comments is more valuable than that which requires
 
 All the fundamental types in C# have both a short name and a BCL name, which is the same across all languages: `System.typeName`
 
-- integer types: `sbyte`, `byte` (8-bit); `short`, `ushort` (16-bit); `int`, `uint` (32-bit), `123u`; `long`, `123l`, `123L`, `ulong` (64-bit), `123ul`; 
-
-- floating-point type: [`float` (32-bit)](https://en.wikipedia.org/wiki/Single-precision_floating-point_format) `8F` ; [`double` (64-bit)](https://en.wikipedia.org/wiki/IEEE_754); there are two properties for a floating-point number: precision and range. For an integer, they are the same.
-
-```python
-# double
->> sum = 0
->> for i in range(1,52):
-        sum += (1/2)**i
-
->> 2**1023*(1+sum)
-1.7976931348623155e+308
-```
-
-```csharp
-string.Format("{0:R}", 1.61234168471843814783718431); // round-trip format
-
-const double number = 1.618033988749895;
-double result;
-string text;
-
-text = $"{number}";
-result = double.Parse(text);
-System.Console.WriteLine($"{result == number}: result == number");
-
-text = string.Format("{0:R}", number);
-result = double.Parse(text);
-System.Console.WriteLine($"{result == number}: result == number");
-```
-
-```bash
-False: result == number
-True: result == number
-```
-
 - decimal float: `decimal` (128-bit), `120M`; maintains exact accuracy for all denary number within the range. Doesn't follow IEEE-754
-
-- boolean types: `bool`, (8-bit)
 
 - character type: `char`, (16-bit), UTF-16, too small for all unicode characters, sometime require two `char`s.
 
@@ -98,89 +40,20 @@ True: result == number
 
 - `e`/`E`: exponent notation is available: `6.023E23`
 
-- `ob`: binary notation is supported
+- `0b`: binary notation is supported
 
-```csharp
-System.Console.WriteLine($"0x{42:X}");
-```
+C# provides checked block and unchecked block to decide what should happen if the target data type is too small to contain the assigned data.
+
 
 ## String Type
 
 - `string`: `@` verbatim string (raw string except for `"`), `$` string interpolation (both can be combined together). The both can be combined. String interpolation is a shorthand for invoking the `string.Format()` method. Strings are immutable.
 
-```csharp
-System.Console.WriteLine(@"\nThis is not escaped!");
-
-System.Console.Write(@"begin
-             /\
-            /  \
-           /    \
-          /      \
-         /________\
-end");
-```
-
-```bash
-\nThis is not escaped!
-begin
-             /\
-            /  \
-           /    \
-          /      \
-         /________\
-end
-```
-
-Important Static Methods
-
-- `string.Format()`
-
-- `string.Concat()`
-
-- `string.Compare()`
-
-`using static` directive allows access static members and nested types of a type
-
-Rely on `System.WriteLine()` and `System.Environment.NewLine` rather than ‘\n’ in order to accommodate Windows specific operating system idiosyncrasies with the same code that runs on Linux and iOS.
-
 Use `System.Text.StringBuilder` to construct a long string in multiple steps.
-
-- `null`: the variable does not refer to any valid object. Reference types, pointer types and nullable value types can be assigned the value `null`.
-
-C# provides checked block and uncheked block to decide what should happen if the target data type is too small to contain the assigned data.
 
 Each numeric data type includes a `Parse()`/`TryParse()` function that enables conversion from a string to the corresponding numeric type.
 
-```csharp
-float kgElectronMass = float.Parse("9.11E-31");
-```
-
-Also `System.Convert`:
-
-```csharp
-double middleC = System.Convert.ToDouble("261.626");
-```
-
-
-
-```csharp
-// double number;
-string input;
-
-System.Console.Write("Enter a number: ");
-input = System.Console.ReadLine();
-if (double.TryParse(input, out double number))
-{
-    System.Console.WriteLine(
-        $"input was parsed successfully to {number}."); }
-else
-{
-
-    // Note: number scope is here too (although not assigned)
-    System.Console.WriteLine(
-        "The text entered was not a valid number.");
-}
-```
+## Value and Reference
 
 All types fall into: 
 
@@ -190,22 +63,7 @@ All types fall into:
 
 `?` modifier declares a variable as nullable, which represents values that are missing for a value type. It is useful for database programming.
 
-```csharp
-int? count = null;
-do
-{
-/...
-}
-while (count == null);
-```
-
-`var`: declaring an implicitly typed local variable. It was added mainly to permit use of anonymous types.
-
-```csharp
-      var patent1 =
-          new { Title = "Bifocals",
-          YearOfPublication = "1784" };
-```
+C# 8.0 introduced nullable reference types, which by default prevents a reference type from being nullable unless explicitly modified by `?`. This compiler feature is not enabled by default.
 
 ### (C# 7.0) Tuples
 
@@ -234,36 +92,18 @@ var info = ("Malawi", "Lilongwe", 226.50);
 var countryInfo = (country, capital, gdpPerCapita);
 ```
 
-`System.ValueType` is the underlying implementation for the tuple syntax. The custom names are known by the compiler through the scope where these names are declared. The compiler looks at the item names within the tuple declaration and leverages those to allow code that uses those names within the scope. For all types that are part of the API (such as the return type), the compiler adds item names to the metadata of the member in the form of attributes.
+`System.ValueTupe` is the underlying implementation for the tuple syntax. The custom names are known by the compiler through the scope where these names are declared. The compiler looks at the item names within the tuple declaration and leverages those to allow code that uses those names within the scope. For all types that are part of the API (such as the return type), the compiler adds item names to the metadata of the member in the form of attributes.
 
-Tuples have more than seven parameter takes a subtuple for the rest of the parameters. `System.valueTuple.Create()` was used before C# 7.0 tuple syntax.
+Tuples have more than seven parameter takes a subtuple for the rest of the parameters. The reference type `System.Tuple` was used before C# 7.0 tuple syntax.
 
 ### Arrays
 
 Most programs now use generic collection types rather than arrays when storing collections of data.
 
-```csharp
-int[,] cellsOne; // 2D
-cellsTwo = {
-    {1, 0, 2},
-    {1, 2, 0},
-    {1, 2, 1}
-};
-int[,] cellsTwo = int[3,3];
-
-```
-
-- `d
-efault`: explicit default of any data type
-
-```csharp
-int count = default(int)
-```
-
 `new` may specifies the size of an array within the square brackets
 
 ```csharp
-string[] languages = new string[9]{
+string[] languages = new string[9]{ // new string[] is optional since C# 3
     "C#", "COBOL", "Java",
     "C++", "Visual Basic", "Pascal",
     "Fortran", "Lisp", "J#"};
@@ -299,21 +139,25 @@ int[][] cells = {
 
 Note the difference between a multi-dimensional array and a jagged array. (this is different from in Java, where there is only arrays of arrays).
 
-Arrays include additional methods for manipulating the elements within the array—for example, `Sort()`, `BinarySearch()`, `Reverse()`, and `Clear()`, through `System.Array`
+## (C# 8.0) Index-from-End Operator `^`
 
-Variables of type `string` are accessible like an array of characters. 
+- `[^integer_expression]`: index from end operator
+  - Not limited to literal indices, `arr[^arr.Length]` is allowed
+  
+## (C# 8.0) Ranges and Slicing
 
-[Equality Operators](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/equality-operators)
+- `(start_index)..(end_index)` of `System.Range`: half close, used inside indexers `[]` to slice an array or a list
 
 # Operators
 
-Operands are always evaluated from left to right in C#. For `A() + B() * C()`,`A()` is first evaluated then `B()` and finally `C()`, in contrast to C/C++. `M(x++, x++)` with `x=1` is always `M(1,2)`.
+In C#, only assignment, call, increment, decrement, await and object creation expressions are allowed to be the entirety of a statement.
+
+Parentheses, associativity, precedence affect the order of execution of operators.
+Unlike C/C++, operands are always evaluated from left to right in C#. For `A() + B() * C()`,`A()` is first evaluated then `B()` and finally `C()`, in contrast to C/C++. `M(x++, x++)` with `x=1` is always `M(1,2)`.
 
 # Control Flow
 
-In C#, a local variable is in scope throughout the entire block in which it is declared, but it is illegal to refer to the local variable before its declaration (there might be another variable with the same ).
-
-The following is illegal in C# while totally fine with C++:
+In C#, a local variable is in scope throughout the entire block in which it is declared, but it is illegal to refer to the local variable before its declaration (there might be another variable with the same ). The following is illegal in C# while totally fine with C++:
 
 ```csharp
 int a = 5;
@@ -323,39 +167,38 @@ int a = 5;
 }
 ```
 
-- null-coalescing operator: `expr1 ?? exp
-r2`, if `expr1` is null, use `expr2`
+- null check
+  - `==` (if there's no overloading) or `ReferenceEquals(obj, null)`, (C# 7.0) `obj is object` (checking for not null), `obj is null` (checking for null), the reason why this null check is valid is that [`null` is a type](https://stackoverflow.com/questions/8204578/what-is-the-type-of-null-literal)
+  
+  > The type of a null-literal is the null type (§11.2.7).
 
-```csharp
-string fileName = GetFileName();
-string fullName = fileName ?? "default.txt";
-```
+- null-coalescing operator: `expr1 ?? expr2`, if `expr1` is null, use `expr2`
 
-(C# 6.0) - null-conditional operator `?.`: checks whether the operand is null prior to invoking the method or property.
+  ```csharp
+  string fileName = GetFileName();
+  string fullName = fileName ?? "default.txt";
+  ```
+
+- (C# 6.0) - null-conditional operator `?.`, `?[]`: checks whether the operand is null prior to invoking the method, property or element.
+  - useful for invoking an event in a thread-safe way without first assigning the delegate value to a local copy (reference assignment is atomic) and then checking for null.
 
 ```csharp
 args?.Length // this is equivalent to
 (args != null) ? (int?)args.Length : null
 ```
+  
+- (C# 8.0) null forgiving operator `!` asserts that the reference type is not null.
 
-Null-conditional operators can also be used in combination with an index operator
+- `foreach` loop
 
-```csharp
-// not of much use though
-      string directoryPath = args?[0];
-      string searchPattern = args?[1];
-```
+  ```csharp
+    foreach(type variable in collection) // `variable` is read-only
+    statement
+  ```
 
-- foreach loop
+- For a switch-clause, C# does not allow control to accidentally fall through from one switch section to the next. Each section has to end with a jump statement. To force a similar behavior, use `goto`. C# 7.0 introduced an improvement to the switch statement that enabled pattern matching.
 
-```csharp
-foreach(type variable in collection) // `variable` is read-only
-  statement
-```
-
-For a switch-clause, C# does not allow control to accidentally fall through from one switch section to the next. To force a similar behavior, use `goto`. C# 7.0 introduced an improvement to the switch statement that enabled pattern matching.
-
- C# supports `goto`, and it is the only method for supporting fall-through within a switch statement.
+- C# supports `goto`, and it is the only method for supporting fall-through within a switch statement.
 
 ```csharp
 switch (option)
@@ -373,7 +216,7 @@ switch (option)
       }
 ```
 
-To branch to a switch section label other than the default label, use the syntax `goto case constant`;, where `constant` is the constant associated with the case label you wish to branch to.
+To branch to a switch section label other than the default label, use the syntax `goto case constant`, where `constant` is the constant associated with the case label you wish to branch to.
 
 C# prevents using `goto` to branch into a code block; instead, `goto` may be used only to branch within a code block or to an enclosing code block. 
 
@@ -382,7 +225,7 @@ C# prevents using `goto` to branch into a code block; instead, `goto` may be use
 compile-time control
 
 ```csharp
-#line org-lien new-line
+#line org-line new-line
 
 #region pre-proc-message
     code
