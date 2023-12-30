@@ -1,0 +1,24 @@
+#+title: Obscure Features
+
+* (C# 7.2) =in= Read-Only Pass By Reference
+
+TODO
+
+* =ref= variable and =ref= return values
+
+TODO
+
+ `ref` locals are initialized to refer to a particular variable, and can’t be modified to refer to a different variable. When declaring a reference local variable, initialization is required. `ref` locals are typicall used to refer to values returned by `return ref`.
+
+ ```csharp
+ ref int rbyref(ref int c)
+    {
+        int a = 5;
+        ref int b = ref a;
+        return ref c;
+    }
+ ```
+
+A by-reference-returning method must return a reference, even if it does not need to. The only workaround is to throw an exception.
+
+Declaring a field of type ref isn’t allowed.
