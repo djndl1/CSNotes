@@ -22,3 +22,53 @@ TODO
 A by-reference-returning method must return a reference, even if it does not need to. The only workaround is to throw an exception.
 
 Declaring a field of type ref isn’t allowed.
+
+
+* (C# 8.0) Nullable/Non-Nullable Reference Types
+
+A few issues and caveats about non-nullable reference types:
+
+- Non-nullable reference fields/automatically-implemented properties may be
+  misdiagnized by the compiler to be uninitialized as they are not initialized
+  directly in the constructor.
+
+- Also, any non-nullable field/property needs validation logic to avoid =null=
+  (e.g. throwing =ArgumentNullException= if a =null= is assigned).
+
+- Automatically implemented properties need to be read-only (otherwise, a setter
+  could set it to =null=).
+
+** Guidelines
+
+- Implement Non-nullable R/W reference fully implemented properties with
+  a nullable backing field field, a null-forgiving operator in the getter and
+  non-null validation in the setter.
+
+- assign non-nullable reference-type properties before instantiation completes.
+
+- implement non-nullable reference-type automatically implemented properties as read-only.
+
+#+begin_src csharp
+public class Employee
+{
+    public Employee(string name, string id)
+    {
+        Name = name;
+        Id = id ?? throw new ArgumentNullException(nameof(id)); // null validation here
+    }
+
+    // the property ensures the field to be non-null
+    public string Name
+    {
+        get => _Name!;
+        set => _Name = value ?? throw new ArgumentNullException(nameof(value));
+    }
+
+    // nullable to avoid compiler warning
+    private string? _Name;
+    // ...
+
+    // read-only non-nullable auto-implemented property
+    public string Id { get; }
+}
+#+end_src
