@@ -57,9 +57,9 @@ Each numeric data type includes a `Parse()`/`TryParse()` function that enables c
 
 All types fall into: 
 
-- value types:
+- value types: assignment is copy by value; value types may not be stored on stack as they could be members of a class, captured variables of a lambda or in a iterator block.
 
-- reference types: in practice, a refrence is always the same size as the native size of the processor.
+- reference types: they are *references* to objects, opaque GC handles. Not necessarily addresses and in practice they are constrained C pointer types managed safely by the CLR but they may well be integer indices. Even C's pointers may be, by spec, opaque handles rather than virtual memory addresses. Objects may be moved around by the GC but their references are still valid.
 
 `?` modifier declares a variable as nullable, which represents values that are missing for a value type. It is useful for database programming.
 
