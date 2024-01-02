@@ -1,5 +1,16 @@
 #+title: Obscure Features
 
+* (C# 7.0) Deconstructors
+
+A method that provides tuple syntax for a class to assign each fields to
+individual variables.
+
+* (C# 3.0) Partial Methods
+
+Similar to C/C++ function declarations. If the developer does not supply an implementation, the
+compiler removes the signature at compile time. Mainly for class designers.
+
+
 * (C# 7.2) =in= Read-Only Pass By Reference
 
 TODO
@@ -72,3 +83,7 @@ public class Employee
     public string Id { get; }
 }
 #+end_src
+
+- Nullable attributes in =System.Diagnostics.CodeAnalysis= help the compiler
+  determine certain null-related pre/postconditions. It also helps generics to
+  apply to both nullable value types and reference types without adding constraints.
