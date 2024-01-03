@@ -57,7 +57,11 @@ Each numeric data type includes a `Parse()`/`TryParse()` function that enables c
 
 All types fall into: 
 
-- value types: assignment is copy by value; value types may not be stored on stack as they could be members of a class, captured variables of a lambda or in a iterator block.
+- value types: assignment is copy by value; value types may not be stored on stack as they could be members of a class, captured variables of a lambda or in a iterator block. Value types are not guaranteed immutable although immutability can be enforced by defining read-only properties.
+  - a struct has a default value that is different from its parameterless constructor's result.
+  - a struct's fields must be initialized directly, without accessing `this`.  If `this` is accessed before all fields are assigned, the struct is initialized to the default value before the constructor body executes.
+  - Failure to initialize all fields within the struct causes a compile-time errror before C# 11.0, where an uninitialized field is initialized to its default value.
+  - (C# 7.2) Immutability can be enforced at compile time on `struct` with the `readonly` modifier; (C# 8.0) individual struct members can be made `readonly`.
 
 - reference types: they are *references* to objects, opaque GC handles. Not necessarily addresses and in practice they are constrained C pointer types managed safely by the CLR but they may well be integer indices. Even C's pointers may be, by spec, opaque handles rather than virtual memory addresses. Objects may be moved around by the GC but their references are still valid.
 
