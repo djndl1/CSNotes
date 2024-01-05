@@ -1,0 +1,10 @@
+#+title: Common Intermediate Language
+
+* Introduction
+
+Global methods are allowed.
+
+Stacks are pushed and popped  with =ldloc= and =stloc=.
+Use =.locals= to declare local variables.
+Local variables can be named.
+A method call pop its arguments off the stack and push the return value onto the stack.
