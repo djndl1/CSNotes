@@ -57,13 +57,29 @@ Each numeric data type includes a `Parse()`/`TryParse()` function that enables c
 
 All types fall into: 
 
-- value types: assignment is copy by value; value types may not be stored on stack as they could be members of a class, captured variables of a lambda or in a iterator block. Value types are not guaranteed immutable although immutability can be enforced by defining read-only properties.
-  - a struct has a default value that is different from its parameterless constructor's result.
-  - a struct's fields must be initialized directly, without accessing `this`.  If `this` is accessed before all fields are assigned, the struct is initialized to the default value before the constructor body executes.
-  - Failure to initialize all fields within the struct causes a compile-time errror before C# 11.0, where an uninitialized field is initialized to its default value.
-  - (C# 7.2) Immutability can be enforced at compile time on `struct` with the `readonly` modifier; (C# 8.0) individual struct members can be made `readonly`.
+### Value types
 
-- reference types: they are *references* to objects, opaque GC handles. Not necessarily addresses and in practice they are constrained C pointer types managed safely by the CLR but they may well be integer indices. Even C's pointers may be, by spec, opaque handles rather than virtual memory addresses. Objects may be moved around by the GC but their references are still valid.
+Assignment is copy by value; value types may not be stored on stack as they could be members of a class, captured variables of a lambda or in a iterator block. Value types are not guaranteed immutable although immutability can be enforced by defining read-only properties.
+
+- a struct has a default value that is different from its parameterless constructor's result.
+
+- a struct's fields must be initialized directly, without accessing `this`.  If `this` is accessed before all fields are assigned, the struct is initialized to the default value before the constructor body executes.
+
+- Failure to initialize all fields within the struct causes a compile-time errror before C# 11.0, where an uninitialized field is initialized to its default value.
+
+- (C# 7.2) Immutability can be enforced at compile time on `struct` with the `readonly` modifier; (C# 8.0) individual struct members can be made `readonly`.
+
+#### Boxing/Unboxing
+
+- Boxing: if a value-type object is access through an interface or `object`, the value is copied to the heap and a reference is returned to access the heap-allocated value.
+
+A boxing involves an allocation and a copy; an unboxing involves a dereference, a type check and a copy. Both causes performance issues if there are too many.
+
+Also, casting a boxed value to another value type throws an `InvalidCastException`. The correct way is to cast the boxed value first to its original value type and then convert to another value type.
+
+### Reference Types
+
+They are *references* to objects, opaque GC handles. Not necessarily addresses and in practice they are constrained C pointer types managed safely by the CLR but they may well be integer indices. Even C's pointers may be, by spec, opaque handles rather than virtual memory addresses. Objects may be moved around by the GC but their references are still valid.
 
 `?` modifier declares a variable as nullable, which represents values that are missing for a value type. It is useful for database programming.
 
