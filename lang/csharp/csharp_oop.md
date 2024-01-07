@@ -177,9 +177,7 @@ In summary, partial methods allow generated code to call methods that have not n
 
 The C# compiler allows an explicit conversion at compile time between potentially compatible types, the CLR will still verify the explicit cast at execution time, throwing an exception if the object instance is not actually of the targeted type.
 
-- Defining Custom Conversions
-
-Similar to C++
+- Defining Custom Conversions is similar to C++
 
 ```csharp
 class GPSCoordiates
@@ -192,79 +190,17 @@ class GPSCoordiates
 }
 ```
 
+Every derived class may be used as an instance of any of its base classes, an extension method on one type also extends every derived type. For the rare cases that require a multiple-inheritance class structure, one solution is to use aggregation.
 
-every derived class may be used as an instance of any of its base classes, an extension method on one type also extends every derived type.
+- `sealed` (= Java `final`) class: a class that cannot be derived from; a method that cannot be overridden
 
-for the rare cases that require a multiple-inheritance class structure, one solution is to use aggregation
+- `virtual`: overridable, dynamic dispatch; the derived class overrides it with `override` (`override` is always used along with `virtual`). C# dispatches virtual calls to the most derived type even during instance construction (while C++ calls the base type's implementation). Java's methods are virtual/overridable by default while in C# virtual methods are explicitly declared.
 
-- `sealed` (= Java `final`) class: a class that cannot be derived from; a method that cannot be overriden
-
-- `virtual`: overridable, dynamic dispatch; the derived class overrides it with `override`
-
-- `new`: it hides a redeclared member of the derived class from the base class. Instead of calling the most derived member, a member of the base class calls the most derived member in the inheritance chain prior to the member with the new modifier. If neither override nor new is specified, new will be assumed. This ensures virtual dispatch for certain derived while it provides total independence for some derived class on this method.
-
-```csharp
-public class Program
-{
-  public class BaseClass
-  {
-      public void DisplayName()
-      {
-          Console.WriteLine("BaseClass");
-      }
-  }
-
-    public class DerivedClass : BaseClass
-    {
-        // Compiler WARNING: DisplayName() hides inherited
-        // member. Use the new keyword if hiding was intended.
-        public virtual void DisplayName()
-        {
-            Console.WriteLine("DerivedClass");
-        }
-    }
-
-  public class SubDerivedClass : DerivedClass
-  {
-      public override void DisplayName()
-      {
-          Console.WriteLine("SubDerivedClass");
-      }
-  }
-
-  public class SuperSubDerivedClass : SubDerivedClass
-  {
-      public new void DisplayName()
-      {
-          Console.WriteLine("SuperSubDerivedClass");
-      }
-  }
-
-  public static void Main()
-  {
-      SuperSubDerivedClass superSubDerivedClass
-          = new SuperSubDerivedClass();
-
-      SubDerivedClass subDerivedClass = superSubDerivedClass;
-      DerivedClass derivedClass = superSubDerivedClass;
-      BaseClass baseClass = superSubDerivedClass;
-
-      superSubDerivedClass.DisplayName();
-      subDerivedClass.DisplayName();
-      derivedClass.DisplayName();
-      baseClass.DisplayName();
-  }
-}
-```
-
-```bash
-SuperSubDerivedClass
-SubDerivedClass
-SubDerivedClass
-BaseClass
-```
+- `new`: it hides a redeclared member of the derived class and cuts off the virtual call chain from the base class. If neither override nor new is specified, new will be assumed. This ensures virtual dispatch for certain derived while it provides total independence for some derived class on this method.
 
 Programmers sometimes need to designate explicitly which base constructor to call inside the derived class constructor.
+
+## Pattern Matching
 
 - `is`: determines what the underlying type is. (C# 7.0) check and assign the result to a new variable
 
@@ -286,9 +222,6 @@ public static void Save(object data)
 
 - `as`: attempts a conversion to a particular data type and assigns `null` if the source type is not inherently of the target type. This strategy is significant because it avoids the exception that could result from casting.
 
-## Pattern Matching
-
-Some kind of RTTI?
 
 ```csharp
 static public void Eject(Storage storage)
