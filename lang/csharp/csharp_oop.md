@@ -200,71 +200,12 @@ Every derived class may be used as an instance of any of its base classes, an ex
 
 Programmers sometimes need to designate explicitly which base constructor to call inside the derived class constructor.
 
-## Pattern Matching
-
-- `is`: determines what the underlying type is. (C# 7.0) check and assign the result to a new variable
-
-```csharp
-public static void Save(object data)
-{
-  if (data is string text && text.Length > 0)
-  {
-      data = Encrypt(text);
-      // ...
-  }
-  else if (data is null)
-  {
-      throw new ArgumentNullException(nameof(data));
-  }
-  // ...
-}
-```
-
-- `as`: attempts a conversion to a particular data type and assigns `null` if the source type is not inherently of the target type. This strategy is significant because it avoids the exception that could result from casting.
-
-
-```csharp
-static public void Eject(Storage storage)
-{
-  switch (storage)
-  {
-      case null: // The location of case null doesn't matter
-          throw new ArgumentNullException(nameof(storage));
-      // ** Causes compile error because case statments below
-      // ** are unreachable.
-      // case Storage tempStorage:
-      //    throw new Exception();
-      //    break;
-      case UsbKey usbKey when usbKey.IsPluggedIn:
-          usbKey.Unload();
-          Console.WriteLine("USB Drive Unloaded!");
-          break;
-      case Dvd dvd when dvd.IsInserted:
-          dvd.Eject();
-          Console.WriteLine("DVD Ejected!");
-          break;
-      case Dvd dvd when !dvd.IsInserted:
-          throw new ArgumentException(
-              "There was no DVD present.", nameof(storage));
-      case HardDrive hardDrive:
-          throw new InvalidOperationException();
-      default:   // The location of case default doesn't matter
-          throw new ArgumentException(nameof(storage));
-  }
-}
-```
-
-Pattern matching should only be used when polymorphism is not an option.
-
-## Abstract Class
-
-An abstract member is a method or property that has no implementation. Its purpose is to force all derived classes to provide the implementation. Abstract members are intended to be a way to enable polymorphism.
 
 `System.Object.Equals`, `System.Object.GetHashCode`, `System.Object.ToString`, `System.Object.Finalize` etc. are intended to be polymorphic.
 
 # Interface
 
-The interface defines the contract between the types that implement the interface and the code that uses the interface. 
+The interface defines the contract between the types that implement the interface and the code that uses the interface.
 
 
 Interfaces may be named `IPascalCase`.
@@ -302,6 +243,5 @@ class SampleCollection<T>
    }
 }
 
-```
 
 C# doesn't limit the indexer parameter type to integer.

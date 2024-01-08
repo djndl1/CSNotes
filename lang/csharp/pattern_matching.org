@@ -1,0 +1,191 @@
+#+title: Pattern Matching
+
+=is= expression, =switch= expression and =switch= statement support pattern matching.
+
+Pattern matching should only be used when polymorphism is not an option.
+
+* Declaration and type Patterns
+
+check if the run-time type of an expression is compatible with a given type and
+if true, a new local variable is declared and is assigned a converted expression result.
+
+The expression may be =T=, a derived type of =T=, of interface =T=,
+convertible through implicit reference conversion into =T=, unboxing/boxing into
+=T=, a nullable value type with its underlying type =T=.
+
+#+begin_src csharp
+if (greeting is string message) {  }
+
+switch (vehicle)
+{
+    Car _ => 2.00m,
+    Truck _ => 7.50m,
+    null => throw new ArgumentNullException(nameof(vehicle)),
+    _ => throw new ArgumentException("Unknown type of a vehicle", nameof(vehicle)),
+}
+#+end_src
+
+The declaration part of a new variable may be dropped and results in a *type pattern*.
+
+* Constant Pattern
+
+Tests if an expression result equals a specified constant.
+
+#+begin_src csharp
+public static decimal GetGroupTicketPrice(int visitorCount) => visitorCount switch
+{
+    1 => 12.0m,
+    2 => 20.0m,
+    3 => 27.0m,
+    4 => 32.0m,
+    0 => 0.0m,
+    _ => throw new ArgumentException($"Not supported number of visitors: {visitorCount}", nameof(visitorCount)),
+};
+
+if (obj is null) {  } // special constant
+#+end_src
+
+* Relational Patterns
+
+Compares an expression result with a constant.
+
+#+begin_src csharp
+measurement switch
+{
+    < 0 => "negative",
+    > 0 => "positive",
+    double.NaN => "Unknown",
+    _ => "Strange",
+};
+#+end_src
+
+* Logical Pattern
+
+=not= negates a pattern; =and= and =or= connect patterns.
+
+#+begin_src csharp
+if (input is not null) {  }
+
+date.Month switch
+{
+    3 or 4 or 5 => "spring",
+    _ => throw new ArgumentOutOfRange(nameof(date)),
+}
+#+end_src
+
+* Property Pattern
+
+matches an expression's properties or fields against *nested patterns*.
+Any pattern may act as a nested pattern.
+
+#+begin_src csharp
+date is { Year: 2020, Month: 5, Day: 19 or 20 or 21 }
+
+static string TakeFive(object input) => input switch
+{
+    string { Length: >= 5 } s => s.Substring(0, 5),
+    string s => s,
+
+    ICollection<char> { Count: >= 5 } symbols => new string(symbols.Take(5).ToArray()),
+    ICollection<char> symbols => new string(symbols.ToArray()),
+
+    null => throw new ArgumentNullException(nameof(input)),
+    _ => throw new ArgumentException("Not supported input type."),
+};
+#+end_src
+
+* =var= Pattern
+
+Basically an assignment or deconstruct expression.
+
+#+begin_src csharp
+// a temporary variable within a Boolean expression to hold the result of intermediate calculations.
+static bool IsAcceptable(int id, int absLimit) =>
+    SimulateDataFetch(id) is var results
+    && results.Min() >= -absLimit
+    && results.Max() <= absLimit;
+
+// perform more checks in when case guards of a switch expression or statement
+static Point Transform(Point point) => point switch
+{
+    var (x, y) when x < y => new Point(-x, y),
+    var (x, y) when x > y => new Point(x, -y),
+    var (x, y) => new Point(x, y),
+};
+#+end_src
+
+* Position Pattern
+
+Deconstructs an expression result and match the resulting values against the corresponding nested patterns
+
+#+begin_src csharp
+public readonly struct Point
+{
+    public int X { get; }
+    public int Y { get; }
+
+    public Point(int x, int y) => (X, Y) = (x, y);
+
+    public void Deconstruct(out int x, out int y) => (x, y) = (X, Y);
+}
+
+static string Classify(Point point) => point switch
+{
+    (0, 0) => "Origin",
+    (1, 0) => "positive X basis end",
+    (0, 1) => "positive Y basis end",
+    _ => "Just a point",
+};
+
+static decimal GetGroupTicketPriceDiscount(int groupSize, DateTime visitDate)
+    => (groupSize, visitDate.DayOfWeek) switch
+    {
+        (<= 0, _) => throw new ArgumentException("Group size must be positive."),
+        (_, DayOfWeek.Saturday or DayOfWeek.Sunday) => 0.0m,
+        (>= 5 and < 10, DayOfWeek.Monday) => 20.0m,
+        (>= 10, DayOfWeek.Monday) => 30.0m,
+        (>= 5 and < 10, _) => 12.0m,
+        (>= 10, _) => 15.0m,
+        _ => 0.0m,
+    };
+
+if (SumAndCount(numbers) is (Sum: var sum, Count: > 0))
+{
+    Console.WriteLine($"Sum of [{string.Join(" ", numbers)}] is {sum}");  // output: Sum of [1 2 3] is 6
+}
+#+end_src
+
+Positional pattern may be combined with type patterns and property patterns.
+
+#+begin_src csharp
+if (input is WeightedPoint (> 0, > 0) { Weight: > 0.0 } p)
+{
+    // ..
+}
+#+end_src
+
+* Discard Pattern =_=
+
+Match any expression.
+
+* (C# 11) List Pattern
+
+Matches an array or a list against a sequence of patterns
+
+#+begin_src csharp
+Console.WriteLine(numbers is [0 or 1, <= 2, >= 3]);  // True
+
+if (numbers is [var first, _, _])
+{
+    Console.WriteLine($"The first element of a three-item list is {first}.");
+}
+
+void Validate(int[] numbers)
+{
+    var result = numbers is [< 0, .. { Length: 2 or 4 }, > 0] ? "valid" : "not valid";
+    Console.WriteLine(result);
+}
+
+Validate(new[] { -1, 0, 1 });  // output: not valid
+Validate(new[] { -1, 0, 0, 1 });  // output: valid
+#+end_src
