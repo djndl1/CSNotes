@@ -1,0 +1,76 @@
+#+title: Interface Trait
+
+* Traditional C# Interface
+
+The interface defines the contract between the types that implement the
+interface and the code that uses the interface.
+
+Interfaces may be named =IPascalCase=.
+
+- *explicit implementation*: To declare an explicit interface member
+  implementation, prefix the member name with the interface name. explicitly
+  implemented methods are available only by calling them through the interface
+  itself; this is typically achieved by casting an object to the interface.
+  + a peripheral method that is not core part of the functionality should be
+    implemented explicitly
+  + use explicit implementation to avoid method signature conflict.
+
+- *implicit implementation*: With implicit member implementation, it is
+  necessary only for the member to be public and for the member's signature to
+  match the interface member's signature.
+
+#+begin_quote
+Interfaces are often used to model "mechanism" relationships, instead of
+semantic relationships. Explicit interface implementation is a technique for
+enabling the separation of mechanism concerns from model concerns. Forcing the
+caller to convert the object to an interface such as =Comparable= before
+treating the object as "comparable" explicitly separates out in the code when
+you are talking to the model and when you are dealing with its implementation
+mechanisms. In general, it is preferable to limit the public surface area of a
+class to be "all model" with as little extraneous mechanism as possible. AVOID
+implementing interface members explicitly without a good reason. However, if not
+sure, favor explicit implementation.
+#+end_quote
+
+Interfaces can derive from each other, resulting in an interface that inherits all the members in its base interfaces.
+
+Extension methods work with interfaces in addition to classes.
+
+A second interface can be created to extend an old one to prevent code breakage.
+(C# 8.0) Default implementation is added so that existing client code needs not
+to implement new members.
+
+Interfaces with no members at all, inherited or otherwise, are sometimes used to
+represent information about a type. This is generally considered to be an abuse
+of the interface mechanism; interfaces should be used to represent which
+functions a type can perform, not to indicate facts about particular types.
+Instead of marker interfaces, use attributes for this purpose.
+
+* (C# 8.0) Virtual Extension Methods - Methods in Interfaces with Concrete Implementations
+
+Enable source/binary compatibility and the /trait/ language feature.
+
+- static members are allowed and have to have default implementations. Static members are not overridden by implementations.
+
+- property and method implementations (explicit cast needed to access default implementations with a class instance variable). Fields are not supported. Public `virtual` function members in an interface may only be implemented in a derived interface explicitly. Reabstraction with `abstract` of a method with a default implementation in a derived interface is allowed.
+
+- Every interface and class have a most specific implementation for every virtual member among the implementations appearing in the type or its direct and indirect interfaces. The most specific implementation rule ensures that a conflict (i.e. an ambiguity arising from diamond inheritance) is resolved explicitly by the programmer at the point where the conflict arises.
+
+- =public=: default for instance members. Only public members may be implicitly overridden, and the access must match.
+
+- =private=: restricts members to the interface and requires a default implementation. Default for static members, designed to support refactoring of default interface members.
+
+- =internal=
+
+- =private protected=, =protected= (may be overridden if done explicitly but not accessible from a derived class).
+
+- =virtual=: an interface member whose declaration includes a body is a virtual member unless the `sealed` or `private` modifier is used.
+   The modifier `virtual` may be used explicitly for clarity.
+
+- =sealed=: a default implementation is required otherwise this could not be sealed.
+
+- =partial= interfaces and `partial` methods
+
+If polymorphic behavior is desired, use default interface implementation instead of extension methods. Default interface members behave like explicitly implemented interface members unless the base class provides an implementation.
+
+C# 8.0 interfaces have all the capabilities of abstract classes except the ability to declare an instance field. It provides multiple inheritance and a more encapsulated version of protected access.

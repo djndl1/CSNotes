@@ -203,29 +203,7 @@ Programmers sometimes need to designate explicitly which base constructor to cal
 
 `System.Object.Equals`, `System.Object.GetHashCode`, `System.Object.ToString`, `System.Object.Finalize` etc. are intended to be polymorphic.
 
-# Interface
-
-The interface defines the contract between the types that implement the interface and the code that uses the interface.
-
-
-Interfaces may be named `IPascalCase`.
-
-- explicit implementation: explicitly implemented methods are available only by calling them through the interface itself; this is typically achieved by casting an object to the interface. To declare an explicit interface member implementation, prefix the member name with the interface name.
-
-- implicit implementation: With implicit member implementation, it is necessary only for the member to be public and for the member’s signature to match the interface member’s signature.
-
-Interfaces are often used to model “mechanism” relationships, instead of semantic relationships. Explicit interface implementation is a technique for enabling the separation of mechanism concerns from model concerns. Forcing the caller to convert the object to an interface such as `IComparable` before treating the object as “comparable” explicitly separates out in the code when you are talking to the model and when you are dealing with its implementation mechanisms. In general, it is preferable to limit the public surface area of a class to be “all model” with as little extraneous mechanism as possible. AVOID implementing interface members explicitly without a good reason. However, if you’re unsure, favor explicit implementation.
-
-Interfaces can derive from each other, resulting in an interface that inherits all the members in its base interfaces.
-
-Extension methods work with interfaces in addition to classes.
-
-A second interface can be created to extend an old one to prevent code breakage.
-
-Interfaces with no members at all, inherited or otherwise, are sometimes used to represent information about a type. This is generally considered to be an abuse of the interface mechanism; interfaces should be used to represent which functions a type can perform, not to indicate facts about particular types. Instead of marker interfaces, use attributes for this purpose.
-
-
-## Indexers
+# Indexers
 
 Indexers allow instances of a class or struct to be indexed just like arrays. The compiler will generate an `Item` property (not directly accessible), and the appropriate accessor methods. Indexers are most frequently implemented in types whose primary purpose is to encapsulate an internal collection or array.
 
