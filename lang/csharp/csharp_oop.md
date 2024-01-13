@@ -200,8 +200,54 @@ Every derived class may be used as an instance of any of its base classes, an ex
 
 Programmers sometimes need to designate explicitly which base constructor to call inside the derived class constructor.
 
+# `System.Object`
 
-`System.Object.Equals`, `System.Object.GetHashCode`, `System.Object.ToString`, `System.Object.Finalize` etc. are intended to be polymorphic.
+## Override `Equals(obj)`
+
+The default implementation uses `ReferenceEquals` for reference types. 
+For value types, two objects are equal if they are of the same type 
+and if the values of the public and private fields of the two objects are equal.
+Calling `ReferenceEquals()` on values type will always return `false` as they are in different boxes.
+
+Typical steps:
+
+- check for `null`
+
+- check for equivalent types
+
+- invoke a typed `Equal()`
+
+- possibly check for equivalent hash codes before checking fields
+
+- check `base.Equals()` if implemented
+
+- comparing identifying fields
+
+- override `GetHashCode()`
+
+- override the `==` and `!=` operators if needed
+
+- Never throw any exception
+
+## Overriding `GetHashCode()`
+
+Overriding `GetHashCode()` of a type is a good practice to be used as a key into a hash table collection.
+
+- (required) if `a.Equals(b)` then `a.GetHashCode() == b.GetHashCode()`, the converse is not true.
+
+- (required) For mutable reference types, override `GetHashCode()` only if the identifying fields are immutable, or the hash code does not change while the object is contained in a hash collection. Otherwise, be careful not to modify object values while the object is stored in a hash table.
+
+- (required) `GetHashCode()` should not throw any exception.
+
+- (for performance) unique whenever possible
+
+- (for performance) evenly distributed
+
+- (for performance) small difference between objects results in large difference between hash codes
+
+- (for security) hard to craft an object of a particular hash code
+
+For ease of implementation, use `System.HashCode` (.NET Standard 2.1 Only) to combine them.
 
 # Indexers
 
@@ -220,6 +266,7 @@ class SampleCollection<T>
       set { arr[i] = value; }
    }
 }
+```
 
 
 C# doesn't limit the indexer parameter type to integer.
