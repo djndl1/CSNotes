@@ -172,7 +172,6 @@ Partial methods are allowed only within partial classes, and like partial classe
 
 In summary, partial methods allow generated code to call methods that have not necessarily been implemented. Furthermore, if there is no implementation provided for a partial method, no trace of the partial method appears in the CIL. This helps keep code size small while keeping flexibility high.
 
-
 # Inheritance
 
 The C# compiler allows an explicit conversion at compile time between potentially compatible types, the CLR will still verify the explicit cast at execution time, throwing an exception if the object instance is not actually of the targeted type.
@@ -199,74 +198,3 @@ Every derived class may be used as an instance of any of its base classes, an ex
 - `new`: it hides a redeclared member of the derived class and cuts off the virtual call chain from the base class. If neither override nor new is specified, new will be assumed. This ensures virtual dispatch for certain derived while it provides total independence for some derived class on this method.
 
 Programmers sometimes need to designate explicitly which base constructor to call inside the derived class constructor.
-
-# `System.Object`
-
-## Override `Equals(obj)`
-
-The default implementation uses `ReferenceEquals` for reference types. 
-For value types, two objects are equal if they are of the same type 
-and if the values of the public and private fields of the two objects are equal.
-Calling `ReferenceEquals()` on values type will always return `false` as they are in different boxes.
-
-Typical steps:
-
-- check for `null`
-
-- check for equivalent types
-
-- invoke a typed `Equal()`
-
-- possibly check for equivalent hash codes before checking fields
-
-- check `base.Equals()` if implemented
-
-- comparing identifying fields
-
-- override `GetHashCode()`
-
-- override the `==` and `!=` operators if needed
-
-- Never throw any exception
-
-## Overriding `GetHashCode()`
-
-Overriding `GetHashCode()` of a type is a good practice to be used as a key into a hash table collection.
-
-- (required) if `a.Equals(b)` then `a.GetHashCode() == b.GetHashCode()`, the converse is not true.
-
-- (required) For mutable reference types, override `GetHashCode()` only if the identifying fields are immutable, or the hash code does not change while the object is contained in a hash collection. Otherwise, be careful not to modify object values while the object is stored in a hash table.
-
-- (required) `GetHashCode()` should not throw any exception.
-
-- (for performance) unique whenever possible
-
-- (for performance) evenly distributed
-
-- (for performance) small difference between objects results in large difference between hash codes
-
-- (for security) hard to craft an object of a particular hash code
-
-For ease of implementation, use `System.HashCode` (.NET Standard 2.1 Only) to combine them.
-
-# Indexers
-
-Indexers allow instances of a class or struct to be indexed just like arrays. The compiler will generate an `Item` property (not directly accessible), and the appropriate accessor methods. Indexers are most frequently implemented in types whose primary purpose is to encapsulate an internal collection or array.
-
-```csharp
-class SampleCollection<T>
-{
-   // Declare an array to store the data elements.
-   private T[] arr = new T[100];
-
-   // Define the indexer to allow client code to use [] notation.
-   public T this[int i]
-   {
-      get { return arr[i]; }
-      set { arr[i] = value; }
-   }
-}
-```
-
-
-C# doesn't limit the indexer parameter type to integer.

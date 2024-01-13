@@ -69,6 +69,8 @@ Assignment is copy by value; value types may not be stored on stack as they coul
 
 - (C# 7.2) Immutability can be enforced at compile time on `struct` with the `readonly` modifier; (C# 8.0) individual struct members can be made `readonly`.
 
+`struct` is meant for small aggregate data structures, typically smaller than 16 bytes.
+
 #### Boxing/Unboxing
 
 - Boxing: if a value-type object is access through an interface or `object`, the value is copied to the heap and a reference is returned to access the heap-allocated value.
