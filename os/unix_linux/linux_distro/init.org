@@ -14,12 +14,17 @@ Several topics are related to init.
 
 * SysV-Style
 
+Besides usual initialization of system (as the name suggests), init also handles rebooting, shutdown and booting into recovery mode (single-user mode). Upon execution, =inittab= is scanned and some corresponding action is taken.
+
 [[https://savannah.nongnu.org/projects/sysvinit][The one used by Debian]]
 
 ** Runlevel
 
+A mode of operation, which defines the state of the OS. The exact setup of these configurations varies between operating systems.
+
 A running system is in one of the predetermined number of states called /runlevels/,
 a software configuration of system which allows only a selected group of applications to exist.
+
 Switching from one runlevel to another causes a per-level set of scripts to be run.
 The exact setup of these runlevels varies between OSes.
    + 0, 1, 6 are standardized for halt, single user mode and reboot respectively.
@@ -27,6 +32,23 @@ The exact setup of these runlevels varies between OSes.
      full mode with GUI etc.
    + =init= reads =/etc/inittab= to determine the behavior for each runlevel.
 
+*** The LSB definition
+
+- 0: off
+
+- 1: single user mode: does not configure netif or start daemons; for administrative tasks
+
+- 2: multi-user mode: no netif
+
+- 3: multi-user mode with networking:
+
+- 4: user-defined:
+
+- 5: runlevel 3 + display manager
+
+- 6: reboot
+
+Most Linux distros default to runlevel 5.
 
 #+begin_src shell
 /sbin/runlevel
@@ -64,17 +86,18 @@ None, scripts are started in alphabetical order hence the priority number is use
 
 - Scripts are handled by =/sbin/rc=.
 
-- Runlevels are in a alphanumerical style with corresponding directories under =/etc/runlevels=.
+- Runlevels are in a alphanumerical style with corresponding directories under
+  =/etc/runlevels=. With symlink to enabled =init.d= files; It is possible to add a custom runlevel just by stacking on another
 
 ** Life Cycle Management
 
-PID files in =/vasr/run= and daemon files in =/var/lib/init.d=.
+PID files in =/var/run= and daemon files in =/var/lib/init.d=.
 
-Crashed services can be restarted automatically with =openrc -n= (manually-started services) or simpley =openrc= (for the default runlevel).
+Crashed services can be restarted automatically with =openrc -n= (manually-started services) or simply =openrc= (for the default runlevel).
 
 ** Dependency
 
-Depedencies are specified in the scripts by certain tags.
+Dependencies are specified in the scripts by certain tags.
 
 ** Service Management
 
