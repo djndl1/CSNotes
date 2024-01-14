@@ -69,7 +69,7 @@ Assignment is copy by value; value types may not be stored on stack as they coul
 
 - (C# 7.2) Immutability can be enforced at compile time on `struct` with the `readonly` modifier; (C# 8.0) individual struct members can be made `readonly`.
 
-`struct` is meant for small aggregate data structures, typically smaller than 16 bytes.
+`struct` is meant for small aggregate data structures, typically smaller than 16 bytes. Value semantics may not always require defining as `struct`: a class with proper value equality test and copy logic suffices.
 
 #### Boxing/Unboxing
 

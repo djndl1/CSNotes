@@ -3,19 +3,22 @@
 ## Override `Equals(obj)`
 
 The default implementation uses `ReferenceEquals` for reference types. 
+
 For value types, two objects are equal if they are of the same type 
-and if the values of the public and private fields of the two objects are equal.
+and if the values of the public and private fields of the two objects are equal (`Object.Equals()` is called on each field of the instance if any member is a reference). Always implement `.Equals()` for values types, otherwise the default reflection-based equality test offer poor performance.
 Calling `ReferenceEquals()` on values type will always return `false` as they are in different boxes.
+
+Note that equality test methods should not be confused with `IComparable.CompareTo()`, where equality only means the same position in the sort order.
 
 Typical steps:
 
 - check for `null`
 
-- check for equivalent types
+- check for equivalent types, be careful when using `is` as it identifies derived types as equivalent types.
 
-- invoke a typed `Equal()`
+- invoke a typed `Equals()`
 
-- possibly check for equivalent hash codes before checking fields
+- possibly check for equivalent hash codes to short-circuit fields checking.
 
 - check `base.Equals()` if implemented
 
@@ -26,6 +29,8 @@ Typical steps:
 - override the `==` and `!=` operators if needed
 
 - Never throw any exception
+
+Additionally, typed equality test `IEquatable<T>` may be implemented, especially for value types since they are sealed and this avoids boxing performance penalty.
 
 ## Overriding `GetHashCode()`
 
@@ -76,6 +81,7 @@ It is possible to overload equality/inequality operators, comparision operators,
 
 Although `&&` and `||` are not overridable, [User-Defined Conditional Logical operators](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#12143-user-defined-conditional-logical-operators) overriding `&`, `|`, `true`, `false` effectively provides overloading.
 
+If `==` is overridden, then `Equals()` should be overridden to provide the same behavior. The converse is not true unless the is type intended as value types.
 
 ## Garbage Collection
 
