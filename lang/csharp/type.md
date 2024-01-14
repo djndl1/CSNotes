@@ -48,7 +48,11 @@ Overriding `GetHashCode()` of a type is a good practice to be used as a key into
 
 - (for performance) small difference between objects results in large difference between hash codes
 
+- (for performance) inexpensive to compute
+
 - (for security) hard to craft an object of a particular hash code
+
+By default, a reference type's hash code is computed based on its reference. For value types, they are computed based on member field values (Do override it for better performance).
 
 For ease of implementation, use `System.HashCode` (.NET Standard 2.1 Only) to combine them.
 
