@@ -1,1 +1,228 @@
 #+title: GC
+
+The garbage collector is responsible only for restoring memory; it does not handle other resources such as database connections, handles (files, windows, etc.), network ports, and hardware devices such as serial ports.
+
+.NET GC uses a mark-and-compact algorithm. It identifies all *root references*
+to objects e.g. static variables, CPU registers, local variables, parameter
+instances and f-reachable objects (objects in the finalization queue) and searches recursively to determine all the
+objects to which the root references point and creates a graph of all reachable
+objects. The GC compacts all reachable objects next to each other and then
+overwrite any memory consumed by objects that are inaccessible (garbage).
+
+All managed threads are paused while the GC is running.
+
+Garbage is not collected in one go. .NET GC is generational: short-lived objects
+are more likely to need GC than long-standing objects. Objects are organized
+into three generations. Each time an object survives a GC cycle, it is moved to
+the next generation until it ends up in generation 2.
+
+* Weak Refernces
+
+=System.WeakReference=: does not prevent garbage collection. Designed for
+reference objects that are expensive to create (needs to be accessible from
+anywhere so as to be shareable after creation) yet too expensive
+to keep around (shouldn't be around after using).
+
+#+begin_src csharp
+// Here WeakReference serves as a cache handle.
+public static class ByteArrayDataSource
+{
+  static private byte[] LoadData()
+  {
+      // Imagine a much lager number
+      byte[] data = new byte[1000];
+      // Load data
+      // ...
+      return data;
+  }
+
+  static private WeakReference<byte[]>? Data { get; set; }
+
+  static public byte[] GetData()
+  {
+      byte[]? target;
+      if (Data is null) // first time
+      {
+          target = LoadData(); // a strong ref before assigninng a weak ref
+          Data = new WeakReference<byte[]>(target);
+          return target;
+      }
+      else if (Data.TryGetTarget(out target)) // try to retrieve the loaded data by checking the weak reference
+      {
+          return target;
+      }
+      else
+      {
+          // Reload the data and assign it (creating a strong
+          // reference) before setting WeakReference’s Target
+          // and returning it.
+          target = LoadData();
+          Data.SetTarget(target);
+          return target;
+      }
+  }
+}
+#+end_src
+
+* Resource Cleanup
+
+- *Managed resource*: a resource object that have a finalizer so that the
+  runtime may call it for cleanup.
+
+- *Unmanaged resource*: a resource that the runtime is not aware of.
+
+
+** Finalizer
+
+GC handles memory deallocation. Finalizers are not responsible for memory
+deallocation. Objects waiting for finalization are put in the finalization queue
+and their finalizers are executed in an unspecified thread other than the GC one.
+
+Limiting the need for a finalizer to only objects that need resource cleanup
+that the runtime isn't already aware of (resources that don't have finalizers)
+is an important guideline that significantly reduces the scenarios where it is
+necessary to implement a finalizer. The containing object needs not have a
+finalizer if its contained objects all have a finalizer so that the runtime may
+call their finalizers.
+
+Finalizers serve the role of a backup mechanism for cleaning up resources not
+explicitly cleaned up.
+
+Avoid exceptions within finalizers since it might cause the application to crash at an undiagnizable time. Caatch all exceptions in the finalizer and report them via an alternate means than an unhandled exception.
+
+If a constructor throws an exception, the instance is still created and eligible
+for finalization. Do implement a finalizer for such objects that also hold
+unmanaged resources.
+
+Finalizers should be simple enough so as not to reference another finalized
+object or let another object hold a reference to this object.
+
+** Dispose Pattern
+
+Unmanaged resources should always be cleaned up either explicitly or during
+finalization. Contained managed resources need not to be cleaned up in the finalizer
+since they are to be cleaned up by their own finalizers anyway.
+
+=IDisposable= interface defines the details of the deterministic pattern with a single method =Dispose()=.
+The =IDisposable= interface requires the implementation of a single parameterless method and a =virtual void Dispose(bool)= for any non-sealed class overload.
+
+The disposing parameter should be false when called from a finalizer to avoid
+clean up a managed resource that is already in the finalization queue, and true
+when called from the =IDisposable.Dispose= method. Note that an unmanaged
+resource need not to be a memory pointer or a system resource handle. It may be
+a valid .NET managed object but its holding resource can only be properly
+cleaned up manually based on its application and semantics.
+
+#+begin_src csharp
+  ~DisposableType()
+  {
+      Dispose(false);
+  }
+
+  public void Dispose()
+  {
+      Dispose(true);
+
+      // Unregister from the finalization queue since resources are
+      // already cleaned up by Dispose(true) and should be GC-ed ASAP
+      // instead of waiting in the finalization queue before being GC-ed
+      System.GC.SuppressFinalize(this);
+  }
+
+  public void Dispose(bool disposing)
+  {
+      // Do not dispose of an owned managed object (one with a
+      // finalizer) if called by the finalizer,
+      // as the owned managed object's finalize method
+      // will be (or has been) called by the finalization queue
+      // processing already
+      if (disposing)
+      {
+          Stream?.Close(); // managed. Finalization will deal with it if not called deterministically
+      }
+
+      // FileInfo may be a managed object but here it represents
+      // a temporary file that needs deleting explicitly
+      // otherwise FileInfo is totally managed
+      try
+      {
+        File?.Delete(); // unmanaged, should be dispose anyway
+      }
+      catch (IOException exception)
+      {
+        ...
+      }
+      Stream = null;
+      File = null;
+  }
+#+end_src
+
+
+Use caution when implementing both =Close()= and =Dispose()= as it confuses
+people on whether to call =Close()= or =Dispose()= or both.
+
+In case of an abnormal process termination, register important cleanup
+procedures at =AppDomain.CurrentDomain.ProcessExit=. The delegate may hold a reference to the object. Be careful not to let
+=.ProcessExit= hold a strong reference to the object to clean up; use a weak
+reference instead to avoid repeated cleanups. Unregister oneself from
+=AppDoamin.CurrentDomain.ProcessExit= in the
+=Dispose()= method so that no reference is contained in any delegate in the invocation list.
+
+#+begin_src csharp
+class SampleUnmanagedResource : IDisposable
+{
+    public SampleUnmanagedResource(string fileName)
+    {
+        WriteLine("Starting...", $"{nameof(SampleUnmanagedResource)}.ctor");
+        WriteLine("Creating managed stuff...", $"{nameof(SampleUnmanagedResource)}.ctor");
+        WriteLine("Creating unmanaged stuff...", $"{nameof(SampleUnmanagedResource)}.ctor");
+
+        var weakReferenceToSelf = new WeakReference<IDisposable>(this);
+        ProcessExitHandler = (_, __) =>
+        {
+             WriteLine("Starting...", "ProcessExitHandler");
+             if (weakReferenceToSelf.TryGetTarget(out IDisposable? self))
+             {
+                 self.Dispose();
+             }
+             WriteLine("Exiting...", "ProcessExitHandler");
+         };
+         AppDomain.CurrentDomain.ProcessExit += ProcessExitHandler;
+         WriteLine("Exiting...", $"{nameof(SampleUnmanagedResource)}.ctor");
+    }
+
+// Stores the process exit delegate so that we can remove
+// it if Dispose() or Finalize() is called already.
+private EventHandler ProcessExitHandler { get; }
+
+~SampleUnmanagedResource()
+{
+    WriteLine("Starting...");
+    Dispose(false);
+    WriteLine("Exiting...");
+}
+public void Dispose()
+{
+     Dispose(true);
+     System.GC.SuppressFinalize(this);
+}
+
+public void Dispose(bool disposing)
+{
+     WriteLine("Starting...");
+     // Do not dispose of an owned managed object
+     // (one with a finalizer) if called by member finalize,
+     // as the owned managed objects finalize method
+     // will be (or has been) called by finalization queue
+     // processing already.
+     if (disposing)
+     {
+          WriteLine("Disposing managed stuff...");
+     }
+
+    // Unregister from the finalization queue.
+    AppDomain.CurrentDomain.ProcessExit -= ProcessExitHandler;
+    WriteLine("Disposing unmanaged stuff...");
+    WriteLine("Exiting...");
+}
+#+end_src
