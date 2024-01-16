@@ -4,7 +4,7 @@ The garbage collector is responsible only for restoring memory; it does not hand
 
 .NET GC uses a mark-and-compact algorithm. It identifies all *root references*
 to objects e.g. static variables, CPU registers, local variables, parameter
-instances and f-reachable objects (objects in the finalization queue) and searches recursively to determine all the
+instances and f-reachable objects (objects to finalize) and searches recursively to determine all the
 objects to which the root references point and creates a graph of all reachable
 objects. The GC compacts all reachable objects next to each other and then
 overwrite any memory consumed by objects that are inaccessible (garbage).
@@ -15,6 +15,70 @@ Garbage is not collected in one go. .NET GC is generational: short-lived objects
 are more likely to need GC than long-standing objects. Objects are organized
 into three generations. Each time an object survives a GC cycle, it is moved to
 the next generation until it ends up in generation 2.
+
+* .NET 1.0 Era: an Example
+
+Refer to [[https://learn.microsoft.com/en-us/archive/msdn-magazine/2000/november/garbage-collection-automatic-memory-management-in-the-microsoft-net-framework][Garbage Collection Automatic Manage in the Microsoft .NET Framework]]
+
+On startup of a process, the runtime reserves a large contiguous region of
+address space (*managed heap*) that initially has no storage allocated for it. A
+pointer that points to the next address =NextObjPtr= available is maintained. The runtime
+allocates memory at the pointer's address and constructs a new object there if
+requested. This process may allocate memory even faster than C's heap allocation
+ as only a pointer modification and some infrequent allocations are made; there is
+no maintaining linked lists.
+
+If the =NextObjPtr= moves over the end of the managed heap's address space, the
+GC kicks in and starts collecting.
+
+Objects are seperated into generations. GC only starts when generation 0 is
+completely full.
+
+** Algorithm
+
+When a new object is requested to be constructed, the garbage collector tries to
+find some memory for it. If none available, it begins to walk from the root
+references recursively to find all references it may reach and mark them
+non-garbage. Any other objects are now garbage, pending for collection. The
+collector then compacts non-garbage objects, modifies root references' pointer
+values. After all this, =NextObjPtr= is placed at an unoccupied memory address
+and the collector tries to construct the new object again. If no memory
+is available, then =OutOfMemoryException= is thrown.
+
+** Finalization
+
+An additional feature that gracefully cleans up an object's resource right
+before it is collected.
+Garbage objects with a finalizer (=Object.Finalize=) will be put into the
+f-reachable queue (a reachable root, thus the garbage object is no longer
+considered a garbage) and get finalized before being GC-ed.
+A special runtime thread is responsible to call any finalizer of the objects in
+the f-reachable queue. If none, the thread sleeps. After finalization and
+being removed from the f-reachable queue, finalized objects are
+GC-ed the next time the collector runs.
+
+In C#, the syntax is similar to C++'s destructor and it automatically calls the
+base class's finalizer.
+
+*** Caveats
+
+- Objects containing a finalizer are promoted to older generations (including
+  its referenced objects) and live longer, causing memory pressure.
+
+- Finalizers are not called when an app terminates.
+
+- Executing finalizers in itself hurts performance.
+
+- Indeterministic execution
+
+- No guarantee of order of execution is made for finalizers. A containing
+  object's finalizer may clean up a contained finalizable object that is already
+  finalized. That's why the dispose pattern put =Dispose(false)= in finalizers.
+
+- When a finalizable object is constructed, its reference is put in the
+  finalization queue, causing some performance loss.
+
+- Collection of finalizable objects takes more than two cycles.
 
 * Weak Refernces
 
@@ -75,7 +139,7 @@ public static class ByteArrayDataSource
 ** Finalizer
 
 GC handles memory deallocation. Finalizers are not responsible for memory
-deallocation. Objects waiting for finalization are put in the finalization queue
+deallocation. Objects waiting for finalization are put in the f-reachable queue
 and their finalizers are executed in an unspecified thread other than the GC one.
 
 Limiting the need for a finalizer to only objects that need resource cleanup
@@ -107,7 +171,7 @@ since they are to be cleaned up by their own finalizers anyway.
 The =IDisposable= interface requires the implementation of a single parameterless method and a =virtual void Dispose(bool)= for any non-sealed class overload.
 
 The disposing parameter should be false when called from a finalizer to avoid
-clean up a managed resource that is already in the finalization queue, and true
+clean up a managed resource that is already in the f-reachable queue, and true
 when called from the =IDisposable.Dispose= method. Note that an unmanaged
 resource need not to be a memory pointer or a system resource handle. It may be
 a valid .NET managed object but its holding resource can only be properly
@@ -123,9 +187,9 @@ cleaned up manually based on its application and semantics.
   {
       Dispose(true);
 
-      // Unregister from the finalization queue since resources are
+      // Unregister from the queue since resources are
       // already cleaned up by Dispose(true) and should be GC-ed ASAP
-      // instead of waiting in the finalization queue before being GC-ed
+      // instead of waiting in the queue before being GC-ed
       System.GC.SuppressFinalize(this);
   }
 
@@ -134,7 +198,7 @@ cleaned up manually based on its application and semantics.
       // Do not dispose of an owned managed object (one with a
       // finalizer) if called by the finalizer,
       // as the owned managed object's finalize method
-      // will be (or has been) called by the finalization queue
+      // will be (or has been) called by the queue
       // processing already
       if (disposing)
       {
@@ -213,14 +277,14 @@ public void Dispose(bool disposing)
      // Do not dispose of an owned managed object
      // (one with a finalizer) if called by member finalize,
      // as the owned managed objects finalize method
-     // will be (or has been) called by finalization queue
+     // will be (or has been) called by finalization
      // processing already.
      if (disposing)
      {
           WriteLine("Disposing managed stuff...");
      }
 
-    // Unregister from the finalization queue.
+    // Unregister from finalization
     AppDomain.CurrentDomain.ProcessExit -= ProcessExitHandler;
     WriteLine("Disposing unmanaged stuff...");
     WriteLine("Exiting...");
