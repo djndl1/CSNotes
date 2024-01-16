@@ -1,0 +1,23 @@
+#+title: Comment Documentation
+
+#+begin_src xml
+
+<!-- specify a documentation xml output file -->
+<Documentation>
+  $(OutputPath)\$(TargetFramework)\$(AssemblyName).xml
+</Documentation>
+#+end_src
+
+* Tools
+
+** NDoc
+
+TODO
+
+** Docfx
+
+TODO
+
+** Doxygen
+
+TODO
