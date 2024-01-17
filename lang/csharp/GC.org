@@ -87,9 +87,8 @@ base class's finalizer.
 * Weak Refernces
 
 =System.WeakReference=: does not prevent garbage collection. Designed for
-reference objects that are expensive to create (needs to be accessible from
-anywhere so as to be shareable after creation) yet too expensive
-to keep around (shouldn't be around after using).
+reference objects that are expensive to create (good to have it alive to avoid re-creation) yet too expensive
+to keep around (not expected to be around for too long if it is not being used).
 
 #+begin_src csharp
 // Here WeakReference serves as a cache handle.
@@ -131,6 +130,24 @@ public static class ByteArrayDataSource
   }
 }
 #+end_src
+
+** Internal
+
+Short and long weak references are maintained by the runtime in their respective
+table. These two tables are not the roots.
+
+After the reachable object graph is created, the runtime first scans the weak
+reference table to
+determine if the references stored within are reachable. If a scanned weak reference
+is a short one and its related object is unreachable now, its =Target= is
+immediately set to =null= (even if the object is still put into the f-reachable
+queue and still alive and reachable again).
+
+After finalizable unreachable objects are put into
+the f-reachable queue, the runtime scans the long weak reference table to
+determine whether the referenced object is reachable and sets =Target= of weak
+references of unreachable object to =null=, that is, only after finalization and
+the memory is reclaimed.
 
 * Resource Cleanup
 
