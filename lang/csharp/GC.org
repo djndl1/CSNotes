@@ -133,7 +133,16 @@ public static class ByteArrayDataSource
 - *Managed resource*: a resource object that have a finalizer so that the
   runtime may call it for cleanup.
 
-- *Unmanaged resource*: a resource that the runtime is not aware of.
+- *Unmanaged resource*: a resource that the runtime is not aware of. This
+  resource may not be a native pointer or a handle (unmanaged ≠ native), but it does require explicit
+  code for cleanup. e.g. =System.IO.FileStream= implements a finalizer to flush
+  the buffer into the file and close the file handle. The runtime doesn't know
+  how to flush a buffer automatically. However, this is not
+  always the case: =System.IO.StreamWriter= holds a =FileStream= but also has its own
+  buffer to flush into the =FileStream=. However, it does not have a finalizer to flush
+  data because the order of finalization is indeterministic and the =FileStream=
+  may be finalized before the =StreamWriter= flushes, so
+  forgetting to close =SteamWriter= guarantees data loss.
 
 
 ** Finalizer
@@ -147,7 +156,9 @@ that the runtime isn't already aware of (resources that don't have finalizers)
 is an important guideline that significantly reduces the scenarios where it is
 necessary to implement a finalizer. The containing object needs not have a
 finalizer if its contained objects all have a finalizer so that the runtime may
-call their finalizers.
+call their finalizers. If the containing object's cleanup depends on its
+contained finalizable objects, do not implement a finalizer but explicit =Close=
+or =Dispose= methods to avoid incorrect finalization order.
 
 Finalizers serve the role of a backup mechanism for cleaning up resources not
 explicitly cleaned up.
