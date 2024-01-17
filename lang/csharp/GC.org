@@ -84,6 +84,36 @@ base class's finalizer.
   inside the finalizer, causing unpredictable results, unless
   =ReRegisterForFinalizer()= is called. Resurrection is hardly desirable.
 
+** Generations
+
+*** Assumptions
+
+#+begin_quote
+1. The newer an object is, the shorter its lifetime will be.
+2. The older an object is, the longer its lifetime will be.
+3. Newer objects tend to have strong relationships to each other and are frequently accessed around the same time.
+4. Compacting a portion of the heap is faster than compacting the whole heap.
+#+end_quote
+
+*** Process
+
+New objects are added to generation 0. If the generation 0 is full, the
+collector runs and the survivors are compacted and put to generatin 1. When the
+collector runs again, the survivors from generation 0 is moved to generation 1
+and the survivors from generation 1 to moved to generation 2. The highest
+generation is 2.
+
+The collector tends to collect generation 0 only unless the reclaimed memory is
+not enough. If an object is from the older generations, its contained references
+are not examined, either. (Assumption 1 2)
+
+Since newer objects are often related and constructed in memory next to each
+other, performance is improved from locality of reference.
+
+Generational GC may provide even better performance than unmanaged heap
+allocation algorithms.
+
+
 * Weak Refernces
 
 =System.WeakReference=: does not prevent garbage collection. Designed for
