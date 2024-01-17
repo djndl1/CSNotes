@@ -38,12 +38,12 @@ completely full.
 
 When a new object is requested to be constructed, the garbage collector tries to
 find some memory for it. If none available, it begins to walk from the root
-references recursively to find all references it may reach and mark them
+references recursively to find all references it is able to reach and mark them
 non-garbage. Any other objects are now garbage, pending for collection. The
 collector then compacts non-garbage objects, modifies root references' pointer
-values. After all this, =NextObjPtr= is placed at an unoccupied memory address
+values. After this, =NextObjPtr= is placed at an unoccupied memory address
 and the collector tries to construct the new object again. If no memory
-is available, then =OutOfMemoryException= is thrown.
+is available, then an =OutOfMemoryException= is thrown.
 
 ** Finalization
 
