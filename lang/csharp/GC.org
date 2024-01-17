@@ -80,6 +80,10 @@ base class's finalizer.
 
 - Collection of finalizable objects takes more than two cycles.
 
+- A finalizable object may be resurrected if it makes itself reachable again
+  inside the finalizer, causing unpredictable results, unless
+  =ReRegisterForFinalizer()= is called. Resurrection is hardly desirable.
+
 * Weak Refernces
 
 =System.WeakReference=: does not prevent garbage collection. Designed for
