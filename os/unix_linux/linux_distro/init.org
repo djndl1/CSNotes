@@ -16,14 +16,13 @@ Several topics are related to init.
 
 Besides usual initialization of system (as the name suggests), init also handles rebooting, shutdown and booting into recovery mode (single-user mode). Upon execution, =inittab= is scanned and some corresponding action is taken.
 
-[[https://savannah.nongnu.org/projects/sysvinit][The one used by Debian]]
+[[https://savannah.nongnu.org/projects/sysvinit][There is one used by Debian]]
 
 ** Runlevel
 
-A mode of operation, which defines the state of the OS. The exact setup of these configurations varies between operating systems.
-
 A running system is in one of the predetermined number of states called /runlevels/,
 a software configuration of system which allows only a selected group of applications to exist.
+A mode of operation, which defines the state of the OS. The exact setup of these configurations varies between operating systems.
 
 Switching from one runlevel to another causes a per-level set of scripts to be run.
 The exact setup of these runlevels varies between OSes.
@@ -84,7 +83,7 @@ None, scripts are started in alphabetical order hence the priority number is use
 
 * OpenRC
 
-- Scripts are handled by =/sbin/rc=.
+- Scripts are handled by =/sbin/openrc-run=.
 
 - Runlevels are in a alphanumerical style with corresponding directories under
   =/etc/runlevels=. With symlink to enabled =init.d= files; It is possible to add a custom runlevel just by stacking on another
@@ -101,15 +100,15 @@ Dependencies are specified in the scripts by certain tags.
 
 ** Service Management
 
-- rc scripts are modified SysVinit. Service settings, located in =/etc/conf.d/=, are separated from the wrapper scripts.
+- rc scripts are modified SysVinit.
 
 - =rc-status=: shows the running status for each service in a runlevel.
 
-- =rc-config=:
+- =rc-service=: locate and run a service
 
 - =rc-update=: create, delete and modify runlevels and manage services under a runlevel.
 
-- =rc=: switches runlevels.
+- =openrc=: switches runlevels.
 
 * [[http://smarden.org/runit/index.html][Runit]]
 
