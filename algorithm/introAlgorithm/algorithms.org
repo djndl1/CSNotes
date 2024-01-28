@@ -1,5 +1,12 @@
 * Introduction
 
+An algorithm is a sequence of computational steps that transform the input into
+the output to solve a well-specified computational problem. An algorithm is said
+to be correct if for each input instance, it halts with the correct output. Some
+problems (NP-complete) may not have best solutions but there are some efficient
+practical algorithms. Algorithms are like machine hardware: advanced algorithms
+make computating faster.
+
 ** Peak Finding (1D Version)
 
 - Formulation: Suppose there is an array of integers. The problem is to find a peak 
