@@ -81,8 +81,40 @@ slices are references to a contiguous sequence.
   + Borrows are weak references and should never outlive the value that they
     points to.
   + one may typedef a pair of =resource_reftype_owned= and =resource_reftype_borrowed= for a reference
-    type to explicit indicate such difference.
+    type to explicitly indicate such difference.
 
+- An owning variable may be const/immutable.
+
+* The Gnome Memory Model
+
+Owner: the piece of code (such as a function, struct or object) which is
+responsible for freeing a piece of allocated memory.
+
+Each allocation has exactly one owner. This owner may change by transferring
+ownership to another piece of code.
+
+Each variable is *owned* or *unowned*. Each function parameter and return type
+either transfers ownership or it doesn't.
+
+Variables must never change from owned to unowned or vice-versa at runtime.
+
+In addition to the =transfer= annotation (=transfer none/full=), there are some conventions:
+
+- =const= return value is not transferring ownership
+
+- if the doc says the returned value is to be freed, it's full transfer.
+
+- if the function is named =dup=, =take= or =steal=, then it's full transfer
+
+- if the function is named =peek= then there's no transfer
+
+- otherwise, take a look at the source code.
+
+** Floating References
+
+Floating references are a deprecated C convenience API (=GInitiallyUnowned=).
+They exist so that some refcounted object may not be owned by some temporary
+variables before settling in an owner.
 
 * [[https://resources.sei.cmu.edu/asset_files/WhitePaper/2013_019_001_55008.pdf][Pointer Ownership Model]]
 
