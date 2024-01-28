@@ -969,7 +969,7 @@ Three commonly used techniques to compute the probe sequences:
 
 ** Formulation
 
-Input: array =A[1...n]= of numbers
+Input: a sequence of =A[1...n]= of numbers
 
 Output: permutation =B[1...n]= of =A= such that 
 $B[1] \leq B[2] \leq \cdots \leq B[n]$.
@@ -1026,6 +1026,7 @@ Worst-case running time $\Theta(n^{2})$ for a reversed-ordered array.
 An improvement to the naive version of insertion sort is to use binary
  search on the already sorted part of the array, which yields 
 $\Theta(n\lg n)$ running time if the swap operation is cheap.
+
 **** Implementations
 
 #+INCLUDE: "python-implementation/insertion_sort.py" src python
@@ -1039,7 +1040,7 @@ static void insert_sort (Iter_t first, Iter_t last,
 {
     //--------------------------------------------------------------------
     //                   DEFINITIONS
-o    //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
     typedef value_iter< Iter_t > value_t;
 
     if ((last - first) < 2) return;
