@@ -69,9 +69,7 @@ minimize/maximize button, nor can it be resized, mainly used for tooltips and me
 
 /signal/: a notification (a chain of functions) to the application that the users has performed some action. The callback function will be called when the action has occurred and the signal is emitted or when the signal is explicitly emitted.
 
-=g_signal_connect()=
-
-The generic form of callback function is like
+=g_signal_connect()= connects a signal to a callback function. The generic form of callback function is like
 
 #+BEGIN_SRC c
 static void callback_function(GtkWidget *widget,
@@ -88,7 +86,8 @@ static void callback_function(GtkWidget *widget,
 static gboolean callback_function(GtkWidget *widget, GdkEvent *event, gpointer data);
 #+END_SRC
 
-the returned value indicates whether the event has been handled. There is no need to connect to it unless the default is overriden. =GdkEventType= enumeration provides a list of available event types that can be used to determine the type of event that has occurred. If more specific type info is known, the argument types can be declared otherwise:
+the return value indicates whether the event has been handled. There is no need
+to connect to it unless the default is to be overridden. =GdkEventType= enumeration provides a list of available event types that can be used to determine the type of event that has occurred. If more specific type info is known, the argument types can be declared otherwise:
 
 #+BEGIN_SRC c
 static key_press(GtkWidget *widget, GdkEventKey *event, gpointer data);
