@@ -93,7 +93,15 @@ to connect to it unless the default is to be overridden. =GdkEventType= enumerat
 static key_press(GtkWidget *widget, GdkEventKey *event, gpointer data);
 #+END_SRC
 
+** =gtk_widget_destroy=
+
+Its parent will remove it from its container and its children are destroyed as
+well. Generally only called on top-level widgets, usually used to destroy dialog
+windows and to implement menu items that quit the application.
+
 ** Processing Pending Events
+
+In case the UI needs updating while doing some other computation
 
 #+BEGIN_SRC c
 // update the UI while doing some time intensive computation
@@ -103,13 +111,18 @@ while (gtk_events_pending())
 
 ** =GtkButton=
 
-/accelerator key/: a key or set of keys that can be used to activate a predefined action.
+A special type of container that turns its child (no limited to text labels)
+into a clickable entity,
+only capable of holding one child.
+Almost always used with =clicked= signal.
+Generally used with a label =gtk_button_new_with_label()=; =gtk_button_new_with_mnemonic=
 
-A special type of container that turns its child (no limited to text labels) into a clickable entity, only capable of holding one child. Almost always used with =clicked= signal. Generally used with a label =gtk_button_new_with_label()=; =gtk_button_new_with_mnemonic=
+/accelerator key/: a key or set of keys that can be used to activate a predefined action.
 
 ** Widget Properties
 
-GObject provides a [[https://discourse.gnome.org/t/property-set-property-and-get-property/2558][property system]]. Every class derived from the =GObject= class
+GObject provides a [[https://discourse.gnome.org/t/property-set-property-and-get-property/2558][property system]].
+Every class derived from the =GObject= class
 can install any number of properties. Use =g_object_get()= to retrieve the
 current value of a property. There is a dispatch function in each class's
 implementation that calls its setters/getters to actually sets/gets properties.
@@ -127,7 +140,8 @@ static void property_changed(GObject *button,
                              gpointer data)
 #+END_SRC
 
-Every =GObject= has a table that associates a list of strings to a list of points, which allows data to be added to an object so that they can be easily accessed.
+Every =GObject= has a table that associates a list of strings to a list of
+pointers, which allows additional data to be added to an object so that they can be easily accessed.
 
 #+BEGIN_SRC c
 void g_object_set_data(GOject *object,
