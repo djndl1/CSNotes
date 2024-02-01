@@ -93,3 +93,27 @@ in the PLT first to finally determine the address of the target function the fir
 - `LD_BIND_NOW`: force the resolution of the address.
 
 - ` LD_PRELOAD`: preload symbols with a shared object before any other shared objects.
+
+# Symbol Visibility
+
+symbol is the corresponding entity of most user-defined variables, function names, 
+mangled with namespace, class/struct/name, and so on.
+
+> Symbol visibility comes to be an attribute for all global symbols for dynamic linking.
+
+For library security, dynamic linking performance and avoiding symbol collision, 
+one may limit visible exported symbols.
+
+`static` and `extern` keywords are provided at language level to control visibility of variables and functions at *translation-unit level*. They are not suited for low-level symbol control.
+
+ELF defines several symbol visibility levels:
+
+- *STV_DEFAULT* `__attribute__((visibility ("default")))`: visible and overridable
+
+- *STV_PROTECTED* `__attribute__((visibility ("protected")))`: visible outside the current executable or sharedd object, but not overridable
+
+- *STV_HIDDEN* `__attribute__((visibility ("hidden")))`: Not visible to other components, shareable among translation units. Two declarations of an object with hidden linkage refer to the same object if they are in the same shared object.
+Still accessible if its address is passed outside.
+
+- *STV_INTERNAL* `__attribute__((visibility ("protected")))`: not accessible outside the current executable or shared library, never called from another module.
+
