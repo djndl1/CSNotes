@@ -17,3 +17,29 @@ With two paths, the compiler cannot distinguish the two paths denotes the same f
 Some headers are meant only for internal consumption. Such headers may be
 protected by a custom macro. If this macro is not defined (external), a =#error=
 should stop the compilation. Any internal usage of the header defines this macro.
+
+* Macro Definition Order
+
+The definition order does not matter as long as the dependent macros are defined
+before the depending macro is used.
+
+#+begin_src c
+#include <stdio.h>
+
+#define TEST_PRE TEST_POST
+
+int main()
+{
+#define TEST_POST 1
+    printf("TEST_PRE %d\n", TEST_PRE);
+#undef TEST_POST
+#define TEST_POST 2
+    printf("TEST_PRE %d\n", TEST_PRE);
+    return 0;
+}
+#+end_src
+
+#+begin_src shell
+TEST_PRE 1
+TEST_PRE 2
+#+end_src
