@@ -43,3 +43,11 @@ int main()
 TEST_PRE 1
 TEST_PRE 2
 #+end_src
+
+* Headers May Be Platform-Dependent
+
+Headers may be generated/configured based on target platforms and are part of
+the software distribution.
+
+e.g. Glib has some byte order swap macro that are defined during configuration,
+depending on the compilation target.
