@@ -10,3 +10,10 @@ neither the Unix nor the Windows filesystem API offer any mechanism that guarant
 The compiler includes a header file once as long as the two paths to the file has the same guard.
 With two paths, the compiler cannot distinguish the two paths denotes the same file and thus
 =pragma once= might fail.
+
+
+* How to Add Internal Headers
+
+Some headers are meant only for internal consumption. Such headers may be
+protected by a custom macro. If this macro is not defined (external), a =#error=
+should stop the compilation. Any internal usage of the header defines this macro.
