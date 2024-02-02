@@ -67,3 +67,11 @@ the software distribution.
 
 e.g. Glib has some byte order swap macro that are defined during configuration,
 depending on the compilation target.
+
+* Function Names
+
+=__FUNCTION__= (GCC and MSVC, inside a function), =__func__= (C99),
+=__PRETTY_FUNCTION__= (GCC, also at top level. In C++, the function name is
+fully qualified and contains the signature)
+
+These three are variables, not
