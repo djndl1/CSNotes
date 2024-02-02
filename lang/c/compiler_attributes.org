@@ -1,0 +1,63 @@
+#+title: Compiler Attributes
+
+* Const and Pure
+
+A pure function does not change the program's observable state other than
+returns a value (it returns only).
+It may read a non-volatile object's value of the program but it does not modify
+it (can take a pointer as an argument).
+
+A const function goes further by being not affected by changes to the observable
+state of the program. It always acts on its own.
+Thus it prohibits a function from reading objects that
+affect its return value between successive invocations. It may read some
+non-volatile constants. It may not take a pointer argument if the pointed data
+may change (as the compile has no way to determine if the data has changed and
+thus cannot safely optimize).
+
+Both kinds of functions cannot be =void= and must return a value.
+
+#+begin_src c
+
+// GCC
+__attribute__((const))
+__attribute__((pure))
+#+end_src
+
+* Unused
+
+Possibly unused and no warning is produced.
+
+#+begin_src c
+
+__attribute__((unused)) // GCC
+[[maybe_unused]] // C23
+#+end_src
+
+
+* Noreturn
+
+Certain functions like =exit()= or =abort()= do not return.
+
+
+#+begin_src c
+__declspec(noreturn) // MSVC prefixed
+__attribute__((noreturn)) // GCC
+=[[noreturn]]= // C23
+#+end_src
+
+* Fallthrough
+
+For certain switch cases to fall through
+
+#+begin_src c
+__attribute__((fallthrough)); // GCC
+[[fallthrough]]; // C23
+#+end_src
+
+* Warn Unused Result
+
+#+begin_src c
+__attribute__ ((warn_unused_result))
+[[nodiscard]] // C23
+#+end_src
