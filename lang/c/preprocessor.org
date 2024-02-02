@@ -1,5 +1,21 @@
 #+title: Preprocessor
 
+* Stringify/Stringizing
+
+the preprocessor =#symbol= turns the symbol name into a string constant. The
+symbol argument is not macro-expanded first.
+
+#+begin_src c
+#define xstr(s) str(s)
+#define str(s) #s
+#define foo 4
+str (foo)
+     → "foo"
+xstr (foo)
+     → xstr (4)
+     → str (4)
+     → "4"
+#+end_src
 
 * Include Guards and Pragma Once
 
