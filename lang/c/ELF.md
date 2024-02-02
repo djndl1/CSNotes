@@ -115,5 +115,5 @@ ELF defines several symbol visibility levels:
 - *STV_HIDDEN* `__attribute__((visibility ("hidden")))`: Not visible to other components, shareable among translation units. Two declarations of an object with hidden linkage refer to the same object if they are in the same shared object.
 Still accessible if its address is passed outside.
 
-- *STV_INTERNAL* `__attribute__((visibility ("protected")))`: not accessible outside the current executable or shared library, never called from another module.
+- *STV_INTERNAL* `__attribute__((visibility ("internal")))`: not accessible outside the current executable or shared library, never called from another module.
 
