@@ -61,3 +61,17 @@ __attribute__((fallthrough)); // GCC
 __attribute__ ((warn_unused_result))
 [[nodiscard]] // C23
 #+end_src
+
+* Always inline
+
+#+begin_src c
+__forceinline // MSVC
+__attribute__ ((__always_inline__)) // GCC
+#+end_src
+
+* No inline
+
+#+begin_src c
+__declspec (noinline) // MSVC
+__attribute__ ((__noinline__)) // GCC
+#+end_src
