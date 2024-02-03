@@ -75,3 +75,32 @@ depending on the compilation target.
 fully qualified and contains the signature)
 
 These three are variables, not
+
+* MSVC Symbol Visibility Macro
+
+MSVC by default hides all symbols unless marked as =__declspec(dllexport)=.
+The header files may be used for both internal compilation and external
+consumption. Thus, a macro may be defined for conditional export/import.
+=__declspec(dllimport)= is optional for functions but [[https://devblogs.microsoft.com/oldnewthing/20060724-00/?p=30403][it's better to have]].
+
+#+begin_src c
+#ifndef GLIB_VAR
+#  ifdef G_PLATFORM_WIN32
+#    ifdef GLIB_STATIC_COMPILATION
+#      define GLIB_VAR extern
+#    else /* !GLIB_STATIC_COMPILATION */
+#      ifdef GLIB_COMPILATION
+#        ifdef DLL_EXPORT
+#          define GLIB_VAR extern __declspec(dllexport)
+#        else /* !DLL_EXPORT */
+#          define GLIB_VAR extern
+#        endif /* !DLL_EXPORT */
+#      else /* !GLIB_COMPILATION */
+#        define GLIB_VAR extern __declspec(dllimport)
+#      endif /* !GLIB_COMPILATION */
+#    endif /* !GLIB_STATIC_COMPILATION */
+#  else /* !G_PLATFORM_WIN32 */
+#    define GLIB_VAR _GLIB_EXTERN
+#  endif /* !G_PLATFORM_WIN32 */
+#endif /* GLIB_VAR */
+#+end_src
