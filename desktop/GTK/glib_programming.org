@@ -85,12 +85,32 @@ Any type of textual message can be conveyed using =g_log()=.
 
 - =g_messsage()=, =g_warning()=, =g_critical()=, =g_error()= and =g_debug()= for the sake of convenience, emitted under the =G_LOG_DOMAIN=. Some types of messages can be set fatal using =g_log_set_always_fatal=. By default, only =G_LOG_LEVEL_ERROR= messages are fatal.
 
-* Memory Management
+* Resource Management
+
+** Resource Types
+
+There are several resource types:
+
+1. *Raw handle*: the variable value itself is the raw resource handle (e.g. memory heap pointer, Win32
+  handle).
+  The cleanup functions accept the raw handle value and free related resources.
+
+2. *Nested resource*: the variable is a pointer to a structure on the heap that contains the actual
+  handle values (e.g. =GString*=). The cleanup functions take this pointer value
+   and free underlying resources. This may be seen as a special case of case 1
+   where a memory resource contains another resource. The cleanup function takes
+   the memory pointer and frees nested resources and then the memory resource.
+
+3. *Wrapped handle*: the variable value may or may not be the handle itself, but
+   it somehow contains the handle value (e.g.
+  C++ =std::vector=-like structures). The cleanup functions may or may not take the
+  structure pointer as either case they are able to access the handle value.
+  However, normally the cleanup functions take the address of the variable.
 
 ** GCC-style Autocleanup
 
 =__attribute__((cleanup))= functions take the address of the variable to free:
-if the variable is a heap pointer, the cleanup function takes a pointer to pointer.
+if the variable pointer, the cleanup function takes a pointer to pointer.
 Hence =g_autofree= frees the memory with
 =g_autoptr_cleanup_generic_gfree=, defined as
 
@@ -108,19 +128,25 @@ pointer.
 The pointer variable's value has to be taken to pass to =g_free=.
 
 
-=G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(TypeName, func)= takes a pointer to =TypeName=
-and frees the pointer with =func=. The pointer is the resource handle or points
-the actual resource handle depending on the free function.
+=G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(TypeName, func)= takes the pointer of the variable.
+and frees the pointer with =func=. This is a generalized case 3 where the
+variable contains the handle value somehow and its pointer is taken into the cleanup function.
 
 =G_DEFINE_AUTO_CLEANUP_FREE_FUNC(TypeName, func, none)= takes a pointer to
-=TypeName= and compares the dereferenced value with =none= before passing the dereferenced value to
-=func=. The pointer parameter is not the resource handle itself but the address
-of the handle variable.
+the =TypeName= variable and compares the dereferenced value with =none= before
+passing the dereferenced value to =func=.
+The pointer parameter is not the resource handle itself but the address
+of the handle variable. The cleanup function takes the variable value (case 1
+and case 3).
 
 #+begin_src c
 G_DEFINE_AUTO_CLEANUP_FREE_FUNC(int, close, -1); // autoclose a file descriptor
 // if (*pfd != -1) { close(*pfd); }
 #+end_src
+
+However, in case of glib, case 3 is handled with =g_autoptr=. A wrapper cleanup
+function takes the pointer to pointer variable, dereferences it and call the actual
+cleanup with the original pointer.
 
 ** The =g_malloc()= Family
 
