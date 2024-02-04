@@ -87,6 +87,41 @@ Any type of textual message can be conveyed using =g_log()=.
 
 * Memory Management
 
+** GCC-style Autocleanup
+
+=__attribute__((cleanup))= functions take the address of the variable to free:
+if the variable is a heap pointer, the cleanup function takes a pointer to pointer.
+Hence =g_autofree= frees the memory with
+=g_autoptr_cleanup_generic_gfree=, defined as
+
+#+begin_src c
+static inline void
+g_autoptr_cleanup_generic_gfree (void *p)
+{
+  void **pp = (void**)p;
+  g_free (*pp);
+}
+#+end_src
+
+The passed value =p= is the address of the pointer variable, a pointer to
+pointer.
+The pointer variable's value has to be taken to pass to =g_free=.
+
+
+=G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(TypeName, func)= takes a pointer to =TypeName=
+and frees the pointer with =func=. The pointer is the resource handle or points
+the actual resource handle depending on the free function.
+
+=G_DEFINE_AUTO_CLEANUP_FREE_FUNC(TypeName, func, none)= takes a pointer to
+=TypeName= and compares the dereferenced value with =none= before passing the dereferenced value to
+=func=. The pointer parameter is not the resource handle itself but the address
+of the handle variable.
+
+#+begin_src c
+G_DEFINE_AUTO_CLEANUP_FREE_FUNC(int, close, -1); // autoclose a file descriptor
+// if (*pfd != -1) { close(*pfd); }
+#+end_src
+
 ** The =g_malloc()= Family
 
 Various typed and untyped wrappers around =malloc= and =realloc=. Must be used
