@@ -1,0 +1,9 @@
+#+title: Compiler Builtin Intrinsics
+
+* Memory Allocation
+
+** =alloca=
+
+Compiler-dependent and platform-dependent, required in essence to be a builtin function.
+Discouraged due to its unsafe nature. The size requested must be entirely under
+control of the program to avoid malicious attack.
