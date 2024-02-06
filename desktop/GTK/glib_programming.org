@@ -152,16 +152,27 @@ However, in case of glib, case 3 is handled with =g_autoptr=. A wrapper cleanup
 function takes the pointer to pointer variable, dereferences it and call the actual
 cleanup with the original pointer.
 
-** The =g_malloc()= Family
+** Memory Allocation
 
-Various typed and untyped wrappers around =malloc= and =realloc=. Must be used
-with =g_free()=.
+Various typed and untyped wrappers around =malloc=, =calloc= and =realloc=. Must be used
+with =g_free()=. These allocation functions terminate the app upon failure
+unless with a =try= infix,
+making glib unsuitable for server apps. The =new=-postfixed macros allocate
+memory in terms of types rather than bytes, adding more type safety.
+Portability is improved over libc malloc by making them always return =NULL= in case
+of zero bytes requested.
+
+A set of aligned allocation functions are introduced to make =aligned_alloc=
+more portable as the standard C11 does not have an =aligned_free= but =free=,
+difficult for Windows to implement. Also, the alignment and size requirement
+is well defined, which aligns with that of =posix_memalign=.
 
 - =g_clear_pointer()=: a useful helper to clean up a generic resource.
 
 - =g_steal_pointer()=: not very useful for common C scenarios (useful only to
   save some typing), but typically
-  with =g_autoptr=.
+  with =g_autoptr= to steal an auto pointer's value to prevent it from being cleaned
+  up automatically.
 
 ** Memory Slices
 
