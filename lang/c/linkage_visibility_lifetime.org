@@ -5,7 +5,7 @@ This note is not about ELF symbol visibility and linkage.
 Microsoft has some nice [[https://learn.microsoft.com/en-us/cpp/c-language/lifetime-scope-visibility-and-linkage?view=msvc-170][articles]] about lifetime, visibility and linkage.
 A [[https://learn.microsoft.com/en-us/cpp/c-language/summary-of-lifetime-and-visibility?view=msvc-170][summary table]] is available.
 
-- *Lifetime* of a variable or an object determined by storage classes can be
+- *Lifetime* of a variable or a function determined by storage classes can be
   *static* (for the duration of the execution of a program) or *automatic* (valid
   only within the block where the identifier is defined or declared).
 
