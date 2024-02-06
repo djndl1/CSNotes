@@ -1,0 +1,10 @@
+#+title: Optimization
+
+* Constant Folding and Propagation
+
+Recognizing and evaluating expressions at compile time rather than computing
+them at runtime.
+
+#+begin_src c
+__builtin_constant_p() // tests if the expression is constant at compile time and subject to constant folding.
+#+end_src
