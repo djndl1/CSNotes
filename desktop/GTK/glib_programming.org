@@ -125,19 +125,23 @@ g_autoptr_cleanup_generic_gfree (void *p)
 
 The passed value =p= is the address of the pointer variable, a pointer to
 pointer.
-The pointer variable's value has to be taken to pass to =g_free=.
-
+The pointer variable's value has to be taken to pass to =g_free=. This is a
+special case of case 1 where the handle is a raw memory heap pointer.
 
 =G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(TypeName, func)= takes the pointer of the variable.
 and frees the pointer with =func=. This is a generalized case 3 where the
-variable contains the handle value somehow and its pointer is taken into the cleanup function.
+variable contains the handle value somehow and its pointer is taken into the
+cleanup function.
+The reason why it is called =CLEAR= is that it clears contents of the structure
+(e.g. containers) represents
+but does not free the structure's memory as the structure is allocated on the stack.
 
 =G_DEFINE_AUTO_CLEANUP_FREE_FUNC(TypeName, func, none)= takes a pointer to
 the =TypeName= variable and compares the dereferenced value with =none= before
 passing the dereferenced value to =func=.
 The pointer parameter is not the resource handle itself but the address
 of the handle variable. The cleanup function takes the variable value (case 1
-and case 3).
+and case 2).
 
 #+begin_src c
 G_DEFINE_AUTO_CLEANUP_FREE_FUNC(int, close, -1); // autoclose a file descriptor
