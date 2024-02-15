@@ -35,6 +35,27 @@ The thread function must be called with =WINAPI= (=__stdcall=).
 =pthread_join()= and =pthread_detach()= are the destroy function of pthreads.
 Joining oneself returns with an error of detected deadlock.
 
+** Thread Communication
+
+Threads may communicate through shared memory or dedicated communication
+channels,
+on the same machine or across the network.
+
+*** Nondeterminism
+
+Nondeterministic execution behavior is caused by the unpredictable rate of
+progress of threads executing on a single or multiple threads and the use of
+nondeterministic programming constructs.
+
+Nondeterministic results do not necessarily indicate the presence of an error.
+The real world is nondeterministic in nature. Concurrency (out-or-order execution or
+in partial order without affecting the outcome) in itself implies
+nondeterminism. Nondeterminism causes
+nondeterministic bugs during testing and debugging.
+It is the programmer's duty to deal with such inherent
+nondeterminisms
+to ensure proper execution and correct outcome.
+
 * The Critical Section Problem
 
 #+begin_quote
