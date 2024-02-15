@@ -8,30 +8,32 @@ is also called /resolving/, /fulfilling/ or /binding/ it.
 
 https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
 
-* Introduction
+* Basic Concepts
+
+Multithreading allows a process to overlap I/O and computation, makes a GUI more
+responsive, speeds up performance through parallelism. Multithreading require
+less overhead to manage than processes and less expensive in  terms of
+mutual communication.
 
 ** Threads in Java
 
-Several system threads are started automatically whenever a Java program is executed.
-
-There are two ways to create a new thread of execution
-
-1. Derive a class from =java.lang.Thread=
-
-2. Implement a =Runnable= and let a =Thread= (which itself is a =Runnable=) run it.
+Any Java program is concurrent.
+Several system threads are started automatically whenever a Java program is
+executed.
 
 ** Threads in Win32
 
-#+begin_src c
-uintptr_t _beginthreadex( // NATIVE CODE
-   void *security,
-   unsigned stack_size,
-   unsigned ( __stdcall *start_address )( void * ),
-   void *arglist,
-   unsigned initflag,
-   unsigned *thrdaddr
-);
-#+end_src
+A Windows thread may start suspended and resume later to run.
+Closing the thread handle simply closes the handle. There is no
+dedicated =join= function to join a thread. Another thread may
+wait for it with =WaitForSingleObject()= or =WaitForMultipleObjects()=
+A thread may enter deadlock waiting for itself.
+The thread function must be called with =WINAPI= (=__stdcall=).
+
+** Threads in Pthread
+
+=pthread_join()= and =pthread_detach()= are the destroy function of pthreads.
+Joining oneself returns with an error of detected deadlock.
 
 * The Critical Section Problem
 
