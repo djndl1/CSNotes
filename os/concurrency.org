@@ -56,6 +56,40 @@ It is the programmer's duty to deal with such inherent
 nondeterminisms
 to ensure proper execution and correct outcome.
 
+*** Atomic Actions
+
+An atomic action is atomic in that the state transformation of the program is
+indivisible, not the action itself. Context switches may occur in the middle
+of an atomic action but other threads see only the state before and after, not
+some intermediate state.
+
+Individual machine instructions are typically atomic (load, add, subtract,
+store).
+The execution of a concurrent program results in a sequence of atomic actions
+for each thread.
+The state transformation of the entire program is a set of atomic actions in
+some sequential order completed by all threads together. This interleaving of
+the atomic actions determines the result of the execution.
+
+- *critical reference* :: a reference in an expression to a variable that is
+  changed by another thread
+
+- *at-most-once* :: a condition under which expression evaluations and
+  assignments will appear to be atomic. At most one shared variable and the
+  shared variable can referenced at most one time.
+  + An assignment statement =x = e= satisfiese the at-most-once property if either
+    - =e= contains at most one critical reference and =x= is neither read nor
+      written by another thread
+    - or =e= contains no critical references in which case =x= may be read or
+      written by other threads
+  + an expression that is not in an assignment satistifies at-most-once if it
+    contains
+    no more than one critical reference.
+
+Even if statements are atomic, their grouping may not be indivisible and thus
+their nondeterministic interleaving may cause unexpected results. If necessary,
+ these groupings may be made atomic.
+
 * The Critical Section Problem
 
 #+begin_quote
