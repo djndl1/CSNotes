@@ -90,6 +90,40 @@ Even if statements are atomic, their grouping may not be indivisible and thus
 their nondeterministic interleaving may cause unexpected results. If necessary,
  these groupings may be made atomic.
 
+** Multithreading Testing and Debugging
+
+The purpose of testing is to find program failures.
+
+- *Failure* :: an observed departure of the external result of software
+  operation from software requirements or user experience. Failures can be
+  caused by hardware or software faults or by user errors.
+
+- *Software fault* :: a defective, missing, or extra instruction or a set of
+  related instructions that is the cause of one or more actual or potential failures.
+
+- *Debugging* :: the process of locating and correcting faults.
+
+Due to the nondeterministic nature of multithreaded programs, the traditional cycle
+of testing and debugging no longer works. Bugs are not always reproducible; a
+single successful execution does not guarantee future success. Testing itself
+may not even guarantee correctness. The assumption of /reproducible testing/
+doesn't hold for concurrent programs.
+
+- *Sequence Feasibility* :: a sequence of action that is allowed by a system is
+  said to be a feasible sequence.
+  + Testing involves determining whether or not a given sequence is feasible or
+    infeasible. Testing all possible sequences itself may be infeasible. An
+    alternative approach is to force selected sequences to be exercised for
+    detecting faults.
+
+- *Sequence Validity* :: not every feasible sequence is desired.
+
+- *Probe Effect* :: tracing of program execution itself may alter the state and
+  behavior of the program, resulting in different sequences between production
+  and testing.
+  + Probe effect may not always be negative: they introduce random interference
+    into the program and may cause potential faults to occur.
+
 * The Critical Section Problem
 
 #+begin_quote
