@@ -90,6 +90,15 @@ Even if statements are atomic, their grouping may not be indivisible and thus
 their nondeterministic interleaving may cause unexpected results. If necessary,
  these groupings may be made atomic.
 
+** Thread Synchronization
+
+For grouping of atomic actions (*critical section*), to avoid data races, a
+critical
+section has to be made atomic by synchronization. One type of synchronization is
+*mutual exclusion*. Another type of synchronization is called *condition
+synchronization* where the state of a program is required to satisfy a particular condition
+before some action occurs.
+
 ** Multithreading Testing and Debugging
 
 The purpose of testing is to find program failures.
