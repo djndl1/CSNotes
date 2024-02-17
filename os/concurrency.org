@@ -10,18 +10,24 @@ https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
 
 * Basic Concepts
 
+** Concurrency
+
+TODO
+
+** Multithreading
+
 Multithreading allows a process to overlap I/O and computation, makes a GUI more
 responsive, speeds up performance through parallelism. Multithreading require
 less overhead to manage than processes and less expensive in  terms of
 mutual communication.
 
-** Threads in Java
+*** Threads in Java
 
 Any Java program is concurrent.
 Several system threads are started automatically whenever a Java program is
 executed.
 
-** Threads in Win32
+*** Threads in Win32
 
 A Windows thread may start suspended and resume later to run.
 Closing the thread handle simply closes the handle. There is no
@@ -30,7 +36,7 @@ wait for it with =WaitForSingleObject()= or =WaitForMultipleObjects()=
 A thread may enter deadlock waiting for itself.
 The thread function must be called with =WINAPI= (=__stdcall=).
 
-** Threads in Pthread
+*** Threads in Pthreads
 
 =pthread_join()= and =pthread_detach()= are the destroy function of pthreads.
 Joining oneself returns with an error of detected deadlock.
