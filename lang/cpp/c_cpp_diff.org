@@ -222,8 +222,14 @@ intentional but are by themselves for the compiler to issue warnings.
   :CUSTOM_ID: const-keyword
   :END:
 
-In C++, variables declared =const= can be used to specify the size of an
-array.
+In C++, =const= implies a compile-time constant expression, meant to used as a rvalue and
+thus by default with internal linkage.
+Variables declared =const= can be used to specify the size of an array. Const
+expressions may be used as case labels, enumerators, initializer expressions or
+bit-sized fields.
+
+In C, =const= variables have external linkage by default and they are not
+constant expressions.
 
 * global namespace and scope resolution operator =::=
   :PROPERTIES:
