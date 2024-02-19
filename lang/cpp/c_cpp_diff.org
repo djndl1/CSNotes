@@ -222,7 +222,10 @@ intentional but are by themselves for the compiler to issue warnings.
   :CUSTOM_ID: const-keyword
   :END:
 
-In C++, =const= implies a compile-time constant expression, meant to used as a rvalue and
+=const= requires the qualified object be non-modifiable, either resulting in  a
+compile-time error (directly) or an undefined behavior  (indirectly).
+
+In C++, =const= may imply a compile-time constant expression, meant as a rvalue and
 thus by default with internal linkage.
 Variables declared =const= can be used to specify the size of an array. Const
 expressions may be used as case labels, enumerators, initializer expressions or
