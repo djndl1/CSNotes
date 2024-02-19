@@ -1,0 +1,74 @@
+#+title: Optimization
+
+* Copy Elision
+
+Omits copy and move constructors, resulting in zero-copy pass-by-value semantics.
+
+Until C++17, copy elision are implementation-defined behavior, but mandated by
+the standard but with some clarification. Copy elision, including return value
+optimization are exempted from the as-if rule, i.e. they may alter the observed behavior.
+
+** Prvalue Guaranteed Copy Elision
+
+This is guaranteed since C++17 by the standard, but often performed in previous
+versions. A prvalue is not materialized until needed and is then constructed
+directly into the storage of its final destination.
+C++17 does not specify this feature as an optimization, rather, it redefines
+temporary materialization to be deferred. There is no longer a temporary to
+copy/move from.
+
+*** Copy Initialization
+
+#+begin_src cpp
+#include <iostream>
+
+int n = 0;
+
+struct C {
+  explicit C(int) {}
+    // this constructor is not even required since C++17
+  C(const C&) { ++n; }  // the copy constructor has a visible side effect
+};                      // it modifies an object with static storage duration
+
+int main() {
+  C c1(42);      // direct-initialization, calls C::C(int)
+  C c2 = C(42);  // copy-initialization, supposedly calls C::C(const C&)
+
+  std::cout << n << std::endl;  // prints 0 if the copy was elided, 1 otherwise
+}
+#+end_src
+
+** Named Return Value Optimization (Optional)
+
+Eliminating the temporary object created to hold a function's return value.
+
+#+begin_src c++
+#include <iostream>
+
+struct C {
+  C() = default;
+  // called zero, one, or two times
+  C(const C&) { std::cout << "A copy was made.\n"; }
+};
+
+C f() {
+  C c = C();
+  return c; // Named RVO
+}
+
+int main() {
+  std::cout << "Hello World!\n";
+  C obj = f();
+}
+#+end_src
+
+Unnamed RVO is a prvalue case and is already covered above.
+
+** Throw and Catch (Allowed Since C++11)
+
+- throwing a named non-volatile innermost-try-block-scoped object (a local variable)
+
+- the catch clause catches an object of the same type it declares, the copy of
+  the exception object is omitted and the exception object is accessed directly
+  unless the observed behavior would be changed (e.g. the exception object is
+  modified and rethrown).
