@@ -1,6 +1,7 @@
 #+title: Linkage Visibility Lifetime
 
-This note is not about ELF symbol visibility and linkage.
+This note is about identifiers, not about ELF symbol visibility and linkage,
+neither about objects.
 
 Microsoft has some nice [[https://learn.microsoft.com/en-us/cpp/c-language/lifetime-scope-visibility-and-linkage?view=msvc-170][articles]] about lifetime, visibility and linkage.
 A [[https://learn.microsoft.com/en-us/cpp/c-language/summary-of-lifetime-and-visibility?view=msvc-170][summary table]] is available.
@@ -27,7 +28,7 @@ can be made to refer to the same object or function by a process called linkage.
     - =static= at tranlation-unit level
   + *external linkage*: accessible through other identifier of the same name
     - by default for functions and global variables.
-    - =extern= forces the symbol has *external linkage*.
+    - =extern= forces the symbol to have *external linkage*.
     - C99 =inline= has external linkage but an undefined symbol and another
-      definition is expected to be supplied.
+      definition is expected to be supplied in case inlining does not occur.
   + *no linkage*: no other way to reference the entity except through a certain identifier.
