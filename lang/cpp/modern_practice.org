@@ -1,0 +1,76 @@
+#+title: Modern Practice
+
+* Leak-Free in C++
+
+** Issues
+
+- Dangling/invalid Dereference (use after delete)
+
+- Null dereference
+
+- No leaks (delete objects after using and only once)
+
+** Goal
+
+Ensure an object will be destroyed once it is no longer needed.
+
+** Principles
+
+- Prefer scoped lifetime (local, members): an object's lifetime is tied to
+  another lifetime.
+
+- use =unique_ptr= or a container if the object must have its own lifetime with
+  unique ownership. It automates simple heap use.
+
+- =shared_ptr= reference counting
+
+- no raw pointers and explicit =delete=
+
+- break cycles with =weak_ptr=.
+
+** Scenarios
+
+- Decoupled Class Member: optional part, changeable part, use unique pointers.
+  + strictly nested lifetime, no leaks, the data's lifetime is bound to the containing object.
+
+- Pimpl pointer: =const unique_ptr<T>=
+  + the pointer cannot be changed
+  + strictly nested lifetime
+
+- dynamic array member: =const unique_ptr<Data[]>=
+
+- trees: =vector<unique_ptr<Node>>= for children and a raw pointer to
+  parent.
+  + the parent owns the children, thus the children may hold a raw pointer
+    wihtout worrying about dangling pointers.
+  + destructors are called recursively by default. They may be automatic and
+    correct, but they may run out of stack.
+  + one may do destruction iteratively by navigating subtree and run constructor
+    bottom-up;
+    or move pointers to the nodes to be pruned to a flattened local scope heap
+    list: a node's children pointers are moved into this heap list so this node
+    is has no children and there would be no double free.
+
+- doubly linked list (a special tree): a =unique_ptr<Node>= for the next node and a raw pointer
+  for the previous node.
+  + still, the default destructor would recursively call the N nodes'
+    destructor, instead of iteratively calling them in the same stackframe.
+
+- trees that hand out strong refs of nodes: =vector<shared_ptr<Node>>= for
+  children
+  + the lifetime of a node's data is connected to the node, thus any data
+    returned from a node may be a =shared_ptr<Data>= but constructed with the
+    aliasing constructor that connects the data's lifetime with the node's.
+
+* With C++ 98/03
+
+** Expressive Zero-Cost Abstractions
+
+Express our intent to other programmers rather than just telling the machine
+what to do. The compiler and various template techniques allow programmers to
+offer specialized versions of a given algorithm to avoid performance loss.
+
+** Stack-based Scoping Of Resources (a.k.a RAII)
+
+e.g. =std::auto_ptr=, =boost::shared_ptr= and =boost::scoped_ptr= and no client
+code should contain an explicit =new= or =delete=.
