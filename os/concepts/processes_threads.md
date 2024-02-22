@@ -2,7 +2,7 @@ The most central concept in any operating system is the _process_: an abstract o
 
 # Process
 
-The process model is based on two independent concepts: _resource grouping_ and _execution_.
+The process model is based on two independent concepts: **resource grouping** and **execution**.
 
 - **sequential process** (process): an instance of an executing program, including the current values of the program counter, registers, and variables. Conceptually, each process has its own virtual CPU.
 
@@ -66,7 +66,7 @@ The process scheduler handles all these process state changes.
 
 The OS maintains a _process table_ (_process control block_), with one entry per process. Each entry contains important information about the process' state, including its program counter, stack pointer, memory allocation, the status of its open files, its accounting and scheduling information and everything about the process that must be saved when context switch occurs.
 
-Suppose a disk interrupt happens. (By hardware) The current program counter, program status word, and sometimes a few registers are pushed onto the current stack by the interrupt hardware. The computer jumps to the address specified in the interrupt vector. (By software) More registers are saved; new stack is setup; C interrupt service runs (to handle the disk); Scheduler decides which process to run next; a process is run.
+Suppose a disk interrupt occurs. (By hardware) The current program counter, program status word, and sometimes a few registers are pushed onto the current stack by the interrupt hardware. The computer jumps to the address specified in the interrupt vector. (By software) More registers are saved; new stack is setup; C interrupt service runs (to handle the disk); Scheduler decides which process to run next; a process is run.
 
 Suppose there are $n$ processes, each spending $p$ fraction of its time waiting for I/O, then the probability of all processes are waiting for I/O is $p^{n}$, the CPU must have at least one process running on it otherwise, then the CPU utilization is 
 
@@ -76,7 +76,7 @@ $$
 
 With high I/O accesses, more processes are favored in order to better utilize the CPU.
 
-A better modeling should be constrcted using _queuing theory_.
+A better modeling should be constructed using _queuing theory_.
 
 # Threads
 
@@ -85,7 +85,7 @@ The main reason for having threads is that in many applications, multiple activi
 - **thread**: The abstraction of execution of a process is a _thread of execution_. The thread has a program counter, registers that hold its current working variables, a stack which contains the execution history with one frame for each procedure. Threads are the entities scheduled for execution on the CPU.
 
 What threads add to the process model is to allow multiple executions to take place in the same process environment, to a large degree indepenedent of one another. 
-Threading separates the concepts of resource grouping and execution. Processes share phsyical hardware resources while threads shared an address space and other resources.
+Threading separates the concepts of resource grouping and execution. Processes share physical hardware resources while threads shared an address space and other resources.
 
 - **multithreading**: used to describe the situation of allowing multiple threads in the same process. Some CPUs have direct hardware support for multithreading and allow thread switches to happen on a nanosecond time scale.
 
@@ -101,7 +101,7 @@ A thread can be in:
 
 There are two main places to implement threads:
 
-- user space: can be implemented on an OS that does not support threads. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Makeing a local call into the runtime is much more efficient than calling a kernel call. User-level threads allow each process to have its own scheduling algorithm. Some major problems with user-level threads are: 1. blocking syscalls blocks the whole process, which defeats one of the major goals of having multiple threads. The whole process is blocked when a page fault occurs. 2. within a single process, there are no clock interrupts, making it impossible to schedule processes round-robin fashion (preemptively). The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
+- user space: can be implemented on an OS that does not support threads. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Making a local call into the runtime is much more efficient than calling a kernel call. User-level threads allow each process to have its own scheduling algorithm. Some major problems with user-level threads are: 1. blocking syscalls blocks the whole process, which defeats one of the major goals of having multiple threads. The whole process is blocked when a page fault occurs. 2. within a single process, there are no clock interrupts, making it impossible to schedule processes round-robin fashion (preemptively). The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
 
 - kernel: the kernel handles all the threads in the system. In some systems, in order to save some overhead, when a thread is destroyed, it is marked as not runnable, but its kernel data structures are not affected. Later when a new thread must be created, an old thread is reactivated. The main disadvantage is that the cost of a syscall is substantial.
 
@@ -115,7 +115,7 @@ There are two main places to implement threads:
 
 ### Global Variables
 
-Accessing global variables can cause problems from different threads.Thread-local storage is one way to handle this. Either create a storage area for each thread and pass it to every procedure of the thread or implement it with library procedure calls.
+Accessing global variables can cause problems from different threads. Thread-local storage is one way to handle this. Either create a storage area for each thread and pass it to every procedure of the thread or implement it with library procedure calls.
 
 ### Reentrancy
 
