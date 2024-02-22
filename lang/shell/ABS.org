@@ -223,7 +223,16 @@ she-bang is actually a two-byte magic number, see =man magic=.
    :CUSTOM_ID: variables-and-parameters
    :END:
 
-=$VAR= is a simplified form of =${VAR}=. Undeclared/uninitialized
+*** Variable Substitution
+
+Referencing a variable's value is called *variable substituion*.
+
+A variable is used without =$= only when declared or assigned, when unset, when
+exported, in an arithmetic expression within =(())= or in the special case of a
+variable representing a signal.
+
+=$VAR= is a simplified form of =${VAR}= (which has a few more advanced forms and
+usage). Undeclared/uninitialized
 variable has a null value. Quoted strings exists as a whole.
 
 #+BEGIN_SRC shell
@@ -231,7 +240,7 @@ variable has a null value. Quoted strings exists as a whole.
   let b=20+1 # b 21
   read a     # implicitly set a
 
-  var= # null value
+  var= # declared with null value
   unset var  # unset it
 #+END_SRC
 
@@ -239,7 +248,7 @@ A null-valued variable is not the same as unsetting it.
 
 Bash variables are untyped. Bash does not segregate its variables by
 type. Essentially, Bash variables are character strings. Depending on
-context, Bash permits arithmetic operations and comparsions on
+context, Bash permits arithmetic operations and comparisons on
 variables. The determining factor is whether the value of a variable
 contains only digits.
 
@@ -255,7 +264,7 @@ contains only digits.
 
 - =local var=: variable visible only within a code block or function
 
-- =Environmental var=: variables that affect the behavior or the shell
+- Environmental variables: variables that affect the behavior or the shell
   or user interface
 
 - =$0=, =$1=, =$2=, ..., =${10}=, =$*=(a whole string), =$@= (each
