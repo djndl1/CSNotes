@@ -113,16 +113,20 @@ Generally, all instructions involving I/O and memory protection are disallowed i
 
 Hyperthreading/hardware multithreading: allows the CPU to hold the state of multiple different threads and then switch back and forth on a nanosecond time scale. This does not offer true parallelism, but thread-switching time is reduced to the order of a nanosecond. Each thread appears to the OS as a separate CPU.
 
-
 Many CPUs have multiple cores. GPUs have thousands of tiny cores, good for many small computations done in parallel.
 
 ## Memory
 
-- Hierarchical architecture; L1 cache: inside the CPU and usually feeds decoded instructions into the CPU's execution engine; L2: several megabytes of recently used memory words.
+- Hierarchical architecture; 
+
+Certain correspondence is established between cache lines and memory addresses.
+
+L1 cache: inside the CPU and usually feeds decoded instructions into the CPU's execution engine; L2: several megabytes of recently used memory words.
 
 ## Disks
 
 - Surface, cylinder, track, sector
+  - tracks through several surfaces forms a cylinder
 
 SSDs are not disks at all, they are flash memory.
 
