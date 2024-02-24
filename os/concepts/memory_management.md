@@ -1,6 +1,19 @@
-In the early days, there is no memory abstraction. Every program simply saw the physical memory. A program may have multiple threads, but it cannot have multiple unrelated programs running together. One way to run multiple programs is to swap the one in memory to disk and load another process into memory. IBM 360 segmented memory into 2-KB blocks each of which is assigned a protection key, with one in the PSW to indicate the active memory block. Only the OS could change the key. Absolute address in a program was modified to reflect the actual address when loading the program. However, this slowed down the loading, and sometimes it was difficult to determine whether an integer is an address.
-
 _Protection_ and _relocation_ are the two major problems with running multiple programs in memory.
+
+# Early Memory Management
+
+In the early days, there is no memory abstraction. Every program simply saw the physical memory. 
+A program may have multiple threads, but it cannot have multiple unrelated programs running together. 
+One way to run multiple programs is to swap the one in memory to disk and load another process into memory. 
+IBM 360 segmented memory into 2-KB blocks, each of which is assigned a protection key, 
+with one in the PSW to indicate the active memory block. Only the OS could change the key. 
+This solves the protection problem, but the relocation problem arises: absolute addresses are used in programs, 
+and some absolute addresses may reference memory not belonging to the process. 
+*Static relocation*, modifying the absolute address by adding base address, was introduced by IBM to solve this.
+However, this slowed down the loading in order to modify the addresses, 
+and sometimes it was difficult to determine whether an integer is an address.
+
+This kind of memory protection is reintroduced into [https://lwn.net/Articles/643797/](Memory protection keys)
 
 # Address Space
 
