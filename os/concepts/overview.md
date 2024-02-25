@@ -134,16 +134,13 @@ SSDs are not disks at all, they are flash memory.
 
 I/O devices generally consist of two parts: a _controller_ and the device itself. The controller presents a simpler interface to the OS. Each controller has a _device driver_. Each controller manufacturer has to supply a driver for each OS it supports. It may be relinked to the kernel, registered to the system or installed on the fly without rebooting. Controller is operated through the device register, which forms the _I/O port space_.
 
-Interrupt machanism.
-
-DMA chip can control the flow of bits between memory and some controller without constant CPU intervention.
-
+I/O operatins may be carried out through busy waiting, interrupt mechanism, or DMA (which controls the flow of bits between memory and some controller without constant CPU intervention).
 
 ## Bus
 
-The main bus is PCIe bus. It has multiple serial lanes that transport different messages, instead of different bits of the same message. The CPU talks to memory over a DDR3 bus, to an external graphics device over PCIe, and to all other devices via a hub over a DMI (Direct Media Interface) bus. 
+The main bus is PCIe bus. It has multiple serial lanes that transport different messages, instead of different bits of the same message. The CPU talks to memory over a DDR bus, to an external graphics device over PCIe, and to all other devices via a hub over a DMI (Direct Media Interface) bus. 
 
-Intel and M$ designed plug and play, which has the system automatically collect information about the I/O devices, centrally assign interrupt levels and I/O addresses, and then tells each device what its numbers are.
+Intel and M$ designed plug and play, which has the system automatically collect information about the I/O devices, centrally assign interrupt levels and I/O addresses, and then tell each device what its numbers are.
 
 ## Booting
 
@@ -163,19 +160,17 @@ A program in execution, with its address space, registers, a list of open files,
 
 ## Filesystem
 
+- hierarchical filesystem
+
 - file, directory
 
 - file descriptor
 
-- mounter file system, special file, pipe
+- mounted file system, special file, pipe
 
 ## Protection
 
 access control, privilege
-
-## Shell
-
-IT serves as a good example of how the system calls are used.
 
 ## Ontogeny Recapitulates Phylogeny
 
@@ -197,9 +192,9 @@ A procedure library makes syscalls written in assembly easier to use in C.
 
 ### Win32 API
 
-A Windows program is normall event driven.
+A Windows program is normally event driven.
 
-On Windows, the library calls and the actuall syscalls are highly decoupled. Win32 API are used to get OS services. By decoupling the API interface from the actuall syscalls, Microsoft retains the ability to change the actual syscalls in time. Win32 provides compatibility among versions of Windows.
+On Windows, the library calls and the actual syscalls are highly decoupled. Win32 API are used to get OS services. By decoupling the API interface from the actual syscalls, Microsoft retains the ability to change the actual syscalls in time. Win32 provides compatibility among versions of Windows.
 
 The Win32 API has a huge number of calls for managing windows, geometric figures, text, fonts, scrollbars, dialog boxes, menus, and other features of the GUI.
 
