@@ -16,3 +16,6 @@ SCHEDULED:  <2023-06-08 四>
 - [ ] Emacs and GnuPG Encryption
 ** TODO Learn Cryptography
 - [ ] basic overview
+
+** TODO Learn about x86 computer organization
+** TODO the separation of mechanism and policy
