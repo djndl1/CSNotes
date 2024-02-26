@@ -9,6 +9,18 @@ E-commerce, online entertainment have been popular.
 
 Ubiquitous computing was proposed to entails computing in everyday life, resulting in IoT. Various consumer electronic devices are networked, even through power-line networks.
 
+## Types
+
+- Broadband Access Networks
+
+- Wireless Access Networks: cellular networks, WIFI, NFC, sensor networks.
+
+- Content Provider Networks: CDN (a large collection of servers that are geographically distributed in such a way that content is placed as close as possible to the users that are requesting it).
+
+- Transit Network, Backbone networks: among ISPs and large content providers. The recent decade has seen more direct interconnection instead of relying on the transit network.
+
+- Enterprise Networks: companies, factories, VPNs, VoIP
+
 ## Social Issues
 
 network neutrality, DMCA, censorship, profiling, phishing, CAPTACHA, botnet
