@@ -4,7 +4,10 @@ Computer network means a collection of autonomous computers interconnected by a 
 
 ## Use
 
-Resource sharing, VPNs, server-client model, VoIP, desktop sharing, publishing, P2P, instant messaging, social network, wiki, IPTV, e-commerce, ubiquitous computing, powerline networks, RFID, NFC, sensor networks.
+Modern information distribution depends on highly targeted behavioral advertising. Communication is typically based client-server model or peer-to-peer communication. Instant messaging, social networks have restructured person-to-person communication. 
+E-commerce, online entertainment have been popular.
+
+Ubiquitous computing was proposed to entails computing in everyday life, resulting in IoT. Various consumer electronic devices are networked, even through power-line networks.
 
 ## Social Issues
 
