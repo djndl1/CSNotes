@@ -234,11 +234,13 @@ This puts the mechanism for doing something in the kernel and let user-mode proc
 
 ### Virtual Machines
 
-In order to run virtual machine software on a computer, its CPU must be virtualizable. It is essential that the hardware trap to the virtual machine monitor so that instruction can be emulated in software.
+IBM provided virtual machine systems in the 1970s with VM/370, which provided full OS and hardware virtualization or a CPM single-user interactive systems.
 
-- type 1 hypervisor
+In order to run virtual machine software on a computer, its CPU must be virtualizable. Privileged instructions executed under user mode are ignored by CPUs without virtualization support unless some interpreter are used. It is essential that the hardware trap to the virtual machine monitor so that instruction can be emulated in software.
 
-- type 2 hypervisor: running on top of a host OS 
+- type 1 hypervisor: virtual machine monitor
+
+- type 2 hypervisor: running on top of a host OS, possibly with some kernel modules.
 
 Practical hypervisors use a hybrid strategy. They add a kernel module to do the heavy lifting.
 
@@ -246,7 +248,14 @@ Practical hypervisors use a hybrid strategy. They add a kernel module to do the 
 
 - The Java virtual machine
 
-### Exokernels
+- Containers, provided by the hosst OS. Each container shares the host OS kernel 
+and typically the binaries and libraries in a read-only fashion.
+
+### Exokernels and Unikernel
+
+Exokernels partition resources and allocate them to user-level virtual machines and do not hide the fact that the underlying resources might be shared. This saves a layer of resource remapping. The functionality of exokernels is limited to ensuring protection and multiplexing of resources. The user application is free to build any custom abstraction on limited hardware resources (not real bare metal), or even runs in full kernel mode.
+
+> The exokernel concept is a compromise: let the kernel allocate the basic physical resources of the machine (e.g. disk blocks, memory pages, and processor time) to multiple application programs, and let each program decide what to do with these resources. The program can then link to a support library that implements the abstractions it needs (or it can implement its own).
 
 # Services
 
