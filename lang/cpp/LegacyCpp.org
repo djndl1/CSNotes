@@ -1,0 +1,50 @@
+#+title: Legacy C++
+
+[[http://eel.is/c++draft/diff][Annex C compatibility]]
+
+* Invalid and Valid Code Between C++ 98/03 and C++ 11
+
+- The banning of narrowing conversions during aggregate initialization in C++11
+
+  #+begin_src c++
+int a[] = { 1.0 }; // invalid C++ 11
+  #+end_src
+
+- =>>= on the right of template parameter is valid in C++11 but not in C++03
+
+- =std::swap= are defined in =<utility>= in C++11 but =<algorithm>= in C++98.
+
+- =std::basic_ios= has in C++11 =explicit operator bool() const= instead of a
+  conversion that evaluates to =bool=.
+
+- string literals do not convert to =char*= in C++11.
+
+* Different Behaviors of the Same Code Under C++ 98/03 and C++ 11
+
+- Integer division always rounds to zero.
+
+- a destructor is now by default =noexcept(true)= unless specified otherwise, but C++98 allows exceptions.
+
+- Dependent function calls with internal linkage are considered in C++11
+
+  #+begin_src c++
+static void f(int) { }
+void f(long) { }
+
+template<typename T>
+void g(T t) { f(t); }
+
+int main() { g(0); } // caslls f(int) in C++11 but f(long) in C++98
+
+// However, with instantiation, this still calls f(B)
+struct B { };
+struct A : B { };
+
+template<typename T>
+void g(T t) { f(t); }
+
+static void f(A) { }
+void f(B) { }
+
+int main() { A a; g(a); }
+  #+end_src
