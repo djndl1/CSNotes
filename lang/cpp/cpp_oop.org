@@ -622,11 +622,8 @@ All =malloc= and =str...= in C should be deprecated in favor of
 
 About two different =new=, see
 
-- [[https://stackoverflow.com/questions/9595758/how-is-the-c-new-operator-implemented][How
-  is the C++ new operator implemented]]
-
-- [[https://stackoverflow.com/questions/1885849/difference-between-new-operator-and-operator-new][operator
-  new and new expression]]
+- [[https://stackoverflow.com/questions/9595758/how-is-the-c-new-operator-implemented][How is the C++ new operator implemented]]
+- [[https://stackoverflow.com/questions/1885849/difference-between-new-operator-and-operator-new][operator new and new expression]]
 
 POD types without constructors are not guaranteed to initialized to zero
 unless adding the brackets =()=. If the struct has a default data member
