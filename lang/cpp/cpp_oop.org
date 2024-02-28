@@ -1689,6 +1689,9 @@ those members should be provided with the =override= indicator, allowing
 the compiler to verify that you're indeed referring to an existing
 virtual member function.
 
+Pure virtual member functions may be implemented inlined or not, but it is of
+limited use and does not align with the intended use of pure virtual member functions.
+
 ** Virtual Destructor
 
 Destructors should /always be defined/ =virtual= in classes designed as
