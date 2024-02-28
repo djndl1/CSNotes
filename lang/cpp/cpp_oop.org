@@ -1695,6 +1695,7 @@ Destructors should /always be defined/ =virtual= in classes designed as
 a base class from which other classes are going to be derived. Since every class
 has, by default, a destructor, a pure virtual base destructor forces its derived
 classes to implement destructors, even though the derived destructor is empty.
+
 If a class is polymorphic (declares or inherits at least one virtual
 function), and its destructor is not virtual, deleting it is undefined
 behavior regardless of whether there are resources that would be leaked
