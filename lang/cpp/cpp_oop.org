@@ -580,7 +580,7 @@ functions.
 However, traditional situations in which call back functions are used in
 C are tackled in C++ using template algorithms
 
-* Classes and Memory Allocation
+* Memory Allocation
   :PROPERTIES:
   :CUSTOM_ID: classes-and-memory-allocation
   :END:
@@ -590,17 +590,16 @@ C are tackled in C++ using template algorithms
    :CUSTOM_ID: new-and-delete
    :END:
 
-=new= is type safe. It knows about the type of allocated entity it may
-and will call the constructor of an allocated class type object. When
-confronted with failing memory allocation, =new='s behavior is
+=new= is type safe in that it knows about the type of allocated entity it may and its
+amound of memory required and will call the constructor of an allocated class
+type object.
+When confronted with failing memory allocation, =new='s behavior is
 configurable through the use of a =new_handler=.
 
 All =malloc= and =str...= in C should be deprecated in favor of
 =string=, =new= and =delete=.
 
-=new= uses a type as its operand, which guarantees the correct amount of
-memory being allocated. =delete= can safely operate on a =NULL= pointer
-(It's not that =delete= guarantees this, it's =free= that does this).
+=delete= can safely operate on a =NULL= pointer by doing nothing like =free=.
 
 #+BEGIN_SRC C++
     //from libstdc++
