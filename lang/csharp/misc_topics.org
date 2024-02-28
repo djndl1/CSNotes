@@ -1,0 +1,10 @@
+#+title: Misc Topics
+
+* Loop Variable with Closures
+
+C# closure captures variables, not their values, unlike Java, where variables
+must be =final= and captured by values.
+
+Starting from C# 5, =foreach='s loop variable is now declared inside the loop,
+and thus a closure captures a new variable each loop. =for='s behavior remains
+the same.
