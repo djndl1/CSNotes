@@ -21,6 +21,23 @@ Ubiquitous computing was proposed to entails computing in everyday life, resulti
 
 - Enterprise Networks: companies, factories, VPNs, VoIP
 
+## Techonology
+
+- Personal Area Networks (PAN): bluetooth
+
+- Local Area Networks (LAN): WLAN, mesh network, IEEE 802.11, Ethernet, VLAN
+
+- Home networks: a LAN, but with various IoT devices, demanding reliability, security and low cost.
+
+- Metropolitan Area Networks (MAN): cable television networks, IEEE 802.16 WiMAX, LTE, 5G
+
+- Wide Area Network: subnet (switches and their communication lines)
+
+- Virtual Private Networks, Software-Defined WAN
+
+- Internetworks: a collection of interconnected networks. This does not conform to the definition above of a computer network. e.g. the global Internet
+  - *gateway*: the device that makes a connection between two or more networks and provides the necessary translation in terms of hardware and software, e.g. router.
+  
 ## Social Issues
 
 network neutrality, DMCA, censorship, profiling, phishing, CAPTACHA, botnet
