@@ -1,6 +1,6 @@
 # Intro
 
-Computer network means a collection of autonomous computers interconnected by a single technology. A distributed system is a collection of independent computers appears to its users as a single coherent system.
+Computer network means *a collection of autonomous computers interconnected by a single technology*. A distributed system is a collection of independent computers appears to its users as a single coherent system.
 
 ## Use
 
