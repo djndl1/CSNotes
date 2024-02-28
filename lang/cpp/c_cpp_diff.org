@@ -475,6 +475,15 @@ the raw string literal), which is in turn followed by a double quote.
     )";
 #+END_SRC
 
+* Character Literal Type
+
+Character literals are considered =int= in C but of actual character types in C++.
+This may affect function overloading resolution;
+
+#+begin_src c++
+sizeof('a') // larger than 1 in C, but 1 in C++
+#+end_src
+
 * Binary constants (C++14)
   :PROPERTIES:
   :CUSTOM_ID: binary-constants-c14
