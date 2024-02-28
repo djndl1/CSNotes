@@ -38,6 +38,16 @@ Ubiquitous computing was proposed to entails computing in everyday life, resulti
 - Internetworks: a collection of interconnected networks. This does not conform to the definition above of a computer network. e.g. the global Internet
   - *gateway*: the device that makes a connection between two or more networks and provides the necessary translation in terms of hardware and software, e.g. router.
   
+## Examples
+
+### Internet
+
+DoD required a robust Command & Control network. An idea based on digital packet switching was proposed. Transmitted data is divided into packets and sent independently towards the destination. Each packet was received in its entirety before being forwarded (store-and-forward). ARPANET was built on this idea and expanded to various institutions, but its protocols ware not suitable for running over different networks, leading to the invention of TCP/IP protocols. the US National Science Foundation built a WAN based on TCP/IP, the NSFNET. Later, NSFNET was commercialized and developed into a larger internetwork, operated by different providers. Similar networks in other countries were also incorporated later.
+
+#### Architecture
+
+Ordinary users access the Internet by fiber (FTTX), wireless or cable (DOCSIS, DSL). Custom packets enter the ISP network at the ISP's POP (Point of Presence). Routers and transmission lines connect POPs together (the backbone of the ISP). ISPs exchange their traffic at IXPs (Internet eXchange Points), a large site where routers of different ISPs are connected to each other in a PLAN. Some small ISPs would pay other ISPs for internet connectivity to reach distant hosts (transit). Data centers are built near or at ISP POPs for fast connection. In the recent decade, content providers have been starting to build direct connections between each other or server farms inside an ISP's network.
+
 ## Social Issues
 
 network neutrality, DMCA, censorship, profiling, phishing, CAPTACHA, botnet
