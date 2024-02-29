@@ -671,14 +671,15 @@ Raw memory is made available by =operator new(sizeInBytes)= and also by
 size of the intended data type must be specified. The counterparts are
 =operator delete()= and =operator delete[]()=. They are C++'s =malloc=/=free=.
 
-** the placement =new= operator
+** the placement =new= operator =<memory>=
    :PROPERTIES:
    :CUSTOM_ID: the-placement-new-operator
    :END:
 
-Placement =new= is declared in =<memory>= header. Placement =new= is
-passed an existing block of memory into which =new= initializes an
-object or value (placing the object in a certain place in memory).
+Placement =new= initializes an
+object or value (placing the object in a certain place in memory) with an
+existing block of memory into which =new= initializes. Placement =new= does not
+allocate memory, it simply construct an object at a given place.
 
 #+BEGIN_SRC C++
     type *new(void *memory) type{arguments};
@@ -703,9 +704,10 @@ than it currently needs).
     //...
     }
 #+END_SRC
-
-Memory allocated by objects initialized using placement new is returned
-by explicitly calling the object's destructor.
+Memory used by objects initialized using placement =new= may be not dynamically
+allocated, thus =delete= should be used with
+caution to prevent freeing stack memory or static memory. =delete[]= may not be
+used as not every part of the memory is initialized with a constructed object.
 
 #+BEGIN_SRC C++
     void Strings::destroy()
