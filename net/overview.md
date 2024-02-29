@@ -48,6 +48,36 @@ DoD required a robust Command & Control network. An idea based on digital packet
 
 Ordinary users access the Internet by fiber (FTTX), wireless or cable (DOCSIS, DSL). Custom packets enter the ISP network at the ISP's POP (Point of Presence). Routers and transmission lines connect POPs together (the backbone of the ISP). ISPs exchange their traffic at IXPs (Internet eXchange Points), a large site where routers of different ISPs are connected to each other in a PLAN. Some small ISPs would pay other ISPs for internet connectivity to reach distant hosts (transit). Data centers are built near or at ISP POPs for fast connection. In the recent decade, content providers have been starting to build direct connections between each other or server farms inside an ISP's network.
 
+### Mobile Network
+
+### Early Generations
+
+- 1G (AMPS, 1982): analog voice signals
+
+- 2G (GSM, 1991): digital signals; voice calls and text messaging
+
+- 3G 2001: both digital voice and broadband digital data services
+
+Radio coverage area is divided into cells to reuse a certain range of ratio spectrum. 
+
+#### 4G Architecture
+
+- *Code Division Multiple Access* (CDMA)
+
+- *eNodeB*: the celluar base station
+
+- *Radio Access Network*: the cellular base station with its controller
+
+- *Core Network*: fully packet-switching network (Evolved Packet Core) that carries the traffic for the ratio access network. Older mobile phone networks used a circuit-switched core in the style of the traditional phone network to carry void calls.
+
+Customers access the network through E-UTRAN (the radio communication protocol) to eNodeB, entering the Ratio Access Network. The RAN is connected to the core network, which connects to external packet networks such as the Internet through S-GW (Serving Network Gateway) and the P-GW (Packet Data Network Gateway).
+
+A device may change its connecting base station through *handover*, soft (connecting the new one before the old one drops) or hard (connecting to the new one after the old one drops)
+
+Each mobile phone network has a *Home Subscriber Server* (HSS) that keeps records of the location of each subscriber.
+
+Security is enforced using SIM (Subscriber Identity Module) cards as basis for authentication and encryption.
+
 ## Social Issues
 
 network neutrality, DMCA, censorship, profiling, phishing, CAPTACHA, botnet
