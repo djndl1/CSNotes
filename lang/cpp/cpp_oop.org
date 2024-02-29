@@ -1563,8 +1563,7 @@ standardize the expected behavior of the members of the redefinable
 interface.
 
 C++ uses early binding and offers both dynamic and static dispatch.
-[[https://softwareengineering.stackexchange.com/questions/387697/what-is-late-binding][What
-the hell are those binding]]
+[[https://softwareengineering.stackexchange.com/questions/387697/what-is-late-binding][What the hell are those binding]]
 
 The following code does not result in duck typing
 
@@ -1647,17 +1646,14 @@ functions. A virtual member becomes a pure virtual member by postfixing
 == 0= to its declaration. Pure virtual member functions may be
 implemented. Implementing a pure virtual member has limited use.
 
-[About ctors and dtors
-constructor]](https://stackoverflow.com/questions/14184341/c-constructor-destructor-inheritance)
+[[https://stackoverflow.com/questions/14184341/c-constructor-destructor-inheritance][About ctors and dtors constructor]]
 
-[[https://stackoverflow.com/questions/1219607/why-do-we-need-a-pure-virtual-destructor-in-c][Pure
-virtual destructor]]. However, a destructor of a derived class
+[[https://stackoverflow.com/questions/1219607/why-do-we-need-a-pure-virtual-destructor-in-c][Pure virtual destructor]]. However, a destructor of a derived class
 implicitly calls the destructor of its base class, even if that
 destructor is pure virtual. A pure virtual destructor must have an
 implementation.
 
-[[https://stackoverflow.com/questions/1193138/virtual-base-class-data-members][About
-data members in an abstract class]]
+[[https://stackoverflow.com/questions/1193138/virtual-base-class-data-members][About data members in an abstract class]]
 
 Polymorphism can also be used in combination with multiple inheritance.
 To avoid ambiguity when inheriting a base class multiple times, use
