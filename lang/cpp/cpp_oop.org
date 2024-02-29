@@ -585,7 +585,7 @@ C are tackled in C++ using template algorithms
   :CUSTOM_ID: classes-and-memory-allocation
   :END:
 
-** =new= and =delete=
+** Operator =new= and =delete=
    :PROPERTIES:
    :CUSTOM_ID: new-and-delete
    :END:
@@ -629,10 +629,11 @@ POD types without constructors are not guaranteed to initialized to zero
 unless adding the brackets =()=. If the struct has a default data member
 initializer, =()= initializes the POD data to that. Objects of arrays
 are initialized using their constructors (with the default constructors
-only).
+only). A non-default constructor cannot be called.
 
 It's totally legal and safe to create =new int[0]= (and =malloc(0)=,
-both of which returns nonzero pointers under glibc and musl).
+both of which returns nonzero pointers under glibc and musl) and the returned
+value is not =nullptr=, dangerous to use with =if (ptr)=.
 
 When calling =delete=, the class's destructor is called and the memory
 pointed at by the pointer is returned to the common pool.
