@@ -78,6 +78,18 @@ Each mobile phone network has a *Home Subscriber Server* (HSS) that keeps record
 
 Security is enforced using SIM (Subscriber Identity Module) cards as basis for authentication and encryption.
 
+### 802.11 WiFi
+
+- AP mode and Ad-Hoc mode
+
+- Path diversity to overcome multipath fading
+
+- OFDM (Orthonogal Frequency Division Multiplexing)
+
+- Carrier Sense Multiple Access (CSMA): wireless transmission does not occur in the same medium coverage, unlike classic Ethernet, a party may not be able to detect that another is already using the target channel due to different signal coverage.
+
+- Security: WEP (Wired Equivalent Privacy) -> WPA (WiFi Protected Access) -> WPA2 -> 802.1X
+
 ## Social Issues
 
 network neutrality, DMCA, censorship, profiling, phishing, CAPTACHA, botnet
