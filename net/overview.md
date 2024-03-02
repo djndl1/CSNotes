@@ -103,6 +103,26 @@ Security is enforced using SIM (Subscriber Identity Module) cards as basis for a
 
 - Disinformation
 
+## Network Protocols
+
+### Goals & Requirements
+
+- *Reliability*: the ability to recover from errors, faults or failures.
+  - a network has to operate correctly even though it is comprised of a collection of components that are themselves unreliable
+    (fluke eletrical noise, random wireless signals, hardware flaws, software bugs etc).
+  - error detection, error correction by adding redundant information, used at low layers.
+  - path routing
+
+- *Resource Allocation*: sharing access to a common, limited resource: bandwidth, latency etc.
+  - *scalable* designs continue to work well when the network gets large.
+  - statistical multiplexing (sharing bandwidth based on the statistics of demand)
+  - *flow control*:  how to keep a fast sender from swamping a slow receiver with data. Too much traffic causes congestion.
+
+- *Evolvability*: allowing for incremental deployment of protocol improvements over time.
+  - protocol layering to support change
+
+- *Security*: defending the network against various types of attacks. Confidentiality, authenticity and integrity.
+
 # Network Hardware
 
 There are two types of transmission technology that are in widespread use:
