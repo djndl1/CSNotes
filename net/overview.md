@@ -92,7 +92,16 @@ Security is enforced using SIM (Subscriber Identity Module) cards as basis for a
 
 ## Social Issues
 
-network neutrality, DMCA, censorship, profiling, phishing, CAPTACHA, botnet
+- Online speed: Illegal online content is not going unpunished; Platforms are responsible for their content; DMCA
+
+- network neutrality: ISPs should provided equal quality of service to as given type of application traffic, regardless of who is sending that content.
+  - no blocking, no throttling, no paid prioritization and transparency about reasonable network management practices that might be seen as violating any of the first three rules.
+  
+- Security: DDoS and botnet; email spamming; phishing
+
+- Privacy: profiling and tracking; browser fingerprinting: use the unique configuration of the browser to determine the identity; location privacy. Anonymous accusations may not be valid under certain justice systems.
+
+- Disinformation
 
 # Network Hardware
 
