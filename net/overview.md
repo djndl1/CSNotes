@@ -272,3 +272,19 @@ The TCP/IP model does not make a clear distinction of services, protocols and in
 ```
 
 >  the strength of the OSI reference model is the model itself (minus the presentation and session layers), which has proven to be exceptionally useful for discussing computer networks. In contrast, the strength of the TCP/IP reference model is the protocols, which have been widely used for many years.
+
+## Standardization
+
+Standards define what is needed for interoperability. A protocol standard defines the protocol over the wire but no the service interface inside the box except to help explain the protocol. De facto standards often evolve into de jure standards if they are successful.
+
+### Standardization bodies
+
+- International Telecommunication Union (ITU);
+
+- International Standards Organization (ISO); 
+
+- Institute of Electrical and Electronics Engineers (IEEE); 
+
+- Internet Architecture Board: Internet Research Task Force (IRTF, for long-term research), Internet Engineering Task Force (IETF, for short-term engineering), Internet Society
+
+- World Wide Web Consortium (W3C)
