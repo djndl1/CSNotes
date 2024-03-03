@@ -37,7 +37,7 @@ A process may be in
 
 2. ready (runnable; temporarily stopped to let another process run)
 
-3. blocked (unable to run until some external event happens)
+3. blocked (unable to run until some external event/condition happens)
 
 ```
              ┌─────────────┐
