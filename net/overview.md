@@ -152,39 +152,64 @@ Some reliable services are built upon lower unreliable protocols.
 
 # Reference Models
 
+Two prevailing layered protocol models are the TCP/IP reference model and the OSI reference model.
+
 ## The OSI (Open System Interconnection) Reference Model
 
 Three concepts, _services_ (sematics of a layer), _interfaces_ (how to access a layer) and _protocols_ (between peer entites, inside a layer) are central to the OSI model. These ideas fit nicely with OOP.
 
 
-
 ```
-+-----------------+
-|   Application   | ---> protocols commonly used by users
-+-----------------+
-|  Presentation   | ---> syntax and semantics of the information transmitted
-+-----------------+
-|    Session      | ---> establishes sessions (dialog control, token management, synchronization)
-+-----------------+
-|   Transport     | ---> split data from above into smaller units, ensure all data correctly arrive
-+-----------------+
-|    Network      | ---> controls the operation of the subnet, how packets are routed
-+-----------------+
-|  Data  Link     | ---> transforms a raw transmission facility into a line free of undetected transmission errors
-+-----------------+
-|     Physical    | ---> trasmitts raw bits over a communication channel
-+-----------------+
+┌─────────────┐                                            ┌────────────┐      
+│ Application │◄──────────────────────────────────────────►│ Application│  APDU
+└─────▲───────┘                                            └─────▲──────┘      
+      │                                                          │             
+┌─────▼───────┐                                            ┌─────▼──────┐      
+│ Presentation│◄──────────────────────────────────────────►│Presentation│  PPUD
+└─────▲───────┘                                            └─────▲──────┘      
+      │                                                          │             
+┌─────▼───────┐                                            ┌─────▼──────┐      
+│ Session     │◄──────────────────────────────────────────►│   Session  │  SPDU
+└─────▲───────┘                                            └─────▲──────┘      
+      │                                                          │             
+┌─────▼───────┐                                            ┌─────┴──────┐      
+│ Transport   │◄──────────────────────────────────────────►│  Transport │  TPDU
+└─────▲───────┘                                            └─────▲──────┘      
+      │                                                          │             
+      │                                                          │             
+      │                Communication subnet boundary             │             
+      │         ┌───────────────────────────────────────┐        │             
+      │         │                                       │        │             
+      │         │           Internet subnet protocol    │        │             
+┌─────▼───────┐ │    ┌───────────┐     ┌────────────┐   │  ┌─────▼──────┐      
+│ Network     │◄├───►│ Network   │◄───►│  Network   │◄──┼─►│  Network   │Packet
+└─────▲───────┘ │    └───────────┘     └────────────┘   │  └─────▲──────┘      
+      │         │                                       │        │             
+┌─────▼───────┐ │    ┌───────────┐     ┌────────────┐   │  ┌─────▼──────┐      
+│ Data Link   │◄├───►│ Data Link │◄───►│ Data Link  │◄──┼─►│ Data Link  │Frame 
+└─────▲───────┘ │    └───────────┘     └────────────┘   │  └─────▲──────┘      
+      │         │                                       │        │             
+┌─────▼───────┐ │    ┌───────────┐     ┌────────────┐   │  ┌─────▼──────┐      
+│  Physical   │◄├───►│  Physical │◄───►│  Physical  │◄──┼─►│  Physical  │Bit   
+└─────────────┘ │    └───────────┘     └────────────┘   │  └────────────┘      
+    Host A      │       Router             Router       │      Host B          
+                │                                       │                      
+                └───────────────────────────────────────┘                      
 ```
 
 - A layer should be created where a different abstract is needed
 
 - Each layer should perform a well-defined function
 
-- The function of each layer should be chosen with an eye toward defining internationally standardized protocols
+- The function of each layer should be chosen towards defining internationally standardized protocols
 
 - The layer boundaries should be chosen to minimize the information flow across the interfaces
 
 - The number of layers should be large enough that distinct functions need not be thrown together in the same layer out of necessity and small enough that the architecture does not become unwieldy.
+
+The OSI model makes clear distinction between *services*, *interfaces* and *protocols*.
+
+The OSI model came out at a bad time when TCP/IP has been proposed and used on Unix with and was beginning to gain traction. Due to some design flaws in the model, initial implementations were of poor quality. The OSI model has never gained widespread use.
 
 ## The TCP/IP Reference Model
 
