@@ -233,6 +233,18 @@ Internet          |               IP           ICMP                          | a
                   +----------------------------------------------------------+
 ```
 
+- *Link*: not really a lower but rather an interface between hosts and transmission links.
+
+- *Internet*: an official packet format and protocol called *Internet Protocol* (IP) and a companion protocol *Internet Control Message Protocol* (ICMP). Packet routing and congestion management are two major issues.
+
+- *Transport*:
+  - *TCP*: reliable, connection-oriented, byte-stream with flow control
+  - *UDP*: unreliable, connectionless
+  
+- *Application*: include any session and presentation functions that they any application requires.
+
+The TCP/IP model does not make a clear distinction of services, protocols and interfaces. Difficult to generalize to other protocol stacks. No distinction between the link layer and the physical layer. Some early protocols (telnet) were not well designed and implemented due to their ad-hoc nature.
+
 ## A Practical Model
 
 ```
