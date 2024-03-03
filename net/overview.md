@@ -254,15 +254,15 @@ The TCP/IP model does not make a clear distinction of services, protocols and in
 |               |
 +---------------+
 |               |
-|  Transport    | increase reliability, provide delivery abstractions
+|  Transport    | stengthen the deliveery guarantees of the Network layer: increase reliability, provide delivery abstractions
 |               |
 +---------------+
 |               |
-|    Network    | how to combine multiple links into networks
+|    Network    | how to combine multiple links into networks and internetworks
 |               |
 +---------------+
 |               |
-|     Link      | how to send to finite-length messages between directly connected computers with reliability
+|     Link      | how to send to finite-length messages between directly connected computers with reliability (within a link)
 |               |
 +---------------+
 |               |
@@ -270,3 +270,5 @@ The TCP/IP model does not make a clear distinction of services, protocols and in
 |               |
 +---------------+
 ```
+
+>  the strength of the OSI reference model is the model itself (minus the presentation and session layers), which has proven to be exceptionally useful for discussing computer networks. In contrast, the strength of the TCP/IP reference model is the protocols, which have been widely used for many years.
