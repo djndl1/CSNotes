@@ -138,27 +138,16 @@ Security is enforced using SIM (Subscriber Identity Module) cards as basis for a
 - *protocol stack*: a list of the protocols used by a certain system
 
 
-- Wide Area Network: spans a large geographical area, often a country or continent. The term _subnet_ was originally the collection of routers and communication lines that moved packets from the source host to the destination host. A WAN can be dedicated one or a VPN, or an ISP network. Other examples include satellite networks, cellular telephone networks.
+### Connetion-Oriented or Connectionless Service
 
-- Internetworks/internet: many networks exist in the world, often with different hardware and software. The internet uses ISP networks to connect enterprise networks, home networks, and many other networks. A network is formed by the combination of a subnet and its hosts. The general name for a machine that makes a connection between two or more networks and provide the necessary translation, both in terms of hardware and software, is a _gateway_. Gateways are distinguished by the layer at which they operate in the protocol hierarchy.
+- Connection-Oriented: modeled after the telephone system, the order is preserved, a negotiation is conducted before the actual data transfer.
+  - a connection may send messages or byte stream.
 
-# Network Software
-
-To reduce design complexity, most networks are organized as a stack of _layers_ or _levels_. The purpose of each layer is to offer certain services to the higher layers while shielding those layers from the details of how the offered services are actually implemented. When layer n on one machine carries on a conversation with layer n on another machine (_peers_), the rules and conventions used in this conversation are collectively known as the _layer n protocol_. Between each pair of adjacent layers is an _interface_, defining which primitive operations and services the lower layer makes available to the upper one.
-
-A set of layers and protocols is a _network architecture_. A list of the protocols used by a certain system, one protocol per layer, is called a _protocol stack_.
-
-One mechanism for finding errors in received information uses codes for error detection. Finding a working path through a network is called routing. Identifying the senders and receivers is called _addressing_/_naming_. Different networks being connected together is called internetworking. Flow control is about controlling sending/receiving rate between layers. Quality of service is the mechanism that reconcile competing demands from users.
-
-Layers can offer two different types of service to the layers above them: 
-
-- connection-oriented: to use a connection-oriented network service, the service user first establishes a connection, uses the connection, and then releases the connection. In most case, the sending order is preserved so that the bits arrive in the order they were sent. The sender, receiver, and subnet conduct a negotiation about the parameter to be used when establishing a connection. A connection with associated resources is called a _circuit_.
-
-- connectionless: each message carries the full destination address and each is routed through the intermediate nodes inside the system independent of all the subsequent messages. These messages have different names in different contexts. A packet (at the network layer) is forwarded using store-and-forward switching or cut-through switching. it is possible that the first one sent can be delayed so that the second one arrives first.
-
-Each of the both can be further characterized by its reliability. Reliable connection-oriented service has two minor variations: message sequences and byte streams. Unreliable (meaning not acknowledged) connectionless service is often called datagram service, which also does not return an acknowledgement to the sender. To add reliability to connectionless service, acknowledged datagram is one way, request-reply (usually used in client-server model).
-
-A service is formally specified by a set of _primitives_ (operations) available to user processes to access the service. These primitives tell the service to perform some action or report on an action taken by a peer entity.
+- Connectionless: modeled after the postal system.  Each message carries the full destination address, and each one is routed through the intermediate nodes inside the system independent of all the subsequent messages.  Each message is sent either by store-and-forward switching or cut-through switching.
+  - unreliable datagram service: no acknowledgement
+  - acknowledged datagram service: e.g. text messaging
+  
+Some reliable services are built upon lower unreliable protocols.
 
 # Reference Models
 
