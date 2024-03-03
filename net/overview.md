@@ -123,21 +123,20 @@ Security is enforced using SIM (Subscriber Identity Module) cards as basis for a
 
 - *Security*: defending the network against various types of attacks. Confidentiality, authenticity and integrity.
 
-# Network Hardware
+### Protocol Layering
 
-There are two types of transmission technology that are in widespread use:
+> The purpose of each layer is to offer certain services to the higher layers while shielding those layers from the details of how the offered services are actually implemented.
 
-- broadcast links: the communication channel is shared by all the machines on the network; packets sent by any machine are received by all the others. e.g. wireless network
+- *peers*: The entities comprising the corresponding layers on different machines
 
-- point-to-point links: connects individual pairs of machines
+> The peer processes in layer 4, for example, conceptually think of their communication as being ‘‘horizontal,’’ using the layer 4 protocol. Each one is likely to have procedures called something like SendToOtherSide and GetFromOtherSide, even though these procedures actually communicate with lower layers across the 3/4 interface, and not with the other side. The peer process abstraction is crucial to all network design. Using it, the unmanageable task of designing the complete network can be broken into several smaller, manageable design problems, namely, the design of the individual layers. As a consequence, all real networks use layering.
 
-By scale
+- *protocol*: is an agreement between the communicating parties on how communication is to proceed.
 
-- Person Area Networks (PAN): e.g. a wireless network that conenct a computer with its peripherals; bluetooth
+- *network architecture*: a set of layers and protocols
 
-- Local Area Networks (LAN): privately owned network that operates within and nearby a single building like a home, office or factory. It is possible to divide one large physical LAN into smaller logical LANs. Both wireless and wired broadcast networks can be divided into static and dynamic designs, depending on how the channel is allocated. e.g. enterprise networks, Wifi, Ethernet (in a switched Ethernet, each computer speaks the the Ethernet protocol and connects to a switch with a point-to-point link).
+- *protocol stack*: a list of the protocols used by a certain system
 
-- Metropolitan Area Networks (MAN): A MAN covers a city. e.g. cable television, IEEE 802.16 (WiMAX).
 
 - Wide Area Network: spans a large geographical area, often a country or continent. The term _subnet_ was originally the collection of routers and communication lines that moved packets from the source host to the destination host. A WAN can be dedicated one or a VPN, or an ISP network. Other examples include satellite networks, cellular telephone networks.
 
