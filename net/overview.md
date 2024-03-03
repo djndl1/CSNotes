@@ -131,12 +131,13 @@ Security is enforced using SIM (Subscriber Identity Module) cards as basis for a
 
 > The peer processes in layer 4, for example, conceptually think of their communication as being ‘‘horizontal,’’ using the layer 4 protocol. Each one is likely to have procedures called something like SendToOtherSide and GetFromOtherSide, even though these procedures actually communicate with lower layers across the 3/4 interface, and not with the other side. The peer process abstraction is crucial to all network design. Using it, the unmanageable task of designing the complete network can be broken into several smaller, manageable design problems, namely, the design of the individual layers. As a consequence, all real networks use layering.
 
-- *protocol*: is an agreement between the communicating parties on how communication is to proceed.
+- *protocol*: is an agreement between the communicating parties on how communication is to proceed. A set of rules governing the format and meaning of the packets, or messages that are exchanged by the peer entities within a layer.
 
 - *network architecture*: a set of layers and protocols
 
 - *protocol stack*: a list of the protocols used by a certain system
 
+- *Service*: a set of primitives (operations) available to the upper layer. It relates to an interface between two layers.
 
 ### Connetion-Oriented or Connectionless Service
 
