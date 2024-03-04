@@ -288,6 +288,9 @@ many positions to shift.
   $1 <-- $2, $2 <-- $3, $3 <-- $4, ...
 #+END_SRC
 
+In case =shift=-ing a number larger than the number of parameters, =1= is
+returned. Use =shift N || break= to avoid an infinite loop.
+
 *** Internal Variables
     :PROPERTIES:
     :CUSTOM_ID: internal-variables
