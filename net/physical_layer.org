@@ -1,0 +1,49 @@
+#+title: Physical Layer
+
+* Guided Transmission Media
+
+** Persistent Storage
+
+#+begin_quote
+Never underestimate the bandwidth of a station wagon full of tapes hurtling
+down the highway.
+#+end_quote
+
+e.g. snowmobile service (a truck of hard disks that is able to connect to a fiber network)
+
+** Twisted Pair
+
+Two insulated copper wires twisted together in a helical form to cancel out
+waves. A signal is usually carried as the difference in voltage between the two.
+Twisted pairs can run several kilometers without amplification. They may be used
+for analog or digital signal. The bandwidth depends on the thickness of the
+wire, easily reaches hundreds of Mbps for a few kilometers.
+
+e.g. telephone, ADSL internet access
+
+Twisted pairs typically have four pairs in a cable. Different LAN standards use
+the twisted pairs differently, some with more pairs while some fewer.
+
+Twisted pair cables are categorized. Category 5 can support 100-Mbps and 1Gbps LAN.
+Category 6 can support up to 10Gbps. Category 7 introduced shielding on the
+individual twisted pairs and the entire cable. Category 8 runs at higher speeds
+but over a shorter distance.
+
+** Coaxial Cable
+
+A stiff copper wire as the core, surrounded by an insulating material and then
+enveloped by a cylindrical conductor, often as a closely woven braided mesh. The
+outer surface is a protective plastic sheath.
+
+- High bandwidth up to 6 GHz.
+
+- Used as long distance lines. Still widely used for cable television and
+  metropolitan area networks.
+
+** Power Lines
+
+An old idea for remote metering, but a new idea for high-rate communications.
+
+Difficulties: quick to attenuate; constant change of the electrical properties
+due to the change of electric use; transient currents and noise caused by
+switching on/off of appliances; the wiring itself is susceptible to external noise.
