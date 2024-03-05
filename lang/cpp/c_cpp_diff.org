@@ -334,6 +334,9 @@ initialization expressions in their definitions.
   :CUSTOM_ID: type-inference-using-auto
   :END:
 
+With type inference, the programmer cares more about the behavior of the type in
+use rather than its formal type.
+
 The keyword =auto= can be used to simplify type definitions of variables
 and return types of functions if the compiler is able to determine the
 proper types of such variables or functions. It is no longer used as a
@@ -361,7 +364,7 @@ functions returning auto, simply
     auto autoReturnFunction();
 #+END_SRC
 
-in which case, all return values must have an identical type. Funtions
+in which case, all return values must have an identical type. Functions
 merely returning =auto= cannot be used before the compiler has seen
 their definitions. So they cannot be used after mere declarations. When
 such functions are implemented as recursive function, at least one
