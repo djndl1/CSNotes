@@ -47,3 +47,36 @@ An old idea for remote metering, but a new idea for high-rate communications.
 Difficulties: quick to attenuate; constant change of the electrical properties
 due to the change of electric use; transient currents and noise caused by
 switching on/off of appliances; the wiring itself is susceptible to external noise.
+
+** Fibers
+
+Up to 50 Tbps, fast but expensive at the edge to the point where computation
+resource and cache storage are used.
+
+An optical transmission system has three key components: *the light source*
+(LEDs or semiconductor lasers),
+*the transmission medium (an ultra-thin fiber of glass*), *the detector* (photodiode). A
+light source is attached to one end and the detector at the other end to receive
+the light signal.
+A pulse of light indicates 1 bit and the absence of light indicates 0 bit.
+
+A light ray incident on the boundary of two media at or above the critical angle
+is fully reflected back into the original medium and can propagate for
+kilometers with virtually no loss.
+
+Each ray is said to have a different *mode*. A fiber that has multiple rays
+reflected at different angles are called a *multimode fiber*. A fiber less than
+10 microns can propagate light only in a straight line without bouncing,
+yielding a *single-mode fiber* (for long distance about 50 times farther than
+multimode fibers, up to 100 Gbps for 100 km without amplification).
+
+The attenuation of light within a fiber depends on the wavelength. Three
+wavelength bands (0.85, 1.30 and 1.55 micros) are most commonly used.
+
+A fiber has a glass core, where light is trapped inside, and wrapped by a
+glass cladding with a lower index of refraction, and then a plastic jacket.
+Multiple fibers grouped in a cable.
+
+Fibers can be mechanically spliced together in about 5 minutes for trained
+personnel and result in a 10% light loss, fused to form a solid connection
+without much light loss or terminate in conenctors and be plugged into fiber sockets.
