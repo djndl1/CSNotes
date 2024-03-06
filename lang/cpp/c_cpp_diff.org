@@ -96,7 +96,7 @@ default arguments must be mentioned at the function's declaration.
   :END:
 
 Each C++ compiler which conforms to the ANSI/ISO standard defines the
-symbol =__cplusplus=.
+symbol =__cplusplus= (C++ standard version in use).
 
 * Using standard C functions
   :PROPERTIES:
