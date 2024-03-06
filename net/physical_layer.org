@@ -80,3 +80,48 @@ Multiple fibers grouped in a cable.
 Fibers can be mechanically spliced together in about 5 minutes for trained
 personnel and result in a 10% light loss, fused to form a solid connection
 without much light loss or terminate in conenctors and be plugged into fiber sockets.
+
+* Wireless Transmission
+
+** The Electromagnetic Spectrum
+
+ Radio, microwave, infrared, visible light can all be used for information
+ transmission. High-frequency UV, X-ray and Gamma ray are even better but they
+ are difficult to produce and modulate, do not propagate well through buildings
+ and they are harmful to living things.
+
+ The amount of information that a signal such as electromagnetic wave can carry
+ depends on the received power and is proportional to its bandwidth. Most
+ transmissions use a relatively narrow frequency band.
+
+*** Spread Spectrum
+
+#+TODO: more clarification
+
+#+begin_quote
+spread spectrum are techniques by which a signal (e.g., an electrical,
+electromagnetic, or acoustic) generated with a particular bandwidth is
+deliberately spread in the frequency domain over a wider frequency band.
+Spread-spectrum techniques are used for the establishment of secure
+communications, increasing resistance to natural interference, noise, and
+jamming, to prevent detection, to limit power flux density (e.g., in satellite
+downlinks), and to enable multiple-access communications.
+#+end_quote
+
+ - *Frequency Hopping Spread Spectrum* :: a transmitter hops from frequency to
+   frequency hundreds of times per second.
+   + Hard to detect and jam
+   + well resistant to multipath fading
+   + suitable for crowded channels.
+   + e.g. bluetooth, older versions of 802.11
+
+- *Direct Sequence Spread Spectrum* :: uses a code sequence to spread the data
+  signal over a wide frequency band.
+  + e.g. GPS, 3G mobile networks,
+
+- *Ultra-Wideband Communication* :: a series of low-energy rapid pulses that
+  varying their carrier frequencies over a very wide frequency band.
+  + at least 500MHz wide
+  + tolerable to a substantial amount of relatively strong interference from
+    other narrowband signals.
+  + little interference to other narrowband signals.
