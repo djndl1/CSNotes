@@ -60,9 +60,26 @@ can be specified instead of =int= only.
   :END:
 
 In C++, all zero values are coded as 0.
+=NULL= should be avoided. =0= or =NULL= pointer may lead to trouble with function
+overloading since it's actually =int= or =long=, not as a pointer =void*=.
+Use =nullptr= instead since C++11.
 
-=NULL= should be avoided. =0= pointer may lead to trouble with function
-overloading since it's actually =int=. Use =nullptr= instead.
+In C, a =NULL= constant is equal to =0= but the value of a pointer variable with
+=NULL= value is not necessarily represented as all zero bits. =int *p = 0= is
+equal to =int *p = NULL= but =p= is not guaranteed to be zero. This pointer
+value is equal to =0= or =NULL=. From C99 standard:
+
+#+begin_quote
+An integer constant expression with the value 0, or such an expression cast to type
+void *, is called a null pointer constant.
+#+end_quote
+
+Null pointers are equal to =0= or =NULL= as the latter is converted to the former.
+
+#+begin_quote
+If one operand is a pointer and the other is a
+null pointer constant, the null pointer constant is converted to the type of the pointer.
+#+end_quote
 
 * default arguments
   :PROPERTIES:
