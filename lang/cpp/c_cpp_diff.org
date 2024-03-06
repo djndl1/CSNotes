@@ -7,7 +7,7 @@ Only =int main()= or =int main(int argc, char **argv)= are allowed. The
 third =char **envp= parameter is not defined by the C++ standard and
 should be avoid. Instead, =extern char **environ= should be declared to
 provide access to the program's environment variables. The value of
-=argv[argc]= equals 0.
+=argv[argc]= equals =nullptr=.
 
 The return type is =int=, not =void=. =return= statement may be omitted,
 and =main= returns 0 in this case. When a C++ ends normally, dtors of
