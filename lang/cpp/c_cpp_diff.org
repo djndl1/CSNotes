@@ -26,7 +26,7 @@ parameter, i.e. as with =void=.
 
 Implicit conversions from generic pointers =void*= to typed pointers are not allowed.
 
-* Strongly types enumerations
+* Strongly types enumerations (C++11)
   :PROPERTIES:
   :CUSTOM_ID: strongly-types-enumerations
   :END:
