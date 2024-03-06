@@ -81,7 +81,7 @@ If one operand is a pointer and the other is a
 null pointer constant, the null pointer constant is converted to the type of the pointer.
 #+end_quote
 
-* default arguments
+* Default arguments
   :PROPERTIES:
   :CUSTOM_ID: default-arguments
   :END:
@@ -116,7 +116,7 @@ library can be used in C++ programs.
     }
 #+END_SRC
 
-The comibination of the predefined symbol =__cplusplus= and the
+The combination of the predefined symbol =__cplusplus= and the
 possibility to define =extern "C"= functions offers the ability to
 create header files for both C and C++.
 
