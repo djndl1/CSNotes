@@ -125,3 +125,41 @@ downlinks), and to enable multiple-access communications.
   + tolerable to a substantial amount of relatively strong interference from
     other narrowband signals.
   + little interference to other narrowband signals.
+
+** Electromagnetic Information Transmission
+
+*** Radio (Frequency) Transmission
+
+Around 20kHz to around 300MHz
+
+RF is easy to generate, can travels long distances, penetrates buildings easily.
+Radio waves are omnidirectional: antennas need not be precisely aligned.
+
+Radio waves are subject to path loss — signal energy loss as fast as $1/r_{2}$
+in the air. Low-frequency waves pass through obstacles well but suffer path loss
+sharply. High-frequency waves reflect upon obstacles and can be absorbed by rain
+and other obstacles. VLF, LF and MF waves follow the ground; HF and VHF tend to
+be absorbed by the earth but reflect off the ionosphere.
+
+*** Microwave Transmission
+
+Between 300 Mhz and 300 GHz
+
+Cheap directional long-distance transmission in a straight line.
+It offers high signal-to-noise ratio due to concentrated energy.
+It suffers from multipath fading and absorption by rain.
+
+*** Infrared Transmission
+
+Relatively directional, cheap and easy to build.
+Unable to pass through solid objects.
+
+Not a major communication method.
+
+*** Light Transmission
+
+Unguided optical signaling is inheritly unidirectional, offers very high
+bandwidth at very low cost and is easy to install.
+
+It is difficuilt to align the transmitter and the receiver and the beam is susceptible to
+temperature change and bad weather.
