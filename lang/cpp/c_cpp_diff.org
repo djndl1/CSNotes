@@ -136,21 +136,13 @@ create header files for both C and C++.
 The standard C header files are built in this manner and are therefore
 usable for both C and C++.
 
-* Defining local variables
+* Variable Definition inside =if=, =while= and =switch= Since C++98
   :PROPERTIES:
   :CUSTOM_ID: defining-local-variables
   :END:
 
-Local variables should be defined only when they're needed. Variables
-should be defined in such a way that their scope is as limited and
-localized as possible. It is considered good practice to avoid global
-variables. In C++, global varaibles are seldom required.
-
-If considered appropriate, /nested block/ can be used to localize
-auxiliary variables.
-
 In C++, local variables can be defined and initialized within =if-else=,
-=switch=, =while= statements.
+=switch=, =while= statements since .
 
 * =typedef= and =using=
   :PROPERTIES:
