@@ -158,8 +158,8 @@ Not a major communication method.
 
 *** Light Transmission
 
-Unguided optical signaling is inheritly unidirectional, offers very high
+Unguided optical signaling is inherently unidirectional, offers very high
 bandwidth at very low cost and is easy to install.
 
-It is difficuilt to align the transmitter and the receiver and the beam is susceptible to
+It is difficult to align the transmitter and the receiver and the beam is susceptible to
 temperature change and bad weather.
