@@ -7,7 +7,7 @@ Only =int main()= or =int main(int argc, char **argv)= are allowed. The
 third =char **envp= parameter is not defined by the C++ standard and
 should be avoid. Instead, =extern char **environ= should be declared to
 provide access to the program's environment variables. The value of
-=argv[argc]= equals 0.
+=argv[argc]= equals =nullptr=.
 
 The return type is =int=, not =void=. =return= statement may be omitted,
 and =main= returns 0 in this case. When a C++ ends normally, dtors of
@@ -24,7 +24,9 @@ call must match the prototype. =return= must explicitly return =int= in
 =main=. An empty parameter list indicates the total absence of
 parameter, i.e. as with =void=.
 
-* Strongly types enumerations
+Implicit conversions from generic pointers =void*= to typed pointers are not allowed.
+
+* Strongly types enumerations (C++11)
   :PROPERTIES:
   :CUSTOM_ID: strongly-types-enumerations
   :END:
@@ -58,11 +60,28 @@ can be specified instead of =int= only.
   :END:
 
 In C++, all zero values are coded as 0.
+=NULL= should be avoided. =0= or =NULL= pointer may lead to trouble with function
+overloading since it's actually =int= or =long=, not as a pointer =void*=.
+Use =nullptr= instead since C++11.
 
-=NULL= should be avoided. =0= pointer may lead to trouble with function
-overloading since it's actually =int=. Use =nullptr= instead.
+In C, a =NULL= constant is equal to =0= but the value of a pointer variable with
+=NULL= value is not necessarily represented as all zero bits. =int *p = 0= is
+equal to =int *p = NULL= but =p= is not guaranteed to be zero. This pointer
+value is equal to =0= or =NULL=. From C99 standard:
 
-* default arguments
+#+begin_quote
+An integer constant expression with the value 0, or such an expression cast to type
+void *, is called a null pointer constant.
+#+end_quote
+
+Null pointers are equal to =0= or =NULL= as the latter is converted to the former.
+
+#+begin_quote
+If one operand is a pointer and the other is a
+null pointer constant, the null pointer constant is converted to the type of the pointer.
+#+end_quote
+
+* Default arguments
   :PROPERTIES:
   :CUSTOM_ID: default-arguments
   :END:
@@ -77,7 +96,7 @@ default arguments must be mentioned at the function's declaration.
   :END:
 
 Each C++ compiler which conforms to the ANSI/ISO standard defines the
-symbol =__cplusplus=.
+symbol =__cplusplus= (C++ standard version in use).
 
 * Using standard C functions
   :PROPERTIES:
@@ -97,7 +116,7 @@ library can be used in C++ programs.
     }
 #+END_SRC
 
-The comibination of the predefined symbol =__cplusplus= and the
+The combination of the predefined symbol =__cplusplus= and the
 possibility to define =extern "C"= functions offers the ability to
 create header files for both C and C++.
 
@@ -117,21 +136,13 @@ create header files for both C and C++.
 The standard C header files are built in this manner and are therefore
 usable for both C and C++.
 
-* Defining local variables
+* Variable Definition inside =if=, =while= and =switch= Since C++98
   :PROPERTIES:
   :CUSTOM_ID: defining-local-variables
   :END:
 
-Local variables should be defined only when they're needed. Variables
-should be defined in such a way that their scope is as limited and
-localized as possible. It is considered good practice to avoid global
-variables. In C++, global varaibles are seldom required.
-
-If considered appropriate, /nested block/ can be used to localize
-auxiliary variables.
-
 In C++, local variables can be defined and initialized within =if-else=,
-=switch=, =while= statements.
+=switch=, =while= statements since .
 
 * =typedef= and =using=
   :PROPERTIES:
@@ -334,6 +345,9 @@ initialization expressions in their definitions.
   :CUSTOM_ID: type-inference-using-auto
   :END:
 
+With type inference, the programmer cares more about the behavior of the type in
+use rather than its formal type.
+
 The keyword =auto= can be used to simplify type definitions of variables
 and return types of functions if the compiler is able to determine the
 proper types of such variables or functions. It is no longer used as a
@@ -361,7 +375,7 @@ functions returning auto, simply
     auto autoReturnFunction();
 #+END_SRC
 
-in which case, all return values must have an identical type. Funtions
+in which case, all return values must have an identical type. Functions
 merely returning =auto= cannot be used before the compiler has seen
 their definitions. So they cannot be used after mere declarations. When
 such functions are implemented as recursive function, at least one

@@ -266,6 +266,9 @@ their sizes remain small. As a rule of thumb: lambda expressions should
 be treated like in-line functions, and should merely consist of one, or
 maybe occasionally two expressions.
 
+One may even call a lambda immediately where it is defined, as a scoped expression that
+returns a value, for example, to initialize some objects that is context-dependent.
+
 * Overloading =operator|=
   :PROPERTIES:
   :CUSTOM_ID: overloading-operator
