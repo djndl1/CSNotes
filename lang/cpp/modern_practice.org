@@ -37,6 +37,14 @@ In case an initializer of a constant is not allowed inside a
 class definition, define an =enum= in that class and use the enum as a
 constant.
 
+** Use Template and =inline= Instead of Function-Like Macros.
+
++ Function-like macros may produce unexpected behaviors especially with
+  operations that have side effects.
+
++ Inline functions are type-safe with the efficiency of macros and they
+  understand scope rules.
+
 * Leak-Free in C++
 
 ** Issues
