@@ -31,6 +31,12 @@
   + The other way around for implementation is not safe: a =const= object that
     implicitly calls a non-=const= member function may change its state.
 
+** the =enum= Hack
+
+In case an initializer of a constant is not allowed inside a
+class definition, define an =enum= in that class and use the enum as a
+constant.
+
 * Leak-Free in C++
 
 ** Issues
