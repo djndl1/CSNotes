@@ -1,5 +1,36 @@
 #+title: Modern Practice
 
+* Prefer the Compiler to the Preprocessor
+
+** Use =const=, not macros
+- a symbol seen by the compiler provides more reasonable error messages.
+
+- =const= can be declared at the class level, and a =static const= data member
+  of integral or enumeration type can be initialized with an
+  initializer right inside the class definition. If its value is required, a
+  namespace-scope definition should be provided without an initializer.
+
+- Apply =const= whenever it makes sense to function parameters and return
+  values, to pointers, references and iterators, to the objects referred to by
+  pointers, iterators and references, to local variables, to member functions.
+
+- The C++ compiler understands and checks only *bitness constness*, that is,
+  whether a member function modifies this object or not. However, a =const=
+  member function may return a pointer or reference to the internal data and a
+  =const= object is now modifiable through unexpected approaches. Or a class has
+  some internal cached data for optimization that is not logically part of the
+  object, but modified in a =const= member function. This is where =mutable=
+  comes in to allow *logical constness*. Program using logical constness.
+
+- In case of code duplication of a pair of =const= and non-=const= member functions,
+  implement the non-=const= version in terms of the =const= version by casting the
+  object to =const= and cast the return value to non-=const=.
+  + It is safe to cast a non-=const= object to =const= to call a =const=
+    function; and since the object is non-=const= and mutable, it is safe to drop the
+    =const= qualifier of the return value.
+  + The other way around for implementation is not safe: a =const= object that
+    implicitly calls a non-=const= member function may change its state.
+
 * Leak-Free in C++
 
 ** Issues
