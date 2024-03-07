@@ -1,21 +1,26 @@
+A *Data Link* is a means of connecting one location to another for the purpose
+of transmitting and receiving digital information. Physical communication
+channels make errors occasionally and provide a finite data rate and have some delays.
 The data link layer uses the services of the physical layer to send and
-receive bits over communication channels. It has three functions:
+receive bits over communication channels.
 
-- Providing a well-defined service interface to the network layer:
-  transmit the bits handled by the network layer to the destination
-  machine. It provides unacknowledged connectionless service,
-  acknowledged connectionless service and acknowledged
-  connection-oriented service.
+* Raison D'etre: Design Goals and Issues
 
-- Dealing with transmission errors
+The key role of this layer is to achieve *reliable*, *efficient*
+communication of whole units of information called /frames/,
+which has a *header*, a *payload* for holding the packet, and a frame *trailer*.
+/Frame management forms the heart of what the data link layer does./
 
-- Regulating the flow of data so that the slow receivers are not swamped
-  by fast senders.
+The link layer provides minimal error control and flow control, which is mostly
+found in the upper layers..
 
-The key role of this layer is to achieve reliable, efficient
-communication of whole units of information called /frames/, which has a
-header, a payload for holding the packet, and a frame trailer. Frame
-management forms the heart of what the data link layer does.
+** Providing a Well-Defined Service Interface to the Network Layer
+
+** Framing Sequences of Bytes as Self-Contained Segments
+
+** Error Control: Detecting and Correcting Transmission Errors
+
+** Flow Control
 
 * Main issues
 :PROPERTIES:
