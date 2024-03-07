@@ -279,17 +279,6 @@ Some advantages of using streams are:
 
 - Streams are independent of the media they operate on.
 
-* References
-  :PROPERTIES:
-  :CUSTOM_ID: references
-  :END:
-
-When a function explicitly must change the values of its arguments, a
-pointer parameter is preferred. These pointer parameters should
-preferably be the function's initial parameters. This is called return
-by argument. If the modification of the argument is a trivial
-side-effect, references can be used.
-
 * Initializer lists
   :PROPERTIES:
   :CUSTOM_ID: initializer-lists
