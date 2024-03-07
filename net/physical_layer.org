@@ -163,3 +163,18 @@ bandwidth at very low cost and is easy to install.
 
 It is difficult to align the transmitter and the receiver and the beam is susceptible to
 temperature change and bad weather.
+
+* Waveforms and Information Representation
+
+A finite signal may be extended by repeating itself and periodic signals can be
+represented by a Fourier series. The width of frequency range transmitted
+without being strongly attenuated is the *bandwidth*.
+
+- *Baseband Signals* :: signals that run from 0 to a maximum frequency
+
+- *Passband Signals* :: signals that are shifted to occupy a higher range of frequencies.
+
+Suppose a transmission rate of $b$ bps, then sending eight bits requires $8/b$
+seconds, that is, the frequency of $b/8$ Hz for first harmonic of the signal.
+The higher rate, the higher frequency required. Limiting the bandwidth limits
+the data rate.
