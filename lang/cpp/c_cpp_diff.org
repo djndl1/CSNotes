@@ -458,7 +458,7 @@ to define additional variables (plural, as it may contain a
 comma-separated list of variables, similar to the syntax that's
 available for for-statements).
 
-* Raw String literals
+* Raw String Literals (C++11)
   :PROPERTIES:
   :CUSTOM_ID: raw-string-literals
   :END:
