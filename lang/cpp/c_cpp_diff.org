@@ -496,7 +496,7 @@ sizeof('a') // larger than 1 in C, but 1 in C++
   :END:
 
 Binary integral constants can be defined using the prefixes =0b= or
-=oB=.
+=oB=. Available in C since C23.
 
 * New language-defined data types
   :PROPERTIES:
