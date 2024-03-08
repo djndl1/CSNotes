@@ -47,3 +47,134 @@ An old idea for remote metering, but a new idea for high-rate communications.
 Difficulties: quick to attenuate; constant change of the electrical properties
 due to the change of electric use; transient currents and noise caused by
 switching on/off of appliances; the wiring itself is susceptible to external noise.
+
+** Fibers
+
+Up to 50 Tbps, fast but expensive at the edge to the point where computation
+resource and cache storage are used.
+
+An optical transmission system has three key components: *the light source*
+(LEDs or semiconductor lasers),
+*the transmission medium (an ultra-thin fiber of glass*), *the detector* (photodiode). A
+light source is attached to one end and the detector at the other end to receive
+the light signal.
+A pulse of light indicates 1 bit and the absence of light indicates 0 bit.
+
+A light ray incident on the boundary of two media at or above the critical angle
+is fully reflected back into the original medium and can propagate for
+kilometers with virtually no loss.
+
+Each ray is said to have a different *mode*. A fiber that has multiple rays
+reflected at different angles are called a *multimode fiber*. A fiber less than
+10 microns can propagate light only in a straight line without bouncing,
+yielding a *single-mode fiber* (for long distance about 50 times farther than
+multimode fibers, up to 100 Gbps for 100 km without amplification).
+
+The attenuation of light within a fiber depends on the wavelength. Three
+wavelength bands (0.85, 1.30 and 1.55 micros) are most commonly used.
+
+A fiber has a glass core, where light is trapped inside, and wrapped by a
+glass cladding with a lower index of refraction, and then a plastic jacket.
+Multiple fibers grouped in a cable.
+
+Fibers can be mechanically spliced together in about 5 minutes for trained
+personnel and result in a 10% light loss, fused to form a solid connection
+without much light loss or terminate in conenctors and be plugged into fiber sockets.
+
+* Wireless Transmission
+
+** The Electromagnetic Spectrum
+
+ Radio, microwave, infrared, visible light can all be used for information
+ transmission. High-frequency UV, X-ray and Gamma ray are even better but they
+ are difficult to produce and modulate, do not propagate well through buildings
+ and they are harmful to living things.
+
+ The amount of information that a signal such as electromagnetic wave can carry
+ depends on the received power and is proportional to its bandwidth. Most
+ transmissions use a relatively narrow frequency band.
+
+*** Spread Spectrum
+
+#+TODO: more clarification
+
+#+begin_quote
+spread spectrum are techniques by which a signal (e.g., an electrical,
+electromagnetic, or acoustic) generated with a particular bandwidth is
+deliberately spread in the frequency domain over a wider frequency band.
+Spread-spectrum techniques are used for the establishment of secure
+communications, increasing resistance to natural interference, noise, and
+jamming, to prevent detection, to limit power flux density (e.g., in satellite
+downlinks), and to enable multiple-access communications.
+#+end_quote
+
+ - *Frequency Hopping Spread Spectrum* :: a transmitter hops from frequency to
+   frequency hundreds of times per second.
+   + Hard to detect and jam
+   + well resistant to multipath fading
+   + suitable for crowded channels.
+   + e.g. bluetooth, older versions of 802.11
+
+- *Direct Sequence Spread Spectrum* :: uses a code sequence to spread the data
+  signal over a wide frequency band.
+  + e.g. GPS, 3G mobile networks,
+
+- *Ultra-Wideband Communication* :: a series of low-energy rapid pulses that
+  varying their carrier frequencies over a very wide frequency band.
+  + at least 500MHz wide
+  + tolerable to a substantial amount of relatively strong interference from
+    other narrowband signals.
+  + little interference to other narrowband signals.
+
+** Electromagnetic Information Transmission
+
+*** Radio (Frequency) Transmission
+
+Around 20kHz to around 300MHz
+
+RF is easy to generate, can travels long distances, penetrates buildings easily.
+Radio waves are omnidirectional: antennas need not be precisely aligned.
+
+Radio waves are subject to path loss — signal energy loss as fast as $1/r_{2}$
+in the air. Low-frequency waves pass through obstacles well but suffer path loss
+sharply. High-frequency waves reflect upon obstacles and can be absorbed by rain
+and other obstacles. VLF, LF and MF waves follow the ground; HF and VHF tend to
+be absorbed by the earth but reflect off the ionosphere.
+
+*** Microwave Transmission
+
+Between 300 Mhz and 300 GHz
+
+Cheap directional long-distance transmission in a straight line.
+It offers high signal-to-noise ratio due to concentrated energy.
+It suffers from multipath fading and absorption by rain.
+
+*** Infrared Transmission
+
+Relatively directional, cheap and easy to build.
+Unable to pass through solid objects.
+
+Not a major communication method.
+
+*** Light Transmission
+
+Unguided optical signaling is inherently unidirectional, offers very high
+bandwidth at very low cost and is easy to install.
+
+It is difficult to align the transmitter and the receiver and the beam is susceptible to
+temperature change and bad weather.
+
+* Waveforms and Information Representation
+
+A finite signal may be extended by repeating itself and periodic signals can be
+represented by a Fourier series. The width of frequency range transmitted
+without being strongly attenuated is the *bandwidth*.
+
+- *Baseband Signals* :: signals that run from 0 to a maximum frequency
+
+- *Passband Signals* :: signals that are shifted to occupy a higher range of frequencies.
+
+Suppose a transmission rate of $b$ bps, then sending eight bits requires $8/b$
+seconds, that is, the frequency of $b/8$ Hz for first harmonic of the signal.
+The higher rate, the higher frequency required. Limiting the bandwidth limits
+the data rate.
