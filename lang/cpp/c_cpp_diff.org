@@ -297,6 +297,9 @@ multidimensional arrays, structs and clases.
     values2({{1, 2}, {2, 3}, {3, 5}, {4, 7}, {5, 11}, {6, 13}});
 #+END_SRC
 
+Implicit conversions are not allowed in initializer lists, making C++11
+initializer syntax more type-safe.
+
 * Designated initialization
   :PROPERTIES:
   :CUSTOM_ID: designated-initialization
