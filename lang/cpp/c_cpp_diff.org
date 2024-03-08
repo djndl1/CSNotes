@@ -194,6 +194,7 @@ overloads.
 
 Attributes are used to inform the compiler about situations that are
 intentional but are by themselves for the compiler to issue warnings.
+Before standardization, they are commonly defined as compiler extensions.
 
 - =[[fallthrough]]=: if falling through is intentional, this attribute
   should be used so that the compiler does not give a warning.
