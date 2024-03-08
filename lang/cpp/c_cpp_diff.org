@@ -332,7 +332,7 @@ initialization expressions in their definitions.
     };
 #+END_SRC
 
-* Type inference using =auto=
+* Type inference using =auto= (C++11)
   :PROPERTIES:
   :CUSTOM_ID: type-inference-using-auto
   :END:
