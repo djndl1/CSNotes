@@ -409,9 +409,10 @@ should be returned from a function, a struct can be used.
     }
 #+END_SRC
 
-The struct definition can completely be omitted if fun returns a pair or
+The struct definition can completely be omitted if =fun= returns a pair or
 tuple. Instead of referring to the elements of the returned struct, pair
-or tuple structured binding declarations can also be used.
+or tuple structured binding declarations can also be used. Struct data members are automatically
+bound to variables.
 
 #+BEGIN_SRC C++
     auto [one, two] = fun();
@@ -429,8 +430,12 @@ There doesn't have to be a function call!
         cout << "Year " << year << ": amount = " << amount << '\n';
 #+END_SRC
 
+Before C++17, one has to use =std::tie= to achieve similar results only with
+tuples or pairs. There is no way similar to =std::ignore= to discard a component with structured binding.
+
 The object doesn't even have to make its data member publicly available
-(TODO).
+
+#+TODO: More about structured binding customization
 
 * Range-based for-loops
   :PROPERTIES:
