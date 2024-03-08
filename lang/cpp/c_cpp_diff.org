@@ -469,6 +469,13 @@ characters not equal to =(=, followed by =(=. The raw string ends at the
 closing parenthesis ), followed by the label (if specified when starting
 the raw string literal), which is in turn followed by a double quote.
 
+The ugly syntax might seem strange at first, but consider Python's triple
+quotation syntax, one has to find a way to distinguish quotation marks inside the
+string from the closing sequence (in Python's case, the triple quotation cannot
+appear inside the string content). Custom labels give users a chance to define
+one's own closing sequence to allow true raw strings in case something inside
+the string resembles the predefined closing sequence.
+
 #+BEGIN_SRC C++
     R"label(whatever raw string you want)label"
 #+END_SRC
