@@ -511,6 +511,10 @@ sizeof('a') // larger than 1 in C, but 1 in C++
 Binary integral constants can be defined using the prefixes =0b= or
 =oB=. Available in C since C23.
 
+* Three-Way Comparison ~<=>~ (Spaceship Operator) (C++20)
+
+#+TODO:
+
 * New language-defined data types
   :PROPERTIES:
   :CUSTOM_ID: new-language-defined-data-types
