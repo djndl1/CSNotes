@@ -285,7 +285,7 @@ Some advantages of using streams are:
   :END:
 
 C++ extends the concept of initializer list by introducing the type
-=initializer_list<Type>= where =Type= is reolaced by the type name of
+=initializer_list<Type>= where =Type= is replaced by the type name of
 the values used in the initializer list.
 
 Initializer lists are recursive, so they can be used with
