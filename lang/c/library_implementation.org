@@ -1,0 +1,25 @@
+#+title: Library Implementation
+
+* Design Issues
+
+- Generality: too general, too hard to use or inefficient for their intended purposes
+
+- Simplicity: too simple, risk not satisfying the demands of applications that
+  might use them; too confusing, no one uses them.
+
+- Efficiency
+
+  #+begin_quote
+ Tuning a program to make it faster almost always makes it bigger,
+ more difficult to understand, and more likely to contain errors. There’s
+ no point in such tuning unless measurements of execution time show
+ that the program is too slow. A program needs only to be fast enough,
+ not necessarily as fast as possible.
+ ...
+ Reliability is more important than efficiency.
+ ...
+ Straightforward implementations of inherently fast algorithms are better than
+ hand-tuned implementations of slow algorithms. For example, squeezing
+ instructions out of the inner loop of a linear search is doomed to be less
+ profitable than using a binary search in the first place.
+  #+end_quote
