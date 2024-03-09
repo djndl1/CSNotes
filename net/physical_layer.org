@@ -178,3 +178,37 @@ Suppose a transmission rate of $b$ bps, then sending eight bits requires $8/b$
 seconds, that is, the frequency of $b/8$ Hz for first harmonic of the signal.
 The higher rate, the higher frequency required. Limiting the bandwidth limits
 the data rate.
+
+** Nyquist's & Shannon's Theory On Maximum Data Rate
+
+*** Noiseless Channels
+
+#+begin_quote
+If an arbitrary signal has been run through a low-pass filter of bandwidth B,
+the filtered signal can be completely reconstructed by making only 2B samples
+per second.
+#+end_quote
+
+A perfect channel has a finite transmission capacity. Sampling the line faster
+than $2B$ times per second is pointless because the higher-frequency components
+that such sampling could recover have already been filtered out.
+
+If the signal consists of $V$ discrete levels, then
+$$
+    \text{Maximum data rate} = 2B \log_{2}V\:\text{bits/sec}
+$$
+
+*** Noisy Channels
+
+*Signal-to-Noise Ratio* in decibels $10 \log_{10}{S}$, e.g. S/N ratio of 10 is
+ $10\text{dB}$, and a ratio of 100 is $20\text{dB}$.
+
+ The maximum data rate or *capacity* of a noisy channel of bandwidth $B$ Hz and
+ SNR $S/N$ is given by
+ $$
+    \text{Capacity} = B\log_{2}{(1 + S/N)}\: \text{bits/sec}
+ $$
+
+ e.g. the Classical ADSL uses a channel of 1MHz and the typical SNR is about
+ $41$ dB, the capacity is originally designed up to 12 Mbps, lower than the
+ theoretic capacity at about 13 Mbps.
