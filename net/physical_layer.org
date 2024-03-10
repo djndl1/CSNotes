@@ -212,3 +212,20 @@ $$
  e.g. the Classical ADSL uses a channel of 1MHz and the typical SNR is about
  $41$ dB, the capacity is originally designed up to 12 Mbps, lower than the
  theoretic capacity at about 13 Mbps.
+** Digital Modulation
+
+Converting between binary bits and signals that represent.
+
+- *Multiplexing* :: use a single channel to carry several signals.
+
+*** Baseband Transmission
+
+The signal occupies frequencies from zero up to a maximum
+
++ *Non-Return-to-Zero* (*NRZ*) :: a positive voltage for 1 bit and a negative
+    for 0 bit. The receiver converts it into the closest symbols by sampling the signal at
+    regular intervals of time.
+  - With $B$ bits/sec, the bandwidth is at least $B/2$ Hz. To reduce
+    bandwidth, one may define more voltage levels (symbols) to decrease the
+    *symbol rate* (baud rate) while retaining the bit rate.
+
