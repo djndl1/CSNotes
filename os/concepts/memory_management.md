@@ -63,6 +63,8 @@ Using a page size of a power of 2 simplifies the mapping from virtual addresses 
 
 ## Page Table
 
+### Table Entry
+
 The virtual address is split into a virtual page number and an offset. The purpose of the page table is to map virtual pages onto page frames.
 
 ```
@@ -76,15 +78,19 @@ The virtual address is split into a virtual page number and an offset. The purpo
                   Referenced
 ```
 
+- page frame number: the output
+
+- present/absent bit: whether this page/entry is mapped and can be used
+
 - protection bits: what kinds of access are permitted
 
-- modified bit/dirty bit: of value when the OS decides to reclaim a frame
+- supervisor bit: whether the page is accessible only to privileged code.
 
-- referenced bit: helps the OS choose a page to evict when a page fault occurs. Pages that are not being used are far better candidates than pages that are.
+- modified bit/dirty bit: must be written back to nonvolatile storage when the OS decides to reclaim a frame
 
-- caching bit: important for pages that map onto device registers rather than memory.
+- referenced bit: whether a page is referenced. It helps the OS choose a page to evict when a page fault occurs. Pages that are not being used are far better candidates than pages that are.
 
-Virtual memory fundamentally does is create a new abstraction - the address space which is an abstraction of physical memory, just as a process is an abstraction of the physical processor.
+- caching bit: whether caching is disabled for this page. Important for pages that map onto device registers rather than memory.
 
 The major issue in any paging system is
 
