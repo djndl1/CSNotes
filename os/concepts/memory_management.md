@@ -47,6 +47,8 @@ The OS must manage memory allocation of processes (note this is not about implem
 
 The problem of programs larger than memory has been around since the beginning of computing. A solution in the '60s was to split programs into little pieces (overlays). The overlay manager loaded each overlay when it was needed. The overlays were kept on the disk and swapped in and out of memory by the overlay manager. The work of splitting the program had to be done manually by the programmer. The automatic version of this splitting method is known as _virtual memory_. The basic idea is that each program has its own address space, which is broken up into chunks called _pages_ and swapped by pages. An alternative, called _segmentation_ is to use variable-sized segment as units, which is not really used much nowadays.
 
+Virtual memory creates a new abstraction - the address space which is an abstraction of physical memory, just as a process is an abstraction of the physical processor.
+
 ## Paging Overview
 
 - _page_: a contiguous range of addresses. These pages are mapped onto physical memory by an _Memory Management Unit_ (MMU), but not all pages have to be in physical memory at the same time to run the program.
@@ -55,9 +57,9 @@ The problem of programs larger than memory has been around since the beginning o
 
 - _virtual address_: program-generated address.
 
-When virtual memory is used, the virtual addresses do not go directly to the memory bus. Instead, they go to an MMU that maps the virtual addresses onto the physical memory addresses. A present/absent bit keeps track of which pages are physically present in memory. A page fault causes the OS to bring the unmapped page into physical memory and occupy a page frame if that page is not mapped. The original page that uses this frame, if any, is set to absent and the faulting page is set to present.
+When virtual memory is used, the virtual addresses do not go directly to the memory bus. Instead, they go to an MMU that maps the virtual addresses onto the physical memory addresses. The MMU holds the current set of page mappings. A present/absent bit keeps track of which pages are physically present in memory. A page fault causes the OS to bring the unmapped page into physical memory and occupy a page frame if that page is not mapped. The original page that uses this frame, if any, is set to absent and the faulting page is set to present.
 
-Using a page size of a power of 2 simplifies the mapping from virtual addresses to physical addresses as the lower offset part may be retained while the higher page number is mapped and replaced.
+Using a page size of a power of 2 simplifies the mapping from virtual addresses to physical addresses as the lower offset part may be retained while the higher page number is mapped and replaced. All memory access made by software use virtual addresses including the kernel, which has its own set of mappings. Sometimes the OS maps the kernel memory into the user process' virtual space but protected to avoid switching page mappings.
 
 ## Page Table
 
