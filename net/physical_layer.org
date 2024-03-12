@@ -229,3 +229,8 @@ The signal occupies frequencies from zero up to a maximum
     bandwidth, one may define more voltage levels (symbols) to decrease the
     *symbol rate* (baud rate) while retaining the bit rate.
 
+**** Clock Recovery Problem
+
+Sampling requires an accurate clock to determine when to sample to accurately
+reconstruct the bits: a long run of 15 zero bits looks not much different from
+16 bits.
