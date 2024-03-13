@@ -172,7 +172,7 @@ without being strongly attenuated is the *bandwidth*.
 
 - *Baseband Signals* :: signals that run from 0 to a maximum frequency
 
-- *Passband Signals* :: signals that are shifted to occupy a higher range of frequencies.
+- *Bandpass Signals* :: signals that are shifted to occupy a higher range of frequencies.
 
 Suppose a transmission rate of $b$ bps, then sending eight bits requires $8/b$
 seconds, that is, the frequency of $b/8$ Hz for first harmonic of the signal.
@@ -214,7 +214,7 @@ $$
  theoretic capacity at about 13 Mbps.
 ** Digital Modulation
 
-Converting between binary bits and signals that represent.
+Converting between binary bits and signals that represent bits.
 
 - *Multiplexing* :: use a single channel to carry several signals.
 
@@ -233,4 +233,16 @@ The signal occupies frequencies from zero up to a maximum
 
 Sampling requires an accurate clock to determine when to sample to accurately
 reconstruct the bits: a long run of 15 zero bits looks not much different from
-16 bits.
+16 bits. Sending a separate clock signal is not feasible for most network links.
+To solve this problem and avoid long runs of equal symbols:
+
+- *Manchester Encoding* :: XOR a clock signal with the data signal; used for
+  classic Ethernet; Requires twice as much as bandwidth as NRZ.
+
+- *Non-Return-to-Zero Inverted* :: coding a 1 as a transition and a 0 as no
+  transition; used in USB; Long consecutive bits of 1s and 0s requires recoding
+  to add some bit change. (*4B/5B*)
+
+- *Scrambling* :: Encoding and decoding the data by XORing it with a
+  pseudorandom sequence, which also randomize its distribution among its different
+  frequency components.
