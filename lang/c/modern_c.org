@@ -1,0 +1,4 @@
+#+title: Modern C
+
+Just like modern C++, Modern C is not C in the latest language standard, but a
+set of encouraged conventions and practices that are used in modern C development.
