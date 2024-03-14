@@ -2,3 +2,84 @@
 
 Just like modern C++, Modern C is not C in the latest language standard, but a
 set of encouraged conventions and practices that are used in modern C development.
+
+* Struct Initialization
+
+Designated initialization, nested initialization and compound literals leads API
+reforms in C.
+
+* =_Generic= and Overloading
+
+Useful for math functions.
+
+* Macro Use
+
+** =defer=
+
+A scope that upon entering sets up something and tears it down when leaving it.
+
+#+begin_src c
+#define CONCAT(a, b) a##b
+#define CONCAT2(a, b) CONCAT(a, b)
+#define INTERNAL_VAR(v) CONCAT2(v, __LINE__)
+
+// both begin and end are required to be expressions
+// function calls, even void functions, are valid expressions.
+#define scoped(begin, end) for ( \
+        int INTERNAL_VAR(_i_) = (begin, 0);  \
+        !INTERNAL_VAR(_i_);                  \
+        ((INTERNAL_VAR(_i_)) += 1), end)
+
+bool entered = false;
+
+void begin_func()
+{
+    entered = true;
+}
+
+void end_func()
+{
+    entered = false;
+}
+
+int main(void)
+{
+    printf("Before enter: Entered %d\n", entered);
+    scoped(begin_func(), end_func()) {
+        printf("Entered %d\n", entered);
+    }
+    printf("After entered: Entered %d\n", entered);
+}
+#+end_src
+
+* Parameters & Return Values
+
+Out parameters are discouraged, use return value with structures.
+Value passing rather than pointers are more preferred
+and can be used with compound literals.
+
+* Union as a way to give members different styles of name.
+
+#+begin_src c
+typedef union _pair {
+    struct { float X, Y; };
+    struct { float Left, Right; };
+    float Elements[2];
+} pair;
+#+end_src
+
+* Error Handling
+
+Return the result data along with the error in a struct.
+The error may be even propagated through multiple function calls without being
+checked before the final check.
+
+#+begin_src c
+result_t a = read_data();
+result_t b = process_data();
+result_t c = write_data();
+
+if (c.succeeded) {
+    ...
+}
+#+end_src
