@@ -3,6 +3,16 @@
 Just like modern C++, Modern C is not C in the latest language standard, but a
 set of encouraged conventions and practices that are used in modern C development.
 
+- Declarative and Functional
+
+- Value-Oriented and Less Pointers
+
+- Heavy Zero Initializtion
+
+- Centralized Resource Management
+
+- Allocator-aware
+
 * Struct Initialization
 
 Designated initialization, nested initialization and compound literals leads API
