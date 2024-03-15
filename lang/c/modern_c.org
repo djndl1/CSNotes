@@ -93,3 +93,43 @@ if (c.succeeded) {
     ...
 }
 #+end_src
+
+* Generic APIs
+
+[[https://github.com/nothings/stb/blob/master/stb_ds.h][stb_ds.h]] and [[https://github.com/stclib/STC][STC]] offer examples of mixing macros and functions.
+
+* Single-Header Library
+
+A header of the interface and the implementation separated by a macro definition.
+
+* Writing Libraries
+
+- Avoid allocations and request allocators or buffers from the user.
+
+- Try to make libraries freehosted.
+
+#+begin_src c
+typedef struct allocator_t {
+    void *user_data; // some additional data that may be used by the allocator
+    void *(*proc)(allocator_t *this_allocator, size_t amount_to_alloc, void *ptr_to_free);
+} allocator_t;
+
+#+end_src
+
+* Memory Management
+
+- Make an temporary allocator and use it to create a few objects and free the
+  allocator to release the memory altogether, basically a simple GC.
+
+* Avoid Libc
+
+Terrible and confusing API design that often causes misunderstanding and misuse.
+Only a few like =stdint.h=, =memmove=, =memcpy=, =memset=, =math.h= are useful.
+
+Null-terminated strings are slow. String handling functions in libc are badly
+designed: =strtok= is not only non-reentrant, it even modifies the input string
+by replacing the first character of the delimiter with a ='\0'=.
+
+* String Handling
+
+Differentiate owning strings (=StringBuilder=) and non-owning strings (=string=)
