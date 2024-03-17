@@ -123,12 +123,52 @@ typedef struct allocator_t {
 
 * Avoid Libc
 
-Terrible and confusing API design that often causes misunderstanding and misuse.
-Only a few like =stdint.h=, =memmove=, =memcpy=, =memset=, =math.h= are useful.
+#+begin_quote
+The C stdlib is essentially an SDK for very simple 70's UNIX-style command line
+tools, but operating systems have moved on, while the C standard library is
+unfortunately stuck in the past.
+#+end_quote
 
-Null-terminated strings are slow. String handling functions in libc are badly
+- Terrible and confusing API design that often causes misunderstanding and misuse.
+    Only a few like =stdint.h=, =memmove=, =memcpy=, =memset=, =math.h= are useful.
+
+- Character functions are defined for use with =fgetc=. They accepts =int=, which
+in unintuitive, and the domain is =unsigned character= and =EOF=: they do not
+accept most values. Use them with =param & 0xFF= to avoid undefined behavior.
+Still, the behavior is locale-specific.
+  + multibyte and wide string functions are locale specific and thus unreliable
+
+- Null-terminated strings are slow. String handling functions in libc are badly
 designed: =strtok= is not only non-reentrant, it even modifies the input string
-by replacing the first character of the delimiter with a ='\0'=.
+by replacing the first character of the delimiter with a ='\0'=. =strcpy= and
+=strcat= are unsafe; =strncat= and =strncpy= have confusing semantics about the
+terminating =null= and the specified size is the source's length, which should
+have been the destination's length to prevent out-of-bound access.
+
+- =errno= is global (hopefully thread-local).
+
+- signals: limited and useless
+
+- C11 threads: badly designed with limited functionality
+
+- I/O streams distinguishes between text and binary. Text streams translate
+  input and output and have terrible performance. STDIO are buffered. STDIO are
+  usually protected by a mutex. STDIO has terrible support for Unicode. Seek
+  offsets are limited to =long=.
+
+- Numeric conversion functions are locale-dependent.
+
+- the functions themselves are fine; their use is too granular.
+
+** Alternatives
+
+- GLib
+
+- libcork
+
+- Apache Portable Runtime
+
+- [[https://github.com/rustyrussell/ccan/][CCAN]]
 
 * String Handling
 
