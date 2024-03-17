@@ -173,3 +173,18 @@ have been the destination's length to prevent out-of-bound access.
 * String Handling
 
 Differentiate owning strings (=StringBuilder=) and non-owning strings (=string=)
+
+* Workaround Weakness of Typedef
+
+#+begin_src c
+typedef struct { int val; } meter_t; // instead of int for type safety
+typedef struct { int val; } hour_t;
+#+end_src
+
+* Pointers Are =Unsafe=
+
+#+begin_quote
+The presence of pointers in C code and in structs always requires special
+attention and mental effort to read and understand all the code ‘tainted’ by
+those pointers.
+#+end_quote
