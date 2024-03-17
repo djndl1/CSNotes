@@ -68,6 +68,14 @@ Out parameters are discouraged, use return value with structures.
 Value passing rather than pointers are more preferred
 and can be used with compound literals.
 
+The reason why structs may be copied into parameters in C are that, unlike C++,
+where structs/classes have complex copy semantics including memory allocation, C
+structs are copied bit by bit. For a relatively small structure, they might even
+be passed in a register.
+
+Structs may be used as a way to design a function with default parameters as
+unspecified struct members are empty initialized.
+
 * Union as a way to give members different styles of name.
 
 #+begin_src c
