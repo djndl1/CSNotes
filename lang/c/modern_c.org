@@ -163,6 +163,8 @@ have been the destination's length to prevent out-of-bound access.
   input and output and have terrible performance. STDIO are buffered. STDIO are
   usually protected by a mutex. STDIO has terrible support for Unicode. Seek
   offsets are limited to =long=.
+  + On Windows, standard C programs interact with the ANSI Win32 API (through
+    MSVCRT's implementation), completely ignorant of Unicode.
 
 - Numeric conversion functions are locale-dependent.
 
