@@ -80,16 +80,18 @@ A better modeling should be constructed using _queuing theory_.
 
 # Threads
 
-The main reason for having threads is that in many applications, multiple activities are going on at once. Threads are lighter weight than processes, easier/faster to create and destroy than processes. Threads are useful on systems with multiple CPUs.
+The main reason for having threads is that in many applications, multiple activities are going on at once. Threads are lighter weight than processes, easier/faster to create and destroy than processes. Threads are useful especially on systems with multiple CPUs for performance reason.
 
 - **thread**: The abstraction of execution of a process is a _thread of execution_. The thread has a program counter, registers that hold its current working variables, a stack which contains the execution history with one frame for each procedure. Threads are the entities scheduled for execution on the CPU.
 
-What threads add to the process model is to allow multiple executions to take place in the same process environment, to a large degree indepenedent of one another. 
-Threading separates the concepts of resource grouping and execution. Processes share physical hardware resources while threads shared an address space and other resources.
+What threads add to the process model is to allow multiple executions to take place in the same process environment, to a large degree independent of one another. 
+Threading separates the concepts of /resource grouping/ and /execution/. Processes share physical hardware resources while threads shared an address space and other resources.
 
 - **multithreading**: used to describe the situation of allowing multiple threads in the same process. Some CPUs have direct hardware support for multithreading and allow thread switches to happen on a nanosecond time scale.
 
-A thread can be in:
+Multithreading adds complications into the programming model: the behavior and semantics of Unix `fork` when the parent process is multithreaded; thread synchronization;
+
+A thread may be in:
 
 - running
 
@@ -101,9 +103,13 @@ A thread can be in:
 
 There are two main places to implement threads:
 
-- user space: can be implemented on an OS that does not support threads. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Making a local call into the runtime is much more efficient than calling a kernel call. User-level threads allow each process to have its own scheduling algorithm. Some major problems with user-level threads are: 1. blocking syscalls blocks the whole process, which defeats one of the major goals of having multiple threads. The whole process is blocked when a page fault occurs. 2. within a single process, there are no clock interrupts, making it impossible to schedule processes round-robin fashion (preemptively). The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
+- *Userspace*: can be implemented /on an OS that does not support threads/. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Making a local call into the runtime is /much more efficient/ than calling a kernel call. User-level threads allow each process to /have its own scheduling algorithm/. Some major problems with user-level threads are: 
+  - blocking syscalls blocks the whole process, which defeats one of the major goals of having multiple threads.Either the system calls have to be nonblocking or it is possible to determine in advance whether it will block. 
+  - The whole process is blocked when a page fault occurs. 
+  - Cooperative scheduling: within a single process, there are no clock interrupts, making it impossible to schedule processes preemptively. The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
+  - threads are often used in situations where they are frequently blocked, to overcome the negative effects of blocking calls to provide responsive results and high throughput. Kernel threads may immediately switch on blocking calls without much cost since the kernel has already taken control. For CPU-bound tasks, userspace threads are not of much value.
 
-- kernel: the kernel handles all the threads in the system. In some systems, in order to save some overhead, when a thread is destroyed, it is marked as not runnable, but its kernel data structures are not affected. Later when a new thread must be created, an old thread is reactivated. The main disadvantage is that the cost of a syscall is substantial.
+- *Kernel**: the kernel handles all the threads in the system. In some systems, thread structures in the kernel are recycled and reused. The main disadvantage is that the cost of a syscall is substantial.
 
 - hybrid: use kernel-level threads and then multiplex user-level onto some or all of them.
 
