@@ -246,3 +246,13 @@ To solve this problem and avoid long runs of equal symbols:
 - *Scrambling* :: Encoding and decoding the data by XORing it with a
   pseudorandom sequence, which also randomize its distribution among its different
   frequency components.
+
+Certain signals have as much positive voltage as negative voltage even over
+short periods of time (*balanced signals*), lacking in DC component. Balanced
+signals have enough transitions between positive and negative voltage that they
+help clock recovery.
+
+- *Bipolar encoding*, *Alternate Mark Inversion* :: use two voltages levels to
+  represent 1 and 0 (-1V for zero and 1V for one)
+
+- 8B/10B or 4B/5B may also be used as alternative to achieve balance.
