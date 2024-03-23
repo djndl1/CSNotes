@@ -117,7 +117,7 @@ There are two main places to implement threads:
 
 - **pop-up thread**: start up a new thread in a distributed system when an incoming message is received.
 
-## Make Existing Code Multithreaded
+## Issues When Making Existing Code Multithreaded
 
 ### Global Variables
 
@@ -125,11 +125,11 @@ Accessing global variables can cause problems from different threads. Thread-loc
 
 ### Reentrancy
 
-Many library procedures are not reentrant (they are not designed to have a second call made to any given procedure while a previous call has not yet finished). 
+Many library procedures are not reentrant: they are not designed to have a second call made to any given procedure while a previous call has not yet finished (e.g. stateful function). Either rewrite the library or add some kind of mutual exclusion.
 
 ### POSIX Signals
 
-Signals are hard to handle in multithreading as they are not designed for this. 
+Signals are hard to handle in multithreading as they are not designed for this. Some signals are logically thread-specific while others have semantics unrelated to threading.
 
 # IPC
 
