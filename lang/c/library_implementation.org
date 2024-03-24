@@ -1,4 +1,5 @@
 #+title: Library Implementation
+#+bibliography: ref.bib
 
 * Design Issues
 
@@ -23,3 +24,68 @@
  instructions out of the inner loop of a linear search is doomed to be less
  profitable than using a binary search in the first place.
   #+end_quote
+
+
+* Interfaces & Implementations
+
+** Modular Programming
+
+#+begin_quote
+A modular design can be characterized by functional partitioning into discrete
+scalable and reusable modules, rigorous use of well-defined modular interfaces,
+and making use of industry standards for interfaces.
+#+end_quote
+
+A quote from Modula[cite:@wirth_modula_1977]:
+
+#+begin_quote
+A module is a set of procedures, data types, and variables, where the programmer
+has precise control over the names that are imported from and exported to the environment.
+...
+A module is a collection of constant-, type-, variable-, and procedure
+declarations. They are called objects of the module and come into existence
+when control enters the procedure to which the module is local. The module
+should be thought as a fence around its objects. The essential property of the
+module construct is that it allows the precise determination of this fence's transparency.
+In its heading, a module contains two lists of identifiers: the define-list
+mentions all module objects that are to be accessible outside the module. The
+use-list mentions all objects declared outside the module that are to be visible
+inside.
+This facility provides an effective means to make available selectively those
+objects that represent an intended abstraction and to hide those objects that
+are considered as details of implementation. A module encapsulates those parts
+that are non-essential to the remainder of a program or that are even to the
+protected from inadvertent access. Modules may be nested.
+#+end_quote
+
+Originally, Modula (MODUlar programming LAnguage) introduced the concept of module to abstract away
+machine-dependent details of multiprocessing and peripheral devices. Modula even
+considers its use of types similar to that of OOP classes in terms of
+information hiding.
+
+#+begin_quote
+Outside the module from which a type is exported we do not know whether a type
+is a scalar, an array, or a record. Therefore, variables of this type can be
+operated by procedures only that are exported from the same module.
+#+end_quote
+
+#+begin_quote
+While the historical usage of these terms has been inconsistent, "modular
+programming" now refers to the high-level decomposition of the code of an entire
+program into pieces: structured programming to the low-level code use of
+structured control flow, and object-oriented programming to the data use of
+objects, a kind of data structure.
+#+end_quote
+
+#+begin_quote
+Often modules form a directed acyclic graph (DAG); in this case a cyclic
+dependency between modules is seen as indicating that these should be a single
+module. In the case where modules do form a DAG they can be arranged as a
+hierarchy, where the lowest-level modules are independent, depending on no other
+modules, and higher-level modules depend on lower-level ones.
+...
+#+end_quote
+
+* Bibliography
+
+#+print_bibliography:
