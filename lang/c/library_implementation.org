@@ -86,6 +86,31 @@ modules, and higher-level modules depend on lower-level ones.
 ...
 #+end_quote
 
+*** Interface-Based Programming and Component-Based Software
+
+Interface-based programming is the OO version of modular programming: it
+implements modular programming at the component level in an OOP language.
+
+Public members of a class are bound to be used by and become dependencies of client
+code. For a superclass, its subclasses are also its client and protected members
+may also be considered part of its interface and thus *implementation inheritance*
+(whitebox reuse) should be used with caution.
+
+An interface is a contract that defines and guarantees certain behavior.
+An interface also defines a type that represents IS-A relationship with
+*interface inheritance*, an opportunity for polymorphism. Inteface-based programming
+provides black-box reuse, based on formal separation of interface and
+implementation, in which implementation details are never revealed to client.
+
+Component-based software engineering is modular programming at a higher level,
+emphasizing building software out of loosely-coupled components (software
+package, a web service, a code module etc.). Components communicate with each
+other via interfaces (provided by one and used by another). Components must be
+*substitutable*, *reusable* with good documentation, robust implementation and
+appropriate error reporting. Technologies such as MSCOM, gRPC, D-Bus, DCOM,
+REST define common ground and standards for component building and component
+communication.
+
 * Bibliography
 
 #+print_bibliography:
