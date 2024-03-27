@@ -1,9 +1,0 @@
--I/usr/x86_64-w64-mingw32/include
--I./include
--DUNICODE
--D_UNICODE
--fshort-wchar
--D_WIN64
--std=gnu11
--target
-x86_64-w64-mingw32
