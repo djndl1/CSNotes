@@ -1,0 +1,60 @@
+#+title: Microsoft Foundation Classes
+
+* Windows Programming and MFC
+
+- /Event-driven programming model/
+
+#+begin_quote
+applications respond to events by processing messages sent by the operating
+system. An event could be a keystroke, a mouse click, or a command for a window
+to repaint itself, among other things. The entry point for a Windows program is
+a function named WinMain, but most of the action takes place in a function known
+as the window procedure. The window procedure processes messages sent to the
+window. WinMain creates that window and then enters a message loop, alternately
+retrieving messages and dispatching them to the window procedure. Messages wait
+in a message queue until they are retrieved. A typical Windows application
+performs the bulk of its processing in response to the messages it receives, and
+in between messages, it does little except wait for the next message to arrive.
+
+A message manifests itself in the form of a call to a window's window procedure.
+Bundled with the call are four input parameters
+#+end_quote
+
+- a thin-wrapper OOP class library around win32 API for windows apps and also a framework that
+  handles many routine chores: the entry function, the message loop.
+
+- /Document/View Architecture/ document objects =CDocument= hold an app's data and view
+  objects =CView= render views of that data.
+
+- Class Hierarchy
+  + =CObject=:
+    - Serialization support
+    - Runtime class information support (distinguished from RTTI)
+    - Diagnostics and debugging support
+
+- Global functions are prefixed with =Afx=.
+
+- A MFC window maintains a message map that maps a =WM_= message to a handler
+  routine. The window procedure first looks up in the class's message map, and
+  if nothing is found, its base class's message map is searched. This
+  implementation does not use a v-table of each message handler and use a chain
+  of tables for message handling.
+
+* Shared Classes with ATL
+
+- Datetime: =COleDateTime=, =COleDateTimeSpan= with OLE =DATE= types and
+  =CTime=, =CTimeSpan= for C-style time functionality.
+
+- String: =CString<>=, =CStringW=, =CStringA=
+
+* MFC Collection Classes
+
+MFC comes with its own set of containers (no better than STL though).
+
+- =CArray<>=, =CByteArray=, =CWordArray= and others: a dynamic array.
+
+- =CList<>=, =CObList=, =CPtrList=, =CStringList=: doubly linked lists
+
+- =CMap<>=, =CMapWordToPtr= and others: associative arrays
+
+- =CTypedPtrArray<>=, =CTypedPtrList<>=, =CTypedPtrMap<>=: type-safe pointer containers.
