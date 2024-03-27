@@ -117,6 +117,58 @@ There are two main places to implement threads:
 
 - **pop-up thread**: start up a new thread in a distributed system when an incoming message is received.
 
+## Multithreading Versus Event-Driven
+
+I/O operations are mostly handled by peripheral devices rather than the CPU and thus inherently asynchronous and concurrent.
+In a multi-threaded program, each run of a thread is a task. The runtime switches between threads to run each task. In an event-driven program,
+A single thread always uses async I/O and saves each task's I/O state before moving on to another task. The thread runs in an event loop, keeps checking all the saved states and picks completed ones to carry out related tasks further. It only returns to a previous task when the related async I/O operation returns.
+A multi-threaded program switches tasks through the runtime and tasks' states are managed and maintained by the runtime. An event-driven program maintains the states
+of tasks by itself and cooperatively yields and switches to another task. A thread is a vessel of a task, which records its execution state. The threading runtime takes this state and lets the CPU to continue at the saved state and to yield when appropriate. The main thread in an event-driven program may as well simulate this mechanism with cooperative multitasking: saving the execution state of a task when it simply cannot continue due to logic requirement, and continuing with the task only when the task's required condition is met. There is no rule saying that multitasking requires multi-threading.
+A typical event driven program runs like the following psuedocode that simulates a web server:
+
+```c
+inputHandles = { }
+outputHandles = {  }
+
+dataDict<Handle, Data> = {  }
+
+while (true) {
+    readyInputHandles, readyOutputHandles = check_available_handles(inputHandles, outputHandles, NO_WAIT);
+    for (readyHandle in readyInputHandles) {
+        if (readyHandle == listening_socket_handle) {
+            // new task is started
+            newSocketHandle = listening_socket_handle.accept(); // a new connection from a client
+            inputHandles.add(new_socket_handle)
+            // yield to wait for request data
+        } else {
+            // continue a previous task to receive request data
+            request = readyHandle.receive(); // new data from the client
+            response = handle_request(request);
+            dataDict[readHandle] = response;
+            
+            outputHandles.add(readyHandle); // for sending responses
+            // yield to wait for output 
+        }
+    }
+    
+    for (readyHandle in readyOutputHandles) {
+      // continue a previous task to send response data
+      saved_response = dataDict[readyHandle]; // previous saved response
+      n = readyHandle.send(saved_response); // sent n bytes
+      
+      if (n < saved_response.length) { // not yet finished
+          dataDict[readyHandle] = saved_response[n:]; // save the unfinished part
+          // yield for further output
+      } else {
+          // request finished, destroying tasks
+          dataDict.remove(readyHandle);
+          outputHandles.remove(readyHandle);
+          // the task is now terminated
+    }
+}
+```
+
+
 ## Issues When Making Existing Code Multithreaded
 
 ### Global Variables
