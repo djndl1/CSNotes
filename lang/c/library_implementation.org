@@ -111,6 +111,15 @@ appropriate error reporting. Technologies such as MSCOM, gRPC, D-Bus, DCOM,
 REST define common ground and standards for component building and component
 communication.
 
+** Interface
+
+An interface specifies only those identifiers used by the clients, hiding
+irrelevant representation details and algorithms as much as possible. Interface
+specification is unfortunately laborious and verbose but necessary.
+
+Interfaces in C are specified by headers. Identifiers may be prefixed to avoid
+name collisions.
+
 * Bibliography
 
 #+print_bibliography:
