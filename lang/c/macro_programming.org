@@ -1,0 +1,85 @@
+#+title: Macro Programming
+
+* Stringify/Stringize
+
+* X Macro
+
+X macros are used to construct and use tables. A table consists of rows of
+related fields, put as arguments of a macro. The macro is not defined until
+later some columns are used, where the use is defined by the macro.
+
+#+begin_src c
+#define _STRINGIFY(s) #s
+#define STRINGIFY(s) _STRINGIFY(s)
+
+#define A_TABLE \
+    X(A, 1) \
+    X(B, 2) \
+    X(C, 3)
+
+#define X(a, b) a = b,
+enum an_enum {
+    A_TABLE
+};
+#undef X
+
+#define X(a, b) [a] = STRINGIFY(a),
+char *an_array[] = {
+     A_TABLE
+};
+#undef X
+#+end_src
+
+To avoid long lines, the table may be even defined as a header and included
+where it is used.
+To avoid the repeated use of a certain token as the macro
+name or the =define=/=undef= pair, the X macro may be even used as an argument.
+
+#+begin_src c
+#define A_TABLE(row) \
+    row(A, 1) \
+    row(B, 2) \
+    row(C, 3)
+
+#define ARR_ELM(a, b) [a] = STRINGIFY(a),
+#define ENUM_ELM(a, b) a = b,
+
+enum an_enum {
+    A_TABLE(ENUM_ELM)
+};
+
+char *an_array[] = {
+     A_TABLE(ARR_ELM)
+};
+#+end_src
+
+One may take advantage of X macro to define smart enum types.
+
+One way to count the number of entries of the table is to expand each row into
+an array element and use =sizeof(arr) / sizeof(element)= to count the size. The
+downsize is that a helper array is generated with actually being used. It is
+expected that the table is relatively small that it doesn't actually occupy much
+space or that the compiler may eliminate the helper array. Otherwise, the table and
+the size should be probably generated using a more capable macro processor.
+
+** Use
+
+- As a code generator
+   + a list of initializers
+   + a list of declarations
+   + smart enums
+
+* Recursive Macro Expansion
+
+C macros does not support recursive macro calls. However, macro expansions are recursive.
+
+#+begin_src c
+#define INIT_VALUE init_value,
+#define INIT_VALUE_2 INIT_VALUE INIT_VALUE
+#define INIT_VALUE_4 INIT_VALUE_2 INIT_VALUE_2
+#define INIT_VALUE_8 INIT_VALUE_4 INIT_VALUE_4
+
+value_t arr[8] = {
+     INIT_VALUE_8
+};
+#+end_src
