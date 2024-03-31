@@ -1,5 +1,19 @@
 #+title: Macro Programming
 
+* C Preprocessor
+
+** Charsets
+
+- *source file character set* ::
+
+- *source/input character set* :: the encoding used to interpret the source
+  files. Text is first converted into this charset before being processed by the preprocessor.
+  + by default UTF-8 in GCC; UTF-8 if BOM is there, current locale if none in MSVC
+
+- *execution character set* :: the encoding used for the text of the program
+  that is input to the compilation phase after preprocessing. Used for the
+  internal representation of any string or character literals in the compiled program.
+
 * Stringify/Stringize
 
 * X Macro
