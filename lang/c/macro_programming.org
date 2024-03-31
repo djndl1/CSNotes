@@ -82,6 +82,22 @@ xstr (foo)
      → "4"
 #+end_src
 
+* Token Concatenation/Pasting
+
+When a macro is expanded, the two tokens on either side of each =##= operator
+are combined into a single token, which then replaces the =##= and the two
+original tokens in the macro expansion. Concatenation succeeds only if the
+result is a valid token, otherwise the two tokens are still separated.
+The token next to =##= is not macro-expanded first.
+
+#+begin_src c
+#define EXPANDABLE 1
+#define CONCAT(a, b) a ## b
+
+CONCAT(EXPANDABLE, _2) // expands to EXPANDABLE_2 instead of 1_2
+#+end_src
+
+
 * X Macro
 
 X macros are used to construct and use tables. A table consists of rows of
