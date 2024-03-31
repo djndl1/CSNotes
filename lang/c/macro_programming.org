@@ -1,20 +1,48 @@
 #+title: Macro Programming
 
-* C Preprocessor
+* Macro Definition Order
 
-** Charsets
+The definition order does not matter as long as the dependent macros are defined
+before the depending macro is used.
 
-- *source file character set* ::
+#+begin_src c
+#include <stdio.h>
 
-- *source/input character set* :: the encoding used to interpret the source
-  files. Text is first converted into this charset before being processed by the preprocessor.
-  + by default UTF-8 in GCC; UTF-8 if BOM is there, current locale if none in MSVC
+#define TEST_PRE TEST_POST
 
-- *execution character set* :: the encoding used for the text of the program
-  that is input to the compilation phase after preprocessing. Used for the
-  internal representation of any string or character literals in the compiled program.
+int main()
+{
+#define TEST_POST 1
+    printf("TEST_PRE %d\n", TEST_PRE);
+#undef TEST_POST
+#define TEST_POST 2
+    printf("TEST_PRE %d\n", TEST_PRE);
+    return 0;
+}
+#+end_src
 
-* Stringify/Stringize
+#+begin_src shell
+TEST_PRE 1
+TEST_PRE 2
+#+end_src
+
+
+* Stringify/Stringizing
+
+the directive =#symbol= turns the symbol name into a string constant. The
+symbol argument is not macro-expanded first.
+
+#+begin_src c
+#define xstr(s) str(s)
+#define str(s) #s
+#define foo 4
+str (foo)
+     → "foo"
+xstr (foo)
+     → xstr (4)
+     → str (4)
+     → "4"
+#+end_src
 
 * X Macro
 
