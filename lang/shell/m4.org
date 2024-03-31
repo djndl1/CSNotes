@@ -1,0 +1,47 @@
+#+title: M4
+
+M4 reads in tokens (divided by whitespace, numbers and punctuation unless whtin
+a quoted string or a macro argument). If it encounters a macro name, it reads in
+macro's arguments if any, determines the expansion and inserts the expansion and
+continues scanning the input starting at the expansion (and thus macro expansion is recursive).
+
+M4 comes with an initial set of built-in macros.
+
+- =define()= defines a macro; expands to an empty string
+  + =()= may be used within a macro's argument list.
+  + unbalanced parentheses can be quoted to get protected.
+  + Unlike the C preprocessor, another =define()= may be nested within the expansion.
+
+- =undefine()= undefines a macro.
+
+- =dnl= deletes to new line; this eliminates any newline after =define()=
+
+  #+begin_src m4
+define(AUTHOR, William Shakespeare)dnl
+
+define(PARENS, ())dnl
+define(LPARENS, `(')dnl
+define(RPARENS, `)')dnl
+brackets: PARENS
+left bracket: LPARENS
+right bracket: RPARENS
+  #+end_src
+
+- quoting =`quoted'= suppresses macro expansion
+  + a quoted string may contain newlines.
+  + quoting a macro name is recommended.
+
+    #+begin_src m4
+  `Author' is Author # Author is William Shakespeare
+  define(newline, `line
+  break')
+
+define(LEFT, A)dnl
+LEFT
+define(LEFT, B)dnl # define(A, B)
+LEFT # B
+A    # A
+# to avoid this, quote LEFT
+    #+end_src
+
+- =#= comments are output by M4
