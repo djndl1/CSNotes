@@ -1,5 +1,43 @@
 #+title: Macro Programming
 
+* Object-Like Macro
+
+A simple identifier which will be replaced by a code fragment.
+
+* Function-Like Macro
+
+A function-like macro may contain no arguments. Parameters must be valid C
+identifiers. Parenthese within each argument must balance and a comma within
+such parentheses does not end the argument.Empty argument is
+not an error but the resulted code may be.
+
+All arguments to a macro are completely macro-expanded before they are
+substituted into the macro body. After substitution, the complete text is
+scanned again for macros to expand, including the arguments.
+
+#+begin_src c
+#define macro_func() (...) // totally legit
+
+macro_func_with_args((a, b, c)) // legit since the argument is surrounded by parentheses
+#+end_src
+
+* Recursive Macro Expansion
+
+C macros does not support recursive macro calls. However, macro expansions are
+recursive until the expanded result contains some macro previously expanded to
+prevent infinite recursion.
+
+#+begin_src c
+#define INIT_VALUE init_value,
+#define INIT_VALUE_2 INIT_VALUE INIT_VALUE
+#define INIT_VALUE_4 INIT_VALUE_2 INIT_VALUE_2
+#define INIT_VALUE_8 INIT_VALUE_4 INIT_VALUE_4
+
+value_t arr[8] = {
+     INIT_VALUE_8
+};
+#+end_src
+
 * Macro Definition Order
 
 The definition order does not matter as long as the dependent macros are defined
@@ -111,17 +149,3 @@ the size should be probably generated using a more capable macro processor.
    + a list of declarations
    + smart enums
 
-* Recursive Macro Expansion
-
-C macros does not support recursive macro calls. However, macro expansions are recursive.
-
-#+begin_src c
-#define INIT_VALUE init_value,
-#define INIT_VALUE_2 INIT_VALUE INIT_VALUE
-#define INIT_VALUE_4 INIT_VALUE_2 INIT_VALUE_2
-#define INIT_VALUE_8 INIT_VALUE_4 INIT_VALUE_4
-
-value_t arr[8] = {
-     INIT_VALUE_8
-};
-#+end_src
