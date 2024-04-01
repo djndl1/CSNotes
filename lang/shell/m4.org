@@ -10,7 +10,9 @@ M4 comes with an initial set of built-in macros.
 - =define()= defines a macro; expands to an empty string
   + =()= may be used within a macro's argument list.
   + unbalanced parentheses can be quoted to get protected.
-  + Unlike the C preprocessor, another =define()= may be nested within the expansion.
+  + Unlike the C preprocessor, another =define()= may be nested within the
+    expansion, protected by quoting. Arbitrary nesting is possible with an extra
+    layer of protective quotes at each level of nesting.
 
 - =undefine()= undefines a macro.
 
@@ -30,6 +32,11 @@ right bracket: RPARENS
 - quoting =`quoted'= suppresses macro expansion
   + a quoted string may contain newlines.
   + quoting a macro name is recommended.
+  + empty quotes may be a separator between two tokens.
+  + =changequote= changes the default quoting delimiters just in case. Do not
+    use the same character for the opening delimiter and the closing delimiter.
+    Also, do not use a quote delimiter that begins with a letter, underscore or
+    a digit.
 
     #+begin_src m4
   `Author' is Author # Author is William Shakespeare
@@ -45,3 +52,16 @@ A    # A
     #+end_src
 
 - =#= comments are output by M4
+  + =changecom= changes comment delimiters, e.g. C-like block comment
+    =changecom(/*, */)=;
+  + for non-echoing comments, use =dnl= as an alternative;
+  + for non-echoing block comments, use =ifelse(comment text)=.
+
+- =ifdef(`a', b[, c])= outputs =b= if =a= is defined, or c if not.
+
+- =ifelse(a, b, c, d)= compares =a= and =b= to determine wheter to output =c= or =d=.
+
+- =eval()= for arithmetic operations; the syntax is similar to as in C
+  + =incr=, =decr= as shortcuts
+
+- for strings: =len=, =substr=, =index=, =translit=, =regexp=, =patsubst=
