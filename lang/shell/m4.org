@@ -13,8 +13,13 @@ M4 comes with an initial set of built-in macros.
   + Unlike the C preprocessor, another =define()= may be nested within the
     expansion, protected by quoting. Arbitrary nesting is possible with an extra
     layer of protective quotes at each level of nesting.
+  + all macros have global scope. There is no way to define a macro that works
+    only in another macro.
 
 - =undefine()= undefines a macro.
+
+- =pushdef(name, def)=, =popdef(name, def)=: each macro name has a stack
+  containing all of its definitions. The top is the active definition.
 
 - =dnl= deletes to new line; this eliminates any newline after =define()=
 
@@ -65,3 +70,35 @@ A    # A
   + =incr=, =decr= as shortcuts
 
 - for strings: =len=, =substr=, =index=, =translit=, =regexp=, =patsubst=
+
+* Macro Arguments
+
+- =$1=, =$2=, =$3=, =$4= ...
+  + to prevent immediate expansion, add a quote in between =$`'1=
+
+- =$0=: the name of the macro
+
+- =$#=: the number of arguments
+
+- =$*=: the list of arguments; =$@= the same but protected by quotes
+
+- =shift=: expands the same list of arguments with the first one removed
+
+  #+begin_src m4
+define(`mylen', `ifelse(
+                $1, , 0,
+                `eval(1 + mylen(substr($1, 1)))'
+)')
+
+mylen(1234567890)
+
+define(`echolast', `ifelse(eval($# < 2), 1, `$1',
+                        `echolast(shift($@))'
+                        )')
+
+echolast(1, 2, 3, 4)
+
+define(`reverse',`ifelse($#, 0, ``$0'',
+                        $1, , ,
+                        `reverse(substr($1,1))`'substr($1,0,1)')') # the middle quote is like a concatenation
+  #+end_src
