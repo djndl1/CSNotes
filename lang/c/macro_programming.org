@@ -30,6 +30,34 @@ An empty variadic argument list is difficult to fit in until the introduction of
 list is used. In GNU C, this is accomplished by an extension =##= to eliminate
 the comma.
 
+* Predefined Macros
+
+- =__FILE__=, =__LINE__=,
+
+- =__func__=, =__FUNCTION__= (GCC): not really macros
+
+- =__DATE__=, =__TIME__=
+
+- =__STDC_HOSTED__=: freestanding or hosted
+
+- =__STDC_VERSION__=: C standard version number
+
+- =__cplusplus=: C++ compiler in use and a version number
+
+- =__OBJC__=: Objective-C in use
+
+** GCC Extensions
+
+- =__COUNTER__=: generates sequential integral values starting from 0
+
+- =__GNUC__=, =__GNUC_MINOR__=, =__GNUC_PATCHLEVEL__=: GCC compiler version
+  number
+- =__GNUG__=: G++
+
+- =__STRICT_ANSI__=
+
+- =__FILE_NAME=: base file name of the input file
+
 * Recursive Macro Expansion
 
 C macros does not support recursive macro calls. However, macro expansions are
