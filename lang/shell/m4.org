@@ -1,6 +1,6 @@
 #+title: M4
 
-M4 reads in tokens (divided by whitespace, numbers and punctuation unless whtin
+M4 reads in tokens (separated by whitespaces, numbers and punctuation unless within
 a quoted string or a macro argument). If it encounters a macro name, it reads in
 macro's arguments if any, determines the expansion and inserts the expansion and
 continues scanning the input starting at the expansion (and thus macro expansion is recursive).
@@ -39,9 +39,9 @@ right bracket: RPARENS
     a digit.
 
     #+begin_src m4
-  `Author' is Author # Author is William Shakespeare
-  define(newline, `line
-  break')
+`Author' is Author # Author is William Shakespeare
+define(newline, `line
+break')
 
 define(LEFT, A)dnl
 LEFT
@@ -59,9 +59,9 @@ A    # A
 
 - =ifdef(`a', b[, c])= outputs =b= if =a= is defined, or c if not.
 
-- =ifelse(a, b, c, d)= compares =a= and =b= to determine wheter to output =c= or =d=.
+- =ifelse(a, b, c, d)= compares =a= and =b= to determine whether to output =c= or =d=.
 
-- =eval()= for arithmetic operations; the syntax is similar to as in C
+- =eval()= for arithmetic operations; the syntax is similar as in C
   + =incr=, =decr= as shortcuts
 
 - for strings: =len=, =substr=, =index=, =translit=, =regexp=, =patsubst=
