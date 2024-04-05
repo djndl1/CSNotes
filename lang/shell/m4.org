@@ -108,3 +108,17 @@ define(`reverse',`ifelse($#, 0, ``$0'',
 * Best Practice
 
 - Add a prefix to custom macros to avoid name clash.
+
+- A nesting macro with arguments may be defined by escaping its arguments with quotes
+
+  #+begin_src m4
+define(`OUTER',
+`
+	define(`INNER', $1 = $`'1)dnl
+INNER(2)')
+
+OUTER(1) # 1 = 2
+  #+end_src
+
+- Be careful not that break a line within an argument including before the next
+  comma and the right parenthesis as the newline will be passed into the macro.
