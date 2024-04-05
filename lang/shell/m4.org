@@ -104,3 +104,7 @@ define(`reverse',`ifelse($#, 0, ``$0'',
                         $1, , ,
                         `reverse(substr($1,1))`'substr($1,0,1)')') # the middle quote is like a concatenation
   #+end_src
+
+* Best Practice
+
+- Add a prefix to custom macros to avoid name clash.
