@@ -71,6 +71,8 @@ A    # A
 
 - for strings: =len=, =substr=, =index=, =translit=, =regexp=, =patsubst=
 
+- =include(filename.m4)= as M4 code or =undivert()= as text
+
 * Macro Arguments
 
 - =$1=, =$2=, =$3=, =$4= ...
