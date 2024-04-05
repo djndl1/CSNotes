@@ -21,6 +21,15 @@ scanned again for macros to expand, including the arguments.
 macro_func_with_args((a, b, c)) // legit since the argument is surrounded by parentheses
 #+end_src
 
+** Variadic Arguments
+
+Unlike =va_arg=, arguments in =__VA_ARGS__= cannot be extracted.
+
+An empty variadic argument list is difficult to fit in until the introduction of
+=__VA_OPT__= in C23/C++20 as there would be an redundant comma where the argument
+list is used. In GNU C, this is accomplished by an extension =##= to eliminate
+the comma.
+
 * Recursive Macro Expansion
 
 C macros does not support recursive macro calls. However, macro expansions are
