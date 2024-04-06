@@ -113,6 +113,17 @@ define(`reverse',`ifelse($#, 0, ``$0'',
                         `reverse(substr($1,1))`'substr($1,0,1)')') # the middle quote is like a concatenation
   #+end_src
 
+* Debugging
+
+- stepping output: Either invoke m4 with =-dV= or limit full debug output with
+  =debugmode(V) problem section debugmode=
+
+- =errprint()=: print custom error
+
+- =dumpdef()=: dumps macro definitions to stderr
+
+- =defn()=: expands to the definition string.
+
 * Best Practice
 
 - Add a prefix to custom macros to avoid name clash.
@@ -130,3 +141,5 @@ OUTER(1) # 1 = 2
 
 - Be careful not that break a line within an argument including before the next
   comma and the right parenthesis as the newline will be passed into the macro.
+
+- Most bugs relate to problems with quoting.
