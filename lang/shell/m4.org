@@ -54,6 +54,14 @@ define(LEFT, B)dnl # define(A, B)
 LEFT # B
 A    # A
 # to avoid this, quote LEFT
+
+# define two macros for literal quotes
+# in the definition quotes must match but one of the two is deleted by dnl
+define(`LQ',`changequote(<,>)`dnl'
+changequote`'')dnl
+define(`RQ',`changequote(<,>)dnl`
+'changequote`'')dnl
+
     #+end_src
 
 - =#= comments are output by M4
