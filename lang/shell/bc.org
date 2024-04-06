@@ -14,7 +14,10 @@ of statements with similar syntax to C.
 - Strings are double-quoted.
 
 - Variables: variables may be scalars or arrays.
-  + arrays are defined when =[expr]= is used and expands automatically.
+  + arrays are defined when =[expr]= is used and expands automatically. Array
+    variables are referenced in =arr_var[]=, not =arr_var= as in C. Array
+    elements have to be assigned one by one. Also, array sizes must be tracked
+    by the programmer.
   + =scale=: default to 0; affects how some operations use fractional parts.
     Legal values are in the range of a C integer.
   + =ibase=, =obase= the conversion base for input/output numbers, default
@@ -76,11 +79,13 @@ when a newline or a semicolon is encountered.
 
 Functions in bc always compute and return a value to the caller. Array
 parameters are passed by value (=arr[]=) unless passed as =*arr[]=.
+Functions may not be passed as arguments.
 
 Local variables are initialized to zero.
 Variables are dynamically scoped: the callee may use a variable defined in the caller.
 
-A function returns 0 if no =return= statement is encountered.
+A function returns 0 if no =return= statement is encountered. Arrays cannot be
+returned from a function.
 
 =define void funcname(params)= function is allowed as an extension.
 
