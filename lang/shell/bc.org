@@ -1,45 +1,88 @@
 #+title: Bc
 
-- Use =-l= to load the mathlib.
+A language that supports arbitrary precision numbers with interactive execution
+of statements with similar syntax to C.
 
--  Numbers are decimal arbitrary-precision.
-  + =scale=: the number of digits after the decimal point
-  + =length=: the number of all digits
+- Use =-l= to load the mathlib, and =scale= set to =20=.
 
-- Variables:
-  + builtin: =scale= (default to 0; affects how some operations use fractional parts). =ibase=, =obase= the conversion base for input/output numbers, default to 10. =last= printed number.
+* Data Types and Variables
+
+-  Numbers are arbitrary-precision decimal.
+  + =scale= (special variable): the number of digits after the decimal point
+  + =length= (special variable): the number of all digits
+
+- Strings are double-quoted.
+
+- Variables: variables may be scalars or arrays.
+  + arrays are defined when =[expr]= is used and expands automatically.
+  + =scale=: default to 0; affects how some operations use fractional parts.
+    Legal values are in the range of a C integer.
+  + =ibase=, =obase= the conversion base for input/output numbers, default
+    to 10.
+  + =last= or =.=: last printed number.
 
 - C89-style comments or =#=
 
-- C-style arithmetic operators except =^= (exponentiation)
+* Expressions
 
-- C-style relational expressions
+Numbers are manipulated by expressions and statements.
+Legal bases of numbers are 2 through 36.
 
-#+begin_src c
+- C-style arithmetic operators except =^= for exponentiation.
+
+- C-style relational expressions. The resuts are expressed in one and zero.
+
+- Boolean operators are GNU extensions and not included in POSIX.
+
+- =bc= has some unusually behaviors regarding operator precedence: *assignment is higher than relational operators and boolean logical operators*.
+
+  #+begin_src c
 a = 3 < 5 # a == 3
-#+end_src
+  #+end_src
 
-* Some Special Expression
+** Some Special Expression
 
-- =length=: get the length of a number
+- =length(expr)=: get the length of a number
 
-- =scale=: get the scale of a number
+- =scale(expr)=: get the scale of a number
 
-- =sqrt=: get the square root
+- =sqrt(expr)=: get the square root
 
 - =read()= prompt for a read from stdin.
 
 * Statements
 
-- =print=
+Statements provide the sequencing of expression evaluation. Execution happens
+when a newline or a semicolon is encountered.
 
-- C-style =if=-=else=, =while=, for
+- expressions are valid statements;
 
-- compound statement is supported
+- strings
+
+- =print command-separated-arguments=, no terminating newline is printed
+  automatically (use ="\n"=).
+
+- C-style =if=-=else=, =while=, =for=, =break=, =continue= (=for= loop only, an extension)
+
+- compound statement (block statement) is supported
+
+- =return [(retval)]=: function return statement (by default 0)
 
 - =halt=: quit =bc=; =quit=: quit =bc= on seen.
 
+- =limits=: print various limits of bc
+
 * Functions
+
+Functions in bc always compute and return a value to the caller. Array
+parameters are passed by value (=arr[]=) unless passed as =*arr[]=.
+
+Local variables are initialized to zero.
+Variables are dynamically scoped: the callee may use a variable defined in the caller.
+
+A function returns 0 if no =return= statement is encountered.
+
+=define void funcname(params)= function is allowed as an extension.
 
 #+begin_src c
 define name(parameters) {
@@ -48,7 +91,11 @@ define name(parameters) {
 }
 #+end_src
 
-A function may return a value =return (expression)=.
+* Math Library
+
+=s(x)= sine, =c(x)= cosine, =a(x)= arctangent, =l= natural logarithm, =e(x)=
+exponential of natural base =e=. =j(n, x)= Bessel function of integer of order
+=n= of =x=.
 
 * Examples
 
