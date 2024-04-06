@@ -81,6 +81,22 @@ define(`RQ',`changequote(<,>)dnl`
 
 - =include(filename.m4)= as M4 code or =undivert()= as text
 
+- =defn()= retrieves the quoted definition of a macro, useful for renaming or
+  aliasing macros.
+
+  #+begin_src m4
+define(`rename',`define(`$2',defn(`$1'))undefine(`$1')')dnl
+  #+end_src
+
+- builtin macros may also be accessed using =builtin= in case some builtin
+  macros are shadowed.
+
+- =syscmd()= executes shell commands; =esyscmd()= executes shell commands and
+  interprets the output.
+  + =sysval=: the m4 =$?=
+
+- =mkstemp()=: makes and expands to a random temporary file.
+
 * Macro Arguments
 
 - =$1=, =$2=, =$3=, =$4= ...
