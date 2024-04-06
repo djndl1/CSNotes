@@ -102,8 +102,6 @@ define name(parameters) {
 exponential of natural base =e=. =j(n, x)= Bessel function of integer of order
 =n= of =x=.
 
-* Examples
+* Useful Resources
 
-#+begin_src shell
-pi=$(echo '4 * a(1)' | bc -l) # get a PI
-#+end_src
+- [[https://github.com/mikepierce/GNU-bc-Functions][GNU bc Functions by Mike Pierce]]
