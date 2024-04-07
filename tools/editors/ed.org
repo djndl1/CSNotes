@@ -1,32 +1,46 @@
+Line-oriented text editor used to create, display, modify and otherwise
+manipulate text files both interactively and via shell scripts. Line editing
+works similarly to Unix shell operations, where a comand is given and some input
+is typed
+or some output is displayed.
+
 All ed commands operate on whole lines or ranges of lines.
 
 *ed* supports two mode:
 
 - *command*: commands are read from the stdin and executed to manipulate the
   contents of the editor buffer.
-  + =[ADDRESS [, ADDRESS]]COMMAND[PARAMETERS]=
+  + basic command structure: =[ADDRESS [, ADDRESS]]COMMAND[PARAMETERS]=, where
+    the address pair may be specified by a regex pattern.
 
 - *input*: with a input command such as =a=, =i=, =c=, ed enters input mode, the
   primary means of adding text to a file. The standard input is written directly
   to the buffer editor buffer and then terminated by a single period =.= on a
   line.
 
-  Since ed operates on lines, there's a reason for commands like =s/old/new/p= to exist
-  since one cannot easily modify an individual word.
+Since ed operates on lines, there's a reason for commands like =s/old/new/p= to exist
+as one cannot easily modify an individual word.
 
 * Line Addressing
 
 'ed' has a current line address =.= that is used by commands
-if addresses are not explicitly specified.
+if addresses are not explicitly specified. By default, it's set to the last line
+of the file. =0= represents "before the first line".
 
-- *address range* format: =a,b=, =a;b= (the current address is first set to =a=.)
-  + =$=: the last line; =+N=, =-N=: the n-th next/previous line; =+=, =-=
+- *address range* format: =a,b=, =a;b= (the current address is first set to =a=,
+  useful when starting at a certain line)
+  + Address omission: =,addr= is =1,addr=; =;addr= is =.;addr=; =addr,= is =addr,addr=, =addr;= is =addr;=.
+  + =$=: the last line; =.= the current line
+  + Offset: =+N=, =-N=: the n-th next/previous line; Single =+=,
+    =-= is =+1= and =-1=. Addresses may be followed by one or more address offsets.
   + =,=: all lines, =;=: the current to the last
   + =/RE/=, =?RE?=: the next/previous line that contains the regex.
+  + ='x=: go to the line marked by the letter =x=
 
-* Basic Operations
 
-- ~p~: print, may be append to most commands; ~l~: print lines with special chacters escaped.
+* Commands
+
+- ~p~: print, may be append to most commands; ~l~: print lines with special characters escaped.
   ~n~: prints with line numbers
 
 - ~a~: append, ~.~: end
@@ -75,3 +89,6 @@ g/peling/s//pelling/gp
 - ~v~: opposite of ~g~
 
 - ~&~: used on the right-hand part of a substitute command where it means "whatever was matched on the left-hand side"
+
+- =!=: runs shell commands inside =ed= and displays the output. Use =r= to read
+  the output
