@@ -40,55 +40,84 @@ of the file. =0= represents "before the first line".
 
 * Commands
 
-- ~p~: print, may be append to most commands; ~l~: print lines with special characters escaped.
-  ~n~: prints with line numbers
+Most commands accept a print suffix (=p=, =l=, =n=) to print the last line
+affected by the command.
 
-- ~a~: append, ~.~: end
+- ~p~ (print): print, may be append to most commands; ~l~ (list): print lines with special characters escaped.
+  ~n~ (enumerate): prints with line numbers
 
-- ~c~: change line(s)
+- ~(.)a~: append
 
-- ~i~: insert at a line
+- ~(.,.)c~: change line(s) in the buffer
 
-- ~d~: delete line(s)
+- ~(.)i~: insert at a line before the addressed line, that is, insert a line at
+  the specified line number and push the original line down.
 
-- ~e~: edit a file
+- ~.~: leaves the input mode
 
-- ~f~: show file info
+- ~(.,.)d~: delete line(s)
 
-- ~r~: read file into the current buffer
+- ~e filename~: edit a file and sets the default filename; ~E file~: discard unwritten changes and edit a new file
 
-- ~.,.+3p~: print the next three lines
+- ~f filename~: set the default filename to =filename=; if no filename is
+  specified, it prints the current filename.
 
-- ~.=~: the value of dot
+- =q=: quit with warning; =Q= forcefully quit without saving
 
-- ~start, end, s/change this/to this/~: ~g~ means global
+- ~($)r filename~: read file into the current buffer after the addressed line
 
-- context searching ~/../~: we can do both the search for the desired line and a substitution all at once like context searches are interchangeable with line numbers
+- =(.,.+1)j=: joins the addressed lines, replacing them by a single line
+  containing their joined text.
 
-#+begin_src
-/their/s/their/the/p
-#+end_src
+- ~($)=~: the line number of the addressed line.
+
+- =h=: prints an explanation of the last error.
 
 - ~(.,.)m(.)~: move lines to a position, cut and paste to
 
-- ~(1,$)g/re/command-list~: executes one or more commands on all the lines in the buffer that match some specified string. Use ~G~ for interactive commands. Use =v= or =V= for lines not matched.
-
-- ~(.,.)s/re/replacement/~: replace text; prefixes can be appended; =&= in the replacement text represents the matched text.
-  + =g=: replace all the matched
-  + a number: replace the n-th matched
-  + =l=, =n=, =p=: print the replaced
-
 - ~(.,.)t(.)~: copies the addressed lines to after the specified destination address
 
-- =u=: undo
+- =(.,.)y=: copies (yanks) the addressed lines to the cut buffer.
 
-#+begin_src sed
+- =(.)x=: puts the contents of the cut buffer to after the addressed line.
+  + the cut buffer is overwritten by =c=, =d=, =j=, =s=, =y=
+
+- =(.+1)zn=: scroll n lines if =n= is specified.
+
+- ~(1,$)g/re/command-list~: global mode. executes one or more commands on all
+  the lines in a range (the buffer) that match some specified string. Use ~G~ for interactive commands. Use =v= or =V= for lines not matched.
+
+- ~(.,.)s/re/replacement/~: substitute text in the first matching line;
+  postfixes can be appended;
+  + =/= delimiter may be replaced by any character other than space, newline and
+    the special characters used by the =s= command.
+  + =&= in the replacement text represents the matched text. =\m= in the
+    replacement is replaced by
+    the mth backreference expression of the matched text, if any, otherwise an
+    empty string. =%= uses the replacement from the last substitution.
+  + =g= postfix: replace all matched lines
+  + a number =n= postfix: replace the n-th matched instance
+  + =l=, =n=, =p= postfixes: print the replaced
+  + without the =/re/replacement/= part, it repeats the last substitution
+
+- context searching ~/../~: we can do both the search for the desired line and a substitution all at once like context searches are interchangeable with line numbers
+
+  #+begin_src
+/their/s/their/the/p
 g/peling/s//pelling/gp
-#+end_src
+  #+end_src
+
+- =u=: undo any modification of the buffer and restore the current address.
 
 - ~v~: opposite of ~g~
 
-- ~&~: used on the right-hand part of a substitute command where it means "whatever was matched on the left-hand side"
+- =!cmd=: runs shell commands inside =ed= and displays the output. =!!= repeats
+  the previous command.
 
-- =!=: runs shell commands inside =ed= and displays the output. Use =r= to read
-  the output
+- =(.)kx=: mark a line with a lower case letter =x=.
+
+- =(.,.)n=: number command, prints the addressed line with line numbers.
+
+- =(1,$)w [filename]/!shell_command=: write a range (the entire buffer) to
+  =filename=, the default filename or the shell command's stdin. Use =W= to
+  append instead of overwrite.
