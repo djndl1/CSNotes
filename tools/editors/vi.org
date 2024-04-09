@@ -126,25 +126,53 @@ The general form of ~vi~ commands is
 
 - =:r FILENAME=, =:r !ls=: read into the current buffer
 
-* ex commands
+* ex commands and the ex mode
 
-A command without a line number is assumed to affect the current line.
+Originally, =vi= was the visual mode of the =ex= editor, an improved line editor
+from and a superset of =ed=. Modern =ex= runs a cleared terminal, unlike =ed=,
+which runs directly in the current view of the terminal.
 
-- ~co~: copy lines
+=ex= has buffers named =a= through =z=.
+The =ex= editor has five modes:
 
-- ~g!~ / ~v~: the opposite of ~g~
+- *command mode* :: =:= prompt
+  + =address command ! parameters count flags=, all parts are optional. The
+    degenerate case (empty command) prints the next line in the file
+  + Most commands names are English words with prefix abbreviations. Most commands
+    accept prefix addresses specifying the lines in the file upon which they are
+    to have effect. A few (e.g. =delete=) may take a trailing count specifying the
+    number of lines to be involved or other parameters after the command name.
+  + commands are commented out by a double quote ="=.
+  + multiple commands on a single line are separated by =|=
 
-- ~|~: command separator
+- *text input mode* :: gathers input lines and places them in the file; the
+  =append=, =insert= and =change= commands use text input mode. A =.= line exits
+  the mode.
 
-- ~;~: the first line address isrecalculated as the current line
+- *open modes* :: displays one line at a time
 
-Line addressing can be used to save part of a file.
+- *visual mode*, *text insertion mode* :: vi's modes
 
-~>>~ can also be used in ex mode to append to a file.
+** Command Addressing
 
-- ~#~: alternative buffer, ~%~: current file 
+- =.= :: the current line
 
-- ~Ctrl-^~: switching between buffers
+- =n= :: the nth line
+
+- =$= :: the last line
+
+- =%= :: the entire buffer, equal to =1,$=
+
+- =+n=, =-n= :: an offset relative to the line specified before it
+
+- =/re/=, =?re?= :: scan forward or backward respectively for a line containing
+  a regex, possibly with some commands to operate on these lines. The search wraps around the end of the buffer. Without the trailing
+  =/= or =?=, the command simply prints the next matching line using the regex. =//= or =??= uses the last regex.
+
+- ='"= :: the previous current line is marked by ="=.
+
+- Null address specification defaults to the current line, =1,p= prints the
+  first line through the current line.
 
 * Pattern Matching
 
