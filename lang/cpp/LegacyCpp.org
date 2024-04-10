@@ -48,3 +48,26 @@ void f(B) { }
 
 int main() { A a; g(a); }
   #+end_src
+
+- =std::vector<T> a(50)= resolves to a separate constructor that construct the
+  elements in place in C++11 while in C++03 a default value of the second
+  parameter is copied to each slot.
+  + in case where a copy constructor taking a default value is different from
+    the default constructor, this behavior is a breaking change.
+
+
+* Later Changes Since C++11
+
+- C++17 changed =std::string::data= to =char*= from =const char*= to allow
+  easy in-place string data modification through a pointer.
+
+- Unnamed classes with a =typedef= name for linkage purposes (i.e. C++ code) can contain only
+C-compatible constructs since C++20. Note this does not forbid the use inside
+=extern "C"= blocks or structs that contains only data.
+
+  #+begin_src cpp
+// forbidden since C++20
+typedef struct {
+   void member_function();
+} m_struct;
+  #+end_src
