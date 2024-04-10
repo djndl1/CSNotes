@@ -144,7 +144,8 @@ The =ex= editor has five modes:
     to have effect. A few (e.g. =delete=) may take a trailing count specifying the
     number of lines to be involved or other parameters after the command name.
   + For commands that takes a range address, the count parameter limits the
-    command to the lines starting at the line of the range, counting the =count=
+    command to the lines starting at the last line of the range with
+    =count= lines involved. That is, the range address is actually invalid and only the last address number is taken.
     number of lines.
   + commands are commented out by a double quote ="=.
   + multiple commands on a single line are separated by =|=
