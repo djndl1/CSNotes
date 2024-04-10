@@ -137,11 +137,15 @@ The =ex= editor has five modes:
 
 - *command mode* :: =:= prompt
   + =address command ! parameters count flags=, all parts are optional. The
-    degenerate case (empty command) prints the next line in the file
+    degenerate case (empty command) prints the next line in the file. Here
+    =flags= are =p=, =l= or =#=, executed after the main command.
   + Most commands names are English words with prefix abbreviations. Most commands
     accept prefix addresses specifying the lines in the file upon which they are
     to have effect. A few (e.g. =delete=) may take a trailing count specifying the
     number of lines to be involved or other parameters after the command name.
+  + For commands that takes a range address, the count parameter limits the
+    command to the lines starting at the line of the range, counting the =count=
+    number of lines.
   + commands are commented out by a double quote ="=.
   + multiple commands on a single line are separated by =|=
 
