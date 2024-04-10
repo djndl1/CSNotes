@@ -175,8 +175,45 @@ The =ex= editor has five modes:
 
 - ='"= :: the previous current line is marked by ="=.
 
-- Null address specification defaults to the current line, =1,p= prints the
+- Null address specification :: defaults to the current line, =1,p= prints the
   first line through the current line.
+
+** Commands
+
+- =args= :: the members of the argument list of the =ex= process
+
+- =(.){a}ppend= ::
+  + =a!= toggles autoindent
+
+- =cd=, =chdir= :: After a =chdir= the current file is not considered edited.
+
+- =(.,.){c}hange count= ::
+  + =c!= toggles autoindent
+
+- =(.,){co}py addr flags=, also abbr. =t= :: copy the range after =addr=
+
+- =(.,.){d}elete (buffer) count flags= :: If a buffer name is given, the deleted
+  lines are saved (lower case buffer name)/append (upper case buffer name) there.
+
+- ={e}dit=, =ex= :: clear the current clean buffer and begin an editing session on a new file.
+  + =e!= :: discards changes to the buffer
+
+- ={f]ile filename=, =file= ::
+
+- =(1,$) {g}lobal /re/ commands= :: the command list may span multiple lines and
+  may include =append=, =insert=, =change= commands and their associated input
+  text. The global command and the undo command are not allowd in the command list.
+  + =g!=, abbr. =v= :: at each line not maching the pattern
+
+- =(.){i}nsert= ::
+  + =i!= :: the autoindent version
+
+- =(.,.+1) {j]oin count flags= ::
+  + =j!=
+
+- =(.)k x=  or =(.)mark x= :: mark a line with a letter.
+
+- =(.,.){m}ove addr= :: move (cut and paste) the specified lines to =addr=.
 
 * Pattern Matching
 
