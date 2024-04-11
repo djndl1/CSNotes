@@ -196,6 +196,9 @@ The =ex= editor has five modes:
 - =(.,.){d}elete (buffer) count flags= :: If a buffer name is given, the deleted
   lines are saved (lower case buffer name)/append (upper case buffer name) there.
 
+- =(.,.)yank buffer count= :: yank the specified lines in th named buffer, if
+  any, for later retrieval via =put=.
+
 - ={e}dit=, =ex= :: clear the current clean buffer and begin an editing session on a new file.
   + =e!= :: discards changes to the buffer
 
@@ -215,6 +218,69 @@ The =ex= editor has five modes:
 - =(.)k x=  or =(.)mark x= :: mark a line with a letter.
 
 - =(.,.){m}ove addr= :: move (cut and paste) the specified lines to =addr=.
+
+- ={n}ext= :: the next file from the command line arguments is edited
+
+- ={rew}ind= :: the argument list is rewound and the first file is edited.
+
+- =(.,.){nu}mber count flags=, =#= :: print with line numbers
+
+- =(.){o}pen (/re/) flags= :: enter intraline editing open mode at each
+  addressed line. =Q= to exit.
+
+- =(.,.){p}rint count= ::
+
+- =(.){pu}t buffer= :: puts back deleted or yanked lines, possibly from a named buffer.
+
+- ={q}uit= ::
+
+- =(.){r}ead file= :: If no filename is given, the current filename is used. The
+  current file name is not changed unless there is none, in which case the
+  specified file becomes the current one.
+
+- =recover file= ::
+
+- ={sh}ell= :: start a new shell, resume editing after the shell exits
+
+- ={so}urce file= :: reads and executes =ex= commands from the specified file
+
+- =(.,.) {s}ubstitute /re/replacement/ options count flags= ::
+  + =options= may be =g= global, =c= asking confirmation
+  + =&= repeats the previous substitute command with possibly different flags.
+  + =~= repeat last substitute with the same replacement but with last used
+    search pattern.
+
+- =stop= :: suspends the editor
+
+- =ta tag= :: switch the focus of editing to the location of =tag=, defined by
+  the tags file, created by, for example, =ctags=.
+
+- =! command= ::
+  + =%= in the command expanded as
+  + if a range address is appended before =!=, that range of lines are supplied
+    as stdin to the command.
+
+- =($)== :: prints the line number of addressed line without changing the
+  current line.
+
+- =(.){vi}sual -/^/. windows_size flags= :: enters visual mode at the specified line
+
+- =(1,$){w}rite (>>) file/!command= :: overwrite/appends (to file only) the specified lines (by
+  default the entire buffer) to a filename/command stdin.
+
+- =(.+1)z window_size= :: print the next count lines, the current line is
+  changed. This command is basically scroll.
+
+- =(.)z -/./ number_of_lines= :: prints a window of text with the specified line
+  at the top.
+  - =-= puts the line at the bottom, =.= at the center, === also at the center
+    with surrounding =-= characters.
+
+- =(.,.) >/< count flags= :: shift the specified lines.
+  + Only whitespaces are shifted; no non-white characters are discarded in a left-shift.
+
+- (.+1, .+1) :: an address alone causes the addressed line to be printed (and
+  also change the curent line).
 
 * Pattern Matching
 
