@@ -1,24 +1,62 @@
+* Basic Concepts
+
+~vi~ has tow modes:
+
+- command mode:
+
+- insert mode:
+
+The general form of ~vi~ commands is
+
+#+begin_src
+(command)(number)(text object)
+(number)(command)(text object)
+#+end_src
+
+=vi= saves the last nine deleted line in nine numbered deletion buffers.
+
 * Basic Operations
 
-** Status-Aware
+** Status Aware
 
 - =C-g=: show the location in a file and the file status
 
 ** Motion
 
-- ~e~: move to the end of the current word
+*** Scrolling and Paging
 
-- ~^f~ / ~^b~: scroll up/down a screen
+- ~^f~ / ~^b~ :: scroll up/down a screen
 
-- ~^d~ / ~^u~: scroll up/down half screen
+- ~^d~ / ~^u~ :: scroll up/down half screen
 
-- ~^e~ / ~^y~: scroll up/down one line
+- ~^e~ / ~^y~ :: scroll up/down one line
+
+*** Go to a Position
+
+- ~G~  :: go to the specified line/the end if none
+
+- =``= :: get back to a previous position (not down a list).
+
+*** Moving Around on the Screen
+
+- =j=, =^n=;  =k=, =^p= ::
+
+- =+=/=Enter=, =-= :: go down/up
+
+- =nH=, =nL= :: the screen top/bottom n line (the first if none)
+
+- =M= :: middle of the screen
+
+*** Moving Within a Line
+
+- =h=, =SPACE=; =l=, =BACKSPACE= (also as =^h=) ::
+
+- =w=, =b=; =W=, =B=; ~e~, =E=  :: move to the next/last word. The upper
+  case version ignores punctuation.
+
+- ~n|~ :: move to column n
 
 - ~zENTER~ / ~z.~ / ~z-~: move current line to top/center/bottom of screen and scroll
-
-- ~H~ / ~M~ / ~L~: move home/middle/last line on screen
-
-- ~n|~: move to column n
 
 - ~(~ / ~)~, ~{~ / ~}~, ~[[~ / ~]]~: move to beginning of current/next sentence/paragraph/section
 
@@ -28,25 +66,37 @@
 
 - ~f~ / ~F~ / ~t~ / ~T~ / ~;~ /~,~
 
-- ~G~ / ~``~: go to/back
-
 ** Change Text
 
-Format: [Change] [Count] [Motion]
+*** Insert Mode
 
-- =o= / =O=: insert a newline below/above and enter the insert mode.
+- =o= / =O= :: insert a newline below/above and enter the insert mode.
 
-- =a=: append after the cursor, =i= before the cursor; =A=: append to the current line.
+- =a= :: append after the cursor, =i= before the cursor; =A=: append to the
+  current line.
+  + Under =vi=, =a= only appends, =i= only inserts: they cannot modify existing
+    text and backspace deleting characters are not instantly displayed as deleted.
+  + Under insert mode, =^U= deletes the input on the current line; =^W= erases a
+    word; =^i= inserts a tab; In case some other operations are required under
+    insert mode, use =^o= to access normal mode commands.
 
-- ~d~: delete
-  + ~D~: delete to the end of the line = ~d$~
+- ~ra~ :: replace the current char with ~a~, no need to enter the insert mode;
 
-- ~ra~: replace the current char with ~a~, no need to enter the insert mode;
-  ~R~: the replace mode that replaces everything in its way, basically the INSERT key in CUA.
+- =s= :: substitute the first char and then enters the insert mode.
 
-- ~c~: change, a combination of delete followed by insert. ~ce~, ~cw~
-  - ~cc~: change the entire line
-  - ~C~: = ~c$~
+- ~R~ :: the replace mode that replaces everything in its way, basically the INSERT key in CUA.
+
+- =Esc= or =^[= :: leaves the insert mode.
+
+- ~c~ :: change, a combination of delete followed by insert, used with various
+  motion commands.
+  - ~cc~ :: change the entire line
+  - ~C~ ::  ~c$~
+
+*** Deletion
+
+- ~d~: delete operator, used with =b=, =d=, =w= and various motion commands.
+  + ~D~: delete to the end of the line, equal to  = ~d$~
 
 - =~=: changing case
 
@@ -76,9 +126,9 @@ Format: [Change] [Count] [Motion]
 
 ** Search/Replace
 
-- =:s/thee/the/=, optionally with =g= (globally in the line)
+- =/=, =?= :: forward/backward search (possibly with regex). Search is also a way to move around.
 
-- =#,#s/old/new/g=, =%s/old/new/g= (the whole buffer=, =%s/old/new/gc= (prompt whether to substitute or not)
+Substitution is mostly done through the =substitute= ex command.
 
 ** Undo/Redo
 
@@ -102,29 +152,6 @@ Format: [Change] [Count] [Motion]
 #+end_src
 
 - ~mx~ / ~'x~ / ~`x~ / ~``~
-
-* Basic Concepts
-
-~vi~ has tow modes:
-
-- command mode:
-
-- insert mode:
-
-The general form of ~vi~ commands is 
-
-#+begin_src 
-(command)(number)(text object)
-(number)(command)(text object)
-#+end_src
-
-=vi= saves the last nine deleted line in nine numbered deletion buffers.
-
-* External Commands
-
-- =!shell_command=
-
-- =:r FILENAME=, =:r !ls=: read into the current buffer
 
 * ex commands and the ex mode
 
@@ -355,7 +382,7 @@ Ex/Vi/Vim mostly uses POSIX basic regular expression. For syntax and rules of re
 
 #+TODO
 
-* VIM 
+* VIM
 
 ** Command line options
 
