@@ -1,0 +1,19 @@
+#+title: Posix Shell
+
+* History
+
+- Thompson Shell (Ken Thompson, Unix Version 1 throughout 6), modeled after the Multics shell =RUNCOM=,
+  hence the =rc= configuration.
+
+- Bourne Shell (Stephen Bourne, Unix Version 7). There are some modern alternatives:
+  + Almquist Shell (ash), a clone of the original Bourne shell (FreeBSD, NetBSD, Busybox, dash)
+  + Bourne-Again Shell: the GNU shell as a superset, the default interactive
+    shell on most Linux distros.
+  + KornShell (ksh), the POSIX shell is a subset of Korn shell, an enhanced
+    version the Bourne shell.
+  + Public domain Korn shell (pdksh)
+    - MirBSD Korn shell (mksh), used by Android as =/system/bin/sh=.
+  + Z shell: a relatively modern shell compatible with bash.
+
+- C shell: modelled after the C programming language. The TENEX C shell as an
+  improved version is a modern alternative.
