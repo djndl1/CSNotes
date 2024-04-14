@@ -97,10 +97,13 @@ Sections are completely defined by macros.
 
 - =a= :: append after the cursor, =i= before the cursor; =A=: append to the
   current line.
+  + insert commands may be prefixed with a count number, to indicate the
+    repetition of the inserted text.
   + Under =vi=, =a= only appends, =i= only inserts: they cannot modify existing
     text and backspace deleting characters are not instantly displayed as deleted.
-  + Under insert mode, =^U= deletes the input on the current line; =^W= erases a
-    word; =^i= inserts a tab; In case some other operations are required under
+  + Under insert mode, =^H= is backspace, =^U= deletes the input on the current
+    line; =^W= erases a word; =^i= inserts a tab; =^[= is the escape key.
+  + In case some other operations are required under
     insert mode, use =^o= to access normal mode commands.
 
 - ~ra~ :: replace the current char with ~a~, no need to enter the insert mode;
@@ -147,6 +150,7 @@ The unnamed buffer is lost when switching files; the named buffers do not.
 ** Search/Replace
 
 - =/=, =?= :: forward/backward search (possibly with regex). Search is also a way to move around.
+  + these patterns may be followed by a count =n= to denote the =n=-th occurrence.
 
 - =fchar=, =Fchar=; =;= :: search for the next =char= forwards/backwards on the
   current line; =;=
@@ -158,11 +162,6 @@ Substitution is mostly done through the =substitute= ex command.
 ** Undo/Redo
 
 - ~u~: undo; ~U~: undo all on a line, ~C-r~: redo
-
-** Set Option
-
-- =:set=
-  + =ic= (ignore case), =hls= (hlsearch), =is= (incsearch), =noic=, =inv= to the option inverts the option.
 
 ** Other Operations
 
@@ -202,9 +201,14 @@ The =ex= editor has five modes:
   =append=, =insert= and =change= commands use text input mode. A =.= line exits
   the mode.
 
-- *open modes* :: displays one line at a time
+- *open modes* :: displays one line at a time, not really useful on modern
+  terminals and monitors and they are usually not implemented. They are designed for hardcopy terminals (terminals
+  that print a line to display instead of drawing on the screen) or glass TTYs
+  (display terminal that behaves like a teletype printing terminal without
+  cursor support).
 
 - *visual mode*, *text insertion mode* :: vi's modes
+  + type =Q= to enter =ex= mode.
 
 ** Command Addressing
 
@@ -416,6 +420,15 @@ Ex/Vi/Vim mostly uses POSIX basic regular expression. For syntax and rules of re
 - =number= :: display line numbers
 
 - =showmatch= :: show matching punctuation
+
+- =hardtabs= :: the boundaries on which terminal hardware tabs are set
+
+- =shiftwidth= :: the width of a software tab stop.
+  + used in shift commands and autoindent backtabbing.
+
+- =tags= :: the tags file to be searched
+
+- =shell= :: the shell used, by default =$SHELL=.
 
 
 ** Key Macros
