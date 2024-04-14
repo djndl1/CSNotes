@@ -145,6 +145,8 @@ The unnamed buffer is lost when switching files; the named buffers do not.
 - =<=, =>= combined with motion, search command to shift lines by a =shiftwidth=.
   + =<<=, =>>= shift the current line.
 
+- =^D= and =^T= :: shift lines under insert mode, so-called tabbing.
+
 - ~J~: join
 
 ** Search/Replace
