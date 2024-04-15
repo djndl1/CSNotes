@@ -17,3 +17,83 @@
 
 - C shell: modelled after the C programming language. The TENEX C shell as an
   improved version is a modern alternative.
+* Control Flow Structure
+
+- list :: a series of command that ends with a semicolon or ends with a newline character.
+  A list can have more than one command: the last one is used to make a
+  decision.  A list cannot be empty: empty statement =:= must be used.
+
+** Conditional
+
+*** if
+
+#+begin_src shell
+if list then list fi
+if list then list else list fi
+if list then list elif list then list fi
+if list then list elif list then list elif list then list fi
+if list then list elif list then list else list fi
+#+end_src
+
+=if= may be nested.
+
+*** case
+
+#+begin_src shell
+case word in esac
+case word in pattern ) list ;; esac
+case word in pattern | pattern) list ;; esac
+#+end_src
+
+#+begin_src shell
+echo answer yes or no
+read word
+case "$word" in
+    yes | YES )
+        echo you answered yes
+        ;;
+    no | NO )
+        echo you answered no
+        ;;
+esac
+#+end_src
+
+** Iteration
+
+*** while
+
+#+begin_src shell
+while list do list done
+#+end_src
+
+#+begin_src shell
+while read msg
+do
+    echo "$msg"
+done
+#+end_src
+
+*** until
+
+#+begin_src shell
+until list do list done
+#+end_src
+
+*** for
+
+#+begin_src shell
+for name do list done # use positional arguments
+for name in word ... do list done # use the word list
+#+end_src
+
+#+begin_src shell
+for args in "a A" "b B" "c C"
+do
+  set $args
+  echo lower case is $1, upper case is $2
+done
+#+end_src
+
+** break & continue
+
+They work the way as in C.
