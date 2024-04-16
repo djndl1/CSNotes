@@ -24,6 +24,15 @@ This note uses =dash= as the POSIX shell due to its availability on Debian-based
 Linux distros and its fully POSIX compliance. On Debian, Ubuntu and termux, =dash= is not configured with
 =libedit= and thus gives no support for vi-mode line editing and history.
 
+* Filename Expansion
+
+Wildcards (=*=, =?=, =[=, =]=) in POSIX shells expands only filenames, not
+random strings. They are not simplified regexp. They are expanded automatically when
+they occurs in a shell.
+
+- Files whose name starts with a dote are not normally listed and various
+  shells, utilities follow this convention.
+
 * Control Flow Structure
 
 - list :: a series of command that ends with a semicolon or ends with a newline character.
