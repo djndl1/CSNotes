@@ -17,6 +17,13 @@
 
 - C shell: modelled after the C programming language. The TENEX C shell as an
   improved version is a modern alternative.
+
+* Dash
+
+This note uses =dash= as the POSIX shell due to its availability on Debian-based
+Linux distros and its fully POSIX compliance. On Debian, Ubuntu and termux, =dash= is not configured with
+=libedit= and thus gives no support for vi-mode line editing and history.
+
 * Control Flow Structure
 
 - list :: a series of command that ends with a semicolon or ends with a newline character.
