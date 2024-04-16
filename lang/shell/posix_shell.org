@@ -33,6 +33,13 @@ they occurs in a shell.
 - Files whose name starts with a dote are not normally listed and various
   shells, utilities follow this convention.
 
+* Quoting
+
+Metacharacters are commonly used in shell. They must be quoted or escaped to be
+treated as regular characters. But quoted characters do not have a
+special meaning. Double quotes are weak in that certain characters retain their
+special meanings.
+
 * Control Flow Structure
 
 - list :: a series of command that ends with a semicolon or ends with a newline character.
