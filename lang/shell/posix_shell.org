@@ -37,8 +37,26 @@ they occurs in a shell.
 
 Metacharacters are commonly used in shell. They must be quoted or escaped to be
 treated as regular characters. But quoted characters do not have a
-special meaning. Double quotes are weak in that certain characters retain their
-special meanings.
+special meaning. Double quotes are weak in that most metacharacters except =$=,
+=`=, =\= retain their special meanings. The easiest way to quote a quotation
+mark is to
+use another type of quotation marks.
+
+POSIX shells supports multiline strings with ='= and ="=.
+
+The quotation marks in the shell are not used to define a string: they are used
+to disable or enable interpretation of meta-characters.
+
+#+begin_src shell
+echo 'string1'"string2"'string3' # string1string2string3
+echo 'My home directory is '"$HOME"', and my account is '"$USER"
+#+end_src
+
+
+* Command Substitution
+
+=$(command)= or =`command`=: Execute a command and return its result as a
+string. The new version =$()= supports nesting.
 
 * Control Flow Structure
 
