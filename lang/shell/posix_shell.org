@@ -24,6 +24,50 @@ This note uses =dash= as the POSIX shell due to its availability on Debian-based
 Linux distros and its fully POSIX compliance. On Debian, Ubuntu and termux, =dash= is not configured with
 =libedit= and thus gives no support for vi-mode line editing and history.
 
+* Variables
+
+- No space before and after ===
+
+- =set= prints all current variables
+
+- Environment variables are exported variables, which propagate to subprocesses.
+  Environment variables in inherited by child processes and they cannot be
+  propagated back to the parent.
+  + =env= prints all current environment variables
+
+- to append strings to a variable, use =${x}appended=, =$x"appended"=.
+
+- ~var=~ assigns null to =var=; =unset var= unsets it.
+
+** Common Environment Variables
+
+- =PATH= :: the command search path
+
+- =HOME= :: the user home
+
+- =CDPATH= :: a list of directories for =cd= to find the destination directory in, in addition to
+  =PWD=.
+
+- =PS1=, =PS2= :: normal propmt before each command and the secondary prompt in
+  a multiline command.
+
+** Parameter Substitution
+
+- =${var?error_message}= :: complain with =error_message= if undefined
+
+- =${var-default_option}= :: use =default_option= if undefined
+  + =default_option= may be a variable, a quoted string, a command substitution
+    etc. Any command inside =default_option= is lazily executed.
+
+- =${var+option_on_defined}= :: use the new value if defined
+  + this form may be used to add a debug message.
+
+- =${var=new_definition_if_undefined}= :: use and define new value if undefined
+
+ Most scripts don't care about the difference between undefined variable and a
+null variable. =:?=, =:-=, =:+=, =:== variations of the above forms check
+whether the variable is null or undefined instead of simply undefined.
+
 * Filename Expansion
 
 Wildcards (=*=, =?=, =[=, =]=) in POSIX shells expands only filenames, not
