@@ -44,7 +44,7 @@ The general form of ~vi~ commands is
 
 - =j=, =^n=;  =k=, =^p= ::
 
-- =+=/=Enter=, =-= :: go down/up to the first character of the line
+- =+=​/​=Enter=, =-= :: go down/up to the first character of the line
 
 - =nH=, =nL= :: the screen top/bottom n line (the first if none)
 
@@ -54,9 +54,9 @@ The general form of ~vi~ commands is
 
 - =^= :: first non-white character.
 
-- =0= :: EOL.
+- =0= :: beginning of the line.
 
-- =$= :: beginning of the line.
+- =$= :: EOL.
 
 - =h=, =SPACE=; =l=, =BACKSPACE= (also as =^h=) ::
 
@@ -65,15 +65,15 @@ The general form of ~vi~ commands is
 
 - ~n|~ :: move to column n
 
-- ~zENTER~ / ~z.~ / ~z-~: move current line to top/center/bottom of screen and scroll
+- ~zENTER~ / ~z.~ / ~z-~ :: move current line to top/center/bottom of screen and scroll
 
-- ~(~ / ~)~, ~{~ / ~}~, ~[[~ / ~]]~: move to beginning of current/next sentence/paragraph/section
+- ~(~​/​~)~, ~{~​/​~}~, ~[[~​/​~]]~ :: move to beginning of current/next sentence/paragraph/section
 
-- =%=: move to the matching parenthesis
+- =%= :: move to the matching parenthesis
 
-- Commands that change text can be combined with ~/~ and ~?~
+- Commands that change text can be combined with ~/~ and ~?~ ::
 
-- ~f~ / ~F~ / ~t~ / ~T~ / ~;~ /~,~
+- ~f~ / ~F~ / ~t~ / ~T~ / ~;~ /~,~ ::
 
 *** High Level Text Objects
 
