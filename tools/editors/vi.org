@@ -6,14 +6,17 @@
 
 - insert mode:
 
+- =ex= mode
+
 The general form of ~vi~ commands is
 
 #+begin_src
-(command)(number)(text object)
-(number)(command)(text object)
+[(command)][(number)](text object)
+[(number)][(command)](text object)
 #+end_src
 
-=vi= saves the last nine deleted line in nine numbered deletion buffers.
+Where =text object= is commands like =w=, =b=, regexes etc, that is, certain
+commands in vi denotes both text objects and certain related commands.
 
 * Basic Operations
 
@@ -61,7 +64,7 @@ The general form of ~vi~ commands is
 - =h=, =SPACE=; =l=, =BACKSPACE= (also as =^h=) ::
 
 - =w=, =b=; =W=, =B=; ~e~, =E=  :: move to the next/last word. The upper
-  case version ignores punctuation.
+  case version ignores punctuation, splits words by whitespaces.
 
 - ~n|~ :: move to column n
 
@@ -95,7 +98,7 @@ Sections are completely defined by macros.
 
 - =o= / =O= :: insert a newline below/above and enter the insert mode.
 
-- =a= :: append after the cursor, =i= before the cursor; =A=: append to the
+- =a= :: append after the cursor, =i= before the cursor; =I= and =A=: prepend/append to the
   current line.
   + insert commands may be prefixed with a count number, to indicate the
     repetition of the inserted text.
@@ -107,21 +110,25 @@ Sections are completely defined by macros.
     insert mode, use =^o= to access normal mode commands.
 
 - ~ra~ :: replace the current char with ~a~, no need to enter the insert mode;
+  + replace =&&= with =||=: =2r|=
 
-- =s= :: substitute the first char and then enters the insert mode.
-
-- ~R~ :: the replace mode that replaces everything in its way, basically the INSERT key in CUA.
+- ~R~ :: the replace mode that replaces (overstrikes) everything in its way, basically the
+  INSERT key in CUA: one may even restore to normal insert mode by pressing the
+  =INSERT= key.
 
 - =Esc= or =^[= :: leaves the insert mode.
 
 - ~c~ :: change, a combination of delete followed by insert, used with various
   motion commands.
-  - ~cc~ :: change the entire line
+  - =s= :: substitute the first char and then enters the insert mode.
+  - ~cc~, =S= :: change the entire line
   - ~C~ ::  ~c$~
 
 - special characters :: insert a =^V= before the character.
 
 *** Deletion
+
+- =x=, =X= :: delete the next/previous character
 
 - ~d~: delete operator, used with =b=, =d=, =w= and various motion and search commands.
   + ~D~: delete to the end of the line, equal to  = ~d$~
@@ -131,23 +138,25 @@ registers 1-9, accessible by ="n=.
 
 *** Rearranging and Duplicating
 
-The unnamed buffer is lost when switching files; the named buffers do not.
+The unnamed buffer (deletion register) is lost when switching files; the named buffers do not.
 
-- ~("buffer_name)y~ :: yank (copy into a buffer, by default the unamed one, unless prefixed by
+- ~("buffer_name)y~ :: yank (copy into a buffer, by default the unamed one
+  (deletion register), unless prefixed by
   a named buffer)
 
-- ~p~, ~P~ :: put after/before
+- ~p~, ~P~ :: put after/before the line/the cursor
+  + =xp= :: to transpose two characters
 
-- ~Y~ :: = ~yy~
+- ~Y~ :: curiously = ~yy~, not yank to the end of the line.
 
 - =~= :: changing case
 
-- =<=, =>= combined with motion, search command to shift lines by a =shiftwidth=.
+- =<=, =>= :: combined with motion, search command to shift lines by a =shiftwidth=.
   + =<<=, =>>= shift the current line.
 
 - =^D= and =^T= :: shift lines under insert mode, so-called tabbing.
 
-- ~J~: join
+- ~J~ :: join
 
 ** Search/Replace
 
@@ -157,13 +166,18 @@ The unnamed buffer is lost when switching files; the named buffers do not.
 - =fchar=, =Fchar=; =;= :: search for the next =char= forwards/backwards on the
   current line; =;=
   repeats the previous search.
-  + =t= and =T= is a version of =f= that goes to the previous position of the searched character.
+  + =t= and =T= is a version of =f= that goes to the position before the searched character.
 
 Substitution is mostly done through the =substitute= ex command.
 
 ** Undo/Redo
 
-- ~u~: undo; ~U~: undo all on a line, ~C-r~: redo
+- ~u~: undo; ~U~: undo all on a line, ~C-r~ (vim): redo (redo an undone operation)
+  + =vi='s undo may undo a previous undo.
+
+- Since the last nine deletions are saved in the nine named buffer in addition
+  to the /deletion register/, use ="np= to
+  retrive them. But vim supports infinite undo.
 
 ** Other Operations
 
@@ -171,7 +185,7 @@ Substitution is mostly done through the =substitute= ex command.
 
 - ~ZZ~ / ~:wq~ ::
 
-- ~.~ :: repeat the former command
+- ~.~ :: repeat the last command
 
 - =%= on a paired punctuation mark ::
 
@@ -254,7 +268,7 @@ The =ex= editor has five modes:
   any, for later retrieval via =put=.
 
 - ={e}dit=, =ex= :: clear the current clean buffer and begin an editing session on a new file.
-  + =e!= :: discards changes to the buffer
+  + =e!= :: discards changes to the buffer and reload the file.
 
 - ={f]ile filename=, =file= ::
 
@@ -321,6 +335,10 @@ The =ex= editor has five modes:
 
 - =(1,$){w}rite (>>) file/!command= :: overwrite/appends (to file only) the specified lines (by
   default the entire buffer) to a filename/command stdin.
+  + =w!= overwrite an existing file.
+
+- =preserve= :: write the current buffeer into its swap and the swap file will
+  not be deleted after exiting so that changes may be recovered.
 
 - =(.+1)z window_size= :: print the next count lines, the current line is
   changed. This command is basically scroll.
@@ -432,6 +450,10 @@ Ex/Vi/Vim mostly uses POSIX basic regular expression. For syntax and rules of re
 
 - =shell= :: the shell used, by default =$SHELL=.
 
+- =wrapmargin= :: the number of columns of a line before the line is
+  automatically broken at a word boundary.
+
+- =showmode= :: the modeline
 
 ** Key Macros
 
