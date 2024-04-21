@@ -1,3 +1,13 @@
 #+title: Truecolors
 
 https://github.com/termstandard/colors
+
+* tmux
+
+See this [[https://stackoverflow.com/questions/41783367/tmux-tmux-true-color-is-not-working-properly][tmux true color is not working]].
+
+Supports true colors since 2.2.
+
+#+begin_src tmux
+set-option -sa terminal-overrides ",xterm*:Tc"
+#+end_src
