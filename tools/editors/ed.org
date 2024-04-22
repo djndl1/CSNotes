@@ -33,7 +33,7 @@ of the file. =0= represents "before the first line".
   + =$=: the last line; =.= the current line
   + Offset: =+N=, =-N=: the n-th next/previous line; Single =+=,
     =-= is =+1= and =-1=. Addresses may be followed by one or more address offsets.
-  + =,=: all lines, =;=: the current to the last
+  + =,=: all lines (a single =,= is different from =,p=), =;=: the current to the last
   + =/RE/=, =?RE?=: the next/previous line that contains the regex.
   + ='x=: go to the line marked by the letter =x=
 
@@ -43,51 +43,56 @@ of the file. =0= represents "before the first line".
 Most commands accept a print suffix (=p=, =l=, =n=) to print the last line
 affected by the command.
 
-- ~p~ (print): print, may be append to most commands; ~l~ (list): print lines with special characters escaped.
-  ~n~ (enumerate): prints with line numbers
+- ~p~ (print) :: print, may be append to most commands;
 
-- ~(.)a~: append
+- ~l~ (list) :: print lines with special characters escaped.
 
-- ~(.,.)c~: change line(s) in the buffer
+- ~n~ (number) :: prints with line numbers
 
-- ~(.)i~: insert at a line before the addressed line, that is, insert a line at
+- ~(.)a~ :: append
+
+- ~(.,.)c~ :: change line(s) in the buffer
+
+- ~(.)i~ :: insert at a line before the addressed line, that is, insert a line at
   the specified line number and push the original line down.
 
-- ~.~: leaves the input mode
+- ~.~ :: leaves the input mode
 
-- ~(.,.)d~: delete line(s)
+- ~(.,.)d~ :: delete line(s)
 
-- ~e filename~: edit a file and sets the default filename; ~E file~: discard unwritten changes and edit a new file
+- ~e filename~ :: edit a file and sets the default filename;
 
-- ~f filename~: set the default filename to =filename=; if no filename is
+- ~E file~ :: discard unwritten changes and edit a new file
+
+- ~f filename~ :: set the default filename to =filename=; if no filename is
   specified, it prints the current filename.
 
-- =q=: quit with warning; =Q= forcefully quit without saving
+- =q= :: quit with warning; =Q= forcefully quit without saving
 
-- ~($)r filename~: read file into the current buffer after the addressed line
+- ~($)r filename~ :: read file into the current buffer after the addressed line
 
-- =(.,.+1)j=: joins the addressed lines, replacing them by a single line
+- =(.,.+1)j= :: joins the addressed lines, replacing them by a single line
   containing their joined text.
 
-- ~($)=~: the line number of the addressed line.
+- ~($)=~ :: the line number of the addressed line.
 
-- =h=: prints an explanation of the last error.
+- =h= :: prints an explanation of the last error.
 
-- ~(.,.)m(.)~: move lines to a position, cut and paste to
+- ~(.,.)m(.)~ :: move lines to a position, cut and paste to
 
-- ~(.,.)t(.)~: copies the addressed lines to after the specified destination address
+- ~(.,.)t(.)~ :: copies the addressed lines to after the specified destination address
 
-- =(.,.)y=: copies (yanks) the addressed lines to the cut buffer.
+- =(.,.)y= :: copies (yanks) the addressed lines to the cut buffer.
 
-- =(.)x=: puts the contents of the cut buffer to after the addressed line.
+- =(.)x= :: puts the contents of the cut buffer to after the addressed line.
   + the cut buffer is overwritten by =c=, =d=, =j=, =s=, =y=
 
-- =(.+1)zn=: scroll n lines if =n= is specified.
+- =(.+1)zn= :: scroll (print and move) n lines if =n= is specified.
 
-- ~(1,$)g/re/command-list~: global mode. executes one or more commands on all
+- ~(1,$)g/re/command-list~ :: global mode. executes one or more commands on all
   the lines in a range (the buffer) that match some specified string. Use ~G~ for interactive commands. Use =v= or =V= for lines not matched.
 
-- ~(.,.)s/re/replacement/~: substitute text in the first matching line;
+- ~(.,.)s/re/replacement/~ :: substitute text in the first matching line;
   postfixes can be appended;
   + =/= delimiter may be replaced by any character other than space, newline and
     the special characters used by the =s= command.
@@ -100,24 +105,20 @@ affected by the command.
   + =l=, =n=, =p= postfixes: print the replaced
   + without the =/re/replacement/= part, it repeats the last substitution
 
-- context searching ~/../~: we can do both the search for the desired line and a substitution all at once like context searches are interchangeable with line numbers
+- context searching ~/../~ :: we can do both the search for the desired line and a substitution all at once like context searches are interchangeable with line numbers
 
   #+begin_src
 /their/s/their/the/p
-g/peling/s//pelling/gp
+g/peling/s//pelling/gp # the // part is the last search pattern, namely peling
   #+end_src
 
-- =u=: undo any modification of the buffer and restore the current address.
+- =u= :: undo any modification of the buffer and restore the current address.
 
-- ~v~: opposite of ~g~
-
-- =!cmd=: runs shell commands inside =ed= and displays the output. =!!= repeats
+- =!cmd= :: runs shell commands inside =ed= and displays the output. =!!= repeats
   the previous command.
 
-- =(.)kx=: mark a line with a lower case letter =x=.
+- =(.)kx= :: mark a line with a lower case letter =x=.
 
-- =(.,.)n=: number command, prints the addressed line with line numbers.
-
-- =(1,$)w [filename]/!shell_command=: write a range (the entire buffer) to
+- =(1,$)w [filename]/!shell_command= :: write a range (the entire buffer) to
   =filename=, the default filename or the shell command's stdin. Use =W= to
   append instead of overwrite.
