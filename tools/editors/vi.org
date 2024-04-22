@@ -132,8 +132,9 @@ Sections are completely defined by macros.
 
 - =x=, =X= :: delete the next/previous character
 
-- ~d~: delete operator, used with =b=, =d=, =w= and various motion and search commands.
-  + ~D~: delete to the end of the line, equal to  = ~d$~
+- ~["x]d~ :: delete operator, used with =b=, =d=, =w= and various motion and
+  search commands, optionally into register =x=.
+  + ~D~ delete to the end of the line, equal to  = ~d$~
 
 The editor saves the last 9 deleted blocks of text in a set of numbered
 registers 1-9, accessible by ="n=.
@@ -207,7 +208,7 @@ which runs directly in the current view of the terminal.
 =ex= has buffers named =a= through =z=.
 The =ex= editor has five modes:
 
-- *command mode* :: =:= prompt
+- *command mode* :: the =:= prompt
   + =address command ! parameters count flags=, all parts are optional. The
     degenerate case (empty command) prints the next line in the file. Here
     =flags= are =p=, =l= or =#=, executed after the main command.
@@ -218,7 +219,6 @@ The =ex= editor has five modes:
   + For commands that takes a range address, the count parameter limits the
     command to the lines starting at the last line of the range with
     =count= lines involved. That is, the range address is actually invalid and only the last address number is taken.
-    number of lines.
   + commands are commented out by a double quote ="=.
   + multiple commands on a single line are separated by =|=
 
@@ -226,7 +226,7 @@ The =ex= editor has five modes:
   =append=, =insert= and =change= commands use text input mode. A =.= line exits
   the mode.
 
-- *open modes* :: displays one line at a time, not really useful on modern
+- *open mode* :: displays one line at a time, not really useful on modern
   terminals and monitors and they are usually not implemented. They are designed for hardcopy terminals (terminals
   that print a line to display instead of drawing on the screen) or glass TTYs
   (display terminal that behaves like a teletype printing terminal without
@@ -243,7 +243,8 @@ The =ex= editor has five modes:
 
 - =$= :: the last line
 
-- =%= :: the entire buffer, equal to =1,$=
+- =%= :: the entire buffer, equal to =1,$=, unlike ed, where comma =,= addresses the
+  whole buffer.
 
 - =+n=, =-n= :: an offset relative to the line specified before it
 
@@ -254,7 +255,8 @@ The =ex= editor has five modes:
 - ='"= :: the previous current line is marked by ="=.
 
 - Null address specification :: defaults to the current line, =1,p= prints the
-  first line through the current line.
+  first line through the current line. This is more consistent than in =ed=, where
+  =,addr= denotes =1,addr= and =addr,= denotes =addr,addr=.
 
 ** Commands
 
@@ -268,7 +270,7 @@ The =ex= editor has five modes:
 - =(.,.){c}hange count= ::
   + =c!= toggles autoindent
 
-- =(.,){co}py addr flags=, also abbr. =t= :: copy the range after =addr=
+- =(.,){co}py addr flags=, also abbreviated as =t= :: copy and put the range after =addr=
 
 - =(.,.){d}elete (buffer) count flags= :: If a buffer name is given, the deleted
   lines are saved (lower case buffer name)/append (upper case buffer name) there.
@@ -283,13 +285,13 @@ The =ex= editor has five modes:
 
 - =(1,$) {g}lobal /re/ commands= :: the command list may span multiple lines and
   may include =append=, =insert=, =change= commands and their associated input
-  text. The global command and the undo command are not allowd in the command list.
-  + =g!=, abbr. =v= :: at each line not maching the pattern
+  text. The global command and the undo command are not allowed in the command list.
+  + =g!=, abbr. =v= :: at each line not matching the pattern
 
 - =(.){i}nsert= ::
   + =i!= :: the autoindent version
 
-- =(.,.+1) {j]oin count flags= ::
+- =(.,.+1) {j}oin count flags= ::
   + =j!=
 
 - =(.)k x=  or =(.)mark x= :: mark a line with a letter.
@@ -313,7 +315,7 @@ The =ex= editor has five modes:
 
 - =(.){r}ead file= :: If no filename is given, the current filename is used. The
   current file name is not changed unless there is none, in which case the
-  specified file becomes the current one.
+  specified =file= becomes the current one.
 
 - =recover file= ::
 
@@ -322,7 +324,7 @@ The =ex= editor has five modes:
 - ={so}urce file= :: reads and executes =ex= commands from the specified file
 
 - =(.,.) {s}ubstitute /re/replacement/ options count flags= ::
-  + =options= may be =g= global, =c= asking confirmation
+  + =options= may be =g= global, =c= asking for confirmation
   + =&= repeats the previous substitute command with possibly different flags.
   + =~= repeat last substitute with the same replacement but with last used
     search pattern.
@@ -333,7 +335,7 @@ The =ex= editor has five modes:
   the tags file, created by, for example, =ctags=.
 
 - =! command= ::
-  + =%= in the command expanded as
+  + =%= and =#= in the command are expanded as in filenames ??
   + if a range address is appended before =!=, that range of lines are supplied
     as stdin to the command. The possible output then replaces the original lines.
 
@@ -358,7 +360,7 @@ The =ex= editor has five modes:
     with surrounding =-= characters.
 
 - =(.,.) >/< count flags= :: shift the specified lines.
-  + Only whitespaces are shifted; no non-white characters are discarded in a left-shift.
+  + Only whitespaces are shifted; no non-white characters are discarded with a left-shift.
 
 - (.+1, .+1) :: an address alone causes the addressed line to be printed (and
   also change the curent line).
