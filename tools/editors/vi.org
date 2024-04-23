@@ -141,9 +141,10 @@ registers 1-9, accessible by ="n=.
 
 *** Rearranging and Duplicating
 
-The unnamed buffer (deletion register) is lost when switching files; the named buffers do not.
+There are a few special buffers (registers) provided by =vi= for temporary use:
+the unnamed buffer and the named buffers.The unnamed buffer (deletion register) is lost when switching files; the named buffers (from =1= to =9= and =a= to =z=) do not, thus they may be used to transfer content from one file to another.
 
-- ~("buffer_name)y~ :: yank (copy into a buffer, by default the unamed one
+- ~("buffer_name)y~ :: yank (copy into a buffer, by default the unnamed one
   (deletion register), unless prefixed by
   a named buffer)
 
@@ -187,7 +188,7 @@ Substitution is mostly done through the =substitute= ex command.
 
 - Since the last nine deletions are saved in the nine named buffer in addition
   to the /deletion register/, use ="np= to
-  retrive them. But vim supports infinite undo.
+  retrieve them. But vim supports infinite undo.
 
 ** Other Operations
 
@@ -199,11 +200,14 @@ Substitution is mostly done through the =substitute= ex command.
 
 - =%= on a paired punctuation mark ::
 
+- =Ctrl-^= :: =:e #=
+
 * ex commands and the ex mode
 
 Originally, =vi= was the visual mode of the =ex= editor, an improved line editor
 from and a superset of =ed=. Modern =ex= runs a cleared terminal, unlike =ed=,
-which runs directly in the current view of the terminal.
+which runs directly in the current view of the terminal. To enter =ex= mode
+under visual mode, hit =Q=.
 
 =ex= has buffers named =a= through =z=.
 The =ex= editor has five modes:
@@ -220,7 +224,9 @@ The =ex= editor has five modes:
     command to the lines starting at the last line of the range with
     =count= lines involved. That is, the range address is actually invalid and only the last address number is taken.
   + commands are commented out by a double quote ="=.
-  + multiple commands on a single line are separated by =|=
+  + Different elements of an =ex= command may be separated by spaces.
+  + multiple commands on a single line are separated by =|= in the same way a
+    semicolon separates a shell command.
 
 - *text input mode* :: gathers input lines and places them in the file; the
   =append=, =insert= and =change= commands use text input mode. A =.= line exits
@@ -236,6 +242,11 @@ The =ex= editor has five modes:
   + type =Q= to enter =ex= mode.
 
 ** Command Addressing
+
+Addresses may be absolute line numbers, relative line offset, special symbols
+indicating some special lines or search pattern as addresses and they may be
+combined: two patterns may form a range with a comma; patterns with an offset
+indicates a line relative to the matching line.
 
 - =.= :: the current line
 
@@ -257,6 +268,8 @@ The =ex= editor has five modes:
 - Null address specification :: defaults to the current line, =1,p= prints the
   first line through the current line. This is more consistent than in =ed=, where
   =,addr= denotes =1,addr= and =addr,= denotes =addr,addr=.
+
+- =;= is also available in =vi= to set the first address as the current line.
 
 ** Commands
 
@@ -302,6 +315,11 @@ The =ex= editor has five modes:
 
 - ={rew}ind= :: the argument list is rewound and the first file is edited.
 
+With =args=, =n= and =rew=, one may switch between multiple files without leaving vi.
+=last=, =prev= (vim) enhanced support for multiple files. However, moving to
+another file requires a save as the buffer is cleared. =vi= remembers the
+current filename as =%= and the alternate filename as =#=. They may be used with =e=, =r=, =!cmd=.
+
 - =(.,.){nu}mber count flags=, =#= :: print with line numbers
 
 - =(.){o}pen (/re/) flags= :: enter intraline editing open mode at each
@@ -335,7 +353,7 @@ The =ex= editor has five modes:
   the tags file, created by, for example, =ctags=.
 
 - =! command= ::
-  + =%= and =#= in the command are expanded as in filenames ??
+  + =%= and =#= in the command are expanded as in filenames.
   + if a range address is appended before =!=, that range of lines are supplied
     as stdin to the command. The possible output then replaces the original lines.
 
@@ -347,6 +365,8 @@ The =ex= editor has five modes:
 - =(1,$){w}rite (>>) file/!command= :: overwrite/appends (to file only) the specified lines (by
   default the entire buffer) to a filename/command stdin.
   + =w!= overwrite an existing file.
+
+- ={x}it! file= :: exits with changes saved if modified.
 
 - =preserve= :: write the current buffeer into its swap and the swap file will
   not be deleted after exiting so that changes may be recovered.
