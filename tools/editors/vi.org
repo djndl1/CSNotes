@@ -342,10 +342,15 @@ current filename as =%= and the alternate filename as =#=. They may be used with
 - ={so}urce file= :: reads and executes =ex= commands from the specified file
 
 - =(.,.) {s}ubstitute /re/replacement/ options count flags= ::
+  + the address range may be replaced with a global command with a search pattern,
+    under which case, =/re/= may be omitted as =//= to denote the search pattern.
+
+    #+begin_src vim
+:g/editer/s//editor/g
+    #+end_src
   + =options= may be =g= global, =c= asking for confirmation
   + =&= repeats the previous substitute command with possibly different flags.
-  + =~= repeat last substitute with the same replacement but with last used
-    search pattern.
+  + =~= last used search pattern in a regular search.
 
 - =stop= :: suspends the editor
 
@@ -387,7 +392,8 @@ current filename as =%= and the alternate filename as =#=. They may be used with
 
 ** Pattern Matching
 
-Ex/Vi/Vim mostly uses POSIX basic regular expression. For syntax and rules of regular expressions, see [[./posix_regex.org][POSIX Regex.]]
+Ex/Vi/Vim mostly uses POSIX basic regular expression. All =vi= clones support
+optional extended regular expression syntaxes. For syntax and rules of regular expressions, see [[./posix_regex.org][POSIX Regex.]]
 
 - =~= in the replacement pattern stands for the defining text of the previous
   replacement pattern. In the search pattern, it matches the text which defined
@@ -407,6 +413,26 @@ Ex/Vi/Vim mostly uses POSIX basic regular expression. For syntax and rules of re
   be converted to upper- and lower-case respectively.
   + =\U= and =\L= turns on the conversion until =\E= and =\e= turns it off.
 
+- =\<=, =\>= matches the beginning/end of a word.
+
+- Most metacharacters lose their special meaning inside brackets except =\=,
+  =-=, =]= which are used by bracket expressions or as the escape marker.
+
+*** Bracket Expressions (Groups of Characters Within Brackets)
+
+Beside literal characters, bracket expressions comprise of
+
+- *POSIX character classes* =[:CharacterClass:]=.
+  + =[:alnum:]=, =[:alpha:]=, =[:blank:]=, =[:cntrl:]=, =[:digit:]=,
+    =[:graph:]=, =[:lower:]=, =[:print:]=, =[:punct:]=, =[:space:]=,
+    =[:upper:]=, =[:xdigit:]=
+
+- *Collating symbols* =[.CollatingSymbol.]= a multicharacter sequence treated as a unit
+
+- *Equivalence classes* ~[\=, \=]~: a set of characters that should be considered equivalent.
+
+All the three types of components have their own brackets in addition to the
+outer pair of brackets.
 
 *** Some Pattern Matching Examples
  
