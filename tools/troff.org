@@ -1,0 +1,10 @@
+#+title: Troff (Typesetter roff)
+
+Pronounced tee-roff.
+
+A typesetting system from the original UNIX, which is originally intended for
+use with typesetters. Various macro packages exist for various document styles.
+
+=groff= is the GNU implementation of troff, with a large number of helper
+programs, preprocessors and postprocessors. Another modern program commonly used
+for man pages is =mandoc=, which focuses on man pages only, not general typesetting.
