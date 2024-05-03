@@ -485,6 +485,11 @@ outer pair of brackets.
 #+end_src
 
 * Advanced Usage
+** How To Exit
+
+Inside Emacs or VSCode terminal, beside =Ctrl-[= and =Esc=, =Ctrl-C= escapes insert mode, =Ctrl-o= gives a
+chance to execute normal mode command (in which case =ZQ= or =ZZ=).
+
 ** Read-Only Mode
 
 =vim -R= or =view=. Use =w!= or =wq!= to force a write if necessary.
