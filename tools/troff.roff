@@ -1,0 +1,53 @@
+.TL
+Troff: Typesetter roff
+
+.PP
+Troff (Pronounced tee-roff) A typesetting system from the original UNIX, which is originally intended for
+use with typesetters.  The great strength of troff is the flexibility of the
+basic language and its programmability at the price of tedious steps to complete
+basic jobs — Macros are provided as complement. The user defines logical
+coponents of a document instead of details such as sizes, fonts and positions.
+Various macro packages exist for various document styles. Preprocessors exist
+for mathematics, tables and figures.
+
+.PP
+groff is the GNU implementation of troff, with a large number of helper
+programs, preprocessors and postprocessors. Another modern program commonly used
+for man pages is
+.CW mandoc ,
+which focuses on man pages only, not general typesetting.
+
+.SH
+Commands
+
+.PP
+There are two forms of commands
+
+.IP \[bu]
+A command started with
+.CW .
+with some optional parameters.
+
+.IP \[bu]
+a switch started with
+.CW \\
+
+Formatting commands must occur at the beginning of the file.
+
+.SH Fonts
+
+.CW groff
+does not define fonts in itself. It contains a few font description files for output devices (ps, pdf, dvi, html etc.), for which the drivers handle the actual font files. The exact steps for ps/pdf are documented in
+.CW grops(1) .
+
+.SH
+CJK支持
+
+.PP
+
+首先，需要指定使用UTF-8编码（
+\CW -Kutf8
+），不然默认ASCII.
+其次，需要把常用格式的中文字体转到groff的需要格式。
+
+结论，不如用LaTex。
