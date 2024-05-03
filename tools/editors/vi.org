@@ -351,6 +351,8 @@ current filename as =%= and the alternate filename as =#=. They may be used with
   + =options= may be =g= global, =c= asking for confirmation
   + =&= repeats the previous substitute command with possibly different flags.
   + =~= last used search pattern in a regular search.
+  + any nonalphanumeric, nonspace character except =\=, ="= and =|= may be used
+    as the delimiter, especially useful when dealing with pathnames.
 
 - =stop= :: suspends the editor
 
@@ -395,16 +397,22 @@ current filename as =%= and the alternate filename as =#=. They may be used with
 Ex/Vi/Vim mostly uses POSIX basic regular expression. All =vi= clones support
 optional extended regular expression syntaxes. For syntax and rules of regular expressions, see [[./posix_regex.org][POSIX Regex.]]
 
+*** Replacement Syntax
+
+Aside from literal characters, the replacement contains a few metacharacters.
+
 - =~= in the replacement pattern stands for the defining text of the previous
-  replacement pattern. In the search pattern, it matches the text which defined
-  the replacement part of the last substitute command.
+  replacement pattern.  Useful for repeating an edit.
+  + also as a command to perform the previous substitution but with the previous
+    search pattern (not necessarily the one used in the last substitution command).
 
 - =#= as the replacement pattern alone specifies the previous replacement pattern.
 
 - =&= in the replacement is replaced by the characters matched by the search pattern.
+  - =&= as a command under both vi mode and ex mode (=:&=) repeats the last substitution without moving the cursor.
 
 - =\n= (backreference): matches the text that was matched by the n-th regular
-  subexpression.
+  subexpression in the search pattern.
   + in the replacement pattern, it is replaced by the text matched by the corresponding subexpression.
   + For nested expression, =n= is determined by the counting occurrences of =\(=
     starting from the left.
@@ -417,6 +425,9 @@ optional extended regular expression syntaxes. For syntax and rules of regular e
 
 - Most metacharacters lose their special meaning inside brackets except =\=,
   =-=, =]= which are used by bracket expressions or as the escape marker.
+
+- A simple =:s= is =:s//~/=, repeating the last substitution.
+
 
 *** Bracket Expressions (Groups of Characters Within Brackets)
 
@@ -435,6 +446,12 @@ All the three types of components have their own brackets in addition to the
 outer pair of brackets.
 
 *** Some Pattern Matching Examples
+
+- move a block of XML
+
+#+begin_src ex
+:g /<syntax>/.,<syntax\/>/ move /<parameters>-1/
+#+end_src
  
 - delete all blank lines plus any lines that contain only whitespace
 
