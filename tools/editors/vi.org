@@ -509,11 +509,16 @@ outer pair of brackets.
 :set nooption
 #+end_src
 
-~:set all~ displays all options.
+~:set all~ displays all options. =set option!= (vim) toggle the value of an
+option. =set option?= shows the current value of the option.
+
+Options may be set in a =.exrc= file in the home directory.
 
 *** Useful Options
 
-- =autoindent= :: supply indentation automatically
+- =exec= :: enable directory-local =.exrc= settings.
+
+- =autoindent= :: supply indentation automatically; useful for programming
 
 - =autowrite= :: automatic write before =:n=, =ta= etc.
 
@@ -533,7 +538,7 @@ outer pair of brackets.
 - =shell= :: the shell used, by default =$SHELL=.
 
 - =wrapmargin= :: the number of columns of a line before the line is
-  automatically broken at a word boundary.
+  automatically broken at a word boundary. Useful for nonprogram text.
 
 - =showmode= :: the modeline
 
