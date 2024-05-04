@@ -370,10 +370,13 @@ current filename as =%= and the alternate filename as =#=. They may be used with
 - =ta tag= :: switch the focus of editing to the location of =tag=, defined by
   the tags file, created by, for example, =ctags=.
 
-- =! command= ::
+- =! command= :: it executes a shell command but vim documentation calls it
+  "filter" as it may be used to filter text in the buffer and write back into the buffer.
   + =%= and =#= in the command are expanded as in filenames.
   + if a range address is appended before =!=, that range of lines are supplied
     as stdin to the command. The possible output then replaces the original lines.
+  + in =vi= mode, type =!= followed by motion operations enters this command
+    with a range automatically. To operate only on the current n lines, type =!!=.
 
 - =($)== :: prints the line number of addressed line without changing the
   current line.
