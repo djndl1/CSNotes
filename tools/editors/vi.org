@@ -583,6 +583,47 @@ There are two flavors of macros:
 
 * VIM
 
+Vi is part of POSIX, with little change over the years. Vim extended its feature
+set and gained a large community around it. It emphasizes modality and touch
+editing but provides features for less experienced users (=evim=, =vimtutor=,
+and some third-party tutorials: OpenVim, Vim Adventures).
+
+- Initialization and Customization with scripting and plugins
+
+- Infinite undo.
+
+- GUI features
+
+- Multiwindow Editing
+
+- Autocompletion
+
+- Syntax awareness
+
+- Postprocessing after editing (e.g. cleanups)
+
+- Arbitrary line length up to a C =long= integer.
+
+- Unicode Awareness
+
+- Binary data: no newline after at the EOF.
+
+- Session Context: recent docuemnts, recent edits of recent files, command
+  history, previous leaving location.
+
+- Meta-information: foru special registers
+  + =%=: the current filename
+  + =#=: the alternate filename
+  + =:= the last shell command
+  + =.= the last inserted text
+
+- the black hole register ="_=: the =/dev/null= of vim.
+
+- Transparent editing with compressed files.
+
+- Builtin help: the =:help= intro provides some basic usage before goint into details.
+  + =Ctrl-]= jumps to the tag
+
 ** Command line options
 
 - ~-b~: in binary mode
