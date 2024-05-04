@@ -509,6 +509,9 @@ chance to execute normal mode command (in which case =ZQ= or =ZZ=).
 
 =:(un)abbrivate abbr expanded text=
 
+Abbreviations expand as soon as a nonalphanumeric character is pressed.
+Definitions are not recursively expanded.
+
 ** Recovery
 
 - =vi -r name= :: recovery a file at the directory where a file is previously not written.
@@ -566,9 +569,14 @@ There are two flavors of macros:
 
 - =:map macro macro_body= defines a key macro
   + =:map!= causes the mapping to apply to input mode.
-  + special characters are input with =^V= prefixed.
+  + special characters are input with =^V= prefixed. Vertical bar =|= can never
+    be escaped as it is used as the crucial =ex= separator.
   + =:unmap= deletes a macro.
   + =#0= through =#9= mean function keys.
+
+- Vim has an internal leader key (=\= by default, and denoted in macro
+  definition as =<leader>=) for prefixing in order not to overload other
+  keys. This leader key is defined with =mapleader=.
 
 * VIM
 
