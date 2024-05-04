@@ -202,6 +202,17 @@ Substitution is mostly done through the =substitute= ex command.
 
 - =Ctrl-^= :: =:e #=
 
+
+** Combination For Special Tasks
+
+- =dwelp= :: swap the two words. Delete the word, go over the next word and a step forward, put the
+  deleted word.
+
+- =lb=, =he= :: move to the beginning/end of a word; =l=​/​=h= here guards against the case
+  where the cursor is already at the beginning.
+
+- =f(xf)x= :: delete a pair parentheses.
+
 * ex commands and the ex mode
 
 Originally, =vi= was the visual mode of the =ex= editor, an improved line editor
