@@ -1,0 +1,66 @@
+#+title Modern Perl
+
+Flexible, Forgiving, Malleable
+
+#+begin_quote
+Modern Perl is a mindset. It’s an approach to writing great software with the
+Perl programming language. It’s how effective Perl programmers write powerful,
+maintainable, scalable, concise, and excellent code. It takes advantage of
+Perl’s extensive library of free software (the CPAN) and language features
+designed to multiply your productivity.
+#+end_quote
+
+* Documentation
+
+=perldoc= is a tool display the docs of Perl modules. Start reading with =perltoc=.
+
+- =-q= :: search the FAQ
+
+- =-f= :: built-in Perl function.
+
+- =-v= :: built-in variable
+
+- =-l= :: list doc paths
+
+- =-m= :: the entire contents of the module, code and all
+
+* Ecosystem and Community
+
+** CPAN (Comprehensive Perl Archive Network)
+
+A uploading and mirroring system for redistributable, reusable Perl code. CPAN
+services provide automated testing and reporting (ticket queue) across platforms
+and Perl versions.
+
+- /distribution/ :: a collection of reusable Perl code, containing one or more /moduels/.
+
+- /module/ :: self-contained library of Perl code.
+
+- =cpan.pm= :: a client to connect to, search, download, build, test and install
+  CPAN distributions.
+
+  #+begin_src perl
+install Modern::Perl
+  #+end_src
+
+Other CPAN clients includes =App::cpanminus=, =App::perlbrew=. The =local::lib= CPAN distribution offers management of multiple Perl installations.
+
+** Microsoft Windows
+
+CPAN distributions often requires a C compiler and some development tools.
+[[https://strawberryperl.com/][Strawberry Perl]] includes a GCC and is designed to be close to unix-like
+environments or [[https://www.activestate.com/products/perl/][ActiveState Perl]].
+
+** Events, Conferences
+
+- [[https://yapc.org/][Yet Another Perl Conference]]
+
+- [[https://www.pm.org/][Perl MOngers]]: Perl User Groups
+
+** REPL
+
+- [[https://metacpan.org/pod/Devel::REPL][Devel::REPL]]
+
+** Modern Perl
+
+- [[https://metacpan.org/pod/Modern::Perl][Modern::Perl]]: one =use= to include all modern features.
