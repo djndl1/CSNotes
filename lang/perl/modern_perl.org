@@ -10,6 +10,32 @@ Perl’s extensive library of free software (the CPAN) and language features
 designed to multiply your productivity.
 #+end_quote
 
+* Philosophy
+
+- /Expressivity/
+  + there is more than one way to do it.
+  + do what I mean (least astonishment)
+
+- /Context/:  each expression is part of a larger context. The behavior of how data are treated depends on the context. Context helps determine how much word a function should do.
+  + /Amount Context/ :: how many items an operation is expected to produce
+    - /void context/ :: a function never use its return value and thus may not
+      even perform any actual work.
+    - /scalar context/ :: a function return value to a single item and thus it may
+      stops when the first result is returned.
+    - /list context/ :: a function returns a list
+  + /Value Context/ :: How a piece of data is interpreted. Types are not
+    explicitly declared. Value contexts provide hints about how to treat the
+    data. Perl coerces values
+    to specific proper types depending on the operators in use.
+    + numeric add =+=, string concatenation =.=, boolean context =!!=
+
+- /Implicit Ideas/ ::
+  + /default scalar variable/ =$_=. Many operators and constructs work on the contents of =$_=
+    in the absence of an explicit variable. This variable is like the "it"
+    pronoun: convenient to use, confusing when overused.
+  + /default array variable/ =@_=, implicit arguments used by functions.
+    =@ARGV= the command-line arguments.
+
 * Documentation
 
 =perldoc= is a tool display the docs of Perl modules. Start reading with =perltoc=.
@@ -64,3 +90,46 @@ environments or [[https://www.activestate.com/products/perl/][ActiveState Perl]]
 ** Modern Perl
 
 - [[https://metacpan.org/pod/Modern::Perl][Modern::Perl]]: one =use= to include all modern features.
+
+* Language Basics
+
+** Variables
+
+#+begin_quote
+The relationship between variable types, sigils, and context is key to Perl.
+Perl’s type system deals with value types and container types. While a
+variable’s container type—scalar, array, or hash—cannot change, Perl is flexible
+about a variable’s value type. Performing an operation on a variable that imposes a specific value type may
+cause coercion of the variable’s existing value type.
+#+end_quote
+
+Variables names are prefixed with a sigil: =$= for scalars, =@= for arrays and
+=%= for hashes. Sigils are not part of a variable name but they represent different
+namespaces: variables with the same name but different sigils are different variables.
+
+The sigils of a variable changes depending on its use, called /variant sigils/.
+Sigils behave like contexts. Using a scalar element of an aggregaste as an lvalue
+imposes scalar context on the rvalue. =@keys= imposes list context on a hash
+and slices the hash.
+
+#+begin_src perl
+# assign a list to a slice of array
+@values[@indices] = some_function();
+# access an array element
+$valeus[0];
+# coerced
+my $element = @values[@indices];
+# evaluating an array as a scalar produces its length
+my $len = @values;
+#+end_src
+
+*** Scope
+
+Most variables in modern Perl programs have a /lexical scope/, either the
+contents of blocks delimited by curly braces or entire files but not a =package=
+declaration.
+
+** Namespaces
+
+Perl allows multilevel namespaces joined by =::=. User-defined packages start
+with uppercase letters and lowercase package names for core pragmas.
