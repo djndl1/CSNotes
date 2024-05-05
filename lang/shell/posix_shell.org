@@ -1,4 +1,12 @@
 #+title: Posix Shell
+#+bibliography: posix_shell_ref.bib
+
+
+#+begin_quote
+Writing shell scripts requires more than just a knownledge of the shell
+language. It also requires familiarity with the individual Unix programs.
+[cite:@robbins2005classic]
+#+end_quote
 
 * History
 
@@ -23,6 +31,26 @@
 This note uses =dash= as the POSIX shell due to its availability on Debian-based
 Linux distros and its fully POSIX compliance. On Debian, Ubuntu and termux, =dash= is not configured with
 =libedit= and thus gives no support for vi-mode line editing and history.
+
+* Login & Non-Login Shell
+
+A login shell (=-l=) first reads commands from the files =/etc/profile= and =.profile=.
+It also reads =$ENV= if defined.
+
+* =expr= Expression Evaluator
+
+=expr= performs /arithmetic/, /logical/, /relational/ or /string/ operations.
+
+- Equality test is done by ~=~ not ~==~
+
+- Some operators (=*=, =&=, =|=, =<=, =>=, =(=, =)=) are special metacharacters
+  and they must be quoted or escaped.
+
+- If only one expression is given, then =expr= simply echos it.
+
+- to avoid some variables that are themselves an operator string, append an =x= to them
+  and another operand
+  before string comparison.
 
 * Variables
 
@@ -64,6 +92,9 @@ Linux distros and its fully POSIX compliance. On Debian, Ubuntu and termux, =das
 
 - =${var=new_definition_if_undefined}= :: use and define new value if undefined
 
+The special expression in the back is executed in the current shell rather than
+a subshell.
+
  Most scripts don't care about the difference between undefined variable and a
 null variable. =:?=, =:-=, =:+=, =:== variations of the above forms check
 whether the variable is null or undefined instead of simply undefined.
@@ -99,7 +130,7 @@ echo 'My home directory is '"$HOME"', and my account is '"$USER"
 
 * Command Substitution
 
-=$(command)= or =`command`=: Execute a command and return its result as a
+=$(command)= or =`command`=: Execute a command in a /child process/ and return its result as a
 string. The new version =$()= supports nesting.
 
 * Control Flow Structure
@@ -182,3 +213,8 @@ done
 ** break & continue
 
 They work the way as in C.
+
+
+* Bibliography
+
+#+print_bibliography:
