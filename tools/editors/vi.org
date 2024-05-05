@@ -589,6 +589,7 @@ editing but provides features for less experienced users (=evim=, =vimtutor=,
 and some third-party tutorials: OpenVim, Vim Adventures).
 
 - Initialization and Customization with scripting and plugins
+  + =_vimrc= on Win32.
 
 - Infinite undo.
 
@@ -623,6 +624,10 @@ and some third-party tutorials: OpenVim, Vim Adventures).
 
 - Builtin help: the =:help= intro provides some basic usage before goint into details.
   + =Ctrl-]= jumps to the tag
+
+** GUI gVim
+
+Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 ** Command line options
 
