@@ -133,3 +133,69 @@ declaration.
 
 Perl allows multilevel namespaces joined by =::=. User-defined packages start
 with uppercase letters and lowercase package names for core pragmas.
+
+** Values and Types
+
+- /strings/: quoted by single or double quotes
+  + single quotes are literal strings with exceptions where a single quote
+    inside the string or a final backslash is required to be escaped. ='\\'= and
+    ='\'= are the same.
+  + double quotes allows more escaped characters as in C.
+  + a string declaration may cross newlines.
+  + =.= concatenates strings.
+  + interpolated strings require no special syntax: simply put a variable inside
+    a double-quoted string.
+  + =q= and =qq= are customizable single/double quoting marks that delimiters may be defined
+    by users.
+  + multiple lines may also be represented by /heredoc/ syntax. The quote type
+    around the delimiter determines the string quoting type.
+
+    #+begin_src perl
+  my $literal = "two
+  lines";
+
+  my $interpolated = "Interpoated";
+  print "$interpolated is here";
+
+  qq{"Ouch", he said. "That hurt!"};
+  q^Dont't escape the single quote!^;
+
+  my $lines = <<'END_LINES';
+  Line one
+  Line two
+  END_LINES
+    #+end_src
+
+- Numbers: both intergers and floating-point values are supported.
+  + nubmers in Perl may be represented as native integers (as in C), native
+    floating-points (IEEE754) or strings of arbitrary length. Operations on them
+    may or may not preserve the original precision and scale.
+
+  #+begin_src perl
+42
+0.07
+1.02e14
+0b101010
+052 # octal
+0x20
+ox1.0p-3
+1_000_000_000
+  #+end_src
+
+- =undef=: unassigned, undefined and unknown value.
+  + =false= in a boolean context, ="uninitialized value"= in a string context.
+  + =defined= determines if a variable is defined.
+
+- Lists: comma-separated group of aone or more expressions.
+  - empty list =()=. The comma operator creates lists, not the parentheses.
+    + =undef= in scalar context.
+    + Imposes list context as a lvalue
+  - lists are values; arrays are containers.
+
+#+begin_src perl
+my @first_fibs = (1, 1, 2, 3, 5, 8, 13, 21);
+my ($package, $filename, $line) = caller();
+my $count = () = get_array();
+
+my @chars = 'a' .. 'z'; # create a list using the range operator
+#+end_src
