@@ -8,3 +8,19 @@ already matured.
 Many UNIX programs do quite trivial tasks in isolation, but combined with other
 programs, become general and useful tools.
 #+end_quote
+
+UNIX is a time-sharing operating system kernel: a program that controls the
+resources of a computer and allocated them among its users.
+
+* Terminal
+
+Every character typed into the terminal is sent to the computer and echoed back
+on the terminal unless some secret passwords are typed.
+
+#+begin_quote
+Tab stops on UNIX systems are eight spaces apart.
+#+end_quote
+
+- =mail= reads and sends emails.
+
+- =write= immediately establishes two-way communication with users on other terminals.
