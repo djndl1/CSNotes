@@ -1,6 +1,4 @@
-#+title: Coreutils
-
-* Library Functions
+#+title:Coreutils Implementation Note
 
 ** =getopt=, =getopt_long()=
 

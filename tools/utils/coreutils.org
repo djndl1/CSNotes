@@ -1,0 +1,21 @@
+#+title: Coreutils
+
+* =ls=
+
+- =-1= :: one line per file
+
+- =-t= :: sort by time in descending order, by default modification time (mtime).
+
+- =-u= :: use access time (atime), =-c= use create time (ctime)
+
+- =-r= :: reverse the order
+
+* =pr=
+
+A paginator that make text into forms suitable for paper pages, possibly in
+multiple columns. By default 66 lines per page. Not a replacement for =troff= or
+=nroff=. For real printing, consider =lp= and =lpr=.
+
+* =wc=
+
+count lines, words, characters or bytes of a file.
