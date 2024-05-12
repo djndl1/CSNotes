@@ -1,0 +1,139 @@
+#+title: Posix Regex
+
+The syntax of regular expressions varies across application programs.
+
+* Matching Mechanism
+
+- If a regex could match more than one substring of a given string, it matches the first.
+
+- If a regex could match more than one substring starting at a given position,
+  it matches the longest possible substring (greed).
+
+- Match lengths are measured in characters.
+
+- a null string is considered than no match at all.
+
+* Components
+
+- *Anchors* :: position of the pattern in relation to a line of text
+
+- *Character sets* :: used to match one or more characters in a single positioned
+
+- *Modifiers* :: repeated count of a character set
+
+* POSIX Extended Regular Expression (Modern)
+
+Used by =awk=
+
+- *atom* :: a regular expresison enclosed in =()=, an empty set of =()=
+  (matching the null string), a *bracket expression*, =.= (any single
+  character), =^=, =$=, =\= followed by a special character, or a single regular
+  character.
+  + ={= followed by a non-digit character is a normal character.
+
+- *piece* :: an *atom* followed by a single =*=, =+=, =?= or *bound* (={m[,[n]]}=)
+
+- *branch* :: one or more concatenated pieces.
+
+A BRE regex consists of one or more nonempty *branches* separated by =|=, which matches anythign that matches one of the branches.
+
+*** Bracket Expressions (Groups of Characters Within Brackets)
+
+A bracket expression matches any single character enclosed in its =[]=.
+
+- =]= at the first position is literal
+
+- =-= at the first/last position is literal
+
+- Most special characters lose their meanings inside =[]=.
+
+Beside literal characters, bracket expressions comprise of
+
+- *POSIX character classes* =[:CharacterClass:]=.
+  + =[:alnum:]=, =[:alpha:]=, =[:blank:]=, =[:cntrl:]=, =[:digit:]=,
+    =[:graph:]=, =[:lower:]=, =[:print:]=, =[:punct:]=, =[:space:]=,
+    =[:upper:]=, =[:xdigit:]=
+
+- *Collating symbols*, *Collating element* =[.CollatingSymbol.]= a
+  multicharacter sequence treated as a unit to match more than one character.
+
+- *Equivalence classes* ~[\=, \=]~: a set of characters that should be
+  considered equivalent to the one enclosed inside.
+
+All the three types of components have their own brackets in addition to the
+outer pair of brackets.
+
+* POSIX Basic Regular Expression (Legacy)
+
+Used by =grep=, =sed= by default, although both should now support ERE.
+
+** Difference From BRE
+
+- =|=, =+=, =?=, ={=, =}= are regular characters. Use bounds as the alternative.
+
+- Bounds are escaped =\{\}=
+
+- Subexpressions are also escaped =\(\)=. =(=, =)= are regular characters.
+
+- =^=, =$= are regular chracters unless positioned at the beginning/end of a regex.
+
+- =*= is regular if positioned at the beginning of a regex or a subexpression.
+
+- BRE supports backreferences as an atom.
+
+- =\( \)=: saves the pattern enclosed between into a special holding space or a hold buffer.
+
+#+begin_src
+:%s/\(abcd\)\1/alphabet-soup/
+# changes `abcdabcd` into `alphbaet-soup`
+#+end_src
+
+- =\< \>=: matches characters at the beginning or at the end of a word
+
+- ~~~: matches whatever regex was used in the last search, only available in a regular search
+
+- ~\( \)~: saves the pattern enclosed between into a special holding space
+
+#+begin_src
+:s/\(abcd\)\1/alphabet-soup/
+# changes abcdabcd to alphabet-soup
+#+end_src
+
+- ~\< \>~: matches characters at the beginning or at the end of a word
+
+- ~~~: matches whatever regex was used in the last search.
+
+- character classes, collating symbols, equivalence classes
+
+#+begin_src
+[[.ch.]] # a multicharacter sequence that should be treated as a unit
+[[=e=]] # match any of e, e with acute, e with
+#+end_src
+
+- ~\n~: replaced with text matched the nth pattern previously saved by ~\(~ and ~\)~
+
+- ~&~: replaced with the entire text matched by the search problem
+
+- ~~~: the string found is replaced with the replacement text specified in the last substitute command. The search pattern doesn't need to be the same.
+
+#+begin_src
+:s/thier/their/
+:s/thier/~/
+#+end_src
+
+- ~\u~ / ~\l~: causes the next character in the replacement string to be changed to uppercase or lowercase. ~\U~ \ ~\L~ \ ~\e~ \ ~\E~: all following characters are converted to uppercase or lowercase until the end of the replacement string or until ~\e~ / ~\E~.
+
+#+begin_src
+:%s/yes, doctor/\uyes, \udoctor/
+:%s/Fortran/\UFortran/
+#+end_src
+
+#+begin_src
+:%s/child\( ,.;:!?\)/children\1/g
+:%s/\<child\>/children/g
+#+end_src
+
+#+begin_src
+:g /SYNTAX/.,/DESCRIPTION/-1 move /PARAMTERS/-1
+#+end_src
+

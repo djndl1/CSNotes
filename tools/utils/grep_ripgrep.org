@@ -1,0 +1,82 @@
+#+title: Grep & Ripgrep
+
+* Grep
+
+Searches input files for lines containing a match to a given pattern list and
+prints matching lines to stdin by default.
+
+** Frequent Options
+
+- =-F=: treat the pattern as literal strings instead of regular expressions.
+
+- =-i=: ignore case
+
+- =-v= (invert): get lines other than those matching the pattern
+
+- =-H=: show filenames
+  + ~--label=LABEl~: label stdin as =LABEL=
+  + =-Z=: output a zero byte after the filename instead of the normal =:= to
+    allow arbitrary file names.
+
+- =-z=: input and output are treated as null-terminated lines instead of newline-termianted.
+
+- =-n=: show line number; =-H=​/​=-h= for enabling/disabling filenames per line.
+
+- =-c=: show the count number of matching lines for each input file, no more piping to =wc -l=
+
+- =-m=: limits matching lines. grep stops at the matching line of the specified number.
+
+- =-e=: Certain patterns may start with a hyphen. Use =-e= to avoid it.
+  Typically, patterns are separated by newlines, which is not very convenient to
+  type on the command line. Multiple =-e= can specify multiple search strings (OR logic) from the command line. For AND-logic multiple patterns without piping, use =awk= or =sed=.
+  + =-f= patterns may also be read from a file
+
+- =-l=, =-L= (list filenames): list matching/non-matching filenames.
+
+- =-w= (word), =-x=: the matching lines must have the matched parts as whole
+  words/lines. Here, a word is a string of characters, digits and underscores,
+  not any string separated by blanks.
+
+- =-Fxf=: with these three options together, it is possible to get common lines between two lines or the difference with =-v= added: that is, use one file as the pattern to match against the other in whole lines and in literal strings.
+
+- =-o=: print only the matching portions of lines.
+
+- =-r=: recursive search as =ripgrep=
+
+- =-C NUM=, =-NUM=; =-A=, =-B=: print =NUM= lines of the context
+  surrounding/after/before the matching line
+  - =--grouping-separator=: separate matching groups of lines with some separator.
+
+- =-T=: add tabs between output fields (filenames, line numbers and line contents)
+
+- =/dev/null= or =-H= (GNU extension): force output of filenames
+
+- =--include=, =--exclude=: include/exclude certain files
+
+- =-G= (BRE, the default), =-E= (ERE), =-F= (Fixed strings), =-P= (PCRE)
+
+** Certain Usage & Caveats
+
+- to prevent extra matching against the =grep= process itself while filtering
+  =ps= output, add a bracket to the first character of the pattern so that the =grep= process' command
+  line won't match since =[P]attern= won't match against the pattern =[P]attern=.
+
+- =grep -lv= matches files that have unmatched lines, use =-L= for files that
+  have no match at all.
+
+- empty pattern/strings match every line.
+
+- nonzero exit status is not an error for =grep=.
+
+- =grep= does not always read all its input, especially with =-q=, which cause premature exits for
+  upstream commands while piping.
+
+** Performance Issues
+
+Backreferences require backtracking, which is inefficient, espcially with
+general referenced groupings like =.*=.
+
+Case-insensitive search and bracket expressions under
+multi-character  collating elements are inefficient.
+
+Cascaded repetitions like =.*{10,}{10,}{10,}= or long repetitions are prone to cause issues.
