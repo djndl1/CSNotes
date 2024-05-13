@@ -55,7 +55,10 @@ Beside literal characters, bracket expressions comprise of
     =[:upper:]=, =[:xdigit:]=
 
 - *Collating symbols*, *Collating element* =[.CollatingSymbol.]= a
-  multicharacter sequence treated as a unit to match more than one character.
+  single character or a multicharacter sequence treated as a unit while sorting.
+  + note the difference from subexpressions. Collating elements are defined by
+    the locale and treated as a unit only when sorting. It is a syntatic form to
+    represent certain locale-specific character sequences.
 
 - *Equivalence classes* ~[\=, \=]~: a set of characters that should be
   considered equivalent to the one enclosed inside.
@@ -65,7 +68,9 @@ outer pair of brackets.
 
 * POSIX Basic Regular Expression (Legacy)
 
-Used by =grep=, =sed= by default, although both should now support ERE.
+Used by =grep=, =sed= by default, although both should now support ERE. Meant
+to unify the regex syntax used by applications that support existing traditional
+simple regular expressions on Unix.
 
 ** Difference From BRE
 
