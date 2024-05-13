@@ -12,7 +12,7 @@ The 7th edition of Unix (Jan. 1979) was released with various tools and features
 at Berkeley. Later, there came 3BSD (Dec. 1979), 4.2BSD (1983, with TCP/IP and socket API),
 4.3BSD (1986) and the final release 4.4BSD (1993). 386/BSD (Feb. 1992) was the first
 complete open source rewrite of BSD for x86. NetBSD (Apr. 1993), FreeBSD
-(Dec. 1993) and OpenBSD (1996) continue the development BSD Unix. The lawsuit
+(Dec. 1993) and OpenBSD (1996) continued the development BSD Unix. The lawsuit
 between AT&T and UC Berkeley, setteled in Jan. 1994, required BSD implementations to remove some
 copyrighted source code and add some modifications (4.4BSD-lite), which caused some delay in
 BSD derivative release but made them to resynchronize with work done at UC Berkeley.
@@ -33,13 +33,13 @@ independent of Unix.
 IEEE standardized Unix by developing the POSIX specification in the late '80s
 and throughout the '90s:
 
-- POSIX.1 (POSIX 1003.1, 1988, revise in 1996) :: UNIX system call and C library API
+- POSIX.1 (POSIX 1003.1, 1988, revised in 1996) :: UNIX system call and C library API
 
 - POSIX 1003.1b (1993) :: realtime extensions
   + file synchronization; async I/O; process scheduling; high-precision clocks
     and timers
   + IPC: semaphores, shared memory, and message queues (new POSIX ones,
-    distinguished from SysV's).
+    distinguished from the SysV's one).
 
 - POSIX 1003.1c (1995) :: POSIX threads
 
