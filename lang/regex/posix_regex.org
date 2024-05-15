@@ -119,3 +119,26 @@ Mostly based on POSIX regex.
   table. =\s-= (whitespace characters)
 
 - =\cC=, =\CC= categories =describe-categories=
+
+* Shell Pattern Matching
+
+- =*= :: zero or more characters
+
+- =?= :: matches any single character
+
+- =[]= :: a character list or character range
+  + POSIX character classes, equivalence classes, collating elements are supported
+
+** =extglob=
+
+Available in bash and ksh.
+
+- =?(pattern-list)= :: zero or one occurrence of the pattern
+
+- =*(pattern-list)= :: zero or more
+
+- =+(pattern-list)= :: one or more
+
+- =@(pattern-list)= :: one
+
+- =!(pattern-list)= :: not one
