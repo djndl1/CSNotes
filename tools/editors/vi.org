@@ -442,23 +442,6 @@ Aside from literal characters, the replacement contains a few metacharacters.
 
 - A simple =:s= is =:s//~/=, repeating the last substitution.
 
-
-*** Bracket Expressions (Groups of Characters Within Brackets)
-
-Beside literal characters, bracket expressions comprise of
-
-- *POSIX character classes* =[:CharacterClass:]=.
-  + =[:alnum:]=, =[:alpha:]=, =[:blank:]=, =[:cntrl:]=, =[:digit:]=,
-    =[:graph:]=, =[:lower:]=, =[:print:]=, =[:punct:]=, =[:space:]=,
-    =[:upper:]=, =[:xdigit:]=
-
-- *Collating symbols* =[.CollatingSymbol.]= a multicharacter sequence treated as a unit
-
-- *Equivalence classes* ~[\=, \=]~: a set of characters that should be considered equivalent.
-
-All the three types of components have their own brackets in addition to the
-outer pair of brackets.
-
 *** Some Pattern Matching Examples
 
 - move a block of XML
