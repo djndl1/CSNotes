@@ -1007,3 +1007,13 @@ $Task = Get-ScheduledTask -TaskName 'Collect Telemetry' -TaskPath '\Awesome App'
 $Task.Actions[0].WorkingDirectory = 'C:\AwesomeApp'
 $Task | Set-ScheduledTask -User 'CONTOSO\AppTelemetry' -Password 'ShhD0ntT3ll4ny0n3!'
 #+end_src
+
+
+* Package Management
+
+- Legacy: =PowerShellGet=, =PackageManagement=
+
+- Since 7.4.0 =Microsoft.PowerShell.PSResourceGet=
+
+- Manually put extracted folder into one of =$env:PSModulePath= and rename them
+  to their respective package name.
