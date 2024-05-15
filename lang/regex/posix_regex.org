@@ -75,6 +75,8 @@ simple regular expressions on Unix.
 ** Difference From BRE
 
 - =|=, =+=, =?=, ={=, =}= are regular characters. Use bounds as the alternative.
+  In ERE, =(=, =)=, =[=, =]=, =.=, =*=, =?=, =+=, =^=, =$= are fully special
+  characters and always require a =\= to escape as a literal character.
 
 - Bounds are escaped =\{\}=
 
@@ -95,50 +97,25 @@ simple regular expressions on Unix.
 
 - =\< \>=: matches characters at the beginning or at the end of a word
 
-- ~~~: matches whatever regex was used in the last search, only available in a regular search
+* Emacs Regexp
 
-- ~\( \)~: saves the pattern enclosed between into a special holding space
+Mostly based on POSIX regex.
 
-#+begin_src
-:s/\(abcd\)\1/alphabet-soup/
-# changes abcdabcd to alphabet-soup
-#+end_src
+- =\w= (word constituent), =\W= (non-word constituent), =\b= (the beginning or
+  the end of a word), =\B= (empty string that is not the two ends of a word), =\<=, =\>=; =\`=, =\'= (start/end of the buffer or string),
+  ~\=~ (empty string at point), =\_<=, =\_>= (matches the beginning/end of
+  symbols than words)
 
-- ~\< \>~: matches characters at the beginning or at the end of a word
+- =\|= for alternation
 
-- ~~~: matches whatever regex was used in the last search.
+- =\{ ... \}= for bounds
 
-- character classes, collating symbols, equivalence classes
+- =\( ... \)= for subexpressions
+  + =\(?: ... \)= unnumbered subexpression, may not be backreferenced.
 
-#+begin_src
-[[.ch.]] # a multicharacter sequence that should be treated as a unit
-[[=e=]] # match any of e, e with acute, e with
-#+end_src
+- supports backreferences.
 
-- ~\n~: replaced with text matched the nth pattern previously saved by ~\(~ and ~\)~
+- =\sc=, =\s-=, =\s= match characters by syntax using mode-specific syntax
+  table. =\s-= (whitespace characters)
 
-- ~&~: replaced with the entire text matched by the search problem
-
-- ~~~: the string found is replaced with the replacement text specified in the last substitute command. The search pattern doesn't need to be the same.
-
-#+begin_src
-:s/thier/their/
-:s/thier/~/
-#+end_src
-
-- ~\u~ / ~\l~: causes the next character in the replacement string to be changed to uppercase or lowercase. ~\U~ \ ~\L~ \ ~\e~ \ ~\E~: all following characters are converted to uppercase or lowercase until the end of the replacement string or until ~\e~ / ~\E~.
-
-#+begin_src
-:%s/yes, doctor/\uyes, \udoctor/
-:%s/Fortran/\UFortran/
-#+end_src
-
-#+begin_src
-:%s/child\( ,.;:!?\)/children\1/g
-:%s/\<child\>/children/g
-#+end_src
-
-#+begin_src
-:g /SYNTAX/.,/DESCRIPTION/-1 move /PARAMTERS/-1
-#+end_src
-
+- =\cC=, =\CC= categories =describe-categories=
