@@ -80,3 +80,8 @@ Case-insensitive search and bracket expressions under
 multi-character  collating elements are inefficient.
 
 Cascaded repetitions like =.*{10,}{10,}{10,}= or long repetitions are prone to cause issues.
+
+* =Select-String=: the Powershell Counterpart
+
+Not only is the functionality similar to grep's, but also the output format, the
+options. The regex used is more PCRE-ish than POSIX.
