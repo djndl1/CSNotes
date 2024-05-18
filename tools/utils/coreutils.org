@@ -19,3 +19,45 @@ multiple columns. By default 66 lines per page. Not a replacement for =troff= or
 * =wc=
 
 count lines, words, characters or bytes of a file.
+
+* =sort=
+
+Lines are compared by specified by fields/keys (=-k=), or the entire line if
+none. Equal lines are ordered according to the entire line unless stable sort =-s=
+(=--stable=) is specified, which retains the original order. Output may be saved
+to a file =-o=.
+
+=sort= by defaults sorts concatenated files, otherwise checks if the files are
+sorted (=-c=, =-C=), or merges already-sorted files without sorting them (=-m=).
+
+** Key Definition
+
+A key is a field (or part of a field) or the part of a line between two keys
+(inclusive). The key is specified in the format of
+=EndpointFieldNumber.EndpointCharacterNumber.OrderingOption=. The count starts at 1 not
+0, which denotes the last one.
+
+Separators are specified by =-t=, by default unintuitively the empty string between a
+non-blank character and a blank character, not blank characters.
+
+** Order
+
+By default in ascending order, =-r= makes it descending. =-s= enables stable
+sort by retaining the original order of equal lines.
+
+** Comparison Rules
+
+By default, keys
+are compared using the collating sequence of =LC_COLLATE=.
+
+- leading blanks may be ignored =-b=
+
+- =-d= sorts only by letter characters.
+
+- =-f= ignores case
+
+- =-i= ignores nonprinting characters
+
+** Performance
+
+- =--parallel=N= threaded sort
