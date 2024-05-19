@@ -48,16 +48,49 @@ sort by retaining the original order of equal lines.
 ** Comparison Rules
 
 By default, keys
-are compared using the collating sequence of =LC_COLLATE=.
+are compared using the collating sequence of =LC_COLLATE=. All these sort
+options including =-r= may be used as options within the key definition to
+override the global ordering for that key.
 
 - leading blanks may be ignored =-b=
-
-- =-d= sorts only by letter characters.
 
 - =-f= ignores case
 
 - =-i= ignores nonprinting characters
 
+- /dictionary sort/ (=-d=): only letters are considered
+
+- /numeric sort/ =-n=: sort by numeric keys (the line is assumed to start with a
+  number), affected by =LC_NUMERIC=
+
+- /general numric sort/ =-g=: the number is taken as a double-precision
+  floating-point number.
+
+- /human numeric sort/ =-h=: understands SI suffixes.
+
+- /version sort/, or /natural sort/: =-V= sort first by character and then by numeric, based Debian's
+  package version sort. There is
+  no standardized rules across various programming contexts.
+  + strings are split into text, digits, text, digits ..., and then compared
+    respectively. Empty numeric parts are seen as zero. ASCII letters precede
+    other bytes in text substrings; =~= precedes all including empty strings.
+  + text characters are compared byte by text, ignoring locales.
+
+- /Month sort/ =-M=: sort by month name abbreiviation, affected by =LC_TIME=
+
+- /Random sort/ =-R=: a random permutation of the input by hashing the input
+  keys and then sorting the hash values. Lines with equal hash values are sorted together.
+
+** Output
+
+- unique output: =-u= output only the first of a sequence of equal lines (in the original order)
+
+- zero-terminated instead of newline-terminated: =-z=
+
+- compressed output with an external compression program: =--compress-program=PROG=
+
 ** Performance
+
+- =-S SIZE= controls sort buffer size.
 
 - =--parallel=N= threaded sort
