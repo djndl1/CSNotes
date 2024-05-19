@@ -1,0 +1,14 @@
+#+title: Utiltiy
+
+* =Microsoft.PowerShell.Utility=
+
+** =Sort-Object=
+
+Ascending/descending order, stable sort (in the original order), unique output are supported. In
+addition, top/bottom n results may be listed (Pwsh 6.0). Comparison is more consistent and
+easier to understand than Unix =sort= due to the OOP nature, using the
+=Compare()= method, the =IComparable= interface, or the converted string
+representation.
+
+Properties may be specified as a list of property names, or a list of hash table with =Expression=
+and =Descending=​/​=Ascending= properties.
