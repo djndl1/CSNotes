@@ -32,13 +32,18 @@ sorted (=-c=, =-C=), or merges already-sorted files without sorting them (=-m=).
 
 ** Key Definition
 
-A key is a field (or part of a field) or the part of a line between two keys
-(inclusive). The key is specified in the format of
-=EndpointFieldNumber.EndpointCharacterNumber.OrderingOption=. The count starts at 1 not
+A key is a segment of a line, specified as the part between two endpoints
+(inclusive) =-k POS1[,POS2]=. The endpoint is specified in the format of
+=EndpointFieldNumber.EndpointCharacterNumber.OrderingOption=. The end of line is
+used if the end is not specified. The field end is used if the character number
+of the second endpoint is not specified. The count starts at 1 not
 0, which denotes the last one.
 
 Separators are specified by =-t=, by default unintuitively the empty string between a
 non-blank character and a blank character, not blank characters.
+
+Multiple key definitions of different ordering options are supported, used
+in the order on the command line
 
 ** Order
 
@@ -50,7 +55,12 @@ sort by retaining the original order of equal lines.
 By default, keys
 are compared using the collating sequence of =LC_COLLATE=. All these sort
 options including =-r= may be used as options within the key definition to
-override the global ordering for that key.
+override the global ordering for that key. All modifiers excpet =-b= apply to
+the associated field, regardless of whether the modifier character is attached
+to the field-start or the field-end part of the key specifier.
+
+As a last resort, any equal results are sorted by using the the entire keys
+unless stable sort is used.
 
 - leading blanks may be ignored =-b=
 
@@ -61,7 +71,15 @@ override the global ordering for that key.
 - /dictionary sort/ (=-d=): only letters are considered
 
 - /numeric sort/ =-n=: sort by numeric keys (the line is assumed to start with a
-  number), affected by =LC_NUMERIC=
+  number field). Empty digit strings are considered zero (and then trailing
+  non-digit characters are sorted as a last resort upon equal results). Affected by =LC_NUMERIC=.
+
+  #+begin_quote
+1. Lines that begin numerically are sorted by numeric value (smaller numbers come first)
+2. Trailing characters on numeric lines do not affect the numeric portion,
+   but the trailing characters are sorted alphanumerically if the numeric portion is the same.
+3. Lines that begin non-numerically are sorted as if they were zero, and then by rule 2.
+  #+end_quote
 
 - /general numric sort/ =-g=: the number is taken as a double-precision
   floating-point number.
@@ -81,6 +99,10 @@ override the global ordering for that key.
 - /Random sort/ =-R=: a random permutation of the input by hashing the input
   keys and then sorting the hash values. Lines with equal hash values are sorted together.
 
+** Input
+
+From command line or files. Zero-terminated filenames are supported with =--files0-from=FILE=.
+
 ** Output
 
 - unique output: =-u= output only the first of a sequence of equal lines (in the original order)
@@ -94,3 +116,10 @@ override the global ordering for that key.
 - =-S SIZE= controls sort buffer size.
 
 - =--parallel=N= threaded sort
+
+** Examples
+
+#+begin_src shell
+# Decorate-Sort-Undecorate: add a length field, sort by length, remove the length field
+awk '{print length, $0}' /etc/passwd | sort -n | cut -f2- -d' '
+#+end_src
