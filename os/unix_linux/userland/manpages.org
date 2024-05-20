@@ -1,0 +1,7 @@
+#+title: Manpages
+
+* Browse and List Pages
+
+Use ~MANPAGER='nvim +Man!'~ to read them in neovim.
+List them with =apropos -w '*' [-s section]=. Also see =/etc/man_db.conf= for
+all man paths and sections.
