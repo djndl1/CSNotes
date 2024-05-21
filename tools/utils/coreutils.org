@@ -64,7 +64,7 @@ unless stable sort is used.
 
 - leading blanks may be ignored =-b=
 
-- =-f= ignores case
+- =-f= ignores (folds) case
 
 - =-i= ignores nonprinting characters
 
