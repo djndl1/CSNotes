@@ -7,6 +7,17 @@ read/written with =ReadFile()= and =WriteFile()= but =ReadConsole()=,
 Console I/O operates on characters rather than bytes. =CONIN$= and =CONOUT$= are
 special file names that always refer to the console input and output.
 
+* Why Windows Console Is Slow
+
+The Windows Terminal itself is poorly written and renders slowly.
+A console app is hosted by a =conhost= process between the child process and its
+parent, which handles the three standard I/O handles, adding more IPC overhead.
+The Windows console subsystem itself adds overhead as it adds a few preprocessing.
+
+** Reference
+
+- [[https://github.com/cmuratori/refterm/blob/main/faq.md][Refterm FAQ]]
+
 * Unicode
 
 http://archives.miloush.net/michkap/archive/2010/10/07/10072032.html
