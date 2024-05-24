@@ -104,7 +104,9 @@ she-bang is actually a two-byte magic number, see =man magic=.
   eval 'kill -9 $!' &> /dev/null
 #+END_SRC
 
-- =()= :: command group, a listing of commands within parentheses starts a subshell.
+- =()= :: command group, a listing of commands within parentheses starts a
+  subshell.
+  + a better way to start a subshell than =bash -c=.
 
 #+BEGIN_SRC shell
   (a=hello; echo $a)
@@ -136,7 +138,11 @@ she-bang is actually a two-byte magic number, see =man magic=.
 
 - =$(())= (deprecated), =$[...]= (preferred) :: integer expansion, expand and evaluate integer expression within.
 
-- => &> >& >> < <>= :: redirection;
+- => &> >& >> < <>= :: redirection, possibly with a file descriptor prefix to indicate
+  the redirection source/target.
+  + to avoid overwriting a file, =set -o noclobber=. To overwrite a file with
+    this option set, use =>|= to force an overwrite.
+  + =&>= and =>&= are not POSIX-compliant, use => file 2>&1=
 
   #+BEGIN_SRC shell
   scriptname >filename # redirects the output of `scriptname` to `filename`
