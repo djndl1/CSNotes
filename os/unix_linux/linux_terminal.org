@@ -1,5 +1,23 @@
 #+title: Linux_terminal
 
+* Common Special Characters
+
+=stty -a= shows the current setting of key mappings to special characters.
+
+- =^H= :: originally the BS (backspace) command on a teletypewriter, later used the
+  Unix =erase= special character to erase the previous character. A =BACKSPACE= key is also
+  mapped to =^H= to generate the an =erase= character. On some systems, =^?= is
+  also mapped to =erase= or a second =erase2=.
+
+- =^M= (=CR=, the =ENTER= key), =^J= (=LF=) :: Newlines are saved as =LF=. The system
+  converts =^M= (=CR=) into =^J= (=LF=) with terminal input while with terminal output =LF=​s are converted to =CRLF=​s.
+
+- =quit= :: historically it stops a program and generates a core dump. No longer
+  in actual use.
+
+- =eof=, typically mapped to =^D=, ASCII =EOT= :: end-of-file. Programs tend to
+  quit or start to process input data upon receiving =EOF=.
+
 * Terminal Incompatibility
 :PROPERTIES:
 :ID:       a7ed193a-fa86-49e2-9778-3f8e5658bae1
