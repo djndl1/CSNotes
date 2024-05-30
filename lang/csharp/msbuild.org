@@ -47,6 +47,15 @@ Msbuild uses imported MSBuild XML files with extensions like =.props= and =.targ
 
 * Basic Elements
 
+The work of building an application is done with =Target= and =Task= elements.
+Build is configured by name-value pairs known as =Property=, grouped inside
+=PropertyGroup=. Items represent object to process, e.g. source files, grouped by
+=ItemGroup=.
+
+** Special Characters
+
+=;=, =*= are represented with =%XX= where =XX= is ASCII code.
+
 ** Properties
 
 #+begin_src xml
@@ -55,7 +64,10 @@ Msbuild uses imported MSBuild XML files with extensions like =.props= and =.targ
 </PropertyGroup>
 #+end_src
 
-key/value pairs that can used to configure builds. =Condition= attribute can be added to a property. Properties can be referenced by using the syntax =$(PropertyName)=.
+key/value pairs that can used to configure builds, with optional =Condition=.
+Properties can be referenced by using the syntax
+=$(PropertyName)=.
+
 
 ** Items
 
@@ -66,17 +78,39 @@ key/value pairs that can used to configure builds. =Condition= attribute can be 
 </ItemGroup>
 #+end_src
 
-Items are inputs into build system and typically represent files. Items are grouped into item types based on user-defined item names.
-Item types can be used as parameters for tasks, which use the individual items to perform the steps of the build process. Item types are referenced by =@(ItemType)=
+Items are inputs into build system and typically represent files. Items are
+grouped into item types based on user-defined item names.
+Item types can be used as parameters for =Task=​s, which use the individual items
+to perform the steps of the build process. Item types are referenced by
+=@(ItemType[, Delimiter])=. =*=, =**=, =?= wildcards are used in =Include=,
+=Exclude= attributes to reference items.
+
+Additional metadata maybe added to items by making them child elements of an
+item, referenced by =.MetadataName=.
+
+*** Transformation
+
+Item lists can be transformed into new item lists.
+
+#+begin_src msbuild
+@(ItemType -> '%(MetadataName')
+#+end_src
+
 
 ** Tasks
 
-Units of code tghat MSBuild projects use to perform build operations. Tasks can be reused and they can be shared by different developers in different projects.
-The execution logic of a task is written in managed code and mapped t o MSBuild by using =UsingTask= element.
+The smallest unit of work, the atom of a build. Independent executable
+components with input and output. Units of code that MSBuild projects used to
+perform build operations. Tasks can be reused and they can be shared by
+different developers in different projects.
+The execution logic of a task is written in managed code and mapped t o MSBuild
+by using =UsingTask= element.
 
 A task is executed by creating an element of the name of the task as a child of a =Target= element.
 
 ** Targets
+
+Named sequence of tasks.
 
 #+begin_src xml
 <Target Name="Compile">
@@ -84,4 +118,16 @@ A task is executed by creating an element of the name of the task as a child of 
 </Target>
 #+end_src
 
-Targets group tasks together in a particular order and expose sections of the project file as entry points into the build process.
+Targets group tasks together in a particular order and expose sections of the
+project file as entry points into the build process.
+
+*** Default Target
+
+The default target is =Import=​ed.
+
+- for C# projects, import ~<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />~
+  + for SDK-style projects, they are imported implicitly.
+
+*** Incremental Build
+
+Use =Inputs= and =Outputs= attributes with a =Target=.
