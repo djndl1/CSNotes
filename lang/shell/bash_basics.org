@@ -1,0 +1,67 @@
+#+title: Bash Basics
+
+* Features Particular to Bash
+
+- =[[= conditional
+
+- shell arithmetic with one of the shell expansions or =let=
+
+- =alias= and =unalias=: aliases are expanded upon a command/function is read.
+
+- one-dimensional non-contiguous array variable declared by =declare=
+
+- directory stack with =pushd=, =popd=, and =dirs=
+
+- POSIX mode =set -o posix=, =--posix= or the envvar =POSIXLY_CORRECT= makes =bash= try to behave as compliant as possible
+to the POSIX stnadard.
+
+- restricted shell: certain operations and features are disallowed or disabled
+
+* Startup Files
+
+A shell may be a login shell or a non-login one and interactive or
+non-interactive at the same time.
+
+- Login Shells
+  + =/etc/profile=
+  + =~/.bash_profile=, =~/.bash_login=, =~/.profile=: first readable file is read
+  + =~/.bash_logout= upon logout
+
+- Non-Login Shells
+  + =~/.bashrc=
+
+- Non-Interactive Shell reads an additional =BASH_ENV= file
+  + a shell may be non-interactive and login or non-login. So it may reads
+    =/etc/profile= and others.
+
+- As =sh=
+  + =/etc/profile=
+  + =~/.profile=
+
+* Interactive Shells
+
+echo =$-= to check if the current shell is interactive (the result contains an
+=i=).
+An interactive shell has some features enabled:
+
+- /job control/ enabled
+
+- prompts are set
+
+- commands are read from the command line with =readline=
+
+- the =ignoreeof= option is checked instead of exiting immediately upon EOF.
+
+- /command history/ and /history expansion/ enabled
+
+- /alias expansion/ enabled
+
+- in the absence of traps, =SIGTERM= is ignored, =SIGINT= is caught and handled.
+
+- =SIGHUP= to all jobs on exit is configured with =huponexit=.
+
+- Redirection errors of built-in commands do not cause the shell to exit
+
+- Failure of =exec= do not exit the shell.
+
+- Parser syntax errors do not cause the shell to exit.
