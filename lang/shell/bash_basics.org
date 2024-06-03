@@ -29,6 +29,7 @@ non-interactive at the same time.
 
 - Non-Login Shells
   + =~/.bashrc=
+  + It does not read =/etc/profile=, but it inherits a login shell.
 
 - Non-Interactive Shell reads an additional =BASH_ENV= file
   + a shell may be non-interactive and login or non-login. So it may reads
@@ -65,3 +66,94 @@ An interactive shell has some features enabled:
 - Failure of =exec= do not exit the shell.
 
 - Parser syntax errors do not cause the shell to exit.
+
+* Commands
+
+** Classification
+
+*** Builtin Commands
+
+Contained within the shell itself.
+
+POSIX-mode bash requires special builtins be found before shell functions during command
+looup; if a special builtin returns an error status, a non-interactive shell
+exits; variable assignments before a (special builtin ???) command stay in effect after the command completes.
+
+TODO
+
+*** Scripts
+
+A new bash process is forked to execute a script. A script name as an argument
+to =bash= is searched first in the current directory and then in the =PATH= variable.
+
+*** Functions
+
+Executed in the current shell context.
+
+*** Other Programs
+
+Executed in a new process.
+
+** Execution Steps
+
+Input is separated by /metacharacters/ and tokenized. Then alias expansion is
+performed. Various shell expansions are then performed. Redirection is performed
+if necessary. Variable assignments are saved. Commands are then executed and the
+shell waits for them to complete.
+
+*** Command Search
+
+- search in the known function list
+
+- search in the builtins
+
+- search the =PATH=, cached in a hash table (=hash=).
+
+- error 127 if not found
+
+- executes the command in a separate execution environment; if the file is not
+  executable and not a directory, it is assumed a shell script.
+
+* Shell Expansions
+
+** Brace Expansion
+
+TODO
+
+** Tilde Expansion
+
+TODO
+
+** Parameter and Variable Expansion
+
+TODO
+
+** Command Substitution
+
+TODO
+
+** Arithmetic Expansion
+
+TODO
+
+** Word Splitting
+
+TODO
+
+** Filename Expansion
+
+TODO
+
+* Developing Good Scripts
+
+Pay attention to:
+
+- User interaction
+
+- Information storage
+
+- Possible file creation
+
+- Commands to use
+
+- User notification
