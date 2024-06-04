@@ -157,3 +157,18 @@ Pay attention to:
 - Commands to use
 
 - User notification
+
+** Debugging
+
+*** Verbose Output and Traces
+
+Traces of each command plus its arguments are printed to stdout after the
+commands have been expanded but before execution. This option may also be
+enabled with =set -x= or =set -o xtrace= and disabled with =set +x= or =set +o xtrace= to trace only part of a script.
+Other options such as =-v= (=verbose=) are also avaiable.
+
+*** Source-Level Debugger
+
+bash supports extended debugging mode by loading the debugger profile.
+
+- [[https://github.com/rocky/bashdb][bashdb]] :: a full-fledged debugger
