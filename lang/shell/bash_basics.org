@@ -23,21 +23,22 @@ A shell may be a login shell or a non-login one and interactive or
 non-interactive at the same time.
 
 - Login Shells
-  + =/etc/profile=
-  + =~/.bash_profile=, =~/.bash_login=, =~/.profile=: first readable file is read
+  + =/etc/profile= the system login file
+  + =~/.bash_profile=, =~/.bash_login=, =~/.profile=: the user login files. First readable file is read
   + =~/.bash_logout= upon logout
+  + OpenSSH opens a non-login shell with a following command argument
 
-- Non-Login Shells
-  + =~/.bashrc=
-  + It does not read =/etc/profile=, but it inherits a login shell.
+- Interactive Non-Login Shells
+  + =~/.bashrc= the environment file. A login shell may read this file inside =.profile=
+  + It does not read =/etc/profile=, but usually it inherits a login shell.
 
 - Non-Interactive Shell reads an additional =BASH_ENV= file
   + a shell may be non-interactive and login or non-login. So it may reads
     =/etc/profile= and others.
 
-- As =sh=
-  + =/etc/profile=
-  + =~/.profile=
+- As POSIX =sh=
+  + login: =/etc/profile= + =~/.profile=
+  + interactive: =$ENV=
 
 * Interactive Shells
 
