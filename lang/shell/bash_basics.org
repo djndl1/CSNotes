@@ -115,6 +115,14 @@ shell waits for them to complete.
 - executes the command in a separate execution environment; if the file is not
   executable and not a directory, it is assumed a shell script.
 
+** Command History
+
+- =fc=, =history= show history
+
+- =fc -s event_number= reexecute the numbered command.
+
+- =^R=, =^S= searches the history, for the next candidate, press =^R= or =^S= again.
+
 * Shell Expansions
 
 ** Brace Expansion
