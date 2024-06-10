@@ -181,3 +181,20 @@ Other options such as =-v= (=verbose=) are also avaiable.
 bash supports extended debugging mode by loading the debugger profile.
 
 - [[https://github.com/rocky/bashdb][bashdb]] :: a full-fledged debugger
+
+* Job Control
+
+Enabled by the =monitor= option. Job control is a shell feature to allow
+multiple processes to run in a single shell: foreground/background (=fg=, =bg=,
+=&=), suspend (=suspend=, =^Z=), status (=jobs=, =ps=). =$$= displays the current
+shell PID, =$!= shows the the PID of the last command moved to the background.
+
+Each command (job) entered is identifiied by a /job number/, (/job ID/). A job
+refers to all the processes that are necessary to interpret an entire command
+line. Jobs are controlled by the shell.
+
+A foreground job may be suspended by =^Z=, then resumed by =fg=. When the user
+logs out, all suspended jobs are terminated automatically. The current shell may
+be suspended with =suspend= if it is not a login shell. =bg= is useful when the
+command is not started with a =&= but later needs moving to the background (by
+first suspending it).
