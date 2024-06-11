@@ -1,5 +1,29 @@
 #+title: System Monitor
 
+* Ps
+
+The so-called BSD style options has never really existed in BSDs and it is
+entirely a Linux invention. Use the POSIX/UNIX personality for portabilility.
+
+#+begin_src shell
+ps -e # all processes
+ps -ef # all processes full format
+ps -o pid,comm,args,pcpu,pmem # comm for command name and args for full command line
+#+end_src
+
+* pstree
+
+Display a tree of processes.
+
+Child processes of the same name are merged as =n*[procname]=; child threads are
+shown in curly braces =[{threads}]=.
+
+=ps -H= also shows processes as a tree.
+
+* fuser
+
+Lists all the processes that are using a specific file or socket.
+
 * Top
 
 Top has ha proper readable manual.
