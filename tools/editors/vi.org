@@ -106,7 +106,7 @@ Sections are completely defined by macros.
   + Under =vi=, =a= only appends, =i= only inserts: they cannot modify existing
     text and backspace deleting characters are not instantly displayed as deleted.
   + Under insert mode, =^H= is backspace, =^U= deletes the input on the current
-    line; =^W= erases a word; =^i= inserts a tab; =^[= is the escape key.
+    line; =^W= erases a word; =^I= inserts a tab; =^[= is the escape key.
   + In case some other operations are required under
     insert mode, use =^o= to access normal mode commands.
 
@@ -201,7 +201,6 @@ Substitution is mostly done through the =substitute= ex command.
 - =%= on a paired punctuation mark ::
 
 - =Ctrl-^= :: =:e #=
-
 
 ** Combination For Special Tasks
 
@@ -523,7 +522,8 @@ Options may be set in a =.exrc= file in the home directory.
 
 - =exec= :: enable directory-local =.exrc= settings.
 
-- =autoindent= :: supply indentation automatically; useful for programming
+- =autoindent= :: supply indentation automatically following the previous line
+  upon starting a new line; useful for programming
 
 - =autowrite= :: automatic write before =:n=, =ta= etc.
 
@@ -535,9 +535,6 @@ Options may be set in a =.exrc= file in the home directory.
 
 - =hardtabs= :: the boundaries on which terminal hardware tabs are set
 
-- =shiftwidth= :: the width of a software tab stop.
-  + used in shift commands and autoindent backtabbing.
-
 - =tags= :: the tags file to be searched
 
 - =shell= :: the shell used, by default =$SHELL=.
@@ -546,6 +543,30 @@ Options may be set in a =.exrc= file in the home directory.
   automatically broken at a word boundary. Useful for nonprogram text.
 
 - =showmode= :: the modeline
+
+**** Tabs
+
+To debug tab problem, =set list= or use =:l= command to display tabs and spaces.
+
+- =tabstop= :: number of spaces that a tab in the file counts for (visually and
+  sometimes expanded space count). The length of
+  a real tab character.
+
+- =softtabstop= :: number of spaces that a tab in the file counts for while
+  performing editing operations, i.e. a tab key in Insert mode is no longer a
+  =tabstop= wide unless multiple tab keys combined reaches the width of
+  =tabstop=, without =expandtab=, it becomes a real tab character.
+
+- =expandtab= :: tabs are replaced by the appropriate number of spaces in Insert
+  mode. Real tabs are inserted with =^V<Tab>=.
+
+- =shiftwidth= :: number of spaces to use for each step of (auto)indent, for
+  =cindent=, =<<=, =>>= etc.
+  + used in shift commands and autoindent backtabbing.
+  + =^D=, =^T= moves a shiftwidth backwards/forwards.
+
+- =smarttab= :: use =shiftwdith= for a tab in front of a line. Probably "smart"
+  in that it respects indentation width.
 
 ** Key Macros
 
