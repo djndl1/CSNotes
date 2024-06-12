@@ -1,13 +1,70 @@
 * Intro
 
-** ~diff~ and ~patch~
 
-https://www.geeksforgeeks.org/diff-command-linux-examples/
+* Tools
 
-https://linuxacademy.com/blog/linux/introduction-using-diff-and-patch/
+** =cmp=: Whether Two Files Differ By Bytes
 
-https://www.thegeekstuff.com/2014/12/patch-command-examples/
+The result is the returned status and possibly the first different line.
 
-#+begin_src shell
-diff original updated
+- =-l=, =--verbose= :: output each differing byte.
+
+** =comm= (not from =diffutils=, but from =coreutils=): Compare Two Sorted Files By Lines
+
+** =diff=
+
+Difference is defined as a series of lines deleted from, inserted into or
+changed in one file to produce the the file. =diff= reports file difference in
+this way. Certain difference may be ignored by =diff= with certain options.
+=diff= also supports various kinds of interpretation of difference. =diff= tries
+to minimize the total hunk size by finding large sequences of common lines
+interspersed with small hunks of differing lines, that is, difference is not
+determined simply by comparing corresponding lines.
+
+- /hunks/ :: groups of differing lines
+
+*** Ignore Changes
+
+**** Regex Pattern
+
+- =-I REGEXP= :: insertions and deletions of matching lines are ignored
+  + multiple =-I= options may be used.
+
+**** Case
+
+- =-i= :: ignore case changes
+
+**** Whitespaces
+
+How blank characters are
+
+- =-E= :: ignore tab/space difference
+
+- =-Z= :: ignore trailing space
+
+- =-b= :: the difference in the number of white spaces is ignored; trailing
+  white spaces are ignored
+
+- =-w= :: even stronger. It ignores the difference between zero whitespace and one whitespace
+
+**** Blank Lines
+
+- =-B= :: changes consisting of blank lines are ignored. A blank line
+  is =^$=, without any blank characters.
+
+*** Text or Binary
+
+=diff= compares text files line by line, and for binary files outputs a
+brief report. =diff= heuristically checks if a file is binary by checking the
+first few magic number of the file, or if any byte in that file is zero.
+
+- =-a= :: force text mode
+
+On systems such as MS Windows, where text files and binary files are
+distinguished, =diff= normally reads and writes as text unless =--binary= is
+forced. On such systems, =CRLF= is properly processed (read and write) in text
+mode, but in binary mode, =CR= is processed as is.
+
+- =--strip-trailing-cr= :: =CRLF= is interpreted as =LF= while reading.
+
 #+end_src
