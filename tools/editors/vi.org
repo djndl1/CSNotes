@@ -533,8 +533,6 @@ Options may be set in a =.exrc= file in the home directory.
 
 - =showmatch= :: show matching punctuation
 
-- =hardtabs= :: the boundaries on which terminal hardware tabs are set
-
 - =tags= :: the tags file to be searched
 
 - =shell= :: the shell used, by default =$SHELL=.
@@ -543,6 +541,14 @@ Options may be set in a =.exrc= file in the home directory.
   automatically broken at a word boundary. Useful for nonprogram text.
 
 - =showmode= :: the modeline
+
+**** Search
+
+- =incsearch= :: show where the pattern matches as the pattern is typed so far.
+  + =^G=, =^T= to move to the next/previous match.
+
+- =hlsearch= :: searched matches are highlighted. =:nohlsearch= turns highlight
+  off until the next search.
 
 **** Tabs
 
