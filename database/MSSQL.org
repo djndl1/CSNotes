@@ -10,6 +10,52 @@ DDL; DML (=SELECT=, =INSERT=, =UPDATE=, =DELETE=, =MERGE=, =TRUNCATE=); DCL (con
 
 An element is identified by its key values, not by positions. A query against a table can return table rows in any order unless explicitly requested.
 
+* Installation Caveats
+
+- Run System Configuration Checks before installation to check any prerequisite.
+
+** Components
+
+- Database Enginer :: a must
+
+- Machine Learning Services :: as the name; optional
+
+- Integration Services :: optional; integration with various data sources from XML, flat
+  files to relational data without much coding.
+  + from text, XML, Excel, relational databases
+  + ADO, ADO.NET, EXCEL, file, FTP, HTTP, MSMQ, OLEDB, ODBC, SMTP, WMI, ORACLE etc.
+
+- Analysis Services :: optional; decision support and business analytics
+  + data models for Power BI; Excel, data visualization.
+
+- Replication :: data synchronization between databases to maintain consistency.
+
+- Data Quality Services :: optional; data cleansing, data matching, monitoring,
+  knowledge base without coding.
+
+- Master Data Services :: optional; master data; data organization, data modeling
+
+** Services
+
+- Database Engine (=MSSQLSERVER=) :: =\<MSSQLPATH>\MSSQL\Binn\sqlservr.exe=
+
+- SQL Server Agent (=SQLServerAgent=) :: =\<MSSQLPATH>\MSSQL\Binn\sqlagent.exe=
+  + task automation (jobs), monitoring SQL Server
+
+- SQL Server Browser :: name resolution service that provides SQL Server
+  connection information for client computers
+
+- SQL Writer :: backup and restore application in the Volume Shadow Copy Service
+  framework (a Windows service)
+
+** User Accounts
+
+- installation requires a =sysadmin= role.
+
+- the =sa= account (SQL Authentication) is also a database login and a member of =sysadmin=.
+
+- The per-service service security principal (SID) is a login and a member of =sysadmin=.
+
 * Users, Logins and Roles
 
 A client connects to the database with a /Login/ (instance-level authentication
