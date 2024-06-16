@@ -751,6 +751,46 @@ More than POSIX ERE.
 - ~Ctrl-W~ + ~q~: quit a window; + ~c~: close the current window
 
 - ~Ctrl-W~ + ~o~: maximize a window
+*** Windows and Buffers
+
+- =:ls=, =:buffers=, =:files= lists buffers and files
+  + =%= (current), =#= (alternate)
+  + =u= unlisted buffer (e.g. a help buffer)
+  + =a= active (loaded and visible) buffer, =h= hidden buffer
+  + =-=, ===, not modifiable. === is read-only and never modifiable
+  + =+= modified, =x= read error
+
+A buffer may be hidden by opening another file if the =hidden= option is set.
+
+- =:windo cmd=: do =cmd= in each window of the current tab
+
+- =:bufdo[!] cmd=: do =cmd= in all the buffers
+
+- =ball=, =sball= (in new windows): edit all args or buffers
+
+- =unhide, =sunhide= (in new windows): edit all loaded buffers
+
+- =badd file=: add file to the buffer list; =bunload=: unload the current buffer from
+  memory (the buffer is still open), =bdelete=: delete the buffer from the
+  buffer list
+
+- =b[uffer]=, =sb[uffer]=: move to a buffer
+
+- =:bnext=, =:sbnext=, =:bNext=, =:sbNext=, =:bprevious=, =:sbprevious=, =:bfirst=,
+  =:sbfist=, =:blast=, =:sblast=,
+
+- =:bmod=, =:sbmod=: move the nth modified buffer
+
+**** Special Buffers
+
+- directory: a list of a directory
+
+- help
+
+- quickfix: the list of errors created by a command or the location list,
+  typically used with edit-compile-debug cycle
+
+- scratch
 
 ** Configuration Files
 
