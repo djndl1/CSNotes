@@ -734,27 +734,73 @@ More than POSIX ERE.
 
 ** Multiwindows behavior
 
-- ~-o~/~-oNumber~
+- =-o=​/​=-oNumber=: start with multiple windows
 
-- ~:split~, ~Ctrl-Ws~: split the window horizontally
+- =:split [filename]=, =Ctrl-Ws=: split the window horizontally
 
-- ~:vnew~ / ~:vsplit~, ~Ctrl-Wv~: vertically split the window
+- =:vnew= / =:vsplit=, =Ctrl-Wv=: vertically split the window (with a new buffer
+  or the current buffer)
 
-- ~:new~, ~Ctrl-Wn~: new window
+- =:new=, =Ctrl-Wn=: new window
 
-- ~:close~, ~Ctrl-Wc~: close the current window; ~:only~: close all but the current window
+Split commands may come optionally with a prefix to indicate the window size.
 
-- ~Ctrl-W~ + ~+, -~: increase/decrease the current windows, ~=~: resize all windows to equal size. + ~<, >~: decrease/increase, + ~|~: resizes the current window to the widest size possible
+- =:sview filname= : open a file in a split window as readonly.
 
-- ~Ctrl-W~ + ~h,j,k,l~, ~t~ (top), ~b~ (bottom), ~p~ (previous)
+- =:sfind filename=: open a window for a file if found
 
-- ~Ctrl-W~ + ~r~: rotate windows, + ~x~: exchange two windows in a row or column
+- =:close=, =Ctrl-Wc=: close the current window; =:only=: close all but the current window
 
-- ~Ctrl-W~ + ~K, J, H, L, T (tab)~: move the current window, full height
+- =Ctrl-W= + =q=: quit a window; + =c=: close the current window
 
-- ~Ctrl-W~ + ~q~: quit a window; + ~c~: close the current window
+*** Conditional Split
 
-- ~Ctrl-W~ + ~o~: maximize a window
+- =topleft=, =vertical=, =leftabove=, =aboveleft=, =rightbelow=, =belowright=,
+  =botright=: modifier before a split command to open a new window only if the
+  command succeeeds.
+
+*** Moving Across Windows
+
+- =Ctrl-W= + =h,j,k,l=,
+
+- =Ctrl-W= + =t= (top leftmost), =b= (bottom rightmost),
+
+- =Ctrl-W= + =p= previously accessed
+
+- =Ctrl-W= + =w=, =W=: cycle through all windows top leftmost to bottom rightmost, the case difference indicates
+  different directions
+
+*** Moving Windows & Changing Layouts
+
+- =Ctrl-W= + =r=: rotate windows on a row/column rightwards/rightwards; + =R= in the
+  opposite direction
+
+- =Ctrl-W= + =x=: exchange the current window with the nth (by default the
+  first) next one
+  + exchange only happens in a row or column
+
+- =Ctrl-W= + =K, J, H, L=: move the current window, full height/width
+
+- =Ctrl-W= + =T=: move to a new tab
+
+*** Change Windows Size
+
+- =Ctrl-W= + =+=​/​=-= (=:resize=): increase/decrease the current windows
+  height; + =<=​/​=>= (=:vertical resize=): decrease/increase width
+
+- =Ctrl-W= + ===: resize all windows to equal size.
+
+- =zCount= + =ENTER=: set the current window to =Count= lines
+  + =:resize n=, or =n= + =Ctrl-W= + =_=
+
+- =Ctrl-W= + =|=: resizes the current window width to the specified column (by
+  default the widest possible)
+
+- =Ctrl-W= + =o=: maximize a window
+
+=winheight=, =winwidth= defines the minimal size of the current active window,
+even if the window in inactive state has a different size.
+
 *** Windows and Buffers
 
 - =:ls=, =:buffers=, =:files= lists buffers and files
