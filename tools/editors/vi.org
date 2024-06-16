@@ -185,6 +185,7 @@ Substitution is mostly done through the =substitute= ex command.
 
 - ~u~: undo; ~U~: undo all on a line, ~C-r~ (vim): redo (redo an undone operation)
   + =vi='s undo may undo a previous undo.
+  + =vim= adds branching undo, similar to Git commit tree and branches.
 
 - Since the last nine deletions are saved in the nine named buffer in addition
   to the /deletion register/, use ="np= to
@@ -544,7 +545,7 @@ Options may be set in a =.exrc= file in the home directory.
 
 **** Search
 
-- =incsearch= :: show where the pattern matches as the pattern is typed so far.
+- =incsearch= (vim) :: show where the pattern matches as the pattern is typed so far.
   + =^G=, =^T= to move to the next/previous match.
 
 - =hlsearch= :: searched matches are highlighted. =:nohlsearch= turns highlight
@@ -643,11 +644,17 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - ~-b~: in binary mode
 
+- ~+command~ ,~c command~: execute command as an =ex= command
+
+- ~-C~: vi-compatible mode (not fully compatible)
+
 - ~-d~: diff mode
 
 - ~-E~: improved ex mode, with extended regex
 
 - ~-F~ / ~-A~: Farsi or Arabic mode
+
+- ~-M~: turn off the write option
 
 - ~view~: vim in read-only mode
 
@@ -655,16 +662,71 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - ~ex~: ex mode, useful in scripts
 
+** New Commands
+
+- =n CTRL-END= :: to the end of the file
+
+- =line_count_percent%= :: go to the line count percent into the file
+
+- =:go n=, =:n go= :: go to the nth byte in the buffer
+
+** New Modes
+
+*** Visual Mode =v=
+
+Define selections visually and perform editing commands on the visual selection.
+
+**** Visual Block =^V=
+
+
 ** Extended Regex
+
+More than POSIX ERE.
 
 - ~\|~: indicates alternation
 
 - ~\+~
 
+- ~\&~: concatenation
+
 - ~\=~: matches zero or one of the preceding regex
 
+- ~{-(n),(m)}~: the =-= inside bound expressions indicates non-greed matching
 
-- {-(n),(m)}: non-greed matching
+- =\a= (alphabetica), =\A= (non-alphabetic)
+
+- =\b= backspace
+
+- =\d=, =\D=  digit  and non-digit
+
+- =\e= escape
+
+- =\f=, =-F= filename character, the latter excludes digits
+
+- =\h=, =\H=: head-of-word character (letters and underscores), non-head-of-word character
+
+- =\i=, =\I= identifier character (the latter excludes digits)
+
+- =\k=, =\K= keyword character (the latter excludes digits)
+
+- =\l=, =\L= lowercase and nonlowercase
+
+- =\n= newline, =\r= carriage return, =\t= tab
+
+- =\o=, =\O= octal and non-octal character
+
+- =\p=, =\P= printable character (the latter excludes digits)
+
+- =\s=, =\S= a tab or space
+
+- =\u=, =\U= uppercase and non-uppercase characters
+
+- =\w=, \W=: word character and non-word character
+
+- =\x=, =X= hexadecimal digit and non-hexdecimal digit
+
+- =\_x= any the of the previous characters: match the same character but with
+  newline included
 
 ** Multiwindows behavior
 
@@ -689,6 +751,10 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 - ~Ctrl-W~ + ~q~: quit a window; + ~c~: close the current window
 
 - ~Ctrl-W~ + ~o~: maximize a window
+
+** Configuration Files
+
+- =$HOME/.vimrc= (Unix), =$HOME/_vimrc= (MS Windows)
 
 ** Vimscripts
 
