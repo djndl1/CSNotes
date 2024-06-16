@@ -111,7 +111,7 @@ Sections are completely defined by macros.
     insert mode, use =^o= to access normal mode commands.
 
 - ~ra~ :: replace the current char with ~a~, no need to enter the insert mode;
-  + replace =&&= with =||=: =2r|=
+  + replace =&&= with =||=: type =2r|=
 
 - ~R~ :: the replace mode that replaces (overstrikes) everything in its way, basically the
   INSERT key in CUA: one may even restore to normal insert mode by pressing the
@@ -135,6 +135,8 @@ Sections are completely defined by macros.
 - ~["x]d~ :: delete operator, used with =b=, =d=, =w= and various motion and
   search commands, optionally into register =x=.
   + ~D~ delete to the end of the line, equal to  = ~d$~
+  + to delete with a search inclusively, add an offset (typically =e=) after the
+    search pattern.
 
 The editor saves the last 9 deleted blocks of text in a set of numbered
 registers 1-9, accessible by ="n=.
@@ -152,8 +154,10 @@ the unnamed buffer and the named buffers.The unnamed buffer (deletion register) 
   + =xp= :: to transpose two characters
 
 - ~Y~ :: curiously = ~yy~, not yank to the end of the line.
+  + under Neovim,  more consistently defined as =y$=
 
 - =~= :: changing case
+  + =gU{motion}= (uppercase), =gu{motion}= (lowercase)
 
 - =<=, =>= :: combined with motion, search command to shift lines by a =shiftwidth=.
   + =<<=, =>>= shift the current line.
