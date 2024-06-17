@@ -117,3 +117,75 @@ principal) can be associated with a login.
 
 Use =BACKUP= to export a backup file. To =RESTORE= as another database, add
 =WITH MOVE ... to ...=.
+
+* Localization, Internationalization & Collation
+
+#+begin_quote
+Collations in SQL Server provide sorting rules, case, and accent sensitivity
+properties for your data. Collations that are used with character data types,
+such as char and varchar, dictate the code page and corresponding characters
+that can be represented for that data type.
+...
+A collation specifies the bit patterns that represent each character in a
+dataset. Collations also determine the rules that sort and compare data.
+For non-Unicode columns, the collation setting specifies the code page for the
+data and which characters can be represented. The data that you move between
+non-Unicode columns must be converted from the source code page to the
+destination code page.
+#+end_quote
+
+Collation may be defined at /server/ level, /database/ level, /column/ level or
+/expression/ level. Collations determine case sensitivity, accent sensitivity,
+kana sensitivity, width sensitivity,
+variation-selector (a Unicode feature) sensitivity
+
+*** Collation Sets
+
+- /Windows collations/ :: based on Windows system locale
+  + the base Windows collation defines the sorting rules for dictionary sorting
+  + For English locales, =Latin1_General= is used by default.
+
+- /Binary collations/ :: based on the sequence of coded values defined by hte
+  locale and data type.
+  + =BIN= incomplete code-point to code-point comparison for Unicode data
+  + =BIN2= pure code-point comparison, sorted by the code points.
+
+- /SQL Server collations/ :: for backward compatibility
+
+*** Collation levels
+
+- Server Level
+  + not changeable without rebuilding the =master= database.
+
+- Database Level: defined with =CREATE DATABASE= or =ALTER DATABASE=
+  + =tempdb= always uses the server collation
+
+- Column Level
+
+- Expression Level: =ORDER BY COLUMN_NAME COLLATE COLLATION_NAME=
+
+*** Unicode
+
+**** Caveats
+
+- Supplementary characters aren't supported for use in metadata, such as in names of database objects.
+
+**** UTF-16
+
+Since SQL Server 2005 as =nchar=, =nvarchar=, =ntext= (Supplementary character =SC=
+support since SQL Server 2012). Supported by OLE DB, ODBC
+3.7 or later.
+
+**** UTF-8
+
+Supported as part of some collations (that supports supplementary characters,
+denoted with the =UTF8= suffix) since SQL Server 2019 in =char=, =varchar=.
+
+**** GB18030
+
+#+begin_quote
+SQL Server provides support for GB18030-encoded characters by recognizing them
+when they enter the server from a client-side application and converting and
+storing them natively as Unicode characters.
+All version 100 collations support linguistic sorting with GB18030 characters.
+#+end_quote
