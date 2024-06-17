@@ -95,6 +95,19 @@ By default, a SQL Server instance is configured for TCP/IP port 1433 and named
 pipe =\\.\pipe\sql\query=. A named instance are configured for TCP dynamic ports
 with a port assigned by the OS.
 
+* Security
+
+** Authentication Mode
+
+- /Windows Authentication/: by default =BUILTIN\Administrators= local group
+  mapped to the =sysadmin= server role. SQL Server validates by using the
+  Windows principal token in the OS.
+  + add at least one Windows principal as an administrator.
+
+- /SQL Server Authenticatin/: a =sa= (system administrator) login is set up for administrator.
+  + for backward compatibility, less secure.
+
+** Users, Logins and Roles
 
 A client connects to the database with a /Login/ (instance-level authentication
 object), possibly with a credential. A user (database-level authorization
