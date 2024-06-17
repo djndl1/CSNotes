@@ -78,6 +78,23 @@ computer name plus the instance name. The instance name is required for clients
 to connect to a named instance. A named instance has an /instance ID/ (by
 default its name).
 
+* Connections & protocols
+
+** Concepts
+
+- /Endpoint/ :: a connection on the server is represented by a T-SQL endpoint.
+  + Permissions can be granted, revoked, and denied for Transact-SQL endpoints.
+    By default, all users have permissions to access an endpoint unless the
+    permissions are denied or revoked by a member of the sysadmin group or by
+    the endpoint owner.
+    + T-SQL local machine; T-SQL named pipes; T-SQL default TCP
+
+** Configuration
+
+By default, a SQL Server instance is configured for TCP/IP port 1433 and named
+pipe =\\.\pipe\sql\query=. A named instance are configured for TCP dynamic ports
+with a port assigned by the OS.
+
 
 A client connects to the database with a /Login/ (instance-level authentication
 object), possibly with a credential. A user (database-level authorization
