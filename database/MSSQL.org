@@ -12,7 +12,7 @@ An element is identified by its key values, not by positions. A query against a 
 
 * Installation Caveats
 
-- Run System Configuration Checks before installation to check any prerequisite.
+- Run /System Configuration Checks/ before installation to check any prerequisite.
 
 ** Components
 
@@ -35,6 +35,14 @@ An element is identified by its key values, not by positions. A query against a 
 
 - Master Data Services :: optional; master data; data organization, data modeling
 
+** Editions
+
+In addition to feature difference, different editions have different scale limits (CPU limits, memory usage limits)
+
+- Standard: lesser of 4 sockets or 24 cores, 128 GB memory
+
+- Enterprise: no limits
+
 ** Services
 
 - Database Engine (=MSSQLSERVER=) :: =\<MSSQLPATH>\MSSQL\Binn\sqlservr.exe=
@@ -56,7 +64,20 @@ An element is identified by its key values, not by positions. A query against a 
 
 - The per-service service security principal (SID) is a login and a member of =sysadmin=.
 
-* Users, Logins and Roles
+** Multiple Instances
+
+Installation of multiple instances on the same host is supported. No special
+configuration except possible TCP port conflicts needs to be done.
+
+SQL Server Browser and SQL Server VSS Writer are shared by all instances.
+Database Engine, Analysis Services and Reporting Services are specific to an
+instance. Some other components are shared by instances of the same major version.
+
+An instance may be default or named. A named instance is identified by the
+computer name plus the instance name. The instance name is required for clients
+to connect to a named instance. A named instance has an /instance ID/ (by
+default its name).
+
 
 A client connects to the database with a /Login/ (instance-level authentication
 object), possibly with a credential. A user (database-level authorization
