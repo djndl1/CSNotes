@@ -58,6 +58,7 @@ Supported by most code editors.
 ** Vim/Vi
 
 - /Go to a tag/: =:ta[g] tagname | /regex=
+  + =:stag=, =Ctrl-W= + =]= in a split window
 
 - /Go to the tag at the cursor/: =^]=, =g<LeftMouse>=, =<C-LeftMouse>=
 
@@ -69,6 +70,8 @@ Supported by most code editors.
 - /Search a matching tag/: =:ts[elect] name=
   + =sts name= splits the window to show the selected tag
   + =tj[ump] name=, =stj[ump] name=, =g^J= (may be used with visual selection) jump when there is only one match.
+  + =Ctrl-W= + =G= + =Ctrl-]= perform =tjump= in a split window
+  + =Ctrl-W= + =G= + =]= perform =tselect= in a split window
 
 - /Search the tag at the cursor/: =g]= (may be combined with visual selection)
 

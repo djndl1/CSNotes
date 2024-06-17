@@ -751,7 +751,10 @@ Split commands may come optionally with a prefix to indicate the window size.
 
 - =:close=, =Ctrl-Wc=: close the current window; =:only=: close all but the current window
 
-- =Ctrl-W= + =q=: quit a window; + =c=: close the current window
+- =Ctrl-W= + =q=: quit a window (quit vim if no window exists); + =c=: close the
+  current window until the tab is closed
+
+- =Ctrl-W= + =o=, =:only= close all windows except the current window.
 
 *** Conditional Split
 
@@ -798,8 +801,22 @@ Split commands may come optionally with a prefix to indicate the window size.
 
 - =Ctrl-W= + =o=: maximize a window
 
+- =Ctrl-W= + =G=:
+
+- =Ctrl-W= + =F=: edit the filename underneath the cursor.
+
 =winheight=, =winwidth= defines the minimal size of the current active window,
 even if the window in inactive state has a different size.
+
+*** Tabbed Editing
+
+- =:tabnew filename=, =:tabedit filename=
+
+- =:tabclose=
+
+- =:tabonly=
+
+- =gT=, =Ctrl-PageDown=, =Ctrl-PageUp=
 
 *** Windows and Buffers
 
@@ -849,3 +866,24 @@ A buffer may be hidden by opening another file if the =hidden= option is set.
 ** Vimscripts
 
 #+TODO
+
+** grep
+
+*** ripgrep
+
+#+begin_src vimscript
+set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+set grepformat+=%f:%l:%c:%m
+#+end_src
+
+** Remote
+
+Vim and Neovim support a client-server mode (if compiled with =clientserver= option, by
+default on Neovim).
+A client remotely programmatically control the server.
+
+#+begin_src shell
+nvim --listen pipepath/socket
+nvim --server
+vim --servername
+#+end_src
