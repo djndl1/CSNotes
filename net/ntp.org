@@ -1,0 +1,56 @@
+#+title: Ntp
+
+#+begin_src
+Server - Client Offset as delta
+Client - Server Transmission delay as transit
+1. Server Response Receiving Time - Client Request Sending Time = transit + delta
+2. Response Sending Time - Request Receiving Time = - transit + delta
+
+Add 1. and 2. and divide by 2 is delta
+#+end_src
+
+Time correction may be done by /skewing/ (gradually adjusting the clock) or
+/setting/ (simply setting the local clock to the desired time).
+
+Time sources are classified by their accuracy into /strata/. Stratum one (GNSS,
+atomic clocks), which
+is the most accurate, is the /reference clock/
+
+* Implementations
+
+** ntpd
+
+TODO
+
+** chrony
+
+TODO
+
+** systemd-timesyncd
+
+TODO
+
+** [[https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-tools-and-settings?tabs=config][Windows Time Service]]
+
+Command =w32tm=, Service =w32time=, or configured with =gpedit.msc= under
+=Computer Configuration\Administrative Templates\System\Windows Time Service=.
+
+The client may use the manual mode (for non-domain users) or =NT5DS= (for domain
+users) for time source.
+
+
+#+begin_src powershell
+w32tm /query /status /verbose # for timesync status
+w32tm /resync
+#+end_src
+
+- /Phase Offset/, or =CurrentTimeOffset= :: the time between the current time
+  and the computer clock time
+
+- =MaxAllowedPhaseOffset= :: if the phase offset is larger than this, direct
+  setting is used, otherwise skewing may be used.
+
+- =PhaseCorrection= :: a value used by the system to skew the clock
+  + it needs to be less than half of =SystemClockRate= to be used with skewing.
+
+- =SystemClockRate= ::
