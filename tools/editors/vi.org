@@ -111,7 +111,7 @@ Sections are completely defined by macros.
     insert mode, use =^o= to access normal mode commands.
 
 - ~ra~ :: replace the current char with ~a~, no need to enter the insert mode;
-  + replace =&&= with =||=: =2r|=
+  + replace =&&= with =||=: type =2r|=
 
 - ~R~ :: the replace mode that replaces (overstrikes) everything in its way, basically the
   INSERT key in CUA: one may even restore to normal insert mode by pressing the
@@ -135,6 +135,8 @@ Sections are completely defined by macros.
 - ~["x]d~ :: delete operator, used with =b=, =d=, =w= and various motion and
   search commands, optionally into register =x=.
   + ~D~ delete to the end of the line, equal to  = ~d$~
+  + to delete with a search inclusively, add an offset (typically =e=) after the
+    search pattern.
 
 The editor saves the last 9 deleted blocks of text in a set of numbered
 registers 1-9, accessible by ="n=.
@@ -152,8 +154,10 @@ the unnamed buffer and the named buffers.The unnamed buffer (deletion register) 
   + =xp= :: to transpose two characters
 
 - ~Y~ :: curiously = ~yy~, not yank to the end of the line.
+  + under Neovim,  more consistently defined as =y$=
 
 - =~= :: changing case
+  + =gU{motion}= (uppercase), =gu{motion}= (lowercase)
 
 - =<=, =>= :: combined with motion, search command to shift lines by a =shiftwidth=.
   + =<<=, =>>= shift the current line.
@@ -185,6 +189,7 @@ Substitution is mostly done through the =substitute= ex command.
 
 - ~u~: undo; ~U~: undo all on a line, ~C-r~ (vim): redo (redo an undone operation)
   + =vi='s undo may undo a previous undo.
+  + =vim= adds branching undo, similar to Git commit tree and branches.
 
 - Since the last nine deletions are saved in the nine named buffer in addition
   to the /deletion register/, use ="np= to
@@ -544,7 +549,7 @@ Options may be set in a =.exrc= file in the home directory.
 
 **** Search
 
-- =incsearch= :: show where the pattern matches as the pattern is typed so far.
+- =incsearch= (vim) :: show where the pattern matches as the pattern is typed so far.
   + =^G=, =^T= to move to the next/previous match.
 
 - =hlsearch= :: searched matches are highlighted. =:nohlsearch= turns highlight
@@ -643,11 +648,17 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - ~-b~: in binary mode
 
+- ~+command~ ,~c command~: execute command as an =ex= command
+
+- ~-C~: vi-compatible mode (not fully compatible)
+
 - ~-d~: diff mode
 
 - ~-E~: improved ex mode, with extended regex
 
 - ~-F~ / ~-A~: Farsi or Arabic mode
+
+- ~-M~: turn off the write option
 
 - ~view~: vim in read-only mode
 
@@ -655,41 +666,224 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - ~ex~: ex mode, useful in scripts
 
+** New Commands
+
+- =n CTRL-END= :: to the end of the file
+
+- =line_count_percent%= :: go to the line count percent into the file
+
+- =:go n=, =:n go= :: go to the nth byte in the buffer
+
+** New Modes
+
+*** Visual Mode =v=
+
+Define selections visually and perform editing commands on the visual selection.
+
+**** Visual Block =^V=
+
+
 ** Extended Regex
+
+More than POSIX ERE.
 
 - ~\|~: indicates alternation
 
 - ~\+~
 
+- ~\&~: concatenation
+
 - ~\=~: matches zero or one of the preceding regex
 
+- ~{-(n),(m)}~: the =-= inside bound expressions indicates non-greed matching
 
-- {-(n),(m)}: non-greed matching
+- =\a= (alphabetica), =\A= (non-alphabetic)
+
+- =\b= backspace
+
+- =\d=, =\D=  digit  and non-digit
+
+- =\e= escape
+
+- =\f=, =-F= filename character, the latter excludes digits
+
+- =\h=, =\H=: head-of-word character (letters and underscores), non-head-of-word character
+
+- =\i=, =\I= identifier character (the latter excludes digits)
+
+- =\k=, =\K= keyword character (the latter excludes digits)
+
+- =\l=, =\L= lowercase and nonlowercase
+
+- =\n= newline, =\r= carriage return, =\t= tab
+
+- =\o=, =\O= octal and non-octal character
+
+- =\p=, =\P= printable character (the latter excludes digits)
+
+- =\s=, =\S= a tab or space
+
+- =\u=, =\U= uppercase and non-uppercase characters
+
+- =\w=, \W=: word character and non-word character
+
+- =\x=, =X= hexadecimal digit and non-hexdecimal digit
+
+- =\_x= any the of the previous characters: match the same character but with
+  newline included
 
 ** Multiwindows behavior
 
-- ~-o~/~-oNumber~
+- =-o=​/​=-oNumber=: start with multiple windows
 
-- ~:split~, ~Ctrl-Ws~: split the window horizontally
+- =:split [filename]=, =Ctrl-Ws=: split the window horizontally
 
-- ~:vnew~ / ~:vsplit~, ~Ctrl-Wv~: vertically split the window
+- =:vnew= / =:vsplit=, =Ctrl-Wv=: vertically split the window (with a new buffer
+  or the current buffer)
 
-- ~:new~, ~Ctrl-Wn~: new window
+- =:new=, =Ctrl-Wn=: new window
 
-- ~:close~, ~Ctrl-Wc~: close the current window; ~:only~: close all but the current window
+Split commands may come optionally with a prefix to indicate the window size.
 
-- ~Ctrl-W~ + ~+, -~: increase/decrease the current windows, ~=~: resize all windows to equal size. + ~<, >~: decrease/increase, + ~|~: resizes the current window to the widest size possible
+- =:sview filname= : open a file in a split window as readonly.
 
-- ~Ctrl-W~ + ~h,j,k,l~, ~t~ (top), ~b~ (bottom), ~p~ (previous)
+- =:sfind filename=: open a window for a file if found
 
-- ~Ctrl-W~ + ~r~: rotate windows, + ~x~: exchange two windows in a row or column
+- =:close=, =Ctrl-Wc=: close the current window; =:only=: close all but the current window
 
-- ~Ctrl-W~ + ~K, J, H, L, T (tab)~: move the current window, full height
+- =Ctrl-W= + =q=: quit a window (quit vim if no window exists); + =c=: close the
+  current window until the tab is closed
 
-- ~Ctrl-W~ + ~q~: quit a window; + ~c~: close the current window
+- =Ctrl-W= + =o=, =:only= close all windows except the current window.
 
-- ~Ctrl-W~ + ~o~: maximize a window
+*** Conditional Split
+
+- =topleft=, =vertical=, =leftabove=, =aboveleft=, =rightbelow=, =belowright=,
+  =botright=: modifier before a split command to open a new window only if the
+  command succeeeds.
+
+*** Moving Across Windows
+
+- =Ctrl-W= + =h,j,k,l=,
+
+- =Ctrl-W= + =t= (top leftmost), =b= (bottom rightmost),
+
+- =Ctrl-W= + =p= previously accessed
+
+- =Ctrl-W= + =w=, =W=: cycle through all windows top leftmost to bottom rightmost, the case difference indicates
+  different directions
+
+*** Moving Windows & Changing Layouts
+
+- =Ctrl-W= + =r=: rotate windows on a row/column rightwards/rightwards; + =R= in the
+  opposite direction
+
+- =Ctrl-W= + =x=: exchange the current window with the nth (by default the
+  first) next one
+  + exchange only happens in a row or column
+
+- =Ctrl-W= + =K, J, H, L=: move the current window, full height/width
+
+- =Ctrl-W= + =T=: move to a new tab
+
+*** Change Windows Size
+
+- =Ctrl-W= + =+=​/​=-= (=:resize=): increase/decrease the current windows
+  height; + =<=​/​=>= (=:vertical resize=): decrease/increase width
+
+- =Ctrl-W= + ===: resize all windows to equal size.
+
+- =zCount= + =ENTER=: set the current window to =Count= lines
+  + =:resize n=, or =n= + =Ctrl-W= + =_=
+
+- =Ctrl-W= + =|=: resizes the current window width to the specified column (by
+  default the widest possible)
+
+- =Ctrl-W= + =o=: maximize a window
+
+- =Ctrl-W= + =G=:
+
+- =Ctrl-W= + =F=: edit the filename underneath the cursor.
+
+=winheight=, =winwidth= defines the minimal size of the current active window,
+even if the window in inactive state has a different size.
+
+*** Tabbed Editing
+
+- =:tabnew filename=, =:tabedit filename=
+
+- =:tabclose=
+
+- =:tabonly=
+
+- =gT=, =Ctrl-PageDown=, =Ctrl-PageUp=
+
+*** Windows and Buffers
+
+- =:ls=, =:buffers=, =:files= lists buffers and files
+  + =%= (current), =#= (alternate)
+  + =u= unlisted buffer (e.g. a help buffer)
+  + =a= active (loaded and visible) buffer, =h= hidden buffer
+  + =-=, ===, not modifiable. === is read-only and never modifiable
+  + =+= modified, =x= read error
+
+A buffer may be hidden by opening another file if the =hidden= option is set.
+
+- =:windo cmd=: do =cmd= in each window of the current tab
+
+- =:bufdo[!] cmd=: do =cmd= in all the buffers
+
+- =ball=, =sball= (in new windows): edit all args or buffers
+
+- =unhide, =sunhide= (in new windows): edit all loaded buffers
+
+- =badd file=: add file to the buffer list; =bunload=: unload the current buffer from
+  memory (the buffer is still open), =bdelete=: delete the buffer from the
+  buffer list
+
+- =b[uffer]=, =sb[uffer]=: move to a buffer
+
+- =:bnext=, =:sbnext=, =:bNext=, =:sbNext=, =:bprevious=, =:sbprevious=, =:bfirst=,
+  =:sbfist=, =:blast=, =:sblast=,
+
+- =:bmod=, =:sbmod=: move the nth modified buffer
+
+**** Special Buffers
+
+- directory: a list of a directory
+
+- help
+
+- quickfix: the list of errors created by a command or the location list,
+  typically used with edit-compile-debug cycle
+
+- scratch
+
+** Configuration Files
+
+- =$HOME/.vimrc= (Unix), =$HOME/_vimrc= (MS Windows)
 
 ** Vimscripts
 
 #+TODO
+
+** grep
+
+*** ripgrep
+
+#+begin_src vimscript
+set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+set grepformat+=%f:%l:%c:%m
+#+end_src
+
+** Remote
+
+Vim and Neovim support a client-server mode (if compiled with =clientserver= option, by
+default on Neovim).
+A client remotely programmatically control the server.
+
+#+begin_src shell
+nvim --listen pipepath/socket
+nvim --server
+vim --servername
+#+end_src
