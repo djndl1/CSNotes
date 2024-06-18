@@ -863,6 +863,61 @@ A buffer may be hidden by opening another file if the =hidden= option is set.
 
 - =$HOME/.vimrc= (Unix), =$HOME/_vimrc= (MS Windows)
 
+** Folding
+
+Folding define what parts of the file to see. Folds are not simply defined by
+language syntax.
+
+To display fold levels, set =foldcolumn= to an appropriate number.
+
+A folded block acts as a line for line operations.
+
+*** Define Folds
+
+The =foldmethod= option defines how folds are defined/created and accepts the
+following methods.
+
+- =diff= :: defined the difference between two files
+
+- =expr= :: defined by regular expressions
+
+- =indent= :: corresponds to the indentation of text and =shiftwidth=
+
+- =manual= :: result from user Vim commands
+  + =zf=, =nzF=
+
+- =marker= :: predefined markers in the file specify fold boundaries
+
+- =syntax= :: defined by the semantics of a file's language.
+
+*** Fold Commands
+
+- =zA= :: toggle fold state
+  + =za= :: toggle teh state of one fold
+
+- =zC= :: close folds, recursively
+  + =zc= :: close one fold
+
+- =zD= :: delete/undefine folds, recursively (not the content in the folds)
+  + =zd= :: delete one fold
+  + =zE= ::  delete all fields
+
+- =zO= :: open folds recursively
+  + =zo= :: open one fold
+
+- =zf= :: create a fold from the current line to the one where the following
+  motion command takes the cursor
+  + =zf%= fold a C code block
+  + =Count= + =zF= :: fold count lines. The count number here counts for visual lines
+    on the screen.
+
+- =zM= :: set =foldlevel= to zero
+  + =zm=, =zr= :: decrement/increment =foldlevel=
+
+- =zN=, =zn= :: set/reset =foldenable= option
+  + =zi= :: toggle =foldenable=
+
+
 ** Vimscripts
 
 #+TODO
