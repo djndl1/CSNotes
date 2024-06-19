@@ -1,13 +1,21 @@
 #+title: Tmux
 
-- Hierarchy : *Served* - *Session* - *Window* - *Pane*
+#+begin_quote
+tmux is to the console what a desktop is to GUI apps.
+#+end_quote
+
+tmux runs a server in the background, maintaining all the sessions. Multiple
+uses can attach to the same session (great for pair programming).
+
+- Hierarchy : *Server* (X) - *Session* (Virtual desktop) - *Window* (Tiling GUI
+  windows) - *Pane* (subwindow regions)
   + =tmux list-clients=
   + =tmux -L=: start a new tmux server with the specified name.
 
 - Why tmux: multitasking, running applications in the background, pair
   programming
 
-* Practical Usage
+* Usage
 
 Tmux is controlled by sending various commands to it. Commands are can be sent
 using keyboard sequences, prefixed by a certain key, or =tmux command=, or in
@@ -18,24 +26,57 @@ the prompt after =Prefix := inside tmux.
 
 - =Prefix d=: detach from the session.
 
-- Clipboard: tmux has a cliboard to copy/paste across sessions, windows and
+- Send the prefix key twice to activate a nested session or =send-prefix=
+
+Configuration files are command scripts. tmux command are also input via
+=Prefix= + =:=.
+
+- =list-keys= to show all keybindings.
+
+* Clipboard
+
+tmux has a cliboard to copy/paste across sessions, windows and
   panes.
-  + =Prefix [= to enter copy mode, =Prefix ]= to paste and =Alt-W= to copy.
+
+- =Prefix [= to enter copy mode
+
+- =Prefix ]= to paste and =Alt-W= to copy.
+
+Copy mode does not work with Vim and Emacs.
 
 * Hierarchy
 
-- *Session*: =tmux new-session=
-  + =Prefix (=, =Prefix )=, =Prefix L=, =Prefix s=: to switch between sessions
+- *Server*: connected to via a socket
+  + a server may contain one or more sessions.
+  + =tmux -L socket_name=: creates a new server
+  + =tmux -L socket_name attach=: attach to that server
+  + =list-clients=
+
+- *Session*:
+  + =tmux [new-session [-s session_name]]= creates a new session
+  + =Prefix-(= (previous session) or =Prefix-)= (next session), =Prefix-L= (the last
+    session), =Prefix-s= (interactively select a session): these commands are
+    actually use =switch-client -t=.
+  + A session has a name: =rename-session=
+  + =tmux has-session -t session_name= to test a session
 
 - *Window*:
-  + =Prefix c=: create a new window
-  + =Prefix x=: kill a window with all its panes.
-  + =Prefix 1,2,3,4=, =Prefix .= =Prefix I=. =Prefix w= shows windows.
-  + =rename-window=
+  + =base-index=: by default a window starts at 0.
+  + =Prefix-c=: create a new window
+  + =Prefix-x=: kill a window with all its panes.
+  + =Prefix-p= =previous-window=, =Prefix-n= =next-window=, =Prefix-1,2,3,4=,
+    =Prefix-I=. =Prefix-w= =choose-window= (interactively) switch windows.
+  + =Prefix-.=: =move-window= to reorder windows
+  + A window has a name: =rename-window= or =Prefix-,=
+  + =kill-window= to quit a window; =Prefix-&= kill the current window
 
-- *Pane*
-  + =split-window -v, -h=, =Prefix %/"=
-  + =Prefix ;=, =Prefix Up/Down/Left/Right=: move between panes
-  + =Prefix o=
-  + =Prefix z+ zoom in/out
-  + =resize-pane=; =Prefix C-ArrowKey=
+- *Pane*: pseudoterminals encapsulating shells.
+  + =split-window -v/-h=, =Prefix-%/"=
+  + =Prefix-;=, =Prefix-Up/Down/Left/Right=: move between panes
+  + =Prefix-o=: select the next pane (similar to Emacs);
+  + =Prefix-z= zoom in/out a pane.
+  + =resize-pane=; =Prefix-Ctrl-ArrowKey=
+  + there are several predefined pane layout: =even-horizontal=,
+    =even-vertical=, =main-horizontal=, =main-vertical=, =tiled=, use
+    =select-layout= to choose one
+  + =pipe-pane -o= output a pane to a file
