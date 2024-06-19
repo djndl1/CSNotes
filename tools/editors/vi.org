@@ -917,6 +917,40 @@ following methods.
 - =zN=, =zn= :: set/reset =foldenable= option
   + =zi= :: toggle =foldenable=
 
+*** Auto and Smart Indenting
+
+- =autoindent= :: similar to vi's, differs subtly as to where the cursor is
+  placed after indentation is deleted.
+  + understands comments
+
+- =smartindent= :: recognizes some basic C syntax for defining indentation
+  levels
+  + before a line starting with ={=, before a line starting with certain
+    keywords =cinwords=
+  + a new line before/after a =}=
+
+- =cindent= :: richer awareness of C syntax and supports customization
+  + =cinkeys= :: keyboard keys under insert mode that triggers reindenting.
+    Reindenting means to indent to an appropriate position.
+     A set of expressions are used to define this option.
+  + =cinoptions= :: indentation style. Another set of expression for various situations are used to
+    define C indentation styles.
+  + =cinwords= :: keywords that signal when Vim should add an extra indent in
+    subsequent lines
+
+- =indentexpr= :: custom indentation rules
+  + not a trivial task to define. Predefined expressions are under =$VIMRUNTIME/indent=.
+
+#+begin_comment
+TODO learn more about cindent customization and indent expressions
+#+end_comment
+
+To use the file type to define indentation, set =:filetype indent on=.
+
+If manual indentation is applied, autoindentation on that line is disabled.
+
+Indentation options may cause indentation problems when pasting text into the
+file. Set the =paste= option before pasting and reset it afterward..
 
 ** Vimscripts
 
