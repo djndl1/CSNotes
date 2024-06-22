@@ -7,6 +7,54 @@
   Informative messages are not only echoed in the echo area, but also in the
   =*Message*= buffer.
 
+* UI Concept
+
+- /Frame/ :: norma MS Windows term would be /windows/. Under a terminal, it is an entire terminal screen.
+
+- /Window/ :: visual subregions within a frame.
+  + Vim uses windows as well: it just doesn't use the term "frame".
+  + at any time, /one/ window is the "selected window".
+
+- /Buffer/ :: the area where text is loaded.
+  + the buffer contained by the selected window is the "current buffer".
+
+- /Point/ :: the location that the cursor operates, before the cursor block.
+  + each buffer has its own /point/.
+
+- /Echo area/ :: the bottom of the frame, where various small text or messages are displayed.
+  + Informative echo messages are saved in =*Message*=.
+  + also for displaying the "minibuffer".
+
+- /Mode line/ :: a status line at the bottom.
+  + =**= modified modifiable buffer, =%*= modified readonly buffer, =%%= otherwise
+
+* Input Concepts
+
+- /Input Event/ :: simple characters and control characters as well as certain non-keyboard inputs
+
+- /key sequence/ :: a sequence of one or more input events meaningful as a unit
+  + /complete key/ :: a key sequence that invokes a command. No more key sequences
+    may be added to a complete key.
+  + /prefix key/ :: a key sequence not long enough to invoke a command.
+    There are some predefined prefix keys but the list may be not be limited to these.
+  + there is not limit to the length of a key sequence.
+
+- /Mouse Events/ :: =mouse-1= (left mouse click), =mouse-2= (middle mouse click),
+  =mouse-3= (right mouse click), =wheel-down= (=mouse-4=), =wheel-up= (=mouse-5=).
+
+Emacs does not assign meanings to keys directly: keys are bound to commands (functions).
+Customization depends on various /variables/.
+
+* Enter and Exiting
+
+It is unnecessary to start Emacs afresh for each file. Emacs may function as a server.
+
+- =C-x C-c=: =save-buffers-kill-emacs=, for a client, it simply closes the client frame.
+
+- =kill-emacs=: kill without being prompted about saving.
+
+- =C-z=: suspend/minimize the frame
+  
 * File Handling
 
 - the minibuffer supports =$= to read an envvar.
