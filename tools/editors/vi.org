@@ -952,6 +952,47 @@ If manual indentation is applied, autoindentation on that line is disabled.
 Indentation options may cause indentation problems when pasting text into the
 file. Set the =paste= option before pasting and reset it afterward..
 
+- =^N=, =^P= Move in the candidate list; =Enter= to select the match; =^E= to
+  halt the match ithout substituting any text.
+
+*** Autocompletion
+
+Insertion completion from programming language specific keywords to filenames,
+dictionary words and even entire lines. Completion includes
+
+- Whole Lines =^X-^L= :: look backwards for a line matching the typed characters
+
+- Keyword =^X-^N= :: not PL-specific keywords, possibly any word in the file,
+  defined by the =iskeyword= option.
+
+- Dictionary =^X-^K= :: searches through the files defined by the =dictionary= option.
+
+- thesaurus =^X-^T= :: searches through the files defined by the =thesaurus=
+  option. A set of similar words are listed as candidates.
+
+- keyword in the current file and includes files =^X-^I= in C/C++ ::
+
+- tag =^X-^]= :: searches forward through the current file and includes files
+  for keywords matching tags.
+
+- filename =^X-^F= :: searches for filenames in the current directory matching the keyword at the current cursor.
+
+- macro and definition names =^X-^D= :: =#define=
+
+- =^X-^V= :: meant for use on the Vim command line and tries to guess the best
+  completions for words to assist users developing Vim scripts.
+
+- =^X-^U= :: use the completion method defined by a custom function =completefunc=.
+
+- Omni =^X-^O= :: use filetype-specific functions to determine the candidate
+  list
+  + C, CSS, HTML, JaaScript, PHP, Python, Ruby, SQL and XML.
+
+- Spelling correction =^X-^S= :: if the word at the location appears to be badly
+  spelled, "more correct" spellings are offered
+
+- Comprehensive complete =^N= :: defined by the =complete= option.
+
 ** Vimscripts
 
 #+TODO
