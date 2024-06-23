@@ -168,13 +168,29 @@ the unnamed buffer and the named buffers.The unnamed buffer (deletion register) 
 
 ** Search/Replace
 
+*** Pattern Search
+
 - =/=, =?= :: forward/backward search (possibly with regex). Search is also a way to move around.
   + By default, the search wraps around when it hits the end of the buffer
     unless =nowrapscan= is set.
-  + these patterns may be followed by a count =n= to denote the =n=-th occurrence.
+  + By default the cursor is placed on the first character of the match. These
+    patterns may be followed by an offset to put the cursor at the
+    location specified by the offset: line count (positive or
+    negative), =e[+/-num]= characters to the right/left of the end of the match
+    (by default 0),
+    =s/b[+/-num]= characters to the right/left of the match, or =;{pattern}=  to
+    perform another search.
+  + the pattern
   + =/=, =?= without a pattern repeats the previous search.
   + =n=, =N= continue the search in the same/opposite direction.
-  + (vim) a history of search commands is maintained, retrivable with arrow keys or =^p=, =^n=.
+  + (vim) a history of search commands is maintained, retrievable with arrow keys or =^p=, =^n=.
+  + the final =/= or =?= is optional without the offset
+  + use =\%>= and =\%<= to limit the search range.
+
+- =*=, =#= :: search forward/backward for the count'th occurrence of the word nearest to the cursor.
+  + a =g= prefix may be added to indicate no word boundaries.
+
+- =^C= :: interrupt the current search command
 
 - =fchar=, =Fchar=; =;= :: search for the next =char= forwards/backwards on the
   current line; =;=
