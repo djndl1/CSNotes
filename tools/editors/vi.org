@@ -124,7 +124,7 @@ Sections are completely defined by macros.
   - =s= :: substitute the first char and then enters the insert mode.
   - ~cc~, =S= :: change the entire line
   - ~C~ ::  ~c$~
-  - =ce= and =cw= do the same even if =w= and =e= have different semantics.
+  - =ce= and =cw= :: the same even if =w= and =e= have different semantics.
 
 - special characters :: insert a =^V= before the character.
 
@@ -917,7 +917,7 @@ following methods.
 - =zN=, =zn= :: set/reset =foldenable= option
   + =zi= :: toggle =foldenable=
 
-*** Auto and Smart Indenting
+** Auto and Smart Indenting
 
 - =autoindent= :: similar to vi's, differs subtly as to where the cursor is
   placed after indentation is deleted.
@@ -955,7 +955,7 @@ file. Set the =paste= option before pasting and reset it afterward..
 - =^N=, =^P= Move in the candidate list; =Enter= to select the match; =^E= to
   halt the match ithout substituting any text.
 
-*** Autocompletion
+** Autocompletion
 
 Insertion completion from programming language specific keywords to filenames,
 dictionary words and even entire lines. Completion includes
@@ -993,18 +993,46 @@ dictionary words and even entire lines. Completion includes
 
 - Comprehensive complete =^N= :: defined by the =complete= option.
 
-** Vimscripts
+** Syntax Highlighting
 
-#+TODO
+=:syntax enable=, =:syntax on=, =set syntax=filetype=. Syntax definition files
+are stored in =$VIMRUNTIME/syntax=.
 
-** grep
+#+begin_comment
+TODO: customization
+#+end_comment
 
-*** ripgrep
+** QuickFix: Edit-Compile-Edit Cycle
+
+=:make= builds the project and collects the result text in the =Quickfix List=
+window, where one can inspect, jump to and correct errors.
+
+- =:cnext=, =:cprevious=: move in the error list
+
+- =errorformat=: an option defining a format of errors returned from a compile
+
+- =makeprg=: an option containing the name of the build instruction
+
+*** grep
+
+Vim's grep may also take advantage of the Quickfix list.
+
+- =vim[grep]  /pattern[g][j] files= :: use builtin grep to search for a pattern
+  + by default the result is shown in the Quickfix list.
+
+- =copen= :: open the Quickfix list
+
+**** ripgrep
 
 #+begin_src vimscript
 set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
 set grepformat+=%f:%l:%c:%m
 #+end_src
+
+
+** Vimscripts
+
+#+TODO
 
 ** Remote
 
