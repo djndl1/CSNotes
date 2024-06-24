@@ -180,7 +180,6 @@ the unnamed buffer and the named buffers.The unnamed buffer (deletion register) 
     (by default 0),
     =s/b[+/-num]= characters to the right/left of the match, or =;{pattern}=  to
     perform another search.
-  + the pattern
   + =/=, =?= without a pattern repeats the previous search.
   + =n=, =N= continue the search in the same/opposite direction.
   + (vim) a history of search commands is maintained, retrievable with arrow keys or =^p=, =^n=.
@@ -196,7 +195,7 @@ the unnamed buffer and the named buffers.The unnamed buffer (deletion register) 
   current line; =;=
   repeats the previous search.
   + =t= and =T= is a version of =f= that goes to the position before the searched character.
-  + =;=, =,= repeats the previous find command in the same/opposite direction.
+  + =;=​/​=,= repeats the previous find command in the same/opposite direction.
   + use =``= or =''= to return to the position/line before the search.
 
 Substitution is mostly done through the =substitute= ex command.
@@ -1048,7 +1047,40 @@ set grepformat+=%f:%l:%c:%m
 
 ** Vimscripts
 
-#+TODO
+- conditions are not required to be surrounded by parentheses.
+
+- =elseif=, not =else if=; =if= ends with an =endif=
+
+- =let= assigns a variable.
+  + a variable may has a prefix to indicate its scope:
+    - =a= function argument
+    - =b=: buffer-local
+    - =g=: global
+    - =l=: function-local
+    - =s=: script-level
+    - =t=: tab-level
+    - =v=: controlled by Vim
+    - =w=: window-level
+  + by default variables are global =g=
+
+- =.= string concatenation
+
+- =execute=: execute a string as vimscript
+
+#+begin_src vim
+let g:Favcolorschemes = ["darkblue", "morning", "shine", "evening"]
+function SetTimeOfDayColors()
+    " currentHour will be 0, 1, 2, or 3
+    let g:CurrentHour = strftime("%H") / 6
+    if g:colors_name !~ g:Favcolorschemes[g:CurrentHour]
+    execute "colorscheme " . g:Favcolorschemes[g:CurrentHour]
+    echo "execute " "colorscheme " . g:Favcolorschemes[g:CurrentHour]
+    redraw
+    endif
+endfunction
+#+end_src
+
+- Arrays: =[elm1, elm2, elm3, elm4, ...]
 
 ** Remote
 
