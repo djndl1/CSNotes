@@ -1,19 +1,16 @@
 #+title: Emacs
 
-* Overview
+* Help
 
 - =C-h= to invoke help
 
-  Informative messages are not only echoed in the echo area, but also in the
-  =*Message*= buffer.
-
 * UI Concept
 
-- /Frame/ :: norma MS Windows term would be /windows/. Under a terminal, it is an entire terminal screen.
+- /Frame/ :: normal MS Windows term would be /windows/. Under a terminal, it is the entire terminal screen.
 
 - /Window/ :: visual subregions within a frame.
   + Vim uses windows as well: it just doesn't use the term "frame".
-  + at any time, /one/ window is the "selected window".
+  + at any time, only /one/ window is the "selected window".
 
 - /Buffer/ :: the area where text is loaded.
   + the buffer contained by the selected window is the "current buffer".
@@ -25,7 +22,7 @@
   + Informative echo messages are saved in =*Message*=.
   + also for displaying the "minibuffer".
 
-- /Mode line/ :: a status line at the bottom.
+- /Mode line/ :: the status line at the bottom.
   + =**= modified modifiable buffer, =%*= modified readonly buffer, =%%= otherwise
 
 * Input Concepts
@@ -113,14 +110,18 @@ TODO
 
 ** Insertion
 
-- =C-j=: newline (useful in minibuffer) without indentation.
+- =C-q=, =quoted-insert= in literal keys or in numeric value (Unicode by default): to insert any characters.
+  + =read-quoted-char-radix= sets the input format used by  =quoted-insert=
 
-- =C-q=, =quoted-insert= in literal keys or in octal (=read-quoted-char-radix=) Unicode by default: to insert any non-graphic characters.
-
-- =C-x 8 RET= (=insert-char=): inserts unicode characters.
+- =C-x 8 RET= (=insert-char=): inserts unicode characters
+  using a code point value, a character name, an abbrevation.
+  + without the =RET=, =C-x 8= may be with =[=, =]=, ={=, =}=
+    to type some special characters.
 
 - =C-o=, =open-line=: insert a blank line after
 
+- =C-j=: newline (useful in minibuffer) without automatic indentation.
+  
 - =C-x C-o= (=delete-blank-lines=): delete blank lines.
 
 ** Point (Cursor) Navigation
