@@ -1082,6 +1082,32 @@ endfunction
 
 - Arrays: =[elm1, elm2, elm3, elm4, ...]
 
+- =&option_name=: retrieve the vale of an option
+
+Vim uses /events/ to execute commands (/autocommands/) e.g. =BufNewFile=, =BufReadPre=, =BufRead=,
+=BufReadPost=, =BufWrite=, =BufWritePre=, =FileType=, =VimResized=, =WinEnter=,
+=WinLeave=, =CursorMoved=, =CursorMovedI=.
+
+#+begin_src vim
+augroup newFileDetection
+# everytime the cursor moved under Insert mode.
+    autocmd CursorMovedI * call CheckFileType()
+augroup END
+
+function CheckFileType()
+    if exists("b:countCheck") == 0
+        let b:countCheck = 0
+    endif
+        let b:countCheck += 1
+    " Don't start detecting until approx. 20 chars.
+    if &filetype == "" && b:countCheck > 20 && b:countCheck < 200
+        filetype detect
+    elseif b:countCheck >= 200 || &filetype != ""
+        autocmd! newFileDetection # delete the commands within the group, deleting a group doesn't delete its commands.
+    endif
+endfunction
+#+end_src
+
 ** Remote
 
 Vim and Neovim support a client-server mode (if compiled with =clientserver= option, by
