@@ -45,13 +45,19 @@ In addition to feature difference, different editions have different scale limit
 
 ** Services
 
-- Database Engine (=MSSQLSERVER=) :: =\<MSSQLPATH>\MSSQL\Binn\sqlservr.exe=
+- Database Engine (=MSSQLSERVER= or =MSSQL$<instance_name>) :: =\<MSSQLPATH>\MSSQL\Binn\sqlservr.exe=
+  + default startup options are saved in the registry. Startup parameters may be
+    configured with =Sql Server Configuration Manager=
 
 - SQL Server Agent (=SQLServerAgent=) :: =\<MSSQLPATH>\MSSQL\Binn\sqlagent.exe=
   + task automation (jobs), monitoring SQL Server
 
 - SQL Server Browser :: name resolution service that provides SQL Server
   connection information for client computers
+  + listen to UDP 1434
+  + list available servers
+  + named instances may use dynamic ports; the browser directs clients to the
+    correct port.
 
 - SQL Writer :: backup and restore application in the Volume Shadow Copy Service
   framework (a Windows service)
@@ -73,10 +79,48 @@ SQL Server Browser and SQL Server VSS Writer are shared by all instances.
 Database Engine, Analysis Services and Reporting Services are specific to an
 instance. Some other components are shared by instances of the same major version.
 
-An instance may be default or named. A named instance is identified by the
+An instance may be default (named =MSSQLSERVER=) or named. A named instance is identified by the
 computer name plus the instance name. The instance name is required for clients
 to connect to a named instance. A named instance has an /instance ID/ (by
 default its name).
+
+** Server Configuration
+
+- Tools: SQL Server Management Studio or =sp_configure= system stored procedure.
+
+- View options: =sys.configurations= catalog view
+  + =value=: the configured value
+  + =value_in_use=: the actual current value in use
+  + =is_dynamic=: whether not to require a database engine restart
+
+
+Some options are self-configuring. Some requires a database engine restart.
+Configuration options take effect immediately after setting the option and
+issuing =RECONFIGURE= (or =RECONFIGURE WITH OVERRIDE= in some cases).
+
+* Startup & Stop
+
+Only a local administrator can start, stop, pause, resume or restart SQL Server
+service.
+=SHUTDOWN= statement requires =sysadmin= or =serveradmin= role.
+
+#+begin_src sql
+SHUTDOWN; -- wait for running T-SQL statements and SPs to finish and then stop the database
+SHUTDOWN WITH NOWAIT; -- immediately stop
+#+end_src
+
+** Single-Use Mode =-m=
+
+Stop the SQL Server Agent before entering the single-user mode, or limit the app
+with =-m"SQLCMD"=.
+
+Any member of the Administrators group may connect to the instance but only one
+user for maintenance.
+
+** Minimal Configuration =-f=
+
+More restricted than single-user mode: single user, no remote access, no startup
+stored procedure run, no audit.
 
 * Connections & protocols
 
