@@ -135,9 +135,69 @@ stored procedure run, no audit.
 
 ** Configuration
 
+Communication protocols are configured through SQL Server Configuration Manager.
+
+By default shared memory (on the same host, mainly for troubleshooting) is
+enabled for all editions;
+TCP/IP is enabled for all except Developer edition; named pipes (for LAN) are disabled.
+
 By default, a SQL Server instance is configured for TCP/IP port 1433 and named
 pipe =\\.\pipe\sql\query=. A named instance are configured for TCP dynamic ports
 with a port assigned by the OS.
+
+** Client Connection
+
+#+begin_src
+# shared memory, (local) may be used as the server name on the same computer
+lpc:<servername>[\instancename]
+
+# TCP/IP, by default on port 1433
+# "(local)", a period "." or "localhost" may be used as the server name on the same computer
+tcp:<servername>[\<instancename>],<port>
+tcp:<IPAddress>[\<instancename>],<port>
+#+end_src
+
+- /Server Alias/ :: an alternate name used for client connection that includes
+  required elements of a connection string.
+  + configured in SQL Server Configuration Manager
+
+*** Drivers
+
+**** SQL Server Native Client (Legacy)
+
+the ODBC and OLE DB drivers for SQL Server (2nd gen), superseded Windows DAC
+(new name for MDAC following MDAC 2.8) or MDAC (the
+1st gen ODBC driver).
+
+Removed since SQL Server 2022.
+
+**** Microsoft ODBC Driver for SQL Server (Recommended)
+
+3rd gen
+
+Including =sqlcmd= and =bcp=.
+
+**** Microsoft OLE DB Driver for SQL Server (Recommended)
+
+Since 2018. Supersedes Microsoft OLE DB Provider for SQL Server (SQLOLEDB, 1st gen) and SQL Server
+Native Client (2nd gen).
+
+**** ADO.NET
+
+- =System.Data.SqlClient=: included as part of .NET
+
+- =Microsoft.Data.SqlClient=: since 2019, new generation
+
+**** JDBC
+
+Since 2000, open sourced in 2016.
+
+*** HOW-TO: Connect to the System When Locked Out
+
+- =-m= or =-f= in single-user mode as a member of local Administrators.
+  + stop SQL Server Agent beforehand
+
+- Create a login and add the new login to the =sysadmin= server role.
 
 * Security
 
