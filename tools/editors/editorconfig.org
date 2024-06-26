@@ -1,0 +1,73 @@
+#+title: Editorconfig
+
+INI-style configuration file format that defines coding styles, which is then maintained
+by code editors.
+
+#+begin_src editorconfig
+root = true # at the root directory
+
+[*]
+charset = utf-8
+end_of_line = lf
+
+# a text file is supposed to have a final newline, i.e., a newline is a line terminator, not a separator.
+# which is assumed by many Unix tools,
+# unlike a binary file
+# POSIX defines a line as such.
+# Some editors incorrectly interprets this final newline as a new line.
+insert_final_newline = true
+
+indent_style = space
+indent_size = 4
+#+end_src
+
+An Editorconfig plugin looks for =.editorconfig= in the directory of the current
+file and its parent directory until it reaches a root =.editorconfig=, from
+bottom to top. Editorconfig files are themselves UTF-8 files, with =CRLF= or
+=LF= line separators.
+
+* Syntax & Patterns
+
+- =/= as the only path separator
+
+- =#= or =;= for comments
+
+- =*=: any string of characters except =/=
+  + =**= any string of characters including =/=
+
+- =?=: any single character
+
+- =[name]=: any single character in =name=
+  + =[!name]=: any single character not in =name=
+
+- ={s1,s2,s3}= any of the strings given
+
+- ={num1...num2}= integers inbetween
+
+* Defined Properties
+
+A property may be =unset=.
+
+- =indent_style= :: =tab= or =space= (soft tabs)
+
+- =indent_size= :: the number of columns for each indentation level
+  + if hardtabs are used, =tab_width= is used
+
+- =tab_width= :: the width of a tab character, defaults to =indent_size=.
+
+- =end_of_line= :: =lf=, =cr= or =crlf=
+
+- =charset= :: =utf-8=, =utf-8-bom=, =utf-16be=, =utf-16le=, =latin1=
+
+- =trim_trailing_whitespace= :: true or false
+
+- =insert_final_newline= :: ensure file ends with a newline
+
+- =root= :: whether this editorconfig file stops any further search.
+
+* Editor Support
+
+- Gitea, IntelliJ IDEA (and its Jetbrains siblings), Visual Studio, Neovim, Vim
+  requires no external plugins.
+
+- Emacs, VSCode, Notepad++, Eclipse have plugin support.
