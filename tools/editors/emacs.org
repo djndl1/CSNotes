@@ -118,35 +118,80 @@ TODO
   + without the =RET=, =C-x 8= may be with =[=, =]=, ={=, =}=
     to type some special characters.
 
-- =C-o=, =open-line=: insert a blank line after
+- =C-o=, =open-line=: insert a blank line after the cursor.
 
 - =C-j=: newline (useful in minibuffer) without automatic indentation.
   
-- =C-x C-o= (=delete-blank-lines=): delete blank lines.
+- =C-x C-o= (=delete-blank-lines=): delete blank lines and leave only one.
 
 ** Point (Cursor) Navigation
 
+- =C-f= =forward-char=; =C-b= =backward-char=;
+
+- =C-n= =next-line=; =C-p= =previous-line=: work on visual lines
+  + affected by =line-move-visual= (default =t=)
+  + =next-line-add-newlines= adds a newline at EOF upon =next-line=.
+
+- =C-a= =move-beginning-of-line=; =C-e= =move-end-of-line=
+
+- =M-f= =forward-word=; =M-b= =backward-word=
+
+- =M-r= =move-to-window-line-top-bottom=
+
+- =M-<= =beginning-of-buffer=; =M->= =end-of-buffer=
+
 - =M-g M-g=, =M-g g=: =goto-line=
 
-- =M-g c=, =goto-char=: 
+- =M-g <TAB>=: =move-to-column=
+
+- =M-g c=, =goto-char=: to the nth char in the buffer
 
 - =M-g TAB=: move to column
 
 - To navigate a line visually, set =line-move-visual= to =t=
 
-** Cursor location
+** Deletion
+
+- =<BACKSPACE>= =delete-backward-char=,
+  =C-d= =delete-char= (at point, the semantics stays the same when operating on a marked region),
+   =<Delete>= =delete-forward-char=
+
+- =C-k= =kill-line=
+
+- =M-d= =kill-word=; =M-<BACKSPACE>= =backward-kill-word=
+
+** Move Screen
+
+- =C-v=, =scroll-up-command=; =M-v=, =scroll-down-command=
+
+** Status Awareness
 
 - =line-number-mode=, =column-number-mode=, =hl-line-mode= (highlight), =display-line-mode=
 
-- =what-line=, =C-x ==
+- =what-line=, =C-x == (=what-cursor-position=)
 
 - =count-words=, =M-== (=count-words-regioin=)
 
+- =size-indication-mode=
+
+** Undo/Redo
+
+- =C-/=, =C-x u=, =C-_=: undo one entry of the undo records.
+
 ** Numeric arguments
 
-- =digit-argument=, =negative-argument=, =universal-argument=: specifies arguments for the next command (not necessarily a repetition). To force a repetition, use =C-x z= after the command.
+Some commands interpret the prefix numeric argument as a repetition count.
 
-  To use arguments with a named command, specify the argument before running =M-x= with the command.
+- =digit-argument= =M-<number>=; =negative-argument= =M--= with a following number argument
+  
+- =universal-argument= =C-u=: specifies arguments
+   for the next command (not necessarily a repetition).
+   To force a repetition, use =C-x z= after the command.
+
+- =C-u= also ends any argument input operation.
+  + to insert 5 copies of 0, type =M-5 C-u 0=
+    
+To use arguments with a named command, specify the argument before running =M-x= with the command.
 
 ** Minibuffer
 
