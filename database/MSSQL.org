@@ -139,7 +139,8 @@ Communication protocols are configured through SQL Server Configuration Manager.
 
 By default shared memory (on the same host, mainly for troubleshooting) is
 enabled for all editions;
-TCP/IP is enabled for all except Developer edition; named pipes (for LAN) are disabled.
+TCP/IP is enabled for all except Developer edition (for Express Edition, the
+port is dynamic); named pipes (for LAN) are disabled.
 
 By default, a SQL Server instance is configured for TCP/IP port 1433 and named
 pipe =\\.\pipe\sql\query=. A named instance are configured for TCP dynamic ports
@@ -236,13 +237,16 @@ There are ODBC =sqlcmd= (old) and Go =sqlcmd= (new).
 
 ** Authentication Mode
 
-- /Windows Authentication/: by default =BUILTIN\Administrators= local group
+- /Windows Authentication/, a.k.a /Integrated Security/: by default =BUILTIN\Administrators= local group
   mapped to the =sysadmin= server role. SQL Server validates by using the
   Windows principal token in the OS.
   + add at least one Windows principal as an administrator.
+  + the client may be on the same host, in the same domain or in a workgroup
+    with granted access.
 
-- /SQL Server Authenticatin/: a =sa= (system administrator) login is set up for administrator.
-  + for backward compatibility, less secure.
+- /SQL Server Authentication/: a =sa= (system administrator) login is set up for administrator.
+  + for backward compatibility, less secure. From outside a domain or an
+    untrusted domain.
 
 ** Users, Logins and Roles
 
