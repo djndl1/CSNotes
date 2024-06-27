@@ -192,6 +192,39 @@ Native Client (2nd gen).
 
 Since 2000, open sourced in 2016.
 
+*** Client Tools
+
+**** =sqlcmd=
+
+There are ODBC =sqlcmd= (old) and Go =sqlcmd= (new).
+
+- =-C= :: =TRUSTSERVERCERTICIATE = true=
+  - =-N= :: encrypted connection, =true=, =false= or =disable=
+
+- =-E= (default) :: use a trusted connection (Windows Authentication Mode)
+
+- =-d= :: =USE <db_name>=
+
+- =-U=, =-P= :: (SQL Server Authentication) login name and password
+
+- =-S= :: database server =[protocol:]server_name_or_ip_address[\instance_name][,port]=
+  + Supported protocols: =tcp= (TCP/IP), =lpc= (shared memory) or =np= (named pipes)
+
+- =-i input_file=, =-o output_file= :: input T-SQL script and output text file
+
+- =-q= :: executes a T-SQL upon startup
+  + =-Q= :: exits upon finish
+
+***** Commands
+
+- =GO= :: end of a batch and the execution of any cached T-SQL statements.
+  + =sqlcmd= puts every input line in the statement cache and sends them to the
+    server only when =GO= is issued.
+
+- =:Connect= :: connect to an instance
+
+- =USE= :: set the current database.
+
 *** HOW-TO: Connect to the System When Locked Out
 
 - =-m= or =-f= in single-user mode as a member of local Administrators.
