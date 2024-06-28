@@ -330,3 +330,74 @@ when they enter the server from a client-side application and converting and
 storing them natively as Unicode characters.
 All version 100 collations support linguistic sorting with GB18030 characters.
 #+end_quote
+* Transact-SQL
+
+** Conventions
+
+** Data Types
+
+Each column, local variable, expression and parameters has a related data type.
+Alias data types are defined by =CREATE TYPE=.
+
+*** Exact Numerics
+
+- =bit=: boolean type
+
+- =tinyint= (unsigned byte), =smallint= (16-bit signed ), =int= (32-bit signed),
+  =bigint= (64-bit signed)
+
+- =decimal(p[, s])=, also known as =numeric(p[, s])=
+
+- =money=, (64-bit) =smallmoney= (32-bit): binary integers scaled down 4 digits
+  to represent decimal money.
+
+*** Date & Time
+
+Conversions from string literals to date and time types are allowed if all parts
+of the strings are in valid formats. Implicit conversions or explicit
+conversions that don't specify a style, from date and time types to string
+literals, are in the default format of the current session.
+ISO 8601 formats are not affected by the =SET LANGUAGE= and =SET DATEFORMAT= session
+locale settings.
+
+- =DATE=: from ='0001-01-01'= to =9999-12-31=.
+  + default literal format =yyyy-MM-dd=. ISO 8601 =yyyy-MM-dd= or =yyyyMMdd= are
+    also supported.
+  + ODBC format ={ d 'yyyy-MM-dd' }= seems to work with JDBC and ADO.NET. It
+    maps to =DATETIME= and then converted to =DATE=.
+
+- =TIME=: 0-7 subsecond customizable precision
+  + default literal format =hh:mm:ss[.nnnnnnn]=, also ISO 8601
+    =hh:mm[:ss][.fractional seconds]=
+  + ODBC format ={t 'hh:mm:ss[.fractional seconds]'}= seems to work with JDBC
+    and ADO.NET.
+  + Using hour 24 to represent midnight and leap seconds over 59 as defined by
+    ISO 8601 is not supported.
+
+- =DATETIME= (*Legacy*): millisecond precision. range from =1753-01-01= to =9999-12-31=
+  + ISO 8601 =yyyy-MM-ddTHH:mm:ss[.mmm]= or =yyyyMMdd[ HH:mm:ss[.mmm]]= are supported.
+  + ODBC format ={ ts 'yyyy-MM-dd HH:mm:ss[.fff]' }= is supported and seems to
+    work with JDBC and ADO.NET.
+
+- =DATETIME2= (*recommended*, supersedes =DATETIME=): 0-7 subsecond customizable
+  precision, by default 7.
+  + default literal format =YYYY-MM-DD hh:mm:ss[.fractional seconds]=
+  + ISO 8601 =YYYY-MM-DDThh:mm:ss[.nnnnnnn]=
+  + ODBC format ={ ts 'yyyy-MM-dd HH:mm:ss[.fff]' }= is supported and seems to
+    work with JDBC and ADO.NET.
+
+- =smalldatetime= (*legacy*): minute-level precision. The value is rounded to
+  the nearest minute.
+
+- =DATETIMEOFFSET=: =DATETIME2= with an offset
+  + the data itself is stored as in UTC, with the timezone offset preserved.
+  + default literal format =yyyy-MM-dd HH:mm:ss[.nnnnnnn] [{+|-}hh:mm]=
+  + ISO 8601 =yyyy-MM-ddTHH:mm:ss[.nnnnnnn][{+|-}hh:mm]=,
+    =yyyy-MM-ddTHH:mm:ss[.nnnnnnn]Z= (UTC)
+  + =AT TIME ZONE 'TIMEZONE_NAME'= change timezone info of a datetime type.
+
+** DDL
+
+** DML
+
+** Stored Procedure
