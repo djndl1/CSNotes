@@ -1148,6 +1148,17 @@ nvim --listen pipepath/socket
 nvim --server
 vim --servername
 #+end_src
+
+*** Remote Editing (netrw)
+
+scp, rsync, sftp, ftp, http, dav and rcp are supported.
+Use =:e file_url= to open a remote file, =:Nread= to read into the current
+buffer,
+=:w file_url= to write to a remote path or =Nwrite=. Directory listing is also
+possible (on target machines of Linux only, through ssh and ftp only).
+
+To speed up file transfer, consider ssh's =ControlMaster= feature.
+
 ** Plugins
 
 A plugin is simply a Vim script file that is loaded automatically when Vim
