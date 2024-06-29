@@ -1108,6 +1108,35 @@ function CheckFileType()
 endfunction
 #+end_src
 
+** Binary Files
+
+=-b= or =:set binary=. =textwidth=, =wrapmargin= are set to zero. =modeline= and
+=expandtab= are unset=. Another editor designed to edit binaries is =bvi=.
+
+To show bytes as hex, =:set display=uhex=. See =:h using-xxd=.
+
+** Display Buffers as HTML
+
+Vim can convert the rendered buffer to an HTML document, duplicating the
+original Vim graphics =TOhtml=.
+
+** Backup
+
+- =backup= :: make a backup before writing a file and leave it around after writing.
+
+- =writebackup= (default) :: make a backup before writing a file and delete it after writing.
+
+** Sessions
+
+- *viminfo*: a global session file that saves command line history, search
+  string history, input line history, non-empty registers, file marks, last
+  search/substitute pattern, the buffer list and global variables.
+
+- *Session*: addition to viminfo, a view is a collection of settings that apply
+  to one window; a session keeps the views for all windows plus the global
+  setting.
+  + =:mksession session_filename.vim=: a session file, similar to a vimrc script file, is created
+
 ** Remote
 
 Vim and Neovim support a client-server mode (if compiled with =clientserver= option, by
