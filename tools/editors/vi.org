@@ -1148,3 +1148,32 @@ nvim --listen pipepath/socket
 nvim --server
 vim --servername
 #+end_src
+** Plugins
+
+A plugin is simply a Vim script file that is loaded automatically when Vim
+starts to extend Vim's functionality. Plugins may be
+
+- *global plugins*: for all kinds of files.
+  + A set of standard plugins are automatically loaded upon startup.
+    - =gzip=: supports transparent reading and writing of =compress= =gzip=, =bzip2=,
+      =lzma=, =xz=, =lzip=, =zstd= files.
+    - =netrw=: similar to Emacs' =TRAMP=. Transparent editing of files on other machines.
+    - =tar=, =zip=: similar to =gzip=.
+    - a global plugin is added by dropping the copy in the right directory 
+    (e.g. =~/.local/share/nvim/site/plugin/= per user, =$VIMRUNTIME/plugin= and =$VIMRUNTIME/macros= globally)
+
+- *filetype plugins* (*ftplugins*): used for a specific type of file.
+  + typically put under the =ftplugin= directory
+  + plugin files are renamed as =filetype_name.vim=.
+
+The plugin directory (=plugin= or =ftplugin=) can be in any of the directories in the =runtimepath=
+option. To debug plugin loading, start Vim with =-V2=.
+
+*** Package Management
+
+A *package* is a directory that contains *plugins*. It may be a separate directory,
+a VCS repository, a set of interdependent plugins, "start" packages.
+
+Packages are stored in the paths =runtimepath= or =pack/*/start/*= paths under
+runtime paths.
+
