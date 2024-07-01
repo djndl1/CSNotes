@@ -1,0 +1,83 @@
+#+title: Ascii
+
+8-bit (7 bits used). Internally, characters are organized into *sticks*, a group
+of 16 characters.
+
+Sorting is done in ASCII numerical value.
+
+* Control Characters
+
+The first 32 characters and the last one (number 127) used for in-band control of
+peripheral devices and to provide meta-information about data streams. ASCII
+itself does not define any mechanism for describing the structure or appearance
+of text within a document.
+
+Early termminals cannot handle state well so each function is assigned a single code
+instead of a control sequence.
+
+** C0
+
+- =NUL=, =0x00=, =^@=  :: the original meaning is NOP to signal a time delay or moving on to
+  the next position)
+
+- =SOH=, =0x01= =^B= :: first character of the heading of a message
+
+- =STX=, =0x02= =^B= :: start of text; terminates the hea nd starts the message text
+
+- =ETX=, =0x03= =^C= :: ends the message text (mostly a record), starts a
+  footer; to distinguish data frames in the data link layer.
+
+- =EOT=, =0x04=, =^D= :: end of transmission, may place terminals on standby.
+  + releasing circuits, diconnecting terminals, signal end of file (which is not
+    really a character, but a condition) in Unix.
+
+- =ENQ=, =WRU=, =0x05=, =^E= :: enquiry, send a response to the receiving end to
+see if it is still present. The receiver is supposed to send back some
+identification message, the status of the remote station.
+
+- =ACK=, =0x06=, =^F= :: acknowledge, indication of successful receipt of a
+  message
+
+- =BEL=, =0x07=, =^G= :: bell, alert; call for attention from an operator
+  + =printf '\a'= or =echo =, or =tput bel=
+
+- =BS=, =0x08=, =^H= :: backspace, move one position leftwards. Next character
+  may overprint or replace the character that was there.
+  + a backspace is distinct from the delete key, which strikes out a character.
+    Historically on typewriters, a backspace is used to add a diacritic to a letter.
+
+- =HT=, =0x09=, =^I= :: character/horizontal tabulation; move right to the next
+  tab stop.
+
+- =LF=, =0x10=, =^J= :: line feed; move down the same position on the next line.
+  + Multics and later Unix developed the idea of device driver, allowing a
+    single =LF= to represent the concept of newline.
+  + C/C++, Perl interprets =\n= as a full new line while Java, PHP, and Python
+    distinguish =\n= from =\r\n=.Moreover, Java provides methods (=readLine()=, =println()=) that
+    automatically appends a newline. Languages like C# provides special
+    variables, constants and subroutines to represent a newline.
+  + Unicode-conforming applications uses more than just =LF= or =CRLF= as
+    indicate a newline
+  + On Unix, newlines are viewed as line terminators and requires a newline at the
+    end of a file while some programs view newlines as line separators.
+
+- =VT=, =0x11=, =^K= :: line/vertical tabulation; move down to the next
+  vertical tab stop
+
+- =FF=, =0x12=, =^L= :: form feed; move down to the top of the next page.
+  + On Unix it clears the screen or redraws TUI.
+
+- =CR=, =0x13=, =^M= :: carriage return; move to column zero of the same line.
+  + aside from forming a new line with =LF=, carriage return provides the
+    ability to overprint the line with new text. Also, a single =CR= followed by
+    multiple =LF= saves time than multiple pairs of =CRLF=.
+
+- =SO=, =0x14=, =^N= :: shift out; switch to an alternative character set or a
+  different font.
+  + originally, theses characters were to provide a way to shift a colored ribbon.
+
+- =SI=, =0x15=, =^O= :: shift in; return to the regular
+
+** C1
+
+- =NEL=, =0x85= :: equivalent to =CRLF=, match the EBCDIC control character.
