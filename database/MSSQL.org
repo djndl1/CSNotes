@@ -394,7 +394,30 @@ locale settings.
   + default literal format =yyyy-MM-dd HH:mm:ss[.nnnnnnn] [{+|-}hh:mm]=
   + ISO 8601 =yyyy-MM-ddTHH:mm:ss[.nnnnnnn][{+|-}hh:mm]=,
     =yyyy-MM-ddTHH:mm:ss[.nnnnnnn]Z= (UTC)
-  + =AT TIME ZONE 'TIMEZONE_NAME'= change timezone info of a datetime type.
+  + =AT TIME ZONE 'TIMEZONE_NAME'= converts the timezone info of a datetime type
+    to the specified time zone. If the source already has a time zone, the
+    output represents the same time at the specified time zone.
+
+*** Character strings
+
+- =char[(n)]= (=character=): fixed size, byte-oriented, 1 <= n <= 8000 bytes
+  + =n= is =1= unless specified.
+
+- =varchar[(n | max)]=: variable-size, byte-oriented, 1 <= n <= 8000 bytes or =max=
+  (limited only by the maximum storage parameter 2GB)
+  + =n= is =1= unless specified, unlike Oracle, where =varchar2= alone is
+    allowed in PL/SQL only and indicates only its type.
+  + storage size =n+2= bytes.
+
+- =nchar[(n)]=, =nvarchar[(n|max)]= the UTF-16 version, where 1 <= n <= 4000 in
+  byte pairs (UTF-16 code unit).
+  + literal UTF-16 strings are prefixed with a =N=.
+
+Upon conversion, long strings are truncated into short strings if necessary. The
+converted value uses the collation of the input is used. Non-character types
+uses the default collation of the database unless specified otherwise. =n= is 30
+unless specified otherwise upon conversion or casting.
+Empty strings are converted to integer =0=.
 
 ** DDL
 
