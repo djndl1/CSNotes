@@ -20,7 +20,7 @@ instead of a control sequence.
 - =NUL=, =0x00=, =^@=  :: the original meaning is NOP to signal a time delay or moving on to
   the next position)
 
-- =SOH=, =0x01= =^B= :: first character of the heading of a message
+- =SOH=, =0x01= =^A= :: first character of the heading of a message
 
 - =STX=, =0x02= =^B= :: start of text; terminates the hea nd starts the message text
 
@@ -49,7 +49,7 @@ identification message, the status of the remote station.
 - =HT=, =0x09=, =^I= :: character/horizontal tabulation; move right to the next
   tab stop.
 
-- =LF=, =0x10=, =^J= :: line feed; move down the same position on the next line.
+- =LF=, =0x0A=, =^J= :: line feed; move down the same position on the next line.
   + Multics and later Unix developed the idea of device driver, allowing a
     single =LF= to represent the concept of newline.
   + C/C++, Perl interprets =\n= as a full new line while Java, PHP, and Python
@@ -61,22 +61,70 @@ identification message, the status of the remote station.
   + On Unix, newlines are viewed as line terminators and requires a newline at the
     end of a file while some programs view newlines as line separators.
 
-- =VT=, =0x11=, =^K= :: line/vertical tabulation; move down to the next
+- =VT=, =0x0B=, =^K= :: line/vertical tabulation; move down to the next
   vertical tab stop
 
-- =FF=, =0x12=, =^L= :: form feed; move down to the top of the next page.
+- =FF=, =0x0C=, =^L= :: form feed; move down to the top of the next page.
   + On Unix it clears the screen or redraws TUI.
 
-- =CR=, =0x13=, =^M= :: carriage return; move to column zero of the same line.
+- =CR=, =0x0D=, =^M= :: carriage return; move to column zero of the same line.
   + aside from forming a new line with =LF=, carriage return provides the
     ability to overprint the line with new text. Also, a single =CR= followed by
     multiple =LF= saves time than multiple pairs of =CRLF=.
 
-- =SO=, =0x14=, =^N= :: shift out; switch to an alternative character set or a
+- =SO=, =0x0E=, =^N= :: shift out; switch to an alternative character set or a
   different font.
   + originally, theses characters were to provide a way to shift a colored ribbon.
 
-- =SI=, =0x15=, =^O= :: shift in; return to the regular
+- =SI=, =0x0F=, =^O= :: shift in; return to the regular
+
+- =DLE=, =0x10=, =^P= :: Data link escape; cause a limited number of contiguously
+  following characters to be interpreted in some different way
+  + with an escape mechanism, certain character sequence may be used for control
+    instead of one character for one function.
+
+- =XON=, =0x11=, =^Q=; =TAPE=, =0x12=, =^R=; =XOFF=, =0x13=, =^S=; =DC4=, =0x13=, =^T= :: turn on or off devices
+  + for in-band software flow control: when one end is unable to accept any more
+    data, it sends =XOFF= to the other end and the other end suspends
+    transmission. Once the first end is ready again, it sends =XON= to request
+    the other end resume transmission. The disadvantage is long delay (in-band
+    and software-implemented) and low reliability. Also, =XON= and =XOFF= cannot
+    appear in the data, unless some escape mechanism is implemented.
+
+- =NAK=, =0x15=, =^U= :: negative acknowledge; negative response to a sender,
+  such as a detected error.
+
+- =SYN=, =0x16=, =^V= :: Synchronous Idle; Sent in synchronous transmission
+  systems when no other character is being transmitted.
+
+- =ETB=, =0x17=, =^W= :: end of a transmission block of data when data are
+  divided into such blocks for transmission purposes.  Used for segmenting data
+  into blocks when the block structure is not necessarily related to the
+  processing function.
+
+- =CAN=, =0x18=, =^X= :: Cancel; Indicates that the data preceding it are in
+  error or are to be disregarded.
+
+- =EM=, =0x19=, =^Y= :: end of medium, the end of the usable portion of the tape
+  has been reached.
+
+- =SUB=, =0x1A=, =^Z= :: substitute, replaces a character that was found to be
+  invalid or in error, or used to pad data.
+  + used by CP/M and later DOS to indicate end of file or end of a character
+    stream.
+  + used by Unix shells to suspend the current process.
+
+- =ESC=, =0x1B=, =^[= :: Escape, alters the meaning of a limited number of
+  following bytes.
+  + nowadays used almost to introduce an ANSI escape sequence for in-band signaling.
+
+- =FS= (=^\=); =GS= (=^]=); =RS= =^^=; =US=, =^_= :: delimiters to mark fileds
+  of data structures.
+
+- =SP=, =0x20= :: space
+
+- =DEL=, =0x7F=, =^?= :: delete; ignored; used to delete characters on punched
+  tape by punching out all the holes.
 
 ** C1
 
