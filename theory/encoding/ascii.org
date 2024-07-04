@@ -7,28 +7,43 @@ Sorting is done in ASCII numerical value.
 
 * Control Characters
 
+Control control characters were introduced for printing and display control
+(form feed, line feed, carriage return, backspace),
+data structuring (file/group/record/unit separators), transmission control
+(=SOH=, =STX=, =ETX=, =ETB=, =ESC=)
+
+Printing control characters were first used to control the physical mechanism of
+printers.
+With video terminals, these control characters were adapted.
+
 The first 32 characters and the last one (number 127) used for in-band control of
 peripheral devices and to provide meta-information about data streams. ASCII
 itself does not define any mechanism for describing the structure or appearance
 of text within a document.
 
-Early termminals cannot handle state well so each function is assigned a single code
+Early terminals cannot handle state well so each function is assigned a single code
 instead of a control sequence.
 
 ** C0
+
+The control key on the keyboard was original used to send C0 control characters.
+Modern computer keyboards generates *scancodes* that identify specific physical
+keys that are pressed.
+It is now up to the computer whether to interpret the key press as control characters.
 
 - =NUL=, =0x00=, =^@=  :: the original meaning is NOP to signal a time delay or moving on to
   the next position)
 
 - =SOH=, =0x01= =^A= :: first character of the heading of a message
 
-- =STX=, =0x02= =^B= :: start of text; terminates the hea nd starts the message text
+- =STX=, =0x02= =^B= :: start of text; terminates the head and starts the message text
 
 - =ETX=, =0x03= =^C= :: ends the message text (mostly a record), starts a
   footer; to distinguish data frames in the data link layer.
+  + used as the interrupt key is a transformation of "end of text".
 
 - =EOT=, =0x04=, =^D= :: end of transmission, may place terminals on standby.
-  + releasing circuits, diconnecting terminals, signal end of file (which is not
+  + releasing circuits, disconnecting terminals, signal end of file (which is not
     really a character, but a condition) in Unix.
 
 - =ENQ=, =WRU=, =0x05=, =^E= :: enquiry, send a response to the receiving end to
@@ -65,7 +80,7 @@ identification message, the status of the remote station.
   vertical tab stop
 
 - =FF=, =0x0C=, =^L= :: form feed; move down to the top of the next page.
-  + On Unix it clears the screen or redraws TUI.
+  + Later on Unix it clears the screen or redraws TUI (logically a new page!).
 
 - =CR=, =0x0D=, =^M= :: carriage return; move to column zero of the same line.
   + aside from forming a new line with =LF=, carriage return provides the
@@ -96,6 +111,8 @@ identification message, the status of the remote station.
 
 - =SYN=, =0x16=, =^V= :: Synchronous Idle; Sent in synchronous transmission
   systems when no other character is being transmitted.
+  + Early synchronous models have to send data constantly when there is no data
+    to send.
 
 - =ETB=, =0x17=, =^W= :: end of a transmission block of data when data are
   divided into such blocks for transmission purposes.  Used for segmenting data
@@ -118,7 +135,7 @@ identification message, the status of the remote station.
   following bytes.
   + nowadays used almost to introduce an ANSI escape sequence for in-band signaling.
 
-- =FS= (=^\=); =GS= (=^]=); =RS= =^^=; =US=, =^_= :: delimiters to mark fileds
+- =FS= (=^\=); =GS= (=^]=); =RS= =^^=; =US=, =^_= :: delimiters to mark fields
   of data structures.
 
 - =SP=, =0x20= :: space
