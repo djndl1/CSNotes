@@ -262,11 +262,19 @@ principal) can be associated with a login.
 
 A login may be a Windows login (Windows Authentication) or SQL Server login (SQL Server Authentication).
 
-*** *Security Principal*
+*** Securables
+
+Resources to which the database engine authorization system regulates access.
+Securables may be contained within others, creating hierarchies called /scopes/.
+(*server*, *database*, *schema*).
+
+=ALTER AUTHORIZATION= change the owner of a securable.
+
+*** Security Principal
 
 Entities that use SQL Server and that can be assigned permission to take
-actions.
-Each principal has a *security identifier* (SID).
+actions. Each principal has a *security identifier* (SID).
+Principals hold permissions on *securables*, controlled by =GRANT=, =DENY=, =REVOKE=.
 
 A principal may be at Windows-, server-, database-level.
 
@@ -274,7 +282,9 @@ A principal may be at Windows-, server-, database-level.
 
 **** Logins
 
-Individual user accounts (Windows users, groups or SQL server login, etc.) for logging on to the database engine.
+Individual user accounts (Windows users, groups or SQL server login, etc.) for
+logging on to the database engine.
+Server-level securable.
 
 The =sa= server-level login is a member of the =sysadmin= fixed server-level
 role and has all permissions on the server.
@@ -284,7 +294,19 @@ role and has all permissions on the server.
 
 =sys.sql_logins=
 
-**** Fixed Server Roles
+**** Roles
+
+A role is a *securable*: it has a owner, a database user or role.
+
+=ALTER [SERVER] ROLE= adds/removes member principals or renames itself.
+
+=sys.server_role_members=
+
+***** Server Roles
+
+Server-level securable.
+
+****** Fixed Server Roles
 
 
 A set of pre-configured roles that provide convenient group of server-level permissions.
@@ -299,28 +321,26 @@ A set of pre-configured roles that provide convenient group of server-level perm
 
 - =public=: contains every login
 
-**** User-defined Server Roles
-
+****** User-defined Server Roles
 
 Custom server-level roles
 
-**** Database Users
-
-A user accesses a database. A login assume the identity of the user to access that database.
-Each database user maps to a single login. A login can be mapped to only one
-user in a database, but can be mapped as a database user in several different
-databases.
-
-Each database has a default =dbo= (database owner) user that has all permissions in the database
-and cannot be limited or dropped and it owns the =dbo= schema, the default
-schema for all users. The =guest= user of a database is used for any login
-who has no user account in the database.
-
-A user without a login (*contained database users*)
-
-**** Fixed Database Roles
+***** Database Roles
 
 =sys.database_role_members=
+
+#+begin_src sql
+select a.name as role_name, c.name member_name
+from sys.database_principals a
+join sys.database_role_members b
+on a.principal_id = b.role_principal_id
+join sys.database_principals c
+on b.member_principal_id = c.principal_id
+where a.name = 'programmer'
+#+end_src
+
+****** Fixed Database Roles
+
 
 A set of pre-configured roles that provide convenient group of database-level permissions.
 
@@ -340,13 +360,23 @@ A set of pre-configured roles that provide convenient group of database-level pe
 
 - =db_denydatawriter=: write-forbidden
 
-Combined with =DENY= asnd =GRANT=, one may create a role based on existing roles.
+Combined with =DENY= and =GRANT=, one may create a role based on existing roles.
 
-**** User-defined database roles
-
-=sys.database_role_members=
+****** User-defined database roles
 
 Custom database-level roles.
+
+**** Database Users
+
+A user accesses a database. A login assume the identity of the user to access that database.
+Each database user maps to a single login. A login can be mapped to only one
+user in a database, but can be mapped as a database user in several different
+databases.
+
+Each database has a default =dbo= (database owner) user that has all permissions in the database
+and cannot be limited or dropped and it owns the =dbo= schema, the default
+schema for all users. The =guest= user of a database is used for any login
+who has no user account in the database.
 
 
 Use =BACKUP= to export a backup file. To =RESTORE= as another database, add
