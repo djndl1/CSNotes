@@ -268,7 +268,10 @@ Resources to which the database engine authorization system regulates access.
 Securables may be contained within others, creating hierarchies called /scopes/.
 (*server*, *database*, *schema*).
 
-=ALTER AUTHORIZATION= change the owner of a securable.
+=ALTER AUTHORIZATION= changes the owner of a securable.
+
+The visibility of metadata is limited to securables that a user either owns or
+on which the user has been granted some permission.
 
 *** Security Principal
 
@@ -290,9 +293,11 @@ The =sa= server-level login is a member of the =sysadmin= fixed server-level
 role and has all permissions on the server.
 
 =CHECK_POLICY=ON= implies =CHECK_EXPIRATION=. *Account lockout duration*,
-*account lockout threshold*, *reset account lockout counter after* are also enabled.
+*account lockout threshold*, *reset account lockout counter after* are also
+enabled.
+Use =LOGINPROPERTY= to check the password expiration status.
 
-=sys.sql_logins=
+=sys.sql_logins=.
 
 **** Roles
 
@@ -306,8 +311,15 @@ A role is a *securable*: it has a owner, a database user or role.
 
 Server-level securable.
 
-****** Fixed Server Roles
+- =IS_SRVROLEMEMBER=: whether a login is a member of the server role
 
+- =sp_srvrolepermission=: show server role permission
+
+- =sp_helpsrvrole=: show server roles
+
+- =sp_helpsrvrolemember=: show server role members
+
+****** Fixed Server Roles
 
 A set of pre-configured roles that provide convenient group of server-level permissions.
 
@@ -315,7 +327,7 @@ A set of pre-configured roles that provide convenient group of server-level perm
 
 - =serveradmin=: change server-wide configuration options and shutdown the server
 
-- =securityadmin=:
+- =securityadmin=: manage logins (and thus holds most permissions).
 
 - =dbcreator=: can create/alter/drop/restore any database.
 
@@ -326,6 +338,12 @@ A set of pre-configured roles that provide convenient group of server-level perm
 Custom server-level roles
 
 ***** Database Roles
+
+- =sp_helprole= (show all database roles), =sp_helprolemember= (show role member),
+
+- =IS_ROLEMEMBER=: check if a principal is a member of a role.
+
+- =sp_dbfixedrolepermission=: show role permissions
 
 =sys.database_role_members=
 
@@ -341,6 +359,7 @@ where a.name = 'programmer'
 
 ****** Fixed Database Roles
 
+Show fixed roles =sp_helpdbfixedrole=
 
 A set of pre-configured roles that provide convenient group of database-level permissions.
 
@@ -358,13 +377,22 @@ A set of pre-configured roles that provide convenient group of database-level pe
 
 - =db_datareader=: read all data from all user tables and views.
 
-- =db_denydatawriter=: write-forbidden
+- =db_denydatawriter=, =db_denydatareader=: write/read-forbidden
 
 Combined with =DENY= and =GRANT=, one may create a role based on existing roles.
 
 ****** User-defined database roles
 
 Custom database-level roles.
+
+***** Application Roles
+
+Database-level principal associated with a certain application.
+The client connects with a login and then =sp_setapprole= to assume the app
+role.
+A user may have only limited permissions from outside an app but
+the app itself can elevate permissions by using an application role after
+logging in with the user's login.
 
 **** Database Users
 
@@ -378,6 +406,67 @@ and cannot be limited or dropped and it owns the =dbo= schema, the default
 schema for all users. The =guest= user of a database is used for any login
 who has no user account in the database.
 
+A user without a login (*contained database users*)
+
+** Credentials
+
+SQL Server can store external credentials inside the database.
+
+** Permissions
+
+- =sys.database_permissions=, =sys.server_permissions= (granted permissions)
+
+Every SQL Serve securable has associated permission that can be granted to a
+principal. Permissions are managed at the server level (logins and server
+roles), and at the database level (database users and database roles).
+
+Granting a permission to a principal is not the same as adding the principal to
+a role that has the permission: the effect might be the same but the requirement
+of some operations might differ.
+
+#+begin_src sql
+GRANT/REVOKE/DENY PERMISSION ON SECURABLE_TYPE::NAME TO PRINCIPAL;
+#+end_src
+
+Any permission denial overrides all grants.
+
+
+#+begin_src sql
+-- view all builtin permissions
+SELECT * from sys.fn_builtin_permissions(NULL);
+
+-- view a principal's permissions on a securable
+select * from sys.fn_my_permissions(securable, 'securable_class');
+#+end_src
+
+*** Common Permissions
+
+- =CONTROL= :: ownership-like capabilities; Effectively has all defined
+  permissions on the securable including granting.
+
+- =ALTER= :: change the properties except ownership of a securable.
+  + also includes =alter=, =creawte= =drop= objects within the securable.
+
+- =ALTER ANY= :: the ability to create, alter, drop any individual instance of the securables.
+
+- =TAKE OWNERSHIP= :: the ability to take ownership of granted securables .
+
+- =CREATE= :: to ability to create certain kinds of securables.
+
+- =IMPERSONATE= :: impersonate a login or a user
+
+- =VIEW DEFINITION= :: access to metadata
+
+- =REFERENCES= :: required to create a foreign key constraint that reference the table.
+
+* Import, Export, Backup and Restore
+
+** =bcp=
+
+Used to import large numbers of new rows into tables or to export data out of
+tables into data files.
+
+** BACKUP
 
 Use =BACKUP= to export a backup file. To =RESTORE= as another database, add
 =WITH MOVE ... to ...=.
