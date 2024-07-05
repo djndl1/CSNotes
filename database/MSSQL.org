@@ -642,6 +642,7 @@ locale settings.
   + ISO 8601 =yyyy-MM-ddTHH:mm:ss[.mmm]= or =yyyyMMdd[ HH:mm:ss[.mmm]]= are supported.
   + ODBC format ={ ts 'yyyy-MM-dd HH:mm:ss[.fff]' }= is supported and seems to
     work with JDBC and ADO.NET.
+  + =CURRENT_TIMESTAMP= or =GETDATE()= (local time), =GETUTCDATE()= (UTC time)
 
 - =DATETIME2= (*recommended*, supersedes =DATETIME=): 0-7 subsecond customizable
   precision, by default 7.
@@ -649,6 +650,7 @@ locale settings.
   + ISO 8601 =YYYY-MM-DDThh:mm:ss[.nnnnnnn]=
   + ODBC format ={ ts 'yyyy-MM-dd HH:mm:ss[.fff]' }= is supported and seems to
     work with JDBC and ADO.NET.
+  + =SYSDATETIME()= (local time), =SYSUTCDATETIME()= (UTC time)
 
 - =smalldatetime= (*legacy*): minute-level precision. The value is rounded to
   the nearest minute.
@@ -661,6 +663,9 @@ locale settings.
   + =AT TIME ZONE 'TIMEZONE_NAME'= converts the timezone info of a datetime type
     to the specified time zone. If the source already has a time zone, the
     output represents the same time at the specified time zone.
+  + =SYSDATETIMEOFFSET()=
+
+
 
 *** Character strings
 
