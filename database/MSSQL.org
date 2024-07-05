@@ -492,7 +492,7 @@ Collation may be defined at /server/ level, /database/ level, /column/ level or
 kana sensitivity, width sensitivity,
 variation-selector (a Unicode feature) sensitivity
 
-*** Collation Sets
+** Collation Sets
 
 - /Windows collations/ :: based on Windows system locale
   + the base Windows collation defines the sorting rules for dictionary sorting
@@ -505,19 +505,25 @@ variation-selector (a Unicode feature) sensitivity
 
 - /SQL Server collations/ :: for backward compatibility
 
-*** Collation levels
+To view the server collation, =exec sp_helpsort=.
+For supported collations, view =sys.fn_helpcollations()=.
+For databases' collations, view =sys.databases()= or
+=DATABASEPROPERTYEX('database_name', 'collation')=.
 
-- Server Level
+** Collation levels
+
+- Server Level: the default collation for all system databases within the instance.
   + not changeable without rebuilding the =master= database.
 
 - Database Level: defined with =CREATE DATABASE= or =ALTER DATABASE=
   + =tempdb= always uses the server collation
 
 - Column Level
+  + in-place conversion is possible at the price of blocking operations.
 
 - Expression Level: =ORDER BY COLUMN_NAME COLLATE COLLATION_NAME=
 
-*** Unicode
+** Unicode
 
 **** Caveats
 
@@ -542,6 +548,46 @@ when they enter the server from a client-side application and converting and
 storing them natively as Unicode characters.
 All version 100 collations support linguistic sorting with GB18030 characters.
 #+end_quote
+
+** Session Language
+
+=sys.syslanguages=
+
+The language used for error and other system messages; It also defines date and
+time format, currency, abbreviations of days and months, the first day of a
+week.
+
+A session may be set on the server side (=SET LANGUAGE= statement) and on the client side
+(client-specific API).
+
+** Best Practices
+
+Use UTF-8 for =varchar=, =char=, =text=, enable supplementary characters for
+=nchar=, =nvarchar=, =nvarchar(max)= (=ntext=).
+
+- ADO, ODBC, OLE DB apps should use ODBC timestamp, time, date formats.
+
+* Integration With Other Data Sources
+
+** Linked Servers
+
+#+begin_quote
+Linked servers enable you to implement distributed databases that can fetch and
+update data in other databases. They are a good solution in the scenarios where
+you need to implement database sharding without need to create a custom
+application code or directly load from remote data sources.
+#+end_quote
+
+Requires OLE DB drivers, not supported on Linux, use PolyBase.
+
+- =sp_addlinkedserver=
+
+  TODO
+
+** PolyBase
+
+TODO
+
 * Transact-SQL
 
 ** Conventions
