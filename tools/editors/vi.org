@@ -1,12 +1,29 @@
+Most of the first chapters apply only to Vi but not Vim, although some features
+of Vim are mentioned.
+
 * Basic Concepts
 
 ~vi~ has tow modes:
 
-- command mode:
+- command mode (normal mode):
 
 - insert mode:
 
 - =ex= mode
+
+- (Vim) Visual Mode: select text and execute a normal command.
+
+
+- (Vim) Select Mode: like visual mode but resembles more the selection mode un
+  MS Windows.
+  + =gh=, =gH= or =^G= under visual mode to enter Select Mode.
+  + newline, backspace, carriage return causes the selected area to be deleted
+    and then enters insert mode.
+  + =shift+<movement>= extends the selection.
+
+- (Vim) Command-Line mode
+
+- (NVim) Terminal Mode:
 
 The general form of ~vi~ commands is
 
@@ -695,8 +712,39 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 Define selections visually and perform editing commands on the visual selection.
 
-**** Visual Block =^V=
+- The =selection= option determines if the character under the cursor is
+    selected (by default inclusive).
 
+- =v= enters visual mode per character; =V= per line, =^V= blockwise; with a
+  count prefix, the same amount of text is selected, multiplied by the count.
+  Hitting them again leaves Visual Mode.
+  + =Esc= exits Visual mode.
+
+**** Motion
+
+- =gv=; starts visual mode with the previous selection.
+
+- =gn=, =gN=: continue the previous search pattern and select the match
+
+- =o=, =O=: both move to the other end of the selection. =O= moves on the same
+  line in Visual block mode.
+
+- =$=: under block mode, the selection includes up to the end of all lines.
+
+**** Operating on Selection
+
+Most of the commands operate under Select mode without much semantic
+change. See =:h visual-operators=. There are also a set of motion commands
+usable only under Visual mode or after an operator, see =:h object-select=,
+which makes a distinction between inner part of a text object and a full text
+object (a word without/with the surrounding whitespace, a quoted string
+with/without the quote marks).
+
+=\%V= limits the match inside the selected visual area.
+
+*** Select Mode
+
+Resembles the MS-Windows selection mode.
 
 ** Extended Regex
 
