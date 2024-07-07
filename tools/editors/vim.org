@@ -1,5 +1,7 @@
 #+title: Vim
 
+This note is intended to be read with =vi.org= to introduce basic Vi/Vim editing.
+
 Vi is part of POSIX, with little change over the years. Vim extended its feature
 set and gained a large community around it. It emphasizes modality and touch
 editing but provides features for less experienced users (=evim=, =vimtutor=,

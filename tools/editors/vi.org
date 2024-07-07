@@ -274,14 +274,16 @@ The =ex= editor has five modes:
     number of lines to be involved or other parameters after the command name.
   + For commands that takes a range address, the count parameter limits the
     command to the lines starting at the last line of the range with
-    =count= lines involved. That is, the range address is actually invalid and only the last address number is taken.
+    =count= lines involved. That is, the range address is actually invalid and
+    only the last address number is taken.
+    e.g. =1,3d3= is the same as =3d3=.
   + commands are commented out by a double quote ="=.
   + Different elements of an =ex= command may be separated by spaces.
   + multiple commands on a single line are separated by =|= in the same way a
     semicolon separates a shell command.
 
 - *text input mode* :: gathers input lines and places them in the file; the
-  =append=, =insert= and =change= commands use text input mode. A =.= line exits
+  =append=, =insert= and =change= commands use text input mode. A dot =.= line exits
   the mode.
 
 - *open mode* :: displays one line at a time, not really useful on modern
