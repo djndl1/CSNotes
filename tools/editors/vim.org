@@ -28,10 +28,10 @@ and some third-party tutorials: OpenVim, Vim Adventures).
 
 - Binary data: no newline after at the EOF.
 
-- Session Context: recent docuemnts, recent edits of recent files, command
+- Session Context: recent documents, recent edits of recent files, command
   history, previous leaving location.
 
-- Meta-information: foru special registers
+- Meta-information: four special registers
   + =%=: the current filename
   + =#=: the alternate filename
   + =:= the last shell command
@@ -41,8 +41,9 @@ and some third-party tutorials: OpenVim, Vim Adventures).
 
 - Transparent editing with compressed files.
 
-- Builtin help: the =:help= intro provides some basic usage before goint into details.
+- Builtin help: the =:help= intro provides some basic usage before going into details.
   + =Ctrl-]= jumps to the tag
+  + =gO= shows the outline
 
 
 * GUI gVim
@@ -117,9 +118,69 @@ with/without the quote marks).
 
 =\%V= limits the match inside the selected visual area.
 
+*** Blockwise Operators
+
+Visual-block insert, append, change, shift, replace (=r=)
+
+- visual-block insert inserts only if part of line is selected, otherwise a line
+  remains unmodified. Deletion under insert mode deletes only one line not all.
+
+- visual-block append appends to the end of the block unless the block is
+  created with a =$= to extend to end of each line, under which case, new text is
+  appended to the end of each line.
+
+- For visual-block change, =c= changes only the selected part while =C= changes
+  to the end of each line (expected semantics from =C=).
+
+- =:vmap= and =:vmenu= for key mapping
+
 ** Select Mode
 
+
 Resembles the MS-Windows selection mode.
+
+Use =:smap= and =:xmap= for key mapping
+
+- To Enter select mode, use =Ctrl-G= under visual mode, or =gh=, =gH= or
+  =gCtrl-H= to enter select mode counterparts of visual mode
+
+- Like MS-Windows, the selection may be extended by arrow keys.
+
+** (Vim 8.0 & Neovim with Different Implementation) Terminal Mode
+
+The terminal runs asynchronously. This terminal works on windows.
+
+All input except =C-\= is sent to the process in the current terminal buffer.
+
+There is a normal mode and a job mode (shell, CLI apps) in the terminal buffer.
+
+- =:terminal=, or =:term= opens the terminal; or as a buffer named
+  =term://progname= buffer (Neovim).
+  + Neovim requires additional insert operations to enter Terminal mode
+  + Vim uses =C-W= key sequences to control terminal mode. See =:h terminal-typing=.
+
+- =C-\ C-N= enters Normal mode.
+
+*** Terminal Debug
+
+TODO
+
+** Additional Modes
+
+- Operator-pending Mode: waiting for a motion command after an operator. e.g.
+  after a =d=.
+
+- Replace mode: a special insert mode after =R= or =r=.
+
+- Virtual Replace mode: =gR=. This differs from replace mode in that it operates
+  in visual columns not characters.
+  + useful when working with tables.
+
+- Insert Normal mode: =C-O=, temporary switch to normal mode
+
+- Insert Visual mode: =C-O v/V/C-V= temporary switch to visual mode
+
+- Insert Select mode: temporary switch to select mode.
 
 * Extended Regex
 

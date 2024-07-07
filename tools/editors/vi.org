@@ -13,7 +13,6 @@ of Vim are mentioned.
 
 - (Vim) Visual Mode: select text and execute a normal command.
 
-
 - (Vim) Select Mode: like visual mode but resembles more the selection mode un
   MS Windows.
   + =gh=, =gH= or =^G= under visual mode to enter Select Mode.
@@ -21,9 +20,9 @@ of Vim are mentioned.
     and then enters insert mode.
   + =shift+<movement>= extends the selection.
 
-- (Vim) Command-Line mode
+- (Vim) Command-Line mode: a one-shot ex mode, the more common use of ex commands.
 
-- (NVim) Terminal Mode:
+- (NVim & Vim8) Terminal Mode:
 
 The general form of ~vi~ commands is
 
@@ -207,7 +206,9 @@ registers 1-9, accessible by ="n=.
   + (vim) a history of search commands is maintained, retrievable with arrow keys or =^p=, =^n=.
   + the final =/= or =?= is optional without the offset
   + use =\%>= and =\%<= to limit the search range.
-
+  + =/= are =?= are not suited for every situation, use ex global =g/pattern/#=
+    to list all matching lines and jump there.
+    
 - =*=, =#= :: search forward/backward for the count'th occurrence of the word nearest to the cursor.
   + a =g= prefix may be added to indicate no word boundaries.
 
@@ -240,7 +241,7 @@ Substitution is mostly done through the =substitute= ex command.
 
 - ~.~ :: repeat the last command
 
-- =%= on a paired punctuation mark ::
+- =%= on a paired punctuation mark :: switch to the other of the pair.
 
 - =Ctrl-^= :: =:e #=
 
