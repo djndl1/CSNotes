@@ -43,11 +43,11 @@ and some third-party tutorials: OpenVim, Vim Adventures).
   + =Ctrl-]= jumps to the tag
 
 
-** GUI gVim
+* GUI gVim
 
 Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
-** Command line options
+* Command line options
 
 - ~-b~: in binary mode
 
@@ -69,7 +69,7 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - ~ex~: ex mode, useful in scripts
 
-** New Commands
+* New Commands
 
 - =n CTRL-END= :: to the end of the file
 
@@ -79,9 +79,9 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - =Ctrl-O=, =Ctrl-I= :: jump back/forward in the jump list
 
-** New Modes
+* New Modes
 
-*** Visual Mode =v=
+** Visual Mode =v=
 
 Define selections visually and perform editing commands on the visual selection.
 
@@ -93,7 +93,7 @@ Define selections visually and perform editing commands on the visual selection.
   Hitting them again leaves Visual Mode.
   + =Esc= exits Visual mode.
 
-**** Motion
+*** Motion
 
 - =gv=; starts visual mode with the previous selection.
 
@@ -104,7 +104,7 @@ Define selections visually and perform editing commands on the visual selection.
 
 - =$=: under block mode, the selection includes up to the end of all lines.
 
-**** Operating on Selection
+*** Operating on Selection
 
 Most of the commands operate under Select mode without much semantic
 change. See =:h visual-operators=. There are also a set of motion commands
@@ -115,11 +115,11 @@ with/without the quote marks).
 
 =\%V= limits the match inside the selected visual area.
 
-*** Select Mode
+** Select Mode
 
 Resembles the MS-Windows selection mode.
 
-** Extended Regex
+* Extended Regex
 
 More than POSIX ERE.
 
@@ -168,7 +168,7 @@ More than POSIX ERE.
 - =\_x= any the of the previous characters: match the same character but with
   newline included
 
-** Multiwindows behavior
+* Multiwindows behavior
 
 - =-o=​/​=-oNumber=: start with multiple windows
 
@@ -192,13 +192,13 @@ Split commands may come optionally with a prefix to indicate the window size.
 
 - =Ctrl-W= + =o=, =:only= close all windows except the current window.
 
-*** Conditional Split
+** Conditional Split
 
 - =topleft=, =vertical=, =leftabove=, =aboveleft=, =rightbelow=, =belowright=,
   =botright=: modifier before a split command to open a new window only if the
   command succeeeds.
 
-*** Moving Across Windows
+** Moving Across Windows
 
 - =Ctrl-W= + =h,j,k,l=,
 
@@ -209,7 +209,7 @@ Split commands may come optionally with a prefix to indicate the window size.
 - =Ctrl-W= + =w=, =W=: cycle through all windows top leftmost to bottom rightmost, the case difference indicates
   different directions
 
-*** Moving Windows & Changing Layouts
+** Moving Windows & Changing Layouts
 
 - =Ctrl-W= + =r=: rotate windows on a row/column rightwards/rightwards; + =R= in the
   opposite direction
@@ -222,7 +222,7 @@ Split commands may come optionally with a prefix to indicate the window size.
 
 - =Ctrl-W= + =T=: move to a new tab
 
-*** Change Windows Size
+** Change Windows Size
 
 - =Ctrl-W= + =+=​/​=-= (=:resize=): increase/decrease the current windows
   height; + =<=​/​=>= (=:vertical resize=): decrease/increase width
@@ -244,7 +244,7 @@ Split commands may come optionally with a prefix to indicate the window size.
 =winheight=, =winwidth= defines the minimal size of the current active window,
 even if the window in inactive state has a different size.
 
-*** Tabbed Editing
+** Tabbed Editing
 
 - =:tabnew filename=, =:tabedit filename=
 
@@ -254,7 +254,7 @@ even if the window in inactive state has a different size.
 
 - =gT=, =Ctrl-PageDown=, =Ctrl-PageUp=
 
-*** Windows and Buffers
+** Windows and Buffers
 
 - =:ls=, =:buffers=, =:files= lists buffers and files
   + =%= (current), =#= (alternate)
@@ -284,7 +284,7 @@ A buffer may be hidden by opening another file if the =hidden= option is set.
 
 - =:bmod=, =:sbmod=: move the nth modified buffer
 
-**** Special Buffers
+*** Special Buffers
 
 - directory: a list of a directory
 
@@ -295,11 +295,11 @@ A buffer may be hidden by opening another file if the =hidden= option is set.
 
 - scratch
 
-** Configuration Files
+* Configuration Files
 
 - =$HOME/.vimrc= (Unix), =$HOME/_vimrc= (MS Windows)
 
-** Folding
+* Folding
 
 Folding define what parts of the file to see. Folds are not simply defined by
 language syntax.
@@ -308,7 +308,7 @@ To display fold levels, set =foldcolumn= to an appropriate number.
 
 A folded block acts as a line for line operations.
 
-*** Define Folds
+** Define Folds
 
 The =foldmethod= option defines how folds are defined/created and accepts the
 following methods.
@@ -326,7 +326,7 @@ following methods.
 
 - =syntax= :: defined by the semantics of a file's language.
 
-*** Fold Commands
+** Fold Commands
 
 - =zA= :: toggle fold state
   + =za= :: toggle teh state of one fold
@@ -353,7 +353,7 @@ following methods.
 - =zN=, =zn= :: set/reset =foldenable= option
   + =zi= :: toggle =foldenable=
 
-** Auto and Smart Indenting
+* Auto and Smart Indenting
 
 - =autoindent= :: similar to vi's, differs subtly as to where the cursor is
   placed after indentation is deleted.
@@ -391,7 +391,7 @@ file. Set the =paste= option before pasting and reset it afterward..
 - =^N=, =^P= Move in the candidate list; =Enter= to select the match; =^E= to
   halt the match ithout substituting any text.
 
-** Autocompletion
+* Autocompletion
 
 Insertion completion from programming language specific keywords to filenames,
 dictionary words and even entire lines. Completion includes
@@ -429,7 +429,7 @@ dictionary words and even entire lines. Completion includes
 
 - Comprehensive complete =^N= :: defined by the =complete= option.
 
-** Syntax Highlighting
+* Syntax Highlighting
 
 =:syntax enable=, =:syntax on=, =set syntax=filetype=. Syntax definition files
 are stored in =$VIMRUNTIME/syntax=.
@@ -438,7 +438,7 @@ are stored in =$VIMRUNTIME/syntax=.
 TODO: customization
 #+end_comment
 
-** QuickFix: Edit-Compile-Edit Cycle
+* QuickFix: Edit-Compile-Edit Cycle
 
 =:make= builds the project and collects the result text in the =Quickfix List=
 window, where one can inspect, jump to and correct errors.
@@ -449,7 +449,7 @@ window, where one can inspect, jump to and correct errors.
 
 - =makeprg=: an option containing the name of the build instruction
 
-*** grep
+** grep
 
 Vim's grep may also take advantage of the Quickfix list.
 
@@ -458,7 +458,7 @@ Vim's grep may also take advantage of the Quickfix list.
 
 - =copen= :: open the Quickfix list
 
-**** ripgrep
+*** ripgrep
 
 #+begin_src vimscript
 set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
@@ -466,7 +466,7 @@ set grepformat+=%f:%l:%c:%m
 #+end_src
 
 
-** Vimscripts
+* Vimscripts
 
 - conditions are not required to be surrounded by parentheses.
 
@@ -529,25 +529,25 @@ function CheckFileType()
 endfunction
 #+end_src
 
-** Binary Files
+* Binary Files
 
 =-b= or =:set binary=. =textwidth=, =wrapmargin= are set to zero. =modeline= and
 =expandtab= are unset=. Another editor designed to edit binaries is =bvi=.
 
 To show bytes as hex, =:set display=uhex=. See =:h using-xxd=.
 
-** Display Buffers as HTML
+* Display Buffers as HTML
 
 Vim can convert the rendered buffer to an HTML document, duplicating the
 original Vim graphics =TOhtml=.
 
-** Backup
+* Backup
 
 - =backup= :: make a backup before writing a file and leave it around after writing.
 
 - =writebackup= (default) :: make a backup before writing a file and delete it after writing.
 
-** Sessions
+* Sessions
 
 - *viminfo*: a global session file that saves command line history, search
   string history, input line history, non-empty registers, file marks, last
@@ -558,7 +558,7 @@ original Vim graphics =TOhtml=.
   setting.
   + =:mksession session_filename.vim=: a session file, similar to a vimrc script file, is created
 
-** Remote
+* Remote
 
 Vim and Neovim support a client-server mode (if compiled with =clientserver= option, by
 default on Neovim).
@@ -570,7 +570,7 @@ nvim --server
 vim --servername
 #+end_src
 
-*** Remote Editing (netrw)
+** Remote Editing (netrw)
 
 scp, rsync, sftp, ftp, http, dav and rcp are supported.
 Use =:e file_url= to open a remote file, =:Nread= to read into the current
@@ -580,7 +580,7 @@ possible (on target machines of Linux only, through ssh and ftp only).
 
 To speed up file transfer, consider ssh's =ControlMaster= feature.
 
-** Plugins
+* Plugins
 
 A plugin is simply a Vim script file that is loaded automatically when Vim
 starts to extend Vim's functionality. Plugins may be
@@ -601,7 +601,7 @@ starts to extend Vim's functionality. Plugins may be
 The plugin directory (=plugin= or =ftplugin=) can be in any of the directories in the =runtimepath=
 option. To debug plugin loading, start Vim with =-V2=.
 
-*** Package Management
+** Package Management
 
 A *package* is a directory that contains *plugins*. It may be a separate directory,
 a VCS repository, a set of interdependent plugins, "start" packages.
@@ -609,8 +609,8 @@ a VCS repository, a set of interdependent plugins, "start" packages.
 Packages are stored in the paths =runtimepath= or =pack/*/start/*= paths under
 runtime paths.
 
-**** Builtin Manager
+*** Builtin Manager
 
-** Truecolor Support
+* Truecolor Support
 
 - =set termguicolors= to enable 24-bit true color support.
