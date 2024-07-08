@@ -1,12 +1,28 @@
+Most of the content is about Vi but not Vim, although some features
+of Vim are mentioned.
+
 * Basic Concepts
 
 ~vi~ has tow modes:
 
-- command mode:
+- command mode (normal mode):
 
 - insert mode:
 
 - =ex= mode
+
+- (Vim) Visual Mode: select text and execute a normal command.
+
+- (Vim) Select Mode: like visual mode but resembles more the selection mode un
+  MS Windows.
+  + =gh=, =gH= or =^G= under visual mode to enter Select Mode.
+  + newline, backspace, carriage return causes the selected area to be deleted
+    and then enters insert mode.
+  + =shift+<movement>= extends the selection.
+
+- (Vim) Command-Line mode: a one-shot ex mode, the more common use of ex commands.
+
+- (NVim & Vim8) Terminal Mode:
 
 The general form of ~vi~ commands is
 
@@ -130,6 +146,14 @@ Sections are completely defined by macros.
 
 *** Deletion
 
+There are a few special buffers (registers) provided by =vi= for temporary use:
+the unnamed buffer and the named buffers.
+The unnamed buffer (deletion register) is lost when switching files;
+the named buffers (from =1= to =9= and =a= to =z=) do not,
+thus they may be used to transfer content from one file to another.
+(Vim) the lowercase register name is used to overwrite the regtister while the
+uppercase is used to append to the previous register contents.
+
 - =x=, =X= :: delete the next/previous character
 
 - ~["x]d~ :: delete operator, used with =b=, =d=, =w= and various motion and
@@ -142,9 +166,6 @@ The editor saves the last 9 deleted blocks of text in a set of numbered
 registers 1-9, accessible by ="n=.
 
 *** Rearranging and Duplicating
-
-There are a few special buffers (registers) provided by =vi= for temporary use:
-the unnamed buffer and the named buffers.The unnamed buffer (deletion register) is lost when switching files; the named buffers (from =1= to =9= and =a= to =z=) do not, thus they may be used to transfer content from one file to another.
 
 - ~("buffer_name)y~ :: yank (copy into a buffer, by default the unnamed one
   (deletion register), unless prefixed by
@@ -185,7 +206,9 @@ the unnamed buffer and the named buffers.The unnamed buffer (deletion register) 
   + (vim) a history of search commands is maintained, retrievable with arrow keys or =^p=, =^n=.
   + the final =/= or =?= is optional without the offset
   + use =\%>= and =\%<= to limit the search range.
-
+  + =/= are =?= are not suited for every situation, use ex global =g/pattern/#=
+    to list all matching lines and jump there.
+    
 - =*=, =#= :: search forward/backward for the count'th occurrence of the word nearest to the cursor.
   + a =g= prefix may be added to indicate no word boundaries.
 
@@ -218,7 +241,7 @@ Substitution is mostly done through the =substitute= ex command.
 
 - ~.~ :: repeat the last command
 
-- =%= on a paired punctuation mark ::
+- =%= on a paired punctuation mark :: switch to the other of the pair.
 
 - =Ctrl-^= :: =:e #=
 
@@ -252,14 +275,16 @@ The =ex= editor has five modes:
     number of lines to be involved or other parameters after the command name.
   + For commands that takes a range address, the count parameter limits the
     command to the lines starting at the last line of the range with
-    =count= lines involved. That is, the range address is actually invalid and only the last address number is taken.
+    =count= lines involved. That is, the range address is actually invalid and
+    only the last address number is taken.
+    e.g. =1,3d3= is the same as =3d3=.
   + commands are commented out by a double quote ="=.
   + Different elements of an =ex= command may be separated by spaces.
   + multiple commands on a single line are separated by =|= in the same way a
     semicolon separates a shell command.
 
 - *text input mode* :: gathers input lines and places them in the file; the
-  =append=, =insert= and =change= commands use text input mode. A =.= line exits
+  =append=, =insert= and =change= commands use text input mode. A dot =.= line exits
   the mode.
 
 - *open mode* :: displays one line at a time, not really useful on modern
@@ -604,6 +629,7 @@ There are two flavors of macros:
   + =:map!= causes the mapping to apply to input mode.
   + special characters are input with =^V= prefixed. Vertical bar =|= can never
     be escaped as it is used as the crucial =ex= separator.
+  + Keys are also represented as sequence =<Nul>, =<Home>= etc. see =:h keycodes=.
   + =:unmap= deletes a macro.
   + =#0= through =#9= mean function keys.
 
@@ -611,583 +637,3 @@ There are two flavors of macros:
   definition as =<leader>=) for prefixing in order not to overload other
   keys. This leader key is defined with =mapleader=.
 
-* VIM
-
-Vi is part of POSIX, with little change over the years. Vim extended its feature
-set and gained a large community around it. It emphasizes modality and touch
-editing but provides features for less experienced users (=evim=, =vimtutor=,
-and some third-party tutorials: OpenVim, Vim Adventures).
-
-- Initialization and Customization with scripting and plugins
-  + =_vimrc= on Win32.
-
-- Infinite undo.
-
-- GUI features
-
-- Multiwindow Editing
-
-- Autocompletion
-
-- Syntax awareness
-
-- Postprocessing after editing (e.g. cleanups)
-
-- Arbitrary line length up to a C =long= integer.
-
-- Unicode Awareness
-
-- Binary data: no newline after at the EOF.
-
-- Session Context: recent docuemnts, recent edits of recent files, command
-  history, previous leaving location.
-
-- Meta-information: foru special registers
-  + =%=: the current filename
-  + =#=: the alternate filename
-  + =:= the last shell command
-  + =.= the last inserted text
-
-- the black hole register ="_=: the =/dev/null= of vim.
-
-- Transparent editing with compressed files.
-
-- Builtin help: the =:help= intro provides some basic usage before goint into details.
-  + =Ctrl-]= jumps to the tag
-
-** GUI gVim
-
-Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
-
-** Command line options
-
-- ~-b~: in binary mode
-
-- ~+command~ ,~c command~: execute command as an =ex= command
-
-- ~-C~: vi-compatible mode (not fully compatible)
-
-- ~-d~: diff mode
-
-- ~-E~: improved ex mode, with extended regex
-
-- ~-F~ / ~-A~: Farsi or Arabic mode
-
-- ~-M~: turn off the write option
-
-- ~view~: vim in read-only mode
-
-- ~vimdiff~: diff mode
-
-- ~ex~: ex mode, useful in scripts
-
-** New Commands
-
-- =n CTRL-END= :: to the end of the file
-
-- =line_count_percent%= :: go to the line count percent into the file
-
-- =:go n=, =:n go= :: go to the nth byte in the buffer
-
-** New Modes
-
-*** Visual Mode =v=
-
-Define selections visually and perform editing commands on the visual selection.
-
-**** Visual Block =^V=
-
-
-** Extended Regex
-
-More than POSIX ERE.
-
-- ~\|~: indicates alternation
-
-- ~\+~
-
-- ~\&~: concatenation
-
-- ~\=~: matches zero or one of the preceding regex
-
-- ~{-(n),(m)}~: the =-= inside bound expressions indicates non-greed matching
-
-- =\a= (alphabetica), =\A= (non-alphabetic)
-
-- =\b= backspace
-
-- =\d=, =\D=  digit  and non-digit
-
-- =\e= escape
-
-- =\f=, =-F= filename character, the latter excludes digits
-
-- =\h=, =\H=: head-of-word character (letters and underscores), non-head-of-word character
-
-- =\i=, =\I= identifier character (the latter excludes digits)
-
-- =\k=, =\K= keyword character (the latter excludes digits)
-
-- =\l=, =\L= lowercase and nonlowercase
-
-- =\n= newline, =\r= carriage return, =\t= tab
-
-- =\o=, =\O= octal and non-octal character
-
-- =\p=, =\P= printable character (the latter excludes digits)
-
-- =\s=, =\S= a tab or space
-
-- =\u=, =\U= uppercase and non-uppercase characters
-
-- =\w=, \W=: word character and non-word character
-
-- =\x=, =X= hexadecimal digit and non-hexdecimal digit
-
-- =\_x= any the of the previous characters: match the same character but with
-  newline included
-
-** Multiwindows behavior
-
-- =-o=​/​=-oNumber=: start with multiple windows
-
-- =:split [filename]=, =Ctrl-Ws=: split the window horizontally
-
-- =:vnew= / =:vsplit=, =Ctrl-Wv=: vertically split the window (with a new buffer
-  or the current buffer)
-
-- =:new=, =Ctrl-Wn=: new window
-
-Split commands may come optionally with a prefix to indicate the window size.
-
-- =:sview filname= : open a file in a split window as readonly.
-
-- =:sfind filename=: open a window for a file if found
-
-- =:close=, =Ctrl-Wc=: close the current window; =:only=: close all but the current window
-
-- =Ctrl-W= + =q=: quit a window (quit vim if no window exists); + =c=: close the
-  current window until the tab is closed
-
-- =Ctrl-W= + =o=, =:only= close all windows except the current window.
-
-*** Conditional Split
-
-- =topleft=, =vertical=, =leftabove=, =aboveleft=, =rightbelow=, =belowright=,
-  =botright=: modifier before a split command to open a new window only if the
-  command succeeeds.
-
-*** Moving Across Windows
-
-- =Ctrl-W= + =h,j,k,l=,
-
-- =Ctrl-W= + =t= (top leftmost), =b= (bottom rightmost),
-
-- =Ctrl-W= + =p= previously accessed
-
-- =Ctrl-W= + =w=, =W=: cycle through all windows top leftmost to bottom rightmost, the case difference indicates
-  different directions
-
-*** Moving Windows & Changing Layouts
-
-- =Ctrl-W= + =r=: rotate windows on a row/column rightwards/rightwards; + =R= in the
-  opposite direction
-
-- =Ctrl-W= + =x=: exchange the current window with the nth (by default the
-  first) next one
-  + exchange only happens in a row or column
-
-- =Ctrl-W= + =K, J, H, L=: move the current window, full height/width
-
-- =Ctrl-W= + =T=: move to a new tab
-
-*** Change Windows Size
-
-- =Ctrl-W= + =+=​/​=-= (=:resize=): increase/decrease the current windows
-  height; + =<=​/​=>= (=:vertical resize=): decrease/increase width
-
-- =Ctrl-W= + ===: resize all windows to equal size.
-
-- =zCount= + =ENTER=: set the current window to =Count= lines
-  + =:resize n=, or =n= + =Ctrl-W= + =_=
-
-- =Ctrl-W= + =|=: resizes the current window width to the specified column (by
-  default the widest possible)
-
-- =Ctrl-W= + =o=: maximize a window
-
-- =Ctrl-W= + =G=:
-
-- =Ctrl-W= + =F=: edit the filename underneath the cursor.
-
-=winheight=, =winwidth= defines the minimal size of the current active window,
-even if the window in inactive state has a different size.
-
-*** Tabbed Editing
-
-- =:tabnew filename=, =:tabedit filename=
-
-- =:tabclose=
-
-- =:tabonly=
-
-- =gT=, =Ctrl-PageDown=, =Ctrl-PageUp=
-
-*** Windows and Buffers
-
-- =:ls=, =:buffers=, =:files= lists buffers and files
-  + =%= (current), =#= (alternate)
-  + =u= unlisted buffer (e.g. a help buffer)
-  + =a= active (loaded and visible) buffer, =h= hidden buffer
-  + =-=, ===, not modifiable. === is read-only and never modifiable
-  + =+= modified, =x= read error
-
-A buffer may be hidden by opening another file if the =hidden= option is set.
-
-- =:windo cmd=: do =cmd= in each window of the current tab
-
-- =:bufdo[!] cmd=: do =cmd= in all the buffers
-
-- =ball=, =sball= (in new windows): edit all args or buffers
-
-- =unhide, =sunhide= (in new windows): edit all loaded buffers
-
-- =badd file=: add file to the buffer list; =bunload=: unload the current buffer from
-  memory (the buffer is still open), =bdelete=: delete the buffer from the
-  buffer list
-
-- =b[uffer]=, =sb[uffer]=: move to a buffer
-
-- =:bnext=, =:sbnext=, =:bNext=, =:sbNext=, =:bprevious=, =:sbprevious=, =:bfirst=,
-  =:sbfist=, =:blast=, =:sblast=,
-
-- =:bmod=, =:sbmod=: move the nth modified buffer
-
-**** Special Buffers
-
-- directory: a list of a directory
-
-- help
-
-- quickfix: the list of errors created by a command or the location list,
-  typically used with edit-compile-debug cycle
-
-- scratch
-
-** Configuration Files
-
-- =$HOME/.vimrc= (Unix), =$HOME/_vimrc= (MS Windows)
-
-** Folding
-
-Folding define what parts of the file to see. Folds are not simply defined by
-language syntax.
-
-To display fold levels, set =foldcolumn= to an appropriate number.
-
-A folded block acts as a line for line operations.
-
-*** Define Folds
-
-The =foldmethod= option defines how folds are defined/created and accepts the
-following methods.
-
-- =diff= :: defined the difference between two files
-
-- =expr= :: defined by regular expressions
-
-- =indent= :: corresponds to the indentation of text and =shiftwidth=
-
-- =manual= :: result from user Vim commands
-  + =zf=, =nzF=
-
-- =marker= :: predefined markers in the file specify fold boundaries
-
-- =syntax= :: defined by the semantics of a file's language.
-
-*** Fold Commands
-
-- =zA= :: toggle fold state
-  + =za= :: toggle teh state of one fold
-
-- =zC= :: close folds, recursively
-  + =zc= :: close one fold
-
-- =zD= :: delete/undefine folds, recursively (not the content in the folds)
-  + =zd= :: delete one fold
-  + =zE= ::  delete all fields
-
-- =zO= :: open folds recursively
-  + =zo= :: open one fold
-
-- =zf= :: create a fold from the current line to the one where the following
-  motion command takes the cursor
-  + =zf%= fold a C code block
-  + =Count= + =zF= :: fold count lines. The count number here counts for visual lines
-    on the screen.
-
-- =zM= :: set =foldlevel= to zero
-  + =zm=, =zr= :: decrement/increment =foldlevel=
-
-- =zN=, =zn= :: set/reset =foldenable= option
-  + =zi= :: toggle =foldenable=
-
-** Auto and Smart Indenting
-
-- =autoindent= :: similar to vi's, differs subtly as to where the cursor is
-  placed after indentation is deleted.
-  + understands comments
-
-- =smartindent= :: recognizes some basic C syntax for defining indentation
-  levels
-  + before a line starting with ={=, before a line starting with certain
-    keywords =cinwords=
-  + a new line before/after a =}=
-
-- =cindent= :: richer awareness of C syntax and supports customization
-  + =cinkeys= :: keyboard keys under insert mode that triggers reindenting.
-    Reindenting means to indent to an appropriate position.
-     A set of expressions are used to define this option.
-  + =cinoptions= :: indentation style. Another set of expression for various situations are used to
-    define C indentation styles.
-  + =cinwords= :: keywords that signal when Vim should add an extra indent in
-    subsequent lines
-
-- =indentexpr= :: custom indentation rules
-  + not a trivial task to define. Predefined expressions are under =$VIMRUNTIME/indent=.
-
-#+begin_comment
-TODO learn more about cindent customization and indent expressions
-#+end_comment
-
-To use the file type to define indentation, set =:filetype indent on=.
-
-If manual indentation is applied, autoindentation on that line is disabled.
-
-Indentation options may cause indentation problems when pasting text into the
-file. Set the =paste= option before pasting and reset it afterward..
-
-- =^N=, =^P= Move in the candidate list; =Enter= to select the match; =^E= to
-  halt the match ithout substituting any text.
-
-** Autocompletion
-
-Insertion completion from programming language specific keywords to filenames,
-dictionary words and even entire lines. Completion includes
-
-- Whole Lines =^X-^L= :: look backwards for a line matching the typed characters
-
-- Keyword =^X-^N= :: not PL-specific keywords, possibly any word in the file,
-  defined by the =iskeyword= option.
-
-- Dictionary =^X-^K= :: searches through the files defined by the =dictionary= option.
-
-- thesaurus =^X-^T= :: searches through the files defined by the =thesaurus=
-  option. A set of similar words are listed as candidates.
-
-- keyword in the current file and includes files =^X-^I= in C/C++ ::
-
-- tag =^X-^]= :: searches forward through the current file and includes files
-  for keywords matching tags.
-
-- filename =^X-^F= :: searches for filenames in the current directory matching the keyword at the current cursor.
-
-- macro and definition names =^X-^D= :: =#define=
-
-- =^X-^V= :: meant for use on the Vim command line and tries to guess the best
-  completions for words to assist users developing Vim scripts.
-
-- =^X-^U= :: use the completion method defined by a custom function =completefunc=.
-
-- Omni =^X-^O= :: use filetype-specific functions to determine the candidate
-  list
-  + C, CSS, HTML, JaaScript, PHP, Python, Ruby, SQL and XML.
-
-- Spelling correction =^X-^S= :: if the word at the location appears to be badly
-  spelled, "more correct" spellings are offered
-
-- Comprehensive complete =^N= :: defined by the =complete= option.
-
-** Syntax Highlighting
-
-=:syntax enable=, =:syntax on=, =set syntax=filetype=. Syntax definition files
-are stored in =$VIMRUNTIME/syntax=.
-
-#+begin_comment
-TODO: customization
-#+end_comment
-
-** QuickFix: Edit-Compile-Edit Cycle
-
-=:make= builds the project and collects the result text in the =Quickfix List=
-window, where one can inspect, jump to and correct errors.
-
-- =:cnext=, =:cprevious=: move in the error list
-
-- =errorformat=: an option defining a format of errors returned from a compile
-
-- =makeprg=: an option containing the name of the build instruction
-
-*** grep
-
-Vim's grep may also take advantage of the Quickfix list.
-
-- =vim[grep]  /pattern[g][j] files= :: use builtin grep to search for a pattern
-  + by default the result is shown in the Quickfix list.
-
-- =copen= :: open the Quickfix list
-
-**** ripgrep
-
-#+begin_src vimscript
-set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
-set grepformat+=%f:%l:%c:%m
-#+end_src
-
-
-** Vimscripts
-
-- conditions are not required to be surrounded by parentheses.
-
-- =elseif=, not =else if=; =if= ends with an =endif=
-
-- =let= assigns a variable.
-  + a variable may has a prefix to indicate its scope:
-    - =a= function argument
-    - =b=: buffer-local
-    - =g=: global
-    - =l=: function-local
-    - =s=: script-level
-    - =t=: tab-level
-    - =v=: controlled by Vim
-    - =w=: window-level
-  + by default variables are global =g=
-
-- =.= string concatenation
-
-- =execute=: execute a string as vimscript
-
-#+begin_src vim
-let g:Favcolorschemes = ["darkblue", "morning", "shine", "evening"]
-function SetTimeOfDayColors()
-    " currentHour will be 0, 1, 2, or 3
-    let g:CurrentHour = strftime("%H") / 6
-    if g:colors_name !~ g:Favcolorschemes[g:CurrentHour]
-    execute "colorscheme " . g:Favcolorschemes[g:CurrentHour]
-    echo "execute " "colorscheme " . g:Favcolorschemes[g:CurrentHour]
-    redraw
-    endif
-endfunction
-#+end_src
-
-- Arrays: =[elm1, elm2, elm3, elm4, ...]
-
-- =&option_name=: retrieve the vale of an option
-
-Vim uses /events/ to execute commands (/autocommands/) e.g. =BufNewFile=, =BufReadPre=, =BufRead=,
-=BufReadPost=, =BufWrite=, =BufWritePre=, =FileType=, =VimResized=, =WinEnter=,
-=WinLeave=, =CursorMoved=, =CursorMovedI=.
-
-#+begin_src vim
-augroup newFileDetection
-# everytime the cursor moved under Insert mode.
-    autocmd CursorMovedI * call CheckFileType()
-augroup END
-
-function CheckFileType()
-    if exists("b:countCheck") == 0
-        let b:countCheck = 0
-    endif
-        let b:countCheck += 1
-    " Don't start detecting until approx. 20 chars.
-    if &filetype == "" && b:countCheck > 20 && b:countCheck < 200
-        filetype detect
-    elseif b:countCheck >= 200 || &filetype != ""
-        autocmd! newFileDetection # delete the commands within the group, deleting a group doesn't delete its commands.
-    endif
-endfunction
-#+end_src
-
-** Binary Files
-
-=-b= or =:set binary=. =textwidth=, =wrapmargin= are set to zero. =modeline= and
-=expandtab= are unset=. Another editor designed to edit binaries is =bvi=.
-
-To show bytes as hex, =:set display=uhex=. See =:h using-xxd=.
-
-** Display Buffers as HTML
-
-Vim can convert the rendered buffer to an HTML document, duplicating the
-original Vim graphics =TOhtml=.
-
-** Backup
-
-- =backup= :: make a backup before writing a file and leave it around after writing.
-
-- =writebackup= (default) :: make a backup before writing a file and delete it after writing.
-
-** Sessions
-
-- *viminfo*: a global session file that saves command line history, search
-  string history, input line history, non-empty registers, file marks, last
-  search/substitute pattern, the buffer list and global variables.
-
-- *Session*: addition to viminfo, a view is a collection of settings that apply
-  to one window; a session keeps the views for all windows plus the global
-  setting.
-  + =:mksession session_filename.vim=: a session file, similar to a vimrc script file, is created
-
-** Remote
-
-Vim and Neovim support a client-server mode (if compiled with =clientserver= option, by
-default on Neovim).
-A client remotely programmatically control the server.
-
-#+begin_src shell
-nvim --listen pipepath/socket
-nvim --server
-vim --servername
-#+end_src
-
-*** Remote Editing (netrw)
-
-scp, rsync, sftp, ftp, http, dav and rcp are supported.
-Use =:e file_url= to open a remote file, =:Nread= to read into the current
-buffer,
-=:w file_url= to write to a remote path or =Nwrite=. Directory listing is also
-possible (on target machines of Linux only, through ssh and ftp only).
-
-To speed up file transfer, consider ssh's =ControlMaster= feature.
-
-** Plugins
-
-A plugin is simply a Vim script file that is loaded automatically when Vim
-starts to extend Vim's functionality. Plugins may be
-
-- *global plugins*: for all kinds of files.
-  + A set of standard plugins are automatically loaded upon startup.
-    - =gzip=: supports transparent reading and writing of =compress= =gzip=, =bzip2=,
-      =lzma=, =xz=, =lzip=, =zstd= files.
-    - =netrw=: similar to Emacs' =TRAMP=. Transparent editing of files on other machines.
-    - =tar=, =zip=: similar to =gzip=.
-    - a global plugin is added by dropping the copy in the right directory 
-    (e.g. =~/.local/share/nvim/site/plugin/= per user, =$VIMRUNTIME/plugin= and =$VIMRUNTIME/macros= globally)
-
-- *filetype plugins* (*ftplugins*): used for a specific type of file.
-  + typically put under the =ftplugin= directory
-  + plugin files are renamed as =filetype_name.vim=.
-
-The plugin directory (=plugin= or =ftplugin=) can be in any of the directories in the =runtimepath=
-option. To debug plugin loading, start Vim with =-V2=.
-
-*** Package Management
-
-A *package* is a directory that contains *plugins*. It may be a separate directory,
-a VCS repository, a set of interdependent plugins, "start" packages.
-
-Packages are stored in the paths =runtimepath= or =pack/*/start/*= paths under
-runtime paths.
-
-** Truecolor Support
-
-- =set termguicolors= to enable 24-bit true color support.
