@@ -41,9 +41,15 @@ and some third-party tutorials: OpenVim, Vim Adventures).
 
 - Transparent editing with compressed files.
 
-- Builtin help: the =:help= intro provides some basic usage before going into details.
-  + =Ctrl-]= jumps to the tag
-  + =gO= shows the outline
+- Builtin help: the =:help= intro provides some basic usage before going into
+  details.
+  + Help topics are tags too: =Ctrl-]= jumps to the tag (help topic),
+    =:tselect=, =:tnext=, =:tag= to find further matches.
+  + =(l)helpgrep= search all help text files and make a list of matching lines.
+  + (Neovim) =gO= shows the outline
+  + =:exusage= (show ex commands), =:viusage= (show normal mode commands)
+  + to view translated help, add =@lang= to the =:help= command.
+  + there is an =index=  help file listing all commands.
 
 
 * GUI gVim
@@ -83,6 +89,10 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 - =Ctrl-O=, =Ctrl-I= :: jump back/forward in the jump list
 
 * New Modes
+
+See =:h mode-switching= for mode switching operations. =C-\ C-N/G= can be used to
+go to Normal mode from any other mode.  Type =gQ= (Neovim) or =Q= (Vim) under normal
+mode.
 
 ** Visual Mode =v=
 
@@ -358,9 +368,30 @@ A buffer may be hidden by opening another file if the =hidden= option is set.
 
 - scratch
 
-* Configuration Files
+* Initialization
 
-- =$HOME/.vimrc= (Unix), =$HOME/_vimrc= (MS Windows)
+=:h startup=, also see =:h standard-path= for various paths used by Neovim.
+
+** Configuration Files
+
+- =$HOME/.vimrc= (Unix), =$HOME/_vimrc= (MS Windows);
+  moreover =~/.config/nvim/init.{vim,lua]= (Unix),
+  =~/AppData/Local/nvim/init.{vim,lua}= (Windows) and
+  =$XDG_CONFIG_HOME/nvim/init.vim=.
+
+- =-u file= reads a specified init file without reading the default one.
+
+- =$MYVIMRC= is set to the first valid location unless it was already set or
+  when using =$VIMINIT=.
+
+- If =exrc=  is set, the current directory is searched for =.nvim.lua=,
+  =.nvimrc=, =.exrc=.
+
+- =$VIM=: the vim executable path, used for locating various user files, e.g.
+  config files.
+
+- =$VIMRUNTIME=: used to locate various support files: documentation, syntax
+  highlighting files, plugins.
 
 * Folding
 
