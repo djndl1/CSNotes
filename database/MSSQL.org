@@ -588,6 +588,59 @@ Requires OLE DB drivers, not supported on Linux, use PolyBase.
 
 TODO
 
+* SQL Server Agent
+
+A windows service that executes scheduled administrative tasks.
+
+Run a job on a schedule in response to an event or on demand.
+
+** Concepts
+
+- *Job*: a specified series of operations performed sequentially, including
+  running T-SQL scripts, command prompt apps, ActiveX scripts etc..
+  + A job consists of job steps, which might consist of running a T-SQL statement etc.
+
+- *Schedule*: when a job runs.
+
+- *Alert*: au automatic response to a specific event.
+
+- *Operators*: contact info for an individual responsible for maintenance of one
+  or more instances of SQL Server.
+
+- *Subsystems*: a predefined functionality used by a job
+  + e.g. ActiveX script, OS, PowerShell, Replication, Analysis Services Command,
+    SSIS package execution.
+
+- *Proxy*: an object that defines the security context in which a job step can run, e.g. OS account
+
+** Security
+
+- =SQLAgentUserRole=, =SQLAgentReaderRole=, =SQLAgentOperatorRole= fixed
+  database roles in =msdb= or =sysadmin= are required to use SQL Server Agent.
+
+- create a user in =msdb= and grant necessary roles/permissions to it.
+
+** Implement Jobs
+
+- =sp_add_job= to create an empty job
+
+- =sp_add_jobstep= adds actual job steps to the job.
+
+- =sp_add_jobserver= adds the job to a certain SQL Server instance.
+
+- =sp_add_schedule= makes a schedule for the job, optional if the job is using
+  an existing schedule.
+
+- =sp_attach_schedule= schedules the job
+
+- =sp_start_job= runs a job.
+
+** Job History
+
+View =sp_help_jobhistory=.
+
+Use maintenance plan to periodically purge job history.
+
 * Transact-SQL
 
 ** Conventions
