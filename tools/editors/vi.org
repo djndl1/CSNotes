@@ -40,6 +40,8 @@ commands in vi denotes both text objects and certain related commands.
 
 - =C-g=: show the location in a file and the file status
 
+- =set ruler= shows the current cursor position on the lower right corner of the screen.
+
 ** Motion
 
 *** Scrolling and Paging
@@ -51,13 +53,22 @@ commands in vi denotes both text objects and certain related commands.
 - ~^e~ / ~^y~ :: scroll up/down one line
 
 - ~zENTER~ / ~z.~ / ~z-~ :: move current line to top/center/bottom of screen and scroll
-  + with a line number prefixed, the command sets the specified line the anchor.
+  + with a line number prefixed, the command sets the specified line as the anchor.
+  + (Vim) =zt=, =zz=, =zb= are the same except that they put the cursor in the
+    same column, whereas the original three put the cursor at first non-blank in
+    the line.
 
 *** Go to a Position
 
 - ~G~  :: go to the specified line/the end if none
+   + (Vim) =gg= to the the specified line/the beginning if none
 
-- =``= :: get back to a previous position (not down a list).
+- =``= or =''= :: get back to a previous mark (not down a list).
+  + call =:marks= to show a list of marks
+  + a few special marks: see =:h '[=.
+    - =.= (last change), ='= (before a jump),
+    =^= (last insertion), ="= (the position when last exiting the buffer, e.g.
+    the position before jumping to another buffer)
 
 - =mx=, =`x=, ='x= :: mark a position; return to the position; return to the
   first non-white character of the marked line.
@@ -78,7 +89,8 @@ commands in vi denotes both text objects and certain related commands.
 
 - =0= :: beginning of the line.
 
-- =$= :: EOL.
+- =$= :: EOL. A prefix count moves the cursor down n lines to the end of the
+  target line.
 
 - =h=, =SPACE=; =l=, =BACKSPACE= (also as =^h=) ::
 
@@ -93,7 +105,9 @@ commands in vi denotes both text objects and certain related commands.
 
 - Commands that change text can be combined with ~/~ and ~?~ ::
 
-- ~f~ / ~F~ / ~t~ / ~T~ / ~;~ /~,~ ::
+- ~f~ / ~F~ / ~t~ / ~T~ / ~;~ /~,~ :: move to the next/previous specified character on
+  the current line. =t= move to the character just before the specified
+  character. =;= and =,= repeats the movement in the same/opposite direction.
 
 *** High Level Text Objects
 
@@ -137,7 +151,8 @@ Sections are completely defined by macros.
 
 - ~c~ :: change, a combination of delete followed by insert, used with various
   motion commands.
-  - =s= :: substitute the first char and then enters the insert mode.
+  - =s= :: substitute the first char and then enters the insert mode. =s= to
+    =c= is as =x= to =d=.
   - ~cc~, =S= :: change the entire line
   - ~C~ ::  ~c$~
   - =ce= and =cw= :: the same even if =w= and =e= have different semantics.
@@ -208,6 +223,8 @@ registers 1-9, accessible by ="n=.
   + use =\%>= and =\%<= to limit the search range.
   + =/= are =?= are not suited for every situation, use ex global =g/pattern/#=
     to list all matching lines and jump there.
+  + Unlike =C-P= which completes the previous
+  + to search a word under the cursor, use =*= (forward) and =#= (backward)
     
 - =*=, =#= :: search forward/backward for the count'th occurrence of the word nearest to the cursor.
   + a =g= prefix may be added to indicate no word boundaries.
@@ -225,9 +242,12 @@ Substitution is mostly done through the =substitute= ex command.
 
 ** Undo/Redo
 
-- ~u~: undo; ~U~: undo all on a line, ~C-r~ (vim): redo (redo an undone operation)
+- ~u~: undo; ~U~: undo all on a line, ~C-r~ (vim): redo (redo an undone
+  operation)
+  + One undo command normally undoes a typed command, no matter how much it changes.
   + =vi='s undo may undo a previous undo.
   + =vim= adds branching undo, similar to Git commit tree and branches.
+  + =u= may undo a =U=, that is, redo all on a line.
 
 - Since the last nine deletions are saved in the nine named buffer in addition
   to the /deletion register/, use ="np= to
@@ -239,7 +259,8 @@ Substitution is mostly done through the =substitute= ex command.
 
 - ~ZZ~ / ~:wq~ ::
 
-- ~.~ :: repeat the last command
+- ~.~ :: repeat the last command. For long commands, this is more efficient.
+  + works for all changes except for undo, redo and ex commands.
 
 - =%= on a paired punctuation mark :: switch to the other of the pair.
 
@@ -553,6 +574,9 @@ Definitions are not recursively expanded.
 
 ** Options
 
+(Vim) for a list of options, =:options=. The options in the option window are
+modifiable, similar to Emacs' =customize=. To set an option to its default =set option_name&=.
+
 #+begin_src
 :set option
 :set nooption
@@ -572,7 +596,7 @@ Options may be set in a =.exrc= file in the home directory.
 
 - =autowrite= :: automatic write before =:n=, =ta= etc.
 
-- =ignorecase= :: ignore case in searching
+- =ignorecase= :: ignore case while searching
 
 - =number= :: display line numbers
 
@@ -587,6 +611,8 @@ Options may be set in a =.exrc= file in the home directory.
 
 - =showmode= :: the modeline
 
+- (Vim) =whichwrap= :: allow certain operations to move out of its line, e.g. =<BS>=.
+
 **** Search
 
 - =incsearch= (vim) :: show where the pattern matches as the pattern is typed so far.
@@ -597,7 +623,8 @@ Options may be set in a =.exrc= file in the home directory.
 
 **** Tabs
 
-To debug tab problem, =set list= or use =:l= command to display tabs and spaces.
+To debug tab problem, =set list= or use =:l= command to display tabs and spaces
+or add them to =listchars=.
 
 - =tabstop= :: number of spaces that a tab in the file counts for (visually and
   sometimes expanded space count). The length of

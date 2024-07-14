@@ -50,6 +50,7 @@ and some third-party tutorials: OpenVim, Vim Adventures).
   + =:exusage= (show ex commands), =:viusage= (show normal mode commands)
   + to view translated help, add =@lang= to the =:help= command.
   + there is an =index=  help file listing all commands.
+  + =:h help-summary= to learn how to help.
 
 
 * GUI gVim
@@ -87,6 +88,7 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 - =:go n=, =:n go= :: go to the nth byte in the buffer
 
 - =Ctrl-O=, =Ctrl-I= :: jump back/forward in the jump list
+  + call =:jumps= to show the jump list.
 
 * New Modes
 
@@ -327,6 +329,9 @@ even if the window in inactive state has a different size.
 
 - =gT=, =Ctrl-PageDown=, =Ctrl-PageUp=
 
+- to open a tag in a new tab, =C-W C-]= open it in a new window, =C-W T= move it
+  to a new tab
+
 ** Windows and Buffers
 
 - =:ls=, =:buffers=, =:files= lists buffers and files
@@ -562,6 +567,8 @@ set grepformat+=%f:%l:%c:%m
 
 * Vimscripts
 
+To execute a copied block of vimscript, use =:@=.
+
 - conditions are not required to be surrounded by parentheses.
 
 - =elseif=, not =else if=; =if= ends with an =endif=
@@ -623,25 +630,74 @@ function CheckFileType()
 endfunction
 #+end_src
 
-* Binary Files
+
+* Plugins
+
+A plugin is simply a Vim script file that is loaded automatically when Vim
+starts to extend Vim's functionality. Plugins may be
+
+- *global plugins*: for all kinds of files.
+  + A set of standard plugins are automatically loaded upon startup.
+    - =gzip=: supports transparent reading and writing of =compress= =gzip=, =bzip2=,
+      =lzma=, =xz=, =lzip=, =zstd= files.
+    - =netrw=: similar to Emacs' =TRAMP=. Transparent editing of files on other machines.
+    - =tar=, =zip=: similar to =gzip=.
+    - a global plugin is added by dropping the copy in the right directory
+      + per user: =~/.local/share/nvim/site/plugin/= and its subdirectories
+      + globally: =$VIMRUNTIME/plugin= and =$VIMRUNTIME/macros=, =$VIM/vimfiles/pack/dist/opt/=
+
+- *filetype plugins* (*ftplugins*): used for a specific type of file.
+  + typically put under the =ftplugin= directory
+    - globally: =$VIMRUNTIME/ftplugin=
+    - per user: =~/.local/share/nvim/site/ftplugin=
+  + plugin files are renamed as =filetype_name.vim=, or put as =ftplugin/<filetype>/<name>.vim=.
+
+The plugin directory (=plugin= or =ftplugin=) can be in any of the directories in the =runtimepath=
+option. To debug plugin loading, start Vim with =-V2=.
+
+** Package Management
+
+A *package* is a directory that contains *plugins*. It may be a separate directory,
+a VCS repository, a set of interdependent plugins, "start" packages.
+
+Packages are stored in the paths =runtimepath= or =pack/*/start/*= paths under
+runtime paths.
+
+*** Builtin Manager
+
+- =:packadd= :: enable packages on demand
+
+* Other Tips
+
+** Vertical Ruler
+
+=set colorcolumn=columnNumber1,columnNumber2=
+
+** Clipboard Integration
+
+- the =clipbard= option
+  + =unnamed=: use the =*= register as the clipboard (X11 primary selection)
+  + =unnamedplus=: use the =+= register (the Windows-style clipboard)
+
+** Binary Files
 
 =-b= or =:set binary=. =textwidth=, =wrapmargin= are set to zero. =modeline= and
 =expandtab= are unset=. Another editor designed to edit binaries is =bvi=.
 
 To show bytes as hex, =:set display=uhex=. See =:h using-xxd=.
 
-* Display Buffers as HTML
+** Display Buffers as HTML
 
 Vim can convert the rendered buffer to an HTML document, duplicating the
 original Vim graphics =TOhtml=.
 
-* Backup
+** Backup
 
 - =backup= :: make a backup before writing a file and leave it around after writing.
 
 - =writebackup= (default) :: make a backup before writing a file and delete it after writing.
 
-* Sessions
+** Sessions
 
 - *viminfo*: a global session file that saves command line history, search
   string history, input line history, non-empty registers, file marks, last
@@ -650,9 +706,14 @@ original Vim graphics =TOhtml=.
 - *Session*: addition to viminfo, a view is a collection of settings that apply
   to one window; a session keeps the views for all windows plus the global
   setting.
-  + =:mksession session_filename.vim=: a session file, similar to a vimrc script file, is created
+  + =:mksession session_filename.vim=: a session file, similar to a vimrc script
+    file, is created
 
-* Remote
+** Truecolor Support
+
+- =set termguicolors= to enable 24-bit true color support.
+
+** Remote
 
 Vim and Neovim support a client-server mode (if compiled with =clientserver= option, by
 default on Neovim).
@@ -673,38 +734,3 @@ buffer,
 possible (on target machines of Linux only, through ssh and ftp only).
 
 To speed up file transfer, consider ssh's =ControlMaster= feature.
-
-* Plugins
-
-A plugin is simply a Vim script file that is loaded automatically when Vim
-starts to extend Vim's functionality. Plugins may be
-
-- *global plugins*: for all kinds of files.
-  + A set of standard plugins are automatically loaded upon startup.
-    - =gzip=: supports transparent reading and writing of =compress= =gzip=, =bzip2=,
-      =lzma=, =xz=, =lzip=, =zstd= files.
-    - =netrw=: similar to Emacs' =TRAMP=. Transparent editing of files on other machines.
-    - =tar=, =zip=: similar to =gzip=.
-    - a global plugin is added by dropping the copy in the right directory
-    (e.g. =~/.local/share/nvim/site/plugin/= per user, =$VIMRUNTIME/plugin= and =$VIMRUNTIME/macros= globally)
-
-- *filetype plugins* (*ftplugins*): used for a specific type of file.
-  + typically put under the =ftplugin= directory
-  + plugin files are renamed as =filetype_name.vim=.
-
-The plugin directory (=plugin= or =ftplugin=) can be in any of the directories in the =runtimepath=
-option. To debug plugin loading, start Vim with =-V2=.
-
-** Package Management
-
-A *package* is a directory that contains *plugins*. It may be a separate directory,
-a VCS repository, a set of interdependent plugins, "start" packages.
-
-Packages are stored in the paths =runtimepath= or =pack/*/start/*= paths under
-runtime paths.
-
-*** Builtin Manager
-
-* Truecolor Support
-
-- =set termguicolors= to enable 24-bit true color support.
