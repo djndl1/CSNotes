@@ -790,4 +790,22 @@ For builtin types, see =sys.types=
 
 ** DML
 
+** Procedural SQL
+
+- =BEGIN ... END= as a code block structure
+
+- =IF ... ELSE ...= needs no =THEN= and =END IF=. =BEGIN ... END= is optional if
+  the statement includes only one.
+
+- =GOTO= and labels are used as in C.
+
+- try-catch =BEGIN TRY ... END TRY BEGIN CATCH ... END CATCH= catches any errors
+  of which the severity is higher than 10.
+  + errors are retrieved using The =ERROR_*()= functions.
+  + Errors are thrown with the =THROW= keyword or =RAISEERROR= (legacy).
+
+- All stored procedures may return an integer value (default 0).
+
+- Only =WHILE=-loop is available.
+
 ** Stored Procedure
