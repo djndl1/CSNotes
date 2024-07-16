@@ -531,11 +531,24 @@ dictionary words and even entire lines. Completion includes
 * Syntax Highlighting
 
 =:syntax enable=, =:syntax on=, =set syntax=filetype=. Syntax definition files
-are stored in =$VIMRUNTIME/syntax=.
+are stored in =$VIMRUNTIME/syntax=. User color schemes are placed under =~/.config/nvim/colors=.
 
-#+begin_comment
-TODO: customization
-#+end_comment
+#+begin_src
+# sets color scheme to "evening"
+:colorscheme evening
+# syntax schemes in use, i.e. c, fortran or idl etc.
+set syntax=idl.c
+
+# display a set of colors to test colors and show appropriate color combinations
+:runtime syntax/colortest.vim
+
+:syntax clear # switch off colors for this buffer
+:syntax off # switch off colors completely
+
+:syntax manual # enable syntax highlighting but not automatically when editing a buffer,
+:set syntax=ON # requires explicit setting to turn on syntax highlighting for the current buffer
+#+end_src
+
 
 * QuickFix: Edit-Compile-Edit Cycle
 
