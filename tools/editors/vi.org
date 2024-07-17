@@ -68,10 +68,12 @@ commands in vi denotes both text objects and certain related commands.
   + a few special marks: see =:h '[=.
     - =.= (last change), ='= (before a jump),
     =^= (last insertion), ="= (the position when last exiting the buffer, e.g.
-    the position before jumping to another buffer)
+    the position before jumping to another buffer, useful for returning to the
+    initial position after editing other files)
 
 - =mx=, =`x=, ='x= :: mark a position; return to the position; return to the
   first non-white character of the marked line.
+  + uppercase marks (file marks) are global while lowercase marks are local to a buffer.
 
 *** Moving Around on the Screen
 
@@ -129,13 +131,13 @@ Sections are completely defined by macros.
 
 - =o= / =O= :: insert a newline below/above and enter the insert mode.
 
-- =a= :: append after the cursor, =i= before the cursor; =I= and =A=: prepend/append to the
+- =a=, =i=, =I=, =A= :: =a= append after the cursor, =i= before the cursor; =I= and =A=: prepend/append to the
   current line.
   + insert commands may be prefixed with a count number, to indicate the
     repetition of the inserted text.
   + Under =vi=, =a= only appends, =i= only inserts: they cannot modify existing
     text and backspace deleting characters are not instantly displayed as deleted.
-  + Under insert mode, =^H= is backspace, =^U= deletes the input on the current
+  + Under insert mode (ASCII caret notation), =^H= is backspace, =^U= deletes the input on the current
     line; =^W= erases a word; =^I= inserts a tab; =^[= is the escape key.
   + In case some other operations are required under
     insert mode, use =^o= to access normal mode commands.
@@ -176,6 +178,7 @@ uppercase is used to append to the previous register contents.
   + ~D~ delete to the end of the line, equal to  = ~d$~
   + to delete with a search inclusively, add an offset (typically =e=) after the
     search pattern.
+  + a double quote references a register/buffer. A single quote moves to a mark.
 
 The editor saves the last 9 deleted blocks of text in a set of numbered
 registers 1-9, accessible by ="n=.
@@ -451,14 +454,16 @@ current filename as =%= and the alternate filename as =#=. They may be used with
 - =(1,$){w}rite (>>) file/!command= :: overwrite/appends (to file only) the specified lines (by
   default the entire buffer) to a filename/command stdin.
   + =w!= overwrite an existing file.
+  + (Vim) =saveas file=  writes a file and change the filename of the buffer to
+    that file.
 
 - ={x}it! file= :: exits with changes saved if modified.
 
-- =preserve= :: write the current buffeer into its swap and the swap file will
-  not be deleted after exiting so that changes may be recovered.
-
 - =(.+1)z window_size= :: print the next count lines, the current line is
   changed. This command is basically scroll.
+
+- =preserve= :: write the current buffeer into its swap and the swap file will
+  not be deleted after exiting so that changes may be recovered.
 
 - =(.)z -/./ number_of_lines= :: prints a window of text with the specified line
   at the top.

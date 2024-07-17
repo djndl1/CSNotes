@@ -334,14 +334,20 @@ even if the window in inactive state has a different size.
 
 ** Windows and Buffers
 
+Besides multiple windows on the same tab or multitabbed editing and the old Vi
+args file list, Vim can hide a window but retain the buffer.
+
 - =:ls=, =:buffers=, =:files= lists buffers and files
-  + =%= (current), =#= (alternate)
+  + =%= (current), =#= (alternate); =C-^= edits the alternate file,
   + =u= unlisted buffer (e.g. a help buffer)
   + =a= active (loaded and visible) buffer, =h= hidden buffer
   + =-=, ===, not modifiable. === is read-only and never modifiable
   + =+= modified, =x= read error
+  
 
 A buffer may be hidden by opening another file if the =hidden= option is set.
+=:hide= quits the current windows. The hidden window is not closed and does not
+requires saving and may be unhidden.
 
 - =:windo cmd=: do =cmd= in each window of the current tab
 
