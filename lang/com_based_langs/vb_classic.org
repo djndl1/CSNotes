@@ -6,7 +6,7 @@
 that interfaces with various objects that make up an application via the host
 application's object model.
 
-VB5 introduces the Visual Basic IDE. VBA programs and the VBA developement
+VB5 introduces the Visual Basic IDE. VBA programs and the VBA development
 environment itself both execute in the same process before compilation.
 
 In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rapid Application Development]]
@@ -1562,6 +1562,35 @@ Windows-builtin COM library.
 - =StringBuilder= works but overloading makes it hard to find the correct method name.
 
 - Various crytographic classes
+
+* Unicode
+
+VB strings are UTF-16 strings but VB lacks proper Unicode support due to many
+API design flaws and tooling problems.
+
+** Some APIs Would Convert VB Unicode Strings to ANSI
+
+*** Controls
+
+The builtin controls are an example. *After the conversion*, the =Font.Charset= property determines the
+charset used by the runtime to interpret the ANSI bytes.
+
+Its =PropertyBag= (the Properties window on the screen) is in ANSI mode.
+
+**** Solutions
+
+- Use other control libraries such as Microsoft Forms 2.0 (downloadable)
+
+** The IDE itself does not recognize Unicode Literals
+
+not even UTF-16 and rejects BOM at the beginning of a source file.
+
+*** Solutions
+
+- A workaround is to encode every UTF-16 code units as =ChrW(codepoint)=.
+  The only ultimate savior is probably UTF-8 as a locale since Windows 10.
+
+- Save Unicode text externally in a database or in a file and load it in the code.
 
 * P-Code, Compiler, Linker and Optimization[cite:@vbMinutiae]
 :PROPERTIES:
