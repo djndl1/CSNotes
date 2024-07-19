@@ -1,7 +1,86 @@
 #+title: OPC DA DCOM Remote
 
-OPC DA DCOM configuration is well documented in KEPServerEx's documentation and in other vendors'. However, when launching a client to access a remote OPC DA server. There are some curious situations.
+OPC DA DCOM configuration is well documented in KEPServerEx's documentation and
+in other vendors'. However, when launching a client to access a remote OPC DA
+server.
 
-1. The windows firewall must open certain ports, seemingly TCP 135 but there is an option in the windows firewall configuration called RCP dynamic ports to choose. Not sure which one actually helps.
+An app uses its own hardcoded/configurable security settings or respect settings
+found in Component Services, either the system Defaults or its own specific
+settings if there is an entry for it.
 
-2. Matrikon OPC Explorer works well with documented DCOM configuration. KEPServerEX's runtime needs to run as the same user instead of a system user. OPC Quick client and others I don't known why they work and don't work.
+* Typical Steps
+
+- Create a common user with the same password on both machines.
+
+- Configure the OPC Server's DCOM security so that this user or its belonging
+  group are allowed for remote launching, activation and access.
+
+- Configure the OPC Client machine so that the server has Access Permissions to
+  send data back upon subscription/exception.
+  + The client may not even have an entry in Component Services and it may not
+    even respect any default or app-specific settings.
+
+- Configure OPCEnum so that remote clients can connect and browse for available
+  OPC servers.
+  + Authentication: None or =Packet Integrity= or =Packet Privacy= after hardening;
+  + Launch Permission: Default; Access Permissions: Default; Configuration
+    Permissions: Customize and add remote principals.
+
+- Configure the firewall, well documented.
+
+- Start the client application with the common user and connect to the server.
+
+These steps seem to be enough for OPC DA 1.0 on most machines. Callback to
+clients is not easy to get right. The easy way is to use the same user on both
+the client and the server.
+Machines need a restart after DCOM settings are changed.
+
+With the same user on the client and the server, both OPC Quick Client and
+KEPServerEX OPC DA Client Driver may connect to remote KEPServerEX. The DA
+Driver even supports automatically automatic addressing
+(=DAChannelName.DADeviceName.[TagAddressInRemoteOPCServer]=)
+without first adding an a tag in the DA device.
+
+* [[https://support.microsoft.com/en-us/topic/kb5004442-manage-changes-for-windows-dcom-server-security-feature-bypass-cve-2021-26414-f1400b52-c141-43d2-941e-37ed901c769c][DCOM Hardening]]
+
+Windows 8.1, Windows 2008 and above. Already mandatory and cannot be disabled.
+All non-anonymous activation requests are raised to
+=RPC_C_AUTHN_LEVEL_PKT_INTEGRITY= if a client machine has received the update.
+The server side also automatically work with new client authentication level
+after the update.
+
+This does not affect anonymous activation. That is, in the case where the server
+is patched and the client is not, one may enable anonymous login (insecure!).
+This requires machine-wide =Edit Limits= Remote Access and Remote Activation for =ANONYMOUS=.
+
+#+begin_quote
+    DCOM Servers and, thus, OPC Classic (DA, HDA, A&E) Servers will reject
+    connections with an authentication level of “None”, “Connect”, “Call” or
+    “Packet”
+    DCOM Clients and, thus, OPC Classic (DA, HDA, A&E) Clients must be
+    configured to use an authentication level of “Default”, “Packet Integrity”
+    or “Packet Privacy”.  If configured for Default, the system Default
+    Authentication Level in Component Services->My Computer->Properties, must be
+    set to Packet Integrity or Packet Privacy and match what the target OPC
+    Server computer is using.
+#+end_quote
+
+* Local Security Policy =secpol=
+
+- =Network access: Let Everyone permissions apply to anonymous users=: this gives
+  Everyone permissions to anonymous users, which workarounds the DCOM hardening
+  issue as the client may log on without a credential and still gaining access
+  to OPC Server as long as the server allows =Everyone=.
+
+- =Network access: Sharing the security model for local accounts=: a must so
+  that remote logins as local users may gain local users' security contexts.
+
+* Troubleshooting
+
+The Windows Event Logs has logon/logoff auditing messages and DCOM-related errors.
+
+* References
+
+- [[https://www.softwaretoolbox.com/dcom/html/background.html][Software Toolbox DCOM Tutorial]]
+
+- [[https://support.softwaretoolbox.com/app/answers/detail/a_id/4017][Microsoft DCOM Hardening (CVE-2021-26414, KB5004442) Technical Resources]]
