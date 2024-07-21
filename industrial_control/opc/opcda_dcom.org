@@ -1,24 +1,69 @@
 #+title: OPC DA DCOM Remote
 
-OPC DA DCOM configuration is well documented in KEPServerEx's documentation and
-in other vendors'. However, when launching a client to access a remote OPC DA
-server.
+* DCOM Concepts
 
 An app uses its own hardcoded/configurable security settings or respect settings
 found in Component Services, either the system Defaults or its own specific
 settings if there is an entry for it.
+First, an app may explicitly set its authentication level, which may be not modified
+by administrators. If not, it attempts to use the per-application setting, and
+falls back to the system defaults if not found. The authentication level is both a
+requirement for incoming request and outbound calls. A client may receive
+callbacks from the server, thus a client may also act as a server.
+
+DCOM relies on MSRPC authentication, which provides several level of security:
+default, none, per-connection, per-call, per-package, per-package with data
+integrity, per-package with encryption.
+
+The actual permission of the =RPC_C_AUTHN_LEVEL_DEFAULT= option, if used by an app in its
+code, is controlled by the system's =Default= permission. There is also a
+=Default= option in the DCOM permission setting, which used to be
+=RPC_C_AUTHN_LEVEL_CONNECT=, now after hardening only =RPC_C_AUTHN_LEVEL_PKT_INTEGRITY= and
+=RPC_C_AUTHN_PKG_PRIVACY= are accepted for non-anonymous DCOM.
+
+There are a few permission settings in Component Services:
+
+- *Defaults* Permissions: DCOM apps use unless a per-app entry is used
+
+- *Limits* Permissions: will be enforced even if per-app settings exceed these
+  settings, that is, restriction policy.
+
+- *Access* Permission: access instances of the class
+
+- *Launch* Permission: start new servers of this class
+
+- *Activation* Permission: COM object activation
+
+* Permission Requirement
+
+For a client to access the server, the server's per-app security entry (if any,
+otherwise use the system Defaults) should
+allow the client's security principal to access, activate and possibly launch the server. The
+server system should also lift =Edit Limits= for the client principal.
+
+The client needs to allow remote DCOM access to the client application, most
+likely the Defaults permissions.
+
+Do not remove =Everyone= from any ACL lists, which may cause local services to
+fail to start, even RDP.
 
 * Typical Steps
 
 - Create a common user with the same password on both machines.
 
-- Configure the OPC Server's DCOM security so that this user or its belonging
-  group are allowed for remote launching, activation and access.
+- Configure the OPC Server's DCOM security (application-specific entry and the
+  machine-wide limits) so that this user or its belonging
+  group are allowed for remote activation, access and optionally launch.
 
 - Configure the OPC Client machine so that the server has Access Permissions to
   send data back upon subscription/exception.
   + The client may not even have an entry in Component Services and it may not
     even respect any default or app-specific settings.
+  + Creating a custom user for the server, running the server with the user and granting it Remote Access
+    Permissions on the client side gives the server to call back to the client.
+
+- Machines may need a restart after DCOM settings are changed or at least
+  related DCOM applications may restart.
 
 - Configure OPCEnum so that remote clients can connect and browse for available
   OPC servers.
@@ -30,24 +75,46 @@ settings if there is an entry for it.
 
 - Start the client application with the common user and connect to the server.
 
-These steps seem to be enough for OPC DA 1.0 on most machines. Callback to
-clients is not easy to get right. The easy way is to use the same user on both
-the client and the server.
-Machines need a restart after DCOM settings are changed.
 
-With the same user on the client and the server, both OPC Quick Client and
-KEPServerEX OPC DA Client Driver may connect to remote KEPServerEX. The DA
-Driver even supports automatically automatic addressing
+** Final Result
+
+- For the client to access the server, I created a named user =OPCRemote= and
+  added it a group =OPCRemoteGroup= on both the client and the server.
+  Allow this group on the server in KEPServerEX's DCOM Remote Access,
+  Remote Activation settings and in machine-wide limits. This gives the client
+  access to the server.
+
+- Created a named user =KEPServerRuntime= for KEPServerEX 6.4 Windows service and
+  added it to the client's machine-wide Defaults Remote Access and Remote Access Limits.
+  + Do not use the default =LocalSystem= with KEPServerEX. It presents to remote
+    computers (the client) the computer credential, which is not available
+    without a domain, although it can steal credentials of logged-on users.
+    =NetworkService= presents =Everyone= and =Authenticated Users=.
+    =LocalService= presents =ANONYMOUS LOGON=: neither offers granular access.
+
+If launch is allowed, KEPServerEX as out-of-proc COM server may be started by a
+local or remote client.
+
+The DA Driver even supports automatically automatic addressing
 (=DAChannelName.DADeviceName.[TagAddressInRemoteOPCServer]=)
 without first adding an a tag in the DA device.
 
 * [[https://support.microsoft.com/en-us/topic/kb5004442-manage-changes-for-windows-dcom-server-security-feature-bypass-cve-2021-26414-f1400b52-c141-43d2-941e-37ed901c769c][DCOM Hardening]]
 
-Windows 8.1, Windows 2008 and above. Already mandatory and cannot be disabled.
+Hardening of DCOM authentication with A service-side enforcement. DCOM servers
+will simply not accept non-anonymous connections from DCOM client using
+authentication level that is below Packet Integrity. The solution also raises
+process default authentication level[1] for activation to
+=RPC_C_AUTHN_LEVEL_PKT_INTEGRITY= if it's below Packet Integrity in Windows COM
+layer on DCOM clients.
+
+Windows 7, Windows 2008 and above. Already mandatory and cannot be disabled
+since March 2023.
 All non-anonymous activation requests are raised to
 =RPC_C_AUTHN_LEVEL_PKT_INTEGRITY= if a client machine has received the update.
 The server side also automatically work with new client authentication level
-after the update.
+after the update. The authencation level requirement on the server simply
+becomes more strict. It is the client that should take action to mitigate the issue.
 
 This does not affect anonymous activation. That is, in the case where the server
 is patched and the client is not, one may enable anonymous login (insecure!).
@@ -65,6 +132,23 @@ This requires machine-wide =Edit Limits= Remote Access and Remote Activation for
     Server computer is using.
 #+end_quote
 
+** Client-Side Mitigation
+
+- Fix the client code and use the appropriate authentication level, which is not
+  always possible.
+
+- Change the DCOM setting in Component Services (tested, guaranteed to work):
+  for applications that uses DCOM without explicitly
+  specifying a security level (with =CoInitializeSecurity= or
+  =CoCreateInstanceEx=), it uses the authentication level set in the per-app
+  entry and the system defaults as a fallback.
+  + Set both sides' Default and server's authentication level to =Packet
+    Integrity= and reboot both.
+    This forces clients uses package integrity.
+
+- Client Side Auto-Elevation (with client-side Windows patches): configure the client and the server into the same
+  domain or to use known user accounts.
+
 * Local Security Policy =secpol=
 
 - =Network access: Let Everyone permissions apply to anonymous users=: this gives
@@ -75,6 +159,17 @@ This requires machine-wide =Edit Limits= Remote Access and Remote Activation for
 - =Network access: Sharing the security model for local accounts=: a must so
   that remote logins as local users may gain local users' security contexts.
 
+* Network Issues
+
+TLDR: use a VPN
+
+** NAT
+
+DCOM by default does not work with NAT: the server calls back to the incoming
+IP's 135 port! This makes async and subscription calls invalid. DCOM was not
+designed to cross firewalls. DCOM over HTTP does not seem to solve the problem:
+it doesn't support callback.
+
 * Troubleshooting
 
 The Windows Event Logs has logon/logoff auditing messages and DCOM-related errors.
@@ -84,3 +179,9 @@ The Windows Event Logs has logon/logoff auditing messages and DCOM-related error
 - [[https://www.softwaretoolbox.com/dcom/html/background.html][Software Toolbox DCOM Tutorial]]
 
 - [[https://support.softwaretoolbox.com/app/answers/detail/a_id/4017][Microsoft DCOM Hardening (CVE-2021-26414, KB5004442) Technical Resources]]
+
+- [[https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-r2-and-2008/cc772031(v=ws.11)][Manage DCOM Applications]]
+
+- [[https://serverfault.com/questions/135867/how-to-grant-network-access-to-localsystem-account][How To Grant Network Access to LocalSystem Account]]
+
+- [[http://web.archive.org/web/20061219191308/http://msdn.microsoft.com/library/en-us/dndcom/html/cis.asp][COM Internet Services]]
