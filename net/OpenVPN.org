@@ -8,24 +8,30 @@
 - /Ethernet Bridging/: combining an ethernet interface with one or more virtual TAP interfaces under a single bridge interface.
 
 - /Public Key Infrastructure/:
-  + a separate certificate (public key) and private key for the server and each client and
-  + a master CA certificate and key which is used to sign each of the server and client certificates
-  + Both sides will authenticate the other by first veritying that the presented
+  + may reside on a completely separate machine.
+  + Consists of
+    - a separate certificate (the public key) and private key for the server and each
+    client to implement authentication.
+    - a master CA certificate and key which is used to sign each of the server and client certificates
+  + Both sides will authenticate the other by first verifying that the presented
     certificate was signed by the master CA and then test other information in
     the certificate.
 
-* Setup a OpenVPN server
+* [[https://openvpn.net/community-resources/how-to/][Set Up a OpenVPN server]]
 
 1. Build a CA and produce a CA certificate and a CA private key
+   + with EasyRsa scripts, two lines
 
-2. Request the CA to sign a server certificate, which produces a server certificate
-   and a server private key.
+2. Request the CA to sign a server certificate.
+   + The certicate and the key may be generated beforehand.
 
 3. Request the CA to sign clients' certificates.
+   + The certicate and the key may be generated beforehand.
 
 4. Set up the server's openvpn configuration, which requires the CA's certificate,
-   the server's certificate and the server's privat key.
+   the server's certificate and the server's private key.
+   + for key exchange, DH needs to be generated.
 
-5. Set up the clients, which requires the CA cert, their respective certiciate and the private key.
+5. Set up the clients, which requires the CA cert, their respective certificate and the private key.
 
 6. By default, clients cannot communicate with each other.
