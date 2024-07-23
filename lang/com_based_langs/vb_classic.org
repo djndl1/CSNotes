@@ -25,7 +25,9 @@ In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rap
 
 7. It is possible to reference any COM-visible objects in VB6, including those in CLR.
 
-* VBA Development
+8. event-driven programming, modular programming and half OOP.
+
+* VBA Development Environment
 
 ** Project Structure
 
@@ -73,7 +75,7 @@ Type=[Exe for Standard Exe,OleExe for ActiveX EXE,OleDll for ActiveX DLL,Control
 Reference=*\G{COM Library UUID}#Version#0#PathToDllOrTypeLib#Library Helpstring name
 Module=ModuleName; ModuleFile.bas # module source file
 Form=FormName.frm  # form source file
-From=MDIForm.frm
+Form=MDIForm.frm
 Class=ClassName; ClassName.cls # class source file
 UserControl=UserControlName.ctl # UserControl source file
 Startup="Sub Main" # Startup object
@@ -128,7 +130,8 @@ Attribute VB_Exposed = False
 
 * Basics
 
-VB keywords and identifiers are Case-Insensitive.
+VB keywords and identifiers are Case-Insensitive. Be careful, many common words
+used in other language are keywords in VB (e.g. =Open=, =Close= etc.)
 
 ** Program Entry Point
 
@@ -154,7 +157,13 @@ A form or a code module function can be the entry point of a program.
 - ActiveX components shouldn't exit by themselves: they should be managed by the
   OS since they may be referenced by other apps.
 
+- =Unload= the main form exits the program.
+
 ** Variable and Constants
+
+#+begin_src basic
+Dim varname As varType, [varname2 As varType2]
+#+end_src
 
 *USE* =Option Explicit= *TO FORCE EXPLICIT DECLARATION OF VARIABLES AND CONSTANTS*.
 
@@ -169,7 +178,7 @@ A form or a code module function can be the entry point of a program.
 - In general terms, late binding is slightly more efficient for out-of-process
   ActiveX EXEs, and early binding is vastly more efficient for in-process DLLs.
 
-- Setting an =Object= variable requires a =Set=. The value assignment might
+- Setting an =Object= variable requires a =Set=. Value assignment might
   causes the right-side to use its default property and thus unexpected behavior.
 
 *** Scopes and Lifetimes
@@ -200,15 +209,15 @@ execution when the variable is live and available for use.
 
 *** Simple Types
 
+- =Boolean= (2-byte): =0= for =False= and =-1= for =True=
+
+- =Byte=
+
 - =Integer= (16-bit) and =Long= (32-bit, the preferred type for integer values):
   =&= prefixed forces a literal integer into a =Long= value.
   + =&H1234=, =&O011064=
   + an =enum= type can have a maximum sentinel value to guard against invalid
-    integer assigned to a variable of such a =enum= type.
-
-- =Boolean= (2-byte): =0= for =False= and =-1= for =True=
-
-- =Byte=
+    integers assigned to a variable of such a =enum= type.
 
 - =Single= and =Double=
 
@@ -224,7 +233,8 @@ execution when the variable is live and available for use.
   + =NULL= and =""= are equivalent for =BSTR=. See
     [[https://nolongerset.com/check-for-empty-strings-in-vba/][Check for Empty Strings in VBA]].
 
-- =Date= ([[https://learn.microsoft.com/en-us/cpp/atl-mfc-shared/date-type?view=msvc-170][OLE =DATE=]], 8-bytes): =#12/3/2013#
+- =Date= ([[https://learn.microsoft.com/en-us/cpp/atl-mfc-shared/date-type?view=msvc-170][OLE =DATE=]], 8-bytes): one-second precision
+  + ~#12/3/2013#~, ~#2024-01-03 13:21:33#~. No subsecond precision.
   + actually a DateTime
 
 - =Object=: stores references. Object variables are assigned using =Set=.
@@ -1291,7 +1301,7 @@ Forms expose a special property, the =Controls= collection, which contains all t
 
 Container of all the controls currently loaded on the form itself.
 
-* VBA and VB Libraries
+* VBA and VB Operators & Libraries
 
 ** Numbers
 
