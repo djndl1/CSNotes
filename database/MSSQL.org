@@ -698,11 +698,11 @@ locale settings.
   + =CURRENT_TIMESTAMP= or =GETDATE()= (local time), =GETUTCDATE()= (UTC time)
 
 - =DATETIME2= (*recommended*, supersedes =DATETIME=): 0-7 subsecond customizable
-  precision, by default 7.
+  precision, by default 7 (Windows =FILETIME= precision).
   + default literal format =YYYY-MM-DD hh:mm:ss[.fractional seconds]=
   + ISO 8601 =YYYY-MM-DDThh:mm:ss[.nnnnnnn]=
   + ODBC format ={ ts 'yyyy-MM-dd HH:mm:ss[.fff]' }= is supported and seems to
-    work with JDBC and ADO.NET.
+    work with JDBC and ADO.NET but it only represents a legacy =DATETIME=.
   + =SYSDATETIME()= (local time), =SYSUTCDATETIME()= (UTC time)
 
 - =smalldatetime= (*legacy*): minute-level precision. The value is rounded to
