@@ -979,6 +979,12 @@ Powershell gallery and =PowerShellGet= Module.
 
 * Cookbook
 
+** Delete A Symbolic Link
+
+#+begin_src powershell
+(Get-Item symLink).Delete()
+#+end_src
+
 ** Create a scheduled task
 
 [[https://stackoverflow.com/questions/13965997/powershell-set-a-scheduled-task-to-run-when-user-isnt-logged-in][powershell-set-a-scheduled-task-to-run-when-user-isnt-logged-in]]
