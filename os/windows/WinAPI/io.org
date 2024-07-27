@@ -1,3 +1,100 @@
+* Filesystem
+
+** Linking Filesystem Objects
+
+On NTFS at least. All NTFS links are transparent to applications.
+
+Windows shortcuts are shell links, recognized by the Windows Explorer, but not
+the filesystem.
+
+- *Hard link* (Since NT 4): more than a path referencing a single file in the same volume.
+  Simply a
+  directory entry for a file, without a security descriptor.
+  + not applicable to folders
+  + file attributes and security descriptor are shared among all hard links to
+    the file.
+  + =CreateHardLink= to create, =DeleteFile= to remove,
+
+  #+begin_src shell
+mklink.exe /h linkname targetpath
+# W2K and XP
+fsutil hardlink create linkname targetpath
+
+# powershell
+New-Item -ItemType HardLink -Path LinkPath -Target targetPath
+
+# deletion on CMD
+del linkname
+  #+end_src
+
+- *Directory Junction Point* (since Windows 2000 on NTFS and mostly legacy,
+  except that it requries no admin privilege): May link directories
+  on different local volumes.
+  + implemented using reparse points
+  + always absolute and points only to directories.
+  + Safe to delete in Windows Explorer without affecting the original directory.
+
+  #+begin_src shell
+mklink.exe /j linkname targetpath
+
+# pwsh
+New-Item -ItemType Junction -Path LinkPath -Target targetPath
+
+# for deletion on CMD
+rmdir linkname #  no del
+# for deletion on powershell, use .NET API, do not use Remove-Item or any its aliases
+(Get-Item LinkName).Delete()
+  #+end_src
+
+- *symbolic links* (since Windows Vista): full support for corss-filesystem
+  links and even SMB network path.
+  + Not permitted by default (configurable in Local Security policy) for non-admin users
+  + Implemented with *reparse points*, a collection of user-defined data in a
+    file or a directory that is used by an app or a filesystem filter to process.
+  + Safe to delete in Windows Explorer without affecting the original directory.
+  + =CreateSymbolicLink()= to create
+  + Junctions are processed at the server and symlinks are processed at the
+    client: this might cause unexpected redirection results. However, a junction
+    point points only to local folders, while symlinks permits remote folders.
+
+  #+begin_src shell
+mklink linkname targetpath
+
+#pwsh
+New-Item -ItemType SymbolicLink  -Path LinkPath -Target targetPath
+
+# CMD, to avoid delete the original directory or file
+rmdir linkname # do not use del in CMD and rmdir in Pwsh
+
+# powershell, do not use
+(Get-Item LinkName).Delete()
+  #+end_src
+
+- Mounting point
+  + also implemented using reparse points
+
+  #+begin_src shell
+mountvol mountpoint \\?\volume{volumeGuid}
+  #+end_src
+
+** Use & Usage
+
+- WinSxS uses hard links to track DLLs
+
+- Backward compatibility
+  + Some hidden links on Windows are maintained for compatibility with XP, e.g.
+    =C:\Documents and Settings= to =C:\Users=, =%Userprofile%\Application Data\=
+    to =%UserProfile%\AppData\Roaming=
+
+- Program redirection
+  + do not try to redirect system folders.
+
+- Saving Storage Space
+
+- Circumventing predefined paths
+  + some programs requires a special installation path.
+
+
 * [[https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file][File Naming]]
   :PROPERTIES:
   :CUSTOM_ID: file-naming
