@@ -1,0 +1,22 @@
+#+title: Time
+
+* Representation
+
+** =FILETIME= timestamp
+
+=FILETIME= is the timestamp used by Windows (Do not be fooled by the name). It
+represents the number of 100-nanosecond ticks since 1601-01-01T00:00:00Z,
+supposedly a UTC time. The tick number is supposed to be nonnegative, with the
+highest bit unused, and its value ranging from year 1601
+through year 30827.
+
+#+begin_src c
+typedef struct _FILETIME {
+  DWORD dwLowDateTime;
+  DWORD dwHighDateTime; // the
+} FILETIME, *PFILETIME, *LPFILETIME;
+#+end_src
+
+For any integer operation on =FILETIME=, cast it to the =ULARGE_INTEGER= union
+and use =QuadPart=. Do not cast a =FILETIME= pointer to access it, which causes
+alignment faults on Win64.
