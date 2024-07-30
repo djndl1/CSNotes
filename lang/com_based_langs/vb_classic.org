@@ -820,6 +820,12 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 #+end_src
 
+- =VB_Name=: class name
+
+- =VB_PredeclaredId=: if =True=,  the default instance
+  variable is given the name of the class as its name (a singleton with the same
+  name as the class name).
+
 *** Procedure Attributes
 
 Tools-Procedure Attributes: stored next to the member definition, not shown in
