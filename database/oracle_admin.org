@@ -1,61 +1,76 @@
-G#+TITLE: Oracle_admin
+#+TITLE: Oracle_admin
+#+bibliography: Oracle.bib
 
 * Common Tasks and Tools
 
 *** Common Tasks
 
 1. Installing/Upgrading software:
-
 2. creating databases
-
 3. Start/stopping the instance
-
 4. Managing the storage structures of the database
-
 5. Managing users and security
-
 6. Managing database objects
-
 7. Backup and recovery
-
 8. Monitoring and tuning the performance
 
 *** Tools
 
-1. Oralce Universal Installer
-
+1. Oracle Universal Installer
 2. Oracle Database Configuration Assistant
-
 3. Database Upgrade Assistant
-
 4. Net Configuration Assistant
-
 5. Oracle Enterprise Manager Database Express
-
 6. SQL Developer
 
-* Installation
+* Installation Consideration
 
-- System Identified (SID): unique identifier on the system
+** Identifiers
 
-- Global database name: =database_name.database_domain=
+- *System Identifier* (SID): unique identifier on the system
 
-- Operating System Groups: administrative access to database is granted by
-  membership in certain OS groups.
+- *Global database name*: =database_name.database_domain=
+
+** OS Users
+
+Installing Oracle database software and running DBCA requires system administrative user privilege.
+
+- OSDBA group (Unix-only) =dba=
+
+** Editions & Installation Classes
+
+- *Installation Classes*: installation scheme not actual products.
+  + /Desktop/: minimal configuration with only basic choices
+  + /Server/: support enterprise-level applications and provides advanced
+    configuration options
+
+- *Editions*
+  + /Enterprise/: full-featured for enterprise-level apps for mission-critical,
+    high-security online transaction processing and data warehousing environments.
+  + /Standard Edition 2/: for department or workgroup-leve l apps and small or
+    medium-sized enterprises to provide core relational database management
+    services and options and mangement tools, full distribution, replication, web
+    features and facilities.
+
+** Installation Directories
+
+- Oracle Base =ORACLE_BASE=: a directory where Oracle data and some other components are placed;
+  + by default the =app/username= directory on the partition with the largest space available
+    on Windows or =u01= to =u09= (if present) or =$HOME= on Unix.
+
+- Oracle Home: Oracle database is installed in =ORACLE_HOME=, previously a
+  subdirectory of =ORACLE_BASE=.
+  + =ORACLE_HOME/bin= needs to be in =PATH=.
 
 ** Environment Variables
 
-- =ORACLE_SID=
-
 - On Unix, a profile file for shell, on Windows =HKLM:\Software\Oracle=
 
-- Oracle Base =ORACLE_BASE=: a directory where Oracle software is installed;
-  Oracle database is installed in =ORACLE_HOME=, a subdirectory of the base
-  directory. =ORACLE_HOME/bin= needs to be in =PATH=.
+- =ORACLE_SID=: the Oracle database system ID, by default =ORCL=
 
-** Creating A Database
+** Creating Database
 
-- Fast Recovery Option: LGWR can archive the inactive redo log group to recover all commited transactions, or to keep a standby database current with its original database.
+- Fast Recovery Option: LGWR can archive the inactive redo log group to recover all committed transactions, or to keep a standby database current with its original database.
 
 - Connection Mode:
   + Dedicated Server mode: default. each user process gets a server process. typical for persistent long running requests to the database.
@@ -63,10 +78,20 @@ G#+TITLE: Oracle_admin
 
 - =DATABASE_PROPERTIES=, =GLOBAL_NAME=, =V$DATABASE=
 
+*** Workload Template
+
+DBCA creates a database based on some template.
+
+- General Purpose or Transaction Processing
+
+- Data Warehouse
+
+- Custom
+
 ** Database Service
 
 A named representation of one or more database instances, either a
-single-instance database or an RAC.
+single-instance database or an RAC, not OS background service.
 
 Database services are not just a name, but also units of resource management,
 performance measurement, editioning. It divides workloads of a single database
@@ -86,6 +111,71 @@ otherwise use =DBMS_SERVICE.CREATE_SERVICE=
 - =DBA_SERVICES=, =ALL_SERVICES=, =V$SERVICES=, =V$ACTIVE_SERVICES=,
   =V$SERVICE_STATS=, =V$SERVICE_EVENT=, =V$SERVICE_WAIT_CLASS=,
   =V$SERVICEMETRIC=, =V$SERVICEMETRIC_HISTORY=
+
+** Enterprise Manager Express[cite:@TwoDayDba]
+
+A web-based database management tool for performance management and monitoring, built inside the Oracle database on
+top of Oracle XML DB. *It is not a replacement for SQL Developer or SQL Plus and is still a WIP as of 19c*.
+
+Its overhead on the database server is negligible.
+
+#+begin_src
+# by default port at 5500
+https://database-hostname:port/em/
+#+end_src
+
+*** Features & Functionalities
+
+- *Performance Hub*: a view of all performance data for a give time range,
+  requires Oracle Diagnostics Pack (mainly Automatic Workload Repository AWR).
+
+*** Configuration
+
+If not sure which port is used, run
+
+#+begin_src sql
+
+-- show https port under the current pdb/cdb
+select dbms_xdb_config.gethttpsport() from dual;
+#+end_src
+
+- The =control_management_pack_access= parameter should be set to =DIAGNOSTIC=
+
+- The Oracle Net listener listens this port and should have such an entry.
+
+  #+begin_src
+(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=Desk-Of-P2-1694.cisdi.com. cn)(PORT=5500))(Security=(my_wallet_directory=D:\ORACLE_DATA\admin\orcl
+\xdb_wallet))(Presentation=HTTP)(Session=RAW))
+  #+end_src
+
+- A dispatcher must be configured for Oracle XML DB
+
+  #+begin_src
+dispatcher="(PROTOCOL=TCP)(SERVICE=<sid>XDB)"
+  #+end_src
+  And it should be available as a service
+  #+begin_src
+Service "orcl2023XDB.cisdi.com.cn" has 1 instance(s). Instance "orcl2023", status READY, has 1 handler(s) for this service. ..
+  #+end_src
+
+- A pdb/cdb may use the global CDB port or another port
+  #+begin_src sql
+-- enable the global http port for a pdb
+exec dbms_xdb_config.setglobalportenabled(True);
+
+-- use another one
+exec dbms_xdb_config.sethttpsport(5501);
+  #+end_src
+  If another port is configured, then another endpoint is reachable
+  #+begin_src
+(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=Desk-Of-P2-1694.cisdi.com. cn)(PORT=5501))(Security=(my_wallet_directory=D:\ORACLE_DATA\admin\orcl \xdb_wallet))(Presentation=HTTP)(Session=RAW))
+  #+end_src
+
+- an entry for XML DB is required in the Net listener, the service name is
+  =<SID>XDB= and a dispatcher (shared server mode) is required.
+
+- A user requires a role of =EM_EXPRESS_BASIC= (read-only) or =EM_EXPRESS_ALL= (Read-Write) to log into
+  EM Express (by defualt granted to =SYS= or =SYSTEM=).
 
 * Network Configuration
 
@@ -790,3 +880,19 @@ database called the /Automatic Diagnostic Repository/.
         + =trace=: process trace files, SQL trace files and text-formatted alert
           logpp
         + others
+
+* Globalization & Localization
+
+** Character Set
+
+
+Use =AL32UTF8= (as the database character set) and =AL16UTF16= (as the national character set so that a database
+without proper Unicode support may use Unicode) and set =NLS_LANG= to =.AL32UTF8= on clients.
+
+Language settings affect day and month names, default sorting sequence, reading
+direction.
+
+Territory settings affect day and week numbering, date format, decimal character
+and group separator, currency symbols.
+
+*** National Character Set
