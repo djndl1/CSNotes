@@ -51,7 +51,7 @@ Installing Oracle database software and running DBCA requires system administrat
 - *Editions*
   + /Enterprise/: full-featured for enterprise-level apps for mission-critical,
     high-security online transaction processing and data warehousing environments.
-  + /Standard Edition 2/: for department or workgroup-leve l apps and small or
+  + /Standard Edition 2/: for department or workgroup-level apps and small or
     medium-sized enterprises to provide core relational database management
     services and options and mangement tools, full distribution, replication, web
     features and facilities.
@@ -149,6 +149,9 @@ If not sure which port is used, run
 -- show https port under the current pdb/cdb
 select dbms_xdb_config.gethttpsport() from dual;
 #+end_src
+
+Enabling EM requires configuring a XML DB service and a https port must be configured. Any user logged in
+should have certain privilege.
 
 - The =control_management_pack_access= parameter should be set to =DIAGNOSTIC=
 
@@ -907,3 +910,7 @@ Territory settings affect day and week numbering, date format, decimal character
 and group separator, currency symbols.
 
 *** National Character Set
+
+* Bibliography
+
+#+print_bibliography:
