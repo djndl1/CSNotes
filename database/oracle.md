@@ -166,6 +166,12 @@ WHERE
 
 # OracleDB administration
 
+## Components
+
+- _database_: a collection of physical files, including user data, metadata (e.g. data dictionary), control structures (control files and online redo log files to ensure integrity, availability and recoverability of user data)
+
+- _XML DB_: a high-performance, native XML storage and retrieval engine delivered a part of all versions of Oracle Database. 
+
 ## Architecture
 
 _database instance_: the combination of memory and processes that are a part of running installation.
