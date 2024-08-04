@@ -25,6 +25,10 @@
 
 * Installation Consideration
 
+** License Activation
+
+For oracle, a license is a piece of paper and there is nothing to activate.
+
 ** Identifiers
 
 - *System Identifier* (SID): unique identifier on the system
