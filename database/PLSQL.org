@@ -419,7 +419,66 @@ Doesn't seem to be useful for app code since support for UDT by client drivers i
 
 * Troubleshooting
 
-** Prevent Implicit Data Conversion
+** DBeaver Not Reporting Errors When Compiling Procedures
+
+No solution, use SQL Developer or SQL Plus.
+
+** Remote Debugging With SQL Developer
+
+SQL Developer by default uses =DBMS_DEBUG_JWDP= package to connect the server
+back to a listening debugger on the client.
+
+*** Debug Launch
+
+- Compile a procedure for debug
+  #+begin_src sql
+ALTER PROCEDURE | FUNCTION PROCNAME COMPILE DEBUG | PLSQL_OPTIMIZE_LEVEL = 1;
+  #+end_src
+
+- grant the user =DEBUG CONNECT SESSION= and =EXECUTE= on the target procedure
+  and the =DBMS_DEBUG_JDWP= package.
+
+- Give JDWP ACL privilege to the user
+  #+begin_src sql
+BEGIN
+ DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE
+ (
+ host => '*', -- client ip, possibly with wildward
+ lower_port => null,
+ upper_port => null,
+ ace => xs$ace_type(privilege_list => xs$name_list('jdwp'),
+                    principal_name => '<UserName>'',
+                    principal_type => xs_acl.ptype_db)
+ );
+END;
+  #+end_src
+
+- Configure SQL Developer (in Preferences) to restrict the port so that the
+  client may configure its firewall rule
+
+- If the connection failed, try using SSH remote forwarding, sometimes the
+  connection doesn't work on VPN.
+
+** Debug Attach
+
+- Start A listener (right click the connection in SQL Developer and choose
+  Debug-Remote Debug)
+
+- In another session, establish JDWP connection to the listener. (Possibly requiring =DEBUG CONNECT
+  ANY= or =DEBUG CONNECT USER <user>= to debug other users' sessions)
+
+  #+begin_src sql
+begin
+    dbms_debug_jdwp.connect_tcp('listener_host', 'listener_port');
+end;
+  #+end_src
+
+- run the target procedure (possibly breakpointed) in another session.
+
+- the debug session starts and any breakpoint may halt the execution.
+
+One may create a login trigger and connect to the debugger there if the user
+cannot connect to the debugger manually.** Prevent Implicit Data Conversion
 
 - Use anchors in variable declaration
 
