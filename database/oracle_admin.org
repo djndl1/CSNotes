@@ -82,11 +82,18 @@ Installing Oracle database software and running DBCA requires system administrat
 
 DBCA creates a database based on some template.
 
-- General Purpose or Transaction Processing
+- General Purpose or Transaction Processing: many concurrent users perform
+  numerous transactions that require rapid access to data. Availability, speed,
+  concurrency and recoverability are key issues.
 
-- Data Warehouse
+- Data Warehouse: numeric complex queries that process large volumes of data.
+  Response time, accuracy and availability are key issues.
 
 - Custom
+
+A user may create one's own DBCA template database for time saving, easy
+duplication, easy editing and easy sharing:
+A seed (full structure and data in RMAN backup format and a =.ctl= file) or a nonseed
 
 ** Database Service
 
