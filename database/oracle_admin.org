@@ -897,8 +897,78 @@ database called the /Automatic Diagnostic Repository/.
 
 * Globalization & Localization
 
-** Character Set
+Historically referred to as "National Language Support", which refers to
+choosing a national language and store data in a specific character set, not
+multilingual application support and support for accessing and running software from
+anywhere in the world.
 
+Globalization store, process and retrieve data in native languages. Database utilities, error messages, sort order, and date, time, monetary, numeric and calendar conventions automatically adapt to any native language and locale.
+
+** Common Tasks
+
+- Set up a globalization support environment
+- Choose, analyze or migrate character sets
+- Sort data linguistically
+- Customize locale data
+- Write programs in a global environment
+- Use unicode
+
+** Architecture & Features
+
+Implemented with the *Oracle NLS Runtime Library* (NLSRTL), a comprehensive suite
+of language-independent functions that perform proper text and character
+processing and language-convention manipulations, governed by a set of
+locale-specific data (=$ORACLE_HOME/nls/data=) identified and loaded at runtime on demand.
+
+*** Configuration Parameters
+
+Controlled by several parameters and environment variables on both the client
+and the server.
+Several session-independent parameters controls the database character set and
+the national character set.
+
+Each database session is started on behalf of a client, in the same or different
+locale setting. A client app initializes its NLS environment from environment
+settings and all local NLS operations are performed using these settings. Client
+session NLS parameters are initialized from the server instance's init parameter
+file and then altered by =ALTER SESSION= statements. If =NLS_LANG= is defined on
+the client side, an implicit =ALTER SESSIOIN= is issued to synchronize the
+client environment.
+
+If the client session specifies a different character from the server's,
+conversion is done automatically.
+
+*** Features
+
+- *Language Support*: Languages are stored and encoded by Oracle-supported
+  character sets.  Additional support for a subset of the languages is available
+  + month names translation, sorting according to cultural conventions, proper date
+    formatting and display, translated error messages, translated user interface)
+
+- *Territory Support*: Cultural conventions specific to geographical locations:
+  local time format, date format, numeric and monetary conventions.
+
+- *Date and Time Formats*
+
+- *Monetary and Numeric Formats*: currency symbols, radix symbols and thousand separators.
+
+- *Calendar Systems*: Gregorian, Japanese Imperial, ROC Official, Thai Buddha,
+  Persian, English Hirah, Arabic Hijrah, Ethipian
+
+- *Linguistic Sorting*, or *Collation*: culturally accurate sorting and case convention.
+
+- *Character Set Support*: a large number of single-byte, multibyte and
+  fixed-width encoding schemes based on national, international and
+  vendor-specific standards.
+  + Unicode Support since Oracle 7: =AL32UTF8= for =CHAR=, =VARCHAR= etc. and
+    =NVARCHAR=, =NCHAR=, =NCLOB= (=AL16UTF16= and 3-byte =UTF8= only).
+
+- *Character Semantics*: useful for defining the storage requirements for
+  multibyte strings of varying widths in terms of characters instead of bytes.
+
+- *Locale Customization*: yes, customized locale in addition to builtin locales.
+
+** Character Set
 
 Use =AL32UTF8= (as the database character set) and =AL16UTF16= (as the national character set so that a database
 without proper Unicode support may use Unicode) and set =NLS_LANG= to =.AL32UTF8= on clients.
@@ -908,6 +978,12 @@ direction.
 
 Territory settings affect day and week numbering, date format, decimal character
 and group separator, currency symbols.
+
+*** Migration
+
+Database Migration Assistant for Unicode
+
+TODO
 
 *** National Character Set
 
