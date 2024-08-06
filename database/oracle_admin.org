@@ -987,6 +987,28 @@ TODO
 
 *** National Character Set
 
+*** Application Support
+
+Oracle CLI apps on Unix (on Windows, only SQL Plus) support Unicode. However,
+they use the code pages specified by
+the system. Thus, =NLS_LANG= needs to match the system code page.
+
+**** ADO.NET
+
+- .NET Framework Data Provider For Oracle (from Microsoft)
+  + Requires Oracle 9i clients for =AL16UTF16= =NCHAR=, =NVARCHAR2= and =NCLOB= support.
+  + OCI character set is the expected character set on the client side.
+  + There is the environment NLS settings in OCI (associated with =NLS_LANG=),
+    used by OCI character set conversion functions.
+  + *The provider converts .NET UTF-16 strings to and from the multi-byte
+    strings used by OCI client libraries using the conversion functions in OCI
+    without understanding the conversion details*.
+    The .NET data provider doesn't know =NLS_LANG= and perform the conversion but
+    OCI does. OCI then performs any necessary step to convert to the server's
+    character set. There are two conversions here.
+  + Setting =Unicode=True= initializes the Oracle client libraries in UTF-16
+    mode, which saves the translation between .NET and OCI.
+
 * Bibliography
 
 #+print_bibliography:
