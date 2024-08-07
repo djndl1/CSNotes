@@ -927,6 +927,30 @@ and the server.
 Several session-independent parameters controls the database character set and
 the national character set.
 
+
+- =NLS_LANG=: =[language]_[territory].[charset]= specifying locale behavior for Oracle software
+  + Language settings affect day and month names, default sorting sequence, reading
+    direction. Territory settings affect day and week numbering, date format, decimal character
+    and group separator, currency symbols.
+  + all three are components are optional. Default values are =AMERICAN= for
+    the language, a dervied value from the language value for the territory and
+    a default charset associated with language.
+  + =NLS_LANG= should reflect the setting for the client and correctly enable proper
+    data conversion. The server expects client-side data to be encoded in the
+    charset specified by =NLS_LANG=. Note that =NLS_LANG= does not force the client
+    to use the specified charset, only a hint to certain software components (other
+    wrappers and the server) that the charset should be expected. One may force
+    some other encoding by using raw code values only to input gibberish.
+  + If =NLS_LANG= is not set, it defaults to =AMERICAN_AMERICA.US7ASCII=
+  + NLS session settings =NLS_SESSION_PARAMETERS= (=ALTER SESSION=) supersede NLS instance
+    settings =NLS_INSTANCES_PARAMETERS= (=ALTER SYSTEM=) which supersede NLS
+    database settings =NLS_DATABASE_PARAMETERS= (no way to change after the
+    database creation).
+  + =NLS_[NCHAR_]CHARACTERSET= in the database settings cannot be overrriden by
+    instance or session parameters.
+  + =V$NLS_PARAMETERS=: session parameters in use
+
+
 Each database session is started on behalf of a client, in the same or different
 locale setting. A client app initializes its NLS environment from environment
 settings and all local NLS operations are performed using these settings. Client
