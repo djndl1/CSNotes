@@ -992,16 +992,40 @@ conversion is done automatically.
 
 - *Locale Customization*: yes, customized locale in addition to builtin locales.
 
+
 ** Character Set
 
-Use =AL32UTF8= (as the database character set) and =AL16UTF16= (as the national character set so that a database
+TLDR: Use =AL32UTF8= (as the database character set) and =AL16UTF16= (as the national character set so that a database
 without proper Unicode support may use Unicode) and set =NLS_LANG= to =.AL32UTF8= on clients.
 
-Language settings affect day and month names, default sorting sequence, reading
-direction.
+Character sets differ in
 
-Territory settings affect day and week numbering, date format, decimal character
-and group separator, currency symbols.
+- *character repertoire*: the characters available to used
+  + phonetic, ideographic, syllabary, punctuation, control characters, numbers
+    and symbols.
+
+- the scripts used for writing and the languages that they represent
+  + writing direction is ignored, the database store text in logical order, that
+    is, the order they are input.
+
+- the mapping between code points and characters.
+
+- the encoding scheme to represent a specific character
+
+In summary, what characters, what values they have and how are values encoded.
+
+Characters may be encoded in single bytes (7 bits or 8 bits) or multi bytes
+(fixed-width, variable-wdith or shift-sensitive variable-width)
+
+Oracle Database charsets are typically named in the form
+=<region><number of bits to represent a character><standard charset name>[S|C]=
+
+*** Terminology
+
+- Superset/subset: the relationship between two charsets, in terms of characters
+  only.
+  + binary superset/subset: binary code values are required to be the same for
+    both charsets.
 
 *** Migration
 
