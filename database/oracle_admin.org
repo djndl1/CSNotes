@@ -959,8 +959,9 @@ file and then altered by =ALTER SESSION= statements. If =NLS_LANG= is defined on
 the client side, an implicit =ALTER SESSIOIN= is issued to synchronize the
 client environment.
 
-If the client session specifies a different character from the server's,
-conversion is done automatically.
+If the client session specifies a different character set from the server's,
+conversion is done automatically. The conversion is perfomred at the client side
+if possible, if the client does not support the conversion, the server performs it.
 
 *** Features
 
@@ -995,9 +996,6 @@ conversion is done automatically.
 
 ** Character Set
 
-TLDR: Use =AL32UTF8= (as the database character set) and =AL16UTF16= (as the national character set so that a database
-without proper Unicode support may use Unicode) and set =NLS_LANG= to =.AL32UTF8= on clients.
-
 Character sets differ in
 
 - *character repertoire*: the characters available to used
@@ -1019,6 +1017,54 @@ Characters may be encoded in single bytes (7 bits or 8 bits) or multi bytes
 
 Oracle Database charsets are typically named in the form
 =<region><number of bits to represent a character><standard charset name>[S|C]=
+
+*** Character Sets In Oracle Database
+
+TLDR: Use =AL32UTF8= (as the database character set) and =AL16UTF16= (as the national character set so that a database
+without proper Unicode support may use Unicode) and set =NLS_LANG= to =.AL32UTF8= on clients.
+
+- *Database Character Set*:
+  + =CHAR=, =VARCHAR2=, =CLOB=, =LONG=
+  + Data dictionary data (yes! Chinese identifier names, including column names,
+    schema objects but not all database objects)
+  + SQL, PL/SQL source code
+
+- *National Character Set*: an alternate character set of =AL16UTF16= or 3-byte
+  partial implementation =UTF8=
+  + For =NCHAR=, =NVARCHAR2=, =NCLOB=
+  + NCS should only be considered if Unicode is required but the database
+    character set is not Unicode.
+
+Database/National character sets may not be changed after creation.
+
+*** How To Choose the Character Sets
+
+- the current and the future requirements: generally select =AL32UTF8= for support of
+  most languages in the world.
+
+- Client OS and application support
+
+- Conversion between the client and the server
+  + potential data loss due to unsupported character on one side. The server's
+    charset should be the superset of the client's.
+
+- Performance
+  + avoid charset conversion
+
+*** Length Semantics
+
+Text length may be measured in bytes or characters (code points). Oracle database supports
+defining text types in =BYTE= or =CHAR= qualifier. Or run =ALTER SESSION SET
+NLS_LENGTH_SEMANTICS=BYTE | CHAR= to set the implicit semantics when defining a
+column except in the =SYS= schema.
+=NLS_LENGTH_SEMANTICS= also works as an environment variable on the client or
+the server or initialization parameters (not recommended for compatibility
+reasons). The client's settings take priority. Character semantics is the
+default and the only allowable for national character types.
+
+Some functions and operators are charset-dependent: =SUBSTR=, =LENGHT=, =INSTR=, =LIKE=
+There are charset-independent variants =SUBSTRB=, =SUBSTR2=, =SUBSTR4=,
+=SUBSTRC= (Supplementary and Unicode composed characters are counted as one), =LIKE2= =LIKE4=, =LIKEC=
 
 *** Terminology
 
