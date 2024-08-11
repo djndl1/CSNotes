@@ -923,33 +923,24 @@ locale-specific data (=$ORACLE_HOME/nls/data=) identified and loaded at runtime 
 *** Configuration Parameters
 
 Controlled by several parameters and environment variables on both the client
-and the server.
+and the server, with priority from the lowest to the highest
+
+- Database default values set during creation
+
+- *Initialization parameters* on the server
+
+- *Environment variables* on the client
+
+- Session NLS parameters with =ALTER SESSION=
+
+- In certain SQL functions =TO_CHAR=
+
+Default values are always used when evaluating expressions in
+virtual columns, CHECK constraints, and fine-grained auditing (FGA) rules which
+requires deterministic results for the during of their existence.
+
 Several session-independent parameters controls the database character set and
 the national character set.
-
-
-- =NLS_LANG=: =[language]_[territory].[charset]= specifying locale behavior for Oracle software
-  + Language settings affect day and month names, default sorting sequence, reading
-    direction. Territory settings affect day and week numbering, date format, decimal character
-    and group separator, currency symbols.
-  + all three are components are optional. Default values are =AMERICAN= for
-    the language, a dervied value from the language value for the territory and
-    a default charset associated with language.
-  + =NLS_LANG= should reflect the setting for the client and correctly enable proper
-    data conversion. The server expects client-side data to be encoded in the
-    charset specified by =NLS_LANG=. Note that =NLS_LANG= does not force the client
-    to use the specified charset, only a hint to certain software components (other
-    wrappers and the server) that the charset should be expected. One may force
-    some other encoding by using raw code values only to input gibberish.
-  + If =NLS_LANG= is not set, it defaults to =AMERICAN_AMERICA.US7ASCII=
-  + NLS session settings =NLS_SESSION_PARAMETERS= (=ALTER SESSION=) supersede NLS instance
-    settings =NLS_INSTANCES_PARAMETERS= (=ALTER SYSTEM=) which supersede NLS
-    database settings =NLS_DATABASE_PARAMETERS= (no way to change after the
-    database creation).
-  + =NLS_[NCHAR_]CHARACTERSET= in the database settings cannot be overrriden by
-    instance or session parameters.
-  + =V$NLS_PARAMETERS=: session parameters in use
-
 
 Each database session is started on behalf of a client, in the same or different
 locale setting. A client app initializes its NLS environment from environment
@@ -962,6 +953,78 @@ client environment.
 If the client session specifies a different character set from the server's,
 conversion is done automatically. The conversion is perfomred at the client side
 if possible, if the client does not support the conversion, the server performs it.
+
+
+**** =NLS_LANG=
+
+The language and territory used by the client application and the database
+server and the client's charset for displayed data or entered data. The simplest
+way to specify locale behavior for Oracle database software.
+
+- components: =[language]_[territory].[charset]=
+  + Language settings affect day and month names, default sorting sequence, reading
+    direction.
+  + Territory settings affect day and week numbering, date format, decimal character
+    and group separator, currency symbols.
+  + Each language has a default charset associated with it if the charset is not set.
+  + all three are components are optional. Default values are =AMERICAN= for
+    the language, a derived value from the language value for the territory and
+    a default charset associated with language.
+
+- =NLS_LANG= determines the default values for other detailed NLS parameters.
+  Howevere, each of them can be set in the client environment or in the session to override the
+  value set by =NLS_LANG=.
+
+- =NLS_LANG= should reflect the setting for the client and correctly enable proper
+    data conversion. The server expects client-side data to be encoded in the
+    charset specified by =NLS_LANG=. Note that =NLS_LANG= does not force the client
+    to use the specified charset, only a hint to certain software components (other
+    wrappers and the server) that the charset should be expected. One may force
+    some other encoding by using raw code values only to input gibberish.
+    + (Unix) in case the OS charset is different from =NLS_LANG=, set =NLS_OS_CHARSET=.
+
+- If =NLS_LANG= is not set, it defaults to =AMERICAN_AMERICA.US7ASCII=
+  + =NLS_[NCHAR_]CHARACTERSET= in the database settings cannot be overrriden by
+    instance or session parameters.
+
+**** Data Dictionary Views Related to NLS
+
+- NLS session settings =NLS_SESSION_PARAMETERS= (=ALTER SESSION=) supersede NLS instance
+    settings =NLS_INSTANCES_PARAMETERS= (=ALTER SYSTEM=) which supersede NLS
+    database settings =NLS_DATABASE_PARAMETERS= (no way to change after the
+    database creation).
+
+- =V$NLS_VALID_VALUES=: valid NLS parameter values to choose
+
+- =V$NLS_PARAMETERS=: session parameters in use
+
+**** Other Find-Grained Parameters
+
+- =NLS_LANGUAGE=: by default derived from =NLS_LANG=, also subject to the OS language.
+
+- =NLS_TERRITORY=: Date format, decimal character and group separator, local
+  currency symbol, IOS currency symbol, Dual currency symbol, first day of the
+  week, first week of the year (ISO), credit and debit symbols IOS week flag, list separator
+
+- =NLS_DATE_FORMAT=, =NLS_DATE_LANGUAGE=, =NLS_TIMESTAMP_FORMAT=,
+  =NLS_TIMESTAMP_FORMAT=, =NLS_TIMESTAMP_TZ_FORMAT=, : used for
+  =TO_CHAR=, =TO_DATE=,
+
+- =NLS_CALENDAR=: Japanese Imperial, ROC Official, Persian, Thai Buddha, Arabic
+  Hijrah, English Hijrah, Ethiopian
+
+- =NLS_NUMERIC_CHARACTERS=: decimal character and group separator
+
+- =NLS_LIST_SEPARATOR=: =,=, =.=, =;= or =:=
+
+- =NLS_SORT=: a set of mathcing and comparison rules for character data
+  + either =BINARY= or =collation_name=
+
+- =NLS_COMP=: the comparison behavior and SQL operations whose determined
+  collation is =USING_NLS_COMP=
+
+- =NLS_NCHAR_CONV_EXCP=: whether conversion errors are reported between
+  =NCHAR=-family and =CHAR= family types.
 
 *** Features
 
