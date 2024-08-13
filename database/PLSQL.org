@@ -1,5 +1,118 @@
 #+TITLE: Plsql
 
+* Tools
+
+- =TNS_ADMIN=: sets the location of =tnsnames.ora=
+
+- =ORACLE_PATH= (Unix), =SQLPATH= (Windows registry entry, by default =ORACLE_HOME/DBS=): the location of SQL scripts
+
+** SQL*Plus
+
+- configuration profile scripts:
+  + site profile =$ORACLE_HOME/sqlplus/admin/glogin.sql=
+  + user profile =login.sql= under the directories and subdirectories =$ORACLE_PATH=
+
+- =HELP COMMAND= show related SQL*Plus command description.
+
+*** Logon
+
+- =/NOLOG= for connectionless startup to perform certain administrative operations.
+
+- =/= represents a default logon using OS authentication.
+
+*** Settings & System Variables
+
+A list of settings that affect the way SQL*Plus runs. Set by =SET= and shown by =SHOW=
+
+*** Run Commands & Scripts
+
+There are three kinds of commands in SQL*Plus
+
+1. SQL Commands
+   + ended with a semicolon =;=, with a slash =/= on a line by itself, or with a
+     blank line, which saves the text in the buffer without running it.
+
+2. PL/SQL blocks
+   + =;= or =blank liens does not termiante and execute a block. =.= or =/= on a new line by itself does.
+   + =EXECUTE PL/SQL_ONE_LINER= without a =BEGIN...END= block.
+
+3. SQL*Plus commands for query results, setting options and editing and storing
+   SQL commands and PL/SQL blocks.
+   + Ended with a line ending.
+   + Continued with a hyphen =-=.
+
+Changes made to the database are not commited automatically unless certain other
+commands (DDL, DCL) are entered or an explicit commit is issued. =SET AUTOCOMMIT
+ON= commits DML automatically.
+
+There is a buffer storing the last Command text (except an SQL*Plus Command) executed, shown by =LIST=, run by =RUN=
+or =/=,
+edited by =EDIT=
+
+**** Common SQL*Plus Commands
+
+- =DESC[RIBE] TABLE= shows the structure of an object.
+
+- To run a shell command, use =HOST SHELL_COMMAND=.
+
+- =START script.sql [args...]= or =@script.sql [args...]= runs a script
+
+- =DEFINE=, =UNDEFINE=: define variables as substitution variables.
+  + Substitution variables are not SQL parameters. Prefix =&= to substitute for
+    its value. Substitution variables are substituted by SQL*Plus, dynamically
+    changing SQLs.
+
+- =VAR[IABLE]=: define bind variables, real SQL variables, referenced by =:VariableName=
+  + =PRINT= prints a variable, including a refcursor variable (result set).
+    SQL*Plus, unlike DBeaver, is able to output the result set from a PL/SQL
+    block without defining and printing a refcursor bind variable.
+
+**** Comments
+
+=--= single line comments or =/* */= C-style block comments.
+
+Comments cannot appear in certain positions
+
+- within a statement
+
+- immediately after a =;= or before a =;=
+
+- no =&= within any comment. Or =SET DEFINE OFF= to prevent scanning for the
+  substitution character.
+
+*** Output
+
+The output rendering of SQLPlus is abysmal. However, it provides =-MARKUP "HTML
+ON"= or =-MARKUP "CSV ON"= to allow query output as HTML or CSV. =SHOW MARKUP=
+shows the markup option status. =SET MARKUP HTML/CSV ON/OFF=. For interactive
+use, this may seem unintuitive unless redirected to a file and opened with a
+browser/editor. Also, HTML output styles are customizable through various
+settings. These output formats allow SQLPlus to generate reports. To use HTML
+output interactively, pipe it to =tee= and output to an HTML file. Various
+output format commands also helps generate reports.
+
+- =SET PAUSE ON=: stops on output of each page
+
+- =-SILENT= is used when SQLPlus is embedded so that it is not visible.
+
+*** Scripting
+
+Line editing in SQL*Plus is worse than old DOS command processor. Its editing
+capability is even worse than old Unix's =ed=:
+
+- =A text= (append), =INPUT= (insert at the current line), =C/old/new= (change), =C/text= (delete), =DEL= (the current line),
+  =LIST= (list lines in the buffer or move to a line), =N= (set the
+  current line to the number) See the SQL*Plus reference for all line
+  editing commands.
+
+However,
+SQL*Plus supports editing scripts and the buffer text using an external editor
+(=_EDITOR= system variable, default to notepad.exe on Windows).
+
+*** Globalization
+
+SQL*Plus understands =NLS_LANG= and uses the charset in =NLS_LANG= for data processing.
+
 * Blocks, Functions and Procedures
 
 #+begin_src sql
