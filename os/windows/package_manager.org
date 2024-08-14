@@ -1,0 +1,57 @@
+#+title: Package Manager
+
+* [[scoop.sh][Scoop]]
+
+Focus on open-source command-line developer tools.
+More like an installer, but with package management features.
+
+For documentation, [[https://github.com/ScoopInstaller/Scoop/wiki/][here.]]
+
+** Concepts
+
+- *app* :: a self-contained independent unit of an application or program to be installed.
+
+- *bucket* :: a collections of apps, in the form of Git repository containing
+  JSON app manifests, which describe how to instal an app.
+
+** Features
+
+- By default to =%USERPROFILE%/scoop= as user-specific installation,
+  configurable during setup and after (not
+  supported, by modifying the scoop startup scripts and resetting every app),
+  thus no UAC popup
+
+- Installed apps are accessible through shims, which are under the same path.
+  + Shims then point to a =Current= directory, itself a directory junction
+    (requires no admin permissions) to
+    the versioned app directory.
+
+- Manifest files for installation configuration.
+
+** Dependency Handling
+
+- Self-contained apps with all deps in its own path
+
+- Install the latest version
+
+- For app dependencies, any dependency apps are installed automatically at their
+  latest version.
+
+
+** Folder Layout
+
+- =apps=: installed apps
+
+- =apps\scoop=: the scoop app itself
+
+- =buckets=: manifests of installable apps
+
+- =cache=: downloaded installers
+
+- =persist=: persisted application files
+
+- =shims=: the entries to apps, the path to add to =PATH=
+
+** Proxy
+
+See [[https://github.com/ScoopInstaller/Scoop/wiki/Using-Scoop-behind-a-proxy][here]]
