@@ -1,0 +1,177 @@
+#+title: T-SQL
+
+* Tools
+
+** SQLCMD
+
+*** Scripting & Editing
+
+Vim, nano and some other terminal editors do not seem to work well with SQLCMD,
+use a GUI-based on like Kate or Notepad.
+
+* Conventions
+
+* Data Types
+
+Each column, local variable, expression and parameters has a related data type.
+Alias data types are defined by =CREATE TYPE=.
+
+** Exact Numerics
+
+- =bit=: boolean type
+
+- =tinyint= (unsigned byte), =smallint= (16-bit signed ), =int= (32-bit signed),
+  =bigint= (64-bit signed)
+
+- =decimal(p[, s])=, also known as =numeric(p[, s])=
+
+- =money=, (64-bit) =smallmoney= (32-bit): binary integers scaled down 4 digits
+  to represent decimal money.
+
+** Approximate Numerics
+
+- =float[(n)]=: binary floating-point number, where =n= is the number of bits of
+  the mantissa, up to double precision (53).
+  + =real= is =float(24)=, i.e. single-precision
+
+** Date & Time
+
+Conversions from string literals to date and time types are allowed if all parts
+of the strings are in valid formats. Implicit conversions or explicit
+conversions that don't specify a style, from date and time types to string
+literals, are in the default format of the current session.
+ISO 8601 formats are not affected by the =SET LANGUAGE= and =SET DATEFORMAT= session
+locale settings.
+
+- =DATE=: from ='0001-01-01'= to =9999-12-31=.
+  + default literal format =yyyy-MM-dd=. ISO 8601 =yyyy-MM-dd= or =yyyyMMdd= are
+    also supported.
+  + ODBC format ={ d 'yyyy-MM-dd' }= seems to work with JDBC and ADO.NET. It
+    maps to =DATETIME= and then converted to =DATE=.
+
+- =TIME=: 0-7 subsecond customizable precision
+  + default literal format =hh:mm:ss[.nnnnnnn]=, also ISO 8601
+    =hh:mm[:ss][.fractional seconds]=
+  + ODBC format ={t 'hh:mm:ss[.fractional seconds]'}= seems to work with JDBC
+    and ADO.NET.
+  + Using hour 24 to represent midnight and leap seconds over 59 as defined by
+    ISO 8601 is not supported.
+
+- =DATETIME= (*Legacy*): millisecond precision. range from =1753-01-01= to =9999-12-31=
+  + ISO 8601 =yyyy-MM-ddTHH:mm:ss[.mmm]= or =yyyyMMdd[ HH:mm:ss[.mmm]]= are supported.
+  + ODBC format ={ ts 'yyyy-MM-dd HH:mm:ss[.fff]' }= is supported and seems to
+    work with JDBC and ADO.NET.
+  + =CURRENT_TIMESTAMP= or =GETDATE()= (local time), =GETUTCDATE()= (UTC time)
+
+- =DATETIME2= (*recommended*, supersedes =DATETIME=): 0-7 subsecond customizable
+  precision, by default 7 (Windows =FILETIME= precision).
+  + default literal format =YYYY-MM-DD hh:mm:ss[.fractional seconds]=
+  + ISO 8601 =YYYY-MM-DDThh:mm:ss[.nnnnnnn]=
+  + ODBC format ={ ts 'yyyy-MM-dd HH:mm:ss[.fff]' }= is supported and seems to
+    work with JDBC and ADO.NET but it only represents a legacy =DATETIME=.
+  + =SYSDATETIME()= (local time), =SYSUTCDATETIME()= (UTC time)
+
+- =smalldatetime= (*legacy*): minute-level precision. The value is rounded to
+  the nearest minute.
+
+- =DATETIMEOFFSET=: =DATETIME2= with an offset
+  + the data itself is stored as in UTC, with the timezone offset preserved.
+  + default literal format =yyyy-MM-dd HH:mm:ss[.nnnnnnn] [{+|-}hh:mm]=
+  + ISO 8601 =yyyy-MM-ddTHH:mm:ss[.nnnnnnn][{+|-}hh:mm]=,
+    =yyyy-MM-ddTHH:mm:ss[.nnnnnnn]Z= (UTC)
+  + =AT TIME ZONE 'TIMEZONE_NAME'= converts the timezone info of a datetime type
+    to the specified time zone. If the source already has a time zone, the
+    output represents the same time at the specified time zone.
+  + =SYSDATETIMEOFFSET()=
+
+
+
+** Character strings
+
+- =char[(n)]= (=character=): fixed size, byte-oriented, 1 <= n <= 8000 bytes
+  + =n= is =1= unless specified.
+
+- =varchar[(n | max)]=: variable-size, byte-oriented, 1 <= n <= 8000 bytes or =max=
+  (limited only by the maximum storage parameter 2GB)
+  + =n= is =1= unless specified, unlike Oracle, where =varchar2= alone is
+    allowed in PL/SQL only and indicates only its type.
+  + storage size =n+2= bytes.
+
+- =nchar[(n)]=, =nvarchar[(n|max)]= the UTF-16 version, where 1 <= n <= 4000 in
+  byte pairs (UTF-16 code unit).
+  + literal UTF-16 strings are prefixed with a =N=.
+
+- =text=, =ntext= (deprecated, use =varchar(max)= and =nvarchar(max)=):
+  variable-size, up to 2^31 - 1 bytes;
+
+Upon conversion, long strings are truncated into short strings if necessary. The
+converted value uses the collation of the input is used. Non-character types
+uses the default collation of the database unless specified otherwise. =n= is 30
+unless specified otherwise upon conversion or casting.
+Empty strings are converted to integer =0=.
+
+** Binary Data
+
+- =binary[(n)]=: fixed-length binary data, 1 <= n <= 8000
+  + without =n= default to =1= upon definition, =30= upon casting.
+
+- =varbinary[(n|max)]=: variable-length binary data, 1 <= n <= 8000 or with
+  =max= up to 2^31-1 bytes.
+  + without =n= default to =1= upon definition, =30= upon casting.
+
+- =image= (deprecated, use =varbinary(max)=): variable binary data up to 2^31-1 bytes
+
+** XML & Json
+
+- =json= (since SQL Server 2016 only as json functions, only available in Azure
+  SQL Server since 2024):
+
+- =xml[([Content | Document] xml_schema_colleciton)]=: xml may be typed or
+  untyped, depending on the specified schema.
+
+** Other
+
+- =sql_variant=: can store heterogeneous data, up to 8016 bytes.
+  + other data types are implicitly converted to =sql_variant= but not the reverse.
+  + =SQL_VARIANT_PROPERTY= retrieves its property: type, precision, scale, etc.
+
+- =table=: used to store a result for processing at a later time.
+  + a table variable is used like a regular table within its scope.
+
+- =uniqueidentifier=: 16-byte GUID
+  + =newid()=, =newsequentialid()= (greater than previous generated GUIDs by
+    this function, faster than =newid()= when generating for an identity column).
+
+- =cursor=:
+
+** Type Reflection
+
+For builtin types, see =sys.types=
+
+- =TYPEPROPERTY(type, property)=: =PRECISION=, =SCALE= ...
+
+- =TYPE_ID(namne)=, =TYPE_NAME(id)=
+
+* DDL
+
+* DML
+
+* Procedural SQL
+
+- =BEGIN ... END= as a code block structure
+
+- =IF ... ELSE ...= needs no =THEN= and =END IF=. =BEGIN ... END= is optional if
+  the statement includes only one.
+
+- =GOTO= and labels are used as in C.
+
+- try-catch =BEGIN TRY ... END TRY BEGIN CATCH ... END CATCH= catches any errors
+  of which the severity is higher than 10.
+  + errors are retrieved using The =ERROR_*()= functions.
+  + Errors are thrown with the =THROW= keyword or =RAISEERROR= (legacy).
+
+- All stored procedures may return an integer value (default 0).
+
+- Only =WHILE=-loop is available.
+
+* Stored Procedure
