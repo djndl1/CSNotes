@@ -154,6 +154,11 @@ For builtin types, see =sys.types=
 
 * DDL
 
+** Constraints
+
+MSSQL, unlike OracleDB or MySQL, does not allow multiple =NULL= values in
+unique-constrained column.
+
 * DML
 
 * Procedural SQL
