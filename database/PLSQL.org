@@ -269,7 +269,20 @@ Machine-level 32-bit signed integer with overflow check
 
 **** Table Types: PL/SQL associative arrays
 
-A set of key-value pairs indexed by =varchar2=, =varchar=, =long= or =PLS_INTEGER=.
+A set of key-value pairs indexed by =varchar2=, =varchar=, =long= or
+=PLS_INTEGER=.
+The sort order of an associative array indexed by =varchar2= is affected by NLS parameters
+
+- Has a fixed declared maximum size.
+
+- declaration is empty initialization.
+
+- a constant associative array can only be initialized by an initializer function.
+
+- Cannot be declared outside a package.
+
+- used for passing collections to/from the database server.
+
 
 #+begin_src sql
 set serveroutput on;
@@ -307,19 +320,7 @@ name_table(idx) := value;
   END;
 #+END_SRC
 
-The sort order of an associative array is affected by NLS parameters
-
-**** Associative Arrays
-
-- Has a fixed declared maximum size.
-
-- declaration is empty initialization.
-
-- a constant associative array can only be initialized by an initializer function.
-
-- Cannot be declared outside a package.
-
-- used for passing collections to/from the database server.
+To populate an associative array without looping, use =SElECT BULK COLLECT INTO assoc_array=
 
 **** Varrays
 
