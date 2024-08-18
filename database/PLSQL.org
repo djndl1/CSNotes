@@ -229,6 +229,28 @@ END LOOP [ label ];
 END LOOP [ label ];
 #+end_src
 
+* Error Handling
+
+PL/SQL supports exception and provides many predefined exceptions for many
+operations and error conditions.
+
+#+begin_src sql
+-- catch exceptions
+
+begin
+
+exception
+    when certain_exception_name then
+    error_handling_code;
+
+    when certain_exception_name1 OR certain_exception_name2 then
+    error_handling_code;
+
+    when others then -- default catch
+        raise; -- rethrow
+end;
+#+end_src
+
 * PL/SQL-Specific Types
 
 ** =BOOLEAN=
