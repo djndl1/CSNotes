@@ -6,6 +6,13 @@
 
 - =ORACLE_PATH= (Unix), =SQLPATH= (Windows registry entry, by default =ORACLE_HOME/DBS=): the location of SQL scripts
 
+*DML statement Warning*: both SQL*Plus and SQL Developer does not commit a DML
+statement automatically and the ongoing transaction might hold cause the table
+to be locked and other clients may not be able to access the data. Be careful
+when using such tools on a production server. OracleDB issues an implicit
+=COMMIT= statement before and after any DDL statement. Therefore one cannot
+rollback a DDL.
+
 ** SQL*Plus
 
 - configuration profile scripts:
@@ -41,7 +48,7 @@ There are three kinds of commands in SQL*Plus
    + Ended with a line ending.
    + Continued with a hyphen =-=.
 
-Changes made to the database are not commited automatically unless certain other
+DML (insert, update, delete) Changes made to the database are not commited automatically unless certain other
 commands (DDL, DCL) are entered or an explicit commit is issued. =SET AUTOCOMMIT
 ON= commits DML automatically.
 
