@@ -175,7 +175,7 @@ A library in a database
 #+begin_src sql
 IF conditional THEN
     statements
-[ELSIF conditional2 THEN
+[ELSIF conditional2 THEN -- the only difference from BASIC
        statements
 ]...
 [ELSE
@@ -204,6 +204,8 @@ CASE
       else_statements ]
 END CASE;]
 #+end_src
+
+- =NVL=, =NVL2= and =DECODE= are all special conditional functions, especially =DECODE=
 
 ** Loop
 
