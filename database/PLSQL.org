@@ -443,6 +443,8 @@ Cursor is more like a C# =IEnumerable= and than a =IEnumerator=
 
 ** Implicit Cursors
 
+Every time a DML or =SELECT INTO=  is run, an implicit cursor is opened.
+
 Constructed and managed by PL/SQL. It closes after the associated statement runs.
 
 *** Implicit Cursor Attribute
@@ -454,6 +456,9 @@ SQL%ISOPEN/FOUND/NOTFOUND/ROWCOUNT/BULK_ROWCOUNT/BULK_EXCEPTION
 #+end_src
 
 ** Explicit Cursors (Named Cursors)
+
+Explicit/declared cursors has a name and is associated with a query. It may be
+used with a FOR-IN-LOOP or opened-fetched-closed explicit.
 
 1. Declare and define a cursor and associate it with a query
 
@@ -503,6 +508,16 @@ BEGIN
   CLOSE c1;
 END;
 #+end_src
+
+*** Cursor Variable =REF CURSOR= or =SYS_REFCURSOR=
+
+Unlike a cursor that is bound to a certain query, a cursor variable is useful
+for passing query results between subprograms. A strong =REF CURSOR= specifis a
+return type and the query must return this type. A weak ref cursor (predefined
+=SYS_REFCURSOR=) does not
+specify a return type.
+
+=OPEN cursor_variable for query= binds a cursor variable to a query.
 
 ** Processing Cursors
 
