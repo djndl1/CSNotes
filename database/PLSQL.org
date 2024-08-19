@@ -149,6 +149,44 @@ Blocks with =CREATE OR REPLACE PROCEDURE procedure_name (parameter_list) as=
 
 PL/SQL blocks can be nested.
 
+** Triggers
+
+A PL/SQL unit that executes in response to a specified event
+
+#+begin_src sql
+TRIGGER trigger_name
+        triggering_event
+        [ trigger_restriction ]
+
+BEGIN
+-- body
+END;
+#+end_src
+
+Triggers may be disabled/enabled separately or altogether if they are associated
+with a table (=ALTER TABLE TRIGGER_NAME DISABLE/ENABLE ALL TRIGGERS=)
+
+*** Events
+
+- DML statement
+
+- DDL statement
+
+- Database operation =LOGON=, =LOGOFF=, =STARTUP=, =SHUTDOWN=, =SERVERERROR=
+
+A trigger may be *simple* (triggered before or after a statement is run or a row
+is affected), *composite* (multiple timing points).
+
+If a row trigger is fired, the row record before and after the event is retrievable
+with two variable =:OLD= (none for =INSERT=) and =:NEW= (none for =DELETION=).
+
+An =INSTEAD OF= trigger is executed instead of executing the triggering DML
+statement on a view. An =INSTEAD OF= trigger is useful to update certain columns
+(generated) of a view by updating the underlying table.
+
+A *system trigger* is defined on a schema or the database.
+
+
 ** Packages
 
 A library in a database
