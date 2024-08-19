@@ -1,0 +1,25 @@
+#+title: Relational Database Concepts
+
+* Set Theory
+
+A set is informally defined as "a collection of definite distinguishable
+things". By "distinguishable", we must be able to decide whether they are
+different. By "definite", we are able to know what the thing is and whether it
+is a member of the set: a defining property is required to give a definition of
+a set. The definition is the *database design* the enumeration is the *database*
+itself.
+
+** Relations
+
+SQL dbs are relational!
+
+A set of ordered n-tuples forms a *relation*, an extension to the relation in
+set theory. In SQL, a tuple is called a *row*.
+Each element in a tuple is an *attribute* (in SQL a column value).
+For anything we don't know, not applicable or nothing, or  in SQL, we refer to
+it as =NULL=.
+
+However, in SQLDBs, apparently, we have duplicates in a table unlike in a set.
+But they are meant to denote the same entity so in theory, duplicates should not
+exist in a table and a table should be a relation.
+otherwise it is a design flaw.
