@@ -1,0 +1,18 @@
+#+title: Numerics
+
+* =numbers= abstract base classes
+
+A =numbers.Number= class is the root of the numeric hierarchy. Any numeric type
+is a =Number=. Numeric objects are immutable. Python's string representations of numbers
+are convertible to the value it represents and they have no leading or trailing
+zeros and are in base 10.
+
+Builtin numeric classes are =int= (inheriting from =numbers.Integral=,
+in turn from =numbers.Rational=), =bool= (from =int=) , =float= (from =nubmers.Real=) and =complex=
+(from =numbers.Complex=)
+
+** Builtin Numeric Types
+
+*** =bool=
+
+Not type-safe, unfortunately a subclass of =int=.
