@@ -289,6 +289,9 @@ exception
 end;
 #+end_src
 
+To raise custom exceptions, define variable of the =EXCEPTION= type and raise
+them. To catch them, use the variable names.
+
 * PL/SQL-Specific Types
 
 ** =BOOLEAN=
@@ -613,7 +616,7 @@ SELECT ... BULK COLLECT INTO <collection_name> FROM ...
 
 * Object-Relational SQL
 
-Doesn't seem to be useful for app code since support for UDT by client drivers is scarece.
+Doesn't seem to be useful for app code since support for UDT by client drivers is scarce.
 
 * Troubleshooting
 
