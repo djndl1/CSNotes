@@ -16,3 +16,10 @@ in turn from =numbers.Rational=), =bool= (from =int=) , =float= (from =nubmers.R
 *** =bool=
 
 Not type-safe, unfortunately a subclass of =int=.
+
+*** =int=
+
+Integers with unlimited range. The initializer itself supports conversion from
+strings of various bases and classes implementing certain special methods.
+
+*** =float=
