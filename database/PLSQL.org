@@ -744,3 +744,27 @@ begin
          commit;
 end log_debug;
 #+end_src
+
+* Recommended Practice For Scalability
+
+** Use Bind Variables
+
+Bind variables improve performance (hard parsed once and soft parsed with
+different bind variables) and security (against SQL injection).
+
+** Use PL/SQL
+
+PL/SQL is optimized for db access  and silently caches statements to avoid a
+reparse.
+
+=EXECUTE IMMEDIDATE= caches sql statements. The =DBMS_SQL= package has better
+support for dynamic SQL.
+=OPEN cursor FOR query= is optimized if the cursor is a declared one, not a
+cursor variable.
+
+** Use Bulk SQL (=COLLECT INTO collection=)
+
+When retrieving a set of rows from the database, processing the rows and returning the
+whole set to the database, bulk SQL reduce the number of round trips. Bulk SQL
+is not needed if only read from the database
+is involved. However, bulk SQL uses more CPU resources and requires more code.
