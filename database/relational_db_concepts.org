@@ -23,3 +23,54 @@ However, in SQLDBs, apparently, we have duplicates in a table unlike in a set.
 But they are meant to denote the same entity so in theory, duplicates should not
 exist in a table and a table should be a relation.
 otherwise it is a design flaw.
+
+Since rows are not supposed to be duplicated, they have identities, or some
+combinations of columns (*keys*) that will uniquely identify each row.
+
+** Set Operations
+
+- *Identity* =FROM TABLE_NAME=
+
+- *Cartesian Product* =FROM TABLE_1, TABLE_2=
+
+- *Search Condition* =WHERE=
+
+- *Join*
+
+- *Projection* =SELECT ...=
+
+SQL is nonprocedural but the set operations themselves run one after another
+conceptually.
+There may or may not be a virtual table for =FROM table= before one can select
+from the virtual table.
+
+* Normalization
+
+1. *First Normal Form* (1NF): Each column of a table may take on only a single,
+   non-repeating (atomic) value for each row of the table.
+
+2. *Second Normal Form* (requires 1NF): In every row of a table, each column
+   must be dependent on every part of the key
+   + if a column C1 limits the possible values in C2 to a specific set, then
+     C2 is *set dependent* on C1.
+   + If for each row, the value of column C1 uniquely determines the value of
+     column C2, then C2 is *functionally dependent* on C1.
+   + if column does not meet the requirement, it should be moved to another
+     table with its dependent column(s) as the key so that it fully depends on
+     the key.
+
+3. *Third Normal Form* (requires 1NF 2NF): in every row of table, all columns must depend directly
+   on the key, without any transitive dependencies (C1 dependent on C2 and C2
+   dependent on C3, then C1 is transitively dependent on C3) through other columns.
+
+** Tips for Normalized Tables
+
+- Make sure that each table represents just one subject, either one object or one
+event.
+
+- Define a primary key for each table so that joining tables and unique
+identities are possible.
+
+- Do not define multi-value columns.
+
+- Implement data integrity: unique keys, foreign keys.
