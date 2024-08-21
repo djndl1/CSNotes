@@ -23,3 +23,16 @@ Integers with unlimited range. The initializer itself supports conversion from
 strings of various bases and classes implementing certain special methods.
 
 *** =float=
+
+Typically IEEE 754 double-precision floating-point number, consult
+=sys.float_info=.
+
+=float= passed to =int()= truncates.
+
+*** =complex=
+
+Floating-point complex number. Uses =j= instead of =i=
+
+** Operation Behaviors
+
+- integral division and modulo behaves as in C: the residue is not guaranteed to be non-negative.
