@@ -745,6 +745,7 @@ begin
 end log_debug;
 #+end_src
 
+
 * Recommended Practice For Scalability
 
 ** Use Bind Variables
@@ -768,3 +769,23 @@ When retrieving a set of rows from the database, processing the rows and returni
 whole set to the database, bulk SQL reduce the number of round trips. Bulk SQL
 is not needed if only read from the database
 is involved. However, bulk SQL uses more CPU resources and requires more code.
+
+** Concurrency
+
+- *Data Concurrency*: ensures the users can access data at the same time.
+
+- *Data Consistency*: ensures that each user sees a consistent view of the data.
+  + OracleDB maintains data consistency by using a multiversion consistency
+    model and various types of locks and transaction isolation levels.
+
+OracleDB provides a *serializable* isolation category that appears to be a
+single-user database. For most cases, read committed isolation is perfect.
+
+*Sequences* offer atomic integer generation without using an explicit lock.
+
+A latch is a simple low-level serialization mechanism that coordinates multiuser
+access to shared data structures. More latches means less scalability.
+
+OracleDB uses nonblocking I/O to allow queries execute concurrently.
+
+SQLs are compiled and shared.
