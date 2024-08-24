@@ -789,3 +789,19 @@ access to shared data structures. More latches means less scalability.
 OracleDB uses nonblocking I/O to allow queries execute concurrently.
 
 SQLs are compiled and shared.
+
+** Use Set-based Processing Techniques Instead of Iterative Data Processing
+
+- Iterative process:
+  + row by row loop
+  + batch by batch into an array
+  + manually start multiple PL/SQL programs
+
+- Set-based process: the SQl statement defines the result and allows the
+  database to determine the most efficient way to obtain it, eliminating the
+  network round-trip and the database API overhead. Parallelism and optimization
+  are managed by the database.
+
+  #+begin_src sql
+INSERT INTO A SELECT * FROM B;
+  #+end_src
