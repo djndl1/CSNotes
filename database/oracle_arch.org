@@ -1,6 +1,16 @@
-#+title: Oracle Data Structure
+#+title: Oracle Architecture
 
-* Data Dictionary
+Typically a Oracle DBMS has
+
+- Kernel code: for memory and storage management
+
+- repository of metadata: dat dictionary
+
+- query language
+
+* Data Structures
+
+** Data Dictionary
 
 A set of read-only tables that provides administrative metadata about the
 database. e.g. schema object defintions, allocated space for schema objects,
@@ -24,7 +34,7 @@ Synonyms are defined for many data dictionary views.
 =DBMS_METADATA= provides interfaces for extracting complete definitions of
 database objects.
 
-* Dynamic Performance Views
+** Dynamic Performance Views
 
 A set of *virtual tables* (not real tables, built from memory structures) or *fixed views* (not modifiable)
 that record current database activity, prefixed by =V$=, (=$GV= versions are
