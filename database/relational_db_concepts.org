@@ -1,5 +1,16 @@
 #+title: Relational Database Concepts
 
+Historically, DBMS were hierarchical or networked. Data were stored in rigid,
+predetermined relationships. No standard DDL and query language existed.
+
+A relational model offers well-defined structures of data, clearly defined
+actions to manipulate the data and structures and a database and enforces
+integrity rules governing operations on the data and structures of a database.
+
+A relational DBMS stores data in a set of simple relations, which is a set of
+tuples, an unordered set of attribute values. A table is a two-dimensional
+representation of a relation in the forms of rows and columns.
+
 * Set Theory
 
 A set is informally defined as "a collection of definite distinguishable
@@ -13,7 +24,7 @@ itself.
 
 SQL dbs are relational!
 
-A set of ordered n-tuples forms a *relation*, an extension to the relation in
+A set of unordered n-tuples forms a *relation*, an extension to the relation in
 set theory. In SQL, a tuple is called a *row*.
 Each element in a tuple is an *attribute* (in SQL a column value).
 For anything we don't know, not applicable or nothing, or  in SQL, we refer to
@@ -74,3 +85,46 @@ identities are possible.
 - Do not define multi-value columns.
 
 - Implement data integrity: unique keys, foreign keys.
+
+* SQL Environment
+
+All SQL operations are executed within an SQL-environment. An SQL-environment
+has six components:
+
+- *SQL agent*: an application that calls one or more externally invoked procedures
+  in an SQL-client module.
+
+- *SQL implementation*: a RDBMS that executes SQL statements.
+
+- *SQL client modules*: each contains zero or more externally-invoked procedures.
+
+- *Authorization IDs*: representing a user of SQL data
+
+- *Catalogs*
+
+- *Sites*
+
+* SQL Objects
+
+Each SQL object is defined in terms of the *chracteristics* that describes it,
+called *descriptor*.
+
+** Cluster
+
+the group of *catalogs* available to an SQL session at any point in time, and it
+contaisn all the SQL data accessible through a given SQL server.
+
+** Authorization ID
+
+a character string which identifies a user (an actual person or an application
+program)
+and the set of privileges belonging to the user.
+
+** Privilege
+
+** Catalog
+
+A named group of *schemas*, one of which named =INFORMATION_SCHEMA= which
+contains the descriptions of all the SQL data belonging to that catalog.
+
+Catalogs are dependent on some cluster.
