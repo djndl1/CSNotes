@@ -805,3 +805,28 @@ SQLs are compiled and shared.
   #+begin_src sql
 INSERT INTO A SELECT * FROM B;
   #+end_src
+
+
+** Use Instrumentation Packages
+
+*** =DBMS_APPLICATION_INFO=
+
+Track performance by module
+
+TODO
+
+*** =DBMS_SESSION=
+
+access session information and set preferences and security levels
+
+TODO
+
+*** =UTIL_FILE=
+
+read and write OS text files
+
+TODO
+
+** Use Editioning Views
+
+TODO
