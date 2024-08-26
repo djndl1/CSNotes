@@ -745,9 +745,7 @@ begin
 end log_debug;
 #+end_src
 
-
 * Recommended Practice For Scalability
-
 ** Use Bind Variables
 
 Bind variables improve performance (hard parsed once and soft parsed with
@@ -830,3 +828,16 @@ TODO
 ** Use Editioning Views
 
 TODO
+* Application Example
+
+** Security Design
+
+The data is owned by =app_data=, two packages, one =employees_pkg= for application
+users, one =admin_pkg= for administrators are owned by =app_code= and
+=app_admin= respectively. Two additional users =app_user= and =app_admin_user=
+are given privileges to access the two packages to access the data: A three-tier
+architecture.
+
+Only one user may access all data and two middle-tier users may access certain
+permitted data and other users may only access data through the predefined
+interface exposed by the middle tier.
