@@ -656,7 +656,19 @@ Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
 
 - Public variables have default property implemented by the compiler.
 
+** Auto-Instancing
+
+The problem with auto-instancing is not about performance: the reference is
+checked for nothing in any case. Auto-instancing is not declartion along with
+initialization. It doesn't initialize the variable on the spot and this variable
+is guaranteed not to be =Nothing= even if it has been set to =Nothing=.
+Auto-instancing prevents the user from initializing and assigning to the
+variable explicitly.
+
 ** Properties
+
+Properties are not limited to class modules: ordinary code modules may have
+properties, similar to static properties in C#.
 
 #+begin_src vba
 Private m_BirthDate As Date
