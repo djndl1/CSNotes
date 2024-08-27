@@ -29,6 +29,11 @@ In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rap
 
 * VBA Development Environment
 
+** Computational Environemnt
+
+Mostly hosted an another application and made available to access host
+application data and host computational processes.
+
 ** Project Structure
 
 - =.vbp= :: the [[#projectfile][project file]]
@@ -132,6 +137,51 @@ Attribute VB_Exposed = False
 
 VB keywords and identifiers are Case-Insensitive. Be careful, many common words
 used in other language are keywords in VB (e.g. =Open=, =Close= etc.)
+
+** Concepts
+
+- *Data Value* :: a single element from a specific finite domain of such
+  elements, e.g. single, double, integer, =Nothing=, =Missing=, =Error=,
+  aggregate type values etc.
+
+- *Entity* :: a component that can be accessed by name or index, according to
+  the resolution rules for simple name expressions, index expressions, and member
+  access expressions. e.g. projects, procedural modules, types (class modules,
+  UDTs, Enums or built-in types), properties, functions, subroutines, events,
+  variables, literals, constants and conditional constants.
+
+- *Variable* :: a /mutable/ container of data values.
+
+- *Dependent variable* :: the variable that corresponding to an element of an
+  aggregate value.
+
+- *Extent* of a variable :: the time a variable is created to the time it is destroyed.
+  + /Program extent/ :: the entire existence of an active VBA environment, i.e. static
+  + /Module extent/ :: the span from the point the module is incorporated into the project
+    to the point it is removed from the VBA environment, e.g. static local
+    variable in a procedure, a module variable declaration.
+  + /Procedure Extent/ :: the duration of a particular procedure invocation.
+  + /Object Extent/ :: the lifespan of the containing object, e.g. a variable
+    declaration within a class module
+  + /Aggregate Extent/ :: the lifespan of the variable holding the containing
+    aggregate data value.
+
+- *Procedure* :: a unit of algorithmic functionality, identified by its name
+  that is part of its declaration, including subroutines, functions and properties.
+  + *Property* :: a set of named procedures referenced as if it was a variable
+    name. Properties are more than OOP-object members.
+
+- *Objects* :: In OOP sense, a set of related variables, procedures and events.
+  + events are =RaiseEvent=-ed
+  + Each class has a public interface of its own, but it may also implement the
+    public interface of one or more other classes.
+
+- *Extended Environment* :: additional entities accessible using VBA
+  + the VBA standard library
+  + Host environment: entities defined by the host app, accessible similar to
+    the VBA library
+  + external variables, procedures and others: entities defined using other
+    programming languages.
 
 ** Program Entry Point
 
