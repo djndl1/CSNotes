@@ -841,3 +841,12 @@ architecture.
 Only one user may access all data and two middle-tier users may access certain
 permitted data and other users may only access data through the predefined
 interface exposed by the middle tier.
+
+** Data Integrity
+
+In addition to constraints, triggers may be used to validate data and enforce
+data integrity in case where invalid data are input, an application error is
+raised within the trigger. The trigger may choose to =lock= the table =in share
+mode= throughout the transaction to ensure that the stored criteria is not changed and
+when the validated data is saved into the database, the data is still valid.
+
