@@ -622,7 +622,7 @@ Doesn't seem to be useful for app code since support for UDT by client drivers i
 
 ** DBeaver Not Reporting Errors When Compiling Procedures
 
-No solution, use SQL Developer or SQL Plus.
+query =USER_ERRORS=, =ALL_ERRORS= and =DBA_ERRORS= etc.
 
 ** Remote Debugging With SQL Developer
 
