@@ -183,10 +183,20 @@ used in other language are keywords in VB (e.g. =Open=, =Close= etc.)
   + external variables, procedures and others: entities defined using other
     programming languages.
 
+- *Modules* :: source code files to achieve modularity.
+  + module text encoding is implementation-defined.
+  + source code files treat newlines as line separators. VBA is supposed to
+    support =LF=, =CR=, =U+2028=, =U+2029= as line termination characters. =_=
+    continues a line.
+
+- *Foreign Identifier* :: a token that represents a text sequence used as if it
+  was an identifier but does not conform to VBA rules for forming an identifier.
+  - =[ForeignIdentifier]=
+
 ** Program Entry Point
 
 Every global variables and constants are loaded before the entry point
-(Form-level global variables are not since the form hasn't been loaded).
+().
 A form or a code module function can be the entry point of a program.
 
 - /Form/: the form is loaded and several events are fired
@@ -214,6 +224,8 @@ A form or a code module function can be the entry point of a program.
 #+begin_src basic
 Dim varname As varType, [varname2 As varType2]
 #+end_src
+
+When a variable is created, it is initialized to a default value.
 
 *USE* =Option Explicit= *TO FORCE EXPLICIT DECLARATION OF VARIABLES AND CONSTANTS*.
 
@@ -257,21 +269,27 @@ execution when the variable is live and available for use.
 
 ** Data Types
 
+Type value may be surrounded by =[TypeName]=.
+
 *** Simple Types
 
-- =Boolean= (2-byte): =0= for =False= and =-1= for =True=
+- =Boolean= (2-byte signed binary 2's complement integer): =0= for =False= and =-1= for =True=
 
-- =Byte=
+- =Byte=: 8-bit unsigned binary integer, ranging from 0 to 255.
 
 - =Integer= (16-bit) and =Long= (32-bit, the preferred type for integer values):
   =&= prefixed forces a literal integer into a =Long= value.
-  + =&H1234=, =&O011064=
-  + an =enum= type can have a maximum sentinel value to guard against invalid
+  + =&H1234= (hexadecimal), =&O011064= (octal)
+  + =&= as a literal suffix for =Long=, =^= for =LongLong=, =%= for =Integer=
+  + an =Enum= type (named long) can have a maximum sentinel value to guard against invalid
     integers assigned to a variable of such a =enum= type.
+  + =LongPtr= mapped =Long= under a 32-bit environment.
 
-- =Single= and =Double=
+- =Single= (literal type suffix =!=) and =Double= (=#=): IEEE 754 (1985) floating-point numbers
+  + exponent letter =D=, =E=, =d=, =e=
 
-- =String= (=BSTR=):
+- =String= (=BSTR=): sequence of UTF-16 code points
+  + length no more than 65526.
   + Unicode is supported but Unicode String literals are not due to the IDE's
     non-Unicodeness. The IDE doesn't even recognize support UTF-16.
     Use =ChrW= instead
@@ -283,8 +301,8 @@ execution when the variable is live and available for use.
   + =NULL= and =""= are equivalent for =BSTR=. See
     [[https://nolongerset.com/check-for-empty-strings-in-vba/][Check for Empty Strings in VBA]].
 
-- =Date= ([[https://learn.microsoft.com/en-us/cpp/atl-mfc-shared/date-type?view=msvc-170][OLE =DATE=]], 8-bytes): one-second precision
-  + ~#12/3/2013#~, ~#2024-01-03 13:21:33#~. No subsecond precision.
+- =Date= ([[https://learn.microsoft.com/en-us/cpp/atl-mfc-shared/date-type?view=msvc-170][OLE =DATE=]], 8-bytes): one-second precision. Each integer represents a day.
+  + ~#12/3/2013#~, ~#2024-01-03 13:21:33#~ ~#13:21:33#~ (since the Epoch). No subsecond precision.
   + actually a DateTime
 
 - =Object=: stores references. Object variables are assigned using =Set=.
@@ -293,6 +311,7 @@ execution when the variable is live and available for use.
 
 - =Currency= (=CURRENCY=, 8-byte number in an integer format scaled down by
   10000, i.e. =2^63 / 10000=)
+  + literal suffix =@=
 
 *** =Variant=
 
@@ -306,7 +325,8 @@ the default data type in VBA if no type is not specified.
 - Special values
   + =Empty= (the uninitialized =Variant= variable value), =IsEmpty()=;
   + =Null= (no valid data), =IsNull=
-  + =Error= (an error code)
+  + =Error= (an error code): from 0 to 65535 Windows =HRESULT=
+  + =Missing=: no value is passed to the delcared optional parameter.
 
 - =Variant= can be useful when returning a result of different types on some
   condition, especially as a =Result<T, E>= type since it can contains a
@@ -317,7 +337,7 @@ the default data type in VBA if no type is not specified.
 
 - Use =VarType= and =TypeName= to get the type information of a =Variant= variable.
 
-- [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/decimal-data-type][Decimal]] (12-byte unsigned integer with a scaling factor): not declarable (not
+- [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/decimal-data-type][Decimal]] (12-byte unsigned integer with a scaling factor): not a declared type (not
   a variable type but a data type), used
   only as a =Variant= with =CDec=
 
@@ -344,6 +364,10 @@ basically a structure or record type.
 
 + Structures can contain substructures.
 
++ UDTs in VB are limited in that if they are used with classes, they must be
+  declared in a public object module, that is, a DLL class module so that they
+  may be marshaled by COM.
+
 #+begin_src vba
 Private Type EmployeeUDT
     Name As String
@@ -357,7 +381,9 @@ emp1 = emp2 ' copy one UDT to another
 *** Arrays: Ordered sets of homogeneous items.
 
 Creating an array is called *dimensioning* (defining the size of) the array,
-hence =Dim= and =ReDim=.
+hence =Dim= and =ReDim=, declared and accessed through =ElementType()= and =ArrayObject(N)=.
+
++ Up to 60 dimensions. Initially no dimension as a declared variable.
 
 + can be static or dynamic. Dynamic arrays can be first declared =Dim arr() As
   Type= then defined using =ReDim arr(N) As Type= or with only =ReDim=.
@@ -526,7 +552,7 @@ rules, one may use =Call= if possible.
 - A type private to a project can be used as a parameter or the return value of
   procedure that can be called from outside the project.
 
-- /Optional/ parameters
+- =Optional=-prefixed parameters
   + If the type is =Variant= (an =Err= value), it can checked by =IsMissing()=.
     A =Missing= value is pushed onto the stack for an optional argument.
     =IsMissing= only works with an optional parameter once, the second time it
@@ -553,6 +579,20 @@ With Emp
         Print .City & "  " & .Zip & "  " & .State
     End With
 End Type
+#+end_src
+
+*** Preprocessor & Conditional Compilation
+
+#+begin_src vba
+#const variable_Name = const_expression
+
+#if expression then
+
+#elseif expression then
+
+#else
+
+#endif
 #+end_src
 
 ** Programming Construct
