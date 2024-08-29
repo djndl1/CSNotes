@@ -36,6 +36,11 @@ application data and host computational processes.
 
 ** Project Structure
 
+A project consists of a name, a set of named modules and an ordered list of
+project references with three types of projects: *source projects*, *host projects* and *library projects*.
+A project reference specifies that a project accesses public entities defined in
+another project.
+
 - =.vbp= :: the [[#projectfile][project file]]
 
 - =.frm= :: a form file
@@ -488,14 +493,72 @@ End Sub
 
 *** Modules
 
-Module are made a of a *declaration section* (types, constants and variables)
-plus *a collection of procedures*.
+A module consists of two parts
 
-- Form Module: basically class module with GUI controls
+- *header*: a set of attributes consisting of name/value pairs that specify
+  certain linguistic characteristics of a module, enclosed in =BEGIN ... END= at
+  the start of the file.
 
-- Class Module: OOP-like
+- *body*: actual VBA language source code.
+  + Module bodies are made a of a *declaration section* (types, constants and variables)
+  plus *a collection of procedures*.
 
-- BAS Module: C-like compilation unit
+Two kinds of modules are supported:
+
+- *procedural module*: C-like compilation unit
+
+- *class module*: OOP-like
+  - Form Module: basically class module with GUI controls
+
+*** Header & Attributes
+
+**** Procedure Attributes
+
+The only supported and required attribute of a procedural module. The module name is also
+specified in the project file and used as a prefix to module members. There is
+no such language support in C: whatever in the included header files are
+imported into the current namespace.
+
+#+begin_src vba
+Attribute VB_Name = "ModuleName"
+#+end_src
+
+Tools-Procedure Attributes: stored next to the member definition, not shown in
+the IDE.
+
+***** Default Property/Method (Not Encouraged)
+
+Default property/method is used if any member name is omitted when using an
+object. Object Browser can change the default member of a class, which is
+strongly discouraged.
+
+**** Class Module Attributes
+
+#+begin_src vba
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = ""
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+' Attribute VB_Customizable = True/False
+#+end_src
+
+Class attributes are optional and assumed to be their default values if missing
+(=False=)
+
+- =VB_Name=: class name
+
+- =VB_PredeclaredId=: if =True=,  the default instance
+  variable is given the name of the class as its name (not a singleton, as the
+  user may still =New= another instance).
 
 *** Procedure/Function
 
