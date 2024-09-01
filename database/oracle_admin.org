@@ -1,4 +1,4 @@
-#+TITLE: Oracle_admin
+#+TITLE: Oracle Admin
 #+bibliography: Oracle.bib
 
 * Common Tasks and Tools
@@ -591,6 +591,10 @@ Logical storage units of a database that group related logical structures
   + /account status/ (locked or unlocked)
   + /password status/ (expired or not)
   + a user schema
+    + to access another schema, the schema prefix is required, otherwise, define
+      a synonym for that object or =alter session set
+      current_schema=that_schema= or use a after-logon trigger to set the
+      current schema.
   + a user also needs approprivate system privileges, object privileges and
     roles for its job.
 
