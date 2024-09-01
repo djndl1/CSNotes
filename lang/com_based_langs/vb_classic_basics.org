@@ -45,9 +45,8 @@ used in other language are keywords in VB (e.g. =Open=, =Close= etc.)
   variables, literals, constants and conditional constants.
 
 - *Variable* :: a /mutable/ container of data values.
-
-- *Dependent variable* :: the variable that corresponding to an element of an
-  aggregate value.
+  + *Dependent variable* :: the variable that corresponding to an element of an
+    aggregate value.
 
 - *Extent* of a variable :: the time a variable is created to the time it is destroyed.
   + /Program extent/ :: the entire existence of an active VBA environment, i.e. static
@@ -62,10 +61,10 @@ used in other language are keywords in VB (e.g. =Open=, =Close= etc.)
 
 - *Procedure* :: a unit of algorithmic functionality, identified by its name
   that is part of its declaration, including subroutines, functions and properties.
-  + *Property* :: a set of named procedures referenced as if it was a variable
+  + *Property* :: a set of named procedures referenced as if it were a variable
     name. Properties are more than OOP-object members.
 
-- *Objects* :: In OOP sense, a set of related variables, procedures and events.
+- *Objects* :: In the OOP sense, a set of related variables, procedures and events.
   + events are =RaiseEvent=-ed
   + Each class has a public interface of its own, but it may also implement the
     public interface of one or more other classes.
@@ -85,65 +84,7 @@ used in other language are keywords in VB (e.g. =Open=, =Close= etc.)
 
 - *Foreign Identifier* :: a token that represents a text sequence used as if it
   was an identifier but does not conform to VBA rules for forming an identifier.
-  - =[ForeignIdentifier]=
-
-* Variable and Constants
-
-#+begin_src basic
-' module-level variables, Shared has no meaning
-Public [Shared]
-Global  ' also public but no WithEvent is allowed
-Private/Dim [Shared] # module-level
-
-Dim varname As varType, [varname2 As varType2]
-#+end_src
-
-When a variable is created, it is initialized to a default value.
-
-*USE* =Option Explicit= *TO FORCE EXPLICIT DECLARATION OF VARIABLES AND CONSTANTS*.
-
-A public variable used in a class module code section may not be of a private
-UDT type or a private enum type.
-
-** Constants
-
-#+begin_src vba
-[ Public | Private ] Const constname [ As type ] = expression
-#+end_src
-
-** Object Variable
-
-- In general terms, late binding is slightly more efficient for out-of-process
-  ActiveX EXEs, and early binding is vastly more efficient for in-process DLLs.
-
-- Setting an =Object= variable requires a =Set=. Value assignment might
-  causes the right-side to use its default property and thus unexpected behavior.
-
-** Scopes and Lifetimes
-
-*Scope* is the visibility of a variable; *lifetime* is the period of program
-execution when the variable is live and available for use.
-
-- /Global/ :: BAS module =Public= variables. application long lifetime; application-wide scope
-  + best practice: define all variables in a UDT and declare such a UDT in one
-    place. =Public MyPublicVar As Long= in BAS modules.
-
-- /Private/ module-level :: =Dim= or =Private= statement in the declaration
-  section of a module. Module-long lifetime
-
-- /Public/ module-level :: except in BAS modules where /Public/ variables are
-  global or called /property/; module-long lifetime.
-
-- /Dynamic Local/ :: =Dim= defined within a procedure; procedure-wide scope/lifetime.
-
-- /Static Local/ :: procedure-wide scope; module-level lifetime.
-  =Static InProgress As Boolean=; useful for preventing procedure reentry. VB6
-  apps are single-threaded, no need to worry about thread safety.
-
-- /Project/ :: =Friend= inside an object (class or form) module. Project-wide
-  scope.
-
-The accessibility of a module is controlled by the =Option Private= directive.
+  - =[ForeignIdentifier]=: =[]= is the way to reference illegal identifiers.
 
 * Data Types
 
@@ -151,7 +92,8 @@ Type value may be surrounded by =[TypeName]=.
 
 ** Simple Types
 
-- =Boolean= (2-byte signed binary 2's complement integer): =0= for =False= and =-1= for =True=
+- =Boolean= (=VARIANT_BOOL=) (2-byte signed binary 2's complement integer): =0=
+  for =False= and =-1= for =True=
 
 - =Byte=: 8-bit unsigned binary integer, ranging from 0 to 255.
 
@@ -167,21 +109,21 @@ Type value may be surrounded by =[TypeName]=.
   + exponent letter =D=, =E=, =d=, =e=
 
 - =String= (=BSTR=): sequence of UTF-16 code points
-  + length no more than 65526.
+  + length no more than 65526. However, =BSTR= itself uses a four-byte length prefix.
   + Unicode is supported but Unicode String literals are not due to the IDE's
     non-Unicodeness. The IDE doesn't even recognize support UTF-16.
     Use =ChrW= instead
   + =Dim VarLenStr As String= (variable-length);
     =Dim FixedLenStr As String * 40= fixed-length (not well-supported by VB's
     string functions and causes low performance);
-  + =""""= for embedding a quote inside a string.
-  + String constants such as =vbTab= and =vbCrLf= are available.
+  + Double quotes =""""= to embed a quote inside a string.
+  + String constants such as =vbTab=, =vbCrLf=, =vbNewLine=, =vbCr=, =vbLf= are available.
   + =NULL= and =""= are equivalent for =BSTR=. See
-    [[https://nolongerset.com/check-for-empty-strings-in-vba/][Check for Empty Strings in VBA]].
+    [[https://nolongerset.com/check-for-empty-strings-in-vba/][Check for Empty Strings in VBA]]: TLDR use =Len(str) = 0=
 
-- =Date= ([[https://learn.microsoft.com/en-us/cpp/atl-mfc-shared/date-type?view=msvc-170][OLE =DATE=]], 8-bytes): one-second precision. Each integer represents a day.
+- =Date= ([[https://learn.microsoft.com/en-us/cpp/atl-mfc-shared/date-type?view=msvc-170][OLE =DATE=]], 8-bytes, a double-precision float): one-second precision. Each integer represents a day.
   + ~#12/3/2013#~, ~#2024-01-03 13:21:33#~ ~#13:21:33#~ (since the Epoch). No subsecond precision.
-  + actually a DateTime
+  + actually a DateTime and thus also a Time
 
 - =Object=: stores references. Object variables are assigned using =Set=.
   Missing =Set= might lead to unexpected results (the value might be assigned to
@@ -194,7 +136,7 @@ Type value may be surrounded by =[TypeName]=.
 ** =Variant=
 
 the default data type in VBA if no type is not specified.
-=Variant= is basically a dynamic type.
+=Variant= is basically a dynamic type for various non-object types.
 
 - =VARIANT= defined by OLE, 16 bytes with 2 bytes for typing and 14
   bytes for actual data; most types except =Decimal= use only the upper 8
@@ -204,7 +146,7 @@ the default data type in VBA if no type is not specified.
   + =Empty= (the uninitialized =Variant= variable value), =IsEmpty()=;
   + =Null= (no valid data), =IsNull=
   + =Error= (an error code): from 0 to 65535 Windows =HRESULT=
-  + =Missing=: no value is passed to the delcared optional parameter.
+  + =Missing=: no value is passed to the declared optional parameter.
 
 - =Variant= can be useful when returning a result of different types on some
   condition, especially as a =Result<T, E>= type since it can contains a
@@ -232,7 +174,7 @@ with =Variant=.
 
 - =vbNullChar= :: C's ='\0'= (the actual =Variant= value seems a =String=)
 
-- =vbNullString= :: empty string literal =""=.
+- =vbNullString= :: =NULL= string, equivalent to empty string literal =""= in VB.
 
 ** User-Defined Type
 
@@ -243,7 +185,7 @@ basically a structure or record type.
 + Structures can contain substructures.
 
 + UDTs in VB are limited in that if they are used with classes, they must be
-  declared in a public object module, that is, a DLL class module so that they
+  declared in a public object module, that is, a DLL or ActiveX EXE class module so that they
   may be marshaled by COM.
 
 #+begin_src vba
@@ -269,12 +211,12 @@ hence =Dim= and =ReDim=, declared and accessed through =ElementType()= and =Arra
 + The lower index is assumed to be =0= by default or explicitly with
     =ReDim Customer(1 To 1000) As String=. Also created by =Array()=
 
++ Use =LBound=, =UBound= for bounds and length.
+
 + To resize an array, use =ReDim= again.
     - To destroy an array, use the =Erase= statement.
     - =ReDim Preserve= tries to preserve the original values.
       Only the last dimension can resized with =Preserve=
-
-+ Use =LBound=, =UBound= for bounds and length.
 
 + Array can be assigned to a =Variant= with =var = arr()= by physically copying.
     - an array and an =Variant= can be assigned to each other.
@@ -282,7 +224,8 @@ hence =Dim= and =ReDim=, declared and accessed through =ElementType()= and =Arra
     - an array passed into a procedure as an =Variant= by ref while assignment
       makes an array copy itself.
 
-+ Array assignment only works if the target is a dynamic array. =b() = a()=.
++ Array assignment only works if the target is a dynamic array and requires
+  special syntax: =b() = a()=.
 
 + Byte Array: a string can be assigned to a byte array with all its Unicode
     characters converted to its proper binary representation. The opposite is
@@ -360,6 +303,64 @@ Sub FilterDuplicates(arr As Variant, numEls As Long)
     numEls = j
 End Sub
 #+end_src
+
+* Variable and Constants
+
+#+begin_src basic
+' module-level variables, Shared has no meaning
+Public [Shared]
+Global  ' also public but no WithEvent is allowed
+Private/Dim [Shared] # module-level
+
+Dim varname As varType, [varname2 As varType2]
+#+end_src
+
+When a variable is created, it is initialized to a default value.
+
+*USE* =Option Explicit= *TO FORCE EXPLICIT DECLARATION OF VARIABLES AND CONSTANTS*.
+
+A public variable used in a class module code section may not be of a private
+UDT type or a private enum type.
+
+** Constants
+
+#+begin_src vba
+[ Public | Private ] Const constname [ As type ] = expression
+#+end_src
+
+** Object Variable
+
+- In general terms, late binding is slightly more efficient for out-of-process
+  ActiveX EXEs, and early binding is vastly more efficient for in-process DLLs.
+
+- Setting an =Object= variable requires a =Set=. Value assignment might
+  causes the right-side to use its default property and thus unexpected behavior.
+
+** Scopes and Lifetimes
+
+*Scope* is the visibility of a variable; *lifetime* is the period of program
+execution when the variable is live and available for use.
+
+- /Global/ :: BAS module =Public= variables. application long lifetime; application-wide scope
+  + best practice: define all variables in a UDT and declare such a UDT in one
+    place. =Public MyPublicVar As Long= in BAS modules.
+
+- /Private/ module-level :: =Dim= or =Private= statement in the declaration
+  section of a module. Module-long lifetime
+
+- /Public/ module-level :: except in BAS modules where /Public/ variables are
+  global or called /property/; module-long lifetime.
+
+- /Dynamic Local/ :: =Dim= defined within a procedure; procedure-wide scope/lifetime.
+
+- /Static Local/ :: procedure-wide scope; module-level lifetime.
+  =Static InProgress As Boolean=; useful for preventing procedure reentry. VB6
+  apps are single-threaded, no need to worry about thread safety.
+
+- /Project/ :: =Friend= inside an object (class or form) module. Project-wide
+  scope.
+
+The accessibility of a module is controlled by the =Option Private= directive.
 
 * Source Code Organization
 ** Program Entry Point
