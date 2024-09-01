@@ -1,0 +1,237 @@
+#+title: Vb Stdlib
+
+The project name is =VBA=, present in every VBA environment.
+
+* Common Functions
+
+=Len(String)=
+
+=&=: string concatenation
+
+=Mid=: get a substring
+
+- =LBound=, =UBound=
+
+- =Split= a string
+
+- =Join= an array of strings
+
+- =Filter= a string based on a criterion
+
+- =Left=, =Right=: the leftmost/rightmost n chars
+
+- =LCase=, =UCase=
+
+- =Space=: n spaces
+
+- =Replace= a part of a string with another string
+
+- =StrReverse=
+
+- =LTrim=, =RTrim=
+
+- =Asc= a character
+
+- =Chr= an ASCII code integer
+
+** Numbers
+
+- =/= always converts its operands into =Double=; Use =\= for pure integer
+  division.
+
+- =^=: exponentiation.
+
+- =MOD= works only for integers.
+
+- Common math functions are available: =Abs=, =Sgn=, =Sqr=, =Exp=, =Log=
+
+- =Int=: round to the lower integer, a ceiling function; =Fix=: truncates the decimal part; =Round=
+  to the specified number of digits and uses banker's rounding.
+
+#+begin_src vba
+Function Ceiling(number As Double) As Long
+    Ceiling = -Int(-number)
+End Functio
+#+end_src
+
+- =Val=; =Hex=, =Oct=
+
+- =Randomize= sets the random seed; =Rnd= returns a the next random number
+  between =[0, 1)=
+
+** String Operations and Functions
+
+Use the =$= version, they return a string instead of =Variant=.
+
+- =&=: concatenation
+
+- =Left$=, =Right$=, =Mid$=: substring; =Mid$= also returns a string slice,
+  which can be assigned. =Mid$(Text, 3, 4) = "abcd";
+
+- =Len=: string length;
+
+- =LTrim$=, =RTrim$=, =Trim$=: discard unwanted trailing or leading blanks.
+
+- =Asc=, =Chr$=: ASCII-string conversion
+
+- =Space$=, =String$=: construct a string out of repeated characters.
+
+- =StrComp=: case-insensitive string comparison
+
+- =UCase$=, =LCase$=;
+
+- =StrConv= multi-functionality string conversion
+  + case conversion with =vbUpperCase=, =vbLowerCase=, =vbProperCase=
+  + ANSI-Unicode conversion with =vbUnicode=, =vbFromUnicode=
+
+- =Val=: string to decimal representation; locale-independent
+
+- =CInt=, =CLng=, =CSng=, =CDbl=, =CCur=, =CDate=: locale-aware conversion from
+  string
+
+- =Str$=: converts a number into its representation, with a leading space if the
+  number is positive.
+
+- =InStr=, =InStrRev=: =IndexOf=, =IndexOfLast= substring position search
+
+- =Like=: regex-like pattern matching =?= (any single character), =*= (zero or
+  more), =#= (any single digit), =[A-Z]=, =[0-9]=
+
+#+begin_src vba
+value Like "[A-C]###"
+value Like "[AEIOU][A-Z][A-Z]"
+value Like "[!0-9]??*"
+#+end_src
+
+- =Replace=
+
+- =strReverse=
+
+- =Split=, =Join=
+
+- =Filter=: return an array of items (not) containing a certain substring.
+
+- =Format=: string format
+
+** Date and Times
+
+- Date literal =#8/15/1998 9:20:57 PM#=
+
+- =DateSerial=, =TimeSerial=: may be used added together to create a DateTime
+
+#+begin_src vba
+Function IsLeapYear(year As Integer) As Boolean
+    ' Are February 29 and March 1 different dates?
+    IsLeapYear = DateSerial(year, 2, 29) <> DateSerial(year, 3, 1)
+End Function
+#+end_src
+
+- =Date=, =Time=, =Timer= (subsecond precision) property: the current date and the current time.
+
+- =Now=: the current date and time.
+
+- =DateValue=, =TimeValue=: returns the Date/Time component of the argument.
+  + =Year=, =Month=, =Day=, =Hour=, =Minute=, =Second= returns the corresponding
+    component
+  + =DatePart=
+
+- =Weekday=: locale-dependent; Use =Weekday(arg, vbMonday)= to force locale independence.
+
+- Date Arithmetic
+  + =+=: =Now + 2 + #12:00#=
+  + =DateAdd=, =DateDiff=: addition/difference with the specified time unit.
+
+- Date Format
+  + =Format=, =FormatDateTime=, =MonthName=: useless unless for human eyes.
+
+#+begin_src vba
+Public Function DateTimeAsISO8601(ByRef d As Date) As String
+   DateTimeAsISO8601 = Format(d, "yyyy-mm-ddThh:nn:ss")
+End Function
+#+end_src
+
+** Files
+
+- =Name= (move); =Kill= (delete); =FileCopy=
+
+- =GetAttr=, =SetAttr= [[https://learn.microsoft.com/en-us/windows/win32/fileio/file-attribute-constants][Windows File Attributes]], =FileLen=, =FileDateTime=
+
+- =CurDir$=; =ChDrive=, =ChDir=: both commands must be used to change the
+  current directory to another drive's.
+
+- =MkDir=, =RmDir=; =Name= (rename only)
+
+- =Dir=: iterate through files, something similar to C's =strtok= that maintains a global state.
+#+begin_src vba
+Function FileExists(filename As String) As Boolean
+    On Error Resume Next
+    FileExists = (Dir$(filename) <> "")
+End Function
+
+Function DirExists(path As String) As Boolean
+    On Error Resume Next
+    DirExists = (Dir$(path & "\nul") <> "") ' check for nul device
+End Function
+
+Function GetFiles(filespec As String, Optional Attributes As _
+    VbFileAttribute) As String()
+    Dim result() As String
+    Dim filename As String, count As Long, path2 As String
+    Const ALLOC_CHUNK = 50
+    ReDim result(0 To ALLOC_CHUNK) As String
+    filename = Dir$(filespec, Attributes)
+    Do While Len(filename)
+        count = count + 1
+        If count > UBound(result) Then
+            ' Resize the result array if necessary.
+            ReDim Preserve result(0 To count + ALLOC_CHUNK) As String
+        End If
+        result(count) = filename
+        ' Get ready for the next iteration.
+        filename = Dir$
+    Loop
+    ' Trim the result array.
+    ReDim Preserve result(0 To count) As String
+    GetFiles = result
+End Function
+#+end_src
+
+** =FileSystemObject= : the OOP Way
+
+- =FileExists()=, =DriveExists()=, =FolderExists()=
+
+* Interoperation With the System
+
+- =App=: the current app's
+  + =ExeName=, =Path=
+  + =PrevInstance=: if there's another instance already running
+
+- =Shell=: asynchronously starts a process; returns the PID of the new process.
+
+#+begin_src vba
+Private Declare Function WaitForSingleObject Lib "kernel32" _
+    (ByVal hHandle As Long, ByVal dwMilliseconds As Long) As Long
+Private Declare Function OpenProcess Lib "kernel32" (ByVal dwAccess As _
+    Long, ByVal fInherit As Integer, ByVal hObject As Long) As Long
+Private Declare Function CloseHandle Lib "kernel32" _
+    (ByVal hObject As Long) As Long
+
+' Wait for a number of milliseconds, and return the running status of a
+' process. If argument is omitted, wait until the process terminates.
+Function WaitForProcess(taskId As Long, Optional msecs As Long = -1) _
+    As Boolean
+    Dim procHandle As Long
+    ' Get the process handle.
+    procHandle = OpenProcess(&H100000, True, taskId)
+    ' Check for its signaled status; return to caller.
+    WaitForProcess = WaitForSingleObject(procHandle, msecs) <> -1
+    ' Close the handle.
+    CloseHandle procHandle
+End Function
+#+end_src
+
+* External Libraries
+
+** Microsoft Scripting Runtime
+
+Windows-builtin COM library.

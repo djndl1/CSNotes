@@ -1,0 +1,7 @@
+#+title: Vb IO General
+
+* Quick I/O
+
+=InputBox=
+
+=MsgBox=

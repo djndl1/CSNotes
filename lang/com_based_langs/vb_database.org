@@ -1,0 +1,181 @@
+#+title: VB Classic Database
+
+* Overview
+
+- ODBC
+  + Most data access techniques in VB can use ODBC drivers as intermediate
+    layers.
+  + A connection may or may not use the configured DSN (either stored in the
+    registry or in a file). An ODBC connection can
+    be DSN-less with all connection details specified in the connection string.
+
+- Data Access Object (DAO): an OO interface to Microsoft Jet (Access) and ODBC.
+
+- Remote Data Object (RDO): improved upon DAO and designed around ODBC
+
+- OLE DB: based on COM
+  + the =MSDASQL= provider (Microsoft OLE DB Provider for ODBC): a bridge from
+    OLE DB to ODBC drivers.
+    - the default provider if not specified.
+
+- ActiveX Data Object (ADO): the high-level interface to OLE DB
+
+* ADO Programming
+
+** Object Model
+
+The three core classes (=Connection=, =Command= and =RecordSet=) are not tightly
+related.
+Some of their functionalities overlap due to implicit use of the other types of
+objects but only one specializes. =Connection= represents a physical
+connection/session to the database, =Command= utilizes an =ActiveConnection= to
+execute a database command (possibly a SQL command, be it a normal SQL text
+statement, a stored procedure or something else). A =RecordSet= is a handle to
+the result of a query, which can be modified/updated and propagated back to the
+database.
+
+*** =Connection=: =ADODB.Connection=
+
+If no provider is specified in the connection string, =MSDASQL= is used which is the OLE DB provider
+for ODBC drivers.
+
++ =.Open()=: open a connection
+
++ =.Execute()=
+
++ =.BeginTrans()=, =.CommitTrans()=, =.RollbackTrans()=
+
++ =.OpenSchema()=: for metadata
+
++ =.ConnectionTimeout=, =CommandTimeout=
+
+*** =Command=
+
+A command or query that can be executed on a data source.
++ =.CommandText=, =.CommandType=:  SQL command/query or the name of a table or
+  the name of a stored procedure.
+
++ =.ActiveConnection=: associated DB connection.
+
++ =.Prepared=:
+
++ =.CommandTimeout=:
+
++ =.Execute() As RecordSet=: in case of an action, the returned =RecordSet= is closed.
+
++ =.CreateParameter() As Parameter=:
+
++ =Command.Parameters.Refresh()= can even retrieve provider-specific parameter
+  information for a stored procedure.
+
++ =.NamedParameter=: may not be supported by a provider (e.g. Oracle, ODBC).
+
++ =.Name=: a command can have a name and then its associated
+  =.ActiveConnection= can call this named command =conn.NamedCommandName= like
+  a custom method.
+
+*** =Parameter=
+
++ =.Name=, =.Type=, =.Precision=, =.NumericScale=: precision and numeric scale
+  must be specified for =adNumeric= and =adDecimal=.
+
++ =.Value=: the default property of a parameter object
+
++ =.Direction=:
+
++ =.Size=: must be set for variable-length data type.
+
++ =.Attributes=: bit-field value
+
++ note that ODBC does not support named parameters except in stored procedures.
+
+*** =RecordSet=
+
++ a =RecordSet= can be created independent of a certain =Connection= and can use a
+  =Connection= explicitly or implicitly.
+
++ One can retrieve a =Recordset= from a database, close the connection,
+  modify the data in the =Recordset=, and finally reestablish the connection
+  to send all the updates to the server.
+
++ =.Source=: the name of the table, the SQL text, the SP name or the
+  =CommandText= of a =Command=
+
++ =.Open()=, =.ActiveConnection=, =.ActiveCommand=
+
++ Cursor: a set of records that represent the results of query, may contain
+  the actual data (client-side, for optimistic update) or just pointers to records in the database
+  (forward-only server-side, better performance)
+  + =.CursorLocation=: =2-adUseServer= or =3-adUseClient= (client-side cursor
+    implementation provided by Microsoft Cursor Service for OLE DB)
+  + =.CursorType=:
+    + *dynamic* =adOpenDynamic=: able to view additions, changes and deletions by other users.
+    + *keyset* =adOpenKeySet=: built from unique keys that identify the rows in the result
+      set, which is used to access each row corresponding to each key.
+      Records added by others are invisible and records deleted by
+      others (or of which the key is changed by others) cannot be accessed;
+      only changes of non-key values are still visible.
+    + *static* =adOpenStatic= (client-side): a static copy of a set of records that display
+      the result set as it was when the cursor was first opened, a snapshot. Additions, changes or
+      deletions by other users are not visible.
+    + *forward-only* =adOpenForwardOnly=: (default) =.MoveNext()= only; additions, changes or deletions by
+      other users are not visible. *forward-only* cursors are *dynamic by
+      default*, meaning any change is detected as the current row is processed.
+    + use *forward-only* or =static* cursor to go through data; use *keyset*
+      to select a few rows from a large result set; use *dynamic* to
+      synchronize a result set with recent adds.
+  + =.MoveFirst()=, =.MoveNext()=, =.Move()=, =MoveLast()=,
+    =.MovePrevious()=: moving forward/backward
+  + =.Bookmark=: get/restore where previously moved to, unique to a record set.
+  + =PageSize=, =PageCount=, =AbsolutePage= (current page): paging functionality support
+
++ =.MaxRecords=: a limit to the number of records returned in the
+    =RecordSet=
+
++ =.CacheSize=
+
++ *Update, Insertion, Delete*:
+  - /Immediate Update/: =.Update()=, =.AddNew()=. A field is =.Update()=-ed
+    when the record set moves to the next one;
+  - /Batch Update/: =UpdateBatch=: batch update with =.AddNew()=, =.Update()=, =.Delete()=
+
++ =.Fields=: the field/column collection of the current record.
+  + =.Count=, =.Item= (indexed by integers or column names)
+  + a field may be =.Append= to the collection by the client code before a
+    query is made.
+  + Each field has a =.Name= and =.Value= (the current row value), =.Type=,
+    =.Precision=, =.NumericScale=, =.DefinedSize=, =.ActualSize=
+
++ =.Requery=: refresh data result set with the same command
+
++ =.NextRecordset=: multiple result set support. A query may return multiple record sets just like a cursor
+  may point to multiple rows after moving.
+
++ =.BOF= and =.EOF= to delineate the beginning and end of the dataset. Both
+  combined, a record set can be determined empty or not in case =.RecordCount=
+  is not reliable.
+
+- =.Properties= of =Connection=, =RecordSet=, =Command=, =Field=: contains all the dynamic properties that the ADO provider has
+  added to the built-in properties.
+
+
+*** Transactions
+
+- Concurrency control or *Locks*
+  + =adLockReadOnly=: read-only
+  + =adLockPessimistic=: pessimistic locking by locking records at the data
+  source immediately before editing.
+  + =adLockOptimistic=: optimistic locking by assuming no other user may change
+  the data between the time of editing and committing and thus does not lock on
+  the data source. If any modification is detected, the transaction is rolled back.
+  + =adLockBatchOptimistic=:
+
+- *Isolation levels*
+  + =adXactChaos=: pending changes from more highly isolated transactions cannot
+    be overwritten
+  + =adXactBrowse=, =adXactReadUncommitted=: uncommitted changes from one transaction can be viewed in another
+  + =adXactCursorStability=, =adXactReadCommitted=: changes from one transaction
+    can only be viewed from another after committing the changes
+  + =adXactIsolated=, =adXactSerializable=: transactions are conducted in
+    isolation of other transactions.
+  + =adXactRepeatableRead=: ReadUncommitted after requerying.

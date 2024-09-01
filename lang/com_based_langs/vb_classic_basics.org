@@ -1,0 +1,677 @@
+#+TITLE: Vb Classic Basics
+#+bibliography: vb_classic.bib
+#+cite_export: csl
+
+* Overview
+
+*Visual Basic Application (VBA)* is the name of the language. A glue language
+that interfaces with various objects that make up an application via the host
+application's object model.
+
+VB5 introduces the Visual Basic IDE. VBA programs and the VBA development
+environment itself both execute in the same process before compilation.
+
+In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rapid Application Development]]
+
+1. Heavily integrated with COM/OLE, (=String= is OLE =BSTR= and arrays are =SAFEARRAY=)
+
+2. Primarily used for Windows GUI apps
+
+3. Use refcount for memory management
+
+4. Compiled to P-code or native code
+
+5. Supported on up to Windows 10
+
+6. Poor support for OOP and limited threading capability
+
+7. It is possible to reference any COM-visible objects in VB6, including those in CLR.
+
+8. event-driven programming, modular programming and half OOP.
+
+VB keywords and identifiers are Case-Insensitive. Be careful, many common words
+used in other language are keywords in VB (e.g. =Open=, =Close= etc.)
+
+* Concepts
+
+- *Data Value* :: a single element from a specific finite domain of such
+  elements, e.g. single, double, integer, =Nothing=, =Missing=, =Error=,
+  aggregate type values etc.
+
+- *Entity* :: a component that can be accessed by name or index, according to
+  the resolution rules for simple name expressions, index expressions, and member
+  access expressions. e.g. projects, procedural modules, types (class modules,
+  UDTs, Enums or built-in types), properties, functions, subroutines, events,
+  variables, literals, constants and conditional constants.
+
+- *Variable* :: a /mutable/ container of data values.
+
+- *Dependent variable* :: the variable that corresponding to an element of an
+  aggregate value.
+
+- *Extent* of a variable :: the time a variable is created to the time it is destroyed.
+  + /Program extent/ :: the entire existence of an active VBA environment, i.e. static
+  + /Module extent/ :: the span from the point the module is incorporated into the project
+    to the point it is removed from the VBA environment, e.g. static local
+    variable in a procedure, a module variable declaration.
+  + /Procedure Extent/ :: the duration of a particular procedure invocation.
+  + /Object Extent/ :: the lifespan of the containing object, e.g. a variable
+    declaration within a class module
+  + /Aggregate Extent/ :: the lifespan of the variable holding the containing
+    aggregate data value.
+
+- *Procedure* :: a unit of algorithmic functionality, identified by its name
+  that is part of its declaration, including subroutines, functions and properties.
+  + *Property* :: a set of named procedures referenced as if it was a variable
+    name. Properties are more than OOP-object members.
+
+- *Objects* :: In OOP sense, a set of related variables, procedures and events.
+  + events are =RaiseEvent=-ed
+  + Each class has a public interface of its own, but it may also implement the
+    public interface of one or more other classes.
+
+- *Extended Environment* :: additional entities accessible using VBA
+  + the VBA standard library
+  + Host environment: entities defined by the host app, accessible similar to
+    the VBA library
+  + external variables, procedures and others: entities defined using other
+    programming languages.
+
+- *Modules* :: source code files to achieve modularity.
+  + module text encoding is implementation-defined.
+  + source code files treat newlines as line separators. VBA is supposed to
+    support =LF=, =CR=, =U+2028=, =U+2029= as line termination characters. =_=
+    continues a line.
+
+- *Foreign Identifier* :: a token that represents a text sequence used as if it
+  was an identifier but does not conform to VBA rules for forming an identifier.
+  - =[ForeignIdentifier]=
+
+* Variable and Constants
+
+#+begin_src basic
+' module-level variables, Shared has no meaning
+Public [Shared]
+Global  ' also public but no WithEvent is allowed
+Private/Dim [Shared] # module-level
+
+Dim varname As varType, [varname2 As varType2]
+#+end_src
+
+When a variable is created, it is initialized to a default value.
+
+*USE* =Option Explicit= *TO FORCE EXPLICIT DECLARATION OF VARIABLES AND CONSTANTS*.
+
+A public variable used in a class module code section may not be of a private
+UDT type or a private enum type.
+
+** Constants
+
+#+begin_src vba
+[ Public | Private ] Const constname [ As type ] = expression
+#+end_src
+
+** Object Variable
+
+- In general terms, late binding is slightly more efficient for out-of-process
+  ActiveX EXEs, and early binding is vastly more efficient for in-process DLLs.
+
+- Setting an =Object= variable requires a =Set=. Value assignment might
+  causes the right-side to use its default property and thus unexpected behavior.
+
+** Scopes and Lifetimes
+
+*Scope* is the visibility of a variable; *lifetime* is the period of program
+execution when the variable is live and available for use.
+
+- /Global/ :: BAS module =Public= variables. application long lifetime; application-wide scope
+  + best practice: define all variables in a UDT and declare such a UDT in one
+    place. =Public MyPublicVar As Long= in BAS modules.
+
+- /Private/ module-level :: =Dim= or =Private= statement in the declaration
+  section of a module. Module-long lifetime
+
+- /Public/ module-level :: except in BAS modules where /Public/ variables are
+  global or called /property/; module-long lifetime.
+
+- /Dynamic Local/ :: =Dim= defined within a procedure; procedure-wide scope/lifetime.
+
+- /Static Local/ :: procedure-wide scope; module-level lifetime.
+  =Static InProgress As Boolean=; useful for preventing procedure reentry. VB6
+  apps are single-threaded, no need to worry about thread safety.
+
+- /Project/ :: =Friend= inside an object (class or form) module. Project-wide
+  scope.
+
+The accessibility of a module is controlled by the =Option Private= directive.
+
+* Data Types
+
+Type value may be surrounded by =[TypeName]=.
+
+** Simple Types
+
+- =Boolean= (2-byte signed binary 2's complement integer): =0= for =False= and =-1= for =True=
+
+- =Byte=: 8-bit unsigned binary integer, ranging from 0 to 255.
+
+- =Integer= (16-bit) and =Long= (32-bit, the preferred type for integer values):
+  =&= prefixed forces a literal integer into a =Long= value.
+  + =&H1234= (hexadecimal), =&O011064= (octal)
+  + =&= as a literal suffix for =Long=, =^= for =LongLong=, =%= for =Integer=
+  + an =Enum= type (named long) can have a maximum sentinel value to guard against invalid
+    integers assigned to a variable of such a =enum= type.
+  + =LongPtr= mapped =Long= under a 32-bit environment.
+
+- =Single= (literal type suffix =!=) and =Double= (=#=): IEEE 754 (1985) floating-point numbers
+  + exponent letter =D=, =E=, =d=, =e=
+
+- =String= (=BSTR=): sequence of UTF-16 code points
+  + length no more than 65526.
+  + Unicode is supported but Unicode String literals are not due to the IDE's
+    non-Unicodeness. The IDE doesn't even recognize support UTF-16.
+    Use =ChrW= instead
+  + =Dim VarLenStr As String= (variable-length);
+    =Dim FixedLenStr As String * 40= fixed-length (not well-supported by VB's
+    string functions and causes low performance);
+  + =""""= for embedding a quote inside a string.
+  + String constants such as =vbTab= and =vbCrLf= are available.
+  + =NULL= and =""= are equivalent for =BSTR=. See
+    [[https://nolongerset.com/check-for-empty-strings-in-vba/][Check for Empty Strings in VBA]].
+
+- =Date= ([[https://learn.microsoft.com/en-us/cpp/atl-mfc-shared/date-type?view=msvc-170][OLE =DATE=]], 8-bytes): one-second precision. Each integer represents a day.
+  + ~#12/3/2013#~, ~#2024-01-03 13:21:33#~ ~#13:21:33#~ (since the Epoch). No subsecond precision.
+  + actually a DateTime
+
+- =Object=: stores references. Object variables are assigned using =Set=.
+  Missing =Set= might lead to unexpected results (the value might be assigned to
+  the object's default property). =Nothing= for null reference.
+
+- =Currency= (=CURRENCY=, 8-byte number in an integer format scaled down by
+  10000, i.e. =2^63 / 10000=)
+  + literal suffix =@=
+
+** =Variant=
+
+the default data type in VBA if no type is not specified.
+=Variant= is basically a dynamic type.
+
+- =VARIANT= defined by OLE, 16 bytes with 2 bytes for typing and 14
+  bytes for actual data; most types except =Decimal= use only the upper 8
+  bytes.
+
+- Special values
+  + =Empty= (the uninitialized =Variant= variable value), =IsEmpty()=;
+  + =Null= (no valid data), =IsNull=
+  + =Error= (an error code): from 0 to 65535 Windows =HRESULT=
+  + =Missing=: no value is passed to the delcared optional parameter.
+
+- =Variant= can be useful when returning a result of different types on some
+  condition, especially as a =Result<T, E>= type since it can contains a
+  =vbError= type, checked using =IsError=.
+
+- Use =IsObject= instead of =VarType= to test for an object within a  =Variant=.
+  The latter may evaluates to its default property before passed to =VarType=.
+
+- Use =VarType= and =TypeName= to get the type information of a =Variant= variable.
+
+- [[https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/decimal-data-type][Decimal]] (12-byte unsigned integer with a scaling factor): not a declared type (not
+  a variable type but a data type), used
+  only as a =Variant= with =CDec=
+
+There are several different null/empty values, some of which are commonly used
+with =Variant=.
+
+- =Nothing= :: null object reference value.
+
+- =vbEmpty= :: uninitialized =Variant= value.
+
+- =Null= :: special =Variant= value that denotes "no value", =DBNull.Value=
+  + =Null = Null= returns =False=, use =IsNull(var)=.
+  + =vbNull= :: =Null= variant's type enum.
+
+- =vbNullChar= :: C's ='\0'= (the actual =Variant= value seems a =String=)
+
+- =vbNullString= :: empty string literal =""=.
+
+** User-Defined Type
+
+basically a structure or record type.
+
++ Fixed-length strings are stored directly in a UDT while variable strings are stored as pointers.
+
++ Structures can contain substructures.
+
++ UDTs in VB are limited in that if they are used with classes, they must be
+  declared in a public object module, that is, a DLL class module so that they
+  may be marshaled by COM.
+
+#+begin_src vba
+Private Type EmployeeUDT
+    Name As String
+	DepartmentID As Long
+    Salary As Currency
+End Type
+
+emp1 = emp2 ' copy one UDT to another
+#+end_src
+
+** Arrays: Ordered sets of homogeneous items.
+
+Creating an array is called *dimensioning* (defining the size of) the array,
+hence =Dim= and =ReDim=, declared and accessed through =ElementType()= and =ArrayObject(N)=.
+
++ Up to 60 dimensions. Initially no dimension as a declared variable.
+
++ can be static or dynamic. Dynamic arrays can be first declared =Dim arr() As
+  Type= then defined using =ReDim arr(N) As Type= or with only =ReDim=.
+
++ The lower index is assumed to be =0= by default or explicitly with
+    =ReDim Customer(1 To 1000) As String=. Also created by =Array()=
+
++ To resize an array, use =ReDim= again.
+    - To destroy an array, use the =Erase= statement.
+    - =ReDim Preserve= tries to preserve the original values.
+      Only the last dimension can resized with =Preserve=
+
++ Use =LBound=, =UBound= for bounds and length.
+
++ Array can be assigned to a =Variant= with =var = arr()= by physically copying.
+    - an array and an =Variant= can be assigned to each other.
+    - an array in =Variant= has its =VarType(v) = vbArray + vbElementType=.
+    - an array passed into a procedure as an =Variant= by ref while assignment
+      makes an array copy itself.
+
++ Array assignment only works if the target is a dynamic array. =b() = a()=.
+
++ Byte Array: a string can be assigned to a byte array with all its Unicode
+    characters converted to its proper binary representation. The opposite is
+    also possible. =LenB=
+
+#+begin_src vba
+' Dynamically polymorphism, slow execution
+Function ArraySum(arr As Variant) As Variant
+    Dim i As Long, result As Variant
+    For i = LBound(arr) To UBound(arr)
+        result = result + arr(i)
+    Next
+    ArraySum = result
+End Function
+#+end_src
+
++ to use array of arrays, each array element should be a =Variant= that actually
+  contains an array.
+
+** Type Conversions
+
+*** Implicit
+
+Various data types are converted automatically, even from string to integers.
+
+#+begin_src vba
+   Dim s As String
+   s = "123"
+   Dim i As Long
+   i = s            'i = 123
+#+end_src
+
+*** Explicit
+
+- legacy functions: =Int=, =Str= ...
+
+- the =C*= series locale-aware functions
+  + =CBool=, =CByte=, =CDec=, =CDate=, =CCur=, =CDbl=, =CSng=, =CInt=, =CLng=,
+    =CStr=, =CVar=,
+
+** [[https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa231021(v=vs.60)][Collection]]
+
+A heterogeneous collection of =Variant= items, indexed one-based by =Long= with optional
+=String= keys.
+
+=Collection= supports the =For Each= enumeration by implementing a =NewEnum=
+method that returns an enumerator, which can be access by
+=collectionVar.[_NewEnum]=
+
+=Collection= does not support replacing an element in place. One has to
+=.Remove= and then =.Add Item, , beforeThisIndex=.
+
+One trick to store UDT types in =Collection= is to store a UDT as an array.
+
+#+begin_src vba
+' Filter out all duplicate entries in any Variant-compatible array.
+' On entry, NUMELS should be set to the number of items to be examined.
+' On exit, NUMELS holds the number of nonduplicate items.
+Sub FilterDuplicates(arr As Variant, numEls As Long)
+    Dim col As New Collection, i As Long, j As Long
+    On Error Resume Next
+    j = LBound(arr) - 1
+    For i = LBound(arr) To numEls
+        ' Add a dummy zero value, but use the array's value as the key.
+        col.Add 0, CStr(arr(i))
+        If Err = 0 Then
+            j = j + 1
+            If i <> j Then arr(j) = arr(i)
+        Else
+            Err.Clear
+        End If
+    Next
+    ' Clear all remaining items.
+    For i = j + 1 To numEls: arr(i) = Empty: Next
+    numEls = j
+End Sub
+#+end_src
+
+* Source Code Organization
+** Program Entry Point
+
+Every global variables and constants are loaded before the entry point.
+A startup form or a procedural module function can be the entry point of a program.
+
+- /Startup Form/: the form is loaded and several events are fired
+  + =Initialize=: if the code references a control, =Load= is immediately fired
+    before the end of =Initialize=.
+  + =Load=
+
+- /code module/: the =Main= procedure (=Public= or =Private= or none).
+  + a form can be instantiated and shown in =Main=, the recommended alternative
+    to a startup form.
+
+** Program Exit
+
+- The program exits the =Main= procedure returns.
+
+- the =End= statement aborts the program without cleanup.
+
+- ActiveX components shouldn't exit by themselves: they should be managed by the
+  OS since they may be referenced by other apps.
+
+- =Unload= the main form exits the program.
+
+** Modules
+
+A module consists of two parts
+
+- *header*: a set of attributes consisting of name/value pairs that specify
+  certain linguistic characteristics of a module, enclosed in =BEGIN ... END= at
+  the start of the file.
+
+- *body*: actual VBA language source code.
+  + Module bodies are made a of a *declaration section* (types, constants and variables)
+  plus *a collection of procedures* (*code section*). The declaration section must precede the
+  code section.
+
+Two kinds of modules are supported:
+
+- *procedural module*: C-like compilation unit
+
+- *class module*: OOP-like
+  - Form Module: basically class module with GUI controls
+
+** Header & Attributes
+
+*** Procedure Attributes
+
+The only supported and required attribute of a procedural module. The module name is also
+specified in the project file and used as a prefix to module members. There is
+no such language support in C: whatever in the included header files are
+imported into the current namespace.
+
+#+begin_src vba
+Attribute VB_Name = "ModuleName"
+#+end_src
+
+Tools-Procedure Attributes: stored next to the member definition, not shown in
+the IDE.
+
+**** Default Property/Method (Not Encouraged)
+
+Default property/method is used if any member name is omitted when using an
+object. Object Browser can change the default member of a class, which is
+strongly discouraged.
+
+*** Class Module Attributes
+
+#+begin_src vba
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = ""
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+' Attribute VB_Customizable = True/False
+#+end_src
+
+Class attributes are optional and assumed to be their default values if missing
+(=False=)
+
+- =VB_Name=: class name
+
+- =VB_PredeclaredId=: if =True=,  the default instance
+  variable is given the name of the class as its name (not a singleton, as the
+  user may still =New= another instance).
+
+** Options
+
+- =Option Binary/Text= determines the comparison rules by relational operators.
+
+- =Option Base 0/1=: the default lower bound of all array dimensions.
+  + by default 0
+
+- =Option Explicit=: variables must be explicitly declared.
+
+- =Option Private=: the accessiblity of a module to other projects.
+  + Compared to =internal= in C#
+  + A class module has to be in an ActiveX project or a library project to be public
+
+** Preprocessor & Conditional Compilation
+
+#+begin_src vba
+#const variable_Name = const_expression
+
+#if expression then
+
+#elseif expression then
+
+#else
+
+#endif
+#+end_src
+
+* Control Flow
+** Branch
+
+- Logical operator with ===, =<>=; =And=, =Or=, =Xor=, =Not= bitwise operator
+  (for boolean there's no difference)
+  + be careful when using these operators with integers in conditional expressions.
+
+- =If () Then ... ElseIf () Then ... Else ...=; multi-line branch statement
+   requires a =End If=.
+   + any non-zero value in =IF= is considered =True=
+   + =IF= is not short-circuited
+
+- =Select Case= supports short-circuited evaluation
+  + Case subexpressions are evaluated only until they return True, after which
+    all the remaining expressions on the same line are skipped.
+
+#+begin_src vba
+Select Case Mid$(Text, i, 1)
+    Case "0" To "9"
+        ' It's a digit.
+    Case "A" To "Z", "a" To "z"
+        ' It's a letter.
+    Case ".", ",", " ", ";", ":", "?" ' connected by OR
+        ' It's a punctuation symbol or a space.
+    Case Else
+        ' It's something else.
+End Select
+#+end_src
+
+- =GoTo= is there but not advised. Use sparingly.
+
+*** Functions
+
+All expressions are always evaluated which might lead to unexpected bugs.
+
+- =IIF()=: basically =IF ... Else ... End If=
+
+- =Choose()=: choose a candidate based on the index expression
+
+- =Switch()=: a simple replacement for =Select Case=
+
+** Loop
+
+There is no =continue= in VB, use =IF= with =GOTO=
+
+#+begin_src vba
+' item must be a Variant or an Object type if elements are of certain object type
+For Each item In Col
+...  ' Exit For
+Next item
+
+For i = 0 To N [Step Increment]
+...
+Next i
+#+end_src
+
+#+begin_src vba
+' While Wend is limited in VBA
+While (expr) ' break is not available, use Do While Loop
+...
+Wend
+
+' break out of the loop by `Exit Do`
+Do While (expr) ''
+...
+Loop
+
+Do
+...
+Loop [Until (expr)]
+#+end_src
+
+** Procedure/Function
+
+- Public procedures of a public module can be called through COM. =Public= is
+  the default scope attribute for procedures.
+
+- All event procedures are =Private=
+
+- =Friend= is project-level scope.
+
+#+begin_src vba
+Private/Public Sub SubName
+...
+End Sub
+
+Private/Public Function FuncName
+...
+End Function
+#+end_src
+
+*** Invoking Functions/Procedures
+
+There are some weird rules about parentheses with subroutine call.
+
+If a function is used in an expression, parameters must be enclosed within
+parentheses. Otherwise, =Call= must be used with parentheses. To avoid all these
+rules, one may use =Call= if possible.
+
+- Unnecessary parentheses causes problems especially for subroutines with a
+  single parameter. The parameter is evaluated (either into a rvalue or a
+  default property value) in the parentheses before being
+  passed into the subroutine.
+
+*** Parameters and Return Values
+
+- Parameters can be passed =ByVal= or =ByRef= (by default even for basic types
+  like =Long=, which can lead to undetected bugs).
+  + =ByVal= performs possible type conversion for values passed in
+  + A =ByRef Variant= accepts arguments of any types.
+    #+begin_src vba
+    ' Swap values of any type.
+    Sub Swap(first As Variant, second As Variant)
+        Dim temp As Variant
+        temp = first: first = second: second = temp
+    End Sub
+    #+end_src
+  + Use =ByVal= whenever possible.
+
+- Passing User Defined Types is restricted
+  + a =Public= UDT defined in a =BAS= module cannot be only be passed into
+    =Public= procedures defined in BAS modules. (Such UDT types are unknown to COM)
+  + Define a COM-aware UDT in a class module or a form module.
+
+- A type private to a project can be used as a parameter or the return value of
+  procedure that can be called from outside the project.
+
+- =Optional=-prefixed parameters
+  + If the type is =Variant= (an =Err= value), it can checked by =IsMissing()=.
+    A =Missing= value is pushed onto the stack for an optional argument.
+    =IsMissing= only works with an optional parameter once, the second time it
+    would return =False=.
+  + Can be used with a default value. ~Optional color As Long = vbWhite~;
+  + A non-Variant optional parameter receives its default value if no default value
+    is assigned (not =Missing=).
+  + a UDT type cannot be used with =Optional=.
+
+- /Named/ arguments: ~NamedArg := paramVal~.
+  + Better than multiple commas with optional parameters in between before a
+    final parameter.
+
+- =ParamArray args() As Variant=: any number of arguments as a =Variant= array.
+  + (undocumented) =IsMissing= can be used with =ParamArray= =args= to check if
+    =args= is an empty array=. The legal syntax is to check if =LBound(args) > UBound(args)=.
+
+#+begin_src vba
+With Emp
+    Print .Name
+    Print .Salary
+    With .Location
+        Print .Address
+        Print .City & "  " & .Zip & "  " & .State
+    End With
+End Type
+#+end_src
+
+* Error Handling
+
+First, a error handler (=On Error=) is installed to handle any error until a new
+error handler is installed.
+Primitive with =GoTo= but better than C's =errno= check.
+
+- =On Error Resume Next=: ignore any error.
+  + can be used to test if an object has certain properties.
+
+- =On Error Resume=: retry the erring line. Error is not cleared after the
+  control returns to the calling code.
+
+- =On Error Goto=: jump to the named label to handle any error; to exit from a
+  error routine:
+  + =Resume= to retry the line of code that caused the error.
+  + =Resume Next= to resume execution at the next line after the one that caused
+    the error
+  + =Resume <label>=
+  + =Err.Raise=: errs out again
+  + =Exit Sub= or =Exit Function= with the calling code receiving a zero error code.
+
+- =On Error Goto 0=: disable any previous =On Error=
+
+If any error inside an event handler goes unhandled, the program terminates.
+Error that go unhandled in event procedures terminates the program immediately.
+
+#+begin_src vba
+Err.Raise Number, [Source], [Description], [HelpFile], [HelpContext]
+#+end_src
+
+* Bibliography
+
+These days, [[https://learn.microsoft.com/en-us/openspecs/microsoft_general_purpose_programming_languages/ms-vbal/d5418146-0bd2-45eb-9c7a-fd9502722c74][VBA Language Specification]] from Microsoft should be regarded as the ultimate reference.
+
+#+print_bibliography:

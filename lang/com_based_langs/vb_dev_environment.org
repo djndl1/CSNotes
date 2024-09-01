@@ -1,0 +1,210 @@
+#+title: VB Classic Development Environment
+#+bibliography: vb_classic.bib
+#+cite_export: csl
+
+* Computational Environemnt
+
+Mostly hosted an another application and made available to access host
+application data and host computational processes.
+
+* Project Structure
+
+A project consists of a name, a set of named modules and an ordered list of
+project references with three types of projects: *source projects*, *host projects* and *library projects*.
+A project reference specifies that a project accesses public entities defined in
+another project.
+
+- =.vbp= :: the [[#projectfile][project file]]
+
+- =.frm= :: a form file
+
+- =.frx= :: binary data (images etc.) of a form
+
+- =.bas= :: standard code module
+
+- =.cls= :: Class module
+
+- =.res= :: resource files, bitmaps, text strings and other data.
+
+- =.vbw= :: not part of a project, used by the IDE to position the window.
+
+* [[https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa231236(v=vs.60)][VB6.exe]]
+
+This executable is the IDE for Visual Basic Classic but also a command line tool
+for VB compilation.
+
+#+begin_src shell
+# compile a VB6 project
+# output as filename
+# to output directory
+# compilation definition, like C's macro
+vb6.exe /make project.vbp [/out filename] [/outdir path] [/d const=value]
+
+# to make a console app
+# use MS linker to edit the subsystem
+link /edit /subsystem:console app.exe
+#+end_src
+
+* Project File =.vbp=
+:PROPERTIES:
+:CUSTOM_ID: projectfile
+:END:
+
+Here is an example with comments;
+The bare minimum requires =Type=, =Reference= to =stdole=.tlb=, =Module=, =Startup=
+
+#+begin_src ini
+Type=[Exe for Standard Exe,OleExe for ActiveX EXE,OleDll for ActiveX DLL,Control for ActiveX Control]  # project type
+Reference=*\G{COM Library UUID}#Version#0#PathToDllOrTypeLib#Library Helpstring name
+Module=ModuleName; ModuleFile.bas # module source file
+Form=FormName.frm  # form source file
+Form=MDIForm.frm
+Class=ClassName; ClassName.cls # class source file
+UserControl=UserControlName.ctl # UserControl source file
+Startup="Sub Main" # Startup object
+HelpFile="" # a help file for the project
+[Description=Project Description] # optional
+Title="MyAppName"
+ExeName32="ExecutableName.exe"
+Command32=""
+Name="MyProjectName"
+MajorVer=1
+MinorVer=0
+RevisionVer=0
+AutoIncrementVer=0
+CompilationType=[-1 for P-code, 0 for native]
+Unattended=[0 for false, -1 for true] # unattended execution
+...
+#+end_src
+
+Here is a VB module source file
+
+#+begin_src sql
+' a VB module metainfo
+Attribute VB_Name = "ModuleName"
+Option Explicit
+#+end_src
+
+And a class source file
+
+#+begin_src fortran
+VERSION 1.0 CLASS
+BEGIN 'properties
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "Class1"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+#+end_src
+
+* Language Variants
+
+1. VBA: for application scripting, still COM/OLE based
+
+2. VBScript: COM-based Windows scripting language for automation and web page (succeeded by PowerShell)
+
+3. GAMBAS: a FOSS variant mainly on Linux
+
+* P-Code, Compiler, Linker and Optimization[cite:@vbMinutiae]
+:PROPERTIES:
+:ID:       16923a7f-e53a-400f-ab29-4e6c954e7333
+:END:
+
+** P-Code (PseudoCode)[cite:@MSPCodeTech]
+
+The name p-code was common before Java's bytecode and used in Pascal,
+
+A RISC-like stack machine instruction.
+An intermediate step between the high-level instructions in VB programs and the
+low-level machine code. The sizes of P-code executables are smaller by 50 percent than that of
+native compilation and the process of compilation is much faster.
+
+MS P-code was made to reduce the size of programs. It can be applied globally to
+the program or a certain functions. From a systemic view, the final result may
+not be as slow as imagined. [[https://en-academic.com/dic.nsf/enwiki/464666][Historically]], both MSVC and VB supported P-code generation.
+
+There are some VB P-Code dissemblers available: [[https://github.com/bontchev/pcodedmp][pcodedmp]], [[https://github.com/bontchev/pcodedmp][pcode2code]].
+
+** Code Generation and =C2.EXE=
+
+=C2.EXE= is the backend code generator for VB6, invoked by =VB6.EXE= (which does
+some preprocessing before generating native code).
+
+By hooking a logger program (printing all the arguments and then invoking the
+real =C2.EXE=), the command line arguments of invoking =C2.EXE= can be dumped.
+=C2.EXE= is a modified version of =C2.EXE= used in VC++ 6.
+
+#+begin_src shell
+C2.EXE
+-il C:\DOCUME~1\Admin\LOCALS~1\Temp\VB886942 # undocumented, used for C programs as well
+-f Program.bas
+-W 3
+-Gy
+-G5
+-Gs4096
+-dos # undocumented, used for C programs as well
+-Zl
+-Fo Program.OBJ
+-Zi
+-QIfdiv
+-ML
+-basic # visual basic, undocumented
+#+end_src
+
+** Linking
+
+Only =VBAEXE6.LIB= is linked against. COM references are resolved at runtime.
+
+#+begin_src shell
+LINK
+Program.OBJ
+Console.OBJ
+ConsoleApp.OBJ
+C:\Program Files\Microsoft Visual Studio\VB98\VBAEXE6.LIB
+/ENTRY:__vbaS
+/OUT:ConsoleApp.exe
+/BASE:0x400000
+/SUBSYSTEM:WINDOWS,4.0
+/VERSION:1.0
+/DEBUG
+/DEBUGTYPE:CV
+/INCREMENTAL:NO
+/OPT:REF
+/MERGE:.rdata=.text
+/IGNORE:4078
+#+end_src
+
+* Unicode
+
+VB strings are UTF-16 strings but VB lacks proper Unicode support due to many
+API design flaws and tooling problems.
+
+** Some APIs Would Convert VB Unicode Strings to ANSI
+
+*** Controls
+
+The builtin controls are an example. *After the conversion*, the =Font.Charset= property determines the
+charset used by the runtime to interpret the ANSI bytes.
+
+Its =PropertyBag= (the Properties window on the screen) is in ANSI mode.
+
+**** Solutions
+
+- Use other control libraries such as Microsoft Forms 2.0 (downloadable)
+
+** The IDE itself does not recognize Unicode Literals
+
+not even UTF-16 and rejects BOM at the beginning of a source file.
+
+*** Solutions
+
+- A workaround is to encode every UTF-16 code units as =ChrW(codepoint)=.
+  The only ultimate savior is probably UTF-8 as a locale since Windows 10.
+
+- Save Unicode text externally in a database or in a file and load it in the code.

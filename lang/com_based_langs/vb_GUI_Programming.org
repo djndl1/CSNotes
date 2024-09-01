@@ -1,0 +1,82 @@
+#+title: VB Classic Gui Programming
+
+in VB6, controls can be classified into (1) /Standard Controls/, managed by the
+Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself.
+
+* Form Properties
+
+- =Tag=: VB extender properties that is always available, no specific use,
+  stores any object related to that control.
+
+- =hWnd=: the internal handle used by Windows to identify a control, available
+  only to standard Windows controls.
+
+- =Enabled=, =Visible=: disabled controls don't react to user's actions.
+  Invisible controls are automatically disabled. All mouse events for disabled or invisible controls are passed to the underlying container or to the form itself.
+
+* Form Lifecycle
+
+1. =Initialize=: triggered where variables are initialized; before the actual window and the
+   controls are created
+
+2. =Load=: triggered when properties and controls are referenced. The windows
+   and its child controls are created. Graphical operations will not work.
+   A form is visible after its =Show= method is called.
+
+3. =Resize=: visible or sized changed
+
+4. =Activate=: ready to accept user input
+
+5. =Deactivate=: end user switches to another form
+
+6. =Paint=: the form refreshes itself (fired only if =AutoRedraw= is =False=)
+
+7. =QueryUnload=: =OnClosing=
+
+#+begin_src vba
+' refuse to unload
+Private Sub Form_QueryUnload(Cancel As Integer, _
+    UnloadMode As Integer)
+    ' Don't let the user close this form.
+    Select Case UnloadMode
+        Case vbFormControlMenu, vbAppTaskManager
+            Cancel = True
+    End Select
+End Sub
+#+end_src
+
+8. =Unload=: a last chance to prevent the closure of the form
+
+#+begin_src vba
+' This is a module-level variable.
+Dim Saved As Boolean
+
+Private Sub Form_Unload(Cancel As Integer)
+    If Not Saved Then
+        MsgBox "Please save data first!"
+        Cancel = True
+    End If
+End Sub
+#+end_src
+
+9. =Terminate=: deallocate the memory for the Form
+
+Forms expose a special property, the =Controls= collection, which contains all the controls that are currently loaded on the form itself.
+
+* Form Events
+
+- =Click=, =DblClick=: triggered not only by actual mouse clicks.
+
+- =GetFocus=, =LostFocus=
+
+- =Change=: its behavior is not consistent across VB controls. Not available for =CheckBox= and =OptionButton=, which fires a
+  =Click= event when its content is changed.
+
+- =KeyPress=, =KeyDown= (the key translated into ANSI numeric code), =KeyUp=: Only keys that correspond to control keys (Ctrl+x, BackSpace, Enter, and Escape) and printable characters activate the =KeyPress= event.
+
+- =MouseDown=, =MouseUp=, =MouseMove=: mouse button state, Shift/Ctrl/Alt state
+  and the cursor's location are passed.
+
+* The =Controls= Collection
+
+Container of all the controls currently loaded on the form itself.
