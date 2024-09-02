@@ -102,7 +102,8 @@ Type value may be surrounded by =[TypeName]=.
   + =&H1234= (hexadecimal), =&O011064= (octal)
   + =&= as a literal suffix for =Long=, =^= for =LongLong=, =%= for =Integer=
   + an =Enum= type (named long) can have a maximum sentinel value to guard against invalid
-    integers assigned to a variable of such a =enum= type.
+    integers assigned to a variable of such a =enum= type. An enum member may
+    reference other members that precedes it. VBA's enum is more like C's enum.
   + =LongPtr= mapped =Long= under a 32-bit environment.
 
 - =Single= (literal type suffix =!=) and =Double= (=#=): IEEE 754 (1985) floating-point numbers
@@ -484,6 +485,16 @@ Class attributes are optional and assumed to be their default values if missing
 
 #endif
 #+end_src
+
+** Circular Module Dependencies
+
+Circular reference between modules that involving Const Declarations, Enum
+Declarations, UDT Declarations, Implements Directive, or Event Declarations
+are not allowed.
+
+e.g. A user-defined type or constant in one module references a user-defined type or
+constant in a second module, which in turn references another user-defined type
+or constant in the first module.
 
 * Control Flow
 ** Branch
