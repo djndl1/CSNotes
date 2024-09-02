@@ -1,6 +1,41 @@
-#+title: VB Classic COM Interoperation
+#+title: VB Classic COM/C Interoperation
 
 VB Classes are themselves COM objects.
+
+* C Interop
+
+VBA may invoke external C functions with the =stdcall= calling convention.
+
+#+begin_src vba
+[Private/Public] Declare [ptrsafe] Sub void-func-name Lib "libname" [Alias "symbolname"] [(parameters)]
+[Private/Public] Declare [ptrsafe] Function func-name Lib "libname" [Alias "symbolname"] [(parameters)] [function-type]
+#+end_src
+
+- =PtrSafe= is introduced in VB7 to assert that a =Declare= statement targets
+  64-bit development environments.
+
+
+#+begin_src vba
+Private Declare Function WaitForSingleObject Lib "kernel32" _
+    (ByVal hHandle As Long, ByVal dwMilliseconds As Long) As Long
+Private Declare Function OpenProcess Lib "kernel32" (ByVal dwAccess As _
+    Long, ByVal fInherit As Integer, ByVal hObject As Long) As Long
+Private Declare Function CloseHandle Lib "kernel32" _
+    (ByVal hObject As Long) As Long
+
+' Wait for a number of milliseconds, and return the running status of a
+' process. If argument is omitted, wait until the process terminates.
+Function WaitForProcess(taskId As Long, Optional msecs As Long = -1) _
+    As Boolean
+    Dim procHandle As Long
+    ' Get the process handle.
+    procHandle = OpenProcess(&H100000, True, taskId)
+    ' Check for its signaled status; return to caller.
+    WaitForProcess = WaitForSingleObject(procHandle, msecs) <> -1
+    ' Close the handle.
+    CloseHandle procHandle
+End Function
+#+end_src
 
 * .NET Interop and COM
 
@@ -68,3 +103,8 @@ VB Classes are themselves COM objects.
 - =StringBuilder= works but overloading makes it hard to find the correct method name.
 
 - Various crytographic classes
+
+
+* Microsoft Scripting Runtime
+
+Windows-builtin COM library.
