@@ -2,7 +2,7 @@
 
 VB Classes are themselves COM objects.
 
-* C Interop
+* Invoking C Functions
 
 VBA may invoke external C functions with the =stdcall= calling convention.
 
@@ -36,6 +36,10 @@ Function WaitForProcess(taskId As Long, Optional msecs As Long = -1) _
     CloseHandle procHandle
 End Function
 #+end_src
+
+* Exposing VB API
+
+VB API=s are exposed as COM servers and thus only public class modules are exposed.
 
 * .NET Interop and COM
 
