@@ -431,33 +431,7 @@ Default property/method is used if any member name is omitted when using an
 object. Object Browser can change the default member of a class, which is
 strongly discouraged.
 
-*** Class Module Attributes
-
-#+begin_src vba
-VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-  Persistable = 0  'NotPersistable
-  DataBindingBehavior = 0  'vbNone
-  DataSourceBehavior  = 0  'vbNone
-  MTSTransactionMode  = 0  'NotAnMTSObject
-END
-Attribute VB_Name = ""
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
-Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
-' Attribute VB_Customizable = True/False
-#+end_src
-
-Class attributes are optional and assumed to be their default values if missing
-(=False=)
-
-- =VB_Name=: class name
-
-- =VB_PredeclaredId=: if =True=,  the default instance
-  variable is given the name of the class as its name (not a singleton, as the
-  user may still =New= another instance).
+*** [[file:./vb_OOP.org::#Class Module Attributes][Class Module Attributes]]
 
 ** Options
 
@@ -468,9 +442,15 @@ Class attributes are optional and assumed to be their default values if missing
 
 - =Option Explicit=: variables must be explicitly declared.
 
-- =Option Private=: the accessiblity of a module to other projects.
+- =Option Private=: prevents a module's content from being referenced outside
+  its project
+  + No effect in standalone VB as references between projects are never
+    permitted. Only useful for host applications that support simultaneous
+    loading of multiple projects  and permit references between the loaded projects.
   + Compared to =internal= in C#
-  + A class module has to be in an ActiveX project or a library project to be public
+  + A class module has to be =VB_Exposed = True=
+  + A code module is not exposed in DLLs in this manner. VB DLLs are COM servers
+    and only expose COM classes.
 
 ** Preprocessor & Conditional Compilation
 
