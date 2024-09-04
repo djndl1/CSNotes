@@ -204,13 +204,16 @@ Private WithEvents A As class_type_with_events
 #+begin_src vba
 ' implementation
 ' define an event
-Event FileCopied(file As String, DestPath As String)
+' Public is implicit if not specified
+[Public] Event FileCopied(file As String, DestPath As String)
 
 Public Sub StartCopy(filespec As String)
     ...
     RaiseEvent FileCopied(thisFile, thisDestPath) ' raise the event
 End Sub
 #+end_src
+
+*Warning*: An event name must not have an underscore
 
 To subscribe to an event, declare the event source with =WithEvents=,
 the event handler should be named as =EventSourceVariable_EventName=.
@@ -360,6 +363,9 @@ An interface is defined as an *abstract* class with no executable code.
 Interfaces never include =Event= declarations. A concrete class is an
 interface itself and can be implemented by another class module, possibly with
 inheritance through delegation.
+
+- *Warning*: A class cannot be used as an interface class if the names of any of its public
+    variable or method contain an underscore character.
 
 #+begin_src vba
 ' The IShape class module
