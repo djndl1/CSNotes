@@ -342,6 +342,8 @@ UDT type or a private enum type.
 *Scope* is the visibility of a variable; *lifetime* is the period of program
 execution when the variable is live and available for use.
 
+- Procedure declaration without accessbility modifier is =Public=
+
 - /Global/ :: BAS module =Public= variables. application long lifetime; application-wide scope
   + best practice: define all variables in a UDT and declare such a UDT in one
     place. =Public MyPublicVar As Long= in BAS modules.
@@ -357,6 +359,8 @@ execution when the variable is live and available for use.
 - /Static Local/ :: procedure-wide scope; module-level lifetime.
   =Static InProgress As Boolean=; useful for preventing procedure reentry. VB6
   apps are single-threaded, no need to worry about thread safety.
+  + =Static= may precede or follow a procedure declaration to indicate all
+    variables declared within the procedure have module extent.
 
 - /Project/ :: =Friend= inside an object (class or form) module. Project-wide
   scope.

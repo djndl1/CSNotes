@@ -87,9 +87,11 @@ End Property
 
 To implement a init-once property, use =Variant= and =IsEmpty=.
 
-A property can take an argument:
+- A property can take an argument
+  + the rightmost parameter of a setter (LHS property) is the value assigned to it.
+  + =ByVal= is used regardless for any setter's value parameter.
 
-#+begin_src vba
+  #+begin_src vba
 Private m_Notes(1 To 10) As String
 
 Property Get Notes(Index As Integer) As String
@@ -100,11 +102,11 @@ Property Let Notes(Index As Integer, ByVal newValue As String)
     If Index < LBound(m_Notes) Or Index > UBound(m_Notes) Then Err.Raise 9
     m_Notes(Index) = newValue
 End Property
-#+end_src
+  #+end_src
 
-Every =Public= member variables are accessed through a pair of hidden
-procedures from outside the class or with
-=Me.property=, which causes the following code invalid
+- Every =Public= member variables are accessed through a pair of hidden
+  procedures from outside the class or with
+  =Me.property=, which causes the following code invalid
 
 #+begin_src vba
 Sub ToCentimeters (value As Single)
@@ -126,9 +128,10 @@ Property Set HomeAddress(ByVal newValue As CAddress)
 End Property
 #+end_src
 
-** Variant Property
-
-=Property Set= accepts object parameter and =Property Let= accepts value types.
+- =Property Set= accepts object parameter (=Object=, =Variant= or a named class)
+  and =Property Let= accepts value types. Property procedures of the same type and
+  the same name allows overloading with the same number of parameters and
+  parameter names.
 
 #+begin_src vba
 Private m_CurrentAddress As Variant
@@ -159,7 +162,7 @@ Property Set CurrentAddress(ByVal newValue As CAddress)
 End Property
 #+end_src
 
-** Property In BAS Module (Undocumented)
+** Property In Procedural Module
 
 #+begin_src vba
 Dim m_Percent As Integer
@@ -178,11 +181,9 @@ Property Get DoubleCrLf() As String
 End Property
 #+end_src
 
-
-
 * Class Events
 
-** Event
+** Lifecycle Handlers
 
 - [[https://learn.microsoft.com/en-us/dotnet/visual-basic/language-reference/modifiers/withevents][=WithEvents=]]:
 
@@ -366,6 +367,8 @@ inheritance through delegation.
 
 - *Warning*: A class cannot be used as an interface class if the names of any of its public
     variable or method contain an underscore character.
+
+- A variable of the interface class must be implemented with properties.
 
 #+begin_src vba
 ' The IShape class module
