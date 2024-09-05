@@ -1,8 +1,18 @@
 #+title: Basics
 
-Cython is Python with C data types. Code which manipulates Python values and C
-values can be freely intermixed. Refcount maintenance and error checking of
-Python operations is automatic and Python error handling system is also available.
+* Overview
+
+Cython is Python with optional static data types. Comparable to C++/CLI, it is
+native code under the Python runtime with Python-like syntax.
+
+- transcompiled to C but executed within the Python runtime with its interface
+  as the same as in Python
+
+- Code which manipulates Python values and C values can be freely intermixed
+
+- Refcount maintenance and error checking of Python operations is automatic
+
+- Python error handling system is also available.
 
 * Building
 
@@ -13,15 +23,19 @@ Python operations is automatic and Python error handling system is also availabl
 
 - The most common way to build cython code is a setuptool =setup.py= (~python
   setup.py build_ext --inplace~); other ways
-  include =cythonize=, =Pyximport= or jupyter notebooks.
+  include =cythonize=, =Pyximport=, jupyter notebooks or manually transcompiling
+  with =cython= to C and then compiling into a library.
 
 * First Example
 
-#+include: "./hello_world/setup.py" src python
+#+include: "../../CodeOfLanguages/cython_tutorial/setup.py" src python
 
 * Static Typing
 
-** Declarations
+Cython supports =cdef= syntax or pure Python type annotation/hint syntax (recommended)
+The =cython= module includes C types for declaration in Python syntax.
+
+** =cdef= Declarations
 
 #+begin_src python
 cdef int i, j, k
@@ -68,8 +82,8 @@ All standard C types are supported.
 
 ** Functions
 
-- /pure Python function/ =def= : take Python objects as parameters and return Python
- objects;
+- /pure Python function/ =def=: take Python objects as parameters and return Python
+ objects (weakly typed);
  + When a C type is declared as a parameter of a Python function, the passed value
    is automatically converted to a C value (for numeric values only, otherwise a
    compile-time error).
@@ -97,6 +111,8 @@ declared as type-annotated Python-style function with appropriate declarations.
 
 *** Error Propagation
 
+A C function is not able to raise an exception: it has to return an error code.
+
 Python functions return an error value along with its return value.
 A C function or a =@cpdef=​/​=@ccall= function may be declared with
 an exception return value =@ctyhon.exceptval= for it as a contract with the
@@ -106,3 +122,9 @@ returned and the caller should proceed to propagate that exception. The except
 clause is for propagating Python exceptions that have already been raised.
 
 The caller is expected to raise an error on its own after failing a pure C function.
+
+** Profiling for Typing Choice
+
+Pass =-a=  to =cython=
+
+Certain variables need no typing as their types may be deduced based on assignments.
