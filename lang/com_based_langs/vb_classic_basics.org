@@ -552,7 +552,7 @@ Do
 Loop [Until (expr)]
 #+end_src
 
-** Procedure/Function
+** Procedure
 
 - Public procedures of a public module can be called through COM. =Public= is
   the default scope attribute for procedures.
@@ -571,7 +571,7 @@ Private/Public Function FuncName
 End Function
 #+end_src
 
-*** Invoking Functions/Procedures
+*** Invoking Procedures
 
 There are some weird rules about parentheses with subroutine call.
 
@@ -586,10 +586,23 @@ rules, one may use =Call= if possible.
 
 *** Parameters and Return Values
 
-- Parameters can be passed =ByVal= or =ByRef= (by default even for basic types
-  like =Long=, which can lead to undetected bugs).
+- Every function has an implicit local variable known as the function result variable
+  with the same name and declared type as the function.
+
+#+begin_src vba
+ProcedureName(positional-param, Optional [ByVal/ByRef] paramName [ = constant-expression])
+#+end_src
+
+- Parameters can be passed =ByVal= or =ByRef=
+  + by default =ByRef= for positional parameters and optional parameters, even
+    for basic types like =Long=, which can lead to undetected bugs.
+  + if a =ByRef= parameter type is a type other than the passed-in but
+    compatible, the parameter is passed =ByVal= to the local parameter variable
+    but later assigned back to the outer variable after the procedure terminates.
   + =ByVal= performs possible type conversion for values passed in
-  + A =ByRef Variant= accepts arguments of any types.
+  + =ByVal= may not be used with an array type.
+  + A =ByRef Variant= accepts arguments of any types and always forms a reference
+    parameter binding.
     #+begin_src vba
     ' Swap values of any type.
     Sub Swap(first As Variant, second As Variant)
@@ -607,23 +620,27 @@ rules, one may use =Call= if possible.
 - A type private to a project can be used as a parameter or the return value of
   procedure that can be called from outside the project.
 
-- =Optional=-prefixed parameters
-  + If the type is =Variant= (an =Err= value), it can checked by =IsMissing()=.
-    A =Missing= value is pushed onto the stack for an optional argument.
+- =Optional=-prefixed parameters: optional parameters may have default value,
+  + If the type is =Variant=  and the value is missing,
+    a =Missing= value (an =Err= value 448 "Named argument not found") is pushed
+    onto the stack for an optional argument, which can checked by =IsMissing()=.
     =IsMissing= only works with an optional parameter once, the second time it
     would return =False=.
-  + Can be used with a default value. ~Optional color As Long = vbWhite~;
   + A non-Variant optional parameter receives its default value if no default value
     is assigned (not =Missing=).
+  + May be used with a default value. ~Optional color As Long = vbWhite~;
   + a UDT type cannot be used with =Optional=.
+
+- =ParamArray args() As Variant=: any number of arguments as a =Variant= array.
+  + always =ByRef= since it is an array.
+  + (undocumented) =IsMissing= can be used with =ParamArray= =args= to check if
+    =args= is an empty array=. The legal syntax is to check if =LBound(args) > UBound(args)=.
+
+- External procedure declaration may permit the =Any= parameter type.
 
 - /Named/ arguments: ~NamedArg := paramVal~.
   + Better than multiple commas with optional parameters in between before a
     final parameter.
-
-- =ParamArray args() As Variant=: any number of arguments as a =Variant= array.
-  + (undocumented) =IsMissing= can be used with =ParamArray= =args= to check if
-    =args= is an empty array=. The legal syntax is to check if =LBound(args) > UBound(args)=.
 
 #+begin_src vba
 With Emp
