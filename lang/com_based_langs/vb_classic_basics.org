@@ -480,6 +480,34 @@ e.g. A user-defined type or constant in one module references a user-defined typ
 constant in a second module, which in turn references another user-defined type
 or constant in the first module.
 
+** Namespace
+
+Entities in procedural modules, referenced projects/librarires and enum members
+are automatically imported into
+the current namespace. However, name collisions may be resolved by prefixing the
+entity with its module/type name.
+
+- Module names must be unique in their defining project and they may not be the
+  same as the containing project and any referenced projects.
+
+- UDT names conflicts with those of projects, libraries, modules in their
+  defining projects and constants/UDTs in the UDTs' accessible scope.
+
+- Enum names conflicts with those of enums/UDTs in their accessible scope,
+  projects, libraries and modules in their defining project.
+
+- An enum member name might not be the same as any variable name or constant
+  name defined in the same module
+
+- Duplicate enum member from different enum types in the current namespace is
+  not a compilation error.
+
+*** Faking Namespaces
+
+Using classes of =VB_PredeclaredId = True=, =PublicNotCreatable= to prefix
+procedure names.
+This does not work with external procedure declarations and types.
+
 * Control Flow
 ** Branch
 
