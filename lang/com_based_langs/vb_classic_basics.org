@@ -554,14 +554,31 @@ All expressions are always evaluated which might lead to unexpected bugs.
 There is no =continue= in VB, use =IF= with =GOTO=
 
 #+begin_src vba
-' item must be a Variant or an Object type if elements are of certain object type
+' the type of the bound variable must be a numeric value type of Variant
+' start-value, end-value, increment must be statistically Let-coercible to Double
+' Jumping into a for-loop raises erro 92  (For loop not initialized)
+For bound-variable = start-value To end-value [Step Increment] ' increment by default 1
+...
+Next [i]
+' there's a version called explicit-for-statement, without repeating the outer Next
+Dim v as Variant, v2 As Variant
+For v = 1 to 10
+	v = v + 1
+    for v2 = 11 to 20
+			v2 = v2 + 1
+	Next v2, v
+
+
+' Jumping into a for-loop raises error 92  (For loop not initialized)
+' array: the bound variable must be of the Variant type and is Set/Let assigned based on te typo of the array
+'        the enumeration order starts at the lowest index of the lowest dimension
+' non-array enumerable object: the bound variable is first Let/Set assigned to the frist element in the collection
+'                              and later Set-asigned to the next element
 For Each item In Col
 ...  ' Exit For
-Next item
+Next [item]
 
-For i = 0 To N [Step Increment]
-...
-Next i
+' Exit For is the break statement of For loop
 #+end_src
 
 #+begin_src vba
@@ -570,14 +587,12 @@ While (expr) ' break is not available, use Do While Loop
 ...
 Wend
 
+' the condition clause is omittable, resulting in an infinite loop
+' the condiion clause follows either Do or Loop, with different evaluation order w.r.t the loop body
 ' break out of the loop by `Exit Do`
-Do While (expr) ''
+Do [while/until boolean-expr]
 ...
-Loop
-
-Do
-...
-Loop [Until (expr)]
+Loop [while/until boolean-expr]
 #+end_src
 
 ** Procedure
