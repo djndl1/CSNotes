@@ -607,6 +607,8 @@ If a function is used in an expression, parameters must be enclosed within
 parentheses. Otherwise, =Call= must be used with parentheses. To avoid all these
 rules, one may use =Call= if possible.
 
+- =Call expr=: invokes a subroutine or function discarding any return value
+
 - Unnecessary parentheses causes problems especially for subroutines with a
   single parameter. The parameter is evaluated (either into a rvalue or a
   default property value) in the parentheses before being
@@ -620,6 +622,9 @@ rules, one may use =Call= if possible.
 #+begin_src vba
 ProcedureName(positional-param, Optional [ByVal/ByRef] paramName [ = constant-expression])
 #+end_src
+
+- Argument list in VBA does not require a pair of parentheses, which is the
+  index expression
 
 - Parameters can be passed =ByVal= or =ByRef=
   + by default =ByRef= for positional parameters and optional parameters, even
