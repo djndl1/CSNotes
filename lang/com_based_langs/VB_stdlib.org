@@ -38,14 +38,15 @@ The project name is =VBA=, present in every VBA environment.
 
 - =/= always converts its operands into =Double=; Use =\= for pure integer
   division.
+  - VBA uses round-to-zero division
+  - =MOD= works only for integers.
 
 - =^=: exponentiation.
 
-- =MOD= works only for integers.
-
 - Common math functions are available: =Abs=, =Sgn=, =Sqr=, =Exp=, =Log=
 
-- =Int=: round to the lower integer, a ceiling function; =Fix=: truncates the decimal part; =Round=
+- =Int=: round to the lower integer, a ceiling function; =Fix=: truncates the
+  fractional part; =Round=
   to the specified number of digits and uses banker's rounding.
 
 #+begin_src vba
@@ -54,7 +55,9 @@ Function Ceiling(number As Double) As Long
 End Functio
 #+end_src
 
-- =Val=; =Hex=, =Oct=
+- =Val=, =Str$=​/​=Str=: number-string conversion
+
+- =Hex$=, =Oct$=
 
 - =Randomize= sets the random seed; =Rnd= returns a the next random number
   between =[0, 1)=
