@@ -35,4 +35,6 @@ Floating-point complex number. Uses =j= instead of =i=
 
 ** Operation Behaviors
 
-- integral division and modulo behaves as in C: the residue is not guaranteed to be non-negative.
+- integral division and modulo behaves not as in C: Python uses floored division
+  (the quotient is rounded down)
+  while C uses truncated division (the quotient is rounded toward zero)
