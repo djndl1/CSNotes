@@ -95,7 +95,11 @@ Access to an object is gated by SRM.
   + A resource handle is returned to the requesting process after access
     validation.
 
--  privilege manipulation; audit messages
+-  privilege manipulation;
+
+- audit messages
+    + An administrator can enable it with =secpol.msc= and then view it in
+      the event log viewer.
 
 LSA communicates with SRM via ALPC.
 
@@ -135,6 +139,9 @@ for access *allowed* and for access *denied*.
 
 requests access to the object when it asks for a handle. The handle
 requested contains the desired access.
+
+Inheritance is controllable. Directly applied ACEs take precedence over
+inherited ACEs.
 
 ** The Security Descriptor
 
@@ -282,3 +289,31 @@ appropriate privileges.
 2. absolute and self-relative security descriptors
 
 3. System ACLs: specify which object accesses should be logged.
+
+** Impersonation
+
+An application adopts the security profile of another user, implemented at thread level, typically used by
+server applications.
+
+** Privileges
+
+Specify which system actions a process or a thread can perform, associate with
+groups and user accounts
+
+- *debug*: open any process to inject code, modify code, read sensitive data
+
+- *take ownership*: access any object on the system, replace system files,
+  change security.
+
+- *restore*: can replace any file
+
+- *load driver*: bypass all security
+
+- *create token*: can spoof any user locally
+
+- *Trusted Computer Base* (Act as part of the OS)
+  + can create a new logon session with arbitrary SIDs in the token
+
+* Kerberos
+
+TODO
