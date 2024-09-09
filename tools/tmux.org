@@ -9,11 +9,6 @@ uses can attach to the same session (great for pair programming).
 
 - Hierarchy : *Server* (X) - *Session* (Virtual desktop) - *Window* (Tiling GUI
   windows) - *Pane* (subwindow regions)
-  + =tmux list-clients=
-  + =tmux -L=: start a new tmux server with the specified name.
-
-- Why tmux: multitasking, running applications in the background, pair
-  programming
 
 * Usage
 
@@ -21,12 +16,9 @@ Tmux is controlled by sending various commands to it. Commands are can be sent
 using keyboard sequences, prefixed by a certain key, or =tmux command=, or in
 the prompt after =Prefix := inside tmux.
 
-- prefix key: the default is =C-b=. With nested sessions, the prefix key must be
-  typed twice.
+- prefix key: the default is =C-b=
 
-- =Prefix d=: detach from the session.
-
-- Send the prefix key twice to activate a nested session or =send-prefix=
+- Send the prefix key twice to control a nested session or =send-prefix=
 
 Configuration files are command scripts. tmux command are also input via
 =Prefix= + =:=.
@@ -35,12 +27,11 @@ Configuration files are command scripts. tmux command are also input via
 
 * Clipboard
 
-tmux has a cliboard to copy/paste across sessions, windows and
-  panes.
+tmux has a clipboard to copy/paste across sessions, windows and panes.
 
-- =Prefix [= to enter copy mode
+- =Prefix-[= to enter copy mode
 
-- =Prefix ]= to paste and =Alt-W= to copy.
+- =Prefix-]= to paste and =Alt-W= to copy.
 
 Copy mode does not work with Vim and Emacs.
 
@@ -54,8 +45,9 @@ Copy mode does not work with Vim and Emacs.
 
 - *Session*:
   + =tmux [new-session [-s session_name]]= creates a new session
+  + =Prefix-d=: detach from the session.
   + =Prefix-(= (previous session) or =Prefix-)= (next session), =Prefix-L= (the last
-    session), =Prefix-s= (interactively select a session): these commands are
+    session), =Prefix-s= (session!) (interactively select a session): these commands are
     actually use =switch-client -t=.
   + A session has a name: =rename-session=
   + =tmux has-session -t session_name= to test a session
@@ -65,7 +57,7 @@ Copy mode does not work with Vim and Emacs.
   + =Prefix-c=: create a new window
   + =Prefix-x=: kill a window with all its panes.
   + =Prefix-p= =previous-window=, =Prefix-n= =next-window=, =Prefix-1,2,3,4=,
-    =Prefix-I=. =Prefix-w= =choose-window= (interactively) switch windows.
+    =Prefix-I=. =Prefix-w= (window!) =choose-window= (interactively) switch windows.
   + =Prefix-.=: =move-window= to reorder windows
   + A window has a name: =rename-window= or =Prefix-,=
   + =kill-window= to quit a window; =Prefix-&= kill the current window
