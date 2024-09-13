@@ -1,5 +1,8 @@
 Lisp has outgrown "LISt Processor": Common Lisp is a general-purpose
 programming language with a wide variety of data structures.
+Historically, the plan-and-implement model ignored the limitations of human
+and expected an implementation to be a translation of the specification.
+Lisp as a tool, makes progrmaming depend less on planning and more on exploration.
 
 * Basic Concepts
   :PROPERTIES:
