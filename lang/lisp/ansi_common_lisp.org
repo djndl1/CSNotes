@@ -4,6 +4,9 @@ Historically, the plan-and-implement model ignored the limitations of human
 and expected an implementation to be a translation of the specification.
 Lisp as a tool, makes progrmaming depend less on planning and more on exploration.
 
+Lisp has many parentheses: Lisp programmers read and write code by indentation,
+not by parentheses. A Lisp editor should show matching parentheses.
+
 * Basic Concepts
   :PROPERTIES:
   :CUSTOM_ID: basic-concepts
@@ -37,6 +40,9 @@ Lisp as a tool, makes progrmaming depend less on planning and more on exploratio
 - /Cycle/: An S-expression that contains a reference to itself.
 
 - *Top level**: an interactive front-end.
+
+=quote= / ='=: a special operator meaning it does nothing. A way to
+protect expressions from evaluation.
 
 * Run/Load A Program
   :PROPERTIES:
@@ -76,121 +82,115 @@ Macros give users a way to extend its syntax. The elements of the macro
 from are passed unevaluated to the macro function and expanded and then
 returned and evaluated according to the normal rules.
 
-* Basics
+* Variables & Data Types
   :PROPERTIES:
   :CUSTOM_ID: basics
   :END:
 
-** Data
-   :PROPERTIES:
-   :CUSTOM_ID: data
-   :END:
-
-=quote= / ='=: a special operator meaning it does nothing. A way to
-protect expressions from evaluation.
-
+** Data Types
 *** Numbers
-    :PROPERTIES:
-    :CUSTOM_ID: numbers
-    :END:
 
 *** Boolean and Truth
     :PROPERTIES:
     :CUSTOM_ID: boolean-and-truth
     :END:
 
-- =nil=/=NIL=/=()=/='()=/='NIL= <-> =t=, ='T=: everything except =nil=
-  counts as true in a logical context
+- =nil=​/​=NIL=​/​=()=​/​='()=​/​='nil= <-> =t=, ='T=: everything except =nil= counts as true in a logical context
 
-**** Common Predicates
-     :PROPERTIES:
-     :CUSTOM_ID: common-predicates
-     :END:
+*** Symbols
 
-Clisp predicates often have names that end with =p=. =integerp=
+Quoted words
 
-- =listp=: check if the argument is a list.
+*** List
 
-- =null=: check if the argument is a =NIL=
+Singly linked list. Lists are quoted.
+The quote protects the entire expression, including the expression within.
 
-- =not=: reverse the boolean value
+#+begin_src lisp
+'(a b c)
+(list 'a 'b 'c)
 
-- =if= is a special operator in that one of its argument is not
-  evaluated.
+; empty list
+nil
+'()
+#+end_src
 
-- =(and ...)=, =(or ...)= (macros): evaluate as many as they need to in
-  order to decide what to return.
+Lisp programs are expressed as lists.
 
-** Input and Output
-   :PROPERTIES:
-   :CUSTOM_ID: input-and-output
-   :END:
+**** Common Operations
 
-The most general output function in Common Lisp is =format=. The
-standard function for input is =read=, which a complete parser, does not
-just read characters and return a string.
+- =cons=: make a cons cell. For a list, it prepends an element to a list
 
-** Variables
+- =car=, =cdr=: extract the first/second element of a cons cell. For a list (a
+  cons cell of an element and a sublist), they extract the first element and the sublist.
+  + =third=
+
+** Variables & Constants
    :PROPERTIES:
    :CUSTOM_ID: variables
    :END:
 
 All values in Clisp are references to objects.
 
-- /binding/: an association of an identified to an entity. Machine
-  languages have no built-in notion of identifiers. Bindings can be
-  /dynamic/ or /static/. Dynamic dispatch is dynamic in the sense that
-  the function called is not known until the subtype is known at
-  runtime, but can be static since the subtype can be known before
-  compilation in many cases. The referencing identifier can be
-  /rebound/, and the referenced entity can be /mutated/ (not related to
-  binding).
+*** Concepts
 
-- /binding occurrence/: The establishment of a binding.
+- /binding/ :: an association of an identified to an entity.
+  + Machine languages have no built-in notion of identifiers.
+  + Bindings can be /dynamic/ or /static/. Dynamic dispatch is dynamic in the sense that the function called is not known until the subtype is known at runtime, but can be static since the subtype can be known before
+  compilation in many cases.
+  + The referencing identifier can be /rebound/, and the referenced entity can be /mutated/ (not related to binding).
 
-- /applied occurrence/: assignment, subprogram calls.
+- /binding occurrence/ :: The establishment of a binding.
 
-- /scope/: the portion of program in which a binding of a name with an
+- /applied occurrence/ :: assignment, subprogram calls.
+
+- /(binding) scope/ :: the portion of program in which a binding of a name with an
   entity applies. A property of a name binding.
+  + /lexical scope/ :: "The portion of program" means the source code, the /lexical/static context/, which can be determined at compile time. e.g. most modern languages
+  + /dynamic scope/ :: "The portion of program" means the
+    /execution/runtime/dynamic context/, resolved by searching the local
+    execution context, and then the outer execution context and so on
+    progressing up the call stack. e.g. some dialects of Lisp, some scripting
+    languages. Each name has a global stack of bindings. Introducing a local
+    variable with name x pushes a binding onto the global x stack (which may
+    have been empty), which is popped off when the control flow leaves the
+    scope. Evaluating x in any context always yields the top binding
 
-- /context/: a property of a program, a portion of source code, or a
+
+- /context/ :: a property of a program, a portion of source code, or a
   portion of runtime.
 
-- /lexical scope/: "The portion of program" means the source code, the
-  /lexical/static context/, which can be determined at compile time.
-  e.g. most modern languages
-
-- /dynamic scope/: "The portion of program" means the
-  /execution/runtime/dynamic context/, resolved by searching the local
-  execution context, and then the outer execution context and so on
-  progressing up the call stack. e.g. some dialects of Lisp, some
-  scripting languages. Each name has a global stack of bindings.
-  Introducing a local variable with name x pushes a binding onto the
-  global x stack (which may have been empty), which is popped off when
-  the control flow leaves the scope. Evaluating x in any context always
-  yields the top binding
-
-- /binding form/: any construct that introduces a new variable name
+- /binding form/ :: any construct that introduces a new variable name
   that's usable only within the construct e.g. the function definition,
   =let=, =let*=
 
 The bindings of the inner variable shadows the outer bindings.
 
-- By default, all binding forms introduce /lexically scoped variables/.
-  However, closures can keep the binding of the captured variable even
-  out of the binding form (infinite /extent/).
+In Common Lisp, by default, all binding forms introduce /lexically scoped variables/. However, closures can keep the binding of the captured variable even out of the binding form (infinite /extent/).
 
-- /Global Variable/ (=defparameter= (unconditionally (re)definition,
-  =defvar= (define a variable and optionally initialize it only when
-  uninitialized)): settable by =setf=. =boundp= checks if a name is
-  bound to a global variable or constant.
+*** Global Variable
 
-- /Dynamic Variable/ (indefinite scope but dynamic extent on a
-  per-thread basis): may or may not be a global one: any construct that
-  creates a new variable binding of the same variable name will be a
-  dynamic one and shadow the global one (Define a global with the =**=
-  pair to avoid such shadowings for pure global variables), and a
-  dynamic variable can be declared locally (relatively rare).
+- =defparameter=: unconditionally (re)definition
+
+- =defvar=: define a variable and optionally initialize it only when
+  uninitialized
+  + settable by =setf=. =boundp= checks if a name is bound to a global variable or constant.
+
+*** Local Variable
+
+- =let= expression: define a scope, a local variable list (consisting of
+  variable lists) and a code block.
+
+*** Dynamic Variable
+
+Indefinite scope but dynamic extent on a per-thread basis.
+May or may not be a global one.
+
+Any construct that creates a new variable binding of the same variable name will
+be a dynamic one and shadow the global one.
+Define a global with the =**= pair
+to avoid such shadowings for pure global variables), and a dynamic variable can
+be declared locally (relatively rare).
 
 *** Constant
     :PROPERTIES:
@@ -1347,6 +1347,21 @@ Nearly all the time =progn= is used
 #+BEGIN_SRC lisp
 #+END_SRC
 
+** Conditional
+
+The arguments of these operators and macros are conditionally evaluated, that
+is, evaluated only if necessary, unlike ordinary functions, where arguments are
+evaluated before the function is executed.
+
+- =if=: a special operator whose arguments are conditionally evaluated
+
+  #+begin_src lisp
+(if (listp '(a b c)
+           (+ 1 2)
+           (+ 5 6)))
+  #+end_src
+
+- =and=, =or= (macros): arguments are evaluated one by one until the result can be determined.
 
 ** Multiple Values
    :PROPERTIES:
@@ -1408,6 +1423,14 @@ return values is at least 19.
   :PROPERTIES:
   :CUSTOM_ID: functions
   :END:
+
+Functions may be seen as generalized Lisp expressions. Lisp makes no distinction
+between a program, a procedure and a function.
+
+#+begin_src lisp
+(defun func-name(param-list)
+  (func-body))
+#+end_src
 
 ** Global Functions
    :PROPERTIES:
@@ -1593,3 +1616,12 @@ in a more abstract way.
                     -1
                     (+ 1 i))))))
 #+END_SRC
+
+* Input and Output
+   :PROPERTIES:
+   :CUSTOM_ID: input-and-output
+   :END:
+
+The most general output function in Common Lisp is =format=. The
+standard function for input is =read=, which a complete parser, does not
+just read characters and return a string.
