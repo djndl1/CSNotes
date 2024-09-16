@@ -88,6 +88,20 @@ returned and evaluated according to the normal rules.
   :END:
 
 ** Data Types
+
+The builtin Common Lisp types form a hierarchy of subtypes and supertypes.
+where =t= is the supertype of all types.
+
+#+begin_src lisp
+(typep val 'type-name)
+#+end_src
+
+*** Concepts
+
+- /dynamic/ vs. /static/: Clisp is dynamically typed
+
+- /manifest/ vs. /latent/, or /explicit/ vs. /implicit/: latent typing, where types are not manifestly associated with variables.
+
 *** Numbers
 
 *** Boolean and Truth
@@ -1363,6 +1377,19 @@ evaluated before the function is executed.
 
 - =and=, =or= (macros): arguments are evaluated one by one until the result can be determined.
 
+** Iteration
+
+- =do=: a powerful iteration construct, with variable initialization, update,
+  ending condition, post-loop expression and a loop body.
+
+  #+begin_src lisp
+(do ((var init-value update-form) [(more-iter-var)]) ; variable specification
+    (ending-condition one-or-more-post-stop-expressions)
+  (loop-body))
+  #+end_src
+
+- =dolist=: for each element in a list
+
 ** Multiple Values
    :PROPERTIES:
    :CUSTOM_ID: multiple-values
@@ -1540,13 +1567,11 @@ It would inconvenient to do without side-effects entirely.
    :CUSTOM_ID: functions-as-objects-first-class-functions
    :END:
 
-- =function= returns a function object given the name of the function.
-  Just as ='= is an abbreviation for =(quote ...)=, =#'= (/sharp quote/)
-  is for =(function ...)=.
+- =function= operator (abbreviated as =#'=) returns a function object given the name of the function.
 
 #+BEGIN_SRC lisp
-    (apply #'+ '(1 2 3))
-    (funcall #'+ 1 2 3)
+    (apply #'+ '(1 2 3)) ; apply a function to a list of arguments
+    (funcall #'+ 1 2 3) ; function call on a few arguments
 #+END_SRC
 
 lambda expression (anonymous functions since all Lisp functions are
@@ -1556,11 +1581,6 @@ closures):
     (lambda (x y)
         (+ x y))
 #+END_SRC
-
-In common lisp, values or objects have types, not variables. This
-approach is called /manifest typing/. An object always has more than one
-type. The builtin Common lisp types form a hierarchy of subtypes and
-supertypes.
 
 ** Compilation
    :PROPERTIES:
