@@ -109,7 +109,10 @@ where =t= is the supertype of all types.
     :CUSTOM_ID: boolean-and-truth
     :END:
 
-- =nil=​/​=NIL=​/​=()=​/​='()=​/​='nil= <-> =t=, ='T=: everything except =nil= counts as true in a logical context
+- =nil=​/​=NIL=​/​=()=​/​='()=​/​='nil= <-> =t=, ='T=: everything except =nil= counts as
+  true in a logical context
+
+The number 0 is true.
 
 *** Symbols
 
