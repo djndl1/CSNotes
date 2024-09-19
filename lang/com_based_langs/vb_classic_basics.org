@@ -521,12 +521,14 @@ This does not work with external procedure declarations and types.
    + =IF= is not short-circuited
 
 - =Select Case= supports short-circuited evaluation
+  + =Select Case= supports range expressions, which may be a simple expression,
+    a comparison expression, an =Is= expression, or a =To= expression.
   + Case subexpressions are evaluated only until they return True, after which
     all the remaining expressions on the same line are skipped.
 
 #+begin_src vba
 Select Case Mid$(Text, i, 1)
-    Case "0" To "9"
+    Case "0" To "9" ' the value between "0" and "9"
         ' It's a digit.
     Case "A" To "Z", "a" To "z"
         ' It's a letter.
