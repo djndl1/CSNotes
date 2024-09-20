@@ -540,6 +540,11 @@ End Select
 #+end_src
 
 - =GoTo= is there but not advised. Use sparingly.
+  + =On N-Expression GoTo Label1, Label2, Label3, ..., Label4= conditionally
+    branches to the n-th label based on the value of the expression
+
+- =GoSub=, =Return=, =On .. GoSub=: a primitive form of procedure call, where
+  =GoSub= and =On ... GoSub= enter the procedure and =Return= leaves the procedure
 
 *** Functions
 
@@ -615,6 +620,8 @@ Private/Public Function FuncName
 ...
 End Function
 #+end_src
+
+- To exit a procedure, use =Exit Function=, =Exit Sub= and =Exit Property=
 
 *** Invoking Procedures
 
