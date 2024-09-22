@@ -105,6 +105,15 @@ Still works as of 1.10.1
 
 Seems to work as of 2.0.8
 
+** .NET
+
+The latest .NET Framework version supported on Windows XP is v4.0.
+However, Mono 3.2.3 provides .NET 4.5 support with a C# 5 compiler, and
+possibly supports Roslyn 1.3.2 but Roslyn has a bug that considers the second
+positional argument the source file (under mono, =csc.exe= is the second
+argument),
+fixed only since Roslyn 2.0, which unforunately requires .NET 4.6.
+
 * [[https://www.mingw-w64.org/][MinGW-w64]]
 
 The current de-factor standard GCC on Windows.
