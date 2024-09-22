@@ -44,6 +44,66 @@ the last supported version is 3.7.1, which is only better than GCC 4.
 
 Visual Studio 2010; Windows SDK 7.1 (MSVC 16.00)
 
+** Python
+
+The last officially supported version of Python is 3.4.4 (EOL March 2019), and pip version 19.1.1.
+Use =python -m pip= to upgrade pip.
+Various packages may be installed using pip as of 2024, sometimes by compiling
+from source
+and most are relatively new. If not, use =pip download --platform win32= to
+download on other systems.
+
+- =ipython=: 4.2.1
+
+- =numpy=: 1.16.6
+
+- =scipy=: 1.2.3
+
+- =scikit-learn=: 0.15.2
+
+- =theano=: 1.0.5
+
+- =keras=: 2.10.0
+
+- =pillow=: 5.4.1
+
+- =matplotlib=: 2.2.5
+
+- =pandas= 0.22.0
+
+- =pyodbc=: 4.0.32
+
+- =cx_oracle= 6.4.1
+
+- =pymysql= 0.9.3
+
+- =psycopg2=: 2.8.6
+
+- =cython=: 3.0.11
+
+- =pywin32=: 221, use =easy_install pywin32.exe= to install it into a virtual environment.
+
+- =pygame=: 2.0.1
+
+** Java
+
+Only JDK 8 is supported, with a build from [[https://github.com/ojdkbuild/ojdkbuild/releases][ojdkbuild]].
+
+** Go
+
+Golang 1.10
+
+** FreePascal
+
+Still works as of 3.2.2 and Lazarus 3.4
+
+** FreeBASIC
+
+Still works as of 1.10.1
+
+** Nim
+
+Seems to work as of 2.0.8
 
 * [[https://www.mingw-w64.org/][MinGW-w64]]
 
