@@ -1,0 +1,36 @@
+#+title: Enum
+
+Enums are not built into Python itself, but as a separate package =enum=.
+
+=enum.Enum= is an ordinary enum whose values are mutually exclusive. =enum.Flag=
+supports bit flags. If actual values are of no interest upon definition,
+=enum.auto()= may be used in place and generates them automatically (definitely
+not from 1 to N, unless customized by overriding =_generate_next_value()=.
+A member may not havbe multiple values but a value may correspond to multiple
+names. To disallow member aliasing, put =@unique=.
+
+To access a member, =EnumName.MemberName=, =EnumName(MemberValue)= or =EnumName['MemberName']=
+
+To iterate through an enum, =list(EnumName)= returns a list of enum members
+without duplicates; or the =EnumType.__members__= ordered dict with all the members.
+
+Enums are compared by identity =Is= (aliases are considered equal) or by value ~=~.
+
+Enums can hae arbitrary values and they can even inherit from a =@dataclass=
+class (Java-like enums).
+
+
+Enums may be created with a function =Enum('EnumName', 'Member1 Member2
+Member3')= (the member definitions are diverse)
+
+By default enum the first member starts at =1= to ensure all enum all members
+evalute to =True=.
+
+Some specialized enums are provided: =IntEnum=, also a subclass of =int= can be
+compared to an =int=. =StrEnum= (Python 3.11, from =str=) can be compared to
+strings; =IntFlag= (since Python 3.6), supports only bitwise operators (combined
+flags may be even named). =Flag= (since Python 3.6) cannot be combined with nor
+compared against. Generally, =Enum= and =Flag= are preferred type-safe enums.
+any other =Flag= enumeration nor =int= (=auto()= is recommended for =Flag=)
+
+=__new__()= and =__init__()= may be overriden to customize enums.
