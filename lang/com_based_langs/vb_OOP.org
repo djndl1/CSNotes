@@ -185,14 +185,6 @@ End Property
 
 ** Lifecycle Handlers
 
-- [[https://learn.microsoft.com/en-us/dotnet/visual-basic/language-reference/modifiers/withevents][=WithEvents=]]:
-
-  #+begin_src  vba
-' this variable A is of the specified type
-' with its events handled in this module by functions of A_ClassEventName
-Private WithEvents A As class_type_with_events
-  #+end_src
-
 - =Class_Initialize=: literally, not subtituted for a class name.
 
 - =Class_Terminate=: finalizer. fired before releasing the data instance block and
@@ -228,6 +220,9 @@ Private Sub Fop_FileCopied(file As String, DestPath As String)
     ...
 End Sub
 #+end_src
+
+=ByRef= parameters passed to event handlers are used by the handlers one by one
+and any modification of a previous handler is reflected in the next one.
 
 * Object Structure and Memory Management
 
