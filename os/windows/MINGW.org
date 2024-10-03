@@ -47,7 +47,7 @@ Visual Studio 2010; Windows SDK 7.1 (MSVC 16.00)
 ** Python
 
 The last officially supported version of Python is 3.4.4 (EOL March 2019), and pip version 19.1.1.
-Use =python -m pip= to upgrade pip.
+Use =python -m pip= to upgrade pip before any online =pip install= could succeed.
 Various packages may be installed using pip as of 2024, sometimes by compiling
 from source
 and most are relatively new. If not, use =pip download --platform win32= to
