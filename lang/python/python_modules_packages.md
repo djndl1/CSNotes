@@ -40,4 +40,21 @@ Each module is imported only once per session. To reimport a module, use `import
 
 - `sys.builtin_module_names`
 
-- `sys.path`: initialized from the script's directory, =PYTHONPATH= and the installation-dependent default (`site-packages`)
+- `sys.path`: initialized from the script's directory, `PYTHONPATH` and the installation-dependent default (`site-packages`)
+
+# Startup
+
+- `python scriptname`: =scriptname= may be directory/zipfile containing a `__main__.py` module file, a `.py` file and that file will be the `__main__` module.
+   - `sys.argv[0]` is the script name given
+   
+- `-m modulename`: search the module in `sys.path` and execute it as a script
+  - if a package name is given, its =__main__= module is executed
+  - not for builtin modules written in C as there are no module files.
+  - `sys.argv[0]` is the full path to the module file.
+  - Many standard modules contain code that can be executed as a script.
+  - the zipfile case includes `.whl`, one can run `python pip.whl/pip` to use `pip`
+  
+- `-`: read from stdin
+
+- `-c commands`: one or more statements.
+  - `sys.argv[0]` is `-c`
