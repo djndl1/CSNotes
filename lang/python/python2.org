@@ -1,0 +1,47 @@
+#+title: Python 2
+
+Python 2.7 has reached EOL in 2020 and removed in some linux distros (Debian,
+alpine) as of 2024.
+
+* Major Difference
+
+** Print as a Function since Python 3
+
+=print= is exotic and an exception to Python's design. It puts up great barrier for
+switching to
+other output functions and implementation evolution.
+
+Use =import __future__ import print_function= in Python 2.7.
+
+** =input= is now =raw_input=
+
+=input= in Python 3 Is more type-safe
+
+** =reduce= moved into =functools=
+
+** A Separate Integer Division Operator =//= in Python 3
+
+=/= is now float division.
+
+** Removed Features
+
+- Old-style classes (The only classes until Python 2.2): defined without a
+  new-style parent class. of =instance= type, independent of the other parts of
+  the type system. New-style classes are just another types in the type hierarchy.
+  + =class NewClass(object)= is required for new-style classes in Python 2.
+  + =super()= (a Callable class) added for new-style classes to allow more flexible access to parent attributes/methods.
+  + descriptors:
+
+- string exceptions and implicit relative imports
+
+* Compatibility Libraries
+
+- =enum34=: brings the =enum= module in 3.4 to early versions
+
+- =functools32=
+
+- =futures=: =concurrent.futures= to Python 2
+
+- various =backports.*= packages and packages named the same as in the standard libraries.
+
+For more, see [[https://wiki.python.org/moin/StandardLibraryBackports][Standard Library Backports]]
