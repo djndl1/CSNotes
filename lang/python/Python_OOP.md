@@ -81,9 +81,15 @@ Child classes do not automatically creates attributes of the parent classes: the
 Unlike other OOP languages, method calls in Python are only resolved to the current instance's method (including inherited), 
 never its ancestors' method with the same name unless `super()` is used.
 
-- `super()` is used to avoid referring to the base class explicitly and statically and rely on the MRO.
+> When calling super() to resolve to a parent's version of a classmethod, instance method, or staticmethod, we want to pass the current class whose scope we are in as the first argument, to indicate which parent's scope we're trying to resolve to, and as a second argument the object of interest to indicate which object we're trying to apply that scope to. 
 
-- `super(type, instance)` returns a method bound to `instance`
+### A Few Notes on the `super()` Call
+
+- `super()` rely on the MRO and is used to avoid referring to the base class explicitly and statically
+
+- `super(type, instance)` returns a proxy bound to `instance` as if the instance is cast to its superclass; 
+   `super(type, type2)` returns a proxy bound to the result superclass of `type2`, which is useful 
+   for static methods and class methods of a subclass.
 
 - `super()` itself is a normal callable. Without the instance argument or the parameterless version, 
    it will not modify the current instance with `super().__init__()`. 
