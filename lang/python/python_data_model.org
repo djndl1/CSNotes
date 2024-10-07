@@ -1,0 +1,296 @@
+* Python Data Model
+:PROPERTIES:
+:CUSTOM_ID: python-data-model
+:END:
+** Objects, types and values
+:PROPERTIES:
+:CUSTOM_ID: objects-types-and-values
+:END:
+Every object has an identity, a /type/ and a /value/.
+
+=is=: compares the identity of two objects
+
+=id()=: returns an integer representing its identity (memory address)
+
+Objects are never explicitly destroyed. Instead, they may be
+garbage-collected
+
+CPython currently uses a reference-counting scheme with (optional)
+delayed detection of cyclically linked garbage, which collects most
+objects as soon as they become unreachable, but is not guaranteed to
+collect garbage containing circular references.
+
+Some objects contain references to other objects; these are called
+containers. Examples of containers are tuples, lists and dictionaries.
+The references are part of a container's value.
+
+*** Type
+:PROPERTIES:
+:CUSTOM_ID: type
+:END:
+determins the operations that the object supports and defines the
+possible valus for objects of that type.
+
+=type()=: returns an object's type.
+
+*** value
+:PROPERTIES:
+:CUSTOM_ID: value
+:END:
+mutable and immutable.
+
+** The standard type hierarchy
+:PROPERTIES:
+:CUSTOM_ID: the-standard-type-hierarchy
+:END:
+*** None
+:PROPERTIES:
+:CUSTOM_ID: none
+:END:
+signifies the absence of a value in many situations.
+
+*** NotImplemented
+:PROPERTIES:
+:CUSTOM_ID: notimplemented
+:END:
+*** Ellipsis
+:PROPERTIES:
+:CUSTOM_ID: ellipsis
+:END:
+=...= or the built-in name =Ellipsis=
+
+*** numbers.Number
+:PROPERTIES:
+:CUSTOM_ID: numbers.number
+:END:
+Immutable
+
+**** numbers.Integral
+:PROPERTIES:
+:CUSTOM_ID: numbers.integral
+:END:
+***** Integer(=int=)
+:PROPERTIES:
+:CUSTOM_ID: integerint
+:END:
+represent numbers in an unlimited range.
+
+***** Booleans(=bool=)
+:PROPERTIES:
+:CUSTOM_ID: booleansbool
+:END:
+A subtype of the integer type
+
+**** numbers.Real(=float=)
+:PROPERTIES:
+:CUSTOM_ID: numbers.realfloat
+:END:
+machine-level double precision floating point numbers. Python does not
+uspport single-precision floating point numbers.
+
+**** numbers.Complex(=complex=)
+:PROPERTIES:
+:CUSTOM_ID: numbers.complexcomplex
+:END:
+*** Sequences
+:PROPERTIES:
+:CUSTOM_ID: sequences
+:END:
+finite ordered sets indexed by non-negative numbers.
+
+**** Immutable sequences
+:PROPERTIES:
+:CUSTOM_ID: immutable-sequences
+:END:
+cannot change once it is created. The objects referenced by an immutable
+object may change, but the collecton of objects directly referenced by
+an immutable object cannt change.
+
+***** Strings
+:PROPERTIES:
+:CUSTOM_ID: strings
+:END:
+a sequence of values that represent *Unicode* code points. Python does
+not have a =char= type. Every code point in the string is represented as
+a string object with length 1.
+
+***** Tuples
+:PROPERTIES:
+:CUSTOM_ID: tuples
+:END:
+contain arbitrary Python objects.
+
+***** Bytes
+:PROPERTIES:
+:CUSTOM_ID: bytes
+:END:
+8-bit bytes
+
+**** Mutable sequences
+:PROPERTIES:
+:CUSTOM_ID: mutable-sequences
+:END:
+can be changed after created. The subscription and slicing notations can
+be used as the target of assignment and =del= statements.
+
+***** Lists
+:PROPERTIES:
+:CUSTOM_ID: lists
+:END:
+contain arbitrary Python objects
+
+***** Byte Arrays
+:PROPERTIES:
+:CUSTOM_ID: byte-arrays
+:END:
+created by =bytearray()= constructor. Provides the same interface and
+functionality as immutable =bytes= objects.
+
+*** Set types
+:PROPERTIES:
+:CUSTOM_ID: set-types
+:END:
+unordered, finite sets of unique immutable objects. Cannot be indexed
+but iteratable.
+
+**** Sets
+:PROPERTIES:
+:CUSTOM_ID: sets
+:END:
+mutable set; =set()=
+
+**** Frozen sets
+:PROPERTIES:
+:CUSTOM_ID: frozen-sets
+:END:
+immutable set. =frozenset()=
+
+*** Mappings
+:PROPERTIES:
+:CUSTOM_ID: mappings
+:END:
+finite sets of objects indexed by arbitrary index sets.
+
+**** Dictionaries
+:PROPERTIES:
+:CUSTOM_ID: dictionaries
+:END:
+indexed by values other than objects containing lists or dictionaries or
+other mutable types.
+
+*** Callable types
+:PROPERTIES:
+:CUSTOM_ID: callable-types
+:END:
+**** User-defined functions
+:PROPERTIES:
+:CUSTOM_ID: user-defined-functions
+:END:
+created by a function definition.
+
+**** Instance methods
+:PROPERTIES:
+:CUSTOM_ID: instance-methods
+:END:
+**** Generator funcitons, Coroutine, built-in ...
+:PROPERTIES:
+:CUSTOM_ID: generator-funcitons-coroutine-built-in
+:END:
+*** Modules
+:PROPERTIES:
+:CUSTOM_ID: modules
+:END:
+*** Custom Classes
+:PROPERTIES:
+:CUSTOM_ID: custom-classes
+:END:
+created by class definitions.
+
+*** Class instances
+:PROPERTIES:
+:CUSTOM_ID: class-instances
+:END:
+*** I/O objects (file objects)
+:PROPERTIES:
+:CUSTOM_ID: io-objects-file-objects
+:END:
+*** Internal types
+:PROPERTIES:
+:CUSTOM_ID: internal-types
+:END:
+used internally by the interpreter are exposed to the user.
+
+**** Code objects
+:PROPERTIES:
+:CUSTOM_ID: code-objects
+:END:
+byte-compiled executable Python code, or bytecode.
+
+**** Frame objects
+:PROPERTIES:
+:CUSTOM_ID: frame-objects
+:END:
+execution frames
+
+**** Traceback objects
+:PROPERTIES:
+:CUSTOM_ID: traceback-objects
+:END:
+a stack trace of an exception.
+
+** Special method names
+:PROPERTIES:
+:CUSTOM_ID: special-method-names
+:END:
+A class can implement certain operations that are invoked by special
+syntax (such as arithmetic operations or subscripting and slicing) by
+defining methods with special names. This is Python's approach to
+/operator overloading/.
+
+*** Basic customization
+:PROPERTIES:
+:CUSTOM_ID: basic-customization
+:END:
+- =object.__new__(cls[,...])=: a static method; called to create a new
+  instance of class =cls=.
+
+- =object.__init__(self[, ...])=: Called after the instance has been
+  created (by *new*()), but before it is returned to the caller. The
+  arguments are those passed to the class constructor expression. the
+  derived class's *init*() method, if any, must explicitly call it to
+  ensure proper initialization of the base class part of the instance
+
+- =object.__del__(self)=: Called when the instance is about to be
+  destroyed. This is also called a finalizer or (improperly) a
+  destructor. If a base class has a *del*() method, the derived class's
+  *del*() method, if any, must explicitly call it to ensure proper
+  deletion of the base class part of the instance.
+
+- =object.__repr__(self)=: called by the =repr()= built-in function to
+  compute the "official" string representation of an object. Typically
+  used for debugging.
+
+- =object.__str__(self)=: Called by str(object) and the built-in
+  functions format() and print() to compute the "informal" or nicely
+  printable string representation of an object.
+
+- 
+  #+begin_src python
+  object.__lt__(self, other)
+  object.__le__(self, other)
+  object.__eq__(self, other)
+  object.__ne__(self, other)
+  object.__gt__(self, other)
+  object.__ge__(self, other)
+  #+end_src
+
+rich comparison mthods, corresponding to operator symbols.
+
+=object.__bool__(self)=: Called to implement truth value testing and the
+built-in operation bool(); should return False or True.
+
+** Coroutines
+:PROPERTIES:
+:CUSTOM_ID: coroutines
+:END:
+TODO
