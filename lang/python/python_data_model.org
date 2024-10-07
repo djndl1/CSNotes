@@ -294,3 +294,57 @@ built-in operation bool(); should return False or True.
 :CUSTOM_ID: coroutines
 :END:
 TODO
+
+
+* Object Customization
+
+** Attribute Access
+
+The language reference describes how attributes are looked up.
+
+#+begin_quote
+A class instance has a namespace implemented as a dictionary (=object.__dict__=) which is the first
+place in which attribute references are searched. When an attribute is not found
+there, and the instance’s class has an attribute by that name, the search
+continues with the class attributes. If a class attribute is found that is a
+user-defined function object, it is transformed into an instance method object
+whose =__self__= attribute is the instance. Static method and class method objects
+are also transformed; see above under “Classes”. See section Implementing
+Descriptors for another way in which attributes of a class retrieved via its
+instances may differ from the objects actually stored in the class’s =__dict__=.
+If no class attribute is found, and the object’s class has a =__getattr__()=
+method, that is called to satisfy the lookup.
+Attribute assignments and deletions update the instance’s dictionary, never a class’s dictionary. If the class has a =__setattr__()= or =__delattr__()= method, this is called instead of updating the instance dictionary directly.
+#+end_quote
+
+Technically, instance attributes, class attributes, properties, private
+attributes, methods are all attributes. For introspection, use the =inspect= module.
+
+*** Interface
+
+**** =obj.__dict__=: Dynamic Attributes
+
+ One way to access the data stored in memory of an object,
+ not really all its writable attributes and is not the only way to implement
+ attributes in Python.
+
+**** =__slots__=: Static Declaration
+
+Data members may be statically and explicitly declared in =__slots__= and prevent the creation
+of =__dict__= and =__weakref__= to  improve performance.
+
+TODO:  https://stackoverflow.com/questions/472000/usage-of-slots/28059785#28059785
+
+*** Modification
+
+By default, a value is stored in the instance dictionary.
+=object.__setattr__(self, name, value)=
+overrides this behavior.
+
+*** Retrieval
+
+=object.__getattribute__()=, which looks up the attribute in instance's and class's namespace, and descriptor =__get__()=  are called before
+=object.__getattr__()= (customization after all).
+
+To fake total control, do not save values in the object dictionary so that the
+normal mechanism always fails and =object.__getattr__()= is called.
