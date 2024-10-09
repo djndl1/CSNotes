@@ -13,6 +13,33 @@ other output functions and implementation evolution.
 
 Use =import __future__ import print_function= in Python 2.7.
 
+** Better Unicode Support with =str=
+
+In Python 3, =str= holds Unicode text; =bytes= and =bytearray= hold bytes.
+In Python 2, =str= (aliased as =bytes=) for byte string and =unicode= is real Unicode text string.
+For python 2 string literals, its encoding depends on the current default
+encoding (ASCII, at least in Python 2.7). A byte string in a certain encoding is implicitly converted to Unicode
+when performing operations with Unicode strings, which may or may not raise errors.
+The most absurd and confusing example is ="foo".encode('utf-8')=. ="foo"= is a
+non-Unicode string. It is first converted to a Unicode string and then encoded
+as UTF-8. In Python 2, a codec may convert between two byte encoding schemes.
+
+- Python 3 no longer has encoding-agnostic strings. Any text should be Unicode strings.
+  - unicode escape string: =u"\uXXXX"= is supported in both but mainly a legacy
+    from Python 2. Python 3 does not need such prefixes to support Unicode
+    escape string. It's implicit unless prefixed with =b=.
+  - =from __future__ import unicode_literals= turns literal strings into unicode.
+  - In both cases, the source code encoding comment =#-*- coding: xxx= instructs
+    the interpreter to treat string literals as encoded in the specified
+    encoding.
+    However, the actual result depends on the actual encoding.
+
+- Python 3 removed text encodings between bytes and bytes, =.encode()= on bytes
+  and =.decode()= on Unicode strings.
+
+- Bytes can no longer implicitly converted to Unicode strings. Non-ASCII
+  characters are not allowed in byte strings.
+
 ** =input= is now =raw_input=
 
 =input= in Python 3 Is more type-safe
