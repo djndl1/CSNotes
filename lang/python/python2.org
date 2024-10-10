@@ -40,11 +40,23 @@ as UTF-8. In Python 2, a codec may convert between two byte encoding schemes.
 - Bytes can no longer implicitly converted to Unicode strings. Non-ASCII
   characters are not allowed in byte strings.
 
+** Absolute =import=
+
+=import abc= is now absolute (from =sys.path=) by default
+or enabled since Python 2.5 with =from __future__ import absolute_import=.
+
 ** =input= is now =raw_input=
 
 =input= in Python 3 Is more type-safe
 
 ** =reduce= moved into =functools=
+
+** =xrange= is now =range= in Python 3
+
+** Integer Types
+
+=long= in Python 2 is =int= in Python 3 with unlimited precision. =int= in
+Python 2 with at least 32 bits is dropped.
 
 ** A Separate Integer Division Operator =//= in Python 3
 
@@ -62,6 +74,8 @@ as UTF-8. In Python 2, a codec may convert between two byte encoding schemes.
 - string exceptions and implicit relative imports
 
 * Compatibility Libraries
+
+- =six=
 
 - =enum34=: brings the =enum= module in 3.4 to early versions
 
