@@ -1,6 +1,6 @@
 # Modules
 
-A Python script file consisting of definitions, statements for initialization for modularity.
+A Python script file consisting of definitions, statements for initialization to achieve modularity.
 
 A module can contain 
 
@@ -45,43 +45,74 @@ Each module is imported only once per session. To reimport a module, use `import
 
 - `sys.path`: initialized from the script's directory ,`PYTHONPATH` and the installation-dependent default (`site-packages`)
   - the symlinks are resolved before adding
+  - `site-packages` can be used for packages that are likely to depend on the Python version.
 
 ## `import` syntax
 
 - multiline import with parentheses
 
-  ```python
-from Module import (A, B, C, D,
-  E, F)
-  ```
+    ```python
+    from Module import (A, B, C, D,
+        E, F)
+    ```
   
-- Relative imports: as `import A`  now defaults to absolute `sys.path`, abosolute import is a must, one dot per level; only `from <> import ...` is allowed, `import ..A` is illegal
+- Relative imports: as `import A`  now defaults to absolute `sys.path`, relative import is a must, one dot per level; 
+  - only `from <> import ...` is allowed, `import ..A` is illegal
   because `..A` is not a legal prefix in an expression.
-  - `__name__` is used in relative imports to find a module. If the module name provides no package information or set to `__main__`, then it is assumed to be a top-level module.
-
+  - `__name__` is used in relative imports to find a module (not purely filesystem hierarchy). If the module name provides no package information or set to `__main__`, then it is assumed to be a top-level module.
+  - Note that relative imports are based on the name of the current module. Since the name of the main module is always `__main__`, modules intended for use as the main module of a Python application must always use absolute imports.
   ```python
-from .CurrentDirectoryModule import A
-from ..ParentDirectoryModule import B
-from ...GrantparentDirectoryModule import C
-from . import D # current directory package
+  from .CurrentDirectoryModule import A
+  from ..ParentDirectoryModule import B
+  from ...GrantparentDirectoryModule import C
+  from . import D # current directory package
   ```
 
+- Only absolute-importing a name in package that is a module or subpackage is supported. For a function or a class, it is not.
+  Each name except the last one must be package and the last item can only be a module or a package.
+
+  ```python
+  import Package.Module # ok 
+  import Package.Module1.Module2 # ok
+  from Package import Module1 # ok
+  from Package.Module import Class # ok
+  
+  import Package.Module.Class # error
+  ```
 
 # Packages
 
-Packages are a way of structuring Python’s module namespace by using “dotted module names”. All packages are modules, but not all modules are packages. Any module that contains a `__path__` attribute is considered a package.
+A module of related modules organized together. All packages are modules, but not all modules are packages. Any module that contains a `__path__` attribute is considered a package. Importing a name under a package imports any module/package above the name in the hierarchy.
 
-Python defines two types of packages, __regular packages__ and __namespace packages__. A regular package is typically implemented as a directory containing an `__init__.py` file. When a regular package is imported, this `__init__.py` file is implicitly executed, and the objects it defines are bound to names in the package’s namespace.
+Historically Python defines two types of packages, __regular packages__ (before 3.3) and __namespace packages__ (since 3.3)
 
-A namespace package is a composite of various portions, where each portion contributes a subpackage to the parent package. Portions may reside in different locations on the file system. Portions may also be found in zip files, on the network, or anywhere else that Python searches during import.
+- regular package is typically implemented as a directory containing an `__init__.py` file. When a regular package is imported, this `__init__.py` file is implicitly executed, and the objects it defines are bound to names in the package's namespace.
 
-`__all__` in a package's `__init__.py` specifies a list of of submodules that should also be imported when `from package import *` is encountered. It is also possible to only import certain submodules. Note that relative imports are based on the name of the current module. Since the name of the main module is always `__main__`, modules intended for use as the main module of a Python application must always use absolute imports.
+- namespace package is a package of subpackages with `__init__.py`
 
-Python comes with a packaging framwork called `Disutils`, a build tool, an installation tool, a package metadata format and other things. It integrates with Python Package Index (PyPI). All of these center around the `setup` script, traditionally called `setup.py`.
+TODO
 
-# Startup
+`__init__.py` may be empty or contains initialization code.
 
-- `python scriptname`: =scriptname= may be directory/zipfile containing a `__main__.py` module file, a `.py` file and that file will be the `__main__` module.
+## Search Order
+
+Directories (and thus packages) precedes any modules defined in `importlib.machinery.all_suffixes()`:
+a package precedes a module with the same name during importing.
+
+## `__path__`: the One Distinction between Packages and Modules
+
+If a module has a `__path__`, then it is a package, by default containing the directory name of the package.
+
+The `__path__` list specifies the directories that are searched for submodules of the package, parallel to the global `sys.path`. 
+This may be useful if submodules under certain directories are preferred by prepending these directories to `__path__`.
+
+## `__all__` & import all
+
+`from package import *` does not search the entire directory and its subdirectories. It merely searches `__all__` in a package's `__init__.py`, a list of names of the submodules that should also be imported when `from package import *` is encountered. It is also possible to only import certain submodules. If `__all__` is not defined, then no submodules except what is defined in the package level is imported (e.g. those defined in `__init__.py`)
+
+# Invoking Interpreter 
+
+- `python scriptname`: `scriptname` may be directory/zipfile containing a `__main__.py` module file, a `.py` file and that file will be the `__main__` module.
    - `sys.argv[0]` is the script name given
    
 - `-m modulename`: search the module in `sys.path` and execute it as a script
