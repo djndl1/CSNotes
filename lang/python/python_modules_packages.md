@@ -84,15 +84,32 @@ Each module is imported only once per session. To reimport a module, use `import
 
 A module of related modules organized together. All packages are modules, but not all modules are packages. Any module that contains a `__path__` attribute is considered a package. Importing a name under a package imports any module/package above the name in the hierarchy.
 
-Historically Python defines two types of packages, __regular packages__ (before 3.3) and __namespace packages__ (since 3.3)
+## Basic Concepts
+
+- _distribution_: separately installable sets of Python modules
+
+- _vendor package_: pacakged by OS packaging meechanism
+
+- _portion_: a set of files in a single directory (possibly a zip file) that contribute to a namespace package
+
+Python defines two types of packages, __regular packages__ and __namespace packages__ (since 3.3)
 
 - regular package is typically implemented as a directory containing an `__init__.py` file. When a regular package is imported, this `__init__.py` file is implicitly executed, and the objects it defines are bound to names in the package's namespace.
+  - `__init__.py` may be empty or contains initialization code.
+  - Regular packages are self-contained: all code reside in the same directory hierarchy.
+  - regular packages are constructed statically (a fixed path) and thus can be loaded faster than a dynamic namespace package.
 
-- namespace package is a package of subpackages with `__init__.py`
+- namespace package: a package whose main goal is to provide a namespace for multiple directories belonging to the same package without an `__init__.py`.
 
-TODO
+## Namespace Package (PEP 420)
 
-`__init__.py` may be empty or contains initialization code.
+A mechanism for splitting a single package across multiple directories (under `sys.path`) so that a package is not restricted to one directory hierarchy but still in the same namespace, or under the same directory without causing file conflicts (`__init__.py`).
+
+Also, this enables dynamic path computation and portion search that is not restricted to the `__path__` constructed the first time the package is imported. Additional portions of the package added later to `sys.path` can be found if they are imported. `__path__` may change with the import of new portions due to its dynamic nature.
+
+The concept has been implemented before with various slightly-incompatible mechanisms. The import mechinery itself will construct the list of directories that make up that package without manually manipulating `__path__`. The import machinery looks for any directory matching the package name without an `__init__.py` and adds it to `__path__`, and when the search is finished, a namespace package of the name is _dynamically_ created. The package has no `__file__` attribute since it it not a directory or a `__init__.py` but dynamically created.
+
+This dynamic nature also allows extension to an existing package without modifying the original package as long as the package is implemented as a namespace package.
 
 ## Search Order
 
@@ -116,7 +133,7 @@ This may be useful if submodules under certain directories are preferred by prep
    - `sys.argv[0]` is the script name given
    
 - `-m modulename`: search the module in `sys.path` and execute it as a script
-  - if a package name is given, its =__main__= module is executed
+  - if a package name is given, its `__main__` module is executed
   - not for builtin modules written in C as there are no module files.
   - `sys.argv[0]` is the full path to the module file.
   - Many standard modules contain code that can be executed as a script.
