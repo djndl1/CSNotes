@@ -1,0 +1,6 @@
+#+title: Tls Ssl
+
+* SSL Bumps
+
+=squid= can translate between lower version of TLS (v1.0, v1.1, v1.2) to v1.3
+for compatibility of old OSes.
