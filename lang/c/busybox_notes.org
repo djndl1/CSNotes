@@ -1,0 +1,38 @@
+#+title: Busybox Notes
+
+* Version 0.32
+
+** Entry
+
+The first argument is parsed to get the applet name. However, if the name is
+=busybox= with additional arguments, additional arguments should be parsed to
+find the actual applet to call. =busybox_main= checks if there are additional
+arguments. If any, =main= is called again with the rest of the arguments. The
+first argument into =main= is now the second argument on the command line.
+=busybox= is not a valid applet thus =busybox_main= should not be called twice:
+it is only meant to dump help info or parse the second argument.
+
+** =cat=
+
+The implementation is simple to understand: the only problem is that it
+increments =argc= twice while printing files on the command line.
+
+* Coding Idioms
+
+- Find the filename part of a path
+#+begin_src c
+    char *s = argv[0];
+    char *name = argv[0];
+    const struct Applet *a = applets;
+
+    while (*s != '\0') {
+	if (*s++ == '/') // name is assigned multiple times, but only the last one remains
+	    name = s;
+    }
+#+end_src
+  or
+#+begin_src c
+	skipName = strrchr(srcName, '/');
+	if (skipName)
+	    skipName++;
+#+end_src
