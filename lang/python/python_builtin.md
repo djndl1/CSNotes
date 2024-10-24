@@ -71,3 +71,26 @@ prints
 [1, 2]
 [1, 2, 3]
 ```
+
+## Slicing Assigment
+
+Slicing may be used in assignment or deletion. Supposedly, in assigment, the elements in the slicing should be replaced. However, if the assign iterable is shorter or longer than the slice, the result is unexpected.
+
+> If the target is a slicing: The primary expression in the reference is evaluated. It should yield a mutable sequence object (such as a list). The assigned object should be a sequence object of the same type. Next, the lower and upper bound expressions are evaluated, insofar they are present; defaults are zero and the sequence’s length. The bounds should evaluate to integers. If either bound is negative, the sequence’s length is added to it. The resulting bounds are clipped to lie between zero and the sequence’s length, inclusive. Finally, the sequence object is asked to replace the slice with the items of the assigned sequence. The length of the slice may be different from the length of the assigned sequence, thus changing the length of the target sequence, if the target sequence allows it.
+
+```python
+# append, extend
+a[len(a):] = iterable
+
+# insertion, where the index may be the end of the sequence
+# and this is how sequence.insert is defined
+s[i:i] = [x]
+# append is equal to
+s[len(s):len(s)] = [x]
+# and even worse
+s.insert(len(s) + 10, 5) # appends 5 ten times
+```
+
+## `del` 
+
+A variable may not be referenced after a `del` on the variable. `del` not only deletes the object recursively, `del` a variable removes the binding of the name.
