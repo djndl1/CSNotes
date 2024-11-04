@@ -32,10 +32,97 @@ STDERR_FILENO // 2
 
 *** File Descriptor Duplication
 
-A file description may be indexed by multiple file descriptors (=dup=, =dup2=, =dup3=). Only if the last
+A file description may be indexed by multiple file descriptors (=dup=, =dup2=,
+=dup3=, =fcntl(fd, F_DUPFD, XXX)=). Only if the last
 file descriptor to the file description is closed, that file description is freed.
 
-Two file descriptors may refer to the same file description but with different file descriptor flags (i.e. =FD_CLOEXEC=).
+Two file descriptors may refer to the same file description but with different
+file descriptor flags (i.e. =FD_CLOEXEC=).
+
+=dup2= is atomic by combining =close= the new file descriptor and duplicating
+the old one onto it: a perfect tool for standard I/O redirection.
+
+** File Data Structure
+:PROPERTIES:
+:CUSTOM_ID: file-sharing
+:END:
+
+Thre kernel uses three data structures to represent an openfile.
+
+- Every process entry has a
+  table of open /file descriptors/ and its related flags (*close-on-exec*) and a
+  pointer to a /file table entry/.
+
+- The kernel maintains a /file table/ for all open files, containing the
+  file status flags (read/write/append...), offset, and a pointer to the
+  /v-node/ table entry for the file.
+
+- Each open file has a /v-node/ (virtual filesystem) structure that contains information about
+  the type of file and pointers to functions that operate on the file.
+  For most files, the v-node also contains the *i-node* for the file. This
+  information is read from disk when the file is opened. (Linux has a
+  generic filesystem-independent i-node instead of a v-node).
+
+#+begin_example
+process table entry                             +-----------+
++----|-----+                               +--->-v-node info|
+| fd |     |       file table entry        |    |  v-data+----+
+| 0  |   +-------+  +--------------------+ |    +-----------+ |
++----------+     |  |file status flags   | |                  |
+| fd |     |     +-->current file offset | |                  |
+| 1  |   +----+     | v-node pointer+------+    +-----------+ |
++----------+  |     +--------------------+      |i-node info| |
+|    |     |  |                                 |file size  <-+
+|    |     |  |                                 |           |
+|    |     |  |                                 |i-node     |
+|    |     |  |     +--------------------+      +-----------+
+|    |     |  |     | file status flags  |
+|    |     |  +-----> current file offset|
+|    |     |  +     | v-node pointer+------+     +----------+
++----|-----+        +--------------------+ |     +v-node info
+                                           +---->+   v-data+-----+
+                                                 +----------+    |
+                                                                 |
+                                                +-----------+    |
+                                                |i-node info|    |
+                                                |file size  <----<
+                                                |           |
+                                                | i-node    |
+                                                +-----------+
+#+end_example
+
+Normally, each process that opens the same file gets its own file table entry
+(which indicates the status of a file opening). Every process has its
+own file table entry (*file description*) with its own current file offset.
+The v-node is shared.
+The offset changes as the process write. When the offset goes beyond the file size,
+the i-node entry is set to the current file offset thus and the file is
+extended.
+
+It is possible for more than one file desciptor entry to point to the
+same file table entry:
+
+- =dup()= and =dup2()= duplicate an existing file
+descriptor. These duplicated file descriptors share the same file table
+entry.
+
+- the =fcntl= function.
+
+- Opening or creating =/dev/fd/n= is identical to duplicate the
+corresponding file descriptor. The main use of =/dev/fd/n= is from the
+shell to allow programs that use pathname arguments to handle standard
+input and standard output in the same manner as other pathnames.
+
+  #+begin_src sh
+filter file2 | cat file1 /dev/fd/0 file3 | lpr # sometimes a better choice for `-` and pipeline
+  #+end_src
+
+- after a =fork=
+
+To summarize, a file table entry (maintained by the kernel) is
+associated with a file descriptor of a certain process. The v-nodes are
+shared, maintained by the kernel.
+
 
 ** File Operations
 
@@ -57,10 +144,18 @@ on files and are not meant to be underestimated.
     Even if the reference directory is deleted, it would fail instead of opening
     a file in a substitute new directory with the same path.
 
-A few open flags are defined (read-only, write-only, exec-only, read-write,
+A few flags are defined (read-only, write-only, exec-only, read-write,
 append, create, truncate, creation fails on an existing file,
 synchronized IO, rw sync) to determine the behaviors of =open= and subsequence
 operations on the file.
+
+- file creation flags: only affect the =open= operation
+
+- file status flags: subsequent operations
+
+Note that the append mode is not a replacement for =lseek= before each wrwite,
+rather, it implies a atomic combination of seeking to the end and writing.
+Every write is sure to append.
 
 The file descriptor returned by =open= and =openat=
 is guaranteed to be the lowest-numbered unused descriptor.
@@ -146,96 +241,60 @@ repeatedly, the successive timings will likely be better than the first.
 
 The buffer size of a simple program of copying data should be around 8K to 16K as of Linux 4.19 on a Aarch64 machine.
 
-** File Sharing
-:PROPERTIES:
-:CUSTOM_ID: file-sharing
-:END:
-The UNIX system supports the sharing of open files among different
-processes.
-
-Thre kernel uses three data structures to represent an openfile.
-
-- Every process has an entry in the process table, within which is a
-  table of open file descriptors.
-
-- The kernel maintains a file table for all open files, containing the
-  file status flags (read/write/append...), offset, and a pointer to the
-  v-node table entry for the file.
-
-- Each open file has a /v-node/ strcture that contains information about
-  the type of file and pointers to functions that operate on the file.
-  For most files,the v-node also contains the i-node for the file. This
-  information is read from disk when the file is opened. (Linux has a
-  generic filesystem-independent i-node instead of a v-node).
-
-#+begin_example
-process table entry                             +-----------+
-+----|-----+                               +--->-v-node info|
-| fd |     |       file table entry        |    |  v-data+----+
-| 0  |   +-------+  +--------------------+ |    +-----------+ |
-+----------+     |  |file status flags   | |                  |
-| fd |     |     +-->current file offset | |                  |
-| 1  |   +----+     | v-node pointer+------+    +-----------+ |
-+----------+  |     +--------------------+      |i-node info| |
-|    |     |  |                                 |file size  <-+
-|    |     |  |                                 |           |
-|    |     |  |                                 |i-node     |
-|    |     |  |     +--------------------+      +-----------+
-|    |     |  |     | file status flags  |
-|    |     |  +-----> current file offset|
-|    |     |  +     | v-node pointer+------+     +----------+
-+----|-----+        +--------------------+ |     +v-node info
-                                           +---->+   v-data+-----+
-                                                 +----------+    |
-                                                                 |
-                                                +-----------+    |
-                                                |i-node info|    |
-                                                |file size  <----< 
-                                                |           |
-                                                | i-node    |
-                                                +-----------+
-#+end_example
-
-Each process that opens the same file gets its own file table entry
-(which indicates the status of a file opening). Every process has its
-own file table entry with its own current file offset. The offset
-changes as the process write. When the offset goes beyond the file size,
-the i-node entry is set to the current file offset.
-
-It is possible for more than one file desciptor entry to point to the
-same file table entry. =dup()= and =dup2()= duplicate an existing file
-descriptor. These duplicated file descriptors share the same file table
-entry. Another way to duplicate file descriptor is with the =fcntl=
-function. Opening or creating =/dev/fd/n= is identical to duplicate the
-corresponding file descriptor. The main use of =/dev/fd/n= is from the
-shell to allow programs that use pathname arguments to handle standard
-input and standard output in the same manner as other pathnames.
-
-#+begin_src sh
-filter file2 | cat file1 /dev/fd/0 file3 | lpr # sometimes a better choice for `-` and pipeline
-#+end_src
-
-To summarize, a file table entry (maintained by the kernel) is
-associated with a file descriptor of a certain process. The v-nodes are
-shared, maintained by the kernel.
-
-** Atomic Operation
+** Atomic I/O Operation
 :PROPERTIES:
 :CUSTOM_ID: atomic-operation
 :END:
+
 Atomicity here means for IO, the syscall either succeeds or does nothing
 at all.
+
+*** Concurrent Appending
+
+If two processes/threads are appending the same file, an =lseek= followed by a
+=write= may write to a region already written by another process/thread.
 
 The positioning to the current end of file and the write should be an
 atomic operation with regard to other processes. The UNIX system
 provides an atomic way to do this if we set the =O_APPEND= when a file
-is opened. The SUS includes two functions that allow applications to
-seek and perform I/O atomically: =pread= and =pwrite=.
+is opened.
+
+*** Atomic Check and Create
+
+=open= a file with =O_CREAT= and =O_EXCL=. If no file is found, it is created
+otherwise an error is raised. This atomic operation avoids overwriting a newly
+created file immdiately after the check.
+
+*** General Atomic Seek-Read/Write
+
+The SUS includes two functions that allow applications to
+seek and perform I/O atomically (simply because they are not affected by the
+current file offset): =pread= and =pwrite=.
 
 The =pread()= and =pwrite()= system calls are especially useful in
 multi-threaded applications. They allow multiple threads to perform I/O
 on the same file descriptor without being affected by changes to the
-file offset by other threads.
+file offset by other threads. Neither changes the current file offset.
+(Linux bugs) =pwrite= is affected by =O_APPEND= on Linux.
+
+*** Atomicity of read/write
+
+By [[https://pubs.opengroup.org/onlinepubs/9699919799/functions/V2_chap02.html#tag_15_09_07][Threaded Interactions with Regular File Operations]], reads and writes on
+regular files are atomic and do not interfere with each other in a multithreaded
+process.
+
+Between processes, the guarantee is weaker:
+
+#+begin_quote
+Writes can be serialized with respect to other reads and writes. If a read() of
+file data can be proven (by any means) to occur after a write() of the data, it
+must reflect that write(), even if the calls are made by different processes. A
+similar requirement applies to multiple write operations to the same file
+position. This is needed to guarantee the propagation of data from write() calls
+to subsequent read() calls. This requirement is particularly significant for
+networked file systems, where some caching schemes violate these semantics.
+#+end_quote
+
 
 ** Cache, delayed write
 :PROPERTIES:
@@ -246,10 +305,11 @@ page cache in the kernel through which most disk I/O passes. When
 writing data to a file, the data is normally copied by the kernel into
 one of its buffers and queued for writing to disk at some later time.
 
-The =sync=, =fsync= and =fdatasync= are provided to ensure consistency
-of the file system on disk with the contents of the buffer cache. The
-function =sync= is normally called periodically (usually every 30
-seconds) from a system daemon, often called =update=.
+The =sync=, =fsync= and =fdatasync= (in case for optimization) are provided to ensure consistency
+of the file system on disk with the contents of the buffer cache.
+
+The function =sync= is normally called periodically (usually every 30
+seconds) from a system daemon.
 
 ** =fcntl= function
 :PROPERTIES:
