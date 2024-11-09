@@ -1,5 +1,23 @@
 #+title: Windows 7 Support
 
+* Major [[https://learn.microsoft.com/en-us/previous-versions/windows/desktop/whatsnew/windows-7-api-list][New Features in Windows API Since XP]]
+
+- Conditional variables and reader-writer locks
+
+- Multiple threadpools per process
+
+- Wireless Hosted Network: Virtual Wi-Fi adapters and a SoftAP solution
+
+- Windows Web Services API: a native-code implementation of SOAP
+
+- User-Mode Scheduling (dropped in Windows 11)
+
+- Windows Ribbon Framework
+
+- Better multiprocessor support more than 64 logical processor with a few functions.
+
+- hardware-accelerated Direct2D and DirectWrite in place of GDI/GDI+
+
 * GCC
 
 As of 2024, still well supported up to the lastest version.

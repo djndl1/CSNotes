@@ -1,0 +1,17 @@
+#+title: Windows 10 Support
+
+* Major New API Features Since Windows 7
+
+- (8) WebSocket Protocol Component API
+
+- (8) XAudio2 API
+
+- (8) Windows Runtime
+
+- (10) WinUI
+
+- (10) UWP Apps
+
+* Visual Studio 2022
+
+At least 1909 or higher and 64-bit is now a must.
