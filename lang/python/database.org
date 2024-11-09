@@ -17,8 +17,11 @@ is not just a cursor and it performs various other database operations.
   + cursors are not isolated from each other.
   + has ~.description~ of columns and ~.rowcount~ of affected rows.
   + ~callproc()~, ~.execute()~ query or command, ~executemany()~ a query or command with a set of parameters.
-  + ~fetch*()~ may return a variety of data structures (list, dict).
+  + ~fetch*()~ may return a variety of data structures (tuple, list, dict, namedtuple or some
+    custom class).
   + some databases support multiple result sets ~.nextset()~
+  + ~cursor~ is not required to support the iterator protocol: use ~fetch*()~
+    for max compatibility
 
 - parameter styles:
   + =pymysql=: format or pyformat (=%(named)s= only)

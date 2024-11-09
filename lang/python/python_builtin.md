@@ -1,92 +1,96 @@
-# # Built-in Function
+# Unexpected Python Features
 
-- `all(iterable)`: true if all elements of the iterable are true, or if the iterable is empty.
+- `else`  of `for` and `while`: executed after the loop reaches its final iteration without a `break`.
 
-- `any(iterable)`: true if any element of the iterable is true.
+## `match` Pattern Match Statement(PEP 636, since Python 3.10)
 
-- `ascii(object)`: return a string containing printable representation of an object but escape the non-ASCII characters.
-
-```python
-In [28]: ascii('你好')
-Out[28]: "'\\u4f60\\u597d'"
-```
-
-- `bin(x)`: conert an integer number to a binary string with `0b`.
-
-- (3.7) `breakpoint(*args, **kws)`: drop into the debugger at the call site
-
-- `callable(object)`: true if the object has `__call__()` method.
-
-
-# Built-in types
-
-## sequences
-
-Sequences support some common operations.
-
-- `x (not) in seq`: tests if `x` is in `seq`.
-
-- `s + t`: concatenation. Concatenating immutable sequences always results in a new object.
-
-- `s * n`/`n * s`: they are not copied but referenced `n` times.
+The `case` keyword is always required.
 
 ```python
-In [32]: a*3
-Out[32]: [1, 23, 2, 4, 5, 'a', 1, 23, 2, 4, 5, 'a', 1, 23, 2, 4, 5, 'a']
+match expr:
+    case value1: # literal patterns
+        ...
+    case value2 | value2 | value3: # or pattern
+        ...
+    case (0, y): # unpack assignment
+        do_something_about_y
+    # class type pattern supports built-in types like str() and int()
+    case Point(x=x, y=y): # if expr produces a Point, this binds Point's attributes to x and y
+        ...
+    case Point(x, y): # or positional arguments
+        ...
+    case [Point(x, y)]: # nested pattern, a sequence pattern: the expression produces a list containing one Point
+        ...
+    case Point(x, y) if x == y: # add some constraints with if `guard`
+        ... 
+    case [x, y, *rest]: # matches a sequence of at least two elements without binding the rest to multiple variables; rest is a sequence
+        ...
+    case { "A": x, "B": y, **rest }: # matches a dictionary with `rest` for additional kv pairs.
+        ...
+    case Point(x, 2) as p: # matches and bind to a variable
+        ...
+    case ["go", ("north" | "south" | "east" | "west") as direction]: # capturing matched subpatterns ??? why parentheses
+        do_something_with_direction
+    case _: # wildcard pattern
+        ...
 ```
+
+## Position-Only, Keyword-Only Arguments
 
 ```python
->>> lists = [[]] * 3
->>> lists
-[[], [], []]
->>> lists[0].append(3)
->>> lists
-[[3], [3], [3]]
+def f(pos1, pos2, /, pos_or_kwd, *, kwd1, kwd2):
+      -----------    ----------     ----------
+        |             |                  |
+        |        Positional or keyword   |
+        |                                - Keyword only
+         -- Positional only
 ```
 
-- slicing `seq[i:j:k]`: empty if `i >= j`; if `i` or `j` > `len(s)`, use `len(s)`.  When `k` is negative, `i` and `j` are reduced to `len(s) - 1` if they are greater than `len(s)`.
+If `/` and `*` are not present in the function definition, arguments may be passed to a function by position or by keyword.
 
-- `len(s)`; `min(s)`; `max(s)`
+Also, with `/`, it is possible to have two parameters with the same name, one as a positional-only parameter and the other as a keyword-only parameter in `kwargs`.
 
-- `s.index(x[, i[, j]])`: inex of the first occurrence of x in s at or after index `i` and before index `j`.
+## Default Argument
 
-- `s.count(x)`: total number of occurrences of `x` in `s`
+The default value is evaluated only only once for a function. If the argument value is mutable:
 
-## Immutable and Mutable Sequence Types
+```python
+def f(a, L=[]):
+    L.append(a)
+    return L
 
-Immutables support `hash()` so that they can be used as `dict` keys.
+print(f(1))
+print(f(2))
+print(f(3))
+```
 
-Mutables accepts the following operations:
+prints
 
-- `del s[i:j]`: `s[i:j] = 0`
+```
+[1]
+[1, 2]
+[1, 2, 3]
+```
 
-- slicing assignment `s[i:j] = t`
+## Slicing Assigment
 
-- `s.append()`; `s.copy()`;  `s.insert()`; 
+Slicing may be used in assignment or deletion. Supposedly, in assigment, the elements in the slicing should be replaced. However, if the assign iterable is shorter or longer than the slice, the result is unexpected.
 
-- `s.pop()`; `s.remove()`; `s.clear()` (`del s[:]`);
+> If the target is a slicing: The primary expression in the reference is evaluated. It should yield a mutable sequence object (such as a list). The assigned object should be a sequence object of the same type. Next, the lower and upper bound expressions are evaluated, insofar they are present; defaults are zero and the sequence’s length. The bounds should evaluate to integers. If either bound is negative, the sequence’s length is added to it. The resulting bounds are clipped to lie between zero and the sequence’s length, inclusive. Finally, the sequence object is asked to replace the slice with the items of the assigned sequence. The length of the slice may be different from the length of the assigned sequence, thus changing the length of the target sequence, if the target sequence allows it.
 
-- `s.reverse()`
+```python
+# append, extend
+a[len(a):] = iterable
 
-- `s.extend(t)`; `s += t`; `s * n`;
+# insertion, where the index may be the end of the sequence
+# and this is how sequence.insert is defined
+s[i:i] = [x]
+# append is equal to
+s[len(s):len(s)] = [x]
+# and even worse
+s.insert(len(s) + 10, 5) # appends 5 ten times
+```
 
-### class `list([iterable])`
+## `del` 
 
-Lists are mutable sequences, typically used to store collections of homogeneous items. 
-
-- `.sort()`: using `<` comparisons
-
-### class `tuple([iterable])`
-
-Tuples are immutable sequences, typically used to store collections of heterogeneous data. It is actually the comma not the parentheses that makes a tuple.
-
-### `class range()`
-
-an immutable sequences of numbers. The advantage of the range type over a regular list or tuple is that a range object will always take the same (small) amount of memory, no matter the size of the range it represents (as it only stores the start, stop and step values, calculating individual items and subranges as needed).
-
-
-## Text Sequence Type -`str`
-
-Strings are immutable sequences of Unicode code points. There is also no mutable string type, but `str.join()` or `io.StringIO` can be used to efficiently construct strings from multiple fragments.
-
-If neither encoding nor errors is given, `str(object)` returns `object.__str__()`, which is the “informal” or nicely printable string representation of object. If `object` has no `__str__()`, it returns `repr(object)`.
+A variable may not be referenced after a `del` on the variable. `del` not only deletes the object recursively, `del` a variable removes the binding of the name.

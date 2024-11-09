@@ -1,33 +1,21 @@
-* Installation
+* Manual Installation (Root)
 
-- make a group =mysql= and system account =mysql=
+- make a group =mysql= and system account =mysql=; add the =mysql= user to the
+  =mysql= group
 
-- untar MySQL binary distribution.
+- Initialize the data directory at the MySQL root directory with the proper user.
 
-- Initialize the data directory at the MySQL root directory.
-  + =mkdir mysql-files=
-  + =chown mysql:mysql mysql-files=, =chmod 750 mysql-files=
-  + =bin/mysqld --initialize --user=mysql --basedir=installation_dir
-    --datadir=data_dir= (or these directories can be specified in =my.cnf= used
-    with ~--defaults-file~)
-    - the directory is checked and =mysql= system schema is created along with
-      its tables including data dictionary tables, grant tables, time zone
-      tables and server-side help tables and system tablespace and related data
-      structures to manage InnoDB tables.
-    - a ='root'@'localhost'= superuser is created with other reserved accounts.
-  + =bin/mysql_ssl_rsa_setup=
+- make =mysql= the owner of the data directory and =root= the owner of other files
 
-- Starts the server: =bin/mysqld_safe --user=mysql= or with a service manager.
+- run the server =mysqld_safe --user=mysql=
 
-- =mysql -u root -p= with the random generated password or skip the password if
-  the random one is not given after initialization.
-  + =ALTER USER 'root'@'localhost' IDENTIFIED BY 'chosen-password';=
+- populate the timezone info with =mysql_tzinfo_to_sql= to use various timezones.
 
 ** Testing
 
 - =mysqladmin version=, =mysqladmin variables=, =mysqladmin shutdown=
 
-- =mysqlshow=: Shows the structure of a MariaDB database
+- =mysqlshow=: Shows the structure of the database
 
 ** Transferring Databases
 

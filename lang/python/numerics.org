@@ -1,0 +1,40 @@
+#+title: Numerics
+
+* =numbers= abstract base classes
+
+A =numbers.Number= class is the root of the numeric hierarchy. Any numeric type
+is a =Number=. Numeric objects are immutable. Python's string representations of numbers
+are convertible to the value it represents and they have no leading or trailing
+zeros and are in base 10.
+
+Builtin numeric classes are =int= (inheriting from =numbers.Integral=,
+in turn from =numbers.Rational=), =bool= (from =int=) , =float= (from =nubmers.Real=) and =complex=
+(from =numbers.Complex=)
+
+** Builtin Numeric Types
+
+*** =bool=
+
+Not type-safe, unfortunately a subclass of =int=.
+
+*** =int=
+
+Integers with unlimited range. The initializer itself supports conversion from
+strings of various bases and classes implementing certain special methods.
+
+*** =float=
+
+Typically IEEE 754 double-precision floating-point number, consult
+=sys.float_info=.
+
+=float= passed to =int()= truncates.
+
+*** =complex=
+
+Floating-point complex number. Uses =j= instead of =i=
+
+** Operation Behaviors
+
+- integral division and modulo behaves not as in C: Python uses floored division
+  (the quotient is rounded down)
+  while C uses truncated division (the quotient is rounded toward zero)

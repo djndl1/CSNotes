@@ -1,0 +1,5 @@
+#+title: VB Test
+
+* =Debug.Assert=
+
+An assertion suspends execution if the expression evalutes to =False=

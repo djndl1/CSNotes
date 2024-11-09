@@ -1,61 +1,80 @@
-G#+TITLE: Oracle_admin
+#+TITLE: Oracle Admin
+#+bibliography: Oracle.bib
 
 * Common Tasks and Tools
 
 *** Common Tasks
 
 1. Installing/Upgrading software:
-
 2. creating databases
-
 3. Start/stopping the instance
-
 4. Managing the storage structures of the database
-
 5. Managing users and security
-
 6. Managing database objects
-
 7. Backup and recovery
-
 8. Monitoring and tuning the performance
 
 *** Tools
 
-1. Oralce Universal Installer
-
+1. Oracle Universal Installer
 2. Oracle Database Configuration Assistant
-
 3. Database Upgrade Assistant
-
 4. Net Configuration Assistant
-
 5. Oracle Enterprise Manager Database Express
-
 6. SQL Developer
 
-* Installation
+* Installation Consideration
 
-- System Identified (SID): unique identifier on the system
+** License Activation
 
-- Global database name: =database_name.database_domain=
+For oracle, a license is a piece of paper and there is nothing to activate.
 
-- Operating System Groups: administrative access to database is granted by
-  membership in certain OS groups.
+** Identifiers
+
+- *System Identifier* (SID): unique identifier on the system
+
+- *Global database name*: =database_name.database_domain=
+
+** OS Users
+
+Installing Oracle database software and running DBCA requires system administrative user privilege.
+
+- OSDBA group (Unix-only) =dba=
+
+** Editions & Installation Classes
+
+- *Installation Classes*: installation scheme not actual products.
+  + /Desktop/: minimal configuration with only basic choices
+  + /Server/: support enterprise-level applications and provides advanced
+    configuration options
+
+- *Editions*
+  + /Enterprise/: full-featured for enterprise-level apps for mission-critical,
+    high-security online transaction processing and data warehousing environments.
+  + /Standard Edition 2/: for department or workgroup-level apps and small or
+    medium-sized enterprises to provide core relational database management
+    services and options and mangement tools, full distribution, replication, web
+    features and facilities.
+
+** Installation Directories
+
+- Oracle Base =ORACLE_BASE=: a directory where Oracle data and some other components are placed;
+  + by default the =app/username= directory on the partition with the largest space available
+    on Windows or =u01= to =u09= (if present) or =$HOME= on Unix.
+
+- Oracle Home: Oracle database is installed in =ORACLE_HOME=, previously a
+  subdirectory of =ORACLE_BASE=.
+  + =ORACLE_HOME/bin= needs to be in =PATH=.
 
 ** Environment Variables
 
-- =ORACLE_SID=
-
 - On Unix, a profile file for shell, on Windows =HKLM:\Software\Oracle=
 
-- Oracle Base =ORACLE_BASE=: a directory where Oracle software is installed;
-  Oracle database is installed in =ORACLE_HOME=, a subdirectory of the base
-  directory. =ORACLE_HOME/bin= needs to be in =PATH=.
+- =ORACLE_SID=: the Oracle database system ID, by default =ORCL=
 
-** Creating A Database
+** Creating Database
 
-- Fast Recovery Option: LGWR can archive the inactive redo log group to recover all commited transactions, or to keep a standby database current with its original database.
+- Fast Recovery Option: LGWR can archive the inactive redo log group to recover all committed transactions, or to keep a standby database current with its original database.
 
 - Connection Mode:
   + Dedicated Server mode: default. each user process gets a server process. typical for persistent long running requests to the database.
@@ -63,10 +82,27 @@ G#+TITLE: Oracle_admin
 
 - =DATABASE_PROPERTIES=, =GLOBAL_NAME=, =V$DATABASE=
 
+*** Workload Template
+
+DBCA creates a database based on some template.
+
+- General Purpose or Transaction Processing: many concurrent users perform
+  numerous transactions that require rapid access to data. Availability, speed,
+  concurrency and recoverability are key issues.
+
+- Data Warehouse: numeric complex queries that process large volumes of data.
+  Response time, accuracy and availability are key issues.
+
+- Custom
+
+A user may create one's own DBCA template database for time saving, easy
+duplication, easy editing and easy sharing:
+A seed (full structure and data in RMAN backup format and a =.ctl= file) or a nonseed
+
 ** Database Service
 
 A named representation of one or more database instances, either a
-single-instance database or an RAC.
+single-instance database or an RAC, not OS background service.
 
 Database services are not just a name, but also units of resource management,
 performance measurement, editioning. It divides workloads of a single database
@@ -86,6 +122,74 @@ otherwise use =DBMS_SERVICE.CREATE_SERVICE=
 - =DBA_SERVICES=, =ALL_SERVICES=, =V$SERVICES=, =V$ACTIVE_SERVICES=,
   =V$SERVICE_STATS=, =V$SERVICE_EVENT=, =V$SERVICE_WAIT_CLASS=,
   =V$SERVICEMETRIC=, =V$SERVICEMETRIC_HISTORY=
+
+** Enterprise Manager Express[cite:@TwoDayDba]
+
+A web-based database management tool for performance management and monitoring, built inside the Oracle database on
+top of Oracle XML DB. *It is not a replacement for SQL Developer or SQL Plus and is still a WIP as of 19c*.
+
+Its overhead on the database server is negligible.
+
+#+begin_src
+# by default port at 5500
+https://database-hostname:port/em/
+#+end_src
+
+*** Features & Functionalities
+
+- *Performance Hub*: a view of all performance data for a give time range,
+  requires Oracle Diagnostics Pack (mainly Automatic Workload Repository AWR).
+
+*** Configuration
+
+If not sure which port is used, run
+
+#+begin_src sql
+
+-- show https port under the current pdb/cdb
+select dbms_xdb_config.gethttpsport() from dual;
+#+end_src
+
+Enabling EM requires configuring a XML DB service and a https port must be configured. Any user logged in
+should have certain privilege.
+
+- The =control_management_pack_access= parameter should be set to =DIAGNOSTIC=
+
+- The Oracle Net listener listens this port and should have such an entry.
+
+  #+begin_src
+(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=Desk-Of-P2-1694.cisdi.com. cn)(PORT=5500))(Security=(my_wallet_directory=D:\ORACLE_DATA\admin\orcl
+\xdb_wallet))(Presentation=HTTP)(Session=RAW))
+  #+end_src
+
+- A dispatcher must be configured for Oracle XML DB
+
+  #+begin_src
+dispatcher="(PROTOCOL=TCP)(SERVICE=<sid>XDB)"
+  #+end_src
+  And it should be available as a service
+  #+begin_src
+Service "orcl2023XDB.cisdi.com.cn" has 1 instance(s). Instance "orcl2023", status READY, has 1 handler(s) for this service. ..
+  #+end_src
+
+- A pdb/cdb may use the global CDB port or another port
+  #+begin_src sql
+-- enable the global http port for a pdb
+exec dbms_xdb_config.setglobalportenabled(True);
+
+-- use another one
+exec dbms_xdb_config.sethttpsport(5501);
+  #+end_src
+  If another port is configured, then another endpoint is reachable
+  #+begin_src
+(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=Desk-Of-P2-1694.cisdi.com. cn)(PORT=5501))(Security=(my_wallet_directory=D:\ORACLE_DATA\admin\orcl \xdb_wallet))(Presentation=HTTP)(Session=RAW))
+  #+end_src
+
+- an entry for XML DB is required in the Net listener, the service name is
+  =<SID>XDB= and a dispatcher (shared server mode) is required.
+
+- A user requires a role of =EM_EXPRESS_BASIC= (read-only) or =EM_EXPRESS_ALL= (Read-Write) to log into
+  EM Express (by defualt granted to =SYS= or =SYSTEM=).
 
 * Network Configuration
 
@@ -487,6 +591,10 @@ Logical storage units of a database that group related logical structures
   + /account status/ (locked or unlocked)
   + /password status/ (expired or not)
   + a user schema
+    + to access another schema, the schema prefix is required, otherwise, define
+      a synonym for that object or =alter session set
+      current_schema=that_schema= or use a after-logon trigger to set the
+      current schema.
   + a user also needs approprivate system privileges, object privileges and
     roles for its job.
 
@@ -790,3 +898,278 @@ database called the /Automatic Diagnostic Repository/.
         + =trace=: process trace files, SQL trace files and text-formatted alert
           logpp
         + others
+
+* Globalization & Localization
+
+Historically referred to as "National Language Support", which refers to
+choosing a national language and store data in a specific character set, not
+multilingual application support and support for accessing and running software from
+anywhere in the world.
+
+Globalization store, process and retrieve data in native languages. Database utilities, error messages, sort order, and date, time, monetary, numeric and calendar conventions automatically adapt to any native language and locale.
+
+** Common Tasks
+
+- Set up a globalization support environment
+- Choose, analyze or migrate character sets
+- Sort data linguistically
+- Customize locale data
+- Write programs in a global environment
+- Use unicode
+
+** Architecture & Features
+
+Implemented with the *Oracle NLS Runtime Library* (NLSRTL), a comprehensive suite
+of language-independent functions that perform proper text and character
+processing and language-convention manipulations, governed by a set of
+locale-specific data (=$ORACLE_HOME/nls/data=) identified and loaded at runtime on demand.
+
+*** Configuration Parameters
+
+Controlled by several parameters and environment variables on both the client
+and the server, with priority from the lowest to the highest
+
+- Database default values set during creation
+
+- *Initialization parameters* on the server
+
+- *Environment variables* on the client
+
+- Session NLS parameters with =ALTER SESSION=
+
+- In certain SQL functions =TO_CHAR=
+
+Default values are always used when evaluating expressions in
+virtual columns, CHECK constraints, and fine-grained auditing (FGA) rules which
+requires deterministic results for the during of their existence.
+
+Several session-independent parameters controls the database character set and
+the national character set.
+
+Each database session is started on behalf of a client, in the same or different
+locale setting. A client app initializes its NLS environment from environment
+settings and all local NLS operations are performed using these settings. Client
+session NLS parameters are initialized from the server instance's init parameter
+file and then altered by =ALTER SESSION= statements. If =NLS_LANG= is defined on
+the client side, an implicit =ALTER SESSIOIN= is issued to synchronize the
+client environment.
+
+If the client session specifies a different character set from the server's,
+conversion is done automatically. The conversion is perfomred at the client side
+if possible, if the client does not support the conversion, the server performs it.
+
+
+**** =NLS_LANG=
+
+The language and territory used by the client application and the database
+server and the client's charset for displayed data or entered data. The simplest
+way to specify locale behavior for Oracle database software.
+
+- components: =[language]_[territory].[charset]=
+  + Language settings affect day and month names, default sorting sequence, reading
+    direction.
+  + Territory settings affect day and week numbering, date format, decimal character
+    and group separator, currency symbols.
+  + Each language has a default charset associated with it if the charset is not set.
+  + all three are components are optional. Default values are =AMERICAN= for
+    the language, a derived value from the language value for the territory and
+    a default charset associated with language.
+
+- =NLS_LANG= determines the default values for other detailed NLS parameters.
+  Howevere, each of them can be set in the client environment or in the session to override the
+  value set by =NLS_LANG=.
+
+- =NLS_LANG= should reflect the setting for the client and correctly enable proper
+    data conversion. The server expects client-side data to be encoded in the
+    charset specified by =NLS_LANG=. Note that =NLS_LANG= does not force the client
+    to use the specified charset, only a hint to certain software components (other
+    wrappers and the server) that the charset should be expected. One may force
+    some other encoding by using raw code values only to input gibberish.
+    + (Unix) in case the OS charset is different from =NLS_LANG=, set =NLS_OS_CHARSET=.
+
+- If =NLS_LANG= is not set, it defaults to =AMERICAN_AMERICA.US7ASCII=
+  + =NLS_[NCHAR_]CHARACTERSET= in the database settings cannot be overrriden by
+    instance or session parameters.
+
+**** Data Dictionary Views Related to NLS
+
+- NLS session settings =NLS_SESSION_PARAMETERS= (=ALTER SESSION=) supersede NLS instance
+    settings =NLS_INSTANCES_PARAMETERS= (=ALTER SYSTEM=) which supersede NLS
+    database settings =NLS_DATABASE_PARAMETERS= (no way to change after the
+    database creation).
+
+- =V$NLS_VALID_VALUES=: valid NLS parameter values to choose
+
+- =V$NLS_PARAMETERS=: session parameters in use
+
+**** Other Find-Grained Parameters
+
+- =NLS_LANGUAGE=: by default derived from =NLS_LANG=, also subject to the OS language.
+
+- =NLS_TERRITORY=: Date format, decimal character and group separator, local
+  currency symbol, IOS currency symbol, Dual currency symbol, first day of the
+  week, first week of the year (ISO), credit and debit symbols IOS week flag, list separator
+
+- =NLS_DATE_FORMAT=, =NLS_DATE_LANGUAGE=, =NLS_TIMESTAMP_FORMAT=,
+  =NLS_TIMESTAMP_FORMAT=, =NLS_TIMESTAMP_TZ_FORMAT=, : used for
+  =TO_CHAR=, =TO_DATE=,
+
+- =NLS_CALENDAR=: Japanese Imperial, ROC Official, Persian, Thai Buddha, Arabic
+  Hijrah, English Hijrah, Ethiopian
+
+- =NLS_NUMERIC_CHARACTERS=: decimal character and group separator
+
+- =NLS_LIST_SEPARATOR=: =,=, =.=, =;= or =:=
+
+- =NLS_SORT=: a set of mathcing and comparison rules for character data
+  + either =BINARY= or =collation_name=
+
+- =NLS_COMP=: the comparison behavior and SQL operations whose determined
+  collation is =USING_NLS_COMP=
+
+- =NLS_NCHAR_CONV_EXCP=: whether conversion errors are reported between
+  =NCHAR=-family and =CHAR= family types.
+
+*** Features
+
+- *Language Support*: Languages are stored and encoded by Oracle-supported
+  character sets.  Additional support for a subset of the languages is available
+  + month names translation, sorting according to cultural conventions, proper date
+    formatting and display, translated error messages, translated user interface)
+
+- *Territory Support*: Cultural conventions specific to geographical locations:
+  local time format, date format, numeric and monetary conventions.
+
+- *Date and Time Formats*
+
+- *Monetary and Numeric Formats*: currency symbols, radix symbols and thousand separators.
+
+- *Calendar Systems*: Gregorian, Japanese Imperial, ROC Official, Thai Buddha,
+  Persian, English Hirah, Arabic Hijrah, Ethipian
+
+- *Linguistic Sorting*, or *Collation*: culturally accurate sorting and case convention.
+
+- *Character Set Support*: a large number of single-byte, multibyte and
+  fixed-width encoding schemes based on national, international and
+  vendor-specific standards.
+  + Unicode Support since Oracle 7: =AL32UTF8= for =CHAR=, =VARCHAR= etc. and
+    =NVARCHAR=, =NCHAR=, =NCLOB= (=AL16UTF16= and 3-byte =UTF8= only).
+
+- *Character Semantics*: useful for defining the storage requirements for
+  multibyte strings of varying widths in terms of characters instead of bytes.
+
+- *Locale Customization*: yes, customized locale in addition to builtin locales.
+
+
+** Character Set
+
+Character sets differ in
+
+- *character repertoire*: the characters available to used
+  + phonetic, ideographic, syllabary, punctuation, control characters, numbers
+    and symbols.
+
+- the scripts used for writing and the languages that they represent
+  + writing direction is ignored, the database store text in logical order, that
+    is, the order they are input.
+
+- the mapping between code points and characters.
+
+- the encoding scheme to represent a specific character
+
+In summary, what characters, what values they have and how are values encoded.
+
+Characters may be encoded in single bytes (7 bits or 8 bits) or multi bytes
+(fixed-width, variable-wdith or shift-sensitive variable-width)
+
+Oracle Database charsets are typically named in the form
+=<region><number of bits to represent a character><standard charset name>[S|C]=
+
+*** Character Sets In Oracle Database
+
+TLDR: Use =AL32UTF8= (as the database character set) and =AL16UTF16= (as the national character set so that a database
+without proper Unicode support may use Unicode) and set =NLS_LANG= to =.AL32UTF8= on clients.
+
+- *Database Character Set*:
+  + =CHAR=, =VARCHAR2=, =CLOB=, =LONG=
+  + Data dictionary data (yes! Chinese identifier names, including column names,
+    schema objects but not all database objects)
+  + SQL, PL/SQL source code
+
+- *National Character Set*: an alternate character set of =AL16UTF16= or 3-byte
+  partial implementation =UTF8=
+  + For =NCHAR=, =NVARCHAR2=, =NCLOB=
+  + NCS should only be considered if Unicode is required but the database
+    character set is not Unicode.
+
+Database/National character sets may not be changed after creation.
+
+*** How To Choose the Character Sets
+
+- the current and the future requirements: generally select =AL32UTF8= for support of
+  most languages in the world.
+
+- Client OS and application support
+
+- Conversion between the client and the server
+  + potential data loss due to unsupported character on one side. The server's
+    charset should be the superset of the client's.
+
+- Performance
+  + avoid charset conversion
+
+*** Length Semantics
+
+Text length may be measured in bytes or characters (code points). Oracle database supports
+defining text types in =BYTE= or =CHAR= qualifier. Or run =ALTER SESSION SET
+NLS_LENGTH_SEMANTICS=BYTE | CHAR= to set the implicit semantics when defining a
+column except in the =SYS= schema.
+=NLS_LENGTH_SEMANTICS= also works as an environment variable on the client or
+the server or initialization parameters (not recommended for compatibility
+reasons). The client's settings take priority. Character semantics is the
+default and the only allowable for national character types.
+
+Some functions and operators are charset-dependent: =SUBSTR=, =LENGHT=, =INSTR=, =LIKE=
+There are charset-independent variants =SUBSTRB=, =SUBSTR2=, =SUBSTR4=,
+=SUBSTRC= (Supplementary and Unicode composed characters are counted as one), =LIKE2= =LIKE4=, =LIKEC=
+
+*** Terminology
+
+- Superset/subset: the relationship between two charsets, in terms of characters
+  only.
+  + binary superset/subset: binary code values are required to be the same for
+    both charsets.
+
+*** Migration
+
+Database Migration Assistant for Unicode
+
+TODO
+
+*** National Character Set
+
+*** Application Support
+
+Oracle CLI apps on Unix (on Windows, only SQL Plus) support Unicode. However,
+they use the code pages specified by
+the system. Thus, =NLS_LANG= needs to match the system code page.
+
+**** ADO.NET
+
+- .NET Framework Data Provider For Oracle (from Microsoft)
+  + Requires Oracle 9i clients for =AL16UTF16= =NCHAR=, =NVARCHAR2= and =NCLOB= support.
+  + OCI character set is the expected character set on the client side.
+  + There is the environment NLS settings in OCI (associated with =NLS_LANG=),
+    used by OCI character set conversion functions.
+  + *The provider converts .NET UTF-16 strings to and from the multi-byte
+    strings used by OCI client libraries using the conversion functions in OCI
+    without understanding the conversion details*.
+    The .NET data provider doesn't know =NLS_LANG= and perform the conversion but
+    OCI does. OCI then performs any necessary step to convert to the server's
+    character set. There are two conversions here.
+  + Setting =Unicode=True= initializes the Oracle client libraries in UTF-16
+    mode, which saves the translation between .NET and OCI.
+
+* Bibliography
+
+#+print_bibliography:

@@ -1,0 +1,29 @@
+#+title: Text Strings
+
+* String Formatting
+
+Python supports named format fields since the old-style string interpolation.
+
+- (Since 3.6) /formatted string literals/ or /f-strings/:
+  =f/F'{expr[=][!conversion][:format]}'=.
+  + each expression is evaluated in the context where the formatted string
+    appears from left to right
+  + ~=~ displays the expression and the formatted result (for debugging): ="expr=formatted_result"=.
+  + =conversion= may be =a= (=ascii()=), =s= (=str()=), =r= (=repr()=) and runs
+    on the expression before formatting
+  + ={{=, =}}= to escape ={=, =}=
+  + After expression evaluation and possible conversion, the result is formatted
+    using the =format()= protocol.
+  + replacement expression may be nested to create dynamic format specifications =f'{value:{width}.{precision}}'=
+  + (Since 3.12) Reusing the outer quoting type inside a replacement field is permitted: =f"abc {a["x"]} def"=
+  + (Since 3.12) backslashes are now permitted inside a replacement field
+  + comment after the bracket of a field is permitted
+
+- ='{([argument_name]|[argument_position])[:format]}*'.format()'= TODO
+  + if a dict is passed as a positional argument, the format fields may contains
+    an indexer to access the value of the dict without quoting:
+    ='{0[ABC]}'.format({"ABC": 123})=
+
+- (*Deprecated*) /string interpolation/: old-style printf-style ='%format_specs' % arg_tuple/arg_dict=
+  + =%[(mapping_key, a.k.a argument name)][conversion_flags, #/0/-/ /+][field_width][.precision][useless_length_modifiern_in_python]conversion_type_as_in_C=.
+    This is where named parameters =%s(param_name)s= in DB-API 2.0 come from.

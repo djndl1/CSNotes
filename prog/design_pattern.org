@@ -148,3 +148,15 @@ Handlers are executed one after another by default unless a different publish st
 ******* Contravariant Handlers
 
 =IHandler<BaseRequest>= is a valid =IHandler<DerivedRequest>= and can handle  =DerivedRequest=.
+
+* Decorator Pattern
+
+A decorator extends the behavior of its wrapped object in the same interface.
+The behavior is augmented without defining an entirely new object. A subclass is
+defined statically, a decorator may be chosen and combined dynamically at
+runtime.
+Decorators add additional behavior without breaking the existing class or
+growing the class hierarchy. An object may be decorated multiple times to
+combine several behaviors.
+
+e.g. a data source, extensible by an cryptographic decorator or a compression decorator.

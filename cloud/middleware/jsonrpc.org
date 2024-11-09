@@ -1,0 +1,50 @@
+#+title: Jsonrpc
+
+Stateless, transport-agnostic light-weight RPC protocol.
+
+* Request
+
+#+begin_src json
+{
+    "jsonrpc": "2.0",
+    "method": "MethodNameToInvoke",
+    "params": "OptionalStructuredValue, positional through an array, by name through an object",
+    "id": "Request id. If omitted, then it is a notification and no response is returned"
+}
+#+end_src
+
+* Response
+
+#+begin_src json
+{
+    "jsonrpc": "2.0",
+    "result": "required on success, missing on error",
+    "error": "required on error, missing on success"
+    "id": "required, the same as in the request. Useful when responding to multiple requests in a batch"
+}
+#+end_src
+
+** Error Object
+
+#+begin_src json
+{
+    "code": codeNumber,
+    "message": "error text message",
+    "data": "additional error info"
+}
+#+end_src
+
+* Batch
+
+The client may send multiple requests at a time in an Array and the server
+responds with an Array containing corresponding responses based on request IDs
+in any order after all requests are processed.
+An invalid batch request results in a single error response.
+
+* Implementations
+
+** Python
+
+- [[https://github.com/pavlov99/json-rpc][json-rpc]]
+
+- and various _openrpc_ implementations

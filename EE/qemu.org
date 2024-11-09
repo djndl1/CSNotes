@@ -1,3 +1,17 @@
 #+title: Qemu
 
 ARM virt machine requires a firmware to start.
+
+* Networking
+
+** Bridging
+
+The VM part is relatively easy: set the bridge device name.
+Network manager can create a bridge, but the GUI does not bring up the slave
+(the bridging target). =nmcli= is required to bring up the slave. Also, a bridge
+cannot be bound to a WiFi device.
+
+#+begin_src sh
+nmcli conn up bridge-conn
+nmcli conn up bridge-slave-conn
+#+end_src

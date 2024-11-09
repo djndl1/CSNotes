@@ -1,0 +1,46 @@
+#+title: Oracle Architecture
+
+Typically a Oracle DBMS has
+
+- Kernel code: for memory and storage management
+
+- repository of metadata: dat dictionary
+
+- query language
+
+* Data Structures
+
+** Data Dictionary
+
+A set of read-only tables that provides administrative metadata about the
+database. e.g. schema object defintions, allocated space for schema objects,
+database users, privileges and roles The data dictionary base tables are the
+first objects in any OracleDB, stored in the =SYSTEM= tablespace, owned by the
+=SYS= user are never meant to be written by users.
+
+Metadata are stored in *base tables*, exposed to users via *views*. A set of
+data typically (not always) consists of three views with different prefixes:
+
+- =DBA_=: for database admins, containing all objects in the entire database.
+
+- =ALL_=: for all users, containing all accessible objects
+
+- =USER_=: objects owned by a user
+
+A complete list of data dictionary views are listed in the =Dictionary= view.
+Synonyms are defined for many data dictionary views.
+=DUAL= is also part of the data dictionary
+
+=DBMS_METADATA= provides interfaces for extracting complete definitions of
+database objects.
+
+** Dynamic Performance Views
+
+A set of *virtual tables* (not real tables, built from memory structures) or *fixed views* (not modifiable)
+that record current database activity, prefixed by =V$=, (=$GV= versions are
+global to all instances).
+e.g. System and session parameters; memory usage and allocation; file states;
+progress of jobs and tasks; SQL execution; statistics and metrics.
+
+
+Read consistency is not guaranteed due to constant update.

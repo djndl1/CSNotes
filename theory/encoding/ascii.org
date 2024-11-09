@@ -138,7 +138,8 @@ identification message, the status of the remote station.
 - =FS= (=^\=); =GS= (=^]=); =RS= =^^=; =US=, =^_= :: delimiters to mark fields
   of data structures.
 
-- =SP=, =0x20= :: space
+- =SP=, =0x20= :: space; technically not a control character but the first
+  printable character.
 
 - =DEL=, =0x7F=, =^?= :: delete; ignored; used to delete characters on punched
   tape by punching out all the holes.
@@ -146,3 +147,8 @@ identification message, the status of the remote station.
 ** C1
 
 - =NEL=, =0x85= :: equivalent to =CRLF=, match the EBCDIC control character.
+
+
+* Printable Characters
+
+Leters, digits, and punctuation marks and other symbols.

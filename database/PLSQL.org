@@ -1,5 +1,125 @@
 #+TITLE: Plsql
 
+* Tools
+
+- =TNS_ADMIN=: sets the location of =tnsnames.ora=
+
+- =ORACLE_PATH= (Unix), =SQLPATH= (Windows registry entry, by default =ORACLE_HOME/DBS=): the location of SQL scripts
+
+*DML statement Warning*: both SQL*Plus and SQL Developer does not commit a DML
+statement automatically and the ongoing transaction might hold cause the table
+to be locked and other clients may not be able to access the data. Be careful
+when using such tools on a production server. OracleDB issues an implicit
+=COMMIT= statement before and after any DDL statement. Therefore one cannot
+rollback a DDL.
+
+** SQL*Plus
+
+- configuration profile scripts:
+  + site profile =$ORACLE_HOME/sqlplus/admin/glogin.sql=
+  + user profile =login.sql= under the directories and subdirectories =$ORACLE_PATH=
+
+- =HELP COMMAND= show related SQL*Plus command description.
+
+*** Logon
+
+- =/NOLOG= for connectionless startup to perform certain administrative operations.
+
+- =/= represents a default logon using OS authentication.
+
+*** Settings & System Variables
+
+A list of settings that affect the way SQL*Plus runs. Set by =SET= and shown by =SHOW=
+
+*** Run Commands & Scripts
+
+There are three kinds of commands in SQL*Plus
+
+1. SQL Commands
+   + ended with a semicolon =;=, with a slash =/= on a line by itself, or with a
+     blank line, which saves the text in the buffer without running it.
+
+2. PL/SQL blocks
+   + =;= or =blank liens does not termiante and execute a block. =.= or =/= on a new line by itself does.
+   + =EXECUTE PL/SQL_ONE_LINER= without a =BEGIN...END= block.
+
+3. SQL*Plus commands for query results, setting options and editing and storing
+   SQL commands and PL/SQL blocks.
+   + Ended with a line ending.
+   + Continued with a hyphen =-=.
+
+DML (insert, update, delete) Changes made to the database are not commited automatically unless certain other
+commands (DDL, DCL) are entered or an explicit commit is issued. =SET AUTOCOMMIT
+ON= commits DML automatically.
+
+There is a buffer storing the last Command text (except an SQL*Plus Command) executed, shown by =LIST=, run by =RUN=
+or =/=,
+edited by =EDIT=
+
+**** Common SQL*Plus Commands
+
+- =DESC[RIBE] TABLE= shows the structure of an object.
+
+- To run a shell command, use =HOST SHELL_COMMAND=.
+
+- =START script.sql [args...]= or =@script.sql [args...]= runs a script
+
+- =DEFINE=, =UNDEFINE=: define variables as substitution variables.
+  + Substitution variables are not SQL parameters. Prefix =&= to substitute for
+    its value. Substitution variables are substituted by SQL*Plus, dynamically
+    changing SQLs.
+
+- =VAR[IABLE]=: define bind variables, real SQL variables, referenced by =:VariableName=
+  + =PRINT= prints a variable, including a refcursor variable (result set).
+    SQL*Plus, unlike DBeaver, is able to output the result set from a PL/SQL
+    block without defining and printing a refcursor bind variable.
+
+**** Comments
+
+=--= single line comments or =/* */= C-style block comments.
+
+Comments cannot appear in certain positions
+
+- within a statement
+
+- immediately after a =;= or before a =;=
+
+- no =&= within any comment. Or =SET DEFINE OFF= to prevent scanning for the
+  substitution character.
+
+*** Output
+
+The output rendering of SQLPlus is abysmal. However, it provides =-MARKUP "HTML
+ON"= or =-MARKUP "CSV ON"= to allow query output as HTML or CSV. =SHOW MARKUP=
+shows the markup option status. =SET MARKUP HTML/CSV ON/OFF=. For interactive
+use, this may seem unintuitive unless redirected to a file and opened with a
+browser/editor. Also, HTML output styles are customizable through various
+settings. These output formats allow SQLPlus to generate reports. To use HTML
+output interactively, pipe it to =tee= and output to an HTML file. Various
+output format commands also helps generate reports.
+
+- =SET PAUSE ON=: stops on output of each page
+
+- =-SILENT= is used when SQLPlus is embedded so that it is not visible.
+
+*** Scripting
+
+Line editing in SQL*Plus is worse than old DOS command processor. Its editing
+capability is even worse than old Unix's =ed=:
+
+- =A text= (append), =INPUT= (insert at the current line), =C/old/new= (change), =C/text= (delete), =DEL= (the current line),
+  =LIST= (list lines in the buffer or move to a line), =N= (set the
+  current line to the number) See the SQL*Plus reference for all line
+  editing commands.
+
+However,
+SQL*Plus supports editing scripts and the buffer text using an external editor
+(=_EDITOR= system variable, default to notepad.exe on Windows).
+
+*** Globalization
+
+SQL*Plus understands =NLS_LANG= and uses the charset in =NLS_LANG= for data processing.
+
 * Blocks, Functions and Procedures
 
 #+begin_src sql
@@ -29,6 +149,44 @@ Blocks with =CREATE OR REPLACE PROCEDURE procedure_name (parameter_list) as=
 
 PL/SQL blocks can be nested.
 
+** Triggers
+
+A PL/SQL unit that executes in response to a specified event
+
+#+begin_src sql
+TRIGGER trigger_name
+        triggering_event
+        [ trigger_restriction ]
+
+BEGIN
+-- body
+END;
+#+end_src
+
+Triggers may be disabled/enabled separately or altogether if they are associated
+with a table (=ALTER TABLE TRIGGER_NAME DISABLE/ENABLE ALL TRIGGERS=)
+
+*** Events
+
+- DML statement
+
+- DDL statement
+
+- Database operation =LOGON=, =LOGOFF=, =STARTUP=, =SHUTDOWN=, =SERVERERROR=
+
+A trigger may be *simple* (triggered before or after a statement is run or a row
+is affected), *composite* (multiple timing points).
+
+If a row trigger is fired, the row record before and after the event is retrievable
+with two variable =:OLD= (none for =INSERT=) and =:NEW= (none for =DELETION=).
+
+An =INSTEAD OF= trigger is executed instead of executing the triggering DML
+statement on a view. An =INSTEAD OF= trigger is useful to update certain columns
+(generated) of a view by updating the underlying table.
+
+A *system trigger* is defined on a schema or the database.
+
+
 ** Packages
 
 A library in a database
@@ -55,7 +213,7 @@ A library in a database
 #+begin_src sql
 IF conditional THEN
     statements
-[ELSIF conditional2 THEN
+[ELSIF conditional2 THEN -- the only difference from BASIC
        statements
 ]...
 [ELSE
@@ -85,6 +243,8 @@ CASE
 END CASE;]
 #+end_src
 
+- =NVL=, =NVL2= and =DECODE= are all special conditional functions, especially =DECODE=
+
 ** Loop
 
 =EXIT=, =EXIT WHEN=; =CONTINUE=, =CONTINUE WHEN= can be anywhere inside a loop.
@@ -107,6 +267,31 @@ END LOOP [ label ];
 END LOOP [ label ];
 #+end_src
 
+* Error Handling
+
+PL/SQL supports exception and provides many predefined exceptions for many
+operations and error conditions.
+
+#+begin_src sql
+-- catch exceptions
+
+begin
+
+exception
+    when certain_exception_name then
+    error_handling_code;
+
+    when certain_exception_name1 OR certain_exception_name2 then
+    error_handling_code;
+
+    when others then -- default catch
+        raise; -- rethrow
+end;
+#+end_src
+
+To raise custom exceptions, define variable of the =EXCEPTION= type and raise
+them. To catch them, use the variable names.
+
 * PL/SQL-Specific Types
 
 ** =BOOLEAN=
@@ -125,7 +310,20 @@ Machine-level 32-bit signed integer with overflow check
 
 **** Table Types: PL/SQL associative arrays
 
-A set of key-value pairs indexed by =varchar2=, =varchar=, =long= or =PLS_INTEGER=.
+A set of key-value pairs indexed by =varchar2=, =varchar=, =long= or
+=PLS_INTEGER=.
+The sort order of an associative array indexed by =varchar2= is affected by NLS parameters
+
+- Has a fixed declared maximum size.
+
+- declaration is empty initialization.
+
+- a constant associative array can only be initialized by an initializer function.
+
+- Cannot be declared outside a package.
+
+- used for passing collections to/from the database server.
+
 
 #+begin_src sql
 set serveroutput on;
@@ -163,19 +361,7 @@ name_table(idx) := value;
   END;
 #+END_SRC
 
-The sort order of an associative array is affected by NLS parameters
-
-**** Associative Arrays
-
-- Has a fixed declared maximum size.
-
-- declaration is empty initialization.
-
-- a constant associative array can only be initialized by an initializer function.
-
-- Cannot be declared outside a package.
-
-- used for passing collections to/from the database server.
+To populate an associative array without looping, use =SElECT BULK COLLECT INTO assoc_array=
 
 **** Varrays
 
@@ -298,6 +484,8 @@ Cursor is more like a C# =IEnumerable= and than a =IEnumerator=
 
 ** Implicit Cursors
 
+Every time a DML or =SELECT INTO=  is run, an implicit cursor is opened.
+
 Constructed and managed by PL/SQL. It closes after the associated statement runs.
 
 *** Implicit Cursor Attribute
@@ -309,6 +497,9 @@ SQL%ISOPEN/FOUND/NOTFOUND/ROWCOUNT/BULK_ROWCOUNT/BULK_EXCEPTION
 #+end_src
 
 ** Explicit Cursors (Named Cursors)
+
+Explicit/declared cursors has a name and is associated with a query. It may be
+used with a FOR-IN-LOOP or opened-fetched-closed explicit.
 
 1. Declare and define a cursor and associate it with a query
 
@@ -358,6 +549,16 @@ BEGIN
   CLOSE c1;
 END;
 #+end_src
+
+*** Cursor Variable =REF CURSOR= or =SYS_REFCURSOR=
+
+Unlike a cursor that is bound to a certain query, a cursor variable is useful
+for passing query results between subprograms. A strong =REF CURSOR= specifis a
+return type and the query must return this type. A weak ref cursor (predefined
+=SYS_REFCURSOR=) does not
+specify a return type.
+
+=OPEN cursor_variable for query= binds a cursor variable to a query.
 
 ** Processing Cursors
 
@@ -415,11 +616,70 @@ SELECT ... BULK COLLECT INTO <collection_name> FROM ...
 
 * Object-Relational SQL
 
-Doesn't seem to be useful for app code since support for UDT by client drivers is scarece.
+Doesn't seem to be useful for app code since support for UDT by client drivers is scarce.
 
 * Troubleshooting
 
-** Prevent Implicit Data Conversion
+** DBeaver Not Reporting Errors When Compiling Procedures
+
+query =USER_ERRORS=, =ALL_ERRORS= and =DBA_ERRORS= etc.
+
+** Remote Debugging With SQL Developer
+
+SQL Developer by default uses =DBMS_DEBUG_JWDP= package to connect the server
+back to a listening debugger on the client.
+
+*** Debug Launch
+
+- Compile a procedure for debug
+  #+begin_src sql
+ALTER PROCEDURE | FUNCTION PROCNAME COMPILE DEBUG | PLSQL_OPTIMIZE_LEVEL = 1;
+  #+end_src
+
+- grant the user =DEBUG CONNECT SESSION= and =EXECUTE= on the target procedure
+  and the =DBMS_DEBUG_JDWP= package.
+
+- Give JDWP ACL privilege to the user
+  #+begin_src sql
+BEGIN
+ DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE
+ (
+ host => '*', -- client ip, possibly with wildward
+ lower_port => null,
+ upper_port => null,
+ ace => xs$ace_type(privilege_list => xs$name_list('jdwp'),
+                    principal_name => '<UserName>'',
+                    principal_type => xs_acl.ptype_db)
+ );
+END;
+  #+end_src
+
+- Configure SQL Developer (in Preferences) to restrict the port so that the
+  client may configure its firewall rule
+
+- If the connection failed, try using SSH remote forwarding, sometimes the
+  connection doesn't work on VPN.
+
+** Debug Attach
+
+- Start A listener (right click the connection in SQL Developer and choose
+  Debug-Remote Debug)
+
+- In another session, establish JDWP connection to the listener. (Possibly requiring =DEBUG CONNECT
+  ANY= or =DEBUG CONNECT USER <user>= to debug other users' sessions)
+
+  #+begin_src sql
+begin
+    dbms_debug_jdwp.connect_tcp('listener_host', 'listener_port');
+end;
+  #+end_src
+
+- run the target procedure (possibly breakpointed) in another session.
+
+- the debug session starts and any breakpoint may halt the execution.
+
+One may create a login trigger and connect to the debugger there if the user
+cannot connect to the debugger manually.** Prevent Implicit Data Conversion
 
 - Use anchors in variable declaration
 
@@ -484,3 +744,109 @@ begin
          commit;
 end log_debug;
 #+end_src
+
+* Recommended Practice For Scalability
+** Use Bind Variables
+
+Bind variables improve performance (hard parsed once and soft parsed with
+different bind variables) and security (against SQL injection).
+
+** Use PL/SQL
+
+PL/SQL is optimized for db access  and silently caches statements to avoid a
+reparse.
+
+=EXECUTE IMMEDIDATE= caches sql statements. The =DBMS_SQL= package has better
+support for dynamic SQL.
+=OPEN cursor FOR query= is optimized if the cursor is a declared one, not a
+cursor variable.
+
+** Use Bulk SQL (=COLLECT INTO collection=)
+
+When retrieving a set of rows from the database, processing the rows and returning the
+whole set to the database, bulk SQL reduce the number of round trips. Bulk SQL
+is not needed if only read from the database
+is involved. However, bulk SQL uses more CPU resources and requires more code.
+
+** Concurrency
+
+- *Data Concurrency*: ensures the users can access data at the same time.
+
+- *Data Consistency*: ensures that each user sees a consistent view of the data.
+  + OracleDB maintains data consistency by using a multiversion consistency
+    model and various types of locks and transaction isolation levels.
+
+OracleDB provides a *serializable* isolation category that appears to be a
+single-user database. For most cases, read committed isolation is perfect.
+
+*Sequences* offer atomic integer generation without using an explicit lock.
+
+A latch is a simple low-level serialization mechanism that coordinates multiuser
+access to shared data structures. More latches means less scalability.
+
+OracleDB uses nonblocking I/O to allow queries execute concurrently.
+
+SQLs are compiled and shared.
+
+** Use Set-based Processing Techniques Instead of Iterative Data Processing
+
+- Iterative process:
+  + row by row loop
+  + batch by batch into an array
+  + manually start multiple PL/SQL programs
+
+- Set-based process: the SQl statement defines the result and allows the
+  database to determine the most efficient way to obtain it, eliminating the
+  network round-trip and the database API overhead. Parallelism and optimization
+  are managed by the database.
+
+  #+begin_src sql
+INSERT INTO A SELECT * FROM B;
+  #+end_src
+
+
+** Use Instrumentation Packages
+
+*** =DBMS_APPLICATION_INFO=
+
+Track performance by module
+
+TODO
+
+*** =DBMS_SESSION=
+
+access session information and set preferences and security levels
+
+TODO
+
+*** =UTIL_FILE=
+
+read and write OS text files
+
+TODO
+
+** Use Editioning Views
+
+TODO
+* Application Example
+
+** Security Design
+
+The data is owned by =app_data=, two packages, one =employees_pkg= for application
+users, one =admin_pkg= for administrators are owned by =app_code= and
+=app_admin= respectively. Two additional users =app_user= and =app_admin_user=
+are given privileges to access the two packages to access the data: A three-tier
+architecture.
+
+Only one user may access all data and two middle-tier users may access certain
+permitted data and other users may only access data through the predefined
+interface exposed by the middle tier.
+
+** Data Integrity
+
+In addition to constraints, triggers may be used to validate data and enforce
+data integrity in case where invalid data are input, an application error is
+raised within the trigger. The trigger may choose to =lock= the table =in share
+mode= throughout the transaction to ensure that the stored criteria is not changed and
+when the validated data is saved into the database, the data is still valid.
+

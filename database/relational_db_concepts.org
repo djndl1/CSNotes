@@ -1,0 +1,130 @@
+#+title: Relational Database Concepts
+
+Historically, DBMS were hierarchical or networked. Data were stored in rigid,
+predetermined relationships. No standard DDL and query language existed.
+
+A relational model offers well-defined structures of data, clearly defined
+actions to manipulate the data and structures and a database and enforces
+integrity rules governing operations on the data and structures of a database.
+
+A relational DBMS stores data in a set of simple relations, which is a set of
+tuples, an unordered set of attribute values. A table is a two-dimensional
+representation of a relation in the forms of rows and columns.
+
+* Set Theory
+
+A set is informally defined as "a collection of definite distinguishable
+things". By "distinguishable", we must be able to decide whether they are
+different. By "definite", we are able to know what the thing is and whether it
+is a member of the set: a defining property is required to give a definition of
+a set. The definition is the *database design* the enumeration is the *database*
+itself.
+
+** Relations
+
+SQL dbs are relational!
+
+A set of unordered n-tuples forms a *relation*, an extension to the relation in
+set theory. In SQL, a tuple is called a *row*.
+Each element in a tuple is an *attribute* (in SQL a column value).
+For anything we don't know, not applicable or nothing, or  in SQL, we refer to
+it as =NULL=.
+
+However, in SQLDBs, apparently, we have duplicates in a table unlike in a set.
+But they are meant to denote the same entity so in theory, duplicates should not
+exist in a table and a table should be a relation.
+otherwise it is a design flaw.
+
+Since rows are not supposed to be duplicated, they have identities, or some
+combinations of columns (*keys*) that will uniquely identify each row.
+
+** Set Operations
+
+- *Identity* =FROM TABLE_NAME=
+
+- *Cartesian Product* =FROM TABLE_1, TABLE_2=
+
+- *Search Condition* =WHERE=
+
+- *Join*
+
+- *Projection* =SELECT ...=
+
+SQL is nonprocedural but the set operations themselves run one after another
+conceptually.
+There may or may not be a virtual table for =FROM table= before one can select
+from the virtual table.
+
+* Normalization
+
+1. *First Normal Form* (1NF): Each column of a table may take on only a single,
+   non-repeating (atomic) value for each row of the table.
+
+2. *Second Normal Form* (requires 1NF): In every row of a table, each column
+   must be dependent on every part of the key
+   + if a column C1 limits the possible values in C2 to a specific set, then
+     C2 is *set dependent* on C1.
+   + If for each row, the value of column C1 uniquely determines the value of
+     column C2, then C2 is *functionally dependent* on C1.
+   + if column does not meet the requirement, it should be moved to another
+     table with its dependent column(s) as the key so that it fully depends on
+     the key.
+
+3. *Third Normal Form* (requires 1NF 2NF): in every row of table, all columns must depend directly
+   on the key, without any transitive dependencies (C1 dependent on C2 and C2
+   dependent on C3, then C1 is transitively dependent on C3) through other columns.
+
+** Tips for Normalized Tables
+
+- Make sure that each table represents just one subject, either one object or one
+event.
+
+- Define a primary key for each table so that joining tables and unique
+identities are possible.
+
+- Do not define multi-value columns.
+
+- Implement data integrity: unique keys, foreign keys.
+
+* SQL Environment
+
+All SQL operations are executed within an SQL-environment. An SQL-environment
+has six components:
+
+- *SQL agent*: an application that calls one or more externally invoked procedures
+  in an SQL-client module.
+
+- *SQL implementation*: a RDBMS that executes SQL statements.
+
+- *SQL client modules*: each contains zero or more externally-invoked procedures.
+
+- *Authorization IDs*: representing a user of SQL data
+
+- *Catalogs*
+
+- *Sites*
+
+* SQL Objects
+
+Each SQL object is defined in terms of the *chracteristics* that describes it,
+called *descriptor*.
+
+** Cluster
+
+the group of *catalogs* available to an SQL session at any point in time, and it
+contaisn all the SQL data accessible through a given SQL server.
+
+** Authorization ID
+
+a character string which identifies a user (an actual person or an application
+program)
+and the set of privileges belonging to the user.
+
+** Privilege
+
+** Catalog
+
+A named group of *schemas*, one of which named =INFORMATION_SCHEMA= which
+contains the descriptions of all the SQL data belonging to that catalog.
+
+Catalogs are dependent on some cluster.

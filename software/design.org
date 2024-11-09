@@ -1,5 +1,26 @@
 #+TITLE: Design
 
+* Inversion of Control
+
+#+begin_quote
+Don't call us, we'll call you.
+#+end_quote
+
+- (Inverting the control flow between reusable code and client code) originally, this refers to the framework (external code) controls the flow of
+  control and the client only writes custom code, in contrast with the
+  traditional procedural programming, where the user writes an entry function
+  (=main=)  to control the overall flow of control. The custom code simply fill
+  in the blanks to achieve required functionality.
+  + Inversion of control is commonly used in moderl GUI/web framework where the
+    framework dispathces/routes events/requests to handlers/endpoints.
+  + inversion of control separates the reusable code and the problem-specific
+    code even though they operate together in an app.
+
+- (Inverting control over the implementations of dependencies)
+  Later enterprise app design refers to granting the framework control over the
+  implementations of dependencies that are used by application objects rather
+  than the application consumer objects.
+
 * Design Patterns
 
 ** Mediator Pattern

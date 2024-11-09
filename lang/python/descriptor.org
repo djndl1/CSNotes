@@ -1,0 +1,34 @@
+#+title: Descriptor
+
+#+begin_quote
+In general, a descriptor is an object attribute with “binding behavior”, one
+whose attribute access has been overridden by methods in the descriptor
+protocol. Those methods are __get__(), __set__(), and __delete__(). If any of
+those methods are defined for an object, it is said to be a descriptor.
+
+The default behavior for attribute access is to get, set, or delete the
+attribute from an object’s dictionary.
+#+end_quote
+
+* Mechanism
+
+Descriptors are general-prupose protocol behind properties, methods, static
+methods, class methods and =super()=.
+
+Any object with any of the following methods are considered a descriptor.
+
+#+begin_src python
+descr.__get__(self, obj, type=None) -> value
+descr.__set__(self, obj, value) -> None
+descr.__delete__(self, obj) -> None
+#+end_src
+
+- *data descriptor* :: with =__set()__= or =__delete()__=
+  + read-only data descriptor defines a valid =__get__()= and a =__set__()=
+    raising an =AttributeError=
+
+- *non-data descriptor* :: with only =__get__()=
+
+A descriptor can be called directly by its method name, or automatically invoked
+upon attribute access if the attribute defines the corresponding descriptor
+method. Descriptors are invoked by the =__getattribute__()= method.

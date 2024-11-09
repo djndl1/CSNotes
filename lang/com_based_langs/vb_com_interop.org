@@ -1,0 +1,114 @@
+#+title: VB Classic COM/C Interoperation
+
+VB Classes are themselves COM objects.
+
+* Invoking C Functions
+
+VBA may invoke external C functions with the =stdcall= calling convention.
+
+#+begin_src vba
+[Private/Public] Declare [ptrsafe] Sub void-func-name Lib "libname" [Alias "symbolname"] [(parameters)]
+[Private/Public] Declare [ptrsafe] Function func-name Lib "libname" [Alias "symbolname"] [(parameters)] [function-type]
+#+end_src
+
+- =PtrSafe= is introduced in VB7 to assert that a =Declare= statement targets
+  64-bit development environments.
+
+
+#+begin_src vba
+Private Declare Function WaitForSingleObject Lib "kernel32" _
+    (ByVal hHandle As Long, ByVal dwMilliseconds As Long) As Long
+Private Declare Function OpenProcess Lib "kernel32" (ByVal dwAccess As _
+    Long, ByVal fInherit As Integer, ByVal hObject As Long) As Long
+Private Declare Function CloseHandle Lib "kernel32" _
+    (ByVal hObject As Long) As Long
+
+' Wait for a number of milliseconds, and return the running status of a
+' process. If argument is omitted, wait until the process terminates.
+Function WaitForProcess(taskId As Long, Optional msecs As Long = -1) _
+    As Boolean
+    Dim procHandle As Long
+    ' Get the process handle.
+    procHandle = OpenProcess(&H100000, True, taskId)
+    ' Check for its signaled status; return to caller.
+    WaitForProcess = WaitForSingleObject(procHandle, msecs) <> -1
+    ' Close the handle.
+    CloseHandle procHandle
+End Function
+#+end_src
+
+* Exposing VB API
+
+VB API=s are exposed as COM servers and thus only public class modules are exposed.
+
+* .NET Interop and COM
+
+**  Issues
+
+- Somehow, VBA loads .NET 2-3.5 even if .NET 4 typelib is referenced. It needs a
+  =appname.exe.config= with the following configuration.
+
+  #+begin_src xml
+  <configuration>
+    <startup useLegacyV2RuntimeActivationPolicy="true">
+      <supportedRuntime version="v4.0"/>
+    </startup>
+  </configuration>
+  #+end_src
+
+  See [[http://web.archive.org/web/20130128072944/http://www.marklio.com/marklio/PermaLink,guid,ecc34c3c-be44-4422-86b7-900900e451f9.aspx][What is useLegacyV2RuntimeActivationPolicy for?]]. This disables in-process
+  side-by-side of different .NET versions and uses the specified version.
+
+  #+begin_quote
+  All these have a “single runtime per process” view of the world, so we try to
+  make those codepaths believe they still exist in that world by “unifying” the
+  version that they see.  After a given version has been chosen by one of these
+  codepaths, that’s the version that all of them see for the remainder of the
+  process lifetime.  Additionally, all of these activation paths had some kind of
+  roll-forward semantics associated with them.
+  #+end_quote
+
+  This reason why by default .NET 2.0 is loaded is backward compatiblity:
+
+  #+begin_quote
+  We “cap” those semantics at v2,
+  meaning by default none of these codepaths see v4 at all.  This allows us to
+  claim that installing v4 is “non-impactful”.
+  #+end_quote
+
+- By default, .NET =ComVisible= types' generated class interfaces derive from =IDispatch=
+  + Exposed .NET interfaces are by default dual unless overriden by =InterfaceTypeAttribute=;
+
+- =System.Object= has a default property =ToString=
+
+- [[https://learn.microsoft.com/en-us/visualstudio/code-quality/ca1402?view=vs-2022&tabs=csharp][Method overloading]]
+
+- [[https://marc.info/?l=ms-dcom&m=103440425612266&w=2][IUnknown Support]]
+  + VBA supports holding an =IUnknown= pointer with =Variant= (=vbDataObject=)
+  + =CreateObject= can return an =IUnknown= pointer to a =Variant= variable.
+  + These pointers are not of much use except for passing around.
+
+** Useful =mscorlib= classes
+
+- =System.Random=.
+
+- =System.Type= is returned as =mscorlib.[_Type]=
+
+- =ArrayList=, =Queue=, =HashTable=, =Stack=, =SortedList=
+  + - =For Each ... Next= works as long as the object variable is an
+    =IEnumerable=. The enumerating element has to be a =Variant= as
+    =System.Collections.IEnumerator= is marshaled as =IEnumVARIANT=,
+    see [[https://learn.microsoft.com/en-us/dotnet/standard/native-interop/type-marshalling][Type Marshaling]].
+
+- Various =*Calendar=
+
+- =UTF8Encoding=, =ASCIIEncoding=
+
+- =StringBuilder= works but overloading makes it hard to find the correct method name.
+
+- Various crytographic classes
+
+
+* Microsoft Scripting Runtime
+
+Windows-builtin COM library.

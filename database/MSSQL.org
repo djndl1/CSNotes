@@ -1,15 +1,5 @@
 #+TITLE: Mssql
 
-# Configuration Tips
-
-- The default install enables Windows authentication only, set the =LoginMode= registry key under =HKLM\Software\Microsoft\Microsoft SQL Server\ [instancename] \MSSqlServer= to =2= to enable mixed mode.
-
-- New CLI client =mssql-cli=
-
-DDL; DML (=SELECT=, =INSERT=, =UPDATE=, =DELETE=, =MERGE=, =TRUNCATE=); DCL (control): deals with permissions and includes =GRANT= and =REVOKE=
-
-An element is identified by its key values, not by positions. A query against a table can return table rows in any order unless explicitly requested.
-
 * Installation Caveats
 
 - Run /System Configuration Checks/ before installation to check any prerequisite.
@@ -643,6 +633,7 @@ View =sp_help_jobhistory=.
 
 Use maintenance plan to periodically purge job history.
 
+<<<<<<< HEAD
 * Transact-SQL
 
 ** Conventions

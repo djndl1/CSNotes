@@ -1,0 +1,37 @@
+#+title: Python Dependency Injection
+
+* Approaches
+
+** Through Argument Passing
+
+This is the same as in Java or other static-typed languages.
+
+** Multiple Inheritance
+
+#+begin_src python
+class SomeBaseClass(object):
+    def __init__(self):
+        print('SomeBaseClass.__init__(self) called')
+
+class SuperChild(SomeBaseClass):
+    def __init__(self):
+        print('SuperChild.__init__(self) called')
+        super().__init__()
+
+class InjectMe(SomeBaseClass):
+    def __init__(self):
+        print('InjectMe.__init__(self) called')
+        super().__init__()
+
+class UnsuperInjector(UnsuperChild, InjectMe): pass
+
+class SuperInjector(SuperChild, InjectMe): pass
+#+end_src
+
+With =super()=, changing the injected superclass changes the behavior of
+inherited methods of the subclass. Overriding the injected dependency is
+a little involved by modifying =InjectMe=
+
+* Framework & Libraries
+
+- [[https://python-dependency-injector.ets-labs.org/introduction/di_in_python.html][Dependency Injector]]

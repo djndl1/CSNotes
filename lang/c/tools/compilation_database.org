@@ -1,0 +1,7 @@
+#+title: Clang Json Compilation Database
+
+* Generators
+
+** [[https://github.com/nickdiego/compiledb][compiledb]] for GNU make
+
+Clean and successful build is not required.
