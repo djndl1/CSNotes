@@ -54,3 +54,6 @@ w32tm /resync
   + it needs to be less than half of =SystemClockRate= to be used with skewing.
 
 - =SystemClockRate= ::
+
+Experience configuration: On Windows 2012R2, set =UpdateInterval= to 1000 (1
+sec, large values seem to cause drifting), =PhaseCorrectRate= to 100

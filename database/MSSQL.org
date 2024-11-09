@@ -99,6 +99,8 @@ SHUTDOWN; -- wait for running T-SQL statements and SPs to finish and then stop t
 SHUTDOWN WITH NOWAIT; -- immediately stop
 #+end_src
 
+SQL Server database engine is started by =sqlservr.exe=.
+
 ** Single-Use Mode =-m=
 
 Stop the SQL Server Agent before entering the single-user mode, or limit the app
@@ -631,3 +633,266 @@ View =sp_help_jobhistory=.
 
 Use maintenance plan to periodically purge job history.
 
+<<<<<<< HEAD
+* Transact-SQL
+
+** Conventions
+
+** Data Types
+
+Each column, local variable, expression and parameters has a related data type.
+Alias data types are defined by =CREATE TYPE=.
+
+*** Exact Numerics
+
+- =bit=: boolean type
+
+- =tinyint= (unsigned byte), =smallint= (16-bit signed ), =int= (32-bit signed),
+  =bigint= (64-bit signed)
+
+- =decimal(p[, s])=, also known as =numeric(p[, s])=
+
+- =money=, (64-bit) =smallmoney= (32-bit): binary integers scaled down 4 digits
+  to represent decimal money.
+
+*** Approximate Numerics
+
+- =float[(n)]=: binary floating-point number, where =n= is the number of bits of
+  the mantissa, up to double precision (53).
+  + =real= is =float(24)=, i.e. single-precision
+
+*** Date & Time
+
+Conversions from string literals to date and time types are allowed if all parts
+of the strings are in valid formats. Implicit conversions or explicit
+conversions that don't specify a style, from date and time types to string
+literals, are in the default format of the current session.
+ISO 8601 formats are not affected by the =SET LANGUAGE= and =SET DATEFORMAT= session
+locale settings.
+
+- =DATE=: from ='0001-01-01'= to =9999-12-31=.
+  + default literal format =yyyy-MM-dd=. ISO 8601 =yyyy-MM-dd= or =yyyyMMdd= are
+    also supported.
+  + ODBC format ={ d 'yyyy-MM-dd' }= seems to work with JDBC and ADO.NET. It
+    maps to =DATETIME= and then converted to =DATE=.
+
+- =TIME=: 0-7 subsecond customizable precision
+  + default literal format =hh:mm:ss[.nnnnnnn]=, also ISO 8601
+    =hh:mm[:ss][.fractional seconds]=
+  + ODBC format ={t 'hh:mm:ss[.fractional seconds]'}= seems to work with JDBC
+    and ADO.NET.
+  + Using hour 24 to represent midnight and leap seconds over 59 as defined by
+    ISO 8601 is not supported.
+
+- =DATETIME= (*Legacy*): millisecond precision. range from =1753-01-01= to =9999-12-31=
+  + ISO 8601 =yyyy-MM-ddTHH:mm:ss[.mmm]= or =yyyyMMdd[ HH:mm:ss[.mmm]]= are supported.
+  + ODBC format ={ ts 'yyyy-MM-dd HH:mm:ss[.fff]' }= is supported and seems to
+    work with JDBC and ADO.NET.
+  + =CURRENT_TIMESTAMP= or =GETDATE()= (local time), =GETUTCDATE()= (UTC time)
+
+- =DATETIME2= (*recommended*, supersedes =DATETIME=): 0-7 subsecond customizable
+  precision, by default 7.
+  + default literal format =YYYY-MM-DD hh:mm:ss[.fractional seconds]=
+  + ISO 8601 =YYYY-MM-DDThh:mm:ss[.nnnnnnn]=
+  + ODBC format ={ ts 'yyyy-MM-dd HH:mm:ss[.fff]' }= is supported and seems to
+    work with JDBC and ADO.NET.
+  + =SYSDATETIME()= (local time), =SYSUTCDATETIME()= (UTC time)
+
+- =smalldatetime= (*legacy*): minute-level precision. The value is rounded to
+  the nearest minute.
+
+- =DATETIMEOFFSET=: =DATETIME2= with an offset
+  + the data itself is stored as in UTC, with the timezone offset preserved.
+  + default literal format =yyyy-MM-dd HH:mm:ss[.nnnnnnn] [{+|-}hh:mm]=
+  + ISO 8601 =yyyy-MM-ddTHH:mm:ss[.nnnnnnn][{+|-}hh:mm]=,
+    =yyyy-MM-ddTHH:mm:ss[.nnnnnnn]Z= (UTC)
+  + =AT TIME ZONE 'TIMEZONE_NAME'= converts the timezone info of a datetime type
+    to the specified time zone. If the source already has a time zone, the
+    output represents the same time at the specified time zone.
+  + =SYSDATETIMEOFFSET()=
+
+
+
+*** Character strings
+
+- =char[(n)]= (=character=): fixed size, byte-oriented, 1 <= n <= 8000 bytes
+  + =n= is =1= unless specified.
+
+- =varchar[(n | max)]=: variable-size, byte-oriented, 1 <= n <= 8000 bytes or =max=
+  (limited only by the maximum storage parameter 2GB)
+  + =n= is =1= unless specified, unlike Oracle, where =varchar2= alone is
+    allowed in PL/SQL only and indicates only its type.
+  + storage size =n+2= bytes.
+
+- =nchar[(n)]=, =nvarchar[(n|max)]= the UTF-16 version, where 1 <= n <= 4000 in
+  byte pairs (UTF-16 code unit).
+  + literal UTF-16 strings are prefixed with a =N=.
+
+- =text=, =ntext= (deprecated, use =varchar(max)= and =nvarchar(max)=):
+  variable-size, up to 2^31 - 1 bytes;
+
+Upon conversion, long strings are truncated into short strings if necessary. The
+converted value uses the collation of the input is used. Non-character types
+uses the default collation of the database unless specified otherwise. =n= is 30
+unless specified otherwise upon conversion or casting.
+Empty strings are converted to integer =0=.
+
+**** Operations
+
+- encoding & decoding: =ASCII()= (no extended ASCII), =CHAR()= (extended ASCII
+  support dependent on the collation); =UNICODE()=, =NCHAR()=, the returned
+  type/value depends on the collation.
+
+- concatenation: =CONCAT= or =+=
+
+- join with a separator: =CONCAT_WS=
+
+- length: =LEN= (character length trimming trailing spaces, not code units), =DATALENGTH= (byte length)
+
+- format numbers: =STR=
+
+*** Binary Data
+
+- =binary[(n)]=: fixed-length binary data, 1 <= n <= 8000
+  + without =n= default to =1= upon definition, =30= upon casting.
+
+- =varbinary[(n|max)]=: variable-length binary data, 1 <= n <= 8000 or with
+  =max= up to 2^31-1 bytes.
+  + without =n= default to =1= upon definition, =30= upon casting.
+
+- =image= (deprecated, use =varbinary(max)=): variable binary data up to 2^31-1 bytes
+
+*** XML & Json
+
+- =json= (since SQL Server 2016 only as json functions, only available in Azure
+  SQL Server since 2024):
+
+- =xml[([Content | Document] xml_schema_colleciton)]=: xml may be typed or
+  untyped, depending on the specified schema.
+
+*** Other
+
+- =sql_variant=: can store heterogeneous data, up to 8016 bytes.
+  + other data types are implicitly converted to =sql_variant= but not the reverse.
+  + =SQL_VARIANT_PROPERTY= retrieves its property: type, precision, scale, etc.
+
+- =table=: used to store a result for processing at a later time.
+  + a table variable is used like a regular table within its scope.
+
+- =uniqueidentifier=: 16-byte GUID
+  + =newid()=, =newsequentialid()= (greater than previous generated GUIDs by
+    this function, faster than =newid()= when generating for an identity column).
+
+**** Cursor
+
+A reference into a result set. A cursor name (defined by =DECLARE CURSOR_NAME CURSOR
+FOR QUERY=)
+is different from a local cursor variable (declared by =DECLARE @CURSOR_VAR_NAME
+CURSOR= and then associated with a cursor with =SET @cursor_var = CURSOR FOR QUERY=), in that a query is defined so that the cursor may retrieve the result
+set. The underlying data structure is called *cursor*.
+
+By default, the cursor's scope is determined by the =default to local cursor=
+server option unless explicitly defined as =LOCAL= or =GLOBAL=. Local cursors
+names/variables are automatically deallocated when going out of scope or when the last variable
+referencing it is deallocated or goes out of scope. Cursors are refcounted.
+=DEALLOCATE= releases the resources used by the cursor, removes the reference.
+=DEALLOCATE= only removes the association between a cursor and a variable: the
+variable itself may be used with other cursors.
+
+=OPEN= pupulates the result set. =CLOSE= releases the current result set.
+
+=FETCH= operates on the cursor and returns a row from the result set.
+
+between a cursor and a name/variable.
+
+There is no =%rowtype= anchor, no for-loop. Cursors have to be opened and closed explicitly.
+
+***** Cursor Functions
+
+- =@@FETCH_STATUS=: the status of the last cursor =FETCH= statement.
+  + global to all cursors on a connection.
+  + =0= successful fetch; =-1= failed or beyond the result set; =-2= missing
+    row; =-9= no fetch is performed.
+    #+begin_src sql
+WHILE @@FETCH_STATUS
+BEGIN
+    CONTINUE FETCHING
+END;
+    #+end_src
+
+- =@@CURSOR_ROWS=: the number of qualifying rows in the last cursor opened in
+  the connection.
+  + =0= (not opened), =n= (fullpy populated, the total number of rows), =-1=
+    (dynamic cursor, the number is constantly changing), =-m= (asynchronous; the
+    number of rows currently in the keyset.)
+
+- =CURSOR_STATUS()=: the status of a cursor, whether it is open, the result set
+  is returned.
+
+- =sp_cursor_list()=, =sp_describe_cursor()=, =sp_describe_cursor_columns()=, =sp_describe_cursor_tables()=
+
+*** Type Reflection
+
+For builtin types, see =sys.types=
+
+- =TYPEPROPERTY(type, property)=: =PRECISION=, =SCALE= ...
+
+- =TYPE_ID(namne)=, =TYPE_NAME(id)=
+
+** DDL
+
+*** Tables
+
+- All local temporary tables (prefixed by =#=) are always in the =dbo= schema. Global temporary tables
+  (prefixed by =##=)
+  are in the =tempdb= database.
+  + Temporary tables are dropped upon exiting the scope (procedure-level or
+    session-level). One has to drop it manually if required.
+
+** DML
+
+- No native regular expression support unless managed code is used. =LIKE=
+  supports =[]= (range) and =^= (excluding)
+
+** Dynamic SQL
+
+- =sp_executesql=: run a sql string, optional with parameter definitions and
+  parameter values.
+  + better than =EXECUTE= in that it compiles the statement and only the
+    parameters are changing.
+
+** Procedural SQL
+
+- =BEGIN ... END= as a code block structure
+
+- =IF ... ELSE ...= needs no =THEN= and =END IF=. =BEGIN ... END= is optional if
+  the statement includes only one.
+
+- =GOTO= and labels are used as in C.
+
+- try-catch =BEGIN TRY ... END TRY BEGIN CATCH ... END CATCH= catches any errors
+  of which the severity is higher than 10.
+  + errors are retrieved using The =ERROR_*()= functions.
+  + Errors are thrown with the =THROW= keyword or =RAISEERROR= (legacy).
+
+- All stored procedures may return an integer value (default 0).
+
+- Only =WHILE=-loop is available.
+
+** Stored Procedure
+** Information Schema
+
+Information Schema is supported in SQL Server.
+
+---
+| SQL Server Terms       | SQL Standard Terms |
+|------------------------+--------------------|
+| Database               | Catalog            |
+| Schema                 | Schema             |
+| Object                 | Object             |
+| user-defined data type | domain             |
+|                        |                    |
+
+Besides the information schema, some functions returns similar info.
+
+- =sp_help tablename=, =sp_columns=
