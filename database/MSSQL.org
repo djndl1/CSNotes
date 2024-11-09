@@ -896,3 +896,29 @@ Information Schema is supported in SQL Server.
 Besides the information schema, some functions returns similar info.
 
 - =sp_help tablename=, =sp_columns=
+
+* Notable Features & Changes Since SQL Server 2008
+
+- Contained Database (2012)
+
+TODO
+
+- Sequence Objects (2012)
+
+- the =THROW= statement (2012)
+
+- UTF-16 Supplementary characters collations (2012)
+
+- LocalDB (2012)
+
+- =(CREATE | ALTER | DROP) SERVER ROLE= statements, =ALTER ROLE ... ADD MEMBER=
+
+- Builtin JSON support (2016)
+
+- UTF-8 collations (2019)
+
+- In-Memory Database (2019)
+
+- Linux Support (2017)
+
+- =DATETRUNC= (2022), =TRIM=, =LTRIM=, =RTRIM=, bit manipulation functions
