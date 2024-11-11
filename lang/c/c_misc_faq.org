@@ -1,0 +1,16 @@
+#+title: C Misc FAQ
+
+* Is =char= guaranteed a Byte
+
+Yes, by C standard:
+
+#+begin_quote
+6.5.3.4 The sizeof operator
+
+    1. ...
+    2. The sizeof operator yields the size (in bytes) of its operand, which may be an expression or the parenthesized name of a type. [...]
+    3. When applied to an operand that has type char, unsigned char, or signed char, (or a qualiﬁed version thereof) the result is 1. [...]
+#+end_quote
+
+However, a byte of a platform is not always a octet (8 bits), mainly some DSPs.
+Thus, various assumptions in C that a =char= is the same as a byte always hold.
