@@ -1,0 +1,346 @@
+#+title: Filesystem, Files and Directories
+
+* Terms & Concepts
+
+A file name and inode pair is called a /link/. The actual on-disk form of this
+mapping/link is implemented and managed by the kernel. A directory is a file
+containing only such links and the kernel directly uses this mapping to perform
+name-to-inode resolutions. The root directory is at the top of this "directory database". The kernel walks the directory hierarchy by opening each directory until it
+finds the inode of the next directory and finally the last entry (/pathname
+resolution/). Of course these mappings are cached by the kernel so that the
+process would not have to be performed repeatedly.
+
+A pathname may be /absolute/ (/fully qualified/, on Windows these two are
+different due to disk names) or /relative/.
+
+Directories are files, but they are part of the filesystem structure, not meant
+to be manipulated by normal I/O calls. A special set of system calls are
+provided.
+
+A /hard link/ is simply a file-inode mapping entry in a directory.
+A /soft link/ or /symbolic link/ is a file that contains a path to its target
+file. A hard link maps only to a file on the same filesystem.
+
+Unixes have a unified /namespace/ (down from the root directory), but many
+filesystems (mounted or not, virtual, on-disk or even networked).
+Linux supports per-process namespaces, allowing each process to optionally have
+a unique view of the system's file and directory hierarchy.
+
+* Files and Directories
+:PROPERTIES:
+:CUSTOM_ID: files-and-directories
+:END:
+Given a pathname, the =stat= function returns a structure of information
+about the named file. The =fstat= function obtains information about the
+file that is already opened on the descriptor =fd=. The =lstat= function
+can =stat=s symbolic links. The =fstatat= funciton provides a way to
+return the file statistics for a pathname relative to an open directory
+represented by the =fd= argument.
+
+#+begin_src C
+struct stat {
+    dev_t     st_dev;         /* ID of device containing file */
+    ino_t     st_ino;         /* Inode number */
+    mode_t    st_mode;        /* File type and mode */
+    nlink_t   st_nlink;       /* Number of hard links */
+
+    uid_t     st_uid;         /* User ID of owner */
+    gid_t     st_gid;         /* Group ID of owner */
+
+    dev_t     st_rdev;        /* Device ID (if special file) */
+
+    off_t     st_size;        /* Total size, in bytes */
+    blksize_t st_blksize;     /* Block size for filesystem I/O */
+    blkcnt_t  st_blocks;      /* Number of 512B blocks allocated */
+
+    struct timespec st_atim;  /* Time of last access */
+    struct timespec st_mtim;  /* Time of last modification */
+    struct timespec st_ctim;  /* Time of last i-node status change */
+};
+#+end_src
+
+#+begin_src C
+struct timespec {
+    time_t          tv_sec;     // elaped time in whole seconds
+    long            tv_nsec;    // the rest of the elapsed time in nanoseconds
+};
+#+end_src
+
+** File types
+:PROPERTIES:
+:CUSTOM_ID: file-types
+:END:
+#+begin_src C
+    mode_t    st_mode;        /* File type and mode */
+#+end_src
+
+A file on a UNIX system can be a
+
+- regular file, with no distinction of text or data type. Any
+  interpretation is left to the application.
+
+- directory file: a file that contains the names of other files and
+  pointers to information on these files. Only the kernel can write
+  directly to a directory file.
+
+- block special file: a type of file providing buffered I/O access in
+  fixed-size units to devices such as disk drives.
+
+- character special file: a type of file providing unbuffered I/O access
+  in /variable-sized/ units to devices.
+
+- FIFO/named pipe: a type of file used for communication between
+  processes
+
+- Socket: a type fo file for network communication between processes,
+  also for non-network communication between processes on a single host.
+
+- Symbolic link
+
+All devices on a system are either block special files or character
+special files.
+
+The type of a file can be determined using macros.
+
+#+begin_src C
+S_ISREG()
+S_ISDIR()
+S_ISCHR()
+S_ISBLK()
+S_ISFIFO()
+S_ISLNK()
+S_ISSOCK()
+#+end_src
+
+** Permissions, Ownership and Groups
+:PROPERTIES:
+:CUSTOM_ID: permissions-ownership-and-groups
+:END:
+#+begin_src C
+   uid_t     st_uid;         /* User ID of owner */
+   gid_t     st_gid;         /* Group ID of owner */
+#+end_src
+
+Every process has six or more IDs associated with it
+
+- real user ID; real group ID
+
+- effective user ID; effective group ID; supplementary group IDs
+
+- saved set-user-ID; saved set-group-ID: contain copies of the effective
+  user ID and the effective group ID, respectively when a program is
+  executed.
+
+the set-user-ID bit and the set-group-ID bit causes the effective
+user/group ID to be the user/group ID of the owner. These two bits are
+in =st_mode= and can be tested against the constants =S_ISUID= and
+=S_ISGID=.
+
+The =st_mode= value also encodes the access permission bits of the file.
+There are a few rules about permissions besides the obvious ones.
+
+- To access a file under a directory, the user must have execute
+  permission to the directory and directories above. The execute
+  permission bit for a directory is often called the /search/ bit.
+
+- we must have write permission for a file to specify the =O_TRUNCATE=
+  flag.
+
+- To create a new file in a directory, write permission and execute
+  permission for the directory are required.
+
+- to delete an existing file in a directory, write permission and
+  execute permission for the directory are required but read permission
+  or write permission for the file itself are unnecessary.
+
+#+begin_src sh
+ djn  debian  ~/FOSS/playground/perm  lh
+Permissions Size User Date Modified Name
+.---------     5 djn  13 Aug  0:30  a.txt
+
+ djn  debian  ~/FOSS/playground/perm  rm a.txt
+rm: remove write-protected regular file 'a.txt'? y
+#+end_src
+
+The file access tests that the kernel performs each time a process
+opens, creates, or deletes a file depend on the owner of the file
+(=st_uid= and =st_gid=), the effective IDs of the process and the
+supplementary gorup ID of the process (if the effective group ID of the
+process or one of the supplementary group IDs of the process equals the
+group ID of the file, access is allowed if the appropriate group access
+permission bit is set). The test order is superuser ID, effective user
+ID, group IDs and other access permission. If the process owns the file,
+access is granted or denied only based on the user access permissions.
+
+The user ID of a new file is set to the effective user ID of the
+process. The group ID of a new file can be the effective group ID of the
+process or the group ID of the directory in which the file is being
+created depending on the implementation. On Linux, this is determined by
+whether the set-group-ID bit is set. If it's set, then the permission is
+copied from the directory (the subdirectory will be set-group-ID
+automatically), otherwise it's set to the effective group ID of the
+process.
+
+The =access= and =faccessat= functions base their tests on the real user
+and group IDs instead of effective user ID. If =AT_EACCESS= flag is set,
+the access checks are made using the effective user and group IDs of the
+calling process instead of the real user and group IDs.
+
+The =umask= sets the file mode creation mask for the process and returns
+the previous value. The file mode creation mask is used whenever the
+process creates a new file or a new directory. It disables the
+corresponding mode bits that it is set to. If anyone can read a file,
+the =umask= needs to be set to 0.
+
+The =chmod=, =fchmod=, =fchmodat= functions allow to change the file
+access permissions for an existing file.
+
+Sticky (sticking to the swap area) bit (formally called saved-text) was
+initially used to indicate a executable file should be cached. If the
+sticky bit is set for a directory, a file in the directory can be
+removed or renamed only if the user has write permissions for the
+directory and owns the file or owns the directory or is the superuser.
+e.g. =/var/tmp=, =/tmp= so that any one can create, read, write a file
+there but no one except the superuser can delete files owned by other
+users (the directories belong to root).
+
+The =chown= functions allow us to change a file's user ID and group ID.
+
+** File Size and Trucation
+:PROPERTIES:
+:CUSTOM_ID: file-size-and-trucation
+:END:
+#+begin_src C
+    off_t     st_size;        /* Total size, in bytes */
+    blksize_t st_blksize;     /* Block size for filesystem I/O */
+    blkcnt_t  st_blocks;      /* Number of (typically 512B) blocks allocated */
+#+end_src
+
+=st_size= is meaningful only for regular files, directories and symbolic
+links. A regular file of size 0 is allowed. The file size of a symbol
+link is the nubmer of bytes in the filename it points to.
+
+=truncate()= and =ftruncate()= truncate an existing file to a specified
+size (may increase the size).
+
+** File Systems
+:PROPERTIES:
+:CUSTOM_ID: file-systems
+:END:
+A disk is divided into one or more partitions, each of which contains a
+file system.
+
+#+begin_example
+          file    system
+  +------|-------|---------------------------------------|-------------------------------------|-----|------------------------------------------+
+  |      |       |                                       |                                     |     |                                          |
+  |      |       |                                       |                                     |     |                                          |
+  |      |       | cylinder group 0                      |        cylinder group 1             | ... |           cylinder group 2               |
+  |      |       |                                       |                                     |     |                                          |
+  |      |       |                                       |                                     |     |                                          |
+  |   +  |    +  |                                       |                                     |     |                                          |
+  +------|-------|---------------------------------------|-------------------------------------|-----|------------------------------------------+
+      |       |
+      |       |                                                                 cylinder group
+      |       +--> super block            +--------|--------|--------|--------|---------------------|-----------------------------------------+
+      v                                   |        |        |        |        |                     |                                         |
+                                          | super  |        |        |        |                     |                                         |
+boot block                                | block  |   cg   | i-node | block  |                     |                                         |
+                                          |  copy  |  info  |  map   | bitmap |       i-nodes       |               data blocks               |
+                                          |        |        |        |        |                     |                                         |
+                                          |        |        |        |        |                     |                                         |
+                                          +--------|--------|--------|--------|---------------------|-----------------------------------------+
+#+end_example
+
+Every i-node has link count that contains the number of directory
+entries that point to it. Only when the link count goes to 0 can the
+file be deleted (unlinking).
+
+The i-node contains all the information about the file. Most of the
+information in the =stat= structure is obtaind from the i-node. Only two
+items of interest are stored in the directory entry: the filename and
+the i-node number.
+
+Any leaf directory has a link count of 2, the directory itself contains
+one and its parent directory contains the other.
+
+=link= and =linkat= create a new directory entry that references the
+existing file. The creation of the new directory and the increment of
+the link count must be an atomic operation. =unlink= and =unlinkat=
+remove the directory entry and decrement the link count of the file
+referenced by the entry. Only when the link count reaches 0 can the
+contents of the file be deleted. As long as some process has the file
+open, its contents will not be deleted. When a file is closed, the
+kernel first checks the count of the number of processes that have the
+file open and deletes it if the count reaches zero. This property of
+unlink is often used by a program to ensure that a temporary file it
+creates won't be left around in case the program crashes. The process
+creates a file using either open or creat and then immediately calls
+unlink. The file is not deleted, however, because it is still open. Only
+when the process either closes the file or terminates, which causes the
+kernel to close all its open files, is the file deleted.
+
+ISO C =remove= is identical to =unlink= (file) or =rmdir= (directory).
+
+=rename= (ISO C) and =renameat= rename a file or a directory. If newname
+already exists, we need permissions as if we were deleting it.
+
+Only the superuser can create a hard link to a directory and hard links
+normally require that the link and the file reside in the same file
+system while there are non file system limitations on a symbolic link
+and what it points to. TODO security issues with symbolic link
+
+A symbolic link is created with either the =symlink= or =symlinkat=
+function. =readlink= and =readlinkat= open the link itself and read the
+name in the link.
+
+** File Times
+:PROPERTIES:
+:CUSTOM_ID: file-times
+:END:
+#+begin_src C
+   struct timespec st_atim;  /* Time of last access of file data */
+   struct timespec st_mtim;  /* Time of last modification of file data*/
+   struct timespec st_ctim;  /* Time of last i-node status change */
+#+end_src
+
+The system does not maintain the last-access time for an i-node. Adding,
+deleting, or modifying can affect the three times associated with that
+directory.
+
+=utimensat=, =futimens=, =utimes= change file timestamps with nanosecond
+precision. We are unable to specify a value for the changed-status time,
+=st_ctim= the time the i-node was last changed.
+
+** Directories
+:PROPERTIES:
+:CUSTOM_ID: directories
+:END:
+Directories are created with =mkdir=, =mkdirat= and deleted with =rmdir=
+(empty directories). Note that a directory usually needs an execute bit.
+
+Directories can be read by anyone who has access permission to read the
+directory, through =opendir=, =fdopendir=, =readdir=, =rewinddir=,
+=closedir=, =telldir=, =seekdir=. But only the kernel can write to a
+directory to preserve file sanity.
+
+example TODO
+
+=chdir=, =fchdir=, =getcwd= deal with the current file directory. The
+current working directory is an attribute of a process (that's why =cd=
+is built in the shell).
+
+** Device Special Files
+:PROPERTIES:
+:CUSTOM_ID: device-special-files
+:END:
+#+begin_src C
+dev_t     st_rdev;        /* Device ID (if special file) */
+dev_t     st_dev;         /* ID of device containing file */
+#+end_src
+
+Every file system is known by its major (device driver and peripheral
+board to communicate with) and minor (the specific subdeivce) device
+numbers, access by =major()=/=minor()=. Each file system on the same
+disk drive would usually have the same major number but a different
+number.
