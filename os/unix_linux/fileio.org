@@ -156,6 +156,8 @@ shared, maintained by the kernel.
 
 *** Open a file
 
+The kernel maps the file name to the actual inode and loads the inode metadata into the memory, prepares the inode for any further operations
+
 These two functions seem simple in their signatures but they offers a variety of operations
 on files and are not meant to be underestimated.
 
@@ -174,14 +176,15 @@ on files and are not meant to be underestimated.
 
 A few flags are defined
 
-- file access flags: read-only, write-only, exec-only, read-write,
+- file access flags (required): read-only, write-only, exec-only, read-write,
 
 - file creation flags (append, create, truncate, creation fails on an existing file): only affect the =open= operation
   + Note that =O_CREAT= only creates a file when the file does not exist. To
     restrict the function to create-only, add =O_EXCL= to return an error if the
     file already exists. This check-creation-error operation is atomic.
   + the permissions placed on a newly-created file depends on the mode flags,
-    the process =umask= and the optionally present default ACL of the parent directory.
+    the process =umask= and the optionally present default ACL of the parent
+    directory by ANDing the =mode= argument with the complement of the process's =umask=.
   + to avoid following a symlink, especially in a privileged program to avoid
     security issues, use =O_NOFOLLOW=.
 
