@@ -210,7 +210,9 @@ End Sub
 
 To subscribe to an event, declare the event source with =WithEvents=,
 the event handler should be named as =EventSourceVariable_EventName=.
-Raising events are not asynchronous.
+Raising events are not asynchronous. Setting a =WithEvents= variable to other
+object references or =Nothing= unsubscribes related events and new object is now
+the one handling the event.
 
 #+begin_src vba
 ' subscribe to an event
