@@ -713,9 +713,12 @@ End Type
 
 * Error Handling
 
+Each invocation of a VB procedure has an error handling policy which specifies
+how runtime errors should be handled.
+
 First, a error handler (=On Error=) is installed to handle any error until a new
-error handler is installed.
-Primitive with =GoTo= but better than C's =errno= check.
+error handler is installed. Primitive with =GoTo= but better than C's =errno=
+check. The default policy is to pass the =Err= object and control to the parent procedure.
 
 - =On Error Resume Next=: ignore any error.
   + can be used to test if an object has certain properties.
@@ -723,8 +726,9 @@ Primitive with =GoTo= but better than C's =errno= check.
 - =On Error Resume=: retry the erring line. Error is not cleared after the
   control returns to the calling code.
 
-- =On Error Goto=: jump to the named label to handle any error; to exit from a
-  error routine:
+- =On Error Goto=: jump to the named label to handle any error; the =Err= object
+  is reset;
+  to exit from a error routine:
   + =Resume= to retry the line of code that caused the error.
   + =Resume Next= to resume execution at the next line after the one that caused
     the error
