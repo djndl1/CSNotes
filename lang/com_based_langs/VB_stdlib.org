@@ -8,7 +8,13 @@ The project name is =VBA=, present in every VBA environment.
 
 =&=: string concatenation
 
-=Mid=: get a substring
+- =Mid=: get a substring (and possibly replace)
+  + it may form a statement that replaces part of a string: =Mid(str, start, [length]) = string=
+
+- =LSet=, =RSet=: weird statements that assign the RHS strings (possibly
+  appended/prepended with spaces or truncated) to the LHS variable. That is, the
+  result is the content of the RHS with its length aligned with the LHS.
+
 
 - =LBound=, =UBound=
 
