@@ -215,7 +215,8 @@ hence =Dim= and =ReDim=, declared and accessed through =ElementType()= and =Arra
 + Use =LBound=, =UBound= for bounds and length.
 
 + To resize an array, use =ReDim= again.
-    - To destroy an array, use the =Erase= statement.
+    - The =Erase= statement sets a resizable array to an empty one. For a fixed-size array,
+      =Erase= resets all its element value to their standard initial value.
     - =ReDim Preserve= tries to preserve the original values.
       Only the last dimension can resized with =Preserve=
 
