@@ -247,14 +247,17 @@ disk space is allocated and explicit null bytes are written to the file.
 
 *** Read a File
 
-Data is read from an open file with the =read= funciton. The number o
+Data is read from an open file with the =read= function. The number of
 bytes actually read might be less than the amount requested depending on the
 actual device type, number of data available in the file or the underlying
 buffer:
 
 a file may reach its EOF; a socket has buffers; a terminal device  may be
 line-oriented; a pipe or FIFO may have fewer bytes available; a device may be
-record-oriented; the read may be interrupted by a signal.
+record-oriented; the read may be interrupted by a signal. There is a difference
+between "no data available" and "end of data". In the case of "no data
+available", the call blocks until there is data.
+
 
 The current offset is incremented by the number of actual read bytes before a
 successful return.
