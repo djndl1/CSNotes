@@ -267,7 +267,18 @@ count or a negative error condition.
 
 *** Write a File
 
-Data is writen to an open file with =write= funciton. A common cause for a write error is either filling up a disk or exceeding the file size limit for a given process.
+Data is writen to an open file with =write= funciton. A common cause for a
+partial write
+error is either filling up a disk or the buffer is full (for a socket).
+
+The kernel caches read/write and may reorder write requests to the underlying
+hardware as it sees fit for performance' reason during *writebacks*, which would
+normally not be a problem unless the system crashes.
+Only databases care about the ordering and data consistency on the disk.
+Deferred writes also defers or even prevents the reporting of write errors and
+that is why synchronized I/O exists.
+
+The delay time can be configured via =/proc/sys/vm/dirty_expire_centisecs=.
 
 *** =ioctl= function
 :PROPERTIES:
@@ -278,6 +289,49 @@ The system provides generic =ioctl= commands for different classes of
 devices. Any functionalities not provided by the five basic functions are
 usually provided here.
 
+
+** Nonblocking I/O
+
+Yes, AIO is non-blocking but here by non-blocking we are talking about
+=O_NONBLOCK=. In the kernel or at the hardware level, there are still blocking
+or non-blocking abstraction or mechanism (DMA, even blocking ops at the ISA level while reading I/O registers),
+though they are outside the scope of the note.
+
+POSIX nonblocking I/O simply means the call would not block if the I/O is not ready.
+It has nothing to do with asynchronous I/O, where an I/O request is always sent and
+the thread goes on with other work. Nonblocking I/O simply tells the caller
+that I/O operations are currently not ready and thus not permitted and that you
+should try again later.
+Blocking mode refers to "waiting until a file descriptor can be written to or
+read from". It means different things for different kinds of files:
+
+- for sockets: the receive buffer has data or the send buffer is not full. The
+  exact condition depends on the underlying protocol.
+
+- for pipes/FIFOs/terminals: there is some data to read (write) or the other side is trying
+  to write (read)
+
+- *regular files are always readable and writable* and that is why =O_NONBLOCK=
+  on regular files result in error because they never truly block for data: just
+  some time is needed to read them from the filesystem and the time is always
+  required to spend on the thread unless one can request the data while doing
+  other work, which is called asynchronous I/O. If a read/write requires some
+  time to finish even if there is data available, the thread will wait on the
+  syscall to return. Nonblocking I/O does not deal with the difference between
+  data that are immediately available and data that requires some effort. POSIX
+  AIO comes in to solve the lack of nonblocking file I/O.
+
+If no data is available, =EAGAIN= or =EWOULDBLOCK= (for sockets) is set as the
+error number. Various manpages says about =EAGAIN=
+
+#+begin_quote
+and the thread would be delayed in the read operation.
+#+end_quote
+
+What it actually means "it would normally block without the nonblocking flag". =EAGAIN=
+actually "resource temporarily unavailable, try again".
+
+The point of nonblocking I/O is to catch the =EAGAIN= and do other useful work.
 
 ** I/O efficiency
 :PROPERTIES:
