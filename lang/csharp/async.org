@@ -269,6 +269,49 @@ safely.
 The Synchronization context gets set automatically for types of
 applications where that is critical.
 
+In a GUI app, the continuation is sometimes expected to be executed on
+the UI thread. Synchronously waiting for the task on the UI thread
+might cause deadlocks. The UI thread blocks on a method of which the
+implementation needs to continuing some part of it on the UI thread
+after an async call. The outer call site needs to the result to unblock the UI thread
+while the inner desperately needs the UI thread to finish the call.
+
+#+begin_src csharp
+private void button1_Click(object sender, RoutedEventArgs e)
+{
+    LoadStringAsync().ContinueWith(s => textBox1.Text = s.Result,
+        TaskScheduler.FromCurrentSynchronizationContext());
+}
+
+// or equivalently
+private void button1_Click(object sender, RoutedEventArgs e)
+{
+    string s = LoadStringAsync();
+    textBox1.Text = s.Result; // UI thread blocks until the concatenated string is returned
+}
+
+static async Task<string> LoadStringAsync()
+{
+    string firstName = await GetFirstNameAsync();
+    // I want the UI thread
+    string lastName = await GetLastNameAsync();
+    return firstName + ” ” + lastName;
+}
+
+// or similarly
+private void button1_Click(object sender, RoutedEventArgs e)
+{
+    var mre = new ManualResetEvent(false);
+    SynchronizationContext.Current.Post(_ => mre.Set(), null);
+    mre.WaitOne(); // warning: buggy
+}
+#+end_src
+
+Never block on the UI thread and
+=.ConfigureAwaiter(false)= may not work because one cannot be sure
+any somewhere down the call stack some one forgot =ConfigureAwaiter(false)= and
+captured the synchornization context.
+
 ** =async void=: Non-Option
   :PROPERTIES:
   :CUSTOM_ID: async-void-non-option
