@@ -216,6 +216,9 @@ automatically by the kernel.
 
 =close= does not guarantee a flush to the underlying hardware. Use =fsync= for that.
 
+=close='s result may report any error condition not reported by previous
+operations due to deferred writes.
+
 *** Seeking within a File
 
 Compared to a head reading a tape,
