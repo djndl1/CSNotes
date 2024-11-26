@@ -274,15 +274,6 @@ Data is writen to an open file with =write= funciton. A common cause for a
 partial write
 error is either filling up a disk or the buffer is full (for a socket).
 
-The kernel caches read/write and may reorder write requests to the underlying
-hardware as it sees fit for performance' reason during *writebacks*, which would
-normally not be a problem unless the system crashes.
-Only databases care about the ordering and data consistency on the disk.
-Deferred writes also defers or even prevents the reporting of write errors and
-that is why synchronized I/O exists.
-
-The delay time can be configured via =/proc/sys/vm/dirty_expire_centisecs=.
-
 *** =ioctl= function
 :PROPERTIES:
 :CUSTOM_ID: ioctl-function
@@ -335,6 +326,9 @@ What it actually means "it would normally block without the nonblocking flag". =
 actually "resource temporarily unavailable, try again".
 
 The point of nonblocking I/O is to catch the =EAGAIN= and do other useful work.
+
+=O_NONBLOCK= is also sometimes used to get a file descriptor only without any
+intention to read or write.
 
 ** I/O efficiency
 :PROPERTIES:
@@ -412,7 +406,6 @@ to subsequent read() calls. This requirement is particularly significant for
 networked file systems, where some caching schemes violate these semantics.
 #+end_quote
 
-
 ** Cache, delayed write
 :PROPERTIES:
 :CUSTOM_ID: cache-delayed-write
@@ -422,11 +415,60 @@ page cache in the kernel through which most disk I/O passes. When
 writing data to a file, the data is normally copied by the kernel into
 one of its buffers and queued for writing to disk at some later time.
 
-The =sync=, =fsync= and =fdatasync= (in case for optimization) are provided to ensure consistency
-of the file system on disk with the contents of the buffer cache.
+The kernel may reorder write requests to the underlying
+hardware as it sees fit for performance' reason during *writebacks*, which would
+normally not be a problem unless the system crashes.
+Only databases care about the ordering and data consistency on the disk.
+Deferred writes also defers or even prevents the reporting of write errors and
+that is why synchronized I/O exists.
+
+The delay time can be configured via =/proc/sys/vm/dirty_expire_centisecs=.
+
+** Synchronized I/O
+
+There are times when apps need to avoid buffering writes and control when data
+reaches the disk.
+
+*** =sync=, =fsync=, =fdatasync=
+
+The =sync= (not necessarily synchronous), =fsync= and =fdatasync= (data only,
+metadata are excluded)
+are provided to ensure consistency of the file system on disk with the contents
+of the buffer cache. inodes and data are not often stored adjacently, thus a
+seek operation is required to update the metadata after writing back data.
+Strangely, some filesystems implement the optional =fdatasync= without the
+mandatory =fsync()=
 
 The function =sync= is normally called periodically (usually every 30
 seconds) from a system daemon.
+
+*** =O_SYNC= during =open=
+
+Read requests are always synchronized regardless of =O_SYNC=, otherwise, the
+data validity is unknown. =O_SYNC= forces the relationship between the call
+returning and the data being committed to the disk. The semantics is equivalent
+to a =fsync= during =write=.
+
+*** =O_DSYNC= & =O_RSYNC=
+
+=O_SYNC= and =O_DSYNC= are properly implemented since Linux 2.6.33
+but =O_RSYNC= is the same as =O_SYNC=.
+
+By POSIX, =O_DSYNC= are meant for data sync
+without synching metadata unless necessary for later reads. =O_RSYNC=, used with
+=O_SYNC= or =O_DSYNC= forces any side effects of a read operation
+to be synchronized (practically the access time update on the file before the
+call returns).
+
+*** Direct I/O with =O_DIRECT= (Linux-specific)
+
+I/O will initiate directly from user-space buffers to the device. Various
+buffering and caching systems are bypassed and all I/O ops are synchronized
+(not as strong as =O_SYNC=).
+
+The request length, buffer alignment and file offsets must be integer multiples
+of the underlying device's sector size if this flag is used.
+
 
 * Standard I/O
 :PROPERTIES:
