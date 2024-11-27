@@ -170,7 +170,7 @@ on files and are not meant to be underestimated.
   + it provides a way to avoid time-of-check-to-time-of-use errors: the
     reference directory cannot be deleted and its filesystem cannot be unmounted
     due to a reference to the directory and the reference point is always the
-    specified directory, not afected by the current working directory change.
+    specified directory, not affected by the current working directory change.
     Even if the reference directory is deleted, it would fail instead of opening
     a file in a substitute new directory with the same path.
 
@@ -184,7 +184,8 @@ A few flags are defined
     file already exists. This check-creation-error operation is atomic.
   + the permissions placed on a newly-created file depends on the mode flags,
     the process =umask= and the optionally present default ACL of the parent
-    directory by ANDing the =mode= argument with the complement of the process's =umask=.
+    directory by ANDing the =mode= argument with the complement of the process's
+    =umask= (=mode & ~umask=)
   + to avoid following a symlink, especially in a privileged program to avoid
     security issues, use =O_NOFOLLOW=.
 
@@ -233,6 +234,8 @@ file's offset can be set explicitly by calling =lseek=. We can seek zero
 bytes from the current position to determine the current offset, or to
 determine if a file is capable of seeking.
 File writes cannot go before the beginning of the file.
+
+To find the current file offset, use =lseek(fd, 0, SEEK_CUR)=.
 
 Not every file is seekable. Pipes, FIFOs, sockets are not. The standard input is
 seekable. For regular files, the returned offset must be
@@ -283,6 +286,11 @@ The system provides generic =ioctl= commands for different classes of
 devices. Any functionalities not provided by the five basic functions are
 usually provided here.
 
+
+*** Truncating a File
+
+=ftruncate= and =truncate= shrink a file to  a specified size
+but can also be used to extend a file to a larger size with the extended part filled with zeros.
 
 ** Nonblocking I/O
 
@@ -371,7 +379,7 @@ is opened.
 otherwise an error is raised. This atomic operation avoids overwriting a newly
 created file immdiately after the check.
 
-*** General Atomic Seek-Read/Write
+*** Positional Read/Write
 
 The SUS includes two functions that allow applications to
 seek and perform I/O atomically (simply because they are not affected by the
@@ -467,7 +475,8 @@ buffering and caching systems are bypassed and all I/O ops are synchronized
 (not as strong as =O_SYNC=).
 
 The request length, buffer alignment and file offsets must be integer multiples
-of the underlying device's sector size if this flag is used.
+of the underlying device's sector size if this flag is used. The exact
+restrictions can be queried with =statx= or some other interfaces (see [[man:open(2)][open(2)]]).
 
 
 * Standard I/O
