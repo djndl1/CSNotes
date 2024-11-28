@@ -479,6 +479,52 @@ of the underlying device's sector size if this flag is used. The exact
 restrictions can be queried with =statx= or some other interfaces (see [[man:open(2)][open(2)]]).
 
 
+** Multiplexed I/O
+
+Non-blocking I/O requires constant I/O syscalls instead of doing other work or
+simply sleeping. Multiplexed I/O allows an application to concurrently block on
+multiple file descriptors and receive notification when any one of them becomes
+ready to read or write without blocking.
+
+*** =select= (since 4.2BSD), =pselect= (POSIX 2001): Synchronous Multiplexing I/O
+
+Three file descriptor sets are monitored for three classes of events:
+read-ready, write-ready, exceptional conditions
+
+The three sets are modified through macros. =FD_ZERO()= should be called on each
+set before each =select=.
+
+The three file sets are modified so that only ready ones remain in the sets. To
+use =select= in a loop, the sets have to be reinitialized for each loop.
+
+=pselect= supports higher time resolution (nanosecond-level) and keep the
+timeout unchanged where =select= may modify the timeout (on linux the timeout
+is subtracted by the blocking time).
+
+=pselect= can also mask certain signals to safely (atomically) wait until either
+a file descriptor is ready or a permitted signal interrupts the call. If a
+signal is only supposed to interrupt a =select()= call, we can first block it
+and unblock before we enter =select()=, but there may be a chance that the
+signal comes right after we unblock it but before we enter =select()=.
+=pselect()= prevents this by leaving no room between unblocking and =select()=.
+Also, if a signal is not wanted during =select()=, it may be delivered after
+=select()= but before unblocking. =pselect()='s atomicity leaves no inbetween
+room.
+
+This old effective but tedious trick to capture this missed signal delivery is to install a handler
+which writes into a pipe, monitored by =select()=, that is, converting a signal
+into a condition that can be monitored later by =select()=.
+See [[https://lwn.net/Articles/176911/][The new pselect() system call]] for more elaboration.
+
+**** Limitation
+
+Limited number of file descriptors and maximum fd value up to =FD_SETSIZE= (1024 on
+Linux)
+
+**** Special Use
+
+A portable way to sleep without millisecond precision =select(0, NULL, NULL, NULL, &tv)=
+
 * Standard I/O
 :PROPERTIES:
 :CUSTOM_ID: standard-io
