@@ -539,6 +539,31 @@ Linux also has a =ppoll()=, similar to =pselect()= as for how atomicity is requi
 
 *** =epoll()=
 
+** Inside the Kernel
+
+- /Virtual File System/: via function pointers and some OOP practices, a common
+  file model is provided by the kernel.
+
+- /Page Cache/ (temporal locality): a cache that stores recently accessed data from an on-disk
+  filesystem.
+  The page cache is the first place that the kernel looks for filesystem data.
+  + the page cache is pruned by automatically releasing its least-used pages
+    by the kernel if the memory is fully occupied and an allocation is committed.
+  + the kernel may also swap pages to the disk. The exact configuration is done
+    through =/proc/sys/vm/swappiness=.
+
+- /Readahead/ (sequential locality): a cache that stores extra data ahead of the
+  previous read.
+  + and thus sequential file I/O is always preferred to random access.
+  + the readahead window ranges from 16 KB to 128 KB.
+
+- /page writeback/: the written data is copied into a kernel buffer, marked as dirty, where
+  subsequent updates operate on this buffer.
+  + dirty buffer is written back either when free memory is below a
+    configurable age or its age is beyond a configurable threshold. Writebacks
+    are carried out by kernel /flusher threads/
+  + writeback buffers are placed in the page cache.
+
 * Standard I/O
 :PROPERTIES:
 :CUSTOM_ID: standard-io
@@ -645,43 +670,8 @@ different byte order and memory alignment.
 - =fgetpos=/=fsetpos= (ISO C): =fpos_t=, as big as necessary to record a
   file's position.
 
-** Formatted I/O
-:PROPERTIES:
-:CUSTOM_ID: formatted-io
-:END:
-#+begin_src C
-       #include <stdio.h>
 
-       int printf(const char *format, ...);
-       int fprintf(FILE *stream, const char *format, ...);
-       int dprintf(int fd, const char *format, ...);
-       int sprintf(char *str, const char *format, ...);
-       int snprintf(char *str, size_t size, const char *format, ...);
-#+end_src
-
-#+begin_src C
-       int vprintf(const char *format, va_list ap);
-       int vfprintf(FILE *stream, const char *format, va_list ap);
-       int vdprintf(int fd, const char *format, va_list ap);
-       int vsprintf(char *str, const char *format, va_list ap);
-       int vsnprintf(char *str, size_t size, const char *format, va_list ap);
-#+end_src
-
-#+begin_src C
-       #include <stdio.h>
-
-       int scanf(const char *format, ...);
-       int fscanf(FILE *stream, const char *format, ...);
-       int sscanf(const char *str, const char *format, ...);
-
-       #include <stdarg.h>
-
-       int vscanf(const char *format, va_list ap);
-       int vsscanf(const char *str, const char *format, va_list ap);
-       int vfscanf(FILE *stream, const char *format, va_list ap);
-#+end_src
-
-** Implementatin Details
+** Implementation Details
 :PROPERTIES:
 :CUSTOM_ID: implementatin-details
 :END:
