@@ -525,6 +525,20 @@ Linux)
 
 A portable way to sleep without millisecond precision =select(0, NULL, NULL, NULL, &tv)=
 
+*** =poll()= from SysV
+
+=poll= supports monitoring of more file descriptors with more granularity on
+events. For each file descriptor there are a number of events to monitor.
+No file descriptors are removed after a call, which makes the API easier to use.
+Polling regular files, block devices and other files with no reasonable polling
+semantics always returns instantly as ready to read and write.
+
+For linux, =POLLIN= and =POLLRDNORM=, =POLLOUT= and =POLLWRNORM= are the same.
+
+Linux also has a =ppoll()=, similar to =pselect()= as for how atomicity is required.
+
+*** =epoll()=
+
 * Standard I/O
 :PROPERTIES:
 :CUSTOM_ID: standard-io
