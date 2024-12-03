@@ -564,14 +564,29 @@ Linux also has a =ppoll()=, similar to =pselect()= as for how atomicity is requi
     are carried out by kernel /flusher threads/
   + writeback buffers are placed in the page cache.
 
-* Standard I/O
+* Standard Buffered I/O
 :PROPERTIES:
 :CUSTOM_ID: standard-io
 :END:
-The standard I/O library handles details such as buffer allocation and
-performing I/O in optimal-sized chunks. The standard I/O centers on
-streams.
 
+The standard I/O is not just a convenience.
+The standard I/O library handles details such as buffer allocation and
+performing I/O in optimal-sized chunks. All filesystem operations occur in terms
+of /blocks/.
+
+The block is an abstraction representing the smallest unit of storage on a
+filesystem (block device). Partial block operations are inefficient. The kernel and hardware
+operate in terms of blocks. Using a multiple of the block size guarantees
+block-aligned I/O requests and prevents extra work inside the kernel. Typically,
+4K or 8K chunks work great. Userspace programs typically have their own data
+abstraction, which is unfortunately not of size of a multiple of the block size.
+User space buffering accommodates the need to write/read in blocks to/from the
+filesystem to the various data sizes actually in use. Fewer system calls are
+issued when data is handled in batch. Some mission-critical applications may
+implement their own buffering, however, most use the standard one offered by
+libc or C++.
+
+The standard I/O centers on streams.
 A stream is associated with a file. Standard I/O file streams can be
 used with both single-byte and multibyte character sets. A stream's
 /orientation/ determines whether the character that are read and written
@@ -617,12 +632,17 @@ The =fopen=, =freopen=, =fdopen= functions open a standard I/O streams.
 =dup2=, =fcntl=, =pipe=, =socket=, =socketpair= or =accept= and
 associate a standard I/O stream with the descriptor, often used with
 descriptors returned by the functions that create pipes and network
-communication channels. =b= mode has no effect on any POSIX OSes. When
-in read/write mode, output cannot be directly followed by input without
+communication channels.
+
+=b= mode has no effect on any POSIX OSes.
+
+When in read/write mode, output cannot be directly followed by input without
 an intervening =fflush()=, =fseek=, =fsetpos= or =rewind=; input cannot
 be directly followed by output without an intervening =fseek=,
 =fsetpos=, =rewind= or an input operation that encounters an end of
-file. POSIX.1 requires implementation to create the file with the
+file.
+
+POSIX.1 requires an implementation to create the file with the
 =S_IRUSR | S_IWUSR | S_IRGRP |  S_IWGRP |  S_IROTH | S_IWOTH=. However,
 we can restrict permissions by adjusting =umask= value.
 
@@ -639,7 +659,8 @@ I/O streams are closed.
 - Character-at-a-time: =getc()=, =fgetc()=, =getchar()=; to distinguish
   the error they return, use =ferror()= and =feof()=; =clearerr()=
   clears these errors. After reading from a stream, we can push back
-  characters by calling =ungetc()=. =putc()=, =fputc()=, =putchar()=
+  characters by calling =ungetc()= (only once is it guaranteed to succeed before
+  another read request). =putc()=, =fputc()=, =putchar()=
   output characters.
 
 - Line-at-a-time: input: =fgets()=, =gets()= (never use it). output:
@@ -648,16 +669,15 @@ I/O streams are closed.
 - Direct I/O (binary): common use: read or write a binary array; read or
   write a structure
 
-#+begin_src C
-size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
-
-size_t fwrite(const void *ptr, size_t size, size_t nmem
-b, FILE *stream);
-#+end_src
-
-A fundamental problem with binary I/O is that it can be used to read
+A problem with binary I/O is that it can be used to read
 only data that has been written on the same system since they have
-different byte order and memory alignment.
+different byte order and memory alignment if binary I/O is used directly with
+various C structures or unions without first applying predefined serialization
+schemes to these structures.
+
+#+begin_src c
+fwrite(&data_structure, sizeof(struct mystruct), 1, output_stream);
+#+end_src
 
 ** Positioning a Stream
 :PROPERTIES:
@@ -669,7 +689,6 @@ different byte order and memory alignment.
 
 - =fgetpos=/=fsetpos= (ISO C): =fpos_t=, as big as necessary to record a
   file's position.
-
 
 ** Implementation Details
 :PROPERTIES:
