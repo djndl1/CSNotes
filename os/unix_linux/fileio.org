@@ -720,16 +720,61 @@ Flush the stream before manipulating the backing file descriptor.
 
 ** Wide Characters
 
+On Linux, narrow-oriented I/O are directly sent to the kernel;
+wide-oriented I/O first converts the charset based on the locale and then
+invokes the syscall.
+
 Under Linux, =wchar_t= is a UTF-32 code point. Wide strings are represented by
 UTF-32 perfectly fine in memory. The underlying I/O are byte-oriented, meaning
 wide character strings have to be converted to multi-byte strings, of which the
-conversion is affected by the locale. The problem that is often ignored is that
+conversion is affected by the locale. The locale determines the final output
+charset of bytes into the I/O syscalls, e.g. UTF-8 for =C.UTF-8=, GB18030 for
+=zh_CN.GB18030=.
+
+The problem that is often ignored is that
 on startup, C programs set the locale to ="C"=, which under Linux restricts the
-charset to ASCII (at least with glibc).
-Non-ASCII characters are ignored unless the target charset is able to represent
-them. Simply setting =LC_TYPE= as an environment variable won't work unless
-=setlocale()= is called with that value. Also, the locale in use has to be
-generated beforehand with =locale-gen=.
+charset to byte values and ASCII (at least with glibc).
+Byte-oriented strings works fine with the ="C"= locale since no conversion
+is made and every byte is output as they are (typically UTF-8)
+Non-ASCII characters are ignored during the conversion unless the target charset
+is able to represent them. Simply setting =LC_TYPE= as an environment variable
+won't work unless =setlocale()= is called with that value. Also, the locale in
+use has to be generated beforehand with =locale-gen=.
+
+Also, wide character I/O and byte-oriented I/O should not be mixed as the
+orientation of a stream is established once an I/O call is made until =freopen()=.
+
+On Linux, the locale =""= is the user-preferred locale in the environment.
+
+#+begin_src c
+#include <stdio.h>
+#include <wchar.h>
+#include <locale.h>
+
+const wchar_t *Test1 = L"Aō中文\n";
+const char *Test2 = "Aō中文\n";
+
+void print()
+{
+	printf("printf-s-1 %s\n", Test2); //
+}
+
+void wprint()
+{
+    wprintf(L"wprintf-ls-1 %ls\n", Test1);
+}
+
+int main()
+{
+    setlocale(LC_ALL, "zh_CN.GB18030");
+    wprint();
+    // with GB18030, the output in the terminal is really GB18030.
+    // With iconv's help, the converted result is the same as the original
+    // with C, non-ASCII characters are question marks
+    // we can see the converted characters are output by the system as is, UTF-8 for UTF-8, GB18030 for GB18030.
+    // basically printf prints as it is, wprintf = conversion + printf
+}
+#+end_src
 
 ** Temporary Files
 :PROPERTIES:
