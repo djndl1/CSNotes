@@ -600,9 +600,9 @@ is represented by a =FILE= object.
 :END:
 Three types of buffering are provided:
 
-- Fully buffered: Files on disk are normally fully buffered by the
-  standard I/O library, usually through =malloc=. /Flush/ describes the
-  writing of a standard I/O buffer.
+- Fully buffered: buffering on a per-block basis. Files on disk are normally
+  fully buffered by the standard I/O library, usually through =malloc=. /Flush/
+  describes the writing of a standard I/O buffer.
 
 - Line buffered: performs I/O when a newline character is encountered on
   input or output. A terminal is usually line buffered. A line might be
@@ -610,18 +610,21 @@ Three types of buffering are provided:
   newline. whenever input is requested through the standard I/O library
   from either an unbuffered stream or a line-buffered stream (that
   requires data to be requested from the kernel), all line-buffered
-  output streams are flushed.
+  output streams are flushed. e.g. =stdout=
 
 - Unbuffered: =stderr= so that error messages can be displayed as
   quickly as possible.
 
 On most implementations, =stderr= is always unbuffered. All other
 streams are line buffered if they refer to a terminal device, otherwise
-they are fully buffered. =setbuf= and =setvbuf= can change the buffering
-of a certain stream. In general, we should let the system choose the
-buffer size and automatically allocate the buffer.
+they are fully buffered.
 
-=fflush()= force a stream to be flushed.
+=setbuf()= and the more advanced and safer =setvbuf()= can change the buffering
+of a certain stream. The default buffer size is =BUFSIZ=.
+In general, we should let the system choose the buffer size and automatically
+allocate the buffer.
+
+=fflush()= force a stream to be flushed to the kernel buffer.
 
 ** Open a stream
 :PROPERTIES:
@@ -684,18 +687,49 @@ fwrite(&data_structure, sizeof(struct mystruct), 1, output_stream);
 :CUSTOM_ID: positioning-a-stream
 :END:
 - =ftell=/=fseek=/=rewind= (ISO C): =long= file position;
+  + unlike =lseek=, =fseek= does not return the result offset.
 
-- =ftello=/=fseeko=: =off_t= (larger than 32 bits);
+- =ftello=/=fseeko=: =off_t= (larger than 32 bits, but POSIX only);
 
 - =fgetpos=/=fsetpos= (ISO C): =fpos_t=, as big as necessary to record a
-  file's position.
+  file's position. Especially on Windows, where =long= is 32-bit.
 
-** Implementation Details
+** Error Handling
+
+Unlike the POSIX interface, where error conditions are communicated through
+=errno=, stdio provides two interfaces to differentiate error conditions and
+EOF: =ferror()= and =feof()=, and =clearerr()= to clear the error and the EOF
+for a stream. stdio does not differentiate =EOF= and an error in its design.
+A function may return =EOF= to indicate end-of-fie or an error. An exceptional
+returned result may indicate end-of-file or an error.
+A returned =EOF= from a read function does not necessarily means end-of-file,
+and it may be an error causing =EOF= to be returned ([[man:EOF]]). =fread()= and =fwrite()= does
+not even returns an =EOF= or a =-1= under an error condition. Rather, a
+returned item count fewer than the intended one is a sign of an error or an EOF.
+
+** Interop with POSIX
 :PROPERTIES:
 :CUSTOM_ID: implementatin-details
 :END:
+
 =fileno()= obtains the descriptor for a stream. We need this function if
 we want to call the =dup= or =fcntl= functions.
+
+Intermixing stdio with system calls is not advised due to the user buffering.
+Flush the stream before manipulating the backing file descriptor.
+
+** Wide Characters
+
+Under Linux, =wchar_t= is a UTF-32 code point. Wide strings are represented by
+UTF-32 perfectly fine in memory. The underlying I/O are byte-oriented, meaning
+wide character strings have to be converted to multi-byte strings, of which the
+conversion is affected by the locale. The problem that is often ignored is that
+on startup, C programs set the locale to ="C"=, which under Linux restricts the
+charset to ASCII (at least with glibc).
+Non-ASCII characters are ignored unless the target charset is able to represent
+them. Simply setting =LC_TYPE= as an environment variable won't work unless
+=setlocale()= is called with that value. Also, the locale in use has to be
+generated beforehand with =locale-gen=.
 
 ** Temporary Files
 :PROPERTIES:
