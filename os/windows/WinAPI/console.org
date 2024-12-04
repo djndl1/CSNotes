@@ -34,7 +34,7 @@ The underlying I/O on Windows is based on UTF-16. Any text-mode output goes thro
 a byte-oriented interface has to be converted based on the current code page.
 However, on Windows, stdio goes through the ANSI version of Win32 API
 and that is why even =wprintf= on Windows is affected by the current code page
-(and twice).
+(and twice). ???? (is this really the case)
 
 There are two conversions for wide strings (wide-to-narrow in the CRT and
 narrow-to-UTF16 by Win32),
