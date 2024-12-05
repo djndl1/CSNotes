@@ -30,32 +30,133 @@ https://alfps.wordpress.com/2011/11/22/unicode-part-1-windows-console-io-approac
 
 https://devblogs.microsoft.com/cppblog/new-options-for-managing-character-sets-in-the-microsoft-cc-compiler/
 
-The underlying I/O on Windows is based on UTF-16. Any text-mode output goes through
-a byte-oriented interface has to be converted based on the current code page.
-However, on Windows, stdio goes through the ANSI version of Win32 API
-and that is why even =wprintf= on Windows is affected by the current code page
-(and twice). ???? (is this really the case)
+** Dig into the UCRT Source
 
-There are two conversions for wide strings (wide-to-narrow in the CRT and
-narrow-to-UTF16 by Win32),
-and one for byte strings (narrow-to-UTF16 by Win32).
-For wide strings, they are first converted to the code page charset, i.e. as
-byte strings. The byte strings are then sent into the ANSI Win32 API and
-converted there into UTF-16 and fed into the Unicode version.
-Data loss during conversion mostly occurs from wide strings to narrow. As long
-as the code page matches the narrow strings' charset, the second conversion from
-narrow to UTF-16 always works.
+*** =_write=
 
-The "C" locale on Windows set on startup treats byte strings as their byte
-values and uses ASCII as the charset.
+Depends on whether the output is a console, the text/binary mode,
+UTF-16/UTF-8/ANSI output mode, the function determines whether a
+second conversion to the console's code page is required and dispatch actual
+work to several different helper functions that write into =WriteFile=
+(=WriteFile= writes data and thus has only a Unicode version).
 
-MSVC internally use UTF-8 for string literals. For unprefixed string
-literals, MSVC would treat them based on the current code page.
+For non console output:
 
-Normal strings are output as they are in execution charset (GCC or
-MSVC). Execution character sets affect normal byte strings only.
+- ansi mode: no conversion before =WriteFile=, written as is.
+
+- utf16 mode: the input is assumed a utf-16 character buffer. No conversion
+  before =WriteFile=
+
+- utf8 mode: The assumed UTF-16 buffer is converted to UTF-8 before =WriteFile=.
+
+For console output:
+
+- ansi mode: double conversion from ansi to UTF-16 and then to the console's ansi.
+
+- utf16, utf8: no conversion. Each character is output to the console as it.
+
+**  Conclusions
+#+title: Console
+
+For GUI apps, console must be allocated and freed with =AllocConsole()= and
+=FreeConsole()=. A process may have only one console. The console can be
+read/written with =ReadFile()= and =WriteFile()= but =ReadConsole()=,
+=WriteConsole()= and =SetConsoleMode()= provide console-specific features.
+Console I/O operates on characters rather than bytes. =CONIN$= and =CONOUT$= are
+special file names that always refer to the console input and output.
+
+* Why Windows Console Is Slow
+
+The Windows Terminal itself is poorly written and renders slowly.
+A console app is hosted by a =conhost= process between the child process and its
+parent, which handles the three standard I/O handles, adding more IPC overhead.
+The Windows console subsystem itself adds overhead as it adds a few preprocessing.
+
+** Reference
+
+- [[https://github.com/cmuratori/refterm/blob/main/faq.md][Refterm FAQ]]
+
+* Unicode
+
+http://archives.miloush.net/michkap/archive/2010/10/07/10072032.html
+
+http://illegalargumentexception.blogspot.com/2009/04/i18n-unicode-at-windows-command-prompt.html
+
+http://illegalargumentexception.blogspot.com/2009/04/java-unicode-on-windows-command-line.html
+
+https://alfps.wordpress.com/2011/11/22/unicode-part-1-windows-console-io-approaches/
+
+https://devblogs.microsoft.com/cppblog/new-options-for-managing-character-sets-in-the-microsoft-cc-compiler/
+
+** Dig into the UCRT Source
+
+*** =_write.cpp=
+
+Depends on whether the output is a console, the text/binary mode,
+UTF-16/UTF-8/ANSI output mode, the function determines whether a
+second conversion to the console's code page is required and dispatch actual
+work to several different helper functions that write into =WriteFile=
+(=WriteFile= writes data and thus has only a Unicode version).
+
+For console output that requires a double translation:
+
+- ansi mode: double conversion from ansi to UTF-16 and then to the console's ansi.
+
+- utf16, utf8: no conversion. Each character is output to the console as it.
+
+For non console output or a =C= locale ansi console:
+
+- ansi mode: no conversion before =WriteFile=, written as is.
+
+- utf16 mode: the input is assumed a utf-16 character buffer. No conversion
+  before =WriteFile=
+
+- utf8 mode: The assumed UTF-16 buffer is converted to UTF-8 before =WriteFile=.
+
+*** =fwrite=
+
+Built on =_write()= instead of being built on =WriteFile=.
+
+*** =printf= family
+
+Built with =output_processor=, which dispatches to different =output_adapter=
+and character traits based on the stream and the character type.
+Depends on the stream type, some are sent to =_write= and some to =WriteConsoleW=.
+
+Wide strings are directly sent to =WriteConsoleW=. Narrow strings are first
+converted to UTF-16 (lossless) and then to =WriteConsoleW=. The conversion is
+done by =mbtowc=, which converts nothing if the =C= locale is used.
+
+** Analysis
+
+The underlying I/O interface on Windows is =WriteFile= and =WriteConsoleW=,
+which writes a buffer without considering about code pages or writes UTF-16
+characters.
+The only problem is that the source strings may be affected by the locales
+of both the program and the console due to conversions before the final Win32 call.
+
+Binary mode is not affected by code page settings.
+
+For narrow characters, they may or may not be converted before =WriteFile=.
+They may be written as they are (ANSI), as UTF-8 (converted from UTF-16) or as
+UTF-16 (the buffer is assumed already to contain UTF-16 data).
+
+The console is always using a multibyte code page.
+For console output, the characters may have to be converted
+into the console's code page using UTF-16 as an intermediate charset.
+If the current locale is not ="C"= or the console is open in a non-ANSI mode
+the second translation is required because the input and the console are in
+different code pages.
+
+The ="C"= locale set on program startup prevents any conversion from ansi to
+UTF-16. If written to a console in ansi mode with the ="C"= locale, =_write=
+writes as is, =printf= does no conversion and treats narrow strings as UTTF-16 data.
+
+** Experiment
 
 The following code should have the commented standard-conformant result.
+
+TODO
 
 #+BEGIN_SRC C++
 #include <stdio.h>
@@ -65,9 +166,23 @@ The following code should have the commented standard-conformant result.
 const wchar_t *Test1 = L"Aō中文\n";
 const char *Test2 = "Aō中文\n";
 
-void print()
+void utf8_printf_c()
 {
-	printf("printf-s-1 %s\n", Test2);
+    setlocale(LC_CTYPE, "C");
+    SetConsoleOutputCP(65001); // UTF-8
+	printf("printf-s-1 %s\n", "\x41\xC5\x8D\xE4\xB8\xAD\xE6\x96\x87");
+    // no conversion into WriteConsoleW,
+}
+
+void utf8_printf_zh_cn()
+{
+    setlocale(LC_CTYPE, "zh_CN");
+	printf("printf-s-1 %s\n", "\x41\xC5\x8D\xE4\xB8\xAD\xE6\x96\x87");
+}
+
+void gbk_printf_c()
+{
+
 }
 
 void wprint()
@@ -77,7 +192,6 @@ void wprint()
 
 int main()
 {
-    setlocale(LC_ALL, "C");
     // with "C", garbled during the first conversion
     // with GB2312, first UTF-16 to GB2312, then GB2312 to UTF-16, no loss
     // with ja_JP, the kanji are fine, the macron o is lost
@@ -95,7 +209,9 @@ int main()
 }
 #+END_SRC
 
-The moral is to use ="C"=  and output everything in UTF-8.
 
-=std::cout= and =std::wcout= works in a similar way to =printf("%s")=
-and =wprintf("%ls")=.
+**  Conclusions
+
+*** Emulate Linux Behavior
+
+- =printf=: set the locale to =C= and the console to ansi (actually the default).
