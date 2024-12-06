@@ -90,7 +90,7 @@ https://devblogs.microsoft.com/cppblog/new-options-for-managing-character-sets-i
 
 ** Dig into the UCRT Source
 
-*** =_write.cpp=
+*** =_write=
 
 Depends on whether the output is a console, the text/binary mode,
 UTF-16/UTF-8/ANSI output mode, the function determines whether a
@@ -100,13 +100,20 @@ work to several different helper functions that write into =WriteFile=
 
 For console output that requires a double translation:
 
-- ansi mode: double conversion from ansi to UTF-16 and then to the console's ansi.
+- ansi mode: double conversion from ansi to UTF-16 and then to the console's
+  ansi. Note the second conversion is handled before =WriteFile=, not by the
+  console itself, which probably means that =WriteFile= as a lower-level API
+  directly sends the result to the display. This process is equivalent to
+  sending to =WriteConsoleA= but with the C locale factor.
 
-- utf16, utf8: no conversion. Each character is output to the console as it.
+- utf16, utf8: the buffer is assumed UTF-16 and thus no conversion before
+  =WriteConsoleW=. The console then handles the conversion to the console's code
+  page.
 
 For non console output or a =C= locale ansi console:
 
-- ansi mode: no conversion before =WriteFile=, written as is.
+- ansi mode: no conversion before =WriteFile=, written as is to the file/console
+  window.
 
 - utf16 mode: the input is assumed a utf-16 character buffer. No conversion
   before =WriteFile=
@@ -119,9 +126,22 @@ Built on =_write()= instead of being built on =WriteFile=.
 
 *** =printf= family
 
-Built with =output_processor=, which dispatches to different =output_adapter=
-and character traits based on the stream and the character type.
-Depends on the stream type, some are sent to =_write= and some to =WriteConsoleW=.
+Built with =output_processor=, which dispatches =stream_output_adapter=
+and character traits based on the stream and the character type. All streams
+are sent to =_write=.
+
+For wide characters, if the stream is in ansi mode, they are first converted to
+byte strings based on the current locale and then sent to =_write=. This
+behavior is similar as in Linux. Although for byte strings under ansi mode
+written to the console, two more conversions are waiting.
+
+Under a Unicode mode, they are directly sent to =_write= and as Unicode written
+directly to the console without any conversion along the way.
+
+*** =_cprintf= family
+
+Another set of console I/O API that writes directly to the console.
+Built with =output_processor=, which dispatches =console_output_adapter=
 
 Wide strings are directly sent to =WriteConsoleW=. Narrow strings are first
 converted to UTF-16 (lossless) and then to =WriteConsoleW=. The conversion is
@@ -133,7 +153,8 @@ The underlying I/O interface on Windows is =WriteFile= and =WriteConsoleW=,
 which writes a buffer without considering about code pages or writes UTF-16
 characters.
 The only problem is that the source strings may be affected by the locales
-of both the program and the console due to conversions before the final Win32 call.
+of both the program and the console and the stream translation mode
+due to conversions before the final Win32 call.
 
 Binary mode is not affected by code page settings.
 
@@ -141,77 +162,177 @@ For narrow characters, they may or may not be converted before =WriteFile=.
 They may be written as they are (ANSI), as UTF-8 (converted from UTF-16) or as
 UTF-16 (the buffer is assumed already to contain UTF-16 data).
 
+For wide characters, with standard I/O, they are converted under ansi mode but
+used directly under Unicode mode. Unicode modes are for UTF-16 buffers to be
+written directly to the underlying stream. They are locale-independent.
+
 The console is always using a multibyte code page.
 For console output, the characters may have to be converted
 into the console's code page using UTF-16 as an intermediate charset.
-If the current locale is not ="C"= or the console is open in a non-ANSI mode
+If the current locale is not ="C"= or the console is open in Unicode mode,
 the second translation is required because the input and the console are in
 different code pages.
 
 The ="C"= locale set on program startup prevents any conversion from ansi to
 UTF-16. If written to a console in ansi mode with the ="C"= locale, =_write=
-writes as is, =printf= does no conversion and treats narrow strings as UTTF-16 data.
+writes as is, =printf= does some conversion and treats narrow strings as ansi data.
 
 ** Experiment
 
 The following code should have the commented standard-conformant result.
 
-TODO
 
 #+BEGIN_SRC C++
 #include <stdio.h>
 #include <wchar.h>
 #include <locale.h>
+#include <windows.h>
+#include <fcntl.h>
+#include <conio.h>
 
-const wchar_t *Test1 = L"Aō中文\n";
+const wchar_t *utf16 = L"Aō中文\n";
 const char *Test2 = "Aō中文\n";
 
-void utf8_printf_c()
+void print_string_in_code_page(const char *locale, UINT cp, const char *str)
 {
-    setlocale(LC_CTYPE, "C");
-    SetConsoleOutputCP(65001); // UTF-8
-	printf("printf-s-1 %s\n", "\x41\xC5\x8D\xE4\xB8\xAD\xE6\x96\x87");
-    // no conversion into WriteConsoleW,
+	setlocale(LC_CTYPE, locale);
+    SetConsoleOutputCP(cp);
+	printf("%s\n", str);
 }
 
-void utf8_printf_zh_cn()
+void wprint_string_in_code_page(const char *locale, UINT cp, const wchar_t *str)
 {
-    setlocale(LC_CTYPE, "zh_CN");
-	printf("printf-s-1 %s\n", "\x41\xC5\x8D\xE4\xB8\xAD\xE6\x96\x87");
+	setlocale(LC_CTYPE, locale);
+    SetConsoleOutputCP(cp);
+	wprintf(L"%ls\n", str);
 }
 
-void gbk_printf_c()
+void cwprint_string_in_code_page(const char *locale, UINT cp, const wchar_t *str)
 {
-
+	setlocale(LC_CTYPE, locale);
+    SetConsoleOutputCP(cp);
+	_cwprintf(L"%ls\n", str);
 }
 
-void wprint()
+
+void utf16_wprintf_c_ansi_mode()
 {
-	wprintf(L"wprintf-ls-1 %ls\n", Test1);
+	const wchar_t ws[] = L"UTF-16_C: Aō中文\n";
+	//_setmode(_fileno(stdout), _O_U8TEXT);
+	wprint_string_in_code_page("C", 65001, ws);
+	// garbled
 }
 
-int main()
+void utf16_wprintf_zh_cn_ansi_mode()
 {
-    // with "C", garbled during the first conversion
-    // with GB2312, first UTF-16 to GB2312, then GB2312 to UTF-16, no loss
-    // with ja_JP, the kanji are fine, the macron o is lost
-	wprint();
+	const wchar_t ws[] = L"UTF-16_C: Aō中文\n";
+	//_setmode(_fileno(stdout), _O_U8TEXT);
+	wprint_string_in_code_page("zh_CN", 65001, ws);
+	// garbled
+}
 
-    // note that these two calls may not be mixed in a single process
+void utf16_wprintf_c_unicode_mode()
+{
+	const wchar_t ws[] = L"UTF-16_C: Aō中文\n";
+	_setmode(_fileno(stdout), _O_U8TEXT);
+	wprint_string_in_code_page("C", 65001, ws);
+	// UTF-16 -> UTF-8
+}
 
-    // only ANSI to UTF-16 or even none
-    // with "C", seems to output as is without conversion,
-    //           whether the console shows it well or not depends on the chcp setting
-    // with "zh_CN", completely garbled as the input is UTF-8, not GB2312
-    //               set the execution charset to GBK and now it converts correctly to UTF-16
-    // with "en_US", garbled in a different way, seems to be Latin-1
-    printf();
+void utf16_wprintf_zh_cn_unicode_mode()
+{
+	const wchar_t ws[] = L"UTF-16_C: Aō中文\n";
+	_setmode(_fileno(stdout), _O_U8TEXT);
+	wprint_string_in_code_page("zh_CN", 65001, ws);
+	// UTF-16 -> UTF-8
+}
+
+void utf8_printf_c_ansi()
+{
+	print_string_in_code_page("C", 65001, "UTF8_C: \x41\xC5\x8D\xE4\xB8\xAD\xE6\x96\x87\n");
+    // no conversion into the stream,
+}
+
+
+void gbk_printf_c_ansi()
+{
+	print_string_in_code_page("C", 936, "GBK C: A\xa8\xad\xd6\xd0\xce\xc4\n");
+	// GBK, no conversion
+}
+
+void gbk_printf_zh_cn_ansi()
+{
+	print_string_in_code_page("zh_CN", 936, "GBK zh_CN: A\xa8\xad\xd6\xd0\xce\xc4\n");
+	// GBK -> UTF-16 -> GBK no problem
+}
+
+int main(int argc, char *argv[])
+{
+	if (argc > 1) {
+		utf16_wprintf_c_ansi_mode(); // garbled
+		utf16_wprintf_c_unicode_mode(); // correct
+		utf16_wprintf_zh_cn_ansi_mode(); // correct
+		utf16_wprintf_zh_cn_unicode_mode(); // correct
+	} else {
+		utf8_printf_c_ansi(); // corret
+		gbk_printf_c_ansi(); // correct
+		gbk_printf_zh_cn_ansi(); // correct
+	}
 }
 #+END_SRC
 
 
 **  Conclusions
 
-*** Emulate Linux Behavior
+Unicode modes are not affected by locales: the actual output depends the exact
+mode in use or the console code page. ANSI console with the "C" locale is as raw
+as possible. ANSI console normally tries to convert the input to UTF-16 while ANSI file
+streams accept them as is due to the file's ANSI requirement but it does not
+really check the current locale to ensure the output charset is in the one
+mandated by the locale.
 
-- =printf=: set the locale to =C= and the console to ansi (actually the default).
+*** Raw Output Solutions
+
+The real raw output is to use binary mode. But here a less stricter definition
+translates =LF= to =CRLF=, with the following solutions:
+
+- Console:
+  + =printf=: set the locale to =C= and the console to ansi, the output is the
+    same as in the buffer (the Linux behavior, though under Linux's =printf= is
+    not actually affected by the locale).
+
+- File:
+  + =fprintf=: set the file to ansi and send ansi strings.
+
+*** UTF-8 Solutions
+
+- ANSI Console:
+  + set the console's code page to 65001 UTF-8
+  + the file mode is set to ansi and the locale is set to "C"
+  + the input buffer should be in UTF-8 with the =printf= family.
+
+- Unicode Console:
+  + set the console's code page to 65001 UTF-8
+  + the file mode is set to UTF-8 and the locale is not relevant.
+  + the input buffer should be in UTF-16 with the =wprintf= family.
+
+- Direct Console:
+  + set the console's code page to 65001 UTF-8
+  + call =_cwprintf= with UTF-16 buffers.
+
+- ANSI mode file:
+  + the file mode is set to ansi
+  + the input buffer should be in UTF-8 with the =fprintf= family.
+    After all, the file is supposed to accept ANSI strings and UTF-8 is an ANSI
+    code page (not really). This should be Lua's way to store UTF-8 files (and
+    already used by newre versions of Windows 10).
+
+- UTF-8 mode file:
+  + set the file mode to UTF-8
+  + the input buffer should be in UTF-16 with the =wfprintf= family.
+
+** UTF-16 Solutions
+
+- Console: no solution. The console always uses non-UTF-16 code pages.
+
+- Files: use the UTF-16 mode with the =wfprintf= family
