@@ -291,6 +291,11 @@ streams accept them as is due to the file's ANSI requirement but it does not
 really check the current locale to ensure the output charset is in the one
 mandated by the locale.
 
+Be aware that MSVC recognizes the source file as UTF-8 by the BOM but it does
+not translate narrow strings to UTF-8 just because of the BOM. By default, the
+execution charset is the current code page. To ensure correct behavior to use
+UTF-8 with ANSI mode, explicitly set the execution charset.
+
 *** Raw Output Solutions
 
 The real raw output is to use binary mode. But here a less stricter definition
@@ -336,3 +341,11 @@ translates =LF= to =CRLF=, with the following solutions:
 - Console: no solution. The console always uses non-UTF-16 code pages.
 
 - Files: use the UTF-16 mode with the =wfprintf= family
+
+** TLDR
+
+For C/C++ programs, the default locale is already "C"
+so the console output needs no more configuration.
+Streams are by default ANSI so in both cases, narrow strings are output as the
+are.
+UTF-8 I/O is simple by making sure every strings in the code are UTF-8.
