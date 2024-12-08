@@ -776,6 +776,33 @@ int main()
 }
 #+end_src
 
+** Thread Safely
+
+Standard I/O functions are themselves protected by locks. However, if a larger
+chunk of I/O operations needs locking, additional locking mechanism is required.
+
+*** =flockfile()=, =ftrylockfile()=, =funlockfile()= (POSIX)
+
+These functions provide recursive locking for a stream.
+
+*** Unlocked I/O (Mostly Linux-Specific)
+
+Linux proviedes a set of thread-unsafe unlocked I/O functions.
+
+Combined with the lock mechanism above, they may offer greater performance than
+normal I/O functions.
+
+*** Other Systems
+
+Win32 provides a pair of non-recursive locking functions. Moreover, a few
+=_nolock= I/O functions are provided with no thread-safety guarantee for
+performance reason.
+
+** Critiques
+
+Double-copying from the kernel to the internal buffer and the internal buffer to
+the user code and or the other way around.
+
 ** Temporary Files
 :PROPERTIES:
 :CUSTOM_ID: temporary-files
