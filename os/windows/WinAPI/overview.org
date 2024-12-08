@@ -10,3 +10,60 @@ data types (=BOOL=, =HANDLE=, =DWORD=, =LPTSTR=, =LPSECURITY_ATTRIBUTES=) are
 specific to Windows, although many feel anachronism and many are obsolet but
 never removed. =windows.h= is always necesary and contains all Windows function definitions and
 data types.
+
+* Unicode or ANSI Version of API
+
+The Windows SDK provides function prototypes in generic, Windows code page
+(ANSI) and Unicode versions, which can be compiled to produce either ANSI or
+Unicode prototypes.
+
+#+begin_quote
+New Windows applications should use Unicode to avoid the inconsistencies of
+varied code pages and for ease of localization. They should be written with generic
+functions, and should define UNICODE to compile the functions into Unicode
+functions. In the few places where an application must work with 8-bit character
+data, it can make explicit use of the functions for Windows code pages.
+#+end_quote
+
+The Unicode version always expects UTF-16 strings, while the ANSI version
+expects the narrow strings passeed in to be in the code page of the current
+system, which may not be true.
+
+There are some cases where one may choose the ANSI version:
+
+- The code page is 65001 (UTF-8) and the input is a UTF-8 string, then the ANSI
+  version would gladly accepts this narrow string without further conversion loss.
+  + this only applies to =WriteConsoleA= until very recent Windows 10 because it relies on the console's
+    output code page, which does support 65001 (UTF-8). Other functions depends
+    on the
+  + The few functions that are implemented in ANSI natively.
+
+** UTF-8
+
+UTF-8 65001 is not available as an active code page on Windows until Windows
+10 1903. One can pass a UTF-8 string to the A-family functions but they were
+always interpreted by the current code page instead of UTF-8.
+
+Windows 10 1903 supports configuration of the active code page individual
+programs via application manifests, not limited to UTF-8 but other code pages,
+for compatibility purposes. GDI requires the global locale setting to be UTF-8
+(not very backward-compatible) as of 2024. This feature has the benefit of
+supporting existing code built with -A APIs without any changes but adds Unicode support.
+
+By [[https://www.reddit.com/r/cpp/comments/g7tkd7/state_of_utf8_support_on_windows/][some reddit user]] (probably from MS)
+
+#+begin_quote
+The intent of the UTF-8 system codepage behavior is to primarily to help well behaved Unicode workflows that still have a dependency on the ACP.
+There are a class of apps that are basically Unicode, but have a dependency on the system codepage. (Think notepad before it started saving in UTF-8 by default). When used in a global environment, that leads to unnecessary mojibake.
+...
+There are a class of apps that are basically Unicode, but have a dependency on the system codepage. (Think notepad before it started saving in UTF-8 by default). When used in a global environment, that leads to unnecessary mojibake.
+#+end_quote
+
+*** Library Solution
+
+**** =Boost.NoWide=
+
+A compatibility layer to solve UTF-8 API issue in C/C++ for cross-platform
+programs. It provides UTF8-aware alternative implementations for common C/C++
+API: standard I/O, console, conversion between UTF-8 and UTF-16, command line
+arguments, environment variables etc.
