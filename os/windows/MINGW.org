@@ -2,9 +2,9 @@
 
 * [[https://www.mingw-w64.org/][MinGW-w64]]
 
-The current de-factor standard GCC on Windows.
+The current de facto standard GCC on Windows.
 
-- Support from Windows 2000
+- Support since Windows 2000
 
 - Has DDK and DirectX support from other projects.
 
