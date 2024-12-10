@@ -1,0 +1,53 @@
+#+title: Back To Procedural Programming
+
+Zig, Rust, Go, Odin, JAI, Carbon: recent programming languages that does not
+emphasize OOP.
+
+Procedural programming uses procedures over GOTOs, with strcutured flow control.
+
+* Alan Kay's OOP
+
+- /messaging/: send a message to tell an object to act (calling a method). The
+  object looks at the message and decides what action to take based on current
+  state. A method is seen as a message type allowed by an object. Calling an method
+  sends a message of the type.
+  + comparable to HTTP request
+  + modern OOP languages move away from messaging.
+
+- encapsulation: local retention and protection and hiding of state-process
+
+- extreme late-binding of all things: objects attributes, behaviors and methods
+  are completely determined and changeable at runtime.
+  + at odds with modern static-typed OOP languages.
+
+C++ didn't take flight because of OOP.
+Even functional languages nowadays combine data and actions together, even
+without classes (with modules).
+
+* The Pillars of OOP
+
+- Abstraction: don't depend on implementation
+
+- Encapsulation: prevent depending on implementation
+
+- Polymorphism: implementation determined by type at runtime or compile-time
+
+- Inheritance: OOP-unique, hierarchical code sharing, in contrast with
+  composition (non-hierarchical code sharing, basically every language, e.g. nesting
+  structs in C)
+  + method overriding might accidentally break other code due to implicitness of inheritance.
+
+Every modern language has the first three.
+Hierarchical code sharing seems to be the actual essence of classical OOP.
+
+* Procedural: Functions and Data
+
+Let data just be data and actions just be actions.
+
+* Reference
+
+- [[https://www.youtube.com/watch?v=vQPHtAxOZZw][The Return Of Procedural Programming]]
+
+- [[https://www.youtube.com/watch?v=69edOm889V4][The Design Of C++]]
+
+- [[https://www.youtube.com/watch?v=IRTfhkiAqPw&feature=youtu.be][Object Oriented Programming is Embarassing]]
