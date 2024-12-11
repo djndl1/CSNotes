@@ -3,7 +3,7 @@
   :CUSTOM_ID: introduction
   :END:
 
-For those library that are defined as functions, C STDLIB permits
+For those library that are defined as functions, C standard library permits
 implementations to provide a function-like macro of the same name in
 addition to the true function. the macro might provide a faster
 implementation of a simple function or it might call a function of a
@@ -31,6 +31,12 @@ Besides the common way, another way to provide compatibility with C++ is
   #include "c_lib.h"
   }
 #+END_SRC
+
+** Windows
+
+The current implementation (UCRT) implements most of C99 and POSIX.1.
+POSIX functions and Microsoft-specific functions are prefixed with an underscore
+to comply to the C++ standard's requirement for reserve names.
 
 * Standard Language Additions
   :PROPERTIES:
@@ -174,6 +180,29 @@ function and check it afterwards. =strerror=, =perror= interpretes
 =va_copy= can be used to retain a pointer into the argument list
 
 * Standard I/O
+
+I/O functions are divided into two classes (called /orientation/): wide and
+narrow.
+A file stream is either wide or narrow. The first I/O operation determines its
+orientation unless reopen. Before that, a stream is unbound.
+
+The conversion between wide and narrow streams are handled within libc, affected
+by =LC_CTYPE= upon orientation initialization, altered by =setlocale=.
+
+The =FILE= object stores the state of a stream, including the error condition,
+an EOF indicator, file position, orientation, read/write access rights,
+conversion state, shift state (conversion), a file buffer. A =FILE= object is
+not meant to be altered or copied.
+
+Note that ANSI C requires that a file positioning function intervene between
+output and input, unless an input operation encounters end-of- file.  (If this
+condition is not met, then a read is allowed to return the result of writes
+other than the most recent.)  Therefore it is good practice (and indeed
+sometimes necessary under Linux) to put an fseek(3) or fsetpos(3) operation
+between write and read operations on such a stream. *Linux does not mandate this
+but it is always recommended so*.
+
+** Pitfalls
 
 - for =printf=-family functions
   #+begin_quote
@@ -362,6 +391,10 @@ In STD C, memory is interpreted as an array of objects of type
 
 - =memset=: copies a value into a certain number of bytes beginning at a
   memory location.
+
+** Windows
+
+Aligned allocations are not supported. Use =_aligned_malloc=.
 
 * Time Support
 
