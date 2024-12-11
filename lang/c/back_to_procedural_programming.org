@@ -14,9 +14,9 @@ Procedural programming uses procedures over GOTOs, with strcutured flow control.
   + comparable to HTTP request
   + modern OOP languages move away from messaging.
 
-- encapsulation: local retention and protection and hiding of state-process
+- /encapsulation/: local retention and protection and hiding of state-process
 
-- extreme late-binding of all things: objects attributes, behaviors and methods
+- extreme /late-binding/ of all things: objects attributes, behaviors and methods
   are completely determined and changeable at runtime.
   + at odds with modern static-typed OOP languages.
 
@@ -43,6 +43,33 @@ Hierarchical code sharing seems to be the actual essence of classical OOP.
 * Procedural: Functions and Data
 
 Let data just be data and actions just be actions.
+Some languages force users to envision everything as a thing even if it
+originates as an action, a process. Not everything is an object.
+Also, hierarchical classification is not unique to OOP.
+
+Interfaces are there in Go, Rust and even Haskell. There are various ways to
+accept abstract data:
+- interfaces
+
+- traits,
+
+- type classes
+
+-  closures: Javascript, where a closure may even refer to the object currently being defined, to which
+it belongs, to capture the =self= parameter. The actual behavior depends on the
+object definition by duck typing)
+
+- non-closure functions: the =self= parameter is explicitly passed in
+
+- function pointers
+
+Encapsulation, type hierarchy, abstraction are not unique to OOP. Many OOP's
+features are not exclusive to it and some are out of favor now. Language
+paradigms are not about what styles are possible, more about how those styles
+are supported and what styles the ecosystem embraces.
+
+Procedural style is programming with /less hierarchy/,
+/organizing code into data and procedures/ and /using modules for modularity/.
 
 * Reference
 
