@@ -1,5 +1,17 @@
 #+title: Windows XP Support
 
+* RDP: Anti-Aliasing
+
+According to [[https://leitchronicle.wordpress.com/2009/11/07/remote-desktop-with-clear-type-on-windows-xp/][this article]], there are two registry keys:
+
+- =[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal
+  Server\WinStations]"AllowFontAntiAlias"=dword:00000001=: anti alias setting
+  for RDP if the session is initiated by a console
+
+- =[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal
+  Server\WinStations\RDP-Tcp]"AllowFontAntiAlias"=dword:00000001=: if a session
+  is initiated by an RDP connection.
+
 * GCC
 
 - a modified MSYS2 is available [[https://archive.org/details/msys2xp][here]], with many userland utils replaced by =busybox=. Another way to get proper Bash support
