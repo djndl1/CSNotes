@@ -78,3 +78,15 @@ Procedural style is programming with /less hierarchy/,
 - [[https://www.youtube.com/watch?v=69edOm889V4][The Design Of C++]]
 
 - [[https://www.youtube.com/watch?v=IRTfhkiAqPw&feature=youtu.be][Object Oriented Programming is Embarassing]]
+
+- [[http://steve-yegge.blogspot.com/2006/03/execution-in-kingdom-of-nouns.html][Execution in Kingdomn of Nouns]]
+
+- [[https://www.youtube.com/watch?v=0iyB0_qPvWk][Object Oriented Programming is Good*]]
+
+- [[https://www.youtube.com/watch?v=QM1iUe6IofM&t=146s][Object Oriented Programming is Bad]]
+
+- [[https://www.youtube.com/watch?v=V6VP-2aIcSc][Object Oriented Programming is Garbage]]
+
+- [[https://www.youtube.com/watch?v=hxGOiiR9ZKg][The Flaws of Inheritance]]
+
+- [[https://www.youtube.com/watch?v=aq365yzrTVE][Why Inheritance Sucks]]
