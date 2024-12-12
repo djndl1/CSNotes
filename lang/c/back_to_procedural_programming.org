@@ -5,7 +5,25 @@ emphasize OOP.
 
 Procedural programming uses procedures over GOTOs, with strcutured flow control.
 
-* Alan Kay's OOP
+* What is OOP
+
+As programs became complex with more and more shared state, two approaches have
+to proposed to solve this issue:
+
+- functional programming: minimize state
+
+- object-oriented programming: segregate state
+  + we use objects and objects contain other objects.
+
+** What is an Object
+
+An object is a bundle of encapsulated states, with which any interaction is
+performed through /messaging/. The object has a predefined set of messages as
+its public interface, with its private states hidden behind the public
+interface. Objects may contain other objects and objects interact with each
+other by sending messages.
+
+** Alan Kay's OOP
 
 - /messaging/: send a message to tell an object to act (calling a method). The
   object looks at the message and decides what action to take based on current
@@ -24,7 +42,7 @@ C++ didn't take flight because of OOP.
 Even functional languages nowadays combine data and actions together, even
 without classes (with modules).
 
-* The Pillars of OOP
+** The Pillars of OOP
 
 - Abstraction: don't depend on implementation
 
@@ -39,6 +57,13 @@ without classes (with modules).
 
 Every modern language has the first three.
 Hierarchical code sharing seems to be the actual essence of classical OOP.
+
+* Why OOP Succeeds
+
+The paradigm itself may have some merits but it came to dominate the industry
+probably due to the simplicity of early Java's API, its C-like syntax, platform
+independence, GC,
+its method call syntax =subject.verb(object)= (and IDE autocompletion of the syntax).
 
 * Procedural: Functions and Data
 
