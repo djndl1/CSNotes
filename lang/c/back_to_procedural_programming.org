@@ -65,6 +65,44 @@ probably due to the simplicity of early Java's API, its C-like syntax, platform
 independence, GC,
 its method call syntax =subject.verb(object)= (and IDE autocompletion of the syntax).
 
+* The Problem of OOP
+
+Patterns, SOLID, DI, agile development and so on are all bandages to the
+original OOP.
+
+** Encapsulation does not work at a fine-grained level.
+
+Originally messages send only copies of state, not object references. To send
+messages to another object, the sender has to have a reference to the receiver
+since the inception, and thus the receiver is part of the sender's private
+state.
+
+Messaging modifies the internal state of an object. As long as messages are sent
+to an object by many other objects, this object becomes the shared global state.
+To strictly enforce encapsulation, objects has to form a tree-like hierarchy,
+where only the parent is able to send messages to an object. If an object wants
+to send a message to an object on another branch, it has to modify its own
+private state to notify its parent, and ancestors and then down the
+other branch until a message reaches the other object. *No one writes code like
+this*. If this is not to be followed, then an object may be modified by multiple
+others, which is equally bad.
+
+Too much encapsulation adds unnecessary barriers to the architecture of a
+program and actually hinders change.
+Absence of structure is more structured than bad structure.
+
+** OOP Represents No Real-World Objects
+
+The relationship between types and behaviors are difficult to decide and
+sometimes even random. There is no real-world relationship between the behavior
+code and its belonging class name. Various "manager", "factory", "service", doer classes
+represents no real-world notions. Behaviors are split into various objects
+(nouns).
+Here programming abstraction reduces no complexity but adds more abstract code.
+An object's behavior is then put into numerous objects, leading to code
+fragmentation (single responsibility). The problem here is that OOP forces
+behaviors into a certain object.
+
 * Procedural: Functions and Data
 
 Let data just be data and actions just be actions.
@@ -74,6 +112,7 @@ Also, hierarchical classification is not unique to OOP.
 
 Interfaces are there in Go, Rust and even Haskell. There are various ways to
 accept abstract data:
+
 - interfaces
 
 - traits,
@@ -95,6 +134,29 @@ are supported and what styles the ecosystem embraces.
 
 Procedural style is programming with /less hierarchy/,
 /organizing code into data and procedures/ and /using modules for modularity/.
+
+** Still Need OOP?
+
+Only behaviors strongly associated with a certain data type should be modeled as
+object methods. Most procedures handle cross-cut behaviors.
+
+** Handle Shared State
+
+- Favor pure functions.
+
+- When in doubt, parameterize
+
+- Bundle globals into structs/records/classes, creating subnamespaces.
+
+- Encapsulate at the level of namespaces/packages/modules.
+
+- A Long function of a sequence of coupled logic steps should be not be split blindly.
+  + prefer section comments over extracting code into separate helper functions.
+  + prefer nested functions to indicate the helpers' usage (if the language
+    offers the feature). Use anonymous functions and call them immediately.
+  + constraint scope of local variables. (C-like) when in doubt, embrace
+    variables in curly braces. Using anonymous functions (expressions) also avoids variables
+    shared within the scope and the enclosing function.
 
 * Reference
 
