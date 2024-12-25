@@ -13,7 +13,7 @@ The entire Windows API is supported by a DLL that invokes the Windows
 kernel for additional services. Since DLLs might be used by multiple
 processes, it should be thread-safe.
 
-* Implicit Linking
+* Implicit Linking (Load Time)
    :PROPERTIES:
    :CUSTOM_ID: implicit-linking
    :END:
@@ -23,9 +23,13 @@ calling program; =DLL= for functions when executing the calling program;
 A DLL file that contains the executable image, placed in the same
 directory as the application.
 
-A exported function in DLL must be annotated with
-=__declspec (dllexport)= (typically used in the form the
-=MYLIBRARYNAME_EXPORTS= macro ) or use a =.DEF= file.
+An exported function in DLL must be annotated with =__declspec(dllexport)=
+during building (typically used in the form the =MYLIBRARYNAME_EXPORTS= macro)
+and =__declspec(dllimport)= for client code.
+
+A =.DEF= file may be used instead.
+CMake is able to generate such a =.def= file without explicitly annotating each
+visible function.
 
 The search path is
 
@@ -39,6 +43,24 @@ The search path is
 - the current directory
 
 - =%PATH%=
+
+** Symbol Visibility
+
+Not every non-static function should be exported from a shared library.
+Also import annotations provide some optimization hint so that
+trampolines are not generated.
+
+For MINGW, no =.def= or import/export annotation is required as long as the
+symbols are exported in the DLL. Also =gendef= is
+included in MINGW to generate a definition file for use with other toolsets.
+=dlltool= in MINGW can generate an import library from a def file or directly by GCC.
+
+MSVC cannot directly link with an DLL and requires an import library.
+Typically MSVC generates an import library for an DLL's exported symbols.
+Export annotations or a def file is mandatory for MSVC to export any symbol.
+Import annotations are optional for function declarations, but mandatory to
+access data symbols and objects for MSVC as well but
+[[https://learn.microsoft.com/en-us/cpp/build/importing-into-an-application-using-declspec-dllimport?view=msvc-170][including them produces more efficient code]].
 
 * Explicit Linking (Dynamic loading)
    :PROPERTIES:
@@ -59,9 +81,10 @@ The address of any entry point can be queried by =GetProcAddress=.
    :CUSTOM_ID: the-dll-entry-point
    :END:
 
-entry point (typically =DllMain=): invoked automatically every time a
+The entry point (typically =DllMain=) is invoked automatically every time a
 process attaches or detaches the DLL or a new thread is created or
-terminated, specified by users.
+terminated, specified by users. The entry point is supposed to manage resources
+and thread-local storage in thread-safe DLL (during thread initialization/termination).
 
 * Versioning
    :PROPERTIES:
