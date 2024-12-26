@@ -62,6 +62,10 @@ Import annotations are optional for function declarations, but mandatory to
 access data symbols and objects for MSVC as well but
 [[https://learn.microsoft.com/en-us/cpp/build/importing-into-an-application-using-declspec-dllimport?view=msvc-170][including them produces more efficient code]].
 
+Static libraries are simply archived combined object files.
+Symbols in static libraries on Windows have different names for the client code
+to use than those in DLLs. So the client code should not use =dllimport=.
+
 * Explicit Linking (Dynamic loading)
    :PROPERTIES:
    :CUSTOM_ID: explicit-linking-dynamic-loading
