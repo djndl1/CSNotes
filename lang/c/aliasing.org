@@ -1,0 +1,141 @@
+#+title: Aliasing
+
+#+begin_quote
+A situation where two different expressions or symbols refer to the same object.
+#+end_quote
+
+Normally, it is safe to use aliases to access the same object. In some cases,
+using aliasing symbols may even affect correctness or efficiency of the code.
+
+* Strict Aliasing Rules
+
+The standard specifies which expression types are allowed to alias which types.
+The compiler and optimizer are allowed to assume the aliasing rules are followed
+strictly and acts accordingly. Any other types that are not allowed would lead to undefined behavior.
+
+*Strict alias violation is about accessing data via an incompatible handle.*
+The compiler assumes that two incompatible handles refer to different objects.
+Strict aliasing rules are about object identity assumption resulted from type
+incompatibility, not about memory overlapping. If the object is not the same one,
+then there is no violation at all.
+
+Also, strict aliasing rules are a different issue with the =restrict= keyword.
+
+#+begin_src c
+int foo( float *f, int *i ) {
+  ,*i = 1;
+  ,*f = 0.f;
+  return *i;
+// float is not a valid alias for int
+// f is assumed by the compiler to not be i and thus *i is never 0.f
+}
+#+end_src
+
+For C, the only way to access the same object is to dereference a pointer,
+otherwise, the object's value is copied to another variable. For C++, there are
+aliasing references. However, strict aliasing violation only occurs when
+accessing these memory locations, not simply having pointer pointing to the same
+location. This does not mean pointer casting does not access the memory (in C++).
+
+
+
+** Exact Aliasing Rules (C23 6.5 Para. 7)
+
+The standard explicitly gives rules where aliasing is allowed.
+
+#+begin_quote
+An object shall have its stored value accessed only by an lvalue expression that has one of the
+following types:
+- a type compatible with the effective type of the object,
+- a qualified version of a type compatible with the effective type of the object,
+- a type that is the signed or unsigned type corresponding to the effective type of the object
+- a type that is the signed or unsigned type corresponding to a qualified version of the effective type of the object,
+-  an aggregate or union type that includes one of the aforementioned types among its members (including, recursively, a member of a subaggregate or contained union)
+- a character type.
+#+end_quote
+
+*Pointers to incompatible types are never supposed to alias*.
+
+So basically, valid aliasing types are compatibles types (qualified or not),
+corresponding signed/unsigned types (qualified or not), containing aggregate
+types, or a character type (=char=, =unsigned char=, =signed char=, due to
+=char= being a byte).
+
+Theoretically, =uint8_t= and =int8_t= are not valid aliasing types. But in
+practice they are typedefs of character types.
+
+- For allocated memory, the returned memory pointer has no declared type. =void=
+  is not a complete type so =void*= cannot be dereferenced. There is no object
+  in that allocated memory until later the memory location is accessed through
+  another pointer to a complete type.
+
+- A pointer to a structure object, suitably converted, points to its initial
+  member (or if that member is a bit-field, then to the unit in which it
+  resides), and vice versa.
+  + Accessing a member through the struct falls under the 5th rule
+  + Accessing a member by the struct pointer cast to the member type
+    is also fine as the accessed member object is not an alias of the containing
+    struct. There is no aliasing here as these are two different objects and
+    thus there is not violation.
+
+    #+begin_src c
+typedef struct
+{
+    //... Other fields
+    int x;
+    //... Other fields
+} A;
+
+// no violation
+// x is accessible through a->x as A contains an int member (rule 5)
+// so the compiler gladly assumes a->x may be alias of *x
+// since a->x may be an alias, it means *x may be equal to a->x
+// no optimization is done here, the compiler always returns a->x, not 0
+int test_func(A *a, int *x)
+{
+    a->x = 0;
+    ,*x = 1;
+    return a->x;
+}
+    #+end_src
+
+** C++
+
+There are a few differences between C++ and C due different type systems and
+value categories.
+
+- =signed char= is not included in C++ as a valid aliasing type but =std::byte= is.
+
+- to create an object out of =malloc= memory pointer, in C a type cast is fine.
+  For C++, it has to be placement =new=.
+
+* Scenario
+
+** Type Punning
+
+- type punning :: Circumventing the type system and interpret an object as a different type.
+
+Useful for tasks that want access to the underlying representation of an object.
+
+The traditional method is to cast the pointer to another type (often
+incompatible), lead to invalid aliasing and thus undefined behavior.
+Traditional compilers do not take advantage of strict aliasing rules so this
+just works.
+
+*** The Correct Approach to Type Punning
+
+- For C, unions are a common method for type punning (invalid in C++). Unions
+  are designed for implementing variant types, not for type punning. That is,
+  you are not allowed to write to one member and read from another: at most one
+  member may active at any given time in C++ (C explicitly allows this).
+
+  #+begin_src c
+union u1
+{
+    int n;
+    float f;
+}
+  #+end_src
+
+- =memcpy= (for both C and C++): direct assignment with deferenced pointer does not work but copying a value with
+  library function works. The optimizer should recognize the use of memcpy for type punning and optimize it away.
