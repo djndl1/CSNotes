@@ -1,0 +1,35 @@
+#+title: Type System
+
+#+begin_quote
+The meaning of a value stored in an object or returned by a function is determined by the type of the
+expression used to access it. (An identifier declared to be an object is the simplest such expression;
+the type is specified in the declaration of the identifier.)
+#+end_quote
+
+* Classification
+
+- *Object Types* and *function types*
+
+- *Incomplete* or *complete*
+  + incomplete: no size info is provided, e.g. =void=, declared =struct= without definition
+  + complete
+  + incomplete types can only be used when the size of the object is not needed.
+
+* Common Types
+
+- =bool=: an unsigned integer type as per the standard.
+
+- =char=: its signedness is not defined but should be able to contain a member
+  the basic execution character set as a nonnegative value.
+  + =unsigned char=, =signed char= and =char= are called *the character types*.
+
+- Arithmetic for the unsigned type is performed modulo 2^{N} (wrapping around), meaning
+  computation involving unsigned operands can never produce an overflow.
+
+- A =complex= type is regarded as a floating-point array containing its two
+  components as for representation and alignment requirements.
+
+- =char=, the signed/unsigned integers, the floating types are called *the basic
+  types* and
+  are complete types.
+
