@@ -122,6 +122,13 @@ incompatible), lead to invalid aliasing and thus undefined behavior.
 Traditional compilers do not take advantage of strict aliasing rules so this
 just works.
 
+Accessing a member of a structure through a pointer is not type punning as long
+as the pointer type is compatible. The access is performed through the correct
+type and thus not a type punning. Accessing the first member by casting a
+pointer to the structure seems a
+reinterpretation of the structure, but then again, the cast pointer to the first
+member is of the correct type of the object at that memory location and thus not type punning.
+
 *** The Correct Approach to Type Punning
 
 - For C, unions are a common method for type punning (invalid in C++). Unions
@@ -137,5 +144,16 @@ union u1
 }
   #+end_src
 
-- =memcpy= (for both C and C++): direct assignment with deferenced pointer does not work but copying a value with
-  library function works. The optimizer should recognize the use of memcpy for type punning and optimize it away.
+- =memcpy= (for both C and C++): direct assignment with dereferenced pointer does not work but copying an object with
+  library function works. The optimizer should recognize the use of memcpy, as
+  per the standard, for type punning and optimize it away.
+
+  #+begin_src c
+int n = 5;
+float f;
+memcpy(&f, &n, sizeof(n));
+  #+end_src
+
+- To type punning an array, type punning each element instead of casting the
+  pointer to another type. The optimizer is expected to access the memory
+  directly without an actual copy.
