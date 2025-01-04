@@ -99,6 +99,25 @@ int test_func(A *a, int *x)
 }
     #+end_src
 
+** Common Initial Sequence Rule
+
+If a non-static member of a structure is part of the common initial sequence of two
+structures in a union, then it is allowed to be read.
+
+#+begin_src c
+  struct T1 { int a, b; };
+  struct T2 { int c; double d; };
+  union U { T1 t1; T2 t2; };
+  int f() {
+    U u = { { 1, 2 } };   // active member is t1
+    return u.t2.c;        // OK, as if u.t1.a were
+                          // nominated
+  }
+#+end_src
+
+It is likely this rule is introduced to avoid placing the discriminator out of
+the two structures.
+
 ** C++
 
 There are a few differences between C++ and C due different type systems and
@@ -157,3 +176,30 @@ memcpy(&f, &n, sizeof(n));
 - To type punning an array, type punning each element instead of casting the
   pointer to another type. The optimizer is expected to access the memory
   directly without an actual copy.
+
+* Alising & Alignment
+
+In additional to optimization issue, violating strict aliasing rules can lead to
+violations of alignment requirement.
+
+
+#+begin_quote
+Complete object types have alignment requirements which place restrictions on the addresses at which objects of that type may be allocated. An alignment is an implementation-defined integer value representing the number of bytes between successive addresses at which a given object can be allocated. An object type imposes an alignment requirement on every object of that type: stricter alignment can be requested using the _Alignas keyword.
+#+end_quote
+
+#+begin_quote
+A pointer to an object or incomplete type may be converted to a pointer to a different object or incomplete type. If the resulting pointer is not correctly aligned) for the pointed-to type, the behavior is undefined.
+#+end_quote
+
+A =char= typically aligns at 1, but an =int= aligns at 4. Four consecutive bytes
+do not make an =int= if the location of the first byte is misaligned. To avoid
+alignment issue, allocate the four bytes with =alignas= to align with =int=.
+
+Unaligned access may break atomics on some architectures, rendering the
+operation non-atomic if a store is
+misaligned with a load.
+
+* Catching Strict Aliasing Violations
+
+- For GCC-like compilers, =-fstrict-aliasing= and =-Wstrict-aliasing= can catch
+  some common cases.
