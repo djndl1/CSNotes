@@ -1,0 +1,77 @@
+#+title: Spectre & Meltdown
+:PROPERTIES:
+:ID:       6ccb8fa1-6a23-4c69-a641-f221af84ba01
+:END:
+
+Cybersecurity is no longer a problem only about software systems but for
+hardware as well.
+
+Modern processors rely on the pipeline process and speculative execution to
+implement instruction-level parallelism to improve performance.
+The accuracies of branch predictors have reached 95% on many different kinds of
+programs.
+
+Speculation results are not exposed to the program until the prediction
+succeeds. However, the timing signals may be extracted from *side channels*, an
+*unintended* pathway that leaks information from one entity to another. One side
+channel trick is called *flush and reload*: the attacker flushes certain cache sets from the cache and waits for the victim to access the desired data and measures the time to retrieve the data to determine if the data resides in the flushed cache set and the attacker can know in which cache set the data should be.
+
+* Meltdown
+:PROPERTIES:
+:ID:       29c7d599-a213-4a1e-a58c-73986362a1b7
+:END:
+
+A memory-load instruction may require a permission before loading the data. With
+speculative execution, the instruction may load the data before the permission
+is checked and only reveal the data to the user after the permission is granted.
+An attacker may discover this data via a side channel.
+
+There is a variation of Meltdown called *Foreshadow*: intel processors allow
+speculation during the address translation process, allowing a program to
+speculatively read the L1 cache regardless of who owns the data.
+
+The attacker runs the victim program several times via the secret branch; the
+processor assumes the program will go that branch next time. The attacker
+flushes all cache sets. The processor speculatively loads related cache sets.
+The secret data is now already in the cache but not other data. The secret data
+is retrieved faster than other data due to cache hit. The attacker now knows
+where the secret data is in the cache.
+
+* Spectre
+
+- *branch-direction predictor* :: whether a conditional branch will be taken or
+  not taken.
+
+- *branch-target predictor* :: the target memory address of what are called
+  indirect branches
+
+- *return stack buffer* :: the target of a return instruction. The system uses a
+  piece of memory on the processor to keep the return addresses of functions as
+  they are called.
+
+There are several manners an attacker may carry out the attack:
+
+- the attacker first mistrains the predictor and then deliberately executes a
+  branch that will be misspeculated, causing the program to jump to a piece of
+  code called *the gadget*, which is responsible for stealing data.
+
+- *direct injection*: sometimes the predictors are shared by different programs.
+  The attacker may mistrains predictors from another program but affects the
+  victim program.
+
+* Defence & Mitigation
+
+- the OS removes forbidden parts of the page table
+
+- Limit dangerous speculation.
+
+- Update the processor's microcode.
+
+- Interfere with the attacker's ability to transmit the data out using side channels.
+
+* Reference
+:PROPERTIES:
+:ID:       15221e5c-a91a-440d-950f-304da31ff9a4
+:END:
+
+- [[https://spectrum.ieee.org/how-the-spectre-and-meltdown-hacks-really-worked][How the Spectre and Meltdown Hacks Really Worked]]

@@ -18,13 +18,15 @@ set of encouraged conventions and practices that are used in modern C developmen
 C's abstract machine maps poorly to the underlying physical machine.
 C's model was intended to allow implementation on a variety of targets.
 For example, pointers with the same value bitwise may not even point to the
-same chunk of memory to allow segmented architectures and even GC virtual machines.
+same chunk of memory to allow segmented architectures and even GC virtual
+machines.
 
 ** Serialized Execution Model
 
 C code provides a mostly serial abstract machine until C11.
 Modern instruction-level parallelism (pipeline, speculative prediction, SIMD) offers performance boost without changing
-the assumption of the serial abstraction machine.
+the assumption of the serial abstraction machine. Modern computer systems have
+even [[../../security/spectre_meltdown.org][security vulnerabilities]] due to instruction-level parallelism.
 
 ** Flat Memory
 
