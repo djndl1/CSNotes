@@ -1,0 +1,247 @@
+#+title: Standardization
+#+bibliography: ref.bib
+:PROPERTIES:
+:ID:       f0eede1f-98fa-4347-b913-afe99a6f5b08
+:END:
+
+This note serves as a reference to various concepts described in the C standard,
+not to illustrate the history of C standardization nor C's language syntax and
+features.
+For now, this note is based C23[cite:@c23].
+The standard defines some preliminary concepts, the translation environment and
+the execution environment, the language syntax, constraints and semantics and
+finally the standard library facilities.
+
+The standard specifies the representation of C programs, its syntax and
+constraints, semantics rules for interpretation, the representation of input data to
+be processed by C programs, the representation of output data produced by C
+programs, the restrictions and limits  imposed by a conforming implementation of C.
+
+* Standardization Principles
+
+- Existing Code is important, existing implementations are not (no one
+  implementation was held up as the exemplar by which to define C).
+
+- C code can be portable.
+
+- C code can be non-portable. (and the reason for "strictly conforming program" and
+  "conforming program").
+
+- Avoid quiet changes. Any changes to widespread practice altering the meaning
+  of existing code causes problems.
+
+- A standard is a treaty between implementor and programmer.
+
+- Keep the spirit of C
+  + trust the programmer
+  + don't prevent the programmer from doing what needs to be done
+  + keep the language small and simple
+  + provide only one way to do an operation
+  + make it fast, even if it is not guaranteed to be portable.
+
+- support international programming
+
+- Codifying existing practice to address evidence deficiencies.
+
+- Minimize incompatibilities with previous versions of the standard.
+
+- Minimize incompatibilities with C++.
+
+- Maintain conceptual simplicity.
+
+* Concepts
+
+** Standardization (Introduction)
+
+- *Syntax* :: the spelling and organization of the language and library
+
+- *Constraints* :: various requirements for the correct interpretation of the
+  language and library, typically during translation
+
+- *Semantics* :: the behavior of language features and similar constructs;
+
+- *Description* :: the behavior of library usage and similar constructs;
+
+- *Returns* :: the effects of constructs provided back to a user of the library;
+
+- *Runtime-constraints* :: various requirements that are expected to be checked
+  and which shall not be violated, typically during execution;
+
+- *Environmental limits* :: limitations an implementation may impose on a
+  library or language construct which might otherwise be unlimited;
+
+- *Recommended practice* :: guidance and important considerations for
+  implementers of this document.
+
+** IT Terms on C
+
+Only terms that are worth attention are listed here:
+
+- *access (verb)* :: read or modify the value of an object
+  + read or write, not simply read
+
+- *alignment* :: requirement that objects of a particular type be located on
+  storage boundaries with addresses that are particular multiples of a byte
+  address
+
+- *argument*, *parameter* :: actual argument, formal parameter
+
+- *behavior* :: external appearance or action
+
+There is some confusion around *undefined bahavior* and *unspecified behavior*.
+
+- *undefined bahavior* :: behavior, upon use of a nonportable or erroneous
+  program construct or of erroneous data, for which the standard imposes no requirements
+  + the standard imposes no requirements on the behavior. Undefined behaviors
+    are described as "undefined behavior" or similar wordings, or by omission of
+    any explicit definition of behavior.
+  + e.g. dereferencing a null pointer
+
+- *unspecified bahavior* :: behavior, that results from the use of an
+  unspecified value, or other behavior upon which this document provides two or
+  more possibilities and imposes no further requirements on which is chosen in
+  any instance
+  + e.g. the order in which function arguments are evaluated
+
+- *implemention-defined behavior* :: unspecified behavior where each
+  implementation documents how the choice is made
+
+By C99 Rationale
+
+#+begin_quote
+The terms unspecified behavior, undefined behavior, and implementation-defined behavior are
+used to categorize the result of writing programs whose properties the Standard does not, or
+cannot, completely describe. The goal of adopting this categorization is to allow a certain
+variety among implementations which permits quality of implementation to be an active force in
+the marketplace as well as to allow certain popular extensions, without removing the cachet of
+conformance to the Standard. Informative Annex J of the Standard catalogs those behaviors
+which fall into one of these three categories.
+
+Unspecified behavior gives the implementor some latitude in translating programs. This latitude
+does not extend as far as failing to translate the program, however, because all possible behaviors
+are “correct” in the sense that they don’t cause undefined behavior in any implementation.
+
+Undefined behavior gives the implementor license not to catch certain program errors that are
+difficult to diagnose. It also identifies areas of possible conforming language extension: the
+implementor may augment the language by providing a definition of the officially undefined
+behavior.
+
+Implementation-defined behavior gives an implementor the freedom to choose the appropriate
+approach, but requires that this choice be explained to the user. Behaviors designated as
+implementation-defined are generally those in which a user could make meaningful coding
+decisions based on the implementation’s definition. Implementors should bear in mind this
+criterion when deciding how extensive an implementation definition ought to be. As with
+unspecified behavior, simply failing to translate the source containing the implementation-
+defined behavior is not an adequate response.
+#+end_quote
+
+The names of these three categories are less of importance than the intentions
+for them:
+
+- Unspecified behaviors give implementations freedom to do as it sees
+  fit and it is always correct as long as it does not reject such code.
+  However, the result is still undetermined unless it is an
+  implementation-defined behavior.
+
+- Implementation-defined behaviors requires implementations explicitly document
+  the behaviors and communicate to the users so that they may make meaningful
+  coding decisions.
+
+- Undefined behaviors give implementations tolerance to allow or prohibit certain program
+  errors or extensions. Undefined behaviors are probably errors except as
+  extensions.
+  + Program dependent on undefined behaviors are *neither correct nor incorrect*
+    by the standard but definitely not portable. The implementation may define some as
+    extensions and accept such code as valid and gives consistent results that
+    the user may as well rely on.
+
+For portable code, none of the three should be allowed.
+
+
+A byte is not necessarily an octet in C but a basic character is always a byte.
+
+- *byte* :: addressable unit of data storage large enough to hold any member of
+  the basic character set of the execution environment
+  + not necessarily an octet
+
+- *character (abstract)* :: member of a set of elements used for the organization, control, or representation of data
+
+- *character* :: single-byte character
+  + the standard guarantees that a =char= is a byte.
+
+- *constraint* :: restriction, either syntactic or semantic, by which the
+  exposition of language elements is interpreted
+
+- *runtime-constraint* :: requirement on a program when calling a library function
+
+- *implementation* :: particular set of software, running in a particular
+  translation environment under particular control options, that performs
+  translation of programs for, and supports execution of functions in, a
+  particular execution environment
+  + basically, both the C toolchain and its runtime.
+
+  An object is a region that represents a value. A memory location is not a
+  memory address but a region certain objects or sub-object parts occupy.
+
+- *object* :: region of data storage in the execution environment, the contents
+  of which can represent values
+  + all objects in C must be representable as a contiguous sequence of bytes,
+    each of which is at least 8 bits wide.
+  + this definition does not employ the notion of type, and thus an object *has
+    no type* in and of itself. The wording *the type of an object* should be
+    interpreted as "the type of the lvalue designating the object", "the value
+    of an object" means "the contents of the object interpreted as a value of
+    the type of the lvalue designating the object".
+
+
+- *value* :: precise meaning of the contents of an object when interpreted as
+  having a specific type
+
+- *memory location* :: either an object of scalar type, or a maximal sequence of
+  adjacent bit-fields all having nonzero width
+
+The *wraparound* of unsigned integers is actually well-defined.
+
+- *wraparound* :: the process by which a value is reduced modulo 2N , where N is
+  the width of the resulting type
+
+* Conformance
+
+A program correct in all other aspects but with undefined behaviors is a correct program.
+
+A *strictly conforming program* uses features and library specified only in the
+standard, and its output does not depend on unspecified, undefined or
+implementation-defined behavior. This category describes programs with maximal portability.
+Each function called within a maximally portable program must either be defined
+within some source file of the program or else be a function in the standard
+library.
+
+
+A *conforming implementation* may be *hosted* (full-featured, able to process
+any strictly conforming program) or *freestanding* (any strictly conforming
+program with limited features from the library, mainly for low-level programs
+such as operating systems and ROM-based applications).
+
+A conforming implementation may
+have extensions provided they do not alter behavior of any strictly conforming
+program. A *conforming program* is one that is acceptable to a conforming
+implementation (which accepts extensions in the program). That is, a conforming
+program may use extension features not mandated by the standard (and thus
+non-portable to other implementations) but provided by the implementation.
+
+* Name spaces
+
+- Only a subset of identifiers beginning with an underscore are usable for a
+  strictly conforming program. TODO
+
+* Reference
+
+- *ISO 2387 Information Technology - Vocabulary*[cite:@iso2387]
+
+-  *Electropedia: The World's Online Electrotechnical Vocabulary*[cite:@electropedia]
+
+- [[https://c-faq.com/ansi/undef.html][comp.lang.c FAQ Question 11.33]]
+
+* Bibliography
+
+#+print_bibliography:
