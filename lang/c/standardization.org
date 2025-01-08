@@ -1,8 +1,10 @@
-#+title: Standardization
-#+bibliography: ref.bib
 :PROPERTIES:
 :ID:       f0eede1f-98fa-4347-b913-afe99a6f5b08
 :END:
+#+title: Standardization
+#+bibliography: ref.bib
+#+cite_export: csl
+
 
 This note serves as a reference to various concepts described in the C standard,
 not to illustrate the history of C standardization nor C's language syntax and
@@ -88,16 +90,16 @@ Only terms that are worth attention are listed here:
 
 - *behavior* :: external appearance or action
 
-There is some confusion around *undefined bahavior* and *unspecified behavior*.
+There is some confusion around *undefined behavior* and *unspecified behavior*.
 
-- *undefined bahavior* :: behavior, upon use of a nonportable or erroneous
+- *undefined behavior* :: behavior, upon use of a nonportable or erroneous
   program construct or of erroneous data, for which the standard imposes no requirements
   + the standard imposes no requirements on the behavior. Undefined behaviors
     are described as "undefined behavior" or similar wordings, or by omission of
     any explicit definition of behavior.
   + e.g. dereferencing a null pointer
 
-- *unspecified bahavior* :: behavior, that results from the use of an
+- *unspecified behavior* :: behavior, that results from the use of an
   unspecified value, or other behavior upon which this document provides two or
   more possibilities and imposes no further requirements on which is chosen in
   any instance
@@ -140,7 +142,7 @@ for them:
 
 - Unspecified behaviors give implementations freedom to do as it sees
   fit and it is always correct as long as it does not reject such code.
-  However, the result is still undetermined unless it is an
+  However, the result remains indeterminate unless it is an
   implementation-defined behavior.
 
 - Implementation-defined behaviors requires implementations explicitly document
@@ -162,7 +164,8 @@ A byte is not necessarily an octet in C but a basic character is always a byte.
 
 - *byte* :: addressable unit of data storage large enough to hold any member of
   the basic character set of the execution environment
-  + not necessarily an octet
+  + not necessarily an octet. All major computers are octet-based, the only
+    exceptions are a few embedded microcontrollers (mostly PIC and AVR) and many DSPs.
 
 - *character (abstract)* :: member of a set of elements used for the organization, control, or representation of data
 
@@ -180,8 +183,8 @@ A byte is not necessarily an octet in C but a basic character is always a byte.
   particular execution environment
   + basically, both the C toolchain and its runtime.
 
-  An object is a region that represents a value. A memory location is not a
-  memory address but a region certain objects or sub-object parts occupy.
+An object is a region that represents a value. A memory location is not a
+memory address but a region certain objects or sub-object parts occupy.
 
 - *object* :: region of data storage in the execution environment, the contents
   of which can represent values
@@ -193,16 +196,15 @@ A byte is not necessarily an octet in C but a basic character is always a byte.
     of an object" means "the contents of the object interpreted as a value of
     the type of the lvalue designating the object".
 
-
 - *value* :: precise meaning of the contents of an object when interpreted as
   having a specific type
 
 - *memory location* :: either an object of scalar type, or a maximal sequence of
   adjacent bit-fields all having nonzero width
 
-The *wraparound* of unsigned integers is actually well-defined.
+The concept *wraparound* of unsigned integers is actually well-defined.
 
-- *wraparound* :: the process by which a value is reduced modulo 2N , where N is
+- *wraparound* :: the process by which a value is reduced modulo $2^{N}$ , where N is
   the width of the resulting type
 
 * Conformance
