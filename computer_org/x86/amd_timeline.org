@@ -1,0 +1,174 @@
+#+title: AMD CPU timeline
+
+* A Second Source Besides Intel
+
+- *AM9080*: a reverse-engineered clone of Intel 8080
+
+- *Licensed 8086* (1982, 4-10 MHz)
+
+- *AM29030* (1983, 8-20 MHz): a line of 32-bit RISC processors
+  + a variation of the Berkeley RISC arch.
+
+- *AM286*: a licensed clone of Intel 80286, with higher clock rates
+  + 16-bit data bus, 24-bit address bus
+
+- *AM386* (1991, 12-40 MHz): only licensed later due to legal disputes
+  + with higher clock rates
+
+- *AM486* (1993, 16-120 MHz, 800-1000nm)
+  + 32-bit data bus and address bus, 4GB memory support
+  + 8-16KB L1 cache
+  + FPU integrated
+
+- *5x86* (1995, 133-150MHz, 350nm, 3.45V voltage): basically AM486 with improved performance and fab process
+
+* Starting In-House Design
+
+- *K5*: combined AM29000 RISC with an x86 front end.
+  + out-of-order speculative execution
+  + 75-133 MHz, PR75 - PR200
+  + Socket5/7
+
+- *K6* (1997/1998, 266-350 MHz): based on Nx686 (NexGen) with an x86 front end
+  + On par with Pentium 2 with inferior FPU performance
+  + MMX SIMD
+  + Socket 7
+
+- *K6-2* (1998, 300-500 MHz, 250nm, 2.2-2.4V): an extended version of K6 with 100 MHz FSB
+  + 3D Now! SIMD
+  + (Super) Socket 7
+  + Upgradable from Pentium MMX
+
+- *K6-3* (1999, 350-550 MHz, 250nm, 2.2-2.4V): L2 cache integrated
+  + Super Socket 7
+
+- *K6-2+*, *K6-3+* (2000, 400-550nm, 180 nm, 1.6V - 2.0V): Mobile versions, with on-die L2 cache.
+
+* K7
+
+- *Athlon* (1999; K7, K75; 250nm, 180nm):
+  + a powerful triggle-issue out-of-order FPU
+  + low-speed out-of-die L2 cache.
+
+- *Athlon Thunderbird* (2000, 600-1400MHz, 180nm): on-die L2 cache version of Athlon
+
+- *Duron* (2000/2001, K7): 64 KB L2 cache low-end version of Thunderbird
+
+- *Athlon Palomino/XP/MP* (May 2001, 850-1733MHz, 180 nm):
+  + SSE
+
+- *Athlon Thoroughbred* and *Barton* (2002/2003, 130 nm)
+  + 200 MHz FSB
+
+- *Athlon Thorton and new Duron* (2003, 130 nm): L2 cache partially butchered
+  from Barton
+
+- *Geode* (2003): from National Semiconductor, used in low-end devices.
+
+- *Sempron* (2004, 1.5GHz - 2.2 GHz ,130nm): built out of Thorton and Barton
+
+* AMD64 with K8
+
+Heavily modified variations of K7. *HyperTransport* instead of FSB.
+
+- *Athlon 64* (2003/2004), *Opteron* (for servers)
+  + 1.5V
+  + On-die memory controller, thus less latency
+  + SSE2
+
+- *Athlon 64 Winchester, Venice, San Diego, Orleans, Lima* (2004-2006, 90nm)
+  + DDR2
+  + SSE3
+
+- *K8 Sempron* (2004-2007): lower-cache lower clock speeds version of Athlon 64
+  + SSE2, SSE3
+
+- *Athlon X2* (2005-2006): Dual-core
+  + 1.25V - 1.4V
+
+- *Turion* and *Turion X2 (2005-2008, 65-90 nm): mobile version of later Athlon 64
+
+* K10
+
+Enhanced K8 with quad-core support
+
+- the first K10s are sold under Phenom, Opteron and Athlon product lines (2007 - 2008).
+  + SSE4a
+
+- *Phenom II* (2009, 2.6-3.7 GHz, 45 nm): Phenom fixed
+  + DD2-1066, DDR3-1333
+  + X4 fully quad-core version. X2, X3 are semi-defective quad-core CPU die
+    with some cores disabled.
+
+- *Athlon II* (2009): mid/low-end K10
+  - no L3 cache
+
+- *K10 Sempron* (2009): Single core edition of Athlon II
+
+- *Phenom II X6 Thuban* and *Zosma Phenom II X4* (210): six cores and defective
+  version with four cores
+
+- *Llano* (2011, 32nm, 65W-100W): first APUs, K10 CPU cores combined with Radeon Stream Processors to offer
+  graphics capability
+  + DDR3-1866
+
+- *Bobcat* (2011, 40nm): an APU for computers that require low power consumption
+  + SSE4.1, SSE4.2, AVX
+
+* Bulldozer
+
+High core count but a drop in IPC.
+
+- *Bulldozer Zambezi* (October 2011, 95W - 125W, 0.95-1.4125V)
+  + AES, FMA4,XOP
+
+- *Piledriver Trinity and Richland* (2012-2013): revised Bulldozer
+  + BMI1, F16C, FMA3, TBM
+
+- *Bulldozer Vishera* (Oct. 2012):
+
+* Streamroller
+
+2024-2015; 28nm process; better IPC; increased graphics performance with GCN GPU
+architecture capable of HSA. PCIe 3.0 support.
+
+* Jaguar (2014)
+
+Replacing Bobcat with four cores and a GCN GPU. 28nm;
+
+* Excavator (2015)
+
+Last iteration of Bulldozer.
+
+* Zen
+
+Some APUs have higher numbers than normal CPU. A Zen 2 APU is the Ryzen 4000 series
+with a G/GE suffix while a Zen 2 CPU is the Ryzen 3000 series.
+
+** Zen 1 (2017, 14nm)
+
+Micro-op cache; Hyper-threading; DDR4 support
+
+- Ryzen 1000 Series (2016)
+  + Ryzen 9, Ryzen 7, Ryzen 5, Ryzen 3, comparable to Intel i9, i7, i5, i3
+  + Threadripper: up to 64 cores, high performance for professional workloads.
+
+** Zen+ (2018, 12nm)
+
+- Ryzen 2000 Series
+
+** Zen 2 (2019, 7nm)
+
+- Ryzen 3000/4000
+
+** Zen 3 (2020, 7nm)
+
+- Ryzen 5000
+
+** Zen 4 (2022, 5nm)
+
+- Ryzen 7000
+
+** Zen 5 (2024, 4nm, 3nm)
+
+- Ryzen 9000
