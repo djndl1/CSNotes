@@ -1,0 +1,65 @@
+#+title: Encoding & Character Sets
+
+* Concepts
+
+The standard defines the /source character set/ and the /execution character set/.
+Each set is further divided into
+
+- *basic character set* (ASCII): contains the basic 26 letters (lower- and upper-case),
+  the null character, the 10 digits etc.
+  + All the members in the basic character set are single-byte characters.
+
+- *extended characters*: a set of zero or more locale-specific members
+  The two combined is the *extended character set*.
+
+The following classification is probably better:
+
+- *source file character set* :: the character set used by source files
+
+- *source/input character set* :: the encoding used to interpret the source
+  files. Text is first converted into this charset before being processed by the preprocessor.
+  + by default UTF-8 in GCC; UTF-8 if BOM is there, current locale if none in MSVC
+
+- *execution character set* :: the encoding used for the text of the program
+  that is input to the compilation phase after preprocessing. Used for the
+  internal representation of any string or character literals in the compiled program.
+
+The source character set and the execution character set can contain *multibyte characters*: used to represent
+members of the /extended character set/. In this extended character set:
+
+- the basic character set shall be present and its member is represented as a
+  single byte.
+
+- a byte with *all bits zero* shall be interpreted as a *null character*. Such a
+  byte shall not occur as part of any other multibyte character.
+  + then =0= as a character is always ='\0'= and its equivalents.
+
+- a multibyte character can have a *state-dependent encoding*; e.g. UTF-8, where
+  the state is reset at each character.
+  + a sequence of multibyte characters begins in an /initial shift state/, in
+    which all single-byte characters retain their usual interpretation.
+  + enters other locale-specific /shift states/ when specific multibyte
+    characters are encountered in the sequence.
+  + the interpretation for subsequent bytes in the sequence is a function of the
+    current shift state.
+  + all identifiers, comment, string literals, character constant or header name
+    shall be valid multibyte character sequences, beginning and ending in the
+    initial shift state.
+
+** Character Display
+
+- Active Position :: location on a display device where the next character output by =fputc= function would appear.
+
+Various escape sequences representing non-graphic characters in the execution
+character set are intended to produce certain display effects on display devices.
+
+- =\f=: move the active position to the initial position at the start of the
+  next page
+
+- =\n=: move the active position to the initial position of the next line
+  + already contains the semantics of a carriage return.
+
+- =\r=: move the active position to the initial position of the current line
+
+- =\v=: the initial position of the next vertical tabulation position, i.e. the
+  first tabulation position down the current position
