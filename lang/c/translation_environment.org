@@ -1,0 +1,63 @@
+#+title: Translation Environment
+
+* Standard
+
+- *preprocessing translation unit* :: a source file together with all the
+  headers and source files included via the preprocessing directive =#include=
+  + *translation unit* :: after preprocessing
+
+#+begin_quote
+A C program is not required to be translated in its entirety at the same time.
+...
+The separate translation units of a program communicate by (for example) calls to functions whose
+identifiers have external linkage, manipulation of objects whose identifiers have external linkage, or
+manipulation of data files. Translation units may be separately translated and then later linked to
+produce an executable program.
+#+end_quote
+
+** Translation Phases
+
+1. Source file characters are mapped to the supposed source character set.
+
+2. Line-end =\= (file end excluded) are replaced by a space to combine physical lines into one
+  logical line.
+
+
+3. Source lines are then decomposed into preprocessing tokens and whitespaces.
+  + comments are replaced by a space character.
+
+4. Preprocessing directives are executed, macros are expanded, =#pragma= unary
+  operator expressions are executed. =#include= causes the named header or
+  source file to processed from phase 1 to 4, recursively. All preprocessing
+   directives are then deleted.
+
+5. Source character set members and escape sequences in character constants and
+   string literals are converted into the execution character set. Inconvertible
+   characters are mapped in an implementation-defined manner (but not the null character).
+
+6. Adjacent string literals are concatenated.
+
+7. Preprocessing tokens are converted into tokens, syntactically and
+   semantically analyzed and translated as a translation unit.
+
+8. All external object and function references are resolved; libraries
+   components are linked to satisfy external references to functions and objects
+   not defined in t he current translation. All such translator output is
+   collected into a program image which contains information needed for
+   execution in its execution environment.
+
+** Diagnostics
+
+- *Warning* :: a diagnostic message for valid programs.
+
+#+begin_quote
+A conforming implementation shall produce at least one diagnostic message (identified in an
+implementation-defined manner) if a preprocessing translation unit or translation unit contains
+a *violation of any syntax rule or constraint*, even if the behavior is also explicitly specified as
+undefined or implementation-defined.
+...
+An implementation is encouraged to identify the nature of, and where possible localize, each
+violation. Of course, an implementation is free to produce any number of diagnostic messages, often
+referred to as warnings, as long as a valid program is still correctly translated. It can also successfully
+translate an invalid program. Annex I lists a few of the more common warnings.
+#+end_quote
