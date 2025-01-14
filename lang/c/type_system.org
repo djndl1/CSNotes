@@ -11,9 +11,9 @@ the type is specified in the declaration of the identifier.)
 - *Object Types* and *function types*
 
 - *Incomplete* or *complete*
-  + incomplete: no size info is provided, e.g. =void=, declared =struct= without definition
+  + incomplete: no size info is provided, e.g. =void=, declared =struct= without definition.
+    incomplete types can only be used when the size of the object is not needed.
   + complete
-  + incomplete types can only be used when the size of the object is not needed.
 
 * Common Types
 
@@ -23,13 +23,27 @@ the type is specified in the declaration of the identifier.)
   the basic execution character set as a nonnegative value.
   + =unsigned char=, =signed char= and =char= are called *the character types*.
 
-- Arithmetic for the unsigned type is performed modulo 2^{N} (wrapping around), meaning
-  computation involving unsigned operands can never produce an overflow.
+- =signed char=, =short int=, =int=, =long int=, =long long int= are the standard signed integer types.
+ =_BitInt(N)= bit-precise signed integer types are also provided.
+  An implementation may provide additional *extended integer types*.
+  + Signed integer types have unsigned counterparts using the same amount of storage and alignment requirements.
+  + Arithmetic for the unsigned type is performed modulo $2^{N}$ (wrapping around), meaning
+   computation involving unsigned operands can never produce an overflow.
+  + *enumeration* is a set of named integer constant values.
+
+- =float=, =double=, and =long double= are the three *standard floating types*.
+  *Decimal floating types* =_Decimal32=, =_Decimal64=, =_Decimal128= are
+  optionally provided by an implementation.
+  + collectively as *real floating types*.
+  + real and complex floating types combined are the *floating types*.
 
 - A =complex= type is regarded as a floating-point array containing its two
   components as for representation and alignment requirements.
 
-- =char=, the signed/unsigned integers, the floating types are called *the basic
-  types* and
-  are complete types.
+- *Basic types* :: =char=, the signed/unsigned integers, the floating types. Basic types are complete types.
 
+- *Arithmetic Types* :: integer (=char=, signed/unsigned integers, the enumerated types) and floating types
+
+- *Type Domain* :: each arithmetic type belongs to either the *real type domain* or the *complex type domain*.
+
+- =void=: an empty set of values, an imcomplete object type that cannot be completed.
