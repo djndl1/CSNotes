@@ -1,0 +1,102 @@
+#+title: Execution Environment
+
+* Startup, Execution & Termination
+
+- *Program startup*: a designated C function is called by the execution environment.
+  + All objects with static storage duration shall be /initialized/ before program startup.
+
+- *Program termination*: control is returned to the execution environment.
+
+The standard defines two execution environments:
+
+- *freestanding*: C program execution can take place without any benefit of an
+  operating system.
+
+- *hosted*
+
+
+** Freestanding
+
+The name and type of the function called at program startup are implementation-defined.
+
+** Hosted
+
+- startup: the =main= function, possibly with some other implementation-defined manner
+
+  #+begin_src c
+int main(void) { ... }
+int main(int argc, char *argv[]) { ...  }
+  #+end_src
+
+  + =argc= is always nonnegative; =argv[argc]= is =NULL=;
+  + =argc=, =argv= and the strings in =argv[]= are modifiable;
+
+- execution: a program can use all the functions, macros, type definitions and
+  objects described in the library.
+
+- termination: a =return= within =main=, an =exit()= call or reaching the final
+  =}= in =main= (returning 0 in this case).
+  + if the return type is not compatible with =int=, the returned status is unspecified.
+
+* Abstract Machine Concepts & Overall Semantics
+
+- *Side effects*: changes in the state of the execution environment
+
+- *Evaluation* of an expression in general includes both /value computations/ and
+ /initiation of side effects/.
+  + *Value computation* for an lvalue expression includes determining the identity of
+    the designated object.
+  + An actual implementation is not required to evaluate part of an expression
+    if it can deduce its value is not used and that no needed side effects are
+    produced.
+
+- *Sequenced before/after*: A is said to be sequenced before B if the execution
+  of A precedes the execution of B in a single thread.
+  + *sequenced before/after* reflects a partial order among evaluations executed
+    by a single thread. Two evaluations may be *unsequenced* (neither sequenced
+    before nor after).
+  + if A may be sequenced either before B or after B but unspecified, then A and B are
+    *indeterminately sequenced*.
+  + A *sequence point* separates the evaluation of expression A and expression B,
+    that is, every value computation and side effects of A is sequenced before
+    every value computations and side effects of B.
+
+- *volatile access*: An access to an object through the use of an lvalue of =volatile=-qualified type
+  is a volatile access
+  + volatile access to objects are evaluated strictly according to the rules of
+    the abstract machine.
+
+- *optimization*: If the actual semantics of an implementation strictly corresponds to that of
+  the abstract machine, then every access is a volatile access. However, an
+  implementation can perform various optimizations within each translation
+  unit s.t. the actual semantics would agree with the abstract semantics only
+  when making function calls across translation unit boundaries. In this case,
+  objects referred by interrupt service activated by =signal= would require
+  explicit specification of =volatile=.
+
+- *signals and interrupts*: If the execution is interrupted by a signal, the values of objects are that
+  neither lock-free atomic objects nor of =volatile sig_atomic_t= are
+  unspecified as is the state of the dynamic floating-point environment.
+  + the representation of any object modified by the handler that is neither a
+    lock-free atomic object nor of type =volatile sig_atomic_t= becomes
+    indeterminate when the handler exits, as does the dynamic floating-point
+    environment if modified by the handler and not restored to its original state.
+  + lock-free atomics [[https://stackoverflow.com/questions/56598970/stdatomicint-memory-order-relaxed-vs-volatile-sig-atomic-t-in-a-multithreade/56600194#56600194][may not be the right replacement]] for =volatile sig_atomic_t=.
+  + [[https://stackoverflow.com/questions/16891019/how-to-avoid-using-printf-in-a-signal-handler][C takes a conservative approach here; POSIX permits more actions.]] Also see
+    the specification of =signal= in the standard.
+
+- *file flushing*: At program termination, all data written into files shall be identical to the
+  result that execution of the program according to the abstract semantics would
+  have produced.
+
+The only semantics requirements mandated by the standard are:
+
+- volatile access are evaluated according to the rules of the abstract machine
+
+- the *file flushing* rule above
+
+- the I/O dynamics of interactive devices shall take place as described by the
+  specification of file I/O.
+
+Any more stringent correspondences between abstract machine and actual semantics
+/may be defined by each implementation/.
