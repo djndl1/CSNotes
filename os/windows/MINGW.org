@@ -50,6 +50,13 @@ TODO
 
 *** widl
 
+=stdole32.tlb= is the version 1.0 of =stdole2.tlb= (2.0). They even have the
+same UUIDs. Some IDLs import them
+both (e.g. OPC DA). Only =stdole2.tlb= is needed actually. There seems to be an
+older version of the typelib file format (1.0).
+
+Also, the microsoft =midl= seems to be case-insensitive with certain identifiers
+while =widl= requires strictly equal cases.
 
 ** Cross Compilation
 
