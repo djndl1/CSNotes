@@ -1,0 +1,33 @@
+#+title: Intel Early History
+
+This note covers the history of Intel CPU before modern Core microarchitectures
+since 8086.
+
+
+* Before x86
+
+- *4004*: as the first significant example of LSI with MOS gates, mainly used for calculators
+  + 4-bit bus
+  + highly integrated, requires fewer external components, mostly as embedded controllers.
+
+- *8008* (1972): more flexible but requires more external circuits.
+  + 8-bit data bus, 14-bit address bus (16K memory)
+  + partially implemented interrupt mechanism
+  + the CPU for the very first commercial non-calculator PCs.
+
+- *8080* (1974): 8008 with registers expanded
+  + 16-bit address but
+
+- *8085* (1976): a version implemented with depletion-mode transistors
+
+** Similar Processors From Other Vendors
+
+- *Zilog Z80*:
+  + designed by none other than Fedrico Faggin, one of the designer of Intel 8080.
+  + software compatible with Intel 8080 with increased performance.
+  + wide spread in video game systems and home computers in the '70s and the
+    early '80s.
+
+* 8086
+
+A non-strict extension of 8080.
