@@ -24,25 +24,28 @@
 
 * Starting In-House Design
 
-- *K5*: combined AM29000 RISC with an x86 front end.
+- *K5* (1996): combined AM29000 RISC with an x86 decoding front end.
   + out-of-order speculative execution
   + 75-133 MHz, PR75 - PR200
   + Socket5/7
+  + Right design with problematic implementation, late to the market.
 
-- *K6* (1997/1998, 266-350 MHz): based on Nx686 (NexGen) with an x86 front end
+- *K6* (1997/1998, 166-300 MHz): based on Nx686 (NexGen) with an x86 front end
   + On par with Pentium 2 with inferior FPU performance
-  + MMX SIMD
-  + Socket 7
+  + MMX
+  + Socket 7, pin-compatible with Pentium
 
-- *K6-2* (1998, 300-500 MHz, 250nm, 2.2-2.4V): an extended version of K6 with 100 MHz FSB
-  + 3D Now! SIMD
+- *K6-2* (1998, 200-550 MHz, 250nm, 2.2-2.4V): an extended version of K6 with 100 MHz FSB
+  + 3DNow!
   + (Super) Socket 7
   + Upgradable from Pentium MMX
 
-- *K6-3* (1999, 350-550 MHz, 250nm, 2.2-2.4V): L2 cache integrated
+- *K6-3* (Feb. 1999, 350-550 MHz, 250nm, 2.2-2.4V): 256-KiB L2 cache integrated on-die
+  + Enhanced 3DNow!
   + Super Socket 7
 
-- *K6-2+*, *K6-3+* (2000, 400-550nm, 180 nm, 1.6V - 2.0V): Mobile versions, with on-die L2 cache.
+- *K6-2+* (128KB L2 cache), *K6-3+* (256KB L2 cache) (2000, 400-550nm, 180 nm, 1.6V - 2.0V): Mobile versions, both
+  based on K6-III, with on-die L2 cache.
 
 * K7
 
