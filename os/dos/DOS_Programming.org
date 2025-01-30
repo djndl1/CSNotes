@@ -1,5 +1,14 @@
 #+title: DOS Programming
 
+* FreeDOS
+
+** File Transfer To/From the VM
+
+- [[https://www.freedos.org/books/get-started/24-guestmount-freedos/][mount the virtual disk with =guestmount=]]
+
+- install =ssh2dos= and configure the host to support older algorithms.
+  + check =sshd='s log to find out missing algorithms.
+
 * Early x86 Machine
 :PROPERTIES:
 :ID:       4bb8c2cc-3730-469d-8f8f-31aa090a6069
