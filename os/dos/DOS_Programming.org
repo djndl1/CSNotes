@@ -2,12 +2,21 @@
 
 * FreeDOS
 
+** Serial Console
+
+- start =ctty COM1= at the DOS side and start a serial port communication client
+  at the client side.
+  + =stty con= returns control to the graphics console.
+
 ** File Transfer To/From the VM
 
 - [[https://www.freedos.org/books/get-started/24-guestmount-freedos/][mount the virtual disk with =guestmount=]]
 
 - install =ssh2dos= and configure the host to support older algorithms.
   + check =sshd='s log to find out missing algorithms.
+
+- use the kermit protocol
+  + it requires both sides set up kermit and start the connection.
 
 * Early x86 Machine
 :PROPERTIES:
