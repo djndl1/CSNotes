@@ -1,0 +1,128 @@
+#+title: Intel Pentium Era Before Core
+
+* The Original Pentium (P5, March 1993)
+
+800nm, 600nm, 350nm
+
+- The first superscalar (multiple-issue) x86 processor.
+  + Two pipelines of 5 stages
+  + there are multiple execution units within one CPU core.
+  + instructions are issued from a sequential instruction stream;
+    the CPu dynamically checks for data dependencies between instructions at
+    run time; the CPU can execute multiple instructions per clock cycle.
+  + essentially all general-purpose CPU developed since 1998 are superscalar
+    except some embedded processors.
+  + superscalar processors are limited by the intrinsic sequentialism of the
+    program logic (program logic, branch processing, dependency checking).
+
+- Optimized microcode system and RISC-like techniques.
+
+- Redesigned fast FPU
+
+- 64-bit data bus, internal and external.
+
+- separate code and data caches.
+
+- branch prediction
+
+- Multiprocessing support
+
+** Pentium MMX
+
+350 nm - 250 nm
+
+- MMX SIMD: 57 instructions that handle packed integer arithmetic (64-bit data with overflow saturate semantics).
+  + the 8 MM0-MM7 registers are aliases for the matissa part of x87 FPU 80-bit
+    registers. The disadvantage of MMX is that it cannot deal with floating
+    point, and thus requires the x87 instructions to step in and take over the registers.
+  + Software support is limited and as of 2000 still typically written in assembly.
+  + AMD addes 3DNow! as an extension to MMX, which adds 32-bit floating-point support.
+
+- 6-stage pipeline
+
+* Pentium Pro (the P6 Microarchitecture or i686, 1995)
+
+The sixth generation x86 microprocessor by Intel, knonwn for its low power
+consumption, excellent integer performance and relatively high IPC. The ancestor of modern Intel
+Core microarchitecture.
+
+- conditional move instructions =CMOVcc= and =FCMOVcc=, conditional jump =Jcc=.
+  + conditional statement with a costly conditional branch.
+
+- =UD2= illegal instruction for developers to crash the program.
+
+- RISC implementation with a x86 decoding front end.
+
+- 14-stage superpipelined
+
+- out-of-order execution including speculative execution via register renaming.
+
+- 36-bit address bus but with PAE
+
+- first x86 processor to support upgradeable microcode under BIOS or OS control.
+
+- There is no MMX support
+
+Frequent pipeline flushing when dealing with mixed code (8-bit with 16-bit,
+16-bit with 32-bit), and thus not suitable for PC users, but used with 32-bit OS
+(NT, Unix).
+
+* Pentium II (May 1997, 233Mhz to 450MHz, 350-180 nm)
+
+A more consumer-oriented version of Pentium Pro, combining the P6 microarchitecture with MMX, largely a Pentium Pro.
+
+- MMX support
+
+- Improved 16-bit code execution performance by adding segment register caches.
+
+- In-Package 512KB L2 cache
+
+** Revisions
+
+- Klamath: 233, 266, 300 MHz at 66 Mhz FSB.
+
+- Deschutes: 333, 266, 300 (66MT/s FSB); 350, 400, 450 (100 MT/s)
+  + combined with the 440BX chipset and its derivatives.
+  + =FXSAVE=, =FXRSTOR= instructions
+
+- Tonga and Dixon, 250 and 180 nm mobile versions.
+
+** Covington & Mendocino Celeron
+
+- Covington (Apr. 1998): Pentium II without L2 cache with poor performance
+
+- Mendocino (August 1998): 128KB full-speed L2 cache with great performance, from 300MHz up to 533MHz
+
+* Pentium III (Feb. 1999 until early 2003)
+
+Continued evolution from P6
+
+- SSE SIMD to accelerate floating-point and parallel calculations
+
+** Revisions
+
+- Katmai: further development of Deschutes Pentium II.
+  + 250nm process
+  + 450, 500, 550, 533B (133MHz FSB), 600B (133MHz FSB)
+
+- Coppermine (Oct. 1999):
+  + On-chip L2 cache
+  + 180nm process
+  + 500MHz up to 1GHz
+
+- Tualatin: (2001)
+  + 130nm process
+  + 1.0, 1.13, 1.2, 1.26, 1.33 and 1.4GHz
+  + the basis for Pentium-III M and later Pentium-M
+
+** Coppermine-128 Celeron
+
+Derivative of Coppermine Pentium-III with 128KB on-chip L2 cache. 566MHz up to 1100MHz.
+
+** Tualatin-256 Celeron (Oct. 2001)
+
+- 100MHz bus, 256KB L2 cache.
+
+- 130nm process
+
+- 1.0 up to 1.4GHz, with comparable performance with Pentium 4 Willamette.
