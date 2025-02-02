@@ -9,3 +9,12 @@ What is `restrict`: https://stackoverflow.com/questions/19731256/what-is-the-lev
 # Dealing with C String
 
 https://www.approxion.com/dangerously-confusing-interfaces-iv-the-perils-of-cs-safe-string-functions/
+
+# Pointers and Arrays are Different
+
+An array may decay to a pointer but it is not an array.
+
+```c
+int p* = { 0 }; // a NULL is assigned to p
+int p[] = { 0 }; // a proper { 0 } array
+```
