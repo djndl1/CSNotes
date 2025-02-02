@@ -126,3 +126,128 @@ Derivative of Coppermine Pentium-III with 128KB on-chip L2 cache. 566MHz up to 1
 - 130nm process
 
 - 1.0 up to 1.4GHz, with comparable performance with Pentium 4 Willamette.
+
+* Pentium 4 (NetBurst P68)
+
+- the first processor to implement *Simultaneous Multithreading* (Hyperthreading): issue multiple instructions from
+  multiple threads in one cycle, each executing threads independently.
+  + the opposite is *temporal multithreading*; multicore is chip-level multiprocessing.
+  + a form of thread-level parallelism;
+
+- Quad-pumped front-side bus: 200MHz but 4 bit per cycle
+
+- 20-stage instruction long pipeline
+
+- rapid execution engine: double pumped ALUs, at twice the rate the core clock frequency
+
+- execution trace cache: part of L1 cache that stores decoded micro-operations
+
+- replay system: TODO
+
+** Revisions
+
+- Willamette (2000)
+  + 180nm
+  + 20-stage pipeline
+
+- Northwood (2002)
+  + Hyper-threading
+  + 130 nm
+  + 20-stage pipeline
+
+- Prescott (Feb. 2004)
+  + SSE3 instruction set and later the EM64T (AMD64) architecture
+  + 90 nm
+  + 31-stage pipeline
+
+** Celerons
+
+Willamette-128, Northwwod-128, Prescott-256 ("Celeron D" but with a single
+core), Cedar Mill-512
+
+* Pentium D
+
+Dual core version of the Pentium 4. The two cores are not linked together,
+rather rely on the northbridge link for communication. The front side bus is
+shared by the two cores.
+
+** Revisions
+
+- Smithfield: 90 nm, named 8xx series
+
+- Presler: 65 nm Cedar Mill cores, named 9xx series
+
+* Itanium (IA-64, the originally planned P7 architecture)
+
+Intel's discontinued 64-bit architecture with no compatibility with existing x86
+programs other than emulation, defeated by x86-64, originally from HP, never popular
+outside enterprise servers (and even there only a fraction of market share) and high-performance computing systems.
+
+- Merced (2001, 733 to 800 MHz): poor performance
+
+- Itanium 2 (McKinley and Madison, 2002-2006):
+  + 900 to 1667 MHz
+  + 180nm to 130nm
+  + replaced by AMD64 soon
+
+- Itanium 9100 series
+
+- Itanium 9300 (2010)
+
+- Itanium 9500 (2012)
+  + 32 nm
+
+- Itanium 9700 (2017): a limited improvement over 9500
+  + 22 nm
+
+Major OSes offered support for Itanium, however, Linux dominated in all systems
+except those of HP.
+
+* Pentium M
+
+An evolution of Tualatin, with the FSB of Pentium-4
+
+- 10 or 12 stage pipeline
+
+- SSE2
+
+- Larger L2 cache
+
+- improved branch prediction
+
+- 130nm to 90 nm
+
+- 5-27 W TDP
+
+** Revisions
+
+- Banias:
+  + 24.5 watts TDP
+  + 130nm
+  + 900MHz to 1.7 GHz with a 400MT/s FSB.
+
+- Dothan: Pentium M 7xx Series
+  + 90 nm
+  + 2NM L2 cache
+  + 21 W TDP
+
+* Enhanced Pentium M (Yonah)
+
+The prologue of the Core microarchitecture.
+
+Under the brand Core Solo, Core Duo (Jan. 2006, low-power dual-core), Pentium
+Dual-Core, Xeon LV/ULV, Celeron M 400 (single-core). Core Solo/Duo are still
+marketed as mobile processors.
+
+- SSE3 support
+
+- single- and dual-core with 2MB L2 cache
+
+- 667 MT/s FSB
+
+- 12-stage pipeline
+  + 2.33-2.50GHz at maximum
+
+- specialized bus for core-cache communication
+
+- No x86-64 implementation until Core 2, the real Core microarchitecture
