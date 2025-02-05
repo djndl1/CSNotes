@@ -1,0 +1,131 @@
+* The Core Microarchitecture (June 2006)
+
+No longer Pentium-M or mobile processors.
+They are branded as Core 2, Pentium Dual-Core, Celeron M, Xeon.
+
+** Major Features
+
+- native x86-64 support
+
+- 14-stage pipeline, less than half of Prescott's
+
+- 533 MT/s to 1600 MT/s FSB
+
+- 65nm to 45 nm
+
+- MMX, SSE, SSE2, SSE3, SSSE3, SSE4
+
+- No VT-x generally
+
+- Shared L2 cache for dual cores
+
+- Macro-Ops Fusion: two x86 instructions may be combined into a single micro-operation.
+
+- New power saving design: dynamic rate change.
+
+* Nahalem (nuh-HA-luhm, 1st Gen Core i)
+
+** Major Features
+
+- Reintroduced Hyper-threading
+
+- 45 nm processors
+
+- Intel Turbo Boost 1.0: dynamic frequency scaling (dynamic overclocking)
+
+- 2-24MB L3 cache
+
+- 64-bit Macro-op fusion
+
+- 20-24 pipeline stages
+
+- SSE4.2
+
+- Intel VT-x
+
+- Intel QuickPath Interconnect in servers and Direct Media Interface on other
+  models to replace front side bus.
+
+- memory controller (DDR3 supported), PCI-E, DMI integrated, replacing the northbridge.
+
+- 64KB L1 cache per core, 256KB L2 cache per core.
+
+- native multi-core implementation: all cores are on the same die
+
+* Sandy Bridge (32nm, 2011) & Ivy Bridge (22nm, 2012): 2nd and 3rd Gen Core i
+
+** Major Features
+
+- integrated GPU cores for Core i series
+
+- Intel Turbo Boost 2.0
+
+- AVX
+
+- Up to 8 physical cores
+
+- Integration of the integrated graphics and memory controller and processor
+  into a single die
+
+- 14-19 pipeline stages
+
+- PCI-E 3.0
+
+- Every bus (USB, SATA, PCI, PCIe, CPU cores, Uncore, memory) are tied to a
+  single clock generator at 100MHz.
+
+* Haswell (4th, 22nm, 2013), Broadwell (5th, 6th, 14nm, 2014)
+
+** Major Features
+
+- 14 to 19 pipeline stages
+
+- 4 ALUs, 3 AGU
+
+- AVX2 and other new instruction sets
+
+- Fully Integrated voltage regulator
+
+- DDR3 for enterprise/server segments
+
+- (Haswell) Last Intel processors with support for Windows XP and Vista
+
+- (Broadwell) last intel processors with support for Windows 7
+
+* Skylake (6th, 7th, 14nm, 2015)
+
+The last Intel processors with suport for Windows 7/8.1
+
+** Major Features
+
+- AVX-512
+
+- Intel Memory Protection Extensions
+
+- Intel Software Guard Extensions
+
+- more execution units
+
+- DMI 3.0 for CPUs with a discrete Platform Controller Hub
+
+- DDR3/4 support
+
+- Thunderbold 3.0
+
+- Graphics: no more VGA support, HDMI, DisplayPort or eDP only.
+
+- No more IDE mode of SATA controller
+
+* Kaby Lake (7th, 14nm, 2016/2017)
+
+Basically the same as Skylake
+
+* Kaby Lake Refresh, Amber Lake (8th, 14nm, 2016/2017)
+
+Mobile-only
+
+* Coffee Lake (8th, 14nm, 2017)
+
+- Increased core count
+
+- No more DDR3 support
