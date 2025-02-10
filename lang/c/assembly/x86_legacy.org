@@ -72,6 +72,72 @@ For a large system, break the specification into a large number of much smaller 
   It is necessary to consider alternatives during design in case of future
   impediment or for a more efficient solution.
 
+** Implementation
+
+Actual coding, debugging and integrating.
+
+*** Coding
+
+- use subroutines.
+
+- documentation
+
+- ensure the code handles errors, special cases, boundary cases, trivial cases.
+
+*** Debugging and Integration
+
+Removing errors from the code and then integrating debugged modules into a final
+working system. Debugging executes the program in real hardware or a simulator, rather than
+mental desk checking.
+
+- Debug commonly used or system subroutines.
+
+- Debug each area of the specification individually.
+
+- Individual modules are combined into a subsystem and then debugged as a
+  subsystem. As each subsystem is debugged, it can then be combined with other
+  subsystems until the final system is debugged. During the integration phase,
+  ensure the interface between modules and subsystems is handled correctly.
+
+** Testing
+
+Introducing special sets of data and verifying that the correct results are produced.
+Testing is often neglected due to time consumption and it is not a well
+understood art.
+
+- enter three basic types of data:
+  + typical normal data
+  + a series of boundary conditions that exercise the system's ability to
+    perform decisions correctly
+  + a random selection of both legitimate and illegitimate data
+
+- input speed:
+  + typical rate
+  + fastest rate at which the system is supposed to function
+  + a random selection of data rates
+
+** Documentation
+
+- program documentation: how the code works, module by module and sometimes why
+  the code works the it does.
+
+- System guide
+  + the program's design
+  + development guide
+  + external interface: inputs and outputs, protocols; external consumers;
+    external data suppliers
+
+- user guide: how to use and how to interface with the system
+
+** Maintenance
+
+Altering the program to accommodate new equipment or new processing
+requirements and keeping the program functioning in a changing environment.
+
+Hardware parts, OS platforms may change. The system is supposed adapt and expand
+and these scenarios should be taken into consideration during program design and
+implementation stages.
+
 * Architecture
   :PROPERTIES:
   :CUSTOM_ID: architecture
