@@ -15,16 +15,25 @@ since 8086.
   + partially implemented interrupt mechanism
   + the CPU for the very first commercial non-calculator PCs.
 
-- *8080* (1974): 8008 with registers expanded
-  + 16-bit address but
+- *8080* (1974): 8008 with registers expanded. A CPU-on-a-chip that is not a
+  full product.
+  + 8-bit data path, 16-bit address bus
+  + extended and enhanced variant of 8080 without binary compatibility but with
+    the same basic instruction set and register model. Many of the instructions
+    survived into x86.
+  + a 8224 clock generator and a 8228 bus controller are required for 8080 to function.
+  + a new dedicated stack pointer instead of the internal 7-level call stack.
+  + 256 I/O ports in a dedicated I/O address space.
 
-- *8085* (1976): a version implemented with depletion-mode transistors
+- *8085* (1976): a enhanced version of 8080 implemented with depletion-mode transistors
+  + binary compatible with 8080 with only two instructions added
+  + 8-bit data width, 16-bit address width
 
 ** Similar Processors From Other Vendors
 
 - *Zilog Z80*:
   + designed by none other than Fedrico Faggin, one of the designer of Intel 8080.
-  + software compatible with Intel 8080 with increased performance.
+  + backward-compatible with Intel 8080 with increased performance and features.
   + wide spread in video game systems and home computers in the '70s and the
     early '80s.
 
