@@ -1,0 +1,28 @@
+#+title: Timezone Management
+
+* GNU libc
+
+=/etc/localtime=, a symlink that points a configuration file under =/usr/share/zoneinfo=
+(provided typically by =tzdata=) unless overriden by the =TZ= environment
+variable or some other application-specific configuration. This symlink is also managed
+by  =timedatectl=.
+
+Time zone files are compiled binary (by =zic=) data that contains timezone rules.
+
+Many programs needs a restart before adapting to the new timezone.
+
+On Debian, besides =timedatectl= run =dpkg-reconfigure tzdata= to update the
+timezone in the debconf database and the selinux context.
+
+* Debian-Specific =/etc/timezone=
+
+A legacy plan text file containing a time zone name.
+=timedatectl= also updates this file on Debian in older versions of =systemd=.
+
+* =TZ=: the POSIX Way
+
+The only-POSIX way of specifying the timezone.
+
+* Java
+
+=/etc/timezone= (Debian), =/etc/sysconfig/clock= (Red Hat).
