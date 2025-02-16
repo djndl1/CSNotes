@@ -1,0 +1,97 @@
+#+title: IBM PC: Architecture & Organization
+
+CPUs are wired to emmory memory and I/O through /address bus/, /data bus/ and
+/control bus/.
+
+* IBM 5150
+
+** Basic Configuration
+
+- Intel 8088 @ 4.77 MHz
+  + 8-bit bus to lower the cost
+  + expandable by a second processor (typically an Intel 8087)
+
+- 8259 PIC, 8237 DMA controller and an Intel 8253 PIT.
+
+- an 8-KB ROM BIOS
+
+- 16 KB or 64KB, expandable to 640KB
+
+- IBM Monochrome Display Adapter (text only) or IBM Color Graphics Adapter
+
+-  5.25-inch floppy disk drives, 160 KB per drive. A controller card is
+  installed on the motherboard.
+  + a port for a cassette data recorder (later removed on the XT)
+
+- 5 ISA expansion slots
+
+- optional serial (8250 UART) and parallel ports
+
+** Expansion
+
+The five ISA slots allowed expansion hardware such as graphics, sound, mouse,
+memory, joystick, serial or parallel ports, networking and other industrial or
+scientific equipment.
+
+** Software
+
+CP/M-86, UCSD p-System, IBM PC DOS (based on 86-DOS, provided by Microsoft), MS-DOS
+
+* Industry Standard Architecture (ISA, a.k.a AT bus)
+
+16-bit internal bus of IBM PC/AT and similar computers.
+
+There are 16t data pins, 24 address pins, 12V and +5V and -5V power voltage
+pins, clocks, interrupt lines.
+
+Originally this bus runs synchronously with the CPU, resulting in different
+clock rates. It was later modified to run with a different clock generator.
+
+
+* Peripheral Compoent Interconnect (PCI)
+
+* The Front Side Bus Architecture (FSB, front side, the external side of the CPU)
+
+On Intel chip-based and AMD K5, K6, K7 computers during the 90s and 2000s (introduced with Pentium
+Pro),
+typically between the CPU and a memory controller hub (the northbridge).
+Until 2007, the only user of the bus was Intel's CPUs (potentially multiple CPUs
+ sharing one bus).
+
+A typical FSB runs between 50 and 400, with the width of 64-bit, 1 to 4
+transfers per cycle. Thus the transfer rate ranges from several hundred MB/sec
+to less than 10GB/sec.
+
+The CPU runs at a multiple rate of the front side bus. The memory bus between
+the northbridge and the memory slots is not the
+FSB but typically runs at the same rate.
+PCI, AGP and PCI-E peripheral buses are operated at a set fraction of the FSB
+frequency or later receive their own clock signals.
+
+** Northbridge
+
+A microchip connected to the CPU via the FSB as an intermediate hub between the
+CPU, memory and peripherals. The northbridge is connected to the CPU, system
+memory, PCI-E and the southbridge. It also integrates the memory controller,
+sometimes a GPU.
+
+** Southbridge
+
+Connected to the northbridge and functions as a hub of I/O peripherals: USB,
+audio, system firmware, lower-speed PCI/PCIe, SATA, PATA, NVMe storage, ISA,
+LPC, SPI etc.
+
+** Super I/O
+
+A set of I/O controller chips since the late 80s that combines interfaces for a
+variety of low-bandwidth devices, typically a floppy-disk controller, parallel
+ports, 16C550-compatible UART serial ports, a PS/2 keyboard or mouse controller.
+It emerged as a backward-compatible solution to ISA, typically connected to the
+southbridge via the LPC bus (later eSPI).
+
+** Post-FSB
+
+For faster connection, modern designs favor direct point-to-point and serial connections
+(HyperTransport, DMI, QPI) between the CPU to the system memory, high-speed
+peripherals and the Platform Controller Hub, southbridge or I/O controller, with
+the memory controller integrated into the CPU.
