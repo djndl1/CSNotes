@@ -50,6 +50,31 @@ clock rates. It was later modified to run with a different clock generator.
 
 * Peripheral Compoent Interconnect (PCI)
 
+- 32-bit or 64-bit parallel bus
+
+- Half-duplex
+
+- 33MHz or 66MHz
+
+- separate address space from memory on x86. Firmware/Software configures a PCI
+  device via the /PCI configuration space/
+
+* PCI Express
+
+- Serial, possibly with multiple lanes (two differential signaling pairs, 4 wires)
+  + 1, 2, 4, 8, 16 (x32 is defined but never used)
+  + numbers of lane used is automatically negotiated
+  + a PCI-E card with fewer lanes may fit into a slot with more lanes.
+
+- Point-to-point topology, with separate serial links connecting each device to
+  the root complex.
+
+- Full-duplex communication between any two endpoints
+
+- Software-level compatible with older PCI: legacy PCI system software can
+  detect and configure newer PCI Express devices without explicit support for
+  the PCI Express standard
+
 * The Front Side Bus Architecture (FSB, front side, the external side of the CPU)
 
 On Intel chip-based and AMD K5, K6, K7 computers during the 90s and 2000s (introduced with Pentium
@@ -85,7 +110,8 @@ LPC, SPI etc.
 
 A set of I/O controller chips since the late 80s that combines interfaces for a
 variety of low-bandwidth devices, typically a floppy-disk controller, parallel
-ports, 16C550-compatible UART serial ports, a PS/2 keyboard or mouse controller.
+ports, 16C550-compatible UART serial ports, a PS/2 keyboard or mouse controller,
+sensors, LED management, MIDI ports, GPIO pins, fans.
 It emerged as a backward-compatible solution to ISA, typically connected to the
 southbridge via the LPC bus (later eSPI).
 
