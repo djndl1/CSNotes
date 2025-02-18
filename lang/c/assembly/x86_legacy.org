@@ -142,29 +142,36 @@ implementation stages.
   :PROPERTIES:
   :CUSTOM_ID: architecture
   :END:
-Eight general-purpose registers
 
-1. Accumulator register =AX=: Used in arithmetic operations
+** Registers
 
-2. Counter register =CX=: Used in shift/rotate instructions and loops.
+*** General-Purpose Registers
 
-3. Data register =DX=: Used in arithmetic operations and I/O operations.
+- Accumulator register =AX=: Used in arithmetic operations
 
-4. Base register =BX=. Used as a pointer to data (located in segment
-   register DS, when in segmented mode).
+- Counter register =CX=: Used in shift/rotate instructions and loops.
 
-5. Stack Pointer register =SP=: Pointer to the top of the stack.
+- Data register =DX=: Used in arithmetic operations and I/O operations.
 
-6. Stack Base Pointer register =BP=: Used to point to the base of the
-   stack.
+- Base register =BX=. Used as a pointer to data (located in segment register DS, when in segmented mode).
 
-7. Source Index register =SI=: Used as a pointer to a source in stream
-   operations.
+*** Stack Pointer
 
-8. Destination Index register =DI=: Used as a pointer to a destination
-   in stream operations.
+- Stack Pointer register =SP=: Pointer to the top of the stack.
+
+- Stack Base Pointer register =BP=: Used to point to the base of the stack.
+
+Stack pointers are used in combination with =SS= to provide 20-bit address space.
+
+*** Index Pointer
+
+- Source Index register =SI=: Used as a pointer to a source in stream operations.
+
+- Destination Index register =DI=: Used as a pointer to a destination in stream operations.
 
 The order is same as what is used in a push-to-stack operation.
+
+*** Segment Registers
 
 Six Segment Registers:
 
@@ -176,6 +183,8 @@ Six Segment Registers:
 
 - Extra Segment =ES=: Pointer to extra data ('E' stands for 'Extra').
 
+Additional two segment registers are introduced in 80386
+
 - F Segment =FS=: Pointer to more extra data ('F' comes after 'E').
 
 - G Segment =GS=: Pointer to still more extra data ('G' comes after
@@ -184,6 +193,12 @@ Six Segment Registers:
 In real mode, segment registers were used to addressing a 20-bit address
 bus using 16-bit registers. Later, they were used as selectors to
 protect memory access.
+
+*** Program Counter
+
+- =IP=: instruction pointer
+
+*** Flags
 
 The =EFLAGS= is a 32-bit register used as a collection of boolean bits
 to store the results of operations and the state of the processors.
