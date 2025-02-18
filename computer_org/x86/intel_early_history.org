@@ -53,7 +53,9 @@ A mixture of random logic and microcode.
 
 - 20 bit address width
 
-- pipelined instruction prefetch
+- two-stage pipeling: BIU (instructions fetched into the instruction queue), EU
+  (execution of fetched instructions). Certain instructions (jump) may require
+  flushing the queue (and thus the pipeline), causing a /branch penalty/.
 
 8086 is divided into an Execution Unit (EU) and a Bus interface Unit (BIU). The
 BIU is responsible for handling all interfaces with external bus. When the EU
@@ -116,7 +118,8 @@ not accessible (intended by design), which is incompatible with existing DOS pro
 
 Fully 32-bit CPU (internal registers, buses and external buses).
 
-- Up to 4GB physical memory and 64 TB virtual memory
+- Up to 4GB physical memory and 64 TB virtual memory ($2^14$ segment selectors
+  times $2^{32}$)
 
 ** 386SX
 
