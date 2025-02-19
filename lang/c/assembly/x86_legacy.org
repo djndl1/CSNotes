@@ -147,7 +147,8 @@ implementation stages.
 
 *** General-Purpose Registers
 
-- Accumulator register =AX=: Used in arithmetic operations
+- Accumulator register =AX=: Used in arithmetic operations. However, this does
+  not mean addition or any arithmetic operations uses =AX= as the only destination.
 
 - Counter register =CX=: Used in shift/rotate instructions and loops.
 
@@ -190,6 +191,8 @@ Additional two segment registers are introduced in 80386
 - G Segment =GS=: Pointer to still more extra data ('G' comes after
   'F').
 
+Values cannot be loaded directly into any segment register; load segment registers via other non-segment register.
+
 In real mode, segment registers were used to addressing a 20-bit address
 bus using 16-bit registers. Later, they were used as selectors to
 protect memory access.
@@ -211,3 +214,25 @@ https://unix.stackexchange.com/questions/469253/does-linux-not-use-segmentation-
 
 https://wiki.osdev.org/Global_Descriptor_Table
 
+
+
+** Program Segments
+
+For 8086, segments are not simply program image sections. They are memory
+regions accessed via the three segment registers (code =CS=, data =DS= and stack
+=SS=). The 8086 can only access these three segments of 64KB at any given time
+due to its limited width of registers even its physical address bus is larger.
+
+- /physical address/: the address on the external address bus
+
+- /offset address/: an address within a 64KK range segment range
+
+- /logical address/: a pair of a segment value and an offset address
+
+*** Code Segments
+
+The address of the next instruction is represented by the =CS:IP= register pair, where =CS= is the segment and =IP= is
+the offset. The program counter =IP= is never used
+by itself. The actual address represented by this pair is =(CS << 4) + IP=
+
+On modern CPUs, instructions are often prefetched so the program counter only reflects the next instruction to execute but not the next one to fetch. It is a conceptual representation of the CPU's state, not an actual register.
