@@ -215,10 +215,28 @@ https://unix.stackexchange.com/questions/469253/does-linux-not-use-segmentation-
 https://wiki.osdev.org/Global_Descriptor_Table
 
 
+** Memory: Representation, Addressing, Models
 
-** Program Segments
+20-bit address bus from =0x00000= to =0xFFFFF=
+CPU after 8088 can access high memory called *extended memory*, often used for disk caches, RAM disks and print spoolers, which can be configured as *expanded memory* for programs to store data.
 
-For 8086, segments are not simply program image sections. They are memory
+Since a CPU register is 16-bit only, allowing only 64KB address (/segment/).
+To access the memory in a fine
+granular manner, the /offset register/ is added to the multiplied result,
+normally written as =segment:offset=.
+Unlike later IA-32 or AMD64, where a single register is enough to access the
+entire memory space, on 16-bit 8086, a pointer value has to be represented by
+a segment register plus an offset in another register or an immediate number
+offset. There is nothing special about segment registers except that they are
+reserved specifically for pointer representation. As long as one needs to access the memory, segment registers have to be used.
+
+Code is not supposed to be load by the user and so =CS= is not normally changed
+by user code. Different memory access instructions assume different segment registers.
+
+*** Program Segments
+
+For 8086, segments are not simply program image sections. They are supposed to
+be memory
 regions accessed via the three segment registers (code =CS=, data =DS= and stack
 =SS=). The 8086 can only access these three segments of 64KB at any given time
 due to its limited width of registers even its physical address bus is larger.
@@ -229,10 +247,94 @@ due to its limited width of registers even its physical address bus is larger.
 
 - /logical address/: a pair of a segment value and an offset address
 
-*** Code Segments
+**** Code Segments
 
 The address of the next instruction is represented by the =CS:IP= register pair, where =CS= is the segment and =IP= is
 the offset. The program counter =IP= is never used
-by itself. The actual address represented by this pair is =(CS << 4) + IP=
+by itself. The actual address represented by this pair is =(CS << 4) + IP=. =IP=
+increments as instruction is executed.
 
 On modern CPUs, instructions are often prefetched so the program counter only reflects the next instruction to execute but not the next one to fetch. It is a conceptual representation of the CPU's state, not an actual register.
+
+**** Data Segments
+
+Data are supposed to be put in certain memory regions called data segments and
+are accessed through the =CS= segment and an offset register (=BX=, =DI= or
+=SI=).
+
+#+begin_src asm
+mov al, [bx] // relative to CS
+#+end_src
+
+**** Extra Segment
+
+Used as an extra /data segment/.
+
+**** Stack Segment
+
+8086 was designed with memory stacks in mind and a special segment register is
+reserved for it and related instructions operate with this segment register =SS= and
+its offset register =SP=. =SP= points to the last stack location *occupied*.
+
+The stack grows downwward from upper addresses to lower addresses, opposite of =IP=.
+
+=BP= (stack base) is another stack offset that represents the address of the
+current stack frame.
+
+*** Point Types
+
+Pointer types are designed by Intel, not purely a programmer's invention.
+
+- /near pointers/: 16-bit offsets within the current segment, determined by the
+  value of the current segment register.
+
+- /far pointers/: 32-bit =segment:offset= pairs resolving to 20-bit external
+  addresses, the typical representation produced by x86 memory segmentation.
+
+- /huge pointers/: a special types of far pointers that presents a flat memory model. These pointers are normalized so
+  that they have the highest possible segment (the most significant 16 bits of
+  its physical address) for that address (a pointer may be
+  represented by different segment-offset pairs).
+  + e.g. =0x15020= is in the segment =0x1502=. Then each such segment (/paragraph/) contains
+    only 16 addresses and does not overlapping.
+
+*** Memory Models
+
+Due to 8086's memory segmentation, there are different configurations and usages
+for segment registers, resulting in six memory models, listed below
+
+---
+| model   | data | code | definitions                                                            | comment                  |
+|---------+------+------+------------------------------------------------------------------------+--------------------------|
+| tiny    | near | near | CS=DS=SS                                                               | only one segment is used |
+| small   | near | near | DS=SS                                                                  |                          |
+| medium  | near | far  | DS=SS, multiple code segments                                          |                          |
+| compact | far  | near | single code segment, multiple data segments                            |                          |
+| large   | far  | far  | multiple code and data segments                                        |                          |
+| huge    | huge | far  | multiple code and data segments; single array be longer than a segment |                          |
+
+*** Memory Map: How Memory Space is Used
+
+#+begin_src
+┌───────────────────┐ 00000
+│                   │
+│                   │
+│                   │
+│                   │
+│      RAM          │
+│      640K         │
+│                   │
+│                   │
+│                   │
+│                   │ 9FFFF
+┌───────────────────┐----
+│   videos 128K     │ A0000
+└───────────────────┘----
+│      ROM          │ C0000
+│     256K          │
+└───────────────────┘ FFFFF
+#+end_src
+
+- /conventional memory/: RAM, from 0x0 to 0x9FFFF
+
+- /upper memory/: Videos + ROM, from 0xA0000 to 0xFFFFF
