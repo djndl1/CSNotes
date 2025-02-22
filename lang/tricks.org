@@ -1,0 +1,15 @@
+#+title: Tricks
+
+* Loops
+
+** Countdown
+
+- =while (n-- > 0)=: check before decrement, run after check, n times execution
+
+- =while (--n > 0)=: check after decrement, run after check, n-1 times execution
+
+- =do { } while (--n > 0);=: check after decrement (-1), run before check
+  (+1), n times
+
+- =do { } while (n-- > 0);=: check before decrement (0), run before check (+1),
+  n + 1 times
