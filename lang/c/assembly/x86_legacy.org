@@ -201,19 +201,32 @@ protect memory access.
 
 - =IP=: instruction pointer
 
-*** Flags
+*** Flags (Status)
 
-The =EFLAGS= is a 32-bit register used as a collection of boolean bits
-to store the results of operations and the state of the processors.
+The =EFLAGS= is a register used as a collection of boolean bits to store the results of operations and the state of the processors.
 
-https://en.wikibooks.org/wiki/X86_Assembly/16,_32,_and_64_Bits
+- =SF=: sign, the sign of arithmetic or logic operations
 
-https://wiki.osdev.org/Segmentation
+- =ZF=: whether the result of an operation is zero
 
-https://unix.stackexchange.com/questions/469253/does-linux-not-use-segmentation-but-only-paging#
+- =CF=: carry, indicating a carry after an 8-bit or 16-bit operation (depending
+  on the bitness of the operation)
+  + also as overflow status for unsigned operations
 
-https://wiki.osdev.org/Global_Descriptor_Table
+- =AF=: auxiliary carry, indicating a carry from D3 to D4 of an operation, used by BCD arithmetic
 
+- =PF=: even parity result of certain operation
+  + the parity result depends on the bit-length of the operation.
+
+- =IF=: enable or disable external maskable interrupt  requests
+
+- =TF=: trap, for debugging
+
+- =DF=: direction, used to control the direction of string operations
+
+- =OF=: overflow, set whenever the result of a signed number operation overflows
+
+- =R= and =U=: reserved and undefined
 
 ** Memory: Representation, Addressing, Models
 
@@ -338,3 +351,66 @@ for segment registers, resulting in six memory models, listed below
 - /conventional memory/: RAM, from 0x0 to 0x9FFFF
 
 - /upper memory/: Videos + ROM, from 0xA0000 to 0xFFFFF
+
+** Addressing Modes
+
+"Addressing" here means the way to access operands, not simply about memory addressing.
+
+- *register*: the use of registers to hold the data to be manipulated
+
+- *immediate*: the operand as a constant, immediately follows the opcode in the
+  instruction.
+  + Loading segment registers with immediate operands is not allowed.
+
+The following modes manipulate data in the memory through a data pointer. The
+first two correspond to the two modes above but as data pointers.
+
+- *direct*: the data pointer is a constant in the instruction.
+
+  #+begin_src asm
+mov dl, [2400]   // DS:2400H
+
+mov [2518], al
+  #+end_src
+
+- *register indirect*: the data pointer is in a register
+
+#+begin_src asm
+mov cl, [si]
+mov [di], ah
+#+end_src
+
+- *based relative*: Base registers =BX= or =BP= (default with =SS=) along with a displacement value are added as the data pointer
+
+#+begin_src asm
+mov cx, [bx]+10 ; DS:BX+10, confusing, seems like plus 10 after dreferencing bx
+mov cx, [bx+10] ; DS:BX+10
+mov cx, 10[bx]  ; weird, at least not ambiguous
+#+end_src
+
+- *indexed relative*: Index registers =DI= or =SI= with a displacement;
+  + this mode is essentially the same as based relative but uses index registers.
+
+- *Based indexed*: the above two combined
+
+  #+begin_src asm
+mov cl, [bx][di]+8 ; DS:(BX+DI+8)
+mov cl, [bx][si]+8 ; DS:(BX+SI+8]
+mov cl, [bp][di]+8 ; SS:(BP+DI+8)
+mov cl, [bp][si]+8 ; SS:(BP+SI+8)
+  #+end_src
+
+*** Segment Override
+
+By default, an offset register are combined with a fixed segment register as the
+following
+
+| CS | DS         | ES         | SS     |
+|----+------------+------------+--------|
+| IP | SI, DI, BX | SI, DI, BX | SP, BP |
+
+However, one may override the default segment by explicitly specify the segment
+
+#+begin_src asm
+mov al, es:[bx]
+#+end_src
