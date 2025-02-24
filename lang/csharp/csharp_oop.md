@@ -88,6 +88,143 @@ class Employee
 (_, firstName, lastName, salary) = employee;
 ```
 
+## Static Initialization
+
+The initialization order of different classes is not deterministic but follows the dependency relationship between classes.
+A type is first initialized before using. Their static fields are not initialized in parallel.
+
+### Type Initialization Order
+
+For a certain class:
+
+1. Static fields to zero-initialized;
+
+2. Derived type static field initializers run;
+
+3. Base type static field initializer run;
+
+4. Any static constructor runs, starting from the ultimate base.
+   Static constructors run before any instance creation (unless any field initializer of its class creates an instance) 
+   or static member access.
+   
+The order between static field initializers and static constructors cannot be determined 
+without considering the relationships of their containing classes.
+"the static constructor runs after static field initializers" applies only when initializing a certain class.
+For cross-class references of static members, the static constructor of class `A` is executed 
+before static members of another class retrieves the value of static members of `A`. 
+In this sense, the static constructor of a class `A` runs before static field initializers of another class 
+that references static memberrs of this class.
+
+*Warning*: the order of initialization of partial classes is not defined in C#. 
+
+### Case Analysis
+
+```csharp
+class A
+{
+    public static int X;
+
+    static A()
+    {
+        X = B.Y + 1;
+    }
+}
+
+class B
+{
+    public static int Y = A.X + 1;
+
+    static B() {}
+
+    static void Main()
+    {
+        Console.WriteLine($"X = {A.X}, Y = {B.Y}");
+    }
+}
+// X = 1, Y = 2
+```
+
+- To run the static member of `B` `Main()`, `B.Y` is initialized (first to zero and then its initializer)
+
+- `B.Y`'s initializer access `A.X`, causing `A.X`'s initializer to run (with `B.Y` having been zero-initialized) and then `A`'s static constructor
+
+- `B.Y` is `0`, then `A.X` is initialized to `1`, then `Y = A.X + 1` is `2`
+
+A more complex example would be:
+
+```csharp
+static class B
+{
+    public static int X = 7;
+    static B() {
+        Console.WriteLine("B.X = " + X);
+        X = A.X;
+        Console.WriteLine("B.X = " + X);
+    }
+}
+
+static class A
+{
+    public static int X = B.X + 1;
+    static A() {
+        Console.WriteLine("A.X = " + X);
+    }
+}
+
+static class Program
+{
+    static void Main() {
+        Console.WriteLine("A = {0}, B = {1}", A.X, B.X);
+    }
+}
+```
+
+```shell
+B.X = 7
+B.X = 0
+A.X = 1
+A = 1, B = 0
+```
+
+- `A.X` is accessed, so its initializer is called after being zero initialization
+
+- but `B.X` is referenced, then `B.X` is initialized to `7` and then to `A.X` (`0`), so `A.X` is finally set to `B.X + 1` (`0 + 1`)
+
+- `B.X = 0`, `A.X = 1`
+
+   
+### Suggestions
+
+- Use `const` instead of `static` if possible.
+
+- Static constructors provides better maintainability and is deterministic than static field initializers if these initializers depends on each other.
+  Also, they always run before dependent classes.
+
+- For partial classes, the order of static fields initialization is undefined in different files, use static constructors instead.
+
+- Avoid circular references between static fields (in-class or cross-class), 
+  which could cause unexpected results, even stack overflows.
+  
+- As long as there is no circular referencing, the initialization follows the order defined by their dependency relationship.
+
+- Consider `Lazy<T>` for expensive initialization that may not be needed at startup.
+
+- Because the static constructor is executed exactly once for each closed constructed class type, 
+  it is a convenient place to enforce run-time checks on the type parameter that cannot be checked at compile-time via constraints
+  
+  ```csharp
+  class Gen<T> where T : struct
+  {
+    static Gen()
+    {
+        if (!typeof(T).IsEnum)
+        {
+            throw new ArgumentException("T must be an enum");
+        }
+    }
+  }
+  ```
+  
 ## static class
 
 A class with no data field should be declared as `static` to prevent instantiation. The compiler automatically marks it as `abstract` and `sealed` within the CIL, rendering it inextensible.
