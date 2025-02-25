@@ -166,3 +166,38 @@ mov  rax, 0x400921fb...
 #+begin_src shell
 ndisasm -b {16|32|64} filename
 #+end_src
+
+* DOS Debug
+
+One great feature of =debug= is JIT of assembly code. The user may write
+assembly into a memory region and let debug run it.
+
+** Registers
+
+- =R=: read/write registers
+
+** Assembly/Unassembly
+
+- =A address=: input assembly instructions starting at the specified address
+
+- =U start end/byte_count=: disassembly memory block from =start= to =end=.
+
+** Execution
+
+- ~G =start stop~: execute the instructions between the two addresses; or without
+  the boundaries, start at =CS:IP= until a breakpoint =INT 3= is encountered.
+  + up to 10 stop addresses are allowed, at which the execution will be stopped.
+
+- =T [=start] [instruction_count]= (trace): execute and display registers after
+  each instruction.
+
+** Memory Access
+
+- =F start end/byte_count bytes=): fill memory with data (inclusive)
+
+- =D start end/byte_count= (dump): examine the contents of memory
+  + the segment register is needed in the end address.
+
+- =E address data_list= (examine or enter): enter a list of data into a certain portion of memory.
+  + =data_list= may be hex data or ='string'=
+  + without a data list, each byte is printed and waiting for possible writing.
