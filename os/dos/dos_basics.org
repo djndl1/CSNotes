@@ -61,3 +61,18 @@ TODO
   + /High Memory Area/ (HMA): the first 64K of extended memory. DOS is automatically placedd in this area if available.
 
 - /Expanded memory/: installed on an expanded memory board.
+
+* Networks
+
+** SSH
+
+SSH2DOS uses obsolete algorithms, which is disabled by default by modern SSH servers.
+
+#+begin_src
+HostKeyAlgorithms +ssh-dss,ssh-rsa
+# and then run sudo ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key
+# and add HostKey /etc/ssh/ssh_host_dsa_key in addition to more modern keys
+
+KexAlgorithms +diffie-hellman-group1-sha1
+Ciphers +aes128-cbc
+#+end_src
