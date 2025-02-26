@@ -167,22 +167,44 @@ mov  rax, 0x400921fb...
 ndisasm -b {16|32|64} filename
 #+end_src
 
-* DOS Debug
+* Debugging
+
+Writing programs back then requires putting much more effort into writing
+correct programs (even on paper by pencil), rather than removing bugs from incorrect programs, partly due
+to terrible tools.
+
+** [[https://learn.microsoft.com/en-us/previous-versions/tn-archive/cc722863(v=technet.10)][DOS Debug]]
+
+Debug may act as an assembler, disassembler or hexdump program.
+The original =Debug= supports only 8086 opcodes and 16-bit registers.
 
 One great feature of =debug= is JIT of assembly code. The user may write
 assembly into a memory region and let debug run it.
 
-** Registers
+*** Load Files
+
+- =N filename= (name): set up the filename to be loaded by the =L= (load) command
+
+- =L= (load): load the named file
+
+- =DEBUG filename=
+
+- =W= (write): write code to the setup filename.
+  + this command may accept drive and sector numbers, which is not very ideal
+    for high level filesystem manipulation.
+
+*** Registers
 
 - =R=: read/write registers
+  + =F= is the flag register
 
-** Assembly/Unassembly
+*** Assembly/Unassembly
 
 - =A address=: input assembly instructions starting at the specified address
 
-- =U start end/byte_count=: disassembly memory block from =start= to =end=.
+- =U start end/L byte_count=: disassembly memory block from =start= to =end=.
 
-** Execution
+*** Execution
 
 - ~G =start stop~: execute the instructions between the two addresses; or without
   the boundaries, start at =CS:IP= until a breakpoint =INT 3= is encountered.
@@ -191,13 +213,23 @@ assembly into a memory region and let debug run it.
 - =T [=start] [instruction_count]= (trace): execute and display registers after
   each instruction.
 
-** Memory Access
+- =P [=start] [instruction_count]= (procedure): similar to trace, but executes a loop, call, interrupt
+  or repeat string operation as if it were a single instruction.
 
-- =F start end/byte_count bytes=): fill memory with data (inclusive)
+*** Memory Access
 
-- =D start end/byte_count= (dump): examine the contents of memory
+- =F start end/L byte_count bytes=): fill memory with data (inclusive)
+
+- =D start end/L byte_count= (dump): examine the contents of memory
   + the segment register is needed in the end address.
 
 - =E address data_list= (examine or enter): enter a list of data into a certain portion of memory.
   + =data_list= may be hex data or ='string'=
   + without a data list, each byte is printed and waiting for possible writing.
+
+- =M [start] [end/L byte_count] [dest]= (move): move (copy) a region of data to the destination.
+
+- =C [start] [end/L byte_count] [compare_addr]= (compare): compare a memory region with
+  another region.
+
+- =S [start] [end/L byte_count] [data]= (search): search for a specific data value in the region
