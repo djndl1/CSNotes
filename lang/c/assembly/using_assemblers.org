@@ -176,35 +176,89 @@ to terrible tools.
 ** [[https://learn.microsoft.com/en-us/previous-versions/tn-archive/cc722863(v=technet.10)][DOS Debug]]
 
 Debug may act as an assembler, disassembler or hexdump program.
-The original =Debug= supports only 8086 opcodes and 16-bit registers.
+
 
 One great feature of =debug= is JIT of assembly code. The user may write
 assembly into a memory region and let debug run it.
 
-*** Load Files
+*** Enhancement
+
+The original =Debug= supports only 8086 opcodes and 16-bit registers. The
+FreeDOS version ([[https://github.com/Baron-von-Riedesel/DOS-debug/][Debug/X]]) is an enhanced clone of MS-Debug with enhanced
+features:
+
+- supports instruction sets up to the Pentium Pro (including x87 FPU), with partial support for MMX.
+  + and of course 32-bit registers.
+
+- =Debug=: the clone version
+
+- =DebugX=, an extended version that debugs both real-mode and protected-mode (DPMI) DOS programs
+
+*** Behavior
+
+Registers are represented by a few variables. Upon debugging or execution, these
+variables are copied into actual registers. Execution will start at the current
+value of =CS:IP=.
+
+On program startup, =debug= initializes register variables:
+
+- =AX=, =DX=, =SP=, =SI=, =DI= are set to 0
+
+- If a target program is loaded =BX=, =CX= are set to the size of the program or
+  file
+  + otherwise set to 0.
+
+- Segment registers, =SP=, =IP= are set to values appropriate for the loaded
+  program.
+  + Otherwise the segment registers are set to the segment address of the are of
+    memory that =debug= uses to store the output from the Assemble command; =IP=
+    set to =100h=, =SP= to =FFFEh=
+
+- the high-words of 32-bit registers are initialized to zero.
+
+*** Commands
+
+A "range" parameter denotes a region of memory, eithere as a =start end= address
+pair of a =start L bytecount= pair.
+
+- =-= indicates real mode; =#= protected mode.
+
+**** Load/Write Files
 
 - =N filename= (name): set up the filename to be loaded by the =L= (load) command
 
-- =L= (load): load the named file
+- =L [addr]= (load): load the named file
+  + by default loaded at =CS:100= except EXE files, which are determined by
+    the file header.
 
 - =DEBUG filename=
 
-- =W= (write): write code to the setup filename.
+- =W [addr or 100h by default]= (write): write code to the setup filename.
+  + EXE file output is not supported.
   + this command may accept drive and sector numbers, which is not very ideal
     for high level filesystem manipulation.
 
-*** Registers
+**** Registers
 
-- =R=: read/write registers
-  + =F= is the flag register
+- =R [register_name register_value]=: read/write registers
+  + =F= is the flag register, to set a flag, use =R F flag_name= or =R FL word= altogether.
 
-*** Assembly/Unassembly
+- =RX=: 8086/80386 register display mode switch
+
+- =RN=: display FPU register status
+
+- =RM=: display MMX registers from low to high
+
+**** Assembly/Unassembly
 
 - =A address=: input assembly instructions starting at the specified address
+  + the default address is =100h=
 
 - =U start end/L byte_count=: disassembly memory block from =start= to =end=.
+  + =DB=, =DW=, =DD= are pseudoinstructions that represent data.
+  + =ORG= sets the starting address for instructions.
 
-*** Execution
+**** Execution
 
 - ~G =start stop~: execute the instructions between the two addresses; or without
   the boundaries, start at =CS:IP= until a breakpoint =INT 3= is encountered.
@@ -212,18 +266,34 @@ assembly into a memory region and let debug run it.
 
 - =T [=start] [instruction_count]= (trace): execute and display registers after
   each instruction.
+  + =TM 0/1=: trace execution (single-step execution)
 
-- =P [=start] [instruction_count]= (procedure): similar to trace, but executes a loop, call, interrupt
-  or repeat string operation as if it were a single instruction.
+- =P [=start] [instruction_count]= (proceed): similar to trace, but executes a
+  =REP= string operation, a =LOOP= instruction, a =CALL=, an interrupt
+  as if it were a single instruction.
 
-*** Memory Access
+The output of =R=, =P=, =T=, aside from the current register variables, shows
+the next instruction, and possibly the memory operand  including the content used by that instruction
+
+**** Memory Access
 
 - =F start end/L byte_count bytes=): fill memory with data (inclusive)
 
 - =D start end/L byte_count= (dump): examine the contents of memory
   + the segment register is needed in the end address.
 
-- =E address data_list= (examine or enter): enter a list of data into a certain portion of memory.
+- =DM=: display the memory control block chain (DOS term for freelist)
+  + format: =MCB_segment_address 4D/5A owner size owner_name=
+
+- =DL= (DebugX): display local descriptors
+
+- =DX= (Debug/X): display extended memory (the full range of memory of physical address)
+  + for DOS emulators, the memory displayed is not physical address and may
+    trigger a crash.
+
+- =E address data_list= (examine or enter): enter a list of data into a certain
+  portion of memory.
+  + by default in the =DS= segment
   + =data_list= may be hex data or ='string'=
   + without a data list, each byte is printed and waiting for possible writing.
 
@@ -232,4 +302,32 @@ assembly into a memory region and let debug run it.
 - =C [start] [end/L byte_count] [compare_addr]= (compare): compare a memory region with
   another region.
 
-- =S [start] [end/L byte_count] [data]= (search): search for a specific data value in the region
+- =S [start] [end/L byte_count] [data_list/string]= (search): search for a specific data value in the region
+
+**** Interrupts
+
+- =DI [range]=: display inerrupt vectors
+
+**** I/O
+
+- =I/IW/ID port=: reads a byte/word/dword from a port
+
+- =O/OW/OD port byte/word/dword=: writes a byte/word/dword to a port
+
+**** Other
+
+- =H= computes the sum and difference of two hex numbers.
+  + I have python for that.
+
+- =M 0/1/2/3/4/5/6=: set CPU type, from 8086/8088 to P6.
+
+- =MC [N/2]=: enable, disable and set FPU mode.
+
+- =Q=: quit the debugger
+  + =QQ=: forceful quit
+
+*** Breakpoints
+
+- An =int 3= in code
+
+- Use hardware debug register (386)
