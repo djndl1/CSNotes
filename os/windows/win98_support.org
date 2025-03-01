@@ -1,0 +1,27 @@
+#+title: Windows 98 Support
+
+* Qemu
+
+IDE drive, IDE CDROM, floppy drive, 256M memory.
+
+
+** Drivers
+
+*** Graphics
+
+The graphics requires a [[https://bearwindows.zcm.com.au/vbe9x.htm#2][Universal VBE Video Display Driver]] to support true
+colors and more resolution modes.
+
+Warning: it causes the system to hang upon running a console session or a DOS window.
+
+*** PCI Bus
+
+The Plug and Play BIOS is not recognized automatically and its driver should be
+manually chosen as PCI bus so that Windows 98 can enumerate devices on the bus
+to install drivers including USB.
+
+*** Network
+
+Intel Pro 1000 MT driver (e1000) can be easily found on the Internet, execute
+the setup to extract the files do not use the GUI installer. Point the driver
+path to the Win98SE folder under the extracted driver folder.
