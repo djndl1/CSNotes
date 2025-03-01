@@ -165,6 +165,13 @@ Derivative of Coppermine Pentium-III with 128KB on-chip L2 cache. 566MHz up to 1
 
 * Pentium 4 (NetBurst P68)
 
+Like P6, NetBurst features superscalar hyper-pipelined out-of-order execution.
+The front-end pipeline prefetches instructions that are likely to executed,
+fetches instructions that have not been prefetched, decodes them into
+micro-operations, generates microcode for complex instructions and
+special-purpose code, delivers decoded instructions from the execution trace
+cache and predicts branches using highly advanced algorithms.
+
 - the first processor to implement *Simultaneous Multithreading* (Hyperthreading): issue multiple instructions from
   multiple threads in one cycle, each executing threads independently.
   + the opposite is *temporal multithreading*; multicore is chip-level multiprocessing.
@@ -174,11 +181,27 @@ Derivative of Coppermine Pentium-III with 128KB on-chip L2 cache. 566MHz up to 1
 
 - 20-stage instruction long pipeline
 
+- Expanded hardware registers with renaming to avoid register namespace limitations.
+
+- /trace cache/ in the front end stores decoded sequences of micro-ops (called
+  *traces*, representing prefetched branches).
+  + /how it works/: The trace cache is searched for the instruction that follows the active
+    branch. If the instruction also appears as the first instruction in
+    pre-fetched branch, the fetch and decode of instructions from memory
+    hierarchy ceases and the prefetched branch becomes the new source of instructions.
+  + /why/: the trace cache addresses the issue of decoding latency and wasted decode bandwidth due to branches or branch target in the middle of cache lines.
+
 - rapid execution engine: double pumped ALUs, at twice the rate the core clock frequency
 
-- execution trace cache: part of L1 cache that stores decoded micro-operations
+- New cache system:
+  - L1: advanced execution trace cache stores decoded instructions and removes
+    decoder latency from main execution loops, integrates path of program
+    execution flow into a single line;
+  - L2: full-speed unified 8-way on-die Advance Transfer Cache;
 
-- replay system: TODO
+- deep out-of-order speculative execution engine, up to 126 instructions in
+  flight, 48 loads and 24 stores in pipeline; enhanced branch prediction capability
+  + up to 6 micro-ops per cycle
 
 ** Revisions
 
