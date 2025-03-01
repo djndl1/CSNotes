@@ -23,7 +23,7 @@ nmcli conn up bridge-slave-conn
 
 #+begin_src shell
 qemu-img create floppy.img 2.88M
-mkfs.msdos floppy.img 2880
+mkfs.msdos floppy.img 1440
 #+end_src
 
 The problem with floppy disks are that they can only be as large as DOS
