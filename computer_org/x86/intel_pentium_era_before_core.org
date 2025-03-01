@@ -8,7 +8,7 @@
   + Two pipelines of 5 stages
   + there are multiple execution units within one CPU core.
   + instructions are issued from a sequential instruction stream;
-    the CPu dynamically checks for data dependencies between instructions at
+    the CPU dynamically checks for data dependencies between instructions at
     run time; the CPU can execute multiple instructions per clock cycle.
   + essentially all general-purpose CPU developed since 1998 are superscalar
     except some embedded processors.
@@ -19,6 +19,8 @@
 
 - Redesigned fast FPU
 
+- 125 and 256 bits internal data paths
+
 - 64-bit data bus, internal and external.
 
 - separate code and data caches.
@@ -26,6 +28,10 @@
 - branch prediction
 
 - Multiprocessing support
+
+- 4MB page size in addition to 4-KB pages
+
+- 8 KB code cache and 8KB data cache
 
 ** Pentium MMX
 
@@ -42,9 +48,38 @@
 
 * Pentium Pro (the P6 Microarchitecture or i686, 1995)
 
-The sixth generation x86 microprocessor by Intel, knonwn for its low power
+The sixth generation x86 microprocessor by Intel, known for its low power
 consumption, excellent integer performance and relatively high IPC. The ancestor of modern Intel
-Core microarchitecture.
+Core microarchitecture. For the P6 microarch, it does convert x86 instructions
+into RISC-like microinstructions to be further processed by the execution units.
+[[https://fanael.github.io/is-x86-risc-internally.html#p6-long-long-ago][This is not completely true for later x86 high-performance CPUs]].
+Also, breaking a complex instruction into micro-instructions was nothing new
+before P6. Intel's manual heavily focus on dynamic execution instead of
+"RISC-like internal instructions".
+
+- *Dynamic execution* (out-of-order execution):
+  + /deep branch prediction/: decode instructions beyond branches to keep the
+    instruction full (prediction, not execution).
+  + /dynamic data flow analysis/: analysis of the flow of data through the
+    processor to determine dependencies and to detect opportunities for
+    out-of-order instruction execution. The out-of-order execution core can
+    monitor many instructions and execute these instructions in the order that
+    best optimizes the use of the processor's multiple execution units, while
+    maintaining the data integrity. An optimized schedule of instructions is
+    created for speculative execution.
+  + /speculative execution/: ability to execute instructions that lie beyond a
+    conditional branch that has not yet been resolved and ultimately to commit
+    the results in the order of the original instruction pattern.
+    - Dispatch and execution of instructions are decoupled from the commitment
+      of results. The results are stored in temporary registers. The /retirement
+      unit/ searches the instruction pool for completed instructions that are
+      not depended by other unfinished instruction or unresulved branch
+      predictions, and commits the results of these instructions to memory or
+      x86 registers.
+    - "Retirement" means a micro-op compltes and writes its result to reflect
+      the architectural state change according to the original program order.
+      The Retirement Unit may also send udpated branch targeet information to
+      the Branch Target Buffer.
 
 - conditional move instructions =CMOVcc= and =FCMOVcc=, conditional jump =Jcc=.
   + conditional statement with a costly conditional branch.
@@ -55,13 +90,14 @@ Core microarchitecture.
 
 - 14-stage superpipelined
 
-- out-of-order execution including speculative execution via register renaming.
 
 - 36-bit address bus but with PAE
 
 - first x86 processor to support upgradeable microcode under BIOS or OS control.
 
 - There is no MMX support
+
+- in addition to two 8KB on-chip L1 cache, a 256KB level 2 cache is added to the package.
 
 Frequent pipeline flushing when dealing with mixed code (8-bit with 16-bit,
 16-bit with 32-bit), and thus not suitable for PC users, but used with 32-bit OS
@@ -75,7 +111,7 @@ A more consumer-oriented version of Pentium Pro, combining the P6 microarchitect
 
 - Improved 16-bit code execution performance by adding segment register caches.
 
-- In-Package 512KB L2 cache
+- In-Package 512KB L2 cache connected by a half-frequency backside bus
 
 ** Revisions
 
