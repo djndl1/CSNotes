@@ -55,41 +55,11 @@ into RISC-like microinstructions to be further processed by the execution units.
 [[https://fanael.github.io/is-x86-risc-internally.html#p6-long-long-ago][This is not completely true for later x86 high-performance CPUs]].
 Also, breaking a complex instruction into micro-instructions was nothing new
 before P6. Intel's manual heavily focus on dynamic execution instead of
-"RISC-like internal instructions".
+"RISC-like internal instructions". Its major features includes:
 
-- *Dynamic execution* (out-of-order execution):
-  + /deep branch prediction/: decode instructions beyond branches to keep the
-    instruction full (prediction, not execution).
-  + /dynamic data flow analysis/: analysis of the flow of data through the
-    processor to determine dependencies and to detect opportunities for
-    out-of-order instruction execution. The out-of-order execution core can
-    monitor many instructions and execute these instructions in the order that
-    best optimizes the use of the processor's multiple execution units, while
-    maintaining the data integrity. An optimized schedule of instructions is
-    created for speculative execution.
-  + /speculative execution/: ability to execute instructions that lie beyond a
-    conditional branch that has not yet been resolved and ultimately to commit
-    the results in the order of the original instruction pattern.
-    - Dispatch and execution of instructions are decoupled from the commitment
-      of results. The results are stored in temporary registers. The /retirement
-      unit/ searches the instruction pool for completed instructions that are
-      not depended by other unfinished instruction or unresulved branch
-      predictions, and commits the results of these instructions to memory or
-      x86 registers.
-    - "Retirement" means a micro-op compltes and writes its result to reflect
-      the architectural state change according to the original program order.
-      The Retirement Unit may also send udpated branch targeet information to
-      the Branch Target Buffer.
-
-- conditional move instructions =CMOVcc= and =FCMOVcc=, conditional jump =Jcc=.
-  + conditional statement with a costly conditional branch.
-
-- =UD2= illegal instruction for developers to crash the program.
-
-- RISC implementation with a x86 decoding front end.
+- ISA-decoupled dynamic execution
 
 - 14-stage superpipelined
-
 
 - 36-bit address bus but with PAE
 
@@ -99,9 +69,38 @@ before P6. Intel's manual heavily focus on dynamic execution instead of
 
 - in addition to two 8KB on-chip L1 cache, a 256KB level 2 cache is added to the package.
 
-Frequent pipeline flushing when dealing with mixed code (8-bit with 16-bit,
-16-bit with 32-bit), and thus not suitable for PC users, but used with 32-bit OS
-(NT, Unix).
+** New Instructions
+
+- conditional move instructions =CMOVcc= and =FCMOVcc=, conditional jump =Jcc=.
+  + conditional statement with a costly conditional branch.
+
+- =UD2= illegal instruction for developers to crash the program.
+
+** Disadvantages
+
+Frequent pipeline flushing when dealing with mixed code (8-bit with 16-bit, 16-bit with 32-bit), and thus not suitable for PC users, but used with 32-bit OS (NT, Unix).
+
+** Dynamic execution
+
+*** /deep branch prediction/
+
+Decode instructions beyond branches to keep the instruction full (prediction, not execution).
+
+*** /dynamic data flow analysis/
+
+analysis of the flow of data through the processor to determine dependencies and to detect opportunities for out-of-order instruction execution. The out-of-order execution core can monitor many instructions and execute these instructions in the order that best optimizes the use of the processor's multiple execution units, while maintaining the data integrity. An optimized schedule of instructions is created for speculative execution.
+
+*** /speculative execution/
+
+The ability to execute instructions that lie beyond a conditional branch that has not yet been resolved and ultimately to commit the results in the order of the original instruction pattern.
+
+Dispatch and execution of instructions are decoupled from the commitment of results. The results are stored in temporary registers. The /retirement unit/ searches the instruction pool for completed instructions that are not depended by other unfinished instruction or unresolved branch predictions, and commits the results of these instructions to memory or x86 registers.
+
+
+"Retirement" means a micro-op completes and writes its result to reflect the
+architectural state change according to the original program order. The
+Retirement Unit may also send updated branch Target information to the Branch
+Target Buffer. There is also the /reorder buffer/ that is responsible to hold the results of out-of-order execution.
 
 * Pentium II (May 1997, 233Mhz to 450MHz, 350-180 nm)
 
@@ -266,11 +265,15 @@ except those of HP.
 
 An evolution of Tualatin, with the FSB of Pentium-4
 
+
+
 - 10 or 12 stage pipeline
+
+- Advanced Branch Prediction and Data Prefetch Logic
 
 - SSE2
 
-- Larger L2 cache
+- 32KB code cache and 32KB write-back data cache; Larger On-die L2 cache (up to 2MB)
 
 - improved branch prediction
 
