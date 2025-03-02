@@ -1,6 +1,18 @@
 * The Core Microarchitecture (June 2006)
 
-No longer Pentium-M or mobile processors.
+The Core μarch intended to deliver an energy-efficient solution, not simply
+increasing clock rate. The performance is related to the frequency and the IPC,
+which is determined by many factors such as the microarchitecture, instruction
+capacbility (SIMD). Power consumption is related to the /dynamic capacitance/,
+voltage and frequency:
+
+$$
+Power = Dynamic Capacitance \times Voltage^{2} \times Frequency
+$$
+
+Designers carefully balance IPC efficiency and dynamic capacitance with the
+required voltage and frequency to optimize for performance and power efficiency.
+
 They are branded as Core 2, Pentium Dual-Core, Celeron M, Xeon.
 
 ** Major Features
@@ -17,11 +29,41 @@ They are branded as Core 2, Pentium Dual-Core, Celeron M, Xeon.
 
 - No VT-x generally
 
+*** Wide Dynamic Execution (Further Enhanced Out-Of-Order Execution)
+
+More accurate branch prediction, deeper instruction buffers, enhanced ALU,
+enhanced micro-op fusion (first appeared in Pentium M) and the new /Macrofusion/
+techinique. Potentially 4 instructions per core at a time
+
+- Macrofusion (new, macro-instruction, i.e. an ISA instruction, as compared to
+  micro-instruction within a CPU): two x86 instructions may be combined into a single micro-operation.
+
+*** Intelligent Power Capability
+
+Power gating capability with an fine-grained logic control
+
+- turns on individual processor logic systems only if needed
+
+*** Advanced Smart Cache
+
+Multi-core optimized cache.
+
 - Shared L2 cache for dual cores
 
-- Macro-Ops Fusion: two x86 instructions may be combined into a single micro-operation.
+*** Smart Memory Access
 
-- New power saving design: dynamic rate change.
+- /memory disambiguation/: typical out-of-order processors do not reschedule
+  loads ahead of stores to avoid data dependency violation. Memory
+  disambiguation tries to speculate if a load may precede a store.
+
+- /advanced prefetchers/ (prefetching memory contents into cache): two prefetchers per L1 cache and two per L2 cache.
+  Prefetchers detect multiple streaming and strided access patterns.
+
+*** Advanced Digital Media Boost
+
+The Core μarch runs these instructions one per cycle compared to one every two
+cycle in previous generations.
+
 
 * Nahalem (nuh-HA-luhm, 1st Gen Core i)
 
