@@ -1,4 +1,5 @@
 #+title: Intel Pentium Era Before Core
+#+bibliography: x86_ref.bib
 
 * The Original Pentium (P5, March 1993)
 
@@ -48,14 +49,13 @@
 
 * Pentium Pro (the P6 Microarchitecture or i686, 1995)
 
-The sixth generation x86 microprocessor by Intel, known for its low power
+The sixth generation x86 microprocessor by Intel (CPU Family 6 displayed by =lscpu=), known for its low power
 consumption, excellent integer performance and relatively high IPC. The ancestor of modern Intel
-Core microarchitecture. For the P6 microarch, it does convert x86 instructions
-into RISC-like microinstructions to be further processed by the execution units.
-[[https://fanael.github.io/is-x86-risc-internally.html#p6-long-long-ago][This is not completely true for later x86 high-performance CPUs]].
-Also, breaking a complex instruction into micro-instructions was nothing new
-before P6. Intel's manual heavily focus on dynamic execution instead of
-"RISC-like internal instructions". Its major features includes:
+Core microarchitecture.
+
+Decoupled, 12-stage, superpipelined implementation. P6 was one of first widely used processors to implement out-of-order execution, aside from AMD K5, Cyrix 6x86.
+
+Its major features includes:
 
 - ISA-decoupled dynamic execution
 
@@ -69,28 +69,82 @@ before P6. Intel's manual heavily focus on dynamic execution instead of
 
 - in addition to two 8KB on-chip L1 cache, a 256KB level 2 cache is added to the package.
 
-** New Instructions
+** Background
 
-- conditional move instructions =CMOVcc= and =FCMOVcc=, conditional jump =Jcc=.
-  + conditional statement with a costly conditional branch.
+The memory speed increased little compared to the CPU speed. The CPU had to wait
+for dependent data to be loaded from the memory, making the CPU underutilized.
+Adding more L2 cache would be expensive.
 
-- =UD2= illegal instruction for developers to crash the program.
+Just like an multitasking OS can execute other tasks without busy waiting for an
+I/O, a CPU can execute unrelated instructions while waiting for dependent data
+to load. The CPU core executes instructions depending on their readiness to
+execute and not on their original program order and thus *out-of-order execution*.
 
-** Disadvantages
+** Decoupling
 
-Frequent pipeline flushing when dealing with mixed code (8-bit with 16-bit, 16-bit with 32-bit), and thus not suitable for PC users, but used with 32-bit OS (NT, Unix).
+It is true that the P6 microarch converts x86 instructions
+into RISC-like microinstructions to be further processed by the execution units.
+[[https://fanael.github.io/is-x86-risc-internally.html#p6-long-long-ago][This is not completely true for later x86 high-performance CPUs]].
+Also, breaking a complex instruction into micro-instructions was nothing new
+before P6. Intel's manual heavily focus on dynamic execution instead of "RISC-like internal instructions".
 
-** Dynamic execution
+** Out-Of Order Execution
 
-*** /deep branch prediction/
+#+begin_src
+┌─────────────┐       ┌──────────────┐       ┌──────────────┐
+│             │       │              │       │              │
+│             │       │   Dispatch   │       │              │
+│ Fetch/Decode│       │   Execute    │       │    Retire    │
+│    Unit     │       │     Unit     │       │     Unit     │
+│             │       │              │       │              │
+│             │       │              │       │              │
+└──────┬──────┘       └────▲──────┬──┘       └───────▲──────┘
+       │                   │      │                  │
+       │                   │      │                  │
+       │                   │      │                  │
+       │                   │      │                  │
+       │         ┌─────────┼──────▼─────────┐        │
+       │         │                          │        │
+       │         │                          │        │
+       └────────►│                          ┼────────┘
+                 │     Instruction Pool     │
+                 │                          │
+                 │                          │
+                 └──────────────────────────┘
+#+end_src
+
+The three independent engines communicate via the instruction pool.
+
+Instead of stalling over the dependent data of a certain instruction, the core
+looks ahead for other instructions (20 to 30 in front of the program counter)
+that could be speculatively executed, within which branches must be correctly
+predicted.
+
+The sparse number of architectural registers of x86-32 may create many false
+dependencies (too few registers for too many data that are not really dependent
+on each other). Register renaming separates these independent data to reduce
+false dependencies. The retire unit owns the architectural registers and results
+are only committed to permanent machine state.
+
+*** Dynamic execution: How Intel Explains
+
+#+begin_quote
+Dynamic Execution technology can be summarized as optimally adjusting instruction execution by
+predicting program flow, analysing the program’s dataflow graph to choose the best order to execute
+the instructions, then having the ability to speculatively execute instructions in the preferred order.
+The P6 dynamically adjusts its work, as defined by the incoming instruction stream, to minimize
+overall execution time.[cite:@P6Tour]
+#+end_quote
+
+**** /deep branch prediction/
 
 Decode instructions beyond branches to keep the instruction full (prediction, not execution).
 
-*** /dynamic data flow analysis/
+**** /dynamic data flow analysis/
 
 analysis of the flow of data through the processor to determine dependencies and to detect opportunities for out-of-order instruction execution. The out-of-order execution core can monitor many instructions and execute these instructions in the order that best optimizes the use of the processor's multiple execution units, while maintaining the data integrity. An optimized schedule of instructions is created for speculative execution.
 
-*** /speculative execution/
+**** /speculative execution/
 
 The ability to execute instructions that lie beyond a conditional branch that has not yet been resolved and ultimately to commit the results in the order of the original instruction pattern.
 
@@ -101,6 +155,18 @@ Dispatch and execution of instructions are decoupled from the commitment of resu
 architectural state change according to the original program order. The
 Retirement Unit may also send updated branch Target information to the Branch
 Target Buffer. There is also the /reorder buffer/ that is responsible to hold the results of out-of-order execution.
+
+
+** New Instructions
+
+- conditional move instructions =CMOVcc= and =FCMOVcc=, conditional jump =Jcc=.
+  + conditional statement with a costly conditional branch.
+
+- =UD2= illegal instruction for developers to crash the program.
+
+** Disadvantages
+
+Frequent pipeline flushing when dealing with mixed code (8-bit with 16-bit, 16-bit with 32-bit), and thus not suitable for PC users, but used with 32-bit OS (NT, Unix).
 
 * Pentium II (May 1997, 233Mhz to 450MHz, 350-180 nm)
 
@@ -313,3 +379,7 @@ marketed as mobile processors.
 - specialized bus for core-cache communication
 
 - No x86-64 implementation until Core 2, the real Core microarchitecture
+
+* Bibliography
+
+#+print_bibliography:
