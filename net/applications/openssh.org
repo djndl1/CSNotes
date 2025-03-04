@@ -1,0 +1,10 @@
+#+title: Openssh
+
+* Keys
+
+Besides configuring algorithms in the config file, host keys must be generated
+for certain old algorithms.
+
+#+begin_src shell
+ssh-keygen -q -N ''    -t ssh-dss -f  /etc/ssh/ssh_host_dss_key
+#+end_src
