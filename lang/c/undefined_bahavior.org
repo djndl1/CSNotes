@@ -1,0 +1,24 @@
+#+title: Undefined Bahaviors
+
+* [[https://queue.acm.org/detail.cfm?id=3212479][C Is Not A Low-Level Language Your Computer is not a fast PDP-11]]
+
+** Serialism
+
+C code provides a mostly serial abstract machine until C11.
+Modern instruction-level parallelism (pipeline, speculative prediction, SIMD) offers performance boost without changing
+the assumption of the serial abstraction machine.
+
+** Flat Memory
+
+Modern computers have at least three levels of cache in between registers and
+main memory to hide latency. Efficient use of the cache is one of the most
+important ways of making code run quickly on a modern processor. However C hides
+this respect.
+
+** Optimization
+
+There is no simple translation from C to machine code and using C in itself does no imply
+performance.
+
+For example, if one interation in a loop is independent from another, the
+optimizer can vectorize them. C's syntax provides little information about this.
