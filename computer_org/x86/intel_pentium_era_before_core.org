@@ -90,31 +90,6 @@ before P6. Intel's manual heavily focus on dynamic execution instead of "RISC-li
 
 ** Out-Of Order Execution
 
-#+begin_src
-┌─────────────┐       ┌──────────────┐       ┌──────────────┐
-│             │       │              │       │              │
-│             │       │   Dispatch   │       │              │
-│ Fetch/Decode│       │   Execute    │       │    Retire    │
-│    Unit     │       │     Unit     │       │     Unit     │
-│             │       │              │       │              │
-│             │       │              │       │              │
-└──────┬──────┘       └────▲──────┬──┘       └───────▲──────┘
-       │                   │      │                  │
-       │                   │      │                  │
-       │                   │      │                  │
-       │                   │      │                  │
-       │         ┌─────────┼──────▼─────────┐        │
-       │         │                          │        │
-       │         │                          │        │
-       └────────►│                          ┼────────┘
-                 │     Instruction Pool     │
-                 │                          │
-                 │                          │
-                 └──────────────────────────┘
-#+end_src
-
-The three independent engines communicate via the instruction pool.
-
 Instead of stalling over the dependent data of a certain instruction, the core
 looks ahead for other instructions (20 to 30 in front of the program counter)
 that could be speculatively executed, within which branches must be correctly
@@ -156,6 +131,143 @@ architectural state change according to the original program order. The
 Retirement Unit may also send updated branch Target information to the Branch
 Target Buffer. There is also the /reorder buffer/ that is responsible to hold the results of out-of-order execution.
 
+
+*** The Three Parts
+
+#+begin_src
+ ───System─Bus────────         ┌────────────────────────────┐
+                               │         L2   Cache         │
+ ┌─────────────────────────────└────────────────────────────┘
+ │                 Bus    Interface   Unit                  │
+ └──────────────────────────────────────────────────────────┘
+ ┌────────────┐      ┌──────────────────────────────────────┐
+ │ L1 ICache  │      │           L1   DCache                │
+ └──────┬─────┘      └────────┬─────────────────────▲───────┘
+        │                     │                     │
+┌───────▼─────┐       ┌───────▼──────┐       ┌──────┼───────┐
+│             │       │              │       │              │
+│             │       │   Dispatch   │       │              │
+│ Fetch/Decode│       │   Execute    │       │    Retire    │
+│    Unit     │       │     Unit     │       │     Unit     │
+│             │       │              │       │              │
+│             │       │              │       │              │
+└──────┬──────┘       └────▲──────┬──┘       └───────▲──────┘
+       │                   │      │                  │
+       │                   │      │                  │
+       │                   │      │                  │
+       │                   │      │                  │
+       │         ┌─────────┼──────▼─────────┐        │
+       │         │                          │        │
+       │         │                          │        │
+       └────────►│                          ┼────────┘
+                 │     Instruction Pool     │
+                 │                          │
+                 │                          │
+                 └──────────────────────────┘
+#+end_src
+
+The three independent engines communicate via the instruction pool.
+
+***** *Fetch/Decode Unit*
+
+ #+begin_src
+       │
+       │ From BIU
+       │
+       │
+┌──────▼──────┌─────┐──────────┐
+│             │     │          │
+│    ICache   │     │ Next_IP  │
+│             ◄─────┼          │
+│             │     │          │
+└───────┬─────└─────┘────▲─────┘
+        │                │
+   ┌────▼───┐       ┌────┼──┐
+   │        │       │Branch │
+   │        ├──────►│Target │
+   Instruction      │Buffer │
+   │decoder │       └───────┘
+   │  x3    │
+   │        │       ┌─────────┐
+   │        │◄─────►│Microcode│Instruction Sequencer
+   │        │       └─────────┘
+   │        │       ┌──────────┐
+   └────────┴──────►│Register  ├─────────► Instruction Pool
+                    │Alias Table
+                    └──────────┘
+#+end_src
+
+In-order unit that takes as input the user program
+instruction stream from the instruction cache and decodes into a series of
+micro-ops that represent the dataflow of the instruction stream.
+
+The ICache is indexed by addresses from the Next​_IP unit, provided by prediction
+of the *Branch Target Buffer*, which is responsible for branch prediction.
+
+The ICache fetches the cache line indexed by the current index and the next
+cache line and presents them to the decoder. Three parallel decodes accepts this
+stream of bytes and try to find and decode the IA instructions therein, and then
+convert them into triadic (two sources and one destination per op) micro-ops.
+The microcode instruction sequencer maps complex instructions into preprogrammed
+sequences of normal micro-ops.
+
+The micro-ops are enqueued and sent to the *Register Alias Table* unit to map
+the logical architectural register references into physical register references
+and the *Allocator* stage adds status information to the micro-ops and enters
+them into the instruction pool.
+
+*****  *Dispatch/Execute*
+
+An out-of-order unit that accepts the dataflow stream, schedules execution of
+the micro-ops subject to data dependencies and resource availability and
+temporarily stores the results of these speculative executions.
+
+The dispatch unit select micro-ops from the  pool depending on the
+status: if a micro-op has all of its operands and the required execution
+resources are available, it is removed from the pool and dispatched. The results
+are returned to the pool.
+
+In P6, the dispatcher can schedule at most 5 micro-ops per cycle and
+typically 3. If there are multiple micro-ops ready to run, they are dispatched
+using a pseudo FIFO algorithm to try to run in the most efficient order.
+
+Branch micro-ops are tagged with their fall-through (following) address and
+their predicted destination (the branch address is in the instruction). Upon
+execution, the actual branch destination is
+compared with the predicted one. If tho coincide, the branch operation is
+retired, otherwise the *Jump Execution Unit* removes the status all the
+micro-ops after the branch and provides the actual branch destination to the
+Branch Target Buffer to restart the whole pipeline.
+
+***** *Retire Unit*
+
+An in-order unit that knows how and when to commit (“retire”) the temporary,
+speculative results to permanent architectural state.
+
+The retire unit checks the instruction pool for completed micro-ops, removes them and commits
+them in the original order.
+
+***** *Bus Interface Unit*
+
+Partially ordered unit responsible for connecting the
+three internal units to the outside.
+
+Memory access is basically load and store:
+
+- *load*: memory address and data width to be retrieved, one micro-op on P6
+
+- *store*: memory address, data width and the data to write; two micro-ops on
+  P6, one to generate the address, one to generate the data.
+
+****** Memory Ordering at Micro-Operation Level
+
+On P6, A store is only dispatched when both its address and data are ready and
+there are no older stores awaiting dispatch. Stores are never performed
+speculatively because there are no transparent way to undo them. Loads may pass
+stores or loads (reordered after or across).
+
+The *Memory Order Buffer* suspends loads and stores, redispatching them when the
+blocking condition (dependency or resource) disappears.
 
 ** New Instructions
 
