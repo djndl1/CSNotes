@@ -18,72 +18,9 @@
 - use the kermit protocol
   + it requires both sides set up kermit and start the connection.
 
-* Early x86 Machine
-:PROPERTIES:
-:ID:       4bb8c2cc-3730-469d-8f8f-31aa090a6069
-:END:
+* [[../../lang/c/assembly/x86_legacy.org][8086 Architecture]]
 
-** 8086 Architecture
-
-*** 8086
-
-- All internal registers and external/internal data buses are 16-bit
-
-- 20-bit external address bus, with 16-bit multiplexed with the data bus.
-
-- 16-bit I/O address bus
-
-**** Registers
-
-14 separater registers
-
-***** General Purpose
-
-- =AX=, =BX=, =CX=, =DX=: general purpose
-  + =AL=, =AH= ...
-
-***** Segment Registers
-
-- =CS=: code segment
-
-- =DS=: data segment
-
-- =ES=: extra segment
-
-- =SS=: stack segment
-
-***** Offset Registers
-
-To access the 20-bit address space, one register would not suffice.
-
-- =BP=: (stack) base pointer; =SP=: stack pointer, used with =SS=
-
-- =SI=: source (during data transfer) index, used with =DS=
-
-- =DI=: destination (during data transfer) index, used with =ES=
-
-- =IP=: instruction pointer, program counter, paired with =CS=
-
-***** Flags Register
-
-- =Flags=: status flags
-
-*** 80286
-
-- 24-bit address bus
-
-- separate address/data buses
-
-- On-chip MMU to support protected mode
-  + transition from protected mode back to real mode requires a reset.
-
-** Memory Model
-
-- 20-bit address bus from =0x00000= to =0xFFFFF=
-  + CPU after 8088 can access high memory called *extended memory*, often used
-    for disk caches, RAM disks and print spoolers, which can be
-    configured as *expanded memory* for programs to store data.
-
+* Memory Map
 
 #+begin_src
 ┌─────────────────────────────────┐ FFFFF (1M)
@@ -121,29 +58,6 @@ To access the 20-bit address space, one register would not suffice.
 │         Vector Table            │
 └─────────────────────────────────┘ 00000
 #+end_src
-
-*** Segmented Memory Addressing
-
-Since a CPU register is 16-bit only, allowing only 64KB address,
-the /segment register/ value is automatically multiplied by 16,
-and thus able to access up to 1MB memory, 16 non-overlapping segments, or 64K
-overlapping segments. Each 16-byte chunk is called a /paragraph/.
-
-To access the memory in a fine
-granular manner, the /offset register/ is added to the multiplied result,
-normally written as:
-
-#+begin_src
-segment:offset
-#+end_src
-
-**** Pointers
-
-- /near pointers/: 16-bit offsets
-
-- /far pointers/: 32-bit segment:offset pairs resolving to 20-bit external addresses
-
-- /huge pointers/: a linear 20-bit pointer.
 
 ** Interrupts
 
