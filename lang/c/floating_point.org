@@ -1,0 +1,12 @@
+#+title: Floating Point
+
+The C standard mandates the use of IEEE 754 floating point numbers.
+
+* IEEE 754
+
+IEEE 754-1985 standardized binary floating points of 32-bit single-precision
+floating-point numbers, double-precision 64-bit double-precision floating-point
+numbers, first implemented by Intel 8087.
+
+The 2008 revision added half-precision (16-bit), quad-precision (128-bit) binary
+formats and three decimal floating-point format (32-, 64- and 128-bit)
