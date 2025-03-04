@@ -149,6 +149,15 @@ functionality and compatibility issue of BIOS calls: a modern OS takes matters
 in its own hands.
 
 
+* Extended Memory
+
+Any memory above 1MB under DOS, which cannot be directly accessed under real
+mode or virtual x86 mode.
+
+** Extended Memory Specification (XMS)
+
+** DOS Protected Mode Interface (DPMI)
+
 * DOS ABI
 
 ** Binary File Format
