@@ -90,6 +90,10 @@ A binary-compatible cheap version of 8086, with the external data width reduced
 
 - On-chip MMU with virtual memory support up to 1GB via segmentation (4 pairs of
   segment registers combined).
+  + virtual memory is supported on a segment swapping basis
+  + segments can be protected and marked as read-only and execute-only.
+
+- Four privilege levels
 
 ** Protected Mode
 
@@ -114,15 +118,36 @@ not accessible (intended by design), which is incompatible with existing DOS pro
 
 - Minix
 
-* 80386
+* 80386 (1985)
 
 Fully 32-bit CPU (internal registers, buses and external buses).
 
 - Up to 4GB physical memory and 64 TB virtual memory ($2^14$ segment selectors
   times $2^{32}$)
+  + a fixed 4-KB page size
+
+- Support for parallel stages
 
 ** 386SX
 
 A reduced version with 16-bit external data bus and a 24-bit address bus.
 
-* 80486
+* 80486 (1989)
+
+The first tightly-pipelined x86 design. Production continued into the late 2000s.
+
+- Significantly higher performance than 386
+
+- Separation of CPU clock rate and bus rate
+
+- Up to 100MHz clock rate
+
+- five-pipelined stages
+
+- 8/16-KB on-chip level 1 cache.
+
+- an integrated faster x87 FPU
+
+- power saving and system management capabilities
+
+- =CMPXCHG=, =XADD= ,=BSWAP= and other atomic operation instructions
