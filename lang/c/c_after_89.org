@@ -107,14 +107,21 @@ void drawline2(struct point *from, struct point *to);
     provide some hint so that the compiler may catch some errors that makes them
     unable to inline the functions e.g. an =extern inline= calls some =static= function.
 
-- (C99) =restrict=: used only for non-function lvalue pointers. During each
+- (C99) =restrict= (noalias): used only for non-function lvalue pointers. During each
   execution of a block in which a restricted pointer =P= is declared (typically
   each execution of a function body in which =P= is a function parameter), if some
-  object that is accessible through =P= (directly or indirectly) is modified, by
-  any means, then all accesses to that object (both reads and writes) in that
-  block must occur through =P= (directly or indirectly), otherwise the behavior is
+  object that is accessible through =P= (directly or indirectly) is *modified*, by
+  any means, then all accesses to that object (both reads and writes) *in that
+  block* must occur through =P= (directly or indirectly), otherwise the behavior is
   undefined. If the object is never modified, it may be aliased and accessed
   through different restrict-qualified pointers
+  + Assignment from one restricted pointer to another is undefined behavior,
+    except when assigning from a pointer to an object in some outer block to a
+    pointer in some inner block (including using a restricted pointer argument
+    when calling a function with a restricted pointer parameter) or when
+    returning from a function (and otherwise when the block of the from-pointer
+    ended)
+  + Restricted pointers can be assigned to unrestricted pointers freely
   + The intended use of the restrict qualifier (like the register storage class)
     is to promote optimization. The compiler is then free to optimize or do
     whatever it can with this assumption.
