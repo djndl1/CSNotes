@@ -1,0 +1,10 @@
+#+title: Intel Software Developmemnt Manual Notes
+
+* Conventions & Concepts
+
+- Reserved bits are not only undefined by *unpredictable*. Never depend on their
+  states, never use them to store information, on purpose or accidentally, mask
+  them before testing the register.
+
+- *exception*: there is the concept of exception for CPUs, an event that
+  typically occurs when an instruction causes an error or other conditions.
