@@ -94,8 +94,7 @@ mountvol mountpoint \\?\volume{volumeGuid}
 - Circumventing predefined paths
   + some programs requires a special installation path.
 
-
-* [[https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file][File Naming]]
+** [[https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file][File Naming]]
   :PROPERTIES:
   :CUSTOM_ID: file-naming
   :END:
@@ -111,8 +110,8 @@ Pathnames are subject to =MAX_PATH= length (260 currently, and the limitation ma
 since Window 10 1607 through [[https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry][some configuration]]). Extended-length paths are
 prefixed with the Win32 File namespace prefix =\\?\= (=\\?\UNC\server\share= for UNC paths) to disable any
 string parsing.
-Thus extended-length paths are absolute paths and do not use forward slashes as
-separators, or periods to denote the current or parnent directory. Also, they
+Extended-length paths are absolute paths and do not use forward slashes as
+separators, or periods to denote the current or parent directory. Also, they
 are not supported by every file I/O API.
 
 It is acceptable to specify a period as the first character of a name.
@@ -155,25 +154,44 @@ use =wchar_t= only. Always define =UNICODE= (Win32 API) and =_UNICODE= (C
 runtime, MFC etc.)
 
 
-* Opening, Reading, Writing and Closing
+* Basic File I/O: Opening, Reading, Writing and Closing
   :PROPERTIES:
   :CUSTOM_ID: opening-reading-writing-and-closing
   :END:
 
-Windows File API can specify share mode while Unix files are always shareable.
+** Open/Create Files
 
-[[https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew][CreateFile]], =ReOpenFile= (returns a new handle with different flags, access
-rights etc.)
+- [[https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew][CreateFile]]: open/creates a file or an I/O device: file, file stream, directory,
+  physical disk, volume, console buffer, tape drive, communications resource,
+  mailslot and pipe.
+  + Windows File API can specify share mode while Unix files are always shareable.
+  + the security attributes specify the security descriptor of the file and
+    whether the handle is inheritable by child processes. If =NULL=, the default
+    security descriptor is used (/inherited from its parent directory/).
 
-[[https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle][CloseHandle]]: closes and invalidates nearly all handle objects.
+- =ReOpenFile= return a file handle with different flags, access rights etc.
+
+** Closing Files
+
+[[https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle][CloseHandle]]: closes and invalidates nearly all handle objects. This does not
+actually unload the file from the memory: it merely decrement the object's handle count.
+
+** Reading
 
 [[https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile][ReadFile]]:
 
+** Writing
+
 [[https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile][WriteFile]]:
 
-=GetLastError= (set by =SetLastError=) rather than =errno= ensures that
-system errors are unique to the threads. =FormatMessage= turns the
-message number into a meaning message.
+** Error Handling
+
+=GetLastError()= (set by =SetLastError=) returns a thread-local system error.
+This is the Windows version of =errno=.
+
+=FormatMessage= turns the message number into a meaning message.
+
+** Standard I/O
 
 A Windows process has three standard devices =STD_INPUT_HANDLE=,
 =STD_OUTPUT_HANDLE=, =STD_ERROR_HANDLE=, retrieved by =GetStdHandle= and
@@ -181,6 +199,8 @@ redirected by =SetStdHandle=.
 
 There are two reserved pathnames =CONIN$= and =CONOUT$= for console
 input and output. Use =CreateFile= on them.
+
+* Filesystem
 
 A number of filesystem management high-level (command-line tool level) functions
 are also provided by Win32. =DeleteFile=, =CopyFile=, =CreateHardLink=,
