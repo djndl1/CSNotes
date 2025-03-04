@@ -67,4 +67,20 @@ mode, but in binary mode, =CR= is processed as is.
 
 - =--strip-trailing-cr= :: =CRLF= is interpreted as =LF= while reading.
 
+*** Output
+
+**** Report
+
+- =-q= :: brief report without differing lines
+  +  especially useful when comparing the contents of two directories.
+  + this output format is also used when one of the compared files is binary.
+
+
+#+begin_src
+< # first (left) file
+> # second (right) file
+--- # separated by
+c # change
+a # append
+d # delete, typically the line number after d may be ignored, which is the position a difference is found
 #+end_src
