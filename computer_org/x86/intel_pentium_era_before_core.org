@@ -5,34 +5,53 @@
 
 800nm, 600nm, 350nm
 
-- The first superscalar (multiple-issue) x86 processor.
-  + Two pipelines of 5 stages
-  + there are multiple execution units within one CPU core.
-  + instructions are issued from a sequential instruction stream;
-    the CPU dynamically checks for data dependencies between instructions at
-    run time; the CPU can execute multiple instructions per clock cycle.
-  + essentially all general-purpose CPU developed since 1998 are superscalar
-    except some embedded processors.
-  + superscalar processors are limited by the intrinsic sequentialism of the
-    program logic (program logic, branch processing, dependency checking).
+** Superscalar
 
-- Optimized microcode system and RISC-like techniques.
+The first superscalar (multiple-issue) x86 processor, capable to execute two
+integer instructions or one floating-point instruction per clock cycle.
+Instructions are issued from a sequential instruction stream; the CPU
+dynamically checks for data dependencies between instructions at run time; the
+CPU can execute multiple instructions per clock cycle.
 
-- Redesigned fast FPU
+Control ROM to store microcode which controls the sequence of operations for
+complex instructions.
 
-- 125 and 256 bits internal data paths
+Pentium has two two pipelines of 5 stages, denoted by *u* and *v* there are two
+sets of execution units within one CPU core, corresponding to the two pipelines,
+u for all operations and v for simple integer and =FXCH= floating-point
+instructions.
 
-- 64-bit data bus, internal and external.
+Superscalar processors are limited by the intrinsic sequentialism of the program
+logic (program logic, branch processing, dependency checking). Essentially all
+general-purpose CPU developed since 1998 are superscalar except some embedded
+processors.
 
-- separate code and data caches.
+** Branch Prediction
 
-- branch prediction
+There are two prefetch buffers, one to prefetch in a linear fashion and one that
+prefetches according to the BTB.
 
-- Multiprocessing support
+** Redesigned FPU
 
-- 4MB page size in addition to 4-KB pages
+10x faster than 486's.
 
-- 8 KB code cache and 8KB data cache
+** Separate Code and Data Caches To Reduce Cache Conflicts
+
+8 KB code cache and 8KB data cache, 32-byte cache line size, 2-way set
+associative, with each cache having a dedicated *Translation Lookaside Buffer*
+(compared to lookahead, that is, the memory) .
+
+** Widened 64-Bit Data Bus
+
+Burst modes (read/write based previous addresses) are supported.
+
+** Improved MMU
+
+2MB or 4MB page size in addition to 4-KB pages
+
+** Symmetric Dual Processing
+
+Two Pentium processor.
 
 ** Pentium MMX
 
