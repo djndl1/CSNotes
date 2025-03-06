@@ -289,7 +289,7 @@ Used as an extra /data segment/.
 reserved for it and related instructions operate with this segment register =SS= and
 its offset register =SP=. =SP= points to the last stack location *occupied*.
 
-The stack grows downwward from upper addresses to lower addresses, opposite of =IP=.
+The stack grows downward from upper addresses to lower addresses, opposite of =IP=.
 
 =BP= (stack base) is another stack offset that represents the address of the
 current stack frame.
@@ -316,7 +316,6 @@ Pointer types are designed by Intel, not purely a programmer's invention.
 Due to 8086's memory segmentation, there are different configurations and usages
 for segment registers, resulting in six memory models, listed below
 
----
 | model   | data | code | definitions                                                            | comment                  |
 |---------+------+------+------------------------------------------------------------------------+--------------------------|
 | tiny    | near | near | CS=DS=SS                                                               | only one segment is used |
@@ -380,7 +379,8 @@ mov cl, [si]
 mov [di], ah
 #+end_src
 
-- *based relative*: Base registers =BX= or =BP= (default with =SS=) along with a displacement value are added as the data pointer
+- *based relative*: Base registers =BX= (default with =DS=) or =BP= (default with =SS=) along with a displacement value are added as the data pointer
+  + supposed to access local variables (thus with =SS=).
 
 #+begin_src asm
 mov cx, [bx]+10 ; DS:BX+10, confusing, seems like plus 10 after dreferencing bx
@@ -389,9 +389,12 @@ mov cx, 10[bx]  ; weird, at least not ambiguous
 #+end_src
 
 - *indexed relative*: Index registers =DI= or =SI= with a displacement;
-  + this mode is essentially the same as based relative but uses index registers.
+  + this mode is essentially the same as based relative but uses index
+    registers, supposed to access array elements.
 
 - *Based indexed*: the above two combined
+  + the register order does not matter, the segment register is always the one
+    paired with the base register.
 
   #+begin_src asm
 mov cl, [bx][di]+8 ; DS:(BX+DI+8)
