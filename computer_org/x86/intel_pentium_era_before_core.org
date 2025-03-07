@@ -12,19 +12,38 @@ integer instructions or one floating-point instruction per clock cycle.
 Instructions are issued from a sequential instruction stream; the CPU
 dynamically checks for data dependencies between instructions at run time; the
 CPU can execute multiple instructions per clock cycle.
-
-Control ROM to store microcode which controls the sequence of operations for
-complex instructions.
-
-Pentium has two two pipelines of 5 stages, denoted by *u* and *v* there are two
-sets of execution units within one CPU core, corresponding to the two pipelines,
-u for all operations and v for simple integer and =FXCH= floating-point
-instructions.
-
 Superscalar processors are limited by the intrinsic sequentialism of the program
 logic (program logic, branch processing, dependency checking). Essentially all
 general-purpose CPU developed since 1998 are superscalar except some embedded
 processors.
+
+Control ROM to store microcode which controls the sequence of operations for
+complex instructions.
+
+*** Pipeline
+
+Pentium has two two pipelines of 5 stages, denoted by *u* and *v*. There are two
+sets of execution units within one CPU core, corresponding to the two pipelines,
+u for all operations and v for simple integer and =FXCH= floating-point
+instructions.
+
+The structure is the same as 80486 with some optimization:
+
+- *PF* (Prefetch): instructions are prefetched from the on-chip instruction or memory
+
+- *D1* (Instruction Decode): two parallel decodes attempt to decode and issue
+  the next two sequential instructions.
+
+- *D2* (Address Generate): the memory address operands are calculated.
+  =base+index= or =displacement+immediate= could now be decoded in one cycle in Pentium.
+
+- *EX* (Execute): both ALU operations and for data cache access, requiring more
+  than one block. All u-pipe instructions and all v-pipe instructions except
+  conditional branches are verified for correct branch prediction.
+
+- *WB* (Writeback): process state is modified and v-pipe conditional branches
+  are verified for correct branch prediction.
+
 
 ** Branch Prediction
 
