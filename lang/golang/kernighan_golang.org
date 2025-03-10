@@ -1,0 +1,37 @@
+#+title: Kernighan Golang: A Tour of Golang
+
+* Lineage
+
+Only surface similarity to C, with OOP, GC. Well suited for building
+infrastructure like networked servers and tools and systems for programmers.
+
+From C, expression syntax, control flow statements, basic data types, call-by-value
+parameter passing, pointers and efficient machine code.
+
+From Oberon, the package, there is no more separation of interface and
+implementation files: the syntax for pacakges, imports and declarations and
+method declarations.
+
+From CSP (Communicating Sequential Processes): independent concurrent tasks communicate and
+synchronize using channels.
+
+* Design Choice
+
+Simplicity: simplicity requires some effort at the beginning to reduce an idea
+to its essence and more discipline over time.
+
+GC, a package system, first-class functions, lexical scope, a system call
+interface, immutable UTF-8 strings. No implicit numeric conversions, no
+constructors or destructors, no operator overloading, no default parameter
+values, no inheritance, no generics, no exceptions, no macros, no function
+annotations and no thread-local storage.
+
+backwards-compatibility
+
+type-safe: a simpler type system but strongly typed.
+
+Close to the design of contemporary computer system: no explicit initialization
+or implicit initialization of built-in data types and most data structures.
+Aggregate types (structs and arrays) hold data directly.
+
+Batteries-included standard library with coherent design language.
