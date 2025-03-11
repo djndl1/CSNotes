@@ -1,0 +1,12 @@
+#+title: RISC-V Virtualized
+
+* libvirt (as of 2025)
+
+Use the image from [[https://people.debian.org/~gio/dqib/][Debian Quick Image Baker]], a zip file consists a root
+filesystem, a kernel, an initrd, several ssh keys. Set kernel path to uboot.elf
+and boot off the root image.
+
+The default unprivileged login name
+and password is =debian= and the =root= user's password is =root=. OpenSBI does
+not seem to be necessary or maybe the default. There is already OpenSSH started
+and configured. The network should be configured as static due to lack of a DHCP client.
