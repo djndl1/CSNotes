@@ -12,20 +12,22 @@ ISA due to its open-source nature and hardware/emulator availability.
 Based on the current state of the computing field and appreciation of the organizational paradigms.
 
 Modern computer technology requires professionals to understand
-both hardware and software. The central ideas in computer organization and
-design are the same regardless of hardware or software. Recent developments in
-computing, especially multicore microprocessors have made programmers no longer
-able to ignore the underlying parallel nature of the hardware they are
-programming for some time: the parallel nature of processors and the
-hierarchical nature of memories, how the software and hardware interact, what's
-determines the performance of a program, the techniques used by the hardware designer
-to improve performance (for more read Computer Architecture: A Quantitative
-Approach), the founding principles of modern computing. Imrpove program
-performance should be a scientific procedure driven by insight and analysis
-rather than a complex process of trial and error.
+both hardware and software:
 
-From a programmer's perspective, program performance matters much. It depends on
-a combination of
+- The central ideas in computer organization and design are the same regardless of hardware or software.
+
+- Recent developments in computing, especially multicore microprocessors have
+  made programmers no longer able to ignore the underlying parallel nature of
+  the hardware they are programming for some time: the parallel nature of
+  processors and the hierarchical nature of memories, how the software and
+  hardware interact, what determines the performance of a program, the
+  techniques used by the hardware designer to improve performance (for more read
+  Computer Architecture: A Quantitative Approach), the founding principles of
+  modern computing.
+
+- Improving program performance should be a scientific procedure driven by insight and analysis rather than a complex process of trial and error.
+
+From a programmer's perspective, program performance matters much. It depends on a combination of
 
 - algorithm
 
@@ -36,13 +38,13 @@ a combination of
 - I/O system (hardware and OS).
 
 
-** Recent Developments
+* Recent Developments
 
 - The slowing of Moore's Law
 
 - The rise of Domain-Specific Architectures (DSA): e.g. Google's TPU
 
-- Microarchitecture as a security attach surfaces: speculative out-of-order
+- Microarchitecture as a security attack surfaces: speculative out-of-order
   execution and hardware multithreading make timing based side-channel attacks
   practical.
 
@@ -52,33 +54,49 @@ a combination of
 
 - Massive increase of personal mobile devices.
 
--   Design for Moore\'s law. Computer architects must anticipate where
-    the technology will be when the design finishes rather than design
-    for where it starts.
+* Basic Ideas in Design
 
--   Use abstraction to simplify design: e.g. hardware- system software -
-    application software; low-level language - high-level language
+- Use *abstractions* to simplify design;
+  + Both hardware and software consists of hierarchical layers using abstraction.
+  + e.g. software architecture; high-level language to low-level assembly and
+    machine code; ISA as the interface between software and hardware; ABI; API;
+    interface and implementation
 
--   Making the common case fast will tend to enhance the performance
-    better than optimizing the rare case.
+- Making the *common case* fast tends to enhance performance better than
+  optimizing the rare case;
 
--   performance via parallelism
+- Performance via *parallelism*;
 
--   performance via pipelining
+- Performance via *pipelining*: e.g. branch prediction
 
--   performance via prediction: in some cases, it can be faster on
-    average to guests and start working rather than wait until you know
-    for sure.
+- Performance via *prediction*: better to ask for forgiveness than to ask for
+  permission. It can be faster on average to guess and start working rather than
+  wait until it is known for sure.
 
--   hierarchy of memories
+- *Hierarchy* of Memories: conflicting demands of fast large and cheap memory
+  are met with memory hierarchy.
 
--   dependability via redundancy
+- Dependability via *Redundancy*
 
--   I/O
+* The Big Picture
 
--   memory: main/primary memory, secondary memory
+*Functions*: inputting data, outputting data, storing data, processing data,
 
--   datapath: the component that performs arithmetic operations
+*The Five Classic Components*:
 
--   control: commands the datapath, memory and I/O devices according to
-    the instructions of the program.
+- /input/: LCD, touchscreens
+
+- /output/:
+
+- /memory/: memory hierarchy (cache, primary memory, secondary memory)
+
+- /datapath/: data processing units, registers and buses.
+
+- /control/: commands the datapath, memory and I/O devices according to the
+  instructions of the program.
+
+The content on computer organization resolves around these five basic components.
+
+*Instruction Set Architecture*: the interface between hardware and low-level software.
+
+*Network*: communication, resource sharing, nonlocal access
