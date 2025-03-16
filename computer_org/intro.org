@@ -100,3 +100,117 @@ The content on computer organization resolves around these five basic components
 *Instruction Set Architecture*: the interface between hardware and low-level software.
 
 *Network*: communication, resource sharing, nonlocal access
+
+* Performance
+
+Due to the scale and
+intricacy of modern software systems and the wide range of performance
+improvement techniques employed by hardware designers, performance assessment
+has been difficult. There are limitations of various performance measurements
+and understanding them is crucial in selecting a computer.
+
+The definition of performance itself is multidimensional. Normal PC users care
+about *response/execution time* while *throughput/bandwidth* matters more for
+datacenters.
+
+Performance may be defined as the reciprocal of execution time. However, there
+is a difference between /elapsed time/ (/wall clock time/) and actual time used
+by the CPU (/CPU time/). Furthermore, CPU time can be divided into the user
+spent on the user program (/user CPU time/) and the time spent in the OS on
+behalf of the user program (/system CPU time/). This distinction is made so that
+user programs' performance is assessed separately from the OS'. /System
+performance/ is measured when the OS is unloaded. CPU time is not the only
+metric of performance: the actual performance requirements of programs vary,
+throughput, response time or a complex combination of the two.
+
+$$
+\dfrac{\text{Seconds}}{\text{Program}} =
+\dfrac{\text{Instructions}}{\text{Program}} \times \dfrac{\text{Clock
+ cycles}}{\text{Instructions}} \times \dfrac{\text{Seconds}}{\text{Clock cycles}}
+$$
+
+Performance may be measured at different levels:
+
+- (Clock cycle) The CPU time of a program is determined by the *clock cycles* to execute the program (may not be fixed due to various CPU design techniques) and the *clock rate* of the CPU (fixed once the CPU is chosen).
+
+- (Instruction level) the clock cycles used by a program equals to the number of instructions for a program (fixed on a given ISA) multiplied by *the average time per instruction* (*CPI*, or reciprocal *IPC* to measure *instruction performance*)
+
+$$
+\text{CPU time} = \dfrac{\text{Instruction count} \times \text{CPI}}{\text{Clock rate}}
+$$
+
+While  comparing different ISAs, even if the clock rates are equal,
+the instruction counts and CPIs may be different, determined by the /algorithm/,
+the /programming language/, the /compiler/ in use, the /ISA/.
+
+An alternative to time as a performance metric is *MIPS* (/Million Instructions
+Per Second/, an instruction execution rate):
+
+$$
+\text{MIPS} = \dfrac{\text{Instruction Count}}{\text{Execution time} \times
+10^{6}} = \dfrac{\text{Clock Rate}}{\text{CPI} \times 10^{6}}
+$$
+
+MIPS does not take into consideration /the capabilities of instructions/ and
+varies between programs on the same computer.
+
+Execution time remains *the only valid and unimpeachable measure of performance*.
+
+** Performance Measurement
+
+Either use a workload (a set of programs to evaluate the performance of a
+computer) or a set of /benchmarks/ (programs specifically chosen to measure performance).
+
+- /SPEC/ (System Performance Evaluation Cooperative): a set of integer
+  benchmarks and float-point benchmarks .
+
+* Power Consumption
+
+$$
+\text{Power} \propto 1/2 \times \text{Capacitive Load} \times \text{Voltage}^{2}
+\times \text{Frequency switched}
+$$
+
+
+For the recent decades, frequency has increased more than 1000 times, while voltage
+has decreased from 5V to 1V, resulting in only about 30 times in power.
+Further lowering of the voltage appears to make the transistors too leaky:
+leakage current flows even when a transistor is off, typically responsible for
+40% of the energy consumption. Computer designers have hit the power wall:
+power consumption, distribution across the chip and heat dissipation is
+preventing further performance increase. Increasing performance simply by
+increasing the clock rate is no longer feasible.
+
+Typical computers are not energy-proportional, that is, the power consumption at
+low workload, compared to its peak power consumption, is much higher than its
+workload compared to the full workload. Conserving power while trying to
+increase performance has forced the hardware industry to switch to multicore microprocessors.
+
+
+* Multiprocessing: Rethinking Hardware/Software Interface
+
+Due to the power wall, multicore processors are introduced to overcome the
+performance limit of unicore processors. This somehow broke the previous
+hardware-software interface that programmers have to rewrite programs to take
+advantage of multiple processors.
+
+Writing parallel programs requires more than functional correctness but also
+understanding of performance programming. It also means more work for the
+programmers: scheduling, load balancing, time for synchronization, overhead for
+communication between the parties. Modern computer design focuses heavily on
+parallelism at various levels: instruction-level parallelism (pipelining,
+prediction, out-of-order execution), subword parallelism, multiprocessing.
+
+* Amdahl's Law
+
+$$
+\text{Execution time after improvement} = \dfrac{\text{Execution time affected by
+improvement}}{\text{Amount of improvement}} + \text{Execution time unaffected}
+$$
+
+#+begin_quote
+"the overall performance improvement gained by optimizing a single part of a
+system is limited by the fraction of time that the improved part is actually used"
+#+end_quote
+
+There is just so much performance we can improve by improving one aspect of a computer.
