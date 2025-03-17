@@ -214,3 +214,23 @@ system is limited by the fraction of time that the improved part is actually use
 #+end_quote
 
 There is just so much performance we can improve by improving one aspect of a computer.
+
+* Basic Computer Ideas and History
+
+** Stored Program
+
+Programs are stored as data (numbers) and is later loaded and executed by a computer, which contrasts with systems that stored the program instructions with plugboards or similar mechanisms or systems that are hardwired and unprogrammable.
+
+ENIAC might be the first operational general-purpose electronic computer, but it
+used wires and switches for programming initially (later modified into a stored program system). A stored program computer was not a completely
+new idea in the 1940s. Von Neumann crystallized the idea and turned into an
+influential internal memo. Maurice Wilkes of Cambridge University built the first
+full-scale operational stored-program computer EDSAC.
+
+** Von Neumann Computer
+
+TODO
+
+** Harvard architecture
+
+TODO
