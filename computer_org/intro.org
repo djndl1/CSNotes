@@ -229,7 +229,39 @@ full-scale operational stored-program computer EDSAC.
 
 ** Von Neumann Computer
 
-TODO
+*** Key Design Principles
+
+**** EDVAC
+
+- Large addressable read/write memory
+
+- Binary number representation: more efficient in storage than decimal
+
+**** Von Neuman Architecture Paradigm
+
+- separate organs for storage, arithmetic and control
+
+- special purpose registers: accumulator, instruction register, program counter
+
+- program executed from fast memory: program instructions should be held in
+  numbere3d memory locations, randomly accessible at high speed.
+
+- Fully interchangeable memory
+
+- Program loadable from external media: it should be possible to read the
+  program rapidly into memory from some external medium.
+
+**** Modern Programming Paradigm
+
+- Sequential atomic instructions: separate, atomic instructions to be processed
+  in a sequence as a program
+
+- Automated jump
+
+- Instructions operating on variable addresses: it should be possible to vary
+  the address part of an instruction, nowadays realized as indexed or indirect addressing.
+  + e.g. apply the same code to different data elements; support subroutines for return values.
+
 
 ** Harvard architecture
 
