@@ -227,6 +227,9 @@ new idea in the 1940s. Von Neumann crystallized the idea and turned into an
 influential internal memo. Maurice Wilkes of Cambridge University built the first
 full-scale operational stored-program computer EDSAC.
 
+On a large scale, the ability to treat instructions as data is what makes
+assemblers, compilers, linkers, loaders, and other automated programming tools possible. It makes "programs that write programs" possible.
+
 ** Von Neumann Computer
 
 *** Key Design Principles
@@ -265,4 +268,42 @@ full-scale operational stored-program computer EDSAC.
 
 ** Harvard architecture
 
-TODO
+*** The Original Harvard Machines
+
+This term was coined in the 1970s retrospectively to describe the Harvard
+machines designed by the Harvard Computing Laboratory.
+Today it is applied to machines with a single main memory but with separate
+instruction and data caches. For these machines, the CPU accesses instruction
+and data simultaneously (not for the original Harvard machines). The term has
+come to represent a supposedly different and superior architecture compared to the Von
+Neumann architecture.
+
+The original Harvard machines, especially Mark III and IV, implemented most of
+EDVAC ideas. Mark III and IV had separate memory for instructions and data and
+instruction memory was no writable by other instructions. The design of separate
+stores for data and instruction was most likely an optimization: 16-digit
+decimals were used for data and a 38-bit format was used for instructions, not
+for protection of instructions and data. Modern time-sharing computers require
+dynamic loading of programs, i.e. writable instruction memory. Neither the
+original Harvard machines nor the EDVAC design could accomplish such tasks.
+
+*** Microcontrollers, for Which the Term Was Invented Later
+
+Microcontrollers arised in the late 1970s, where data is stored in a persistent
+ROM, hardwared to the PC and instruction register while variable data are stored
+in the RAM connected to an address and data bus. This design resulted from the
+simplicity of less multiplexing on the buses and different widths of ROM and RAM
+buses. In this architecture, the next instruction can be fetched without waiting for
+dependent data to be fetched.
+
+The term "Harvard Architecture" was cointed at this time to describe this new
+architecture, even though the connection to the original Harvard machines is
+tenuous. For microcontrollers, this separation was not a choice but a must. Also
+the original Harvard machines cannot access data and instructions simultaneously.
+
+*** Split caches in RISC Microprocessors
+
+Since instruction's tend to static, caches are split for instructions and data
+to be optimized for each. This design is often referred to as "Modified Harvard
+Architecture", a misnomer as it has nothing to oo with the original Harvard machines. This design is not limited to classical RISC machines: the P5
+microarchitecture from Intel has two 8KB caches for code and data separately.
