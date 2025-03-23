@@ -1,0 +1,86 @@
+#+title: PLC Programming
+
+A PLC is nothing more than a specialized computer suitable for real-time
+processing and process control, with intuitive programming environment for
+electricians and control engineers, instead of high level computer programming languages.
+
+* Organization
+
+** Input Rack
+
+the input rack has sensors (input) hooked to it. These sensors typically are
+connected to a AC bus and run at
+a high voltage AC, instead of a DC source. This input AC signal is then transformed
+into a DC signal after flowing into the PLC.
+
+Typical ladder diagrams do not show how sensors are connected
+to the PLC, only the PLC logic. Sensors are shown on the terminal diagram.
+Normally, a sensor will be connected to a buffer. This way the connection of the sensor is reflected in the program. If somehow the wiring is incorrect, one can easily swap in software without rewiring the sensor. Still, we cannot be sure if an input sensor is normally closed or open in the PLC program without checking the terminal diagram. We choose a buffer simply because the sensor should be closed when the output is energized and a closed EON reflects the state of the sensor.
+
+** Output Rack
+
+The output rack has coils or loads hooked to it, such as solenoids (SOL),
+contactors (CON),
+pilot lights (PL), motor starters (MS). The computer puts a signal on the gate
+side of a solid state device or on the relay coil of a small control relay on
+the output card and puts the AC on the output terminal, which then flows through
+the load and into the neutral. The relays on the ladder diagram, are conceptual
+devices, with their input connected to the input sensors and output connected to
+the output rack.
+
+The output rack cannot drive a motor directly with its limited current, the user
+has to use a contactor between the output card and the motor.
+
+A PLC is a electronic device after all and it may fail. Do not wire an emergency
+stop button in the PLC. It needs to be hardwired to the motor. Typically, an
+interposing relay contact is placed in the AC line before the AC flows into the
+main terminal. In case of emergency, the power to all the output terminals on
+the output card is killed.
+
+** Internal Rack
+
+Software: control relays (CR), timers (TON, TOF), counters (CTU, CTD),
+sequencers (SQO)
+
+** CPU
+
+* Notation
+
+Both ASCII symbols and graphic symbols are used to represent PLC symbols.
+
+** Terminal Numbering
+
+Terminals are connecting points. Typically noted by
+
+#+begin_src
+O:2/8 # the 8th terminal of the 2nd slot of the output rack
+I:1/3 # the 3rd terminal of the 1st slot of the input rack
+B3/4 # the 4th terminal of the B3 internal control relay
+#+end_src
+
+** Logic Symbols
+
+*** Input Symbols
+
+- =-] [-= (*Examine ON*, *EON*):
+  + a normally open contact (a controlled switch that is normally disconnected) on an output rack or an internal rack.
+  + a YES gate (buffer, no delay is implied) on an input rack, in the sense that if the input signal
+    is on, the contact is closed and the output is on.
+
+
+- =-] / [-= (*Examine OFF*, *EOF*):
+  + a normally closed contact (a controlled switch that is normally connected) on an output rack or an internal rack.
+  + a NOT gate (inverter) on an input rack.
+
+*** Output Symbols
+
+- =-(  )-=: output energize, on the internal rack and the output rack
+
+* Programming
+
+The PLC scans all the inputs to check the system's current state, executes the
+program accordingly and updates the outputs in a loop.
+
+The inputs and the input rack, the outputs and the output rack are different.
+The PLC ladder program only shows its internal logic while a general ladder
+logic shows the entire control logic including input sensors and output loads.
