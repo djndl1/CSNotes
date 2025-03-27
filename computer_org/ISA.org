@@ -1,0 +1,44 @@
+#+title: Instruction Set Architecture
+
+An instruction set is the language of a computer. Computer designers have a
+common goal: find a language that makes it easy to build the hardware and the
+compiler while maximizing performance and minimizing cost and energy.
+
+#+begin_quote
+The really decisive considerations from the present point of view, in selecting an [instruction set], are more of a practical nature: simplicity of the equipment demanded by the [instruction set], and the clarity of its application to the actually important problems together with the speed of its
+handling of those problems.
+#+end_quote
+
+A computer must be able to perform a set of operations. These operations take a
+limited number of operands, typically from special locations built in hardware
+called /registers/. For RISC ISAs, data must be transferred to/from the memory
+by /data transfer instructions/ (load & store) to be operated on. Memory is
+usually byte-addressable on modern computers. Registers are fast and are the
+only locations where data can be used. An ISA must have enough registers and
+compilers/programmers must use registers efficiently.
+
+Instructions are represented as binary numbers of predefined formats (stored program).
+
+* Design Principle
+
+- *Simplicity favors regularity*: hardware for a variable number of operands is
+  more complicated than hardware for a fixed number.
+
+- *Smaller is faster*: limited number of registers in an ISA. Not absolute.
+
+- *Good design demands good compromises*: fixed-length instruction format or
+  a single instruction format with variable length.
+
+* Operand Types
+
+- *Constant* or *Immediate*: due to limited length of the immediate field inside
+  an instruction, an immediate number has limited range, therefore load/store
+  instructions often loads only from relative constant addresses. To move even a
+  full word into a register, it is required for some ISAs to combine several
+  instructions to implement such a simple task.
+  Some assemblers provides some pseudoinstructions to simplify programming.
+
+- *Base*: historically, some ISAs uses the base register for the index and the
+  offset constant for the starting address of an array, contrary to
+  =base+offset=. Today's memory addresses are too large to fit in the offset so
+  they are placed in the register.
