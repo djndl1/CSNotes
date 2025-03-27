@@ -1,0 +1,57 @@
+#+title: Termux
+
+* Development Environment
+
+** Python
+
+- =jupyter= requires =pyzmq=. The default build does not work, add
+  =LDFLAGS=lpython3.12= and force building from source.
+
+- =scikit-learn=
+
+  #+begin_src
+  MATHLIB='m' NPY_NUM_BUILD_JOBS=1 python -m  pip install scikit-learn
+  #+end_src
+
+** Qemu
+
+*** System Emulation
+
+There is no KVM, Xen or any hardware virtualization support on most Android
+devices. Use =--accel tcg,thread=multi= for acceleration.
+
+*** User-Mode
+
+There is no root filesystem to use in the package manager. Install corresponding
+cross-compilation sysroot and copy that directory to =$PREFIX/sysroot-name= and
+set the prefix to that sysroot.
+
+#+begin_src shell
+unset LD_PRELOAD
+QEMU_LD_PREFIX=$PREFIX/riscv64-linux-gnu/ qemu-riscv64 "$@"
+#+end_src
+
+The gdb provided by termux supports only the native architecture and lldb cannot
+read symbols with User-mode qemu (as of lldb-19).
+
+** Cross-Compilation
+
+=clang= is natively a cross compiler but it requires corresponding libraries and
+buildtime libraries and runtime support. Copy a sysroot from another computer
+(on Debian =libc-dev-arch-cross=) and set =--sysroot= to that directory and also
+set the target. Notice sometimes =libc.so= under the buildtime sysroot is not
+the real shared library but a linker script pointed to the real one. Be sure to
+modify the paths in the script so that it points to the one in termux.
+
+#+begin_src linker
+/* GNU ld script
+   Use the shared library, but some functions are only in
+   the static library, so try that secondarily.  */
+OUTPUT_FORMAT(elf64-x86-64)
+/* delete /usr/x86_64-linux-gnu/{lib,lib64}/ so that the linker may find the libc.so.6 on termux */
+GROUP ( /usr/x86_64-linux-gnu/lib/libc.so.6 /usr/x86_64-linux-gnu/lib/libc_nonshared.a  AS_NEEDED ( /usr/x86_64-linux-gnu/lib64/ld-linux-x86-64.so.2  )  )
+#+end_src
+
+#+begin_src shell
+clang -target riscv64-linux-gnu --sysroot=$PREFIX/riscv64-linux-gnu "$@"
+#+end_src
