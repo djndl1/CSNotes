@@ -19,6 +19,11 @@ compilers/programmers must use registers efficiently.
 
 Instructions are represented as binary numbers of predefined formats (stored program).
 
+
+One trick to test if a number is negative or larger than another number is to
+use unsigned test on signed numbers.
+
+
 * Design Principle
 
 - *Simplicity favors regularity*: hardware for a variable number of operands is
@@ -42,3 +47,47 @@ Instructions are represented as binary numbers of predefined formats (stored pro
   offset constant for the starting address of an array, contrary to
   =base+offset=. Today's memory addresses are too large to fit in the offset so
   they are placed in the register.
+
+* Branching
+
+What distinguishes a computer from a simple calculator is a its ability to make
+decisions. ISAs typically provides conditional branch instructions and
+unconditional branch may be emulated by =beq x0, x0, dest= or =jal x0, dest=. An
+=if= statement exits a branch unconditionally while a loop only exits the body
+upon certain condition. ISAs' implementation of conditional branches may branch
+directly, or set some flags and then test and branch, or set some register and
+branch based on the value in that register. One downside to condition flags is
+that if many instructions always set them, it will make it difficult for
+pipelined execution.
+
+
+* Procedures
+
+Procedures are not simply a software concept: they are already taken into
+consideration during computer design and the mechanism has been baked into
+hardware design.
+
+ISAs provide instructions to implement procedures. RISC-V provides a special
+branch instruction =JAL= (jump and link) that branches to a specific address and
+saves the return address in a register to be used by the procedure to return to
+the calling site with =JALR=.
+
+The values of certain registers (argument registers, return address register, frame pointer, temporary registers and other saved registers) must be saved  on the stack and
+restored (by the caller or the callee) across procedure calls to avoid data loss
+so that the caller may use them again.
+Some registers are mandated by a calling convention to be saved either by the
+caller or by the callee. A temporary register is not required by a calling
+convention to be saved and may be used  by the callee, the caller should decide
+whether or not this register should be saved. As long as
+registers may be reused by the callee, they have to be saved in advance.
+Register preservation stands from the view of the caller not the callee.
+
+Aside from saving registers, the stack is responsible for saving extra local
+data. An additional register (frame pointer) that points to the first word of
+the procedure frame (also called *activation record*) to provide a base address
+(an anchor)
+for that frame.
+
+On RISC-V typically by the standard calling convention, the stack pointer is
+fully descending. The x86 stack pointer is also fully descending by the ISA
+=push= and =pop=.
