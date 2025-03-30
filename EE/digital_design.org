@@ -1,0 +1,60 @@
+#+title: Digital Design
+
+#+begin_quote
+Successful product development nowadays is limited more
+by the design team’s ability to correctly and completely specify the product’s
+detailed functions, than by the team’s ability to cram all the needed circuits
+into a single board or chip.
+...
+The level of abstraction of typical designs moving higher above the level of
+individual tgates and flip-flops. The increased speed and density of digital
+circuits at both the chip and board level is forcing many designers to abe more
+competent at a lower electric circuit level.
+#+end_quote
+
+Digital design is more than logic equations and theorems (logic design) but to
+build systems.
+Aside from creative innovation and boring basics, digital design involves
+debugging, business requirements and practices (documentation, component
+availability, feature definitions, target specifications, task scheduling,
+office politics and lunch with vendors), risk-taking, communication
+
+* Why Digital
+
+Due to its discrete nature and use of logic:
+
+- *Reproducibility of results*: insensitive to external inference. Stability and
+  accuracy in physical quantities are difficult to obtain in real circuits,
+  affected by manufacturing variations, temperature, power-supply voltage,
+  cosmic rays and noise created by other circuits.
+
+- *Ease of design*: no special math skills are needed without any special
+  insights about the operation of capacitors, transistors or other devices that
+  require calculus to model. Many mathematical and logical operations can be
+  difficult or impossible to perform with analog quantities.
+
+- *Programmability*: most digital design is done today by writing HDLs or
+  modeled with language-based constructs.
+
+- *Flexibility and functionality*: once reduced to digital form, a problem can
+  be solved using a set of logical steps in space and time.
+
+- *Speed*
+
+- *Economy*
+
+- *Steadily advancing technology*
+
+* Digital Signals
+
+A value is represented as 0 or 1 or a series of 0/1. At the physical level,
+there is an undefined region between the two defined states, a buffer region so that noise does
+not causing a digital value to fluctuate between 0 and 1. Digital signal is an
+abstraction over the underlying analog behavior. This digital abstraction maps a
+large range of physical values to the same binary value, bringing immunity to
+noise and offers a way to amplify weak signals into strong ones without changing
+the values.
+
+- *positive logic*: LOW for 0 and high for 1
+
+- *ngative logic*: LOW for 1 and high for 0
