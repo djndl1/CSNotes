@@ -34,20 +34,49 @@ use unsigned test on signed numbers.
 - *Good design demands good compromises*: fixed-length instruction format or
   a single instruction format with variable length.
 
-* Operand Types
+* Operand Types (Addressing Modes)
 
-- *Constant* or *Immediate*: due to limited length of the immediate field inside
-  an instruction, an immediate number has limited range, therefore load/store
-  instructions often loads only from relative constant addresses. To move even a
-  full word into a register, it is required for some ISAs to combine several
-  instructions to implement such a simple task.
-  Some assemblers provides some pseudoinstructions to simplify programming.
+** *Constant* or *Immediate Addressing*
 
-- *Base*: historically, some ISAs uses the base register for the index and the
-  offset constant for the starting address of an array, contrary to
-  =base+offset=. Today's memory addresses are too large to fit in the offset so
-  they are placed in the register.
+Due to limited length of the immediate field inside an instruction, an immediate
+number has limited range, therefore load/store instructions often loads only
+from relative constant addresses. To move even a full word into a register, it
+is required for some ISAs to combine several instructions to implement such a
+simple task. Some assemblers provides some pseudoinstructions to simplify
+programming.
 
+For RISC-V, =LUI= (load the upper 20 bits) combined with an =ADDI= (add the
+lower 12 bits) combined are used to load a 32-bit immediate. RISC-V uses *PC-relative addressing* for both
+conditional branches and conditional jumps: branching/jumping around the current
+instruction. To far jump to a procedure with an wide address, =LUI= (absolute number)
+or =AUIPC= (the operand is a relative address to the pc) loads the upper
+part in a temporary register and =JALR= adds the lower and jumps there (still
+the provided register contains a pc-relative address, even if a large one).
+
+Since RISC-V has a fixed-length instruction format, the unit of the immediate
+operand in a jump/branch instruction is halfword (2 bytes), that is, these
+instructions cannot jump an address of odd number.
+
+To conditionally branch to a
+far address, the condition can be inverted and an unconditional jump follows to support a far jump.
+
+#+begin_src asm
+// semantically beq x10, x0, L1
+bne x10, x0, L2
+jal L1
+L2:
+#+end_src
+
+** *Register Addressing
+** *Base/Displacement Addressing*
+
+Historically, some ISAs uses the base register for the index and the offset
+constant for the starting address of an array, contrary to =base+offset=.
+Today's memory addresses are too large to fit in the offset so they are placed
+in the register.
+
+
+** *PC-Relative Addressing*
 * Branching
 
 What distinguishes a computer from a simple calculator is a its ability to make
@@ -91,3 +120,43 @@ for that frame.
 On RISC-V typically by the standard calling convention, the stack pointer is
 fully descending. The x86 stack pointer is also fully descending by the ISA
 =push= and =pop=.
+
+* Synchronization
+
+#+begin_quote
+In computing, synchronization mechanisms are typically built with user-level
+software routines that rely on hardware-supplied synchronization instructions.
+#+end_quote
+
+One such common hardware primitive is atomic swap, used to implement a lock: a
+memory location holds a value to indicate the lock status, 0 for unlocked
+and 1 for locked. An atomic swap swaps the memory location with a register of
+value 1. If locked, the register is still 1, if not, the register will be 0.
+Only one occurrence of such atomic swaps will return a 0 and any atomic swaps
+that occur later and return 1 should lead to a wait.
+RISC-V, on the other hand, uses the LR/SC scheme, a pair of instructions that
+first loads the lock value and later uses another
+conditional store instruction that only stores a new lock value if the lock
+content is not modified, that is, the lock is locked only once by the one
+that executes the conditional store first. Here a change test and a store is
+done atomically.
+
+#+begin_src asm
+// atomic exchange, note the loop is not for spin-wait but to ensure atomicity
+again:
+    lr.w x10, (x20)
+    sc.w x11, x23, (x20)
+    bne x11, x0, again // failed sc.w is not atomic, try again
+    addi x23, x10, 0
+
+// spin lock
+    addi x12, x0, 1
+again:
+    lr.w x10, (x20)
+    bne x10, x0, again
+    sc.w x11, x12, (x20)
+    bne x11, x0, again
+
+// to release a lock simple
+sw 0(x20)
+#+end_src
