@@ -160,3 +160,46 @@ again:
 // to release a lock simple
 sw 0(x20)
 #+end_src
+
+* Program Translation and Execution
+
+The assembler can treat common variations of machine language instructions as if
+they were instructions in their own right, called *pseudoinstructions*. These
+pseudoinstructiosn are translated into equivalent machine instructions. RISC-V
+has no buillt-in =mv= or =li= (load immediate number), which are often
+implemented using =addi= or a combination of several instructions. RISC-V
+distinguishes immediate operations (=addi=, =andi= etc) and normal operations
+(=and=); the assembler combines them into a common =and= and translates it
+into respective machine instructions.
+
+The assembler translates symbolic instructions into machine instructions,
+determines the addresses for all labels. The generated *object file* contains a
+header, a text segment, a static data segment, relocation information, symbol
+table (labels that are not defined), debugging information.
+
+A link editor (or linker for short) loads separately produced object files,
+determines the address of data and instruction labels and patches (edits) both the
+internal and external references using the relocation information and symbol
+table in each object module. After external references are resolved, the linker
+determines the memory location that each module will occupy and edits absolute
+addresses to make them relocatable to reflect its true location after linking.
+During programming, these symbols are labels: the linker must place proper
+numbers (absolute or relative) that conform to the addressing modes of the
+instructions to represent actual addresses. Finally, the linker stitches
+together the object modules and turns into an executable.
+
+Upon execution, it reads the executable file header to determine size of the text and data
+segments, creates an address space  for the text and data, copies the
+instructions and data from the executable file into memory, copies the
+parameters (if any) to the main program onto the stack, initializes the
+processor registers and sets the stack pointer to the first free location,
+branches to a start-up
+ that copies the parameters into the argument
+registers and calls the main routine of the program. When the main routine
+returns, the start-up routine terminates the program with an exit system call.
+
+Part of the loader, the dynamic linker is responsible for finding shared
+dynamically linked libraries and loading and mapping libraries routines. The
+linker finds (actually called by the client code with a routine ID) the correct
+address of a library routine and edits the entry for
+that routine call the first time it is called by client code.
