@@ -64,7 +64,8 @@ From a programmer's perspective, program performance matters much. It depends on
 
 - Making the *common case* fast tends to enhance performance better than
   optimizing the rare case;
-  + e.g. =x0= in RISC-V, special immediate instructions in RISC-V
+  + e.g. =x0= in RISC-V, special immediate instructions in RISC-V; the first
+    few arguments in the registers and extra arguments on the stack.
 
 - Performance via *parallelism*;
 

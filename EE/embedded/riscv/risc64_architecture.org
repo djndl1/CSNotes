@@ -117,7 +117,7 @@ Register-immediate: I type format; Register-Register: R-type
 
 * RV64I Base Integer Instruction Set
 
-- Integer registes and user address space is widened to 64 bits.
+- Integer register and user address space is widened to 64 bits.
 
 - Most integer computational instructions operate on 64-bit values.
   Additional instructions are added to provide 32-bit manipulation.

@@ -35,3 +35,13 @@ or implicit initialization of built-in data types and most data structures.
 Aggregate types (structs and arrays) hold data directly.
 
 Batteries-included standard library with coherent design language.
+
+* Some Basics and Conventions
+
+Go is organized into packages. The =main= package indicates an executable with
+the =main= function as its entry. /Unused =import=​s are considered compilation errors/.
+The =goimports= tool fixes up import statements if necessary.
+
+Go comes with its own formatting tool =gofmt= and standardize the formatting.
+
+Package documentation should be written in a comment preceding the package declaration.
