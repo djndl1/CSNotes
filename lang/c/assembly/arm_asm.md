@@ -260,6 +260,11 @@ Depending on which mode the software is executing in and the register being acce
 
 A RISC processor, unlike CISC processors that have significant amounts of internal logic that decode machine instructions to sequence of internal operations (microcode), have a smaller number of more general purpose instructions. ARM instructions typically have a two or three operand format.
 
+The ARM ISA has fairly complex addressing modes. It uses compare-then-branch instructions and conditional codes to implement branching 
+and an optional conditional field in each instruction to make each instruction conditionally executed. The second register and immediate 
+operands of all arithmetic and logical operations has the option of being shifted before being operated on.
+ARM supports block loads/store groups of registers.
+
 ## The ARM instruction sets
 
 A word = 32 bits. 
