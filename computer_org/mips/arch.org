@@ -1,0 +1,58 @@
+No longer actively maintained.
+
+* Versions & Releases
+
+** MIPS I
+
+32 general-purpose registers, $31 as the link register, $0 as the zero register (similar to =/dev/null= when writing and =/dev/zero= when reading). An additional HI/LO register pair, along with specialized copy/load instructions, are provided for integer multiplication and division.
+
+32 floating-point registers. Two registers are paired for double precision numbers.
+
+Three instruction formats
+
+#+begin_src
+// R
+opcode(6), rs(5),  rt(5), rd(5), shamt(5), funct(6)
+// I
+opcode(6), rs(5),  rt(5), immediate(16)
+// J
+opcode(6), address(26)
+#+end_src
+
+One addressing mode: base + displacement.
+
+All memory accesses are required to be aligned to their natural word boundaries.
+
+All load instructions are followed by a /load delay slot/, where the instruction cannot use the data loaded by the last load.
+
+a Load Upper Immediate (16 bit number) is used in combination with OR to load a 32-bit immediate into a register.
+
+All control flow instructions are followed by a branch delay slot.
+
+** MIPS II
+
+No more load delay slot. Several sets of instructions are added: memory synchronization, trap-on-condition; the instructions in the branch delay slot can now execute only if the branch is taken. IEEE754 square root function; floating-point to 32-bit words conversion;
+
+** MIPS III
+
+Support for 64-bit memory addressing and integer operations by extending the HI/LO registers to 64 bits, along with many doubleword instructions.
+
+Floating general registers were extended to 64 bits and the requirement for even-numbered register was removed.
+
+** MIPS IV
+
+Still a superset of MIPS III
+
+Improved FP operations.
+
+An indexed addressing mode.
+
+prefetch instructions.
+
+** MIPS V
+
+Paired single, i.e., a simple SIMD.
+
+** MIPS32/MIPS64
+
+Refined, enhanced version of previous MIPS.
