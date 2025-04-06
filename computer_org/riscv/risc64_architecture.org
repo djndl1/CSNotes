@@ -1,23 +1,45 @@
 #+title: Risc64_architecture
 
+* Myth
+
+- RISC-V is a RISC ISA and thus is fixed-length: no, it  supports optinally variable-length to both expand available instruction encoding space and to support an optional dense instruction encoding for improved performance, static code size and energy efficiency.
+
 * Basic Terminology
 
 - /Core/: a hardware component that contains an independent instruction fetch unit. It may have multiple RISCV-compatible hardware thread resources called /harts/.
 
-- /Coprocessor/: a unit that is attched to a RISC-V core which contains additional architectural state and instruction-set extensions.
+- /Coprocessor/: a unit that is attached to a RISC-V core which contains additional architectural state and instruction-set extensions.
 
 - /Accelerator/: a non-programmable fixed-function unit or a core that can operate autonomously, specialized for certain tasks.
 
-- /Software Execution Environment/, /Execution Environment Interface/: execution environments range fromn bare-metal hardware implementations, to RISC-V OSes, hypervisors to RISC-V emulators.
+- /Software Execution Environment/, /Execution Environment Interface/: execution
+  environments range fromn bare-metal hardware implementations, to RISC-V OSes,
+  hypervisors to RISC-V emulators. The RISC-V specification defines EEI quite
+  broadly so that various CPU concepts may be applied to different implementations.
+  + an EEI has *harts* (an abstract execution resource that autonomous fetches and execute RISC-V
+    instructions within the execution environment)
 
 * Instruction Set
 
-Four distinct base ISAs are designed in parallel as opposed to adding on later to sit on top of another. RISCV is designed to support customization and specialization with the differentiation of standard encoding, reserved encoding and custom encoding.
+RISC-V is a family of related ISAs: four distinct base ISAs are designed in
+parallel as opposed to adding on later to sit on top of another. RISCV is
+designed to support customization and specialization with the differentiation of
+standard encoding, reserved encoding and custom encoding.
 
-- A base integer ISA, present in any implementation
-  + /RV32I/, /RV64I/, /RV32E/ (for microcontrollers), /RV128I/
+- *base integer ISAs*, present in any implementation
+  + /RV32I/, /RV64I/, /RV32E/ (embedded, for microcontrollers), /RV128I/. Any
+    base ISA is not a strict subset of another so that each can be optimized
+    for its needs without requiring to support all the operations needed for4
+    other base ISAs.
 
-- optional extensions: M (integer multiplication/division), A (atomic operations), F/D/Q/L (various floating-point instructions), P (packed SIMD), V (Vector)
+- *optional extensions*:
+  + /standard/: M (integer multiplication/division), A (atomic operations),
+    F/D/Q/L (various floating-point instructions), P (packed SIMD), V (Vector),
+    C (compressed instruction, 16-bit forms of common instructions)
+  + /reserved/: saved for future standard
+  + /custom/: never used fo4r standard extensions and available for
+    vendor-specific non-standard extensions.
+  + /non-conforming/: uses standard or reserved encoding for non-standard ISAs.
 
 ** Encoding
 
@@ -27,17 +49,36 @@ Four distinct base ISAs are designed in parallel as opposed to adding on later t
 
 * Memory Model
 
-- a single byte-addressable space of its bitness for all memory accesses
+- a single byte-addressable circular space of its bitness for all memory accesses
 
 - word = 4-bytes, halfword = 2 bytes, doubleword = 8 bytes, quadword = 16 bytes.
 
 - the address space may contain one or more I/O devices, determined by the execution environment.
 
+- Different harts may see different address spaces. A purely base-metal
+  environment has an identical address space for all harts.
+
+- Normally, implicit memory access is done to obtain the instruction to execute.
+  Other implicit memory accesses may be possible (not to be confused with
+  the load/store concept, where only instructions are discussed over)
+  + implicit reads do not raise an exception and may occur arbitrarily early and speculatively.
+
+- The EEI is responsible for memory access control.
+
+- The memory accesses (implicit or explicit) made by a hart may appear to occur
+  in a different order as perceived by another hart or by any other agent that
+  can access the same memory.
+  + the default memory consistency model for RISC-V is the *RISC-V Weak Memory
+    Ordering*. An implementation may also implements *Total Store Ordering*.
+
+
 * Exceptions, Traps, Interrupes
 
-- /Exception/: unusual conditon occurring at runtime associated with an isntruction in the current RISC-V hart.
+- /Exception/: unusual condition occurring at runtime associated with an instruction in the current RISC-V hart.
 
 - /Interrupt/: an external asynchronous event that may cause a RISC-V hart to experience an unexpected transfer of control.
+
+Exceptions and interrupts are events, traps are the consequences of these events.
 
 - /trap/: the transfer of control to a trap handler caused by either an exception or an interrupt.
 
@@ -45,16 +86,23 @@ From the perspective of software, traps can be divided into
 
 - /Contained traps/: visible to and handled by software.
 
-- /Request traps/: The trap is a synchronous exception that is an explicit call to the execution
+- /Requested traps/: The trap is a synchronous exception that is an explicit call to the execution
 environment requesting an action on behalf of software inside the execution environment. e.g. a syscall
 
 - /Invisible Traps/:  handled by the execution environment.
+  + e.g. emulating missing instructions, handling page faults
 
 - /Fatal traps/: a fator failure and causes the execution environment to terminate execution.
 
-* RV32I Base Integer Instruction Set
+* ISAs
 
-** Programming Model
+Fixed-length 32-bit instructions aligned on 32-bit boundaries. However, RISC-V
+is designed to support variable-length ISA of the multiples of 16 bits.
+Currently all 32-bit instructions have their lowest two bits set to =11=.
+
+** RV32I Base Integer Instruction Set
+
+*** Programming Model
 
 - =x0=: zero register, hardwired to be zero
 
@@ -63,7 +111,7 @@ environment requesting an action on behalf of software inside the execution envi
 
 - =pc=: program counter
 
-** Encoding and Formats
+*** Encoding and Formats
 
 Simple and consistent
 
@@ -71,7 +119,7 @@ Simple and consistent
 
 TODO
 
-** Integer Computation Instruction
+*** Integer Computation Instruction
 
 Register-immediate: I type format; Register-Register: R-type
 
@@ -93,7 +141,7 @@ Register-immediate: I type format; Register-Register: R-type
 
 - =NOP= for =ADDI x0, x0, 0=
 
-** Control Transfer
+*** Control Transfer
 
 - the target should be four-byte aligned.
 
@@ -103,7 +151,7 @@ Register-immediate: I type format; Register-Register: R-type
 
 - Branches: =BEQ=, =BNE=; =BLT=, =BLTU=; =BGE=, =BGEU=: 4KB branch range.
 
-** Load/Store
+*** Load/Store
 
 - Only load and store instructions access memory and arithmetic instructions only operate on CPU registers.
 
@@ -115,14 +163,14 @@ Register-immediate: I type format; Register-Register: R-type
 
 - =SW=, =SH=, =SB=
 
-* RV64I Base Integer Instruction Set
+** RV64I Base Integer Instruction Set
 
 - Integer register and user address space is widened to 64 bits.
 
 - Most integer computational instructions operate on 64-bit values.
   Additional instructions are added to provide 32-bit manipulation.
 
-** Integer Operations
+*** Integer Operations
 
 - =ADDIW=: the result is sign-extended to fit in the 64-bit register.
 
@@ -135,7 +183,7 @@ Register-immediate: I type format; Register-Register: R-type
 - =AUIPC=: used to build PC-relative addresses. It appends 12 low-byte zero bits to the 20-bit U-immediate,
   sign extends to 64 bits and adds it to the addres, adds it to the address of the =AUIPC= instruction and then places the result in the destination register.
 
-** Load/Store
+*** Load/Store
 
 - =LD=: load a 64-bit value from memory into register =rd=
 
@@ -143,7 +191,7 @@ Register-immediate: I type format; Register-Register: R-type
 
 - =SD=
 
-* M Standard Extension
+** M Standard Extension
 
 - =MUL= (lower half); =MULH=, =MULHU=, =MULHSU= (upper half): full multiplication would be =MULH((S)H) rdh, rs1, rs2; MUL rdl, rs1, rs2=
 
@@ -155,11 +203,11 @@ Register-immediate: I type format; Register-Register: R-type
 
 Full division would be =DIV(U) rdq, rs1, rs2; REM(U) rdr, rs1, rs2=.
 
-* F Standard Extension: Single-Precision Floating-Point Computational Instructions
+** F Standard Extension: Single-Precision Floating-Point Computational Instructions
 
 - =f0=-=f31= 32-bit wide register; =fscr= control and status reegsiter, which contains the operating mode and exception status of the floating-point unit.
 
-* D Standard Extension: Double-Precision Floating-Point
+** D Standard Extension: Double-Precision Floating-Point
 
 =f0= through =f32= are widened to 64 bits
 
