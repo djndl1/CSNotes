@@ -1,0 +1,31 @@
+#+title: Relocation
+
+Assembly programs (labels) or C programs (global variables, function names) contains symbols.
+They are names associated with numerical values to represent programming
+constructs or data.
+
+In assembly programming, labels are identifiers that represent addresses decided
+only later during assembling and linking. Each reference to a label must be
+replaced by an address during assembling and linking so that instructions may
+make use of these addresses. During linking, different object modules are
+stitched together and thus requires the addresses (symbols) to be adjusted to
+avoid overlapping regions and possibly to generate position-independent code.
+The addresses associated with labels may change and each reference to a label
+must also be fixed to reflect the new addresses.
+
+Relocation is the process in which /the code and data are assigned new memory addresses/.
+The addresses associated with labels on the symbol table and the references to
+labels must be adjusted.
+
+For each object module, there is a /relocation table/ (not the symbol table), a data structure that contains
+information that describes how the program instructions and data need to be modified to
+reflect the addresses reassignment. The linker uses this information to adjust
+the code during relocation.
+
+Undefined symbols must be resolved: find the symbol definition and adjust the
+symbol table and the code with the symbol value. For a branch target, the linker
+finds the target address and edits the branch instruction's operand so that the
+instruction can jump to that address.
+
+Global symbols are visible to other object modules and are used by the linker to
+resolve undefined references on other files.

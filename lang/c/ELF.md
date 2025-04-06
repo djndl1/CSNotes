@@ -73,7 +73,7 @@ readelf -S
 
 - The C runtime walks through this array and call each of the initialization functions.
 
-# Relocations:
+# Relocation
 
 The process of assigning load addresses for position-dependent code and data of a program and adjusting the code and data to reflect the assigned addresses.
 

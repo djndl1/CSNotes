@@ -185,7 +185,7 @@ determines the memory location that each module will occupy and edits absolute
 addresses to make them relocatable to reflect its true location after linking.
 During programming, these symbols are labels: the linker must place proper
 numbers (absolute or relative) that conform to the addressing modes of the
-instructions to represent actual addresses. Finally, the linker stitches
+instructions that represent actual addresses. Finally, the linker stitches
 together the object modules and turns into an executable.
 
 Upon execution, it reads the executable file header to determine size of the text and data
@@ -203,3 +203,7 @@ dynamically linked libraries and loading and mapping libraries routines. The
 linker finds (actually called by the client code with a routine ID) the correct
 address of a library routine and edits the entry for
 that routine call the first time it is called by client code.
+
+* Some Examples (RISC-V)
+
+#+include ../lang/CodeOfLanguages/ASM/riscv/swap.S
