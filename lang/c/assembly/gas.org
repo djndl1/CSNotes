@@ -1,0 +1,64 @@
+#+title: The GAS Assembly Language
+
+Primarily intended to assemble the output of GCC for use by the linker =ld= and
+thus includes features that may seem weird to human programmers (e.g. logical
+filename directives to indicate error in the original files).
+
+* Syntax
+
+Assembly programs contain /comments/, /labels/, /assembly instructions/ and
+/assembly directives/ (commands used to coordinate the assembling process).
+
+A program line is either =[label] [instruction]= or =[label] [directive]=. Only
+one label or one directive is allowed per line. A label has to precede an
+instruction or a directive. All elements of a single instruction must be
+expressed in the same line.
+
+** Comments
+
+Line comment characters are ISA-dependent (=//= for Aarch64, =@= for ARM, =#=
+for x86, RISC-V)
+Comment-line (the whole line is a comment): =#= begins a comment for ARM,
+Aarch64, x86.
+
+General multi-line comment is the C-style =/* */=
+
+** Instructions
+
+Not necessarily one-to-one mapped to machine instructions. A pseudo-instruction
+does not have a corresponding machine instruction on the ISA but can be
+translated into  one or more to achieve the same effect.
+
+** Values
+
+C style literals.
+
+** Symbols
+
+Labels are automatically converted into symbols by =as=. One may use =.set= to
+explicitly create symbols.
+
+** Labels
+
+Symbolic labels are identifiers followed by =:= and are placed into the symbol
+table. Numeric labels (=<Number>:=) are for local use and are not included in
+the symbol table and thus can be repeatedly defined in the same assembly
+program. A reference to a numeric label contains a suffix =b= (before) or =f=
+(after) to indicate its position relative to the reference.
+
+* Assembling Process
+
+- Location Counter: An internal assembler counter that keeps track of the
+  address of the next available memory position when a program is being
+  assembled.
+  + Each section has its own location counter.
+
+The location counter of each section is initialized. The assembler scans the
+source, adds a symbol to the symbol table when encountering a label, increment
+the location counter of the current section while translating instructions.
+
+* How to Use =as=
+
+=as= accepts more than one files concatenated.
+Use =-D= to enable debugging. =-I= to add an =.include= search path. =--MD= to
+generate a dependency file for use with =make=; =-o= output file name.
