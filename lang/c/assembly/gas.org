@@ -46,6 +46,54 @@ the symbol table and thus can be repeatedly defined in the same assembly
 program. A reference to a numeric label contains a suffix =b= (before) or =f=
 (after) to indicate its position relative to the reference.
 
+** Directives
+
+Used to control the assembler.
+
+*** Add Data Values
+
+=.byte=, =.half=, =.word=, =.dword= add data (comma separated expressions) to
+the active section.
+
+=.string= or =.asciz= (null terminated strings), =.ascii= (string without NULL
+character) add strings to the active section.
+
+Note that these directives will not align the data at a proper boundary. Use
+=.align= for that.
+
+*** =.section=
+
+Changes the active section. =.segment= is not supported by GAS.
+
+=.rodata= (read-only data), =.data= (initialized global data), =.text=
+(instructions), =.bss= (uninitialized global variables).
+
+=.text [subsection]=, =.data [subsection]=, =.bss [subsection]= are also used as directives to add subsections.
+
+=.bss= sections have only symbols, =.skip size [fill_byte_value]= is required to
+allocate memory space.
+
+#+begin_src asm
+.section .bss
+x:  .skip 4 0 # allocate 4 bytes with the value initialized to 0
+#+end_src
+
+*** =.set=, =.equ=
+
+Sets the value of a symbol to an constant expression. By default it creates a local
+symbol if none.
+
+*** =.globl=, =.global=
+
+Makes the symbol visible to the linker. A C's =extern= declaration.
+
+*** =.align=
+
+Instructions and data are not automatically aligned. The programmer is
+responsible for keeping data and instructions aligned. The compiler usually
+inserts a =.align N= (multiple of $2^{N}$) directive before routine labels to ensure the routine
+instructions start on aligned addresses.
+
 * Assembling Process
 
 - Location Counter: An internal assembler counter that keeps track of the
