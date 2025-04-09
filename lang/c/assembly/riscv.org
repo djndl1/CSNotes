@@ -1,0 +1,38 @@
+#+title: RISC-V
+
+* Syntax & Instructions
+
+
+All RISC-V logic, shift and arithmetic instructions contain three operands, a
+target and two sources.
+
+#+begin_src asm
+MNM rd, rs1, rs2
+MNM rd, rs1, imm
+#+end_src
+
+Due to instruction format, the immediate number is limited to 12 bits, ±2048.
+Although the programmer can employ multiple
+instructions to load a large number into a register, the recommended is to use
+the pseudoinstruction =li= (load immediate).
+
+Logical right shift is only for unsigned integers as division while arithmetic
+right shift works for positive or negative (signed) integers.
+
+RISC-V has separate instructions for multiplication =mul= and remainder =rem=.
+
+Aside from load/store instructions, there are several pseudoinstructions:
+
+- =mv rd, rs=: copy between registers
+
+- =li rd, imm=: load an immediate into a register
+
+- =la rd, symbol=: load the address of a symbol
+
+- =l{w|h|hu|b|bu} rd, label=: load the content at the label, the memory address
+  is calculated based on a label. The address is computed in =rd= before loaded
+  with the content.
+
+- =s{w|h|b} rs, label, rt=: store the register to the label, the memory address
+  is calculated based on a label. The address has to be computed in a register
+  other than =rs= so as not to clobber =rs=, and thus =rt=.
