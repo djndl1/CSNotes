@@ -36,3 +36,20 @@ Aside from load/store instructions, there are several pseudoinstructions:
 - =s{w|h|b} rs, label, rt=: store the register to the label, the memory address
   is calculated based on a label. The address has to be computed in a register
   other than =rs= so as not to clobber =rs=, and thus =rt=.
+* Subroutine
+
+** System Call
+
+- =ecall=: make a service request to the execution environment.
+
+[[man:syscall(2)][The calling convention]] on the Linux kernel is basically the same as the RISC-V calling
+convention, with the syscall number in =a7=.
+
+#+begin_src asm
+# write(1, msg, 7);
+li a0, 1
+la a1, msg
+li a2, 7
+li a7, WRITE
+ecall
+#+end_src
