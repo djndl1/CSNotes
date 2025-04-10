@@ -109,9 +109,11 @@ The location counter of each section is initialized. The assembler scans the
 source, adds a symbol to the symbol table when encountering a label, increment
 the location counter of the current section while translating instructions.
 
-=as= has basically none preprocessing capability (=.include= only, no macro
-processing). Name the source file suffixed with =.S= and feed it into =gcc= to
-get C-style preprocessing.
+=as= has basically none preprocessing capability (=.include= only). Name the
+source file suffixed with =.S= and feed it into =gcc= to get C-style
+preprocessing.
+
+
 
 
 * How to Use =as=
