@@ -31,12 +31,16 @@ translated into  one or more to achieve the same effect.
 
 ** Values
 
-C style literals.
+C style literals. A character may be written as a single quote followed by that
+character ='c=.
+
+Binary integers are supported: =0b1011=.
 
 ** Symbols
 
 Labels are automatically converted into symbols by =as=. One may use =.set= to
-explicitly create symbols.
+explicitly create symbols. Symbol names are limited to letters, digits and =$= (machine-specific),
+=.=, =_= and multibyte characters.
 
 ** Labels
 
@@ -104,6 +108,11 @@ instructions start on aligned addresses.
 The location counter of each section is initialized. The assembler scans the
 source, adds a symbol to the symbol table when encountering a label, increment
 the location counter of the current section while translating instructions.
+
+=as= has basically none preprocessing capability (=.include= only, no macro
+processing). Name the source file suffixed with =.S= and feed it into =gcc= to
+get C-style preprocessing.
+
 
 * How to Use =as=
 
