@@ -68,6 +68,15 @@ Note that these directives will not align the data at a proper boundary. Use
 *** =.section=
 
 Changes the active section. =.segment= is not supported by GAS.
+A section is the basic unit of linking. Sections of the same category are linked together.
+The linker also assigns runtime addresses to sections (*relocation*).
+The linker deals with named section, text section, data section, 
+bss section, absolute section (always relocated to runtime address 0),
+undefined section.
+
+To merge data or text in different parts in an assembly source so that they are near each other, 
+they can be placed under the same subsection. By default everything is placed under subsection 0 
+unless explicitly specified otherwise with =.subsection=, =.text= or =.data=.
 
 =.rodata= (read-only data), =.data= (initialized global data), =.text=
 (instructions), =.bss= (uninitialized global variables).
@@ -75,7 +84,7 @@ Changes the active section. =.segment= is not supported by GAS.
 =.text [subsection]=, =.data [subsection]=, =.bss [subsection]= are also used as directives to add subsections.
 
 =.bss= sections have only symbols, =.skip size [fill_byte_value]= is required to
-allocate memory space.
+allocate memory space. =.lcomm= and =.comm= may also be used to declare common variables in bss sections.
 
 #+begin_src asm
 .section .bss
