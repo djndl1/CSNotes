@@ -17,11 +17,13 @@ expressed in the same line.
 ** Comments
 
 Line comment characters are ISA-dependent (=//= for Aarch64, =@= for ARM, =#=
-for x86, RISC-V)
+for x86, RISC-V).
 Comment-line (the whole line is a comment): =#= begins a comment for ARM,
 Aarch64, x86.
 
-General multi-line comment is the C-style =/* */=
+General multi-line comment is the C-style =/* */.
+
+Use C89 style comments in case of confusion.
 
 ** Instructions
 
@@ -38,7 +40,7 @@ Binary integers are supported: =0b1011=.
 
 ** Expressions
 
-The result must e an absolute number or an offset into a particular section.
+The result must be an absolute number or an offset into a particular section.
 
 - empty expression: no value
 
@@ -63,6 +65,8 @@ The current address being assembled.
 
 *** Attributes
 
+Symbols have attributes:
+
 - *value*: usually 32 bits.
   + A label symbol's value is determined during relocation. An undefined symbol
     of the value 0 requires the linker to find its value. Non-zero undefined
@@ -81,8 +85,8 @@ table.
 
 Numeric labels (a.k.a /local labels/ =<Number>:=) are for local use and are not included in
 the symbol table and thus can be repeatedly defined in the same assembly
-program. A reference to a numeric label contains a suffix =b= (before) or =f=
-(after) to indicate its position relative to the reference. Numeric labels are
+program. A reference to a numeric label contains a suffix =b= (backwards) or =f=
+(forwards) to indicate its position relative to the reference. Numeric labels are
 converted into symbols by some predefined scheme.
 
 Some targets support scoped local labels, valid for only a small region of the
@@ -94,7 +98,7 @@ Used to control the assembler.
 
 *** Add Data Values
 
-- =.dc=, =.dcb=, =.ds=, =.fill= (customizable size unit), =.zero=, =.space= (=.skip=, byte unit)
+- =.dc= (per number), =.dcb=, =.ds=, =.fill= (customizable size unit), =.zero=, =.space= (=.skip=, byte unit)
 
 - =.word= (machine-specific), =.short= (machine-specific), =.hword= (2 bytes),
   =.int= (=.long=, machine-specific), =.quad= (8 bytes), =.octa= (16 bytes),
@@ -215,6 +219,9 @@ preprocessing.
 
 * Macro Programming
 
+=\@= (all macros), =\+= (the containing macro) may be used to keep a counter of
+how many times macros have been executed.
+
 - =.rept=: repat the sequence of lines between =.rept= and =.endr=.
 
 - =.irp=, =.irpc=: expands to a list of statements based on the input parameter list
@@ -229,7 +236,31 @@ move d2, sp@-
 move d3, sp@-
   #+end_src
 
-- =.macro=, =.endm=: recursive calls are supported
+- =.macro macname macargs ...=, =.endm=: macro definitiones
+  +  recursive calls are supported
+  #+begin_src asm
+.macro sum from=0, to=5
+.long \from
+.if \to-\from
+sum "(\from+1)",\to
+.endif
+.endm
+/*
+    .long 0
+    .long 1
+    .long 2
+    .long 3
+    .long 4
+    .long 5
+,*/
+  #+end_src
+  + macro arguments may force a non-blank value (through =:req=), takes
+    variable-length arguments (suffixed with =:vararg=), or have default value ~=default_value~.
+  + Arguments may be specified by position or by keyword ~sum to=17, from=9~.
+  + Within the body, a parameter is referenced by prefixing the name with a =\=.
+  + a parameter may be skipped with an empty argument (and thus multiple
+    successive commas)
+  + to exit from a macro, use =.exitm=.
 
 
 * How to Use =as=
