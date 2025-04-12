@@ -36,19 +36,56 @@ character ='c=.
 
 Binary integers are supported: =0b1011=.
 
+** Expressions
+
+The result must e an absolute number or an offset into a particular section.
+
+- empty expression: no value
+
+- integer expressions: one or more arguments delimited by operators, where
+  arguments may be symbols (evaluated as section number), numbers and subexpressions.
+
 ** Symbols
 
-Labels are automatically converted into symbols by =as=. One may use =.set= to
+Symbols are a central concept: the programmer uses symbols to name things, the linker
+uses symbols to link, and the debugger uses symbols to debug.
+
+Labels are automatically converted into symbols by =as=. One may use =.set= (or ~=~) to
 explicitly create symbols. Symbol names are limited to letters, digits and =$= (machine-specific),
 =.=, =_= and multibyte characters.
+
+A local symbol starts with certain prefixes (=.L= for ELF). They are not saved
+in object files and not visible when debugging.
+
+*** the Dot Symbol =.=
+
+The current address being assembled.
+
+*** Attributes
+
+- *value*: usually 32 bits.
+  + A label symbol's value is determined during relocation. An undefined symbol
+    of the value 0 requires the linker to find its value. Non-zero undefined
+    symbols simply have a name and represent a =.comm= common declaration and
+    the value is the number of allocated space.
+
+- *type*: relocation information and any flag settings
+
+- other symbol attributes, some are specific to a file format.
 
 ** Labels
 
 Symbolic labels are identifiers followed by =:= and are placed into the symbol
-table. Numeric labels (=<Number>:=) are for local use and are not included in
+table.
+
+Numeric labels (a.k.a /local labels/ =<Number>:=) are for local use and are not included in
 the symbol table and thus can be repeatedly defined in the same assembly
 program. A reference to a numeric label contains a suffix =b= (before) or =f=
-(after) to indicate its position relative to the reference.
+(after) to indicate its position relative to the reference. Numeric labels are
+converted into symbols by some predefined scheme.
+
+Some targets support scoped local labels, valid for only a small region of the
+input source code, typically suffixed with a =$=.
 
 ** Directives
 
