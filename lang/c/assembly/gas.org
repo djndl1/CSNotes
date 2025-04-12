@@ -70,6 +70,7 @@ The current address being assembled.
     the value is the number of allocated space.
 
 - *type*: relocation information and any flag settings
+  + =.type= directive
 
 - other symbol attributes, some are specific to a file format.
 
@@ -93,11 +94,16 @@ Used to control the assembler.
 
 *** Add Data Values
 
-=.byte=, =.half=, =.word=, =.dword= add data (comma separated expressions) to
-the active section.
+- =.dc=, =.dcb=, =.ds=, =.fill= (customizable size unit), =.zero=, =.space= (=.skip=, byte unit)
 
-=.string= or =.asciz= (null terminated strings), =.ascii= (string without NULL
-character) add strings to the active section.
+- =.word= (machine-specific), =.short= (machine-specific), =.hword= (2 bytes),
+  =.int= (=.long=, machine-specific), =.quad= (8 bytes), =.octa= (16 bytes),
+  =.double=, =.float= (=.single=),
+
+
+- =.string= or =.asciz= (null terminated strings), =.string8=, =.string16=,
+  =.string32=, =.ascii= (string without NULL character) add strings to the
+  active section.
 
 Note that these directives will not align the data at a proper boundary. Use
 =.align= for that.
@@ -125,24 +131,71 @@ allocate memory space. =.lcomm= and =.comm= may also be used to declare common v
 
 #+begin_src asm
 .section .bss
-x:  .skip 4 0 # allocate 4 bytes with the value initialized to 0
+x:  .skip/.space 4 0 # allocate 4 bytes with the value initialized to 0
 #+end_src
 
-*** =.set=, =.equ=
+*** Set Symbols: =.set=, =.equ=, =.equiv=
 
-Sets the value of a symbol to an constant expression. By default it creates a local
-symbol if none.
+Sets the value of a symbol to an constant expression. By default =.set= and
+=.equ= creates a local symbol if none.
+
+=.equiv=: signals an error if the symbol is already define. =.eqv= is like
+=.equiv= but evaluates the expression immediately instead of on site.
+
+#+begin_src asm
+.ifdef SYM
+.err
+.endif
+.equ SYM, VAL
+#+end_src
+
+*** =.comm=, =.lcomm=: common symbol
+
+When linking, a common symbol in one object file may be merged with a defined or
+common symbol of the same name in another object file (compare to =extern=). If
+no definition is found, only uninitialized memory is allocated for it.
 
 *** =.globl=, =.global=
 
 Makes the symbol visible to the linker. A C's =extern= declaration.
 
-*** =.align=
+*** =.local=: Local Symbols
+
+for ELF. The symbols will not be externally visible.
+
+*** =.internal=, =.hidden=, =.protected=
+
+ELF visibility directives.
+
+*** =.align [alignment, [fill_byte, [max_skip_bytes_allowed]]]=
+
+Pad the location counter in current subsection to a particular storage boundary.
+The exact =alignment= specification is target-specific: some indicate the
+alignment request in bytes (see =.balign=, e.g. i386), others (arm, risc-v) indicate then
+number of low-order zero bits the location counter must have after advancement,
+effectively $2^{N}$ byte boundary.
 
 Instructions and data are not automatically aligned. The programmer is
 responsible for keeping data and instructions aligned. The compiler usually
-inserts a =.align N= (multiple of $2^{N}$) directive before routine labels to ensure the routine
+inserts a =.align N= directive before routine labels to ensure the routine
 instructions start on aligned addresses.
+
+*** Conditional Assembly
+
+=.if=, =.ifdef=, =.ifb=, =.ifc=, =.else=, =.elseif=, =.endif=
+
+Compare to C's =#if= preprocessing directives.
+
+*** Including Files
+
+- =.incbin=: includes the file verbatim at the current location, especially
+  binary data.
+
+- =.include=: includes a supporting source file
+
+*** NOP operations
+
+=.nop=, =.nops=
 
 * Assembling Process
 
@@ -154,12 +207,29 @@ instructions start on aligned addresses.
 The location counter of each section is initialized. The assembler scans the
 source, adds a symbol to the symbol table when encountering a label, increment
 the location counter of the current section while translating instructions.
+=.offset loc=, =.org=, =.p2align= can set the location counter.
 
 =as= has basically none preprocessing capability (=.include= only). Name the
 source file suffixed with =.S= and feed it into =gcc= to get C-style
 preprocessing.
 
+* Macro Programming
 
+- =.rept=: repat the sequence of lines between =.rept= and =.endr=.
+
+- =.irp=, =.irpc=: expands to a list of statements based on the input parameter list
+
+  #+begin_src asm
+.irp    param,1,2,3
+    move d\param, sp@-
+.endr
+# equivalent to
+move d1, sp@-
+move d2, sp@-
+move d3, sp@-
+  #+end_src
+
+- =.macro=, =.endm=: recursive calls are supported
 
 
 * How to Use =as=
@@ -167,3 +237,5 @@ preprocessing.
 =as= accepts more than one files concatenated.
 Use =-D= to enable debugging. =-I= to add an =.include= search path. =--MD= to
 generate a dependency file for use with =make=; =-o= output file name.
+
+=al= to generate a listing so that no disassembling is required to see the result.
