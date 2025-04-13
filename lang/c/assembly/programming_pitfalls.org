@@ -1,0 +1,11 @@
+#+title: Programming Pitfalls
+
+* Writing an Incorrect Section Name
+
+=.section data= compiles but the data is not in the =.data= section.
+It's *=.data=* not =data=
+
+* Assembly is Limited by Instruction Encoding
+
+In RISC-V you cannot have number of arbitrary length as an immediate number.
+In AMD64, =push= cannot push a 64-bit immediate.
