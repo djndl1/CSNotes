@@ -1,4 +1,4 @@
-#+title: Risc64_architecture
+#+title: RISC-V Architecture
 
 * Myth
 
@@ -19,7 +19,7 @@
   + an EEI has *harts* (an abstract execution resource that autonomous fetches and execute RISC-V
     instructions within the execution environment)
 
-* Instruction Set
+* Instruction Set Overview
 
 RISC-V is a family of related ISAs: four distinct base ISAs are designed in
 parallel as opposed to adding on later to sit on top of another. RISCV is
@@ -96,50 +96,89 @@ environment requesting an action on behalf of software inside the execution envi
 
 * ISAs
 
-Fixed-length 32-bit instructions aligned on 32-bit boundaries. However, RISC-V
-is designed to support variable-length ISA of the multiples of 16 bits.
-Currently all 32-bit instructions have their lowest two bits set to =11=.
+There are reduced versions RV32E and RV64E of RV32I and RV64I, which have only
+registers =x0= to =x16= for embedded microcontrollers (to save die area).
 
-** RV32I Base Integer Instruction Set
+** RV32I and RV64I Base Integer Instruction Set
+
+A total of around 40 instructions, enough to emulate all other instructions except the
+A(tomicity) extension.
 
 *** Programming Model
 
 - =x0=: zero register, hardwired to be zero
 
 - =x1=-=x31= general purpose registers
-  + the standard calling convention uses =x1= to hold the return address for a call and =x5= as an alternate link register, =x2= as the stack pointer.
+  + the standard calling convention uses =x1= to hold the return address (link
+    register, x86 does not have such special a register) for a call and =x5= as an alternate link register, =x2= as the stack pointer.
 
 - =pc=: program counter
 
 *** Encoding and Formats
 
-Simple and consistent
+Encoding and formats are important as they dictate what instructions can do,
+especially with immediates, due to the length of an instruction. Consult the ISA
+manuals for full encoding specification.
 
-- 0-6: opcode; 7-11: destination register; 15-19: source register 1; 20-24: source register 2;
+*Fixed-length 32-bit instructions aligned on 32-bit boundaries*. However, RISC-V
+is designed to support variable-length ISA of the multiples of 16 bits.
+Currently all 32-bit instructions have their lowest two bits set to =11=.
 
-TODO
+Bit 0-7 are always the code. =rd= (destination registers) is placed at bit 7-11,
+=rs1= at bit 15-19, =rs2= at bit 20-24. Immediates are always sign-extended and
+the sign bit is placed at bit 31 of the instruction, and the length is either 12
+or 20.
+
+- R(egister)-type: =op rd, rs1, rs2=
+
+- I(mmediate)-type: =op rd, rs1, imm12=
+  + the resultant immediate is =imm12= sign extended to 32 bits
+
+- S(tore)/B(ranch)-type: =op rs1, imm12(rs2)=
+  + the B-type is S-type with two bits of the immediate swapped and the
+    12-bit-encoded immediate is actually a 13-bit number with bit 0 equal to
+    zero, to represent branch a offset in multiples of 2 since all instructions
+    are aligned at least on 16-bit boundaries (for extended instructions with
+    length of 16-bit multiples).
+  + For S-type, the resultant immediate is =imm12= sign extended to 32 bits
+  + For B-type, the resultant immediate is =imm12= shifted left by 1 and then sign extended to 32 bits
+
+- U/J(ump)-type: =op rd, imm20=
+  + the J-type is to the U-type as the B-type is to the S-type.
+  + For U-type, the resultant immediate is =imm20= shifted left by 12, occupying
+    the upper part.
+  + for J-type, the resultant immediate is =imm20= shifted left by 1 (21 bits) and then
+    sign extended.
 
 *** Integer Computation Instruction
 
 Register-immediate: I type format; Register-Register: R-type
 
-- =ADDI=; =ADD=
+- arithmetic (mostly I- or R-type): =ADDI=, =ADD=; =SUB=
+  + overflow check is done with a comparison-branch instruction that compares
+    the result with an operand.
+  + =mv rd, rs1= implemented as =addi rd, rs1, 0=
+  + =nop= implemented as =addi x0, x0, 0=, may be used to align code segments or
+    leave space for inline code modifications. Although the same effect may be
+    achieved via other instructions, this is the chosen canonical one (see HINT instructions).
 
-- =SUB=
+- logical: =ANDI=, =ORI=, =XORI=; =AND=, =OR=, =XOR=
+  + =NOT rd, rs= implemented =XORI rd, rs1, -1=, where -1 is all 1s).
 
-- =SLTI=, =SLTIU=; =SEQZ rd, rs= for =SLTIU rd, rs1, 1=
-  =SLT=, =SLTU=
+- shifts (I-type): =SLLI=, =SRLI=; =SRAI=; =SLL=; =SRL=; =SRA=
 
-- =ANDI=, =ORI=, =XORI= (=NOT= for =XORI rd, rs1, -1=); =AND=, =OR=, =XOR=
+- less-than comparison, signed and unsigned: =SLTI=, =SLTIU=; =SLT=, =SLTU=
+  + =SEQZ rd, rs= (set true if equal to zero) implemented as =SLTIU rd, rs1, 1=
+  + =SNEZ rd, rs= (set true if not equal to zero) implemented as =SLTU rd, x0, rs2=
 
-- =SLLI=, =SRLI=; =SRAI=; =SLL=; =SRL=; =SRA=
-
-- =LUI=, =AUIPC=:
-  + the combination of =AUIPC= and the 12-bit immediate in a =JALR= can transfer control to any 32-bit PC-relative address.
-  + an =AUIPC= plus the 12-bit immediate offset in regular load/store instructions can access any 32-bit PC relative data address.
-  + =AUIPC= is better for obtaining the current PC than =JAL+4= since it does not interfere with the branch predictor.
-
-- =NOP= for =ADDI x0, x0, 0=
+- special addition: =LUI= (load upper immediate), =AUIPC= (add upper immediate to pc) (U-type): used to build 32-bit constants, with a number of
+  which the upper 20 bits are explicitly encoded (=LUI=), or a number generated
+  by the upper 20-bit immediate added to the =pc= (=AUIPC=).
+  + the upper 20 bits in =LUI= or =AUIPC=, combined with an 12-bit immediate can
+    construct a 32-bit number(absolute, or pc-relative which adds =pc= to the
+    32-bit offset), and thus provides a way to construct large memory address.
+  + =AUIPC= is better for obtaining the current PC with =auipc rd, 0= than
+    =JAL+4= since it does not interfere with the branch predictor.
 
 *** Control Transfer
 
