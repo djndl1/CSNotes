@@ -100,8 +100,8 @@ Used to control the assembler.
 
 - =.dc= (per number), =.dcb=, =.ds=, =.fill= (customizable size unit), =.zero=, =.space= (=.skip=, byte unit)
 
-- =.word= (machine-specific), =.short= (machine-specific), =.hword= (2 bytes),
-  =.int= (=.long=, machine-specific), =.quad= (8 bytes), =.octa= (16 bytes),
+- =.byte=, =.word= (machine-specific, 2 bytes for x86), =.short= (machine-specific), =.hword= (2 bytes),
+  =.int= (=.long=, machine-specific, 4 bytes for x86), =.quad= (8 bytes), =.octa= (16 bytes),
   =.double=, =.float= (=.single=),
 
 
