@@ -266,7 +266,10 @@ sum "(\from+1)",\to
 * How to Use =as=
 
 =as= accepts more than one files concatenated.
-Use =-D= to enable debugging. =-I= to add an =.include= search path. =--MD= to
+Use =-D= to enable backend debugging. =-g= to generate debug info for each
+assembler source line. =-I= to add an =.include= search path. =--MD= to
 generate a dependency file for use with =make=; =-o= output file name.
+=a[<various_switches]= (=l= assembly source, =h= high-level source, =s= symbols) to generate a listing so that no disassembling is required to see the result.
 
-=al= to generate a listing so that no disassembling is required to see the result.
+=as= does not have to be invoked directly, but via =gcc=: options can be passed
+via =-Wa,...=
