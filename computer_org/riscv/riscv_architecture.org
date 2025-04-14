@@ -179,16 +179,73 @@ Register-immediate: I type format; Register-Register: R-type
     32-bit offset), and thus provides a way to construct large memory address.
   + =AUIPC= is better for obtaining the current PC with =auipc rd, 0= than
     =JAL+4= since it does not interfere with the branch predictor.
+  + =la rd, symbol=: load the address of a symbol
+    #+begin_src asm
+// .option nopic
+auipc   rd, symbol[31:12] // pc + upper_imm20
+addi    rd, rd, symbol[11:0] // pc + lower_imm12
+// .option pic
+auipc       rd, symbol@GOT[31:12] // the upper part of the entry's address
+l{w|d}      rd, symbolGOT[11:0](rd) // the actual address is saved in the global offset table
+    #+end_src
+  + =lla rd, symbol=: load load address, nopic =la=
+  + =lga rd, symbol=: load global address, pic =la=
 
 *** Control Transfer
 
-- the target should be four-byte aligned.
+The target should be four-byte aligned.
 
-- =JAL=: jump and link, target an offset of 1MB (2-bytes).
+All jumps/branches except the indirect jump =JALR= are pc-relative. However, the
+actual use of =JALR= is mostly pc-relative.
 
-- =JALR=: jump and link register: the target is the source register offset by a 12-bit sign extended immediate.
+**** Unconditional Jump
 
-- Branches: =BEQ=, =BNE=; =BLT=, =BLTU=; =BGE=, =BGEU=: 4KB branch range.
+- =JAL rd, imm20= (J-type): jump and link (the =pc= register), a near jump.
+  the offset is actually a range of $\pm 1$ MB (21-bits) and the base register is
+  implicitly the =pc=.
+  + =J imm20= (jump by pc-relative offset) implemented as =jal x0, imm20=,
+    unconditional pc-relative jump without saving a return address
+  + =jal imm20= (jump and save to the default link register =x1=), implemented
+    as =jal x1, imm20=, used to make a function call
+
+- =JALR rd, rs1, imm12= (I-type): jump and link register (indirect jump)
+  + the target address is =rs1 + imm12= with the least-significant bit set to
+    zero. Note this =imm12= is not a multiple of 2 bytes (I-type after all),
+    this reduction in range is not significant due to being used with a base
+    register.
+    Also, the cleared low bit can be used to store auxiliary information in a
+    function pointer without being used with jump instructions.
+  + this instruction is supposed to be combined with =LUI= and =AUIPC= to jump
+    to a far address (up to 2GB). For farther addresses (under RV64), there are
+    other techniques (GOT, PLT, jump tables, etc.) to load the address in a register and indirectly jump beyond 2GB.
+  + =jr rs= implemented as =jalr x0, rs, 0=, indirect jump without saving
+  + =jalr rs= implemented as =jalr x1, rs, 0=,
+  + =ret= implemented as =jalr x0, x1, 0=, return from a subroutine by using the
+    link register as the target address.
+  + =call=
+    #+begin_src asm
+// pc-relative far call, call pc-relative-offset
+// upper_imm20 + pc + lower_imm12
+auipc   x1, imm20
+jalr    x1, x1, imm12
+    #+end_src
+
+RISC-V does not have a set of many jump instructions but two with the ability to
+save the next instruction address that, combined with certain registers, is able
+to implement a short jump, a long jump, an indirect jump, a function call, a
+function return.
+
+**** Conditional Branches
+
+All branch instructions are B-type, meaning all immediates are actually 13-bit
+offset ($\pm 4$KB) relative to =pc=.
+
+(equal or inequal) =BEQ=, =BNE=; (less than) =BLT=, =BLTU= (unsigned); (greater
+than or equal) =BGE=, =BGEU= (unsigned).
+
+With the instructions above, other comparison pseudosinstructions =BGT=, =BLTU=,
+=BGE= and =BGEU= can be easily synthesized.
+
 
 *** Load/Store
 

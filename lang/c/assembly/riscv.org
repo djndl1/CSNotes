@@ -2,6 +2,7 @@
 
 * Syntax & Instructions
 
+GNU =as= has =.half=, =.word=, =.dword= data directives.
 
 All RISC-V logic, shift and arithmetic instructions contain three operands, a
 target and two sources.
@@ -36,6 +37,21 @@ Aside from load/store instructions, there are several pseudoinstructions:
 - =s{w|h|b} rs, label, rt=: store the register to the label, the memory address
   is calculated based on a label. The address has to be computed in a register
   other than =rs= so as not to clobber =rs=, and thus =rt=.
+
+* Control Flow
+
+
+#+begin_quote
+Software should be optimized such that the sequential code path is the most common path, with less-
+frequently taken code paths placed out of line. Software should also assume that backward branches
+will be predicted taken and forward branches as not taken, at least the first time they are encountered.
+Dynamic predictors should quickly learn any predictable branch behavior.
+Unlike some other architectures, the RISC-V jump (JAL with rd=x0) instruction should always be used
+for unconditional branches instead of a conditional branch instruction with an
+always-true condition. RISC-V jumps are also PC-relative and support a much wider offset range than branches, and will not
+pollute conditional-branch prediction tables.
+#+end_quote
+
 * Subroutine
 
 ** System Call
