@@ -106,6 +106,8 @@ A(tomicity) extension.
 
 *** Programming Model
 
+32-bit registers for RV32 and 64-bit registers for RV64.
+
 - =x0=: zero register, hardwired to be zero
 
 - =x1=-=x31= general purpose registers
@@ -131,10 +133,10 @@ or 20.
 
 - R(egister)-type: =op rd, rs1, rs2=
 
-- I(mmediate)-type: =op rd, rs1, imm12=
+- I(mmediate)-type: =op rd, rs1, imm12= or =op, rd, imm12(rs1)=
   + the resultant immediate is =imm12= sign extended to 32 bits
 
-- S(tore)/B(ranch)-type: =op rs1, imm12(rs2)=
+- S(tore)/B(ranch)-type: =op rs2, imm12(rs1)=
   + the B-type is S-type with two bits of the immediate swapped and the
     12-bit-encoded immediate is actually a 13-bit number with bit 0 equal to
     zero, to represent branch a offset in multiples of 2 since all instructions
@@ -191,6 +193,49 @@ l{w|d}      rd, symbolGOT[11:0](rd) // the actual address is saved in the global
   + =lla rd, symbol=: load load address, nopic =la=
   + =lga rd, symbol=: load global address, pic =la=
 
+RV64 contains additional the =*W= series instructions for performance reason. All 32-bit values
+(unsigned integers included) are
+held in a sign-extended format in 64-bit registers by the compiler and calling
+convention.
+
+#+begin_quote
+The compiler and calling convention maintain an invariant that all 32-bit values are held
+in a sign-extended format in 64-bit registers. Even 32-bit unsigned integers extend bit 31
+into bits 63 through 32. Consequently, conversion between unsigned and signed 32-bit
+integers is a no-op, as is conversion from a signed 32-bit integer to a signed 64-bit integer.
+Existing 64-bit wide SLTU and unsigned branch compares still operate correctly on
+unsigned 32-bit integers under this invariant. Similarly, existing 64-bit wide logical
+operations on 32-bit sign-extended integers preserve the sign-extension property. A few
+new instructions (ADD[I]W/SUBW/SxxW) are required for addition and shifts to ensure
+reasonable performance for 32-bit values.
+#+end_quote
+
+- =ADDWI=; =ADDW=, =SUBW=
+  + =SEXT.W rd, rs1= (sign-extend a word) as =ADDIW, rd, rs1, 0=
+
+- =SLL[I]W=, =SRL[I]W=, =SRA[I]W=
+
+*** Load/Store
+
+Only load and store instructions access memory and arithmetic instructions only
+operate on CPU registers. Loads into =x0= raises exceptions.
+
+Endianness is byte-address invariant on RISC-V: if a byte is stored to memory
+at some address in some endianness, then a byte-sized load from that address in
+any endianness returns the stored value. Endianness is defined by the EEI.
+
+- (I-type) =LD rd, imm12(rs1)= (load dword), =LW= (load word), =LWU= (for RV64
+  only); =LH=, =LHU=; =LB=, =LBU=
+  + The loaded value is zero/sign-extended to fit into the register if necessary.
+
+- (S-Type) =SD rs2, imm12(rs1)=, =SW=, =SH=, =SB=
+
+Loads and stores are supposed to have an effective address aligned to the
+referenced datatype (divisible by the size of the access in bytes), otherwise it
+is *dependent on the EEI* (there are reasons for some implementations to allow
+misaligned accesses). Naturally aligned loads and stores are guaranteed to
+execute atomically.
+
 *** Control Transfer
 
 The target should be four-byte aligned.
@@ -246,46 +291,25 @@ than or equal) =BGE=, =BGEU= (unsigned).
 With the instructions above, other comparison pseudosinstructions =BGT=, =BLTU=,
 =BGE= and =BGEU= can be easily synthesized.
 
+**** Memory Ordering Instructions (FENCE)
 
-*** Load/Store
+Used to order device I/O and memory accesses as viewed by other harts and
+external devices or co-processors. No other RISC-V hart or external device can
+observe any operation in the successor set following a FENCE before any
+operation in the predecessor set preceding the FENCE. The FENCE instruction also
+orders memory reads and writes made by the hart as observed by memory reads and
+writes made by an external device.
 
-- Only load and store instructions access memory and arithmetic instructions only operate on CPU registers.
+#+begin_quote
+The EEI will define what I/O operations are possible, and in particular, which
+memory addresses when accessed by load and store instructions will be treated
+and ordered as device input and device output operations respectively rather
+than memory reads and writes.
+#+end_quote
 
-- little-endian or big-endian dependending on the EEI.
+**** Environment Call and Breakpoints
 
-- Effective address: =rs1= with sign-extended 12-bit offset.
-
-- =LW= (load word); =LH=, =LHU=; =LB=, =LBU=
-
-- =SW=, =SH=, =SB=
-
-** RV64I Base Integer Instruction Set
-
-- Integer register and user address space is widened to 64 bits.
-
-- Most integer computational instructions operate on 64-bit values.
-  Additional instructions are added to provide 32-bit manipulation.
-
-*** Integer Operations
-
-- =ADDIW=: the result is sign-extended to fit in the 64-bit register.
-
-- =SLLI=, =SRLI= (logic shift); =SRAI=: arithmetic right shift.
-
-- =SLLIW=, =SRLIW=, =SRAIW=: RV64I=only instructions that operate on 32-bit values and produce signed 32-bit results.
-
-- =LUI=: places 20-bit unsigned immdiate into bits [31-12] of the destination register place zero out all the lower bits and then sign-extend to 64 bits.
-
-- =AUIPC=: used to build PC-relative addresses. It appends 12 low-byte zero bits to the 20-bit U-immediate,
-  sign extends to 64 bits and adds it to the addres, adds it to the address of the =AUIPC= instruction and then places the result in the destination register.
-
-*** Load/Store
-
-- =LD=: load a 64-bit value from memory into register =rd=
-
-- =LWU=
-
-- =SD=
+=ECALL= (service request to the environment, basically syscall) and =EBREAK=
 
 ** M Standard Extension
 
