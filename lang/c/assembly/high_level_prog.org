@@ -1,0 +1,20 @@
+#+title: How to Implement High-Level Constructs
+
+* How to Compare
+
+The RISC-V situation: suppose one has =<= (signed and unsigned) and =xor=, we can have the
+other five comparison
+operations (=<==, ===, =!==, =>=, =>==):
+
+- negation: =xor= the value with all 1s (signed -1, bitwise), or a single 1 bit (logical).
+
+- =>=: swap the operands of =<=, one operation
+
+- =>==: negate the result of =<=, two operations
+
+- =<==: negate the result of =>= (swapped =<=), two operations
+
+- ===, =!==: xor or subtraction on the two operands, they are supposed to be zero if
+  they are equal or non-zero unsigned integer if not.
+  + =result unsigned< 1= to test equality
+  + =0 unsigned< result= to test inequality
