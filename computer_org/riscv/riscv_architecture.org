@@ -313,15 +313,25 @@ than memory reads and writes.
 
 ** M Standard Extension
 
-- =MUL= (lower half); =MULH=, =MULHU=, =MULHSU= (upper half): full multiplication would be =MULH((S)H) rdh, rs1, rs2; MUL rdl, rs1, rs2=
+- =MUL= (lower half); =MULH=, =MULHU=, =MULHSU= (upper half)
 
-- =MULW=
+- =MULW= (RV64)
 
 - =DIV=; =DIVU=; =DIVW=, =DIVUW=
 
 - =REM=, =REMU=; =REMW=, =REMUW=
 
-Full division would be =DIV(U) rdq, rs1, rs2; REM(U) rdr, rs1, rs2=.
+#+begin_src asm
+# full multiplication
+MULH((S)H) rdh, rs1, rs2
+MUL rdl, rs1, rs2=
+
+# full division
+DIV(U) rdq, rs1, rs2
+REM(U) rdr, rs1, rs2=.
+#+end_src
+
+Microarchtectures can fuse the two into a single multipy operation.
 
 ** F Standard Extension: Single-Precision Floating-Point Computational Instructions
 
