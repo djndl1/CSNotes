@@ -9,3 +9,13 @@ It's *=.data=* not =data=
 
 In RISC-V you cannot have number of arbitrary length as an immediate number.
 In AMD64, =push= cannot push a 64-bit immediate.
+
+* Be Careful of Data Size on Memory
+
+When loading data from memory, be sure that the correct size specifier and
+register names are used (especially on x86).
+
+* Remember to Save Callee-Saved Registers in a Function's Prologue
+
+If they are used in the function, save them.
+If not, leave them be, assuming any called functions will preserve them as well.
