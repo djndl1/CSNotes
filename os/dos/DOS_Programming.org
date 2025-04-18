@@ -14,9 +14,14 @@
 
 - install =ssh2dos= and configure the host to support older algorithms.
   + check =sshd='s log to find out missing algorithms.
+  + will no longer works with future builds of OpenSSH.
 
 - use the kermit protocol
   + it requires both sides set up kermit and start the connection.
+
+- the best and easiest is to set up a ftp on the host e.g. =vsftpd=. No security
+  bullshit, best compatibility.
+
 
 * [[../../lang/c/assembly/x86_legacy.org][8086 Architecture]]
 
