@@ -3,7 +3,9 @@
 * Writing an Incorrect Section Name
 
 =.section data= compiles but the data is not in the =.data= section.
-It's *=.data=* not =data=
+It's *=.data=* not =data=. Both COFF (and PE) and ELF use the =.text= section
+even some assemblers accept =.code=. Using incorrect section names results
+unexpected results (link time failure or run-time misbehavior).
 
 * Assembly is Limited by Instruction Encoding
 
