@@ -1,143 +1,3 @@
-* General Computer System Design Steps
-
-** Specification (What-to-do)
-
-General discussion of all the functions that the system will be provided plus a
-description of the character of the inputs and outputs the system will handle.
-A system is designed to perform a certain task. The nature of the task will
-probably limit the system to performing a specific function.
-
-The specification will define the following subsections.
-
-- For each part, possible /error conditions/ must be explicitly listed.
-
-- List all input channels, output channels, all the computational functions.
-
-*** The Inputs Received by the System
-
-The inputs depends on the level of programming being performed.
-
-At the hardware level, the data path width (serial or parallel),
-data transfer speed and type (sync
-or async), accompanying control information.
-
-The input may contain /data ports/, but not always have /status ports/ (data
-availability, error conditions etc.) and
-/control ports/ (mode of operation, channel configuration).
-
-*** The Computation Performed by the System
-
-- processing raw data from the input and translating them into a form more
-  friendly to the system.
-
-- implement the actual algorithm
-
-- preparation of the data for the output
-
-*** The Outputs Created by the System (Hardware-Level)
-
-As with the input channel, there are similar major parameters for an output chanenl:
-
-- the channel's data path width
-
-- data transfer speed.
-
-- accompanying control information
-
-data ports, status ports and control ports are also of great importance for output.
-*** Revision
-
-The first version of the specification may not be the last. The design step and
-the implementation step may reveal certain functions cannot be performed given
-the conditions. It is necessary to modify the specification so that the
-conditions are changed or the offending functions are modified.
-
-** Program Design (How-To-Do)
-
-Taking the specification and detailing the steps to implement the specification
-A simple description should be available for each individual part of the system.
-For a large system, break the specification into a large number of much smaller modules.
-
-*** Considerations
-
-- *Expansion*: the program should have builtin expansion facilities: e.g. system
-  subroutines, expandable tables and lists of data, a convenient,
-  well-documented method for adding more functions to the system, and data
-  structures that are reasonably flexible.
-
-- *Modules*: the interaction and the interfaces between modules.
-
-- *Alternative Approaches*: there are multiple approaches to the design. In some
-  cases, the limitations may not be revealed until later during implementation.
-  It is necessary to consider alternatives during design in case of future
-  impediment or for a more efficient solution.
-
-** Implementation
-
-Actual coding, debugging and integrating.
-
-*** Coding
-
-- use subroutines.
-
-- documentation
-
-- ensure the code handles errors, special cases, boundary cases, trivial cases.
-
-*** Debugging and Integration
-
-Removing errors from the code and then integrating debugged modules into a final
-working system. Debugging executes the program in real hardware or a simulator, rather than
-mental desk checking.
-
-- Debug commonly used or system subroutines.
-
-- Debug each area of the specification individually.
-
-- Individual modules are combined into a subsystem and then debugged as a
-  subsystem. As each subsystem is debugged, it can then be combined with other
-  subsystems until the final system is debugged. During the integration phase,
-  ensure the interface between modules and subsystems is handled correctly.
-
-** Testing
-
-Introducing special sets of data and verifying that the correct results are produced.
-Testing is often neglected due to time consumption and it is not a well
-understood art.
-
-- enter three basic types of data:
-  + typical normal data
-  + a series of boundary conditions that exercise the system's ability to
-    perform decisions correctly
-  + a random selection of both legitimate and illegitimate data
-
-- input speed:
-  + typical rate
-  + fastest rate at which the system is supposed to function
-  + a random selection of data rates
-
-** Documentation
-
-- program documentation: how the code works, module by module and sometimes why
-  the code works the it does.
-
-- System guide
-  + the program's design
-  + development guide
-  + external interface: inputs and outputs, protocols; external consumers;
-    external data suppliers
-
-- user guide: how to use and how to interface with the system
-
-** Maintenance
-
-Altering the program to accommodate new equipment or new processing
-requirements and keeping the program functioning in a changing environment.
-
-Hardware parts, OS platforms may change. The system is supposed adapt and expand
-and these scenarios should be taken into consideration during program design and
-implementation stages.
-
 * Architecture
   :PROPERTIES:
   :CUSTOM_ID: architecture
@@ -230,7 +90,8 @@ The =EFLAGS= is a register used as a collection of boolean bits to store the res
 
 ** Memory: Representation, Addressing, Models
 
-20-bit address bus from =0x00000= to =0xFFFFF=
+20-bit address bus from =0x00000= to =0xFFFFF=.
+
 CPU after 8088 can access high memory called *extended memory*, often used for disk caches, RAM disks and print spoolers, which can be configured as *expanded memory* for programs to store data.
 
 Since a CPU register is 16-bit only, allowing only 64KB address (/segment/).
@@ -243,7 +104,7 @@ a segment register plus an offset in another register or an immediate number
 offset. There is nothing special about segment registers except that they are
 reserved specifically for pointer representation. As long as one needs to access the memory, segment registers have to be used.
 
-Code is not supposed to be load by the user and so =CS= is not normally changed
+Code is not supposed to be loaded by the user and so =CS= is not normally changed
 by user code. Different memory access instructions assume different segment registers.
 
 *** Program Segments
@@ -416,4 +277,112 @@ However, one may override the default segment by explicitly specify the segment
 
 #+begin_src asm
 mov al, es:[bx]
+#+end_src
+
+
+** Jump & Branch
+
+- *Far* & *Near*: intrasegment jump versus intersegment jump.
+
+- All *conditional jumps* are short jumps with an offset within -128 and +127
+  bytes of =ip=,
+  even if the assembly code seems to be using an absolute address, the machine
+  code is actually using an offset from =ip= (the next instruction's address).
+
+- *unconditional jump* can be *short* (8-bit displacement from =ip=), *near*
+  (16-bit ip-relative, register indirect offset, memory indirect offset),
+  *far* (=ip=, =cs= bot can be changed).
+
+- *procedure call* =CALL=, =RET=
+  + can be *near* or =far*. =CS= (for far call), =IP= are pushed onto the stack
+    upon =CALL=.
+  + =RET= directs the CPU to pop out the saved return address and jump back.
+  + the =main= entry point is required to be a far call.
+
+* MASM
+
+** Template Example Analysis
+
+#+include: ../../CodeOfLanguages/ASM/dos/template.asm src asm
+
+When the program begins executing, only =CS= and =SS= have the proper values,
+=DS= must be initialized by the program.
+
+It is strongly recommended that only stack segment is use to prevent
+fragmentation of stack memory.
+
+** Operators
+
+- =offset expr=: get the offset of the segment of the expression
+
+- =EQU=: does not declare a data item but defines a static constant, like a
+  macro in C.
+
+** Directives
+
+- =SEGMENT=, =ENDS=: ; these directives can define segments. =ASSUME= must be
+  used to load segment registers with these segment addresses.
+  + =.stack=, =.code=, =.data= are some specialized segment directives to set up
+    common segments and registers.
+
+- =.model=: memory model, =TINY= =SMALL=, =MEDIUM=, =COMPACT=, =LARGE=, =HUGE=
+  are supported
+  + Use JWasm
+    #+begin_quote
+NASM also does not have any directives to support different 16-bit memory models. The programmer
+has to keep track of which functions are supposed to be called with a far call and which with a near call,
+and is responsible for putting the correct form of RET instruction (RETN or RETF; NASM accepts RET itself
+as an alternate form for RETN); in addition, the programmer is responsible for coding CALL FAR
+instructions where necessary when calling external functions, and must also keep track of which
+external variable definitions are far and which are near.
+    #+end_quote
+
+- =.stack=: defines a stack segment, optionally with a certain size (by default
+  10224 bytes)
+
+- =DB= (define byte), =DW=, =DD=, =DQ=, =DT= (ten bytes, for packed BCD numbers): allocate data in data memory.
+  + =DB= is the only way define an ASCII string, with a pair of single or double
+    quotes.
+
+
+- =ORG= (origin): set location counter
+
+- =N DUP(initval, initval, ...)=: N number of declarations of =initval=
+
+- =?=: data allocated but not initialized in data declarations
+
+- =procname PROC=, =procname ENDP= defines a procedure.
+
+- =END procname= marks the end of a module and defines the entry point
+
+- =.crf file=: generates a cross reference file: an alphabetical of al symbols
+  and labels and the locations where they are referenced.
+
+- =.map file=: how code and data are mapped to memory
+
+
+* ABI
+
+** Calling Convention
+
+- =BP=, =SI=, =DI= are always preserved
+
+- =DX:AX= or simply =AX= is returned.
+
+*** cdecl (the same as in x86-32)
+
+- the parameters are pushed right to left so that the first parameter is nearest
+  to the top of the stack.
+
+- the stack is caller-cleaned
+
+Function name decoration consists of a leading underscore =_funcname=.
+
+* Toolchains
+
+** Use JWasm & JWlink
+
+#+begin_src shell
+jwasm [-Fl=listingfile] -6 -mz example.asm  # target an Intel P6 CPU, format DOS MZ EXE
+jwlink File example.o Name example.exe  system dos # link example.o, output as example.exe, system set to DOS
 #+end_src
