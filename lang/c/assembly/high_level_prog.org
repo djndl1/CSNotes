@@ -44,6 +44,21 @@ endif:
     continuation
 #+end_src
 
+We could test true on =test-expr=, but that would put the if branch below the
+empty =else= branch and an additional jump is required.
+
+#+begin_src asm
+if:
+    test-expr
+    jump_if_test_true body
+
+    jump endif
+body:
+    if_body
+endif:
+    continuation
+#+end_src
+
 For a complex test expression, a =if= may be divided into two
 
 #+begin_src c
@@ -113,9 +128,9 @@ Compare with the simple-if case, here we execute the additional =else_body= when
 does not hold. Since fallthrough has been taken by the =else= branch, we need an
 additional jump to =continuation=.
 
-** IF-ELSE-ELSEIF
+** IF-ELSEIF-ELSE
 
-#+begin_src
+#+begin_src c
 if (test-expr1) {
     if_body
 } else if (test-expr2) {
