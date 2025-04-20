@@ -1,0 +1,13 @@
+#+title: Ftp
+
+* Common Servers
+
+** =vsftpd=
+
+** =pure-ftpd=
+
+Quick anonymous server:
+
+#+begin_src
+pure-ftpd -0  -S 8021 -e -M -z  -B
+#+end_src
