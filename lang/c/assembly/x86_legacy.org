@@ -299,6 +299,46 @@ mov al, es:[bx]
   + =RET= directs the CPU to pop out the saved return address and jump back.
   + the =main= entry point is required to be a far call.
 
+** Arithmetic, Logical & Shift Operations
+
+These instructions change the flag register depending on the operands involved
+and the result.
+
+- =add=, =adc=, =clc= (clear carry): multiword addition is actually multiple additions with carry
+
+- =sub=, =sbb=: subtraction is done using the adder circuitry (not the =add=
+  instruction) with the subtrahend in 2's complement.
+  + Since =x - y= is computed as =x + (2^N - y)=. If =x= is greater than =y=,
+    =x-y= would be positive and the result overflows. That is, if there is no
+    borrow, the carry status is set. The borrow status is the negation of the
+    carry status. *However, here the carry flag bit is used to indicate a
+    borrow*. The carry flag is inverted.
+
+- =mul= for byte by byte, the result is in a single register, for word by word,
+  the result is in =DX:AX=
+
+- =div= (unsigned): for different operand sizes, the numerator and the result are in
+  different registers.
+  + the denominator cannot be an immediate; The numerator has fixed register(s)
+    =AH:AL= or =DX:AX=.
+  + division by zero or the quotient is too large for the assigned register
+    triggers an exception.
+
+- =and=, =or=, =xor=
+  + be careful, these operations clear =CF= and =OF=.
+  + =and=: clear bits; test for a zero operand (=and al, al=, =ZF= is set if one is zero)
+  + =or=: set bits; test for a zero operand (=or al, al=, =ZF= is set if =al= is zero)
+  + =xor=: flip bits; test operand equality (=xor bx, cx=, =ZF= is set if
+    equal); clear oneself (=xor ax, ax= clears =ax=)
+
+
+- =shr=, =shl=
+  + =shr= and =shl= shifts the LSB/MSB into the carry flag.
+
+- =cmp=: comparison of *UNSIGNED* numbers. The operands themselves remain
+  unchanged but the flags chagne accordingly.
+
+
 * MASM
 
 ** Template Example Analysis
