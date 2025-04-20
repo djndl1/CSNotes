@@ -340,10 +340,10 @@ external variable definitions are far and which are near.
 - =.stack=: defines a stack segment, optionally with a certain size (by default
   10224 bytes)
 
-- =DB= (define byte), =DW=, =DD=, =DQ=, =DT= (ten bytes, for packed BCD numbers): allocate data in data memory.
+- =DB= (define byte), =DW=, =DD=, =DQ=, =DT= (ten bytes, for packed BCD numbers
+  which are never used anymore): allocate data in data memory.
   + =DB= is the only way define an ASCII string, with a pair of single or double
     quotes.
-
 
 - =ORG= (origin): set location counter
 
@@ -369,14 +369,60 @@ external variable definitions are far and which are near.
 
 - =DX:AX= or simply =AX= is returned.
 
-*** cdecl (the same as in x86-32)
+*** =__cdecl= (the same as in x86-32)
 
 - the parameters are pushed right to left so that the first parameter is nearest
   to the top of the stack.
 
 - the stack is caller-cleaned
 
-Function name decoration consists of a leading underscore =_funcname=.
+- return value in =ax= (=eax=) or =st0= (floating-point)
+
+- =eax=, =ecx=, =edx= are called-saved
+
+- =st0= to =st7= must be empty upon a function call.
+
+Function name decoration consists of a leading underscore =_funcname= for DOS
+and Windows.
+
+#+begin_src asm
+// int func(A, B, C)
+push C
+push B
+push A
+call _func
+add esp, 12
+#+end_src
+
+Passing of large structures is not specified and is platform-dependent. They may
+be placed on the stack and passed by reference under the hood or their members are pushed onto the stack.
+
+** =__pascal=
+
+Used by Turbo Pascal, Delphi and Win16 functions.
+
+No variable number of parameters.
+
+- Parameters are pushed from left to right;
+
+- Function names are converted to uppercase
+
+- returning values is relatively complex:
+  + ordinal values in =al=, =ax=, =eax= (32-bit) or =dx:ax= (16-bit).
+  + pointers in =ax=, =eax=
+  + real values returned in =dx:bx:ax=
+  + floating-point values in =st0=
+  + strings are returned in a location denoted by =@Result=.
+
+- the stack is callee-cleaned.
+
+** =__fastcall=
+
+Not standardized. Other compilers may do something similar but not compatible.
+
+=__fastcall= was typically faster only for short leaf functions.
+
+- The first parameter in =dx= and the second in =cx=
 
 * Toolchains
 
