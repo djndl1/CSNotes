@@ -114,6 +114,9 @@ be memory
 regions accessed via the three segment registers (code =CS=, data =DS= and stack
 =SS=). The 8086 can only access these three segments of 64KB at any given time
 due to its limited width of registers even its physical address bus is larger.
+Segmented architecture was originally designed to enable a 16-bit processor to
+access an address space larger than 64K. The second use since 80286 is to use as
+a protection mechanism.
 
 - /physical address/: the address on the external address bus
 
@@ -129,6 +132,16 @@ by itself. The actual address represented by this pair is =(CS << 4) + IP=. =IP=
 increments as instruction is executed.
 
 On modern CPUs, instructions are often prefetched so the program counter only reflects the next instruction to execute but not the next one to fetch. It is a conceptual representation of the CPU's state, not an actual register.
+
+The only way to alter =CS= is when execution is switched to another segment:
+
+- far jump
+
+- far call and far return
+
+- from interrupt vector table
+
+- IRET: basically a far return
 
 **** Data Segments
 
@@ -154,6 +167,7 @@ The stack grows downward from upper addresses to lower addresses, opposite of =I
 
 =BP= (stack base) is another stack offset that represents the address of the
 current stack frame.
+
 
 *** Point Types
 

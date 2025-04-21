@@ -128,6 +128,29 @@ Fully 32-bit CPU (internal registers, buses and external buses).
 
 - Support for parallel stages
 
+** Segmentation Under Protected Mode
+
+The  value in a segment register is no longer an absolute value for the segment,
+but a selector, an offset into the *Global Descriptor Table* (maintained by the
+=GDTR= register, loaded by =LGDT=), of which an entry
+of 8 bytes describes a segment. This GDT is controlled by the OS and exposed to
+user programs directly and segment addresses are completely by the OS.
+
+#+begin_src
+base: 32-bit, containing the linear address where the segment begins
+limit: 20-bit, the maximum addressable unit
+access byte: present, privilege level, type, executable, direction, readable/writable, accessed
+flags: granularity (1 byte or 4KB per addressable unit, that is, each segment is 4GB in maximum)
+#+end_src
+
+=CS= points to one segment and other segment registers use another (=CS= cannot
+load a data descriptor), this somehow helps security (but now we have =NX= bit
+on modern x86 CPUs).
+
+Most C compilers assume a flat-memory model, where the segment
+part is ignored. FreePascal have long pointer types that support such
+segmentation mechanism.
+
 ** 386SX
 
 A reduced version with 16-bit external data bus and a 24-bit address bus.
