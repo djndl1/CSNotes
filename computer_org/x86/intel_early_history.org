@@ -151,6 +151,17 @@ Most C compilers assume a flat-memory model, where the segment
 part is ignored. FreePascal have long pointer types that support such
 segmentation mechanism.
 
+** Virtual 8086 Mode
+
+A hardware-virtualization technique under protected mode.
+
+A V86 monitor at ring 0 and in protected mode monitors the 8086 real-mode
+program at ring 3. The CPU traps certain events and calls the V86 monitor which
+examines what the real mode program is trying to do and acts as a proxy to
+interface with the hardware or terminates the real-mode program if the behavior
+is not allowed.
+
+
 ** 386SX
 
 A reduced version with 16-bit external data bus and a 24-bit address bus.
