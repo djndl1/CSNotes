@@ -1,0 +1,32 @@
+:PROPERTIES:
+:ID:       5033736b-2f3c-4438-a46f-22d463239a7c
+:END:
+#+title: X86 Instructions Encoding
+#+bibliography: ./x86_ref.bib
+#+cite_export: basic
+#+filetags: x86
+
+* Legacy Mode[cite:@IntelMan2] :x86:
+:PROPERTIES:
+:ID:       8afe3bc9-fd12-4d75-9799-db0ca7214d7e
+:ROAM_ALIASES: "x86 Legacy Mode Instruction Format"
+:END:
+
+#+begin_src
+[optional prefix] (0B-4B) | Opcode (1B-3B) | ModR/M (1B) | SIB (1B) | Displacement (0,1,2,4B) | Immediate (0,1,2,4B)
+#+end_src
+
+- *Prefixes*: the prefix may only include one prefix code from each of the four
+  groups (one for each group, not one in total).
+  1. lock and repeat prefixes: =LOCK= =0xF0= (exclusive use of shared memory); =REPNE=, =REPNZ= =0xF2=; =REP=,
+  =REPE=​/​=REPZ= =0xF3= (repeated operations for each element of a string)
+  2. Segment override prefixes, branch hints
+  3. Operand-size override prefix: switch between 16-bit and 32-bit operand
+     sizes and override the default size.
+  4. Address-size override prefix: switch between 16-bit and 32-bit addressing.
+
+- *Opcode*
+
+* Bibliography
+
+#+print_bibliography:
