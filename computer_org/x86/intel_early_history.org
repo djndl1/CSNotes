@@ -39,7 +39,7 @@ since 8086.
 
 * 8086 (launched in 1978)
 
-A non-strict extension of 8080,basically the same microarchitecture as 8085.
+A non-strict extension of 8080, basically the same microarchitecture as 8085.
 
 A mixture of random logic and microcode.
 
@@ -49,9 +49,10 @@ A mixture of random logic and microcode.
 
 - 16 bit data width: all internal registers as well as internal and external
   data buses are 16-bit wide.
-  + multiplexed with the address bus.
+  + multiplexed with the address bus. An address transmission is followed by a
+    data transmission over a subset of the same physical lines.
 
-- 20 bit address width
+- 20 bit address width; 1MB memory along with a separate 64KB I/O space.
 
 - two-stage pipeling: BIU (instructions fetched into the instruction queue), EU
   (execution of fetched instructions). Certain instructions (jump) may require
@@ -63,14 +64,54 @@ needs to access memory, it make a request to the BIU. When there is no requests
 from the EU, the BIU fetches machine instructions from the memory into the
 instruction queue.
 
-An additional 8284 clock generator and a 8288 bus controller are required.
+An additional 8284 clock generator and a 8288 bus controller are required. There
+was a 8089 I/O coprocessor (optimized for data transfer), which was not used by IBM and the series was later abandoned.
+Intel provided a product line containing 8086/8088, 8089 I/O processor, 8259 programmable
+interrupt controller, 8082/8083 octal latch, 8286/8287 octal bus transceiver etc..
 
-8086 is designed to work in a multiprocessing system.
+** Multiprocessing
+
+8086 is designed to work in a multiprocessing system for efficiency,
+performance, robustness, parallelism. Two kinds of proccessors are supported:
+
+- Independent processors: 8086, 8088, 8089.
+
+- Coprocessor: the coprocessor monitors instructions fetched by the host and
+  recognizes certain of these as its own and executes them.
+
+There are built-in solutions for multiprocessing coordination:
+
+- *bus arbitration* by 0289 or the bus request/grant logic in a processor
+
+- *mutual exclusion*: *LOCK* bus signal prevents other processors from obtaining
+  a shared system bus. A processor may lock the bus during data transfer so that
+  the other processor may not access the target of the transfer. 8086 has
+  built-in support for mutexes and semaphores with bus lock and special instructions.
+
+** Software Development
+
+Intel provided a series of software tools and hardware development boards, running on the  Intellec Series II
+Microcomputer Development System.
+
+- PL/M compiler
+
+- Assembler: ASM-86
+
+- LINK-86: Linker
+
+- LOC-86: assigns absolute memory, a relocator.
+
+- OH-86: handles program format.
+
+- LIB-86: library archiver
+
+The SDk-86 development kit (a development board) had a monitor program and even
+supported single stepping, basically a debugger.
 
 ** 8088
 
 A binary-compatible cheap version of 8086, with the external data width reduced
-8-bit, thus more compatible with then 8-bit compouter design for IBM.
+8-bit, thus more compatible with then 8-bit computer design for IBM.
 
 * 80286 (1982)
 
