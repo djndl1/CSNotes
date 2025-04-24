@@ -43,6 +43,8 @@ A non-strict extension of 8080, basically the same microarchitecture as 8085.
 
 A mixture of random logic and microcode.
 
+** Basic Specification
+
 - clock frequency 5MHz - 10Hmz
 
 - 40-pin DIP package.
@@ -58,16 +60,43 @@ A mixture of random logic and microcode.
   (execution of fetched instructions). Certain instructions (jump) may require
   flushing the queue (and thus the pipeline), causing a /branch penalty/.
 
-8086 is divided into an Execution Unit (EU) and a Bus interface Unit (BIU). The
-BIU is responsible for handling all interfaces with external bus. When the EU
+** Architecture (Microarchitecture ?)
+
+8086 is divided into an /Execution Unit/ (EU) and a /Bus interface Unit/ (BIU). The
+BIU is responsible for handling all interfaces with external bus (fetching
+instructions and data, writing results). When the EU
 needs to access memory, it make a request to the BIU. When there is no requests
 from the EU, the BIU fetches machine instructions from the memory into the
-instruction queue.
+instruction queue (up to 6 instruction bytes).
+
+*** *Execution Unit*
+
+A 16-bit ALU maintains the CPU status and control flags, and manipulates the
+general registers and instruction operands.
+
+Instructions are obtained from a queue maintained by the BIU and any
+memory access is done by the BIU as a proxy.
+
+*** *Bus Interface Unit*
+
+Accesses memory for the EU and prefetches instructions whenever the queue has some
+empty bytes (one byte per transfer for 8088 and two bytes for 8086, there is a
+reason for memory alignment). However, a branch/jump resets the queue and
+instructions are fetched from the new address.
+
+** Intended Use
+
+Intel did not design these microchips for later IBM "PC"s: they were meant as
+generic building blocks for computing machines and thus the multiprocessing
+capability and various bus configurations. 8086/8088 may be configured in
+minimum mode, where pins transfer control signals directly to memory and I/O, or
+in maximum mode, where these pins take on different functions to help build
+large systems, especially for multiprocessing systems.
 
 An additional 8284 clock generator and a 8288 bus controller are required. There
 was a 8089 I/O coprocessor (optimized for data transfer), which was not used by IBM and the series was later abandoned.
 Intel provided a product line containing 8086/8088, 8089 I/O processor, 8259 programmable
-interrupt controller, 8082/8083 octal latch, 8286/8287 octal bus transceiver etc..
+interrupt controller, 8082/8083 octal latch, 8286/8287 octal bus transceiver etc.
 
 ** Multiprocessing
 
@@ -87,6 +116,40 @@ There are built-in solutions for multiprocessing coordination:
   a shared system bus. A processor may lock the bus during data transfer so that
   the other processor may not access the target of the transfer. 8086 has
   built-in support for mutexes and semaphores with bus lock and special instructions.
+
+** Bus Organization
+
+Microprocessors are always connected to a local bus and memory and I/O
+components usually reside on a system bus. Standard memory and I/O components
+are are not attached to the local bus.
+
+*** Local Bus
+
+A set of processors may be connected to the same local bus and coordinated.
+Other processors may be connected to another *remote* local bus.
+
+The processors and bus interface groups that are connected by a local bus form
+a *processing module*.
+
+*** System Bus
+
+Five sets of signals:
+
+- address bus
+
+- data bus
+
+- control lines
+
+- interrupt lines
+
+- arbitration lines
+
+Local buses are connected to a system bus via a group of bus interface
+components. Memory and I/O may be connected a private system bus only for a
+single local bus or to a public system bus serving multiple processing modules.
+The access of the modules are controlled by bus arbiters of the modules.
+
 
 ** Software Development
 
