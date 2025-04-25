@@ -84,6 +84,41 @@ empty bytes (one byte per transfer for 8088 and two bytes for 8086, there is a
 reason for memory alignment). However, a branch/jump resets the queue and
 instructions are fetched from the new address.
 
+*** Registers
+
+**** General Registers
+
+- A set of 16-bit H-L registers that can be used as two sets of 8-bit registers.
+
+- pointer and index registers (=SP=. =BP=, =DI=, =SI=)
+
+**** Segment Registers
+
+The memory space is divided into segments, pointed to by segment registers:
+
+=CS= (code), =SS= (stack), =DS= (data), =ES= (extra)
+
+**** Instruction Pointer
+
+It contains the offset of the next instruction from the beginning of the current
+code segment, updated by the BIU. The actual value is the offset of the next
+instruction to fetch. Programs have no other way to access the register except
+pushing it onto the stack. However, whenever the value is pushed onto the stack,
+the value actually saved is the offset of the next instructions to be executed.
+
+**** Flags
+
+six 1-bit status flags and three additional control flags
+
+#+begin_src
+[TF DF IF] (OF SF ZF AF PF CF)
+#+end_src
+
+**** Mode Selection
+
+The strap pin $\text{MX} / \overline{\text{MX}}$ defines the function of certain
+CPU pins so that the CPU operates under either the minimum mode or the maximum mode.
+
 ** Intended Use
 
 Intel did not design these microchips for later IBM "PC"s: they were meant as
@@ -149,6 +184,69 @@ Local buses are connected to a system bus via a group of bus interface
 components. Memory and I/O may be connected a private system bus only for a
 single local bus or to a public system bus serving multiple processing modules.
 The access of the modules are controlled by bus arbiters of the modules.
+
+** Memory
+
+*** Alignment
+
+Odd addressed (unaligned) words do not take advantage of the 8086's ability to
+transfer 16-bits at a time. There is no alignment requirement: Instructions, byte
+data and word data may be freely stored at any byte address without regard for
+alignment thereby saving memory space by allowing code to be densely packed in
+memory. Unaligned word access requires two bus cycles, one byte at a time.
+16-bit data should be stored at even addresses.
+
+Word alignemnt is totally transparent to software (except for low performance).
+
+#+begin_quote
+The 8086 always fetches the instruction stream in
+words from even addresses except that the first
+fetch after a program transfer to an odd address
+obtains a byte. The instruction stream is
+disassembled inside the processor and instruction
+alignment will not materially affect the per-
+formance of most systems.
+#+end_quote
+
+*** Segmentation
+
+All segments begin on 16-byte (formed by the 4 bit left shift of a segment
+register) memory boundaries. Segments may be adjacent, disjoint, partially
+overlapped or fully overlapped.
+
+8086 terms the segment and offset pair "logical address", compared to "physical
+address" on the address lines, formed by =Segment << 4 + Offset=, called
+*effective address*.
+
+Instructions are always fetched from the current code segment; =IP= contains the
+offset of the target instruction from the beginning of the segment. =SP=
+contains the offset of the top of the stack (the last pushed item). These are
+fixed combinations: =IP= and =SP= cannot be paired with othe segment registers.
+=BP=, normally as a frame base pointer, may be used as a base pointer and may be
+combined with any currently addressable segments.
+
+For a string operation, the source is specified by =CS/DS/ES/SS:SI= and the destination
+by =ES:DI= and updated by the instruction automatically.
+
+**** Position-Independent Code (Dynamically Relocatable)
+
+Segmentation makes it possible to write position-independent programs and allows
+a multiprogramming or multitasking system to make particularly effective use of
+available memory, combined with swap mechanism.
+
+However, this forces a program to avoid altering its segment registers and make
+far jumps/calls. All offsets in the program must be relative to fixed values in
+the segment registers.
+
+*** Stacks
+
+A stack is limited up to 64KB. However, the system is free to create any number
+of stacks. Push and pop operate in an unit of 16 bits, or a word. The stack
+grows down in memory toward its base address (the segment base, or the limit address maybe?).
+
+*** Reserved Memory
+
+- =0x0= to =0x7F= and =0xFFFF0= to =0xFFFFF= for interrupt and system reset processing.
 
 
 ** Software Development
