@@ -1,4 +1,6 @@
 #+title: Intel Early History
+#+bibliography: x86_ref.bib
+#+cite_export: basic
 
 This note covers the history of Intel CPU before modern Core microarchitectures
 since 8086.
@@ -43,9 +45,23 @@ A non-strict extension of 8080, basically the same microarchitecture as 8085.
 
 A mixture of random logic and microcode.
 
+** Intended Use
+
+Intel did not design these microchips for later IBM "PC"s: they were meant as
+generic building blocks for computing machines and thus the multiprocessing
+capability and various bus configurations. 8086/8088 may be configured in
+minimum mode, where pins transfer control signals directly to memory and I/O, or
+in maximum mode, where these pins take on different functions to help build
+large systems, especially for multiprocessing systems.
+
+An additional 8284 clock generator and a 8288 bus controller are required. There
+was a 8089 I/O coprocessor (optimized for data transfer), which was not used by IBM and the series was later abandoned.
+Intel provided a product line containing 8086/8088, 8089 I/O processor, 8259 programmable
+interrupt controller, 8082/8083 octal latch, 8286/8287 octal bus transceiver etc.
+
 ** Basic Specification
 
-- clock frequency 5MHz - 10Hmz
+- clock frequency 5MHz - 10MHz
 
 - 40-pin DIP package.
 
@@ -60,7 +76,7 @@ A mixture of random logic and microcode.
   (execution of fetched instructions). Certain instructions (jump) may require
   flushing the queue (and thus the pipeline), causing a /branch penalty/.
 
-** Architecture (Microarchitecture ?)
+** Architecture (Microarchitecture Maybe)
 
 8086 is divided into an /Execution Unit/ (EU) and a /Bus interface Unit/ (BIU). The
 BIU is responsible for handling all interfaces with external bus (fetching
@@ -90,7 +106,7 @@ instructions are fetched from the new address.
 
 - A set of 16-bit H-L registers that can be used as two sets of 8-bit registers.
 
-- pointer and index registers (=SP=. =BP=, =DI=, =SI=)
+- pointer and index registers (=SP=, =BP=, =DI=, =SI=)
 
 **** Segment Registers
 
@@ -108,7 +124,8 @@ the value actually saved is the offset of the next instructions to be executed.
 
 **** Flags
 
-six 1-bit status flags and three additional control flags
+six 1-bit status flags and three additional control flags (single-step trap
+enabled; string operation direction; interrupt enabled flag)
 
 #+begin_src
 [TF DF IF] (OF SF ZF AF PF CF)
@@ -118,20 +135,6 @@ six 1-bit status flags and three additional control flags
 
 The strap pin $\text{MX} / \overline{\text{MX}}$ defines the function of certain
 CPU pins so that the CPU operates under either the minimum mode or the maximum mode.
-
-** Intended Use
-
-Intel did not design these microchips for later IBM "PC"s: they were meant as
-generic building blocks for computing machines and thus the multiprocessing
-capability and various bus configurations. 8086/8088 may be configured in
-minimum mode, where pins transfer control signals directly to memory and I/O, or
-in maximum mode, where these pins take on different functions to help build
-large systems, especially for multiprocessing systems.
-
-An additional 8284 clock generator and a 8288 bus controller are required. There
-was a 8089 I/O coprocessor (optimized for data transfer), which was not used by IBM and the series was later abandoned.
-Intel provided a product line containing 8086/8088, 8089 I/O processor, 8259 programmable
-interrupt controller, 8082/8083 octal latch, 8286/8287 octal bus transceiver etc.
 
 ** Multiprocessing
 
@@ -145,12 +148,73 @@ performance, robustness, parallelism. Two kinds of proccessors are supported:
 
 There are built-in solutions for multiprocessing coordination:
 
-- *bus arbitration* by 0289 or the bus request/grant logic in a processor
+- *bus arbitration* by 8289 or the bus request/grant logic in a processor
 
 - *mutual exclusion*: *LOCK* bus signal prevents other processors from obtaining
   a shared system bus. A processor may lock the bus during data transfer so that
   the other processor may not access the target of the transfer. 8086 has
   built-in support for mutexes and semaphores with bus lock and special instructions.
+
+*** Bus Lock \(\overline{\text{LOCK}}\)
+
+The LOCK signal is active during execution of the instruction following the LOCK prefix.
+The LOCK signal is only a hint: other processors on the shared bus may choose to
+ignore it.
+
+#+begin_quote
+LOCK may be used in multiprocessing systems to
+coordinate access to a common resource, such as
+a buffer or a pointer. If access to the resource is
+not controlled, one processor can read an
+erroneous value from the resource when another
+processor is updating it
+#+end_quote
+
+Combined with the =XCHG= instruction, LOCK can implement a semaphore to
+force mutual exclusion.
+
+#+begin_src asm
+; a spin lock
+    mov al, 1
+wait:
+    lock xchg al, semaphore
+    test  al, al
+    jnz wait
+    ; use resource
+    ; ...
+    ; done
+    mov semaphore, 0
+#+end_src
+
+
+*** ​WAIT and Synchronize on External Events
+
+A =WAIT= instruction stays idle and waits for the \(\overline{\text{TEST}}\) to become active.
+
+*** Notify Another Processor with =ESC=
+
+Processor A starts an =ESC=; Processor B monitors the bus and control lines
+ and
+captures the =ESC= and its operand. Processor B begins to prepare data for A. A
+=WAIT= until B sends a \(\overline{\text{TEST}}\) signal to notify that the data is ready.
+
+The instruction queue may be monitored through =QS0= and =QS1= in maximum mode.
+
+*** Request/Grant Lines
+
+In maximum mode, =HOLD= and =HLDA= lines are called
+\(\overline{\text{RQ}}/\overline{\text{GT0}}\) and
+\(\overline{\text{RQ}}/\overline{\text{GT1}}\), used as a bus request/grant
+signal line.
+
+A processor sends a request pulse on the line; the CPU returns an acknowledge
+pulse on the line and disconnects from the line. The other processor takes the
+line while the CPU continues its own execution until a bus access is required.
+The other processor finishes its job and sends a final pulse to relinquish the bus.
+
+*** Multibus Support
+
+Configured in maximum mode and used with 8288 Bus Controller.
 
 ** Bus Organization
 
@@ -247,6 +311,221 @@ grows down in memory toward its base address (the segment base, or the limit add
 *** Reserved Memory
 
 - =0x0= to =0x7F= and =0xFFFF0= to =0xFFFFF= for interrupt and system reset processing.
+
+** I/O
+
+There is a 64KB separate I/O address space (read and write by the =IN= and =OUT=
+instructions). =0xF8= through =0xFF= is reserved by Intel.
+
+*** Memory-Mapped I/O
+
+I/O devices may also be placed in
+the memory space to bring the power of the full ISA and addressing modes to I/O
+processing.
+
+*** DMA
+
+Un minimum mode, 8086 is compatible with traditional DMA controllers.
+
+** Interrupts & Traps
+
+Terms: *INTR* -> interrupt request, *ISR* -> Interrupt Service Routine a.k.a
+Interrupt Procedure
+
+8086 can handle up to 256 different interrupt types.
+
+Generally, the processor checks for interrupts after completion of the current
+instruction, first internal interrupt (=INT= instruction), then external
+interrupts (=NMI= and =INTR= signal lines). It will continues execution of the
+next instruction after any or none interrupt handling. During handling before
+executing the user interrupt procedure, an =NMI= or a single-step trap may interrupt
+the current interrupt. The interrupt service procedures are linked with
+interrupt type codes by the *interrupt pointer table* (a.k.a *interrupt
+vector*). Consult the 8086 manual (Figure 2-29) for the full processing
+sequence[cite:@8086Man].
+
+*** Interrupt Priority
+
+- Most internal interrupts: divide error, =INT n=, =INTO=
+
+- =NMI=
+
+- =INTR=: The =INTR= is generally ignored during interrupt handling since =IF=
+  is cleared before any ISR and restored after the ISR, unless otherwise enabled
+  during execution.
+
+- Single-step: disabled before execution of the first instruction of an ISR and
+  restored after the ISR unless otherwise enabled. It is special in that when
+  enabled, it has
+  a chance to execute its ISR before the real execution of the mainline ISR begins.
+
+The priority issue does not only arise on simultaneous arrival of multiple
+interrupts: if an interrupt is being serviced, another interrupt may even interrupt
+that interrupt handling. Not only are the initial priority of =INTR= and single
+step at a lower level, they are even cleared during any ISR execution to
+prevent preemption unless desired otherwise.
+
+*** Interrupt Sources
+
+By source, an interrupt may come from: external devices (8259A), CPU exceptions
+(divide by zero, overflow) ,
+software-initiated (=INT=).
+
+
+**** External Interrupts
+
+- =INTR= line: interrupt request, level-triggered, usually controlled by a interrupt controller
+  such as 8259A
+  + 8259A is a programmable interrupt controller that appears to software as a set
+    of I/O ports.
+  + The interrupt controller accepts requests from the device, determines which
+    requesting device has the highest priority and then activate the =INTR= line
+    according to the priority.
+  + Interrupts on =INTR= are determined by the interrupt flag, enabled by an
+    =STI= instruction and disabled by a =CLI= instruction. If =IF= is clear,
+    then interrupts on =INTR= are masked and ignored. The interrupt signal is
+    not latched by the CPU and must be held until a response or a withdraw.
+    Interrupts can also be selectively masked in 8259A.
+  + The CPU then acknowledges the interrupt by executing two consecutive
+    interrupt acknowledge (\(\overline{\text{INTA}}\)) bus cycles (and locking
+    the bus in maximum mode). 8259A responds by placing the 1-byte interrupt
+    type code (0-255) on the data bus during the second cycle, used by the
+    processor to call the corresponding interrupt service procedure. The interrupt
+    type is configured by software during the initialization of 8259A.
+
+- =NMI= line: Non-maskable (cannot be disabled) interrupt, edge-triggered.
+  + Generally used to signal a catastrophic event: imminent loss of power;
+    memory error detection or bus parity error.
+  + Higher prieority than =INTR=.
+  + Defined by type 2.
+  + =NMI= results directly in interrupt handling, no acknowledge required.
+
+Interrupt response requires some latency, usually the remaining clock periods of
+the current executed instruction.
+
+**** Internal Interrupts
+
+The =INT= instruction generates an interrupt and supplies a type code. Any type
+code is allowed and thus =INT= may be used to test interrupt procedure written
+to service external devices or inserting breakpoints (type 3), a one-byte long
+instruction can be easily inserted into an existing program and replace another
+instruction for temporary debugging.
+
+Certain conditions may also trigger an interrupt:
+
+- Overflow: type 4
+
+- divide error: type 0
+
+- single-step trap: type 1. The trap flag =TF= generates an interrupt every single
+  instruction, a debugging tool.
+  + The single-step is executed between two instructions, but not under every
+    situation when it is enabled, at least only once when another interrupt takes place.
+  + The ISR needs not to stop execution; it may act merely as a hook. The
+    single-step ISR may act as a window to monitor the system
+    instruction-by-instruction.
+  + The single-step mode is honored once before the ISR of another interrupt,
+    and it may choose to run the mainline ISR in full speed or single step with
+    this opportunity. This call to the single-step ISR is not recursive since
+    =TF= has already been cleared when the mainline ISR is entered.
+  + the processor is not in single-step mode when the single-step interrupt
+    procedure is entered: it runs in full speed as it clears =TF= as well,
+    preventing recursive entries into the single-step ISR.
+
+
+No acknowledge is required and internal interrupts cannot be disabled (except
+for single-step). *Internal interrupts (except single-step) have higher priority
+than any external interrupts*.
+
+
+*** Interrupt Vector
+
+#+begin_quote
+An interrupt type
+code and the procedure that has been designated
+to service interrupts associated with that code.
+#+end_quote
+
+the first 1KB bytes of low memory, up to 256 entries (at least the first 256
+bytes are reserved), each of which a doubleword
+(4 bytes)
+containing a =CS:IP= pair far pointer value to an interrupt procedure.
+
+The CPU saves the current =CS:IP= on the stack, calls the pointer in the
+corresponding entry of the type code.
+
+=TF= (single-step) and =IF= (=INTR=) are cleared before every call of an ISR.
+
+*** Interrupt Procedure
+
+Flags, =CS=, =IP= are saved onto the stack. The procedure may reenable external
+interrupts with =STI=.
+
+An interrupt procedure may be interrupted by a request on =NMI=, software- or
+processor-initiated interrupts.
+
+Care must be taken so that the type of interrupt being serviced by the procedure
+does not itself inadvertently occur within the procedure to avoid endless
+recursive interrupt calls.
+
+#+begin_quote
+It is good practice for an interrupt procedure to enable external interrupts for
+all but "critical sections" of code (those sections that cannot be interrupted
+without risking erroneous results). If external interrupts are disabled for too
+long in a procedure, interrupt requests on INTR can potentially be lost.
+#+end_quote
+
+The actual processing done by an ISR is dependent upon the application:
+
+- for an external interrupt, the ISR should instructs the device to remove its
+  interrupt request and then takes action accordingly.
+
+- for software-initiated interrupt:
+
+  #+begin_quote
+Software-initiated interrupt procedures may be used as service routines
+("supervisor calls") for other programs in the system. In this case, the
+interrupt procedure is activated when a program, rather than an external device,
+needs attention. (The "attention" might be to search a file for a record, send a
+message to another program, request an allocation of free memory, etc.) Software
+interrupt procedures can be advantageous in systems that dynamically relocate
+programs during execution. Since the interrupt pointer table is at a fixed
+storage location, procedures may "call" each other through the table by issuing
+software interrupt instructions. This provides a stable communication "exchange"
+that is independent of procedure addresses. The interrupt procedures may
+themselves be moved so long as the interrupt pointer table always is updated to
+provide the linkage from the "calling" program via the interrupt type code.
+  #+end_quote
+
+** System Reset
+
+The =RESET= edge-triggered signal, clears flags, =IP=, =DS=, =SS=, =ES=, sets
+=CS=, empties the instruction queue.
+
+#+begin_quote
+Since the code segment register contains FFFFH
+and the instruction pointer contains 0H, the processor executes its first
+instruction following system reset from absolute memory location FFFF0H. This
+location normally contains an inter segment direct JMP instruction whose target
+is the actual beginning of the system program.
+...
+As external (maskable) interrupts are disabled by system reset, the system
+software should reenable interrupts as soon as the system is initialized to the
+point where they can be processed.
+#+end_quote
+
+** System Halt =HLT=
+
+All operations are stopped until an external interrupt occurs or the system is reset.
+
+#+begin_quote
+The halt state can be used when an event prevents the system from functioning
+correctly. An example might be a power-fail interrupt. After recognizing that
+loss of power is imminent, the CPU could use the remaining time to move
+registers, flags and vital variables to (for example) a battery-powered CMOS RAM
+area and then halt until the return of power was signaled by an interrupt or
+system reset.
+#+end_quote
 
 
 ** Software Development
