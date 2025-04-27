@@ -16,6 +16,9 @@
 
 - Base register =BX=. Used as a pointer to data (located in segment register DS, when in segmented mode).
 
+Technically, =DI=, =SI=, =BP= can be used as GP registers but often than not
+they are not. Only the four above can have the two 8-bit parts accessed directly.
+
 *** Stack Pointer
 
 - Stack Pointer register =SP=: Pointer to the top of the stack.
@@ -60,10 +63,14 @@ protect memory access.
 *** Program Counter
 
 - =IP=: instruction pointer
+  + =IP= cannot be read or written in any way except via side effect of some
+    instructions. =IP= is not a valid register operand.
 
 *** Flags (Status)
 
-The =EFLAGS= is a register used as a collection of boolean bits to store the results of operations and the state of the processors.
+The =EFLAGS= is a register used as a collection of boolean bits to store the
+results of operations and the state of the processors. It cannot be read or
+written directly: special flag instructions are required.
 
 - =SF=: sign, the sign of arithmetic or logic operations
 
@@ -75,7 +82,7 @@ The =EFLAGS= is a register used as a collection of boolean bits to store the res
 
 - =AF=: auxiliary carry, indicating a carry from D3 to D4 of an operation, used by BCD arithmetic
 
-- =PF=: even parity result of certain operation
+- =PF=: even parity result of the lower byte from certain operations
   + the parity result depends on the bit-length of the operation.
 
 - =IF=: enable or disable external maskable interrupt  requests
@@ -355,6 +362,20 @@ and the result.
 
 * MASM
 
+** Syntax
+
+- Reserved words (instructions, directives, attributes, operators, predefined
+  symbols) are case-insensitive except for predefined symbols.
+
+- Predefined symbols are defined by the assembler to represent certain values
+  like filename, source line number, date, time, cpu mode, memory model etc.
+
+- integer constant radix specifier: =y= for binary, =t= for decimal, =h= for
+  hexadecimal, =o= or =q= for octet. Otherwise the radix is by default specified
+  by =.RADIX= (by default decimal). Hexadecimal numbers must always start with a
+  decimal digit, thus a leading zero is required for =0ABCh=.
+  + The default constant size is 32 bits.
+
 ** Template Example Analysis
 
 #+include: ../../CodeOfLanguages/ASM/dos/template.asm src asm
@@ -365,12 +386,24 @@ When the program begins executing, only =CS= and =SS= have the proper values,
 It is strongly recommended that only stack segment is use to prevent
 fragmentation of stack memory.
 
-** Operators
+** Data Types
+
+Supported data types are =BYTE=, =SBYTE=, =WORD=, =SWORD=, =DWORD=, =DSWORD=,
+=FWORD=, =QWORD=, =TBYTE=, =REAL4=, =REAL8=, =REAL10=.
+
+Arrays and strings are a sequence of data units.
+
+User types =STRUCT=, =UNION=, =RECORD= are supported. =TYPEDEF= are also supported.
+
+** Expressions
+
+The value of the expression is determined at assembly tim.
 
 - =offset expr=: get the offset of the segment of the expression
 
-- =EQU=: does not declare a data item but defines a static constant, like a
+- =sym EQU val= or =sym = val=: symbolic integer constants; does not declare a data item but defines a static constant, like a
   macro in C.
+  + symbols defined by === may be redefined.
 
 ** Directives
 
@@ -414,6 +447,9 @@ external variable definitions are far and which are near.
 
 - =.map file=: how code and data are mapped to memory
 
+- conditional assembly and error: =IF=, =ELSEIF=, =ELSE= =ENDIF=
+  + C-like conditional directives
+
 
 * ABI
 
@@ -432,7 +468,7 @@ external variable definitions are far and which are near.
 
 - return value in =ax= (=eax=) or =st0= (floating-point)
 
-- =eax=, =ecx=, =edx= are called-saved
+- =eax=, =ecx=, =edx= are caller-saved
 
 - =st0= to =st7= must be empty upon a function call.
 
