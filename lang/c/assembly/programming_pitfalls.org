@@ -25,3 +25,9 @@ If not, leave them be, assuming any called functions will preserve them as well.
 * Do Not Destroy Flag Bits Carelessly
 
 e.g. Do not use =add= immediately before =adc=, use =inc= instead.
+
+* NULL Pointer May Be Occupied By Valid Data
+
+On DOS for a near pointer, a zero value is the beginning of a segment and may
+not be invalid. Do not save any valid data at a segment beginning (use =org=).
+Reserve that for =NULL=
