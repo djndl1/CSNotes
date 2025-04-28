@@ -204,7 +204,7 @@ On program startup, =debug= initializes register variables:
 
 - =AX=, =DX=, =SP=, =SI=, =DI= are set to 0
 
-- If a target program is loaded =BX=, =CX= are set to the size of the program or
+- (program info) If a target program is loaded =BX=, =CX= are set to the size of the program or
   file
   + otherwise set to 0.
 
@@ -331,3 +331,43 @@ the next instruction, and possibly the memory operand  including the content use
 - An =int 3= in code
 
 - Use hardware debug register (386)
+
+* Dumpers & Disassemblers
+
+** =wdump= from OpenWatcom
+
+At least for DOS 16-bit code, this is the best dumper.
+
+The header occupies at least 0x1B, already two paragraphs, with the length of
+the relocation table and some zero fillers, the EXE data probably starts at 0x30
+or 0x40. If there is some dwarf debug info, =wdump -Da= and find the
+=DW_AT_low_pc= of the symbol, add that value to the start offset. The most
+straightforward way is to =wdump= and find "size of header in paragraphs",
+multiply the value by =0x10= should be the start address of EXE data.
+
+To find the data segment, note that first two instructions sets up the data
+segment register: the value moved into =DS= is the segment paragraph number.
+Multiply the value by =0x10= and add the result to the start address of the EXE
+data, the result is the file offset of data segment.
+
+** [[https://github.com/zfigura/semblance][semblance]]
+
+Probably the best FOSS x86 disassembler (but crashes too often).
+
+It understands NE, MZ and PE file formats and supports disassembly and can dump all sections.
+
+The source code compiles on ARM, but fails to run.
+
+** x86dis (For x86 Obviously)
+
+It understands some instructions and follows them (e.g. =jmp=) during
+disassembling =-e=. Both Intel syntax and GAS syntax are supported.
+
+No file format parsing is supported.
+
+** ndisasm (Comes with NASM)
+
+- Both Intel syntax and GAS syntax are supported
+
+- =-s sync-point= Due to the variable-length nature of x86 instructions, a disassembler must
+  start at a proper address to correctly decode the byte stream.

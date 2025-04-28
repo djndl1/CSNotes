@@ -20,7 +20,7 @@
   + it requires both sides set up kermit and start the connection.
 
 - the best and easiest is to set up a ftp on the host e.g. =vsftpd=. No security
-  bullshit, best compatibility.
+  bullshit, best compatibility
 
 
 * [[../../lang/c/assembly/x86_legacy.org][8086 Architecture]]
@@ -167,11 +167,15 @@ mode or virtual x86 mode.
 
 ** Binary File Format
 
-- *COM* :: CP/M =.COM=
+*** *COM*: CP/M =.COM=
   + no header, only code and data in a single segment, loaded at a preset
     address of offset 0x100 following the PSP.
   + maximum size of 0xFF00 bytes
 
-- *MZ* :: DOS =.EXE=
-  + supports multiple segments to be loaded at arbitrary memory addresses and
-    executables greater than 64KB.
+*** *MZ*: DOS =.EXE=
+
+Supports multiple segments to be loaded at arbitrary memory addresses and
+executables greater than 64KB.
+
+The loader patches certain operands and values at load time with the relocation
+table to support relocation. The table lists all addresses of which the value needs patching.
