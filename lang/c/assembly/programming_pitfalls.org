@@ -30,4 +30,8 @@ e.g. Do not use =add= immediately before =adc=, use =inc= instead.
 
 On DOS for a near pointer, a zero value is the beginning of a segment and may
 not be invalid. Do not save any valid data at a segment beginning (use =org=).
-Reserve that for =NULL=
+Reserve that for =NULL=.
+
+Not only should =0= be protected, the whole region might be protected. Then
+again, DOS has no memory protection.
+[[https://www.state-machine.com/null-pointer-protection-with-arm-cortex-m-mpu][Other systems]] may have mechanism to protect this region.
