@@ -1,0 +1,32 @@
+#+title: Win32 ABI
+
+Based on SystemV-Intel386-psABI
+
+* Low Level System Information
+
+** Machine Interface
+
+*** [[https://learn.microsoft.com/en-us/cpp/cpp/data-type-ranges?view=msvc-170][Fundamental Types]]
+
+ILP32
+
+- =_Bool=: 1 byte
+
+- =int= and =long= are 4 bytes
+
+- =long long= is 8 bytes
+
+- =long double= is 64-bit floats. No support for x87 80-bit floats since the inception of
+  Windows NT and even more not possible since SSE/SSE2/SSE3 was used.
+
+- =wchar_t= 2 bytes, a UTF-16 code unit.
+
+- =NULL= has the value zero.
+
+- =size_t= 32-bit on Win32
+
+- Still no support for other IEEE 754 floating points except binary32 and
+  binary64. No support for decimal floating points as of 2025.
+
+For alignment, see [[https://learn.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-170][Alignment]]. By default, the compiler aligns class and struct
+members on their size value.
