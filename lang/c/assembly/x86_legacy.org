@@ -459,16 +459,26 @@ external variable definitions are far and which are near.
 
 - =DX:AX= or simply =AX= is returned.
 
-*** =__cdecl= (the same as in x86-32)
+*** =__cdecl= (mostly the same as in x86-32)
+
+- the x87 register stack must be emptied before any call or return except for
+  registers used for return values
 
 - the parameters are pushed right to left so that the first parameter is nearest
   to the top of the stack.
+  + the first parameter is at =bp+4=.
 
 - the stack is caller-cleaned
 
-- return value in =ax= (=eax=) or =st0= (floating-point)
+- return value in =ax= or =st0= (floating-point)
+  + the caller is responsible for popping out =st0= regardless of whether to use
+    it (OpenWatcom does this).
 
-- =eax=, =ecx=, =edx= are caller-saved
+- =ax=, =bx=, =cx=, =dx=, =es=, =stX= are caller-saved
+  + =ebx= on Win32 and SysV-Intel386 is callee-ssaved, a difference between
+    16-bit and 32-bit MS calling convention.
+
+- =si=, =di=, =bp= =ds= are callee-saved.
 
 - =st0= to =st7= must be empty upon a function call.
 

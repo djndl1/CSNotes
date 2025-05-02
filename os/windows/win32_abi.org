@@ -29,4 +29,85 @@ ILP32
   binary64. No support for decimal floating points as of 2025.
 
 For alignment, see [[https://learn.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-170][Alignment]]. By default, the compiler aligns class and struct
-members on their size value.
+members on their size value. The alignment is a bit different from SysV, where
+=double=, =long long=, =long double= takes a 4-byte alignment.
+
+** [[https://learn.microsoft.com/en-us/cpp/cpp/calling-conventions?view=msvc-170][Function Calling Sequence]]
+
+#+begin_quote
+On x86 platforms, all arguments are widened to 32 bits when they are passed.
+Return values are also widened to 32 bits and returned in the EAX register,
+except for 8-byte structures, which are returned in the EDX:EAX register pair.
+Larger structures are returned in the EAX register as pointers to hidden return
+structures. Parameters are pushed onto the stack from right to left. Structures
+that are not PODs will not be returned in registers.
+
+The compiler generates prolog and epilog code to save and restore the ESI, EDI,
+EBX, and EBP registers, if they are used in the function.
+#+end_quote
+
+Due to the situation on Windows,
+library headers should explicitly name a calling convention everywhere — Do not rely on the default.
+
+#+begin_src c
+#ifdef _MSC_VER
+#  define CDECL __cdecl
+#  define STDCALL __stdcall
+#  define FASTCALL __fastcall
+#else
+#  define CDECL /* nothing */
+#  define STDCALL  /* nothing */
+#  define FASTCALL /* nothing */
+#endif /* _WIN32 */
+#+end_src
+
+** The Stack Frame
+
+The same as SystemV-intel386-psABI.
+
+** Parameter Passing and Returning Values
+
+*** =__cdecl=
+
+The default calling convention for C and C++ programs since MS-DOS, similar to SystemV-intel386-psABI.
+The =main= function and variadic functions (even if =__stdcall= is used) are always =__cdecl=.
+
+- Unless exported, =_= is prefixed to names.
+
+- the first parameter is at =ebp+8=.
+
+- the x87 register stack must be emptied before any call or return except for
+  registers used for return values (at least MSVC does this).
+
+- SystemV requires additional padding to ensure the bottom of the parameter
+  block is at an alignment boundary of 16 to guarantee proper alignment to the
+  callee. For Win32, stack is aligned on *4-byte* boundary.
+
+- Structs are returned in different ways depending on the size
+  + sizeof(POD) <= 4 bytes: in =eax=
+  + 4 < sizeof(POD) <= 8: in =edx:eax=
+  + (the only SysV way) Non POD or large POD: the calling code allocates space and passes the
+    pointer as an implicit first argument to the callee via a hidden parameter
+    on the stack. The callee writes to the address via the pointer and returns
+    that pointer via =eax=. The address may be still within the parameter block.
+  + [[https://blog.aaronballman.com/2012/02/describing-the-msvc-abi-for-structure-return-types/][Describing the MSVC ABI for Structure Return Types]]: unfortunately, the
+    situation is much more complex. MSVC does not always behave as documented.
+
+- Variable arguments are all passed on the stack.
+
+*** =__stdcall=
+
+Used by Win32 API. =varargs= functions use =__cdecl=. The =WinMain()= is always
+=__stdcall=, predeclared  in =windows.h=.
+
+The arguments are pushed on the stack from right the to left but the callee
+cleans up the stack: no variable arguments since the callee knows nothing about
+the length of the argument list. The code size is a bit smaller since there is
+only one place for the cleanup code instead at every call site.
+
+#+begin_quote
+An underscore (_) is prefixed to the name. The name is followed by the at sign
+(@) followed by the number of bytes (in decimal) in the argument list.
+Therefore, the function declared as int func( int a, double b ) is decorated as
+follows: _func@12
+#+end_quote
