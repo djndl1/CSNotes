@@ -35,3 +35,57 @@ Reserve that for =NULL=.
 Not only should =0= be protected, the whole region might be protected. Then
 again, DOS has no memory protection.
 [[https://www.state-machine.com/null-pointer-protection-with-arm-cortex-m-mpu][Other systems]] may have mechanism to protect this region.
+
+* SysV Intel 386 requires the parameter block aligns the stack at 16-byte boundary.
+
+#+begin_src c
+int main()
+{
+    putchar('A');
+    return 0;
+}
+#+end_src
+
+The =main= functions uses a somewhat different pair prolog/epilog to align the
+initial address at 16-byte boundary. It finds the real stack base, aligns the
+stack pointer on a 16-byte boundary and does a normal prelog and then pushes the
+real stack base
+
+#+begin_src asm
+/*
+old_stack_top <- ecx after the first instruction
+return_address <- esp on entry
+...
+...
+...
+ ---- <- 16-byte boundary
+return_address <- saved via ecx
+old_stack_base <- ebp
+old_stack_top_address
+empty_padding
+
+,*/
+main:
+        lea     ecx, [esp+4]      # find last stack's top
+        and     esp, -16          # align at 16 bytes
+        push    DWORD PTR [ecx-4] # -4, save ret address again, not really used but for the sake of stack integrity.
+
+        push    ebp               # -4
+        mov     ebp, esp
+
+        push    ecx               # -4
+        sub     esp, 4            # -4, now 16 bytes again
+
+        # one parameter, but 16 bytes on the stack for alignment
+        sub     esp, 12
+        push    65
+        call    putchar
+        add     esp, 16
+
+        mov     eax, 0 # return 0
+
+        mov     ecx, DWORD PTR [ebp-4] # retrieve the last stack's top
+        leave   # shrink the esp by two slots and restore esp
+        lea     esp, [ecx-4] # the real stack base is way upper
+        ret
+#+end_src
