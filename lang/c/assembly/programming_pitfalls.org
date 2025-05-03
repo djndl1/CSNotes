@@ -21,6 +21,7 @@ register names are used (especially on x86).
 
 If they are used in the function, save them.
 If not, leave them be, assuming any called functions will preserve them as well.
+Callee-saved does not mean the callee should save every register.
 
 * Do Not Destroy Flag Bits Carelessly
 
@@ -89,3 +90,5 @@ main:
         lea     esp, [ecx-4] # the real stack base is way upper
         ret
 #+end_src
+
+* For Multiword argument on a little-endian machine, the MS word should be pushed first
