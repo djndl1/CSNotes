@@ -207,6 +207,11 @@ for segment registers, resulting in six memory models, listed below
 | large   | far  | far  | multiple code and data segments                                        |                          |
 | huge    | huge | far  | multiple code and data segments; single array be longer than a segment |                          |
 
+These memory models are used by high-level languages and assemblers, originally
+by Intel. The user needs to follow the assembler's rule and use special
+constructs to take advantage of the builtin support for memory model or
+otherwise may writes his own assembly code to manage the memory model.
+
 *** Memory Map: How Memory Space is Used
 
 #+begin_src
@@ -401,7 +406,7 @@ and the result.
 When the program begins executing, only =CS= and =SS= have the proper values,
 =DS= must be initialized by the program.
 
-It is strongly recommended that only stack segment is use to prevent
+It is strongly recommended that only one stack segment is use to prevent
 fragmentation of stack memory.
 
 ** Data Types
@@ -415,7 +420,7 @@ User types =STRUCT=, =UNION=, =RECORD= are supported. =TYPEDEF= are also support
 
 ** Expressions
 
-The value of the expression is determined at assembly tim.
+The value of the expression is determined at assembly time.
 
 - =offset expr=: get the offset of the segment of the expression
 
@@ -425,13 +430,31 @@ The value of the expression is determined at assembly tim.
 
 ** Directives
 
-- =SEGMENT=, =ENDS=: ; these directives can define segments. =ASSUME= must be
-  used to load segment registers with these segment addresses.
-  + =.stack=, =.code=, =.data= are some specialized segment directives to set up
-    common segments and registers.
+*** Segments
 
-- =.model=: memory model, =TINY= =SMALL=, =MEDIUM=, =COMPACT=, =LARGE=, =HUGE=
-  are supported
+Segments may be specified in full or simplified directives.
+A program consists of modules, which are made of segments. The main module
+contains all three segments while other modules only code and data. All modules
+must define its memory model with =.MODEL= at the beginning of the module and
+ends with =END= at the bottom of the module.
+
+**** Group
+
+A collection of segments may be grouped (=GROUP=) as *group* that is not more than 64K
+under 16-bit mode. A program addresses a code or data item in the group relative
+to the beginning of the group. Using a group that can be fit into a single
+segment saves one from reloading segment registers to access different segments.
+A segment cannot belong to more than one group.
+
+The Microsoft segment model combines =_DATA=, =_BSS=, =CONST= and =STACK= (by default) into
+the =DGROUP= group.
+
+**** Simplified
+
+- =.model=: memory model, default calling and naming conventions, operating
+  system and stack type.
+  + huge is essentially the same as large as the assembler provides no support
+    for large data items.
   + Use JWasm
     #+begin_quote
 NASM also does not have any directives to support different 16-bit memory models. The programmer
@@ -441,9 +464,97 @@ as an alternate form for RETN); in addition, the programmer is responsible for c
 instructions where necessary when calling external functions, and must also keep track of which
 external variable definitions are far and which are near.
     #+end_quote
+  + naming and calling conventions can be specified as well
+    #+begin_quote
+Procedure definitions (PROC) and high-level procedure calls (INVOKE) automatically generate code
+consistent with the calling convention of the specified language. The PROC, INVOKE, PUBLIC, and
+EXTERN directives all use the naming convention of the language. These directives follow the default
+language conventions from the .MODEL directive unless you specifically override the default.
+    #+end_quote
+  + =NEARSTACK= or =FARSTACK= determines whether the stack is in the data
+    segment or not.
+
+- =.186=, =.286(P)=, =.386(P)=, =.486(P)= specifies the processor and ISA to
+  use.
+  + by default =.8087=
 
 - =.stack=: defines a stack segment, optionally with a certain size (by default
-  10224 bytes)
+  1024 bytes)
+
+- =.data= and its friends: creates data segments.
+  #+begin_quote
+Programs can contain both near and far data. In general, you should place important and frequently
+used data in the near data area, where data access is faster. This area can get crowded, however,
+because in 16-bit operating systems the total amount of all near data in all modules cannot exceed
+64K. Therefore, you may want to place infrequently used or particularly large data items in a far data
+segment.
+  #+end_quote
+  + *near segments*: =.data= near data segment (64K under DOS); =.data?= for
+    uninitialized data BSS
+    (zero-initialized by C startup code); =.const= for constant data. They
+    directives produce segments that are all grouped together and contribute to
+    the default data area =DGROUP=.
+  + *far segments*: =fardata=, =.fardata?=
+
+- =.code=: one can have both ear and far code segments in a module.
+  #+begin_quote
+The medium, large, and huge memory models use far code addresses by default. In
+the larger memory models, the assembler creates a different code segment for
+each module. If you use multiple code segments in the small, compact, or tiny
+model, the linker combines the .CODE segments for all modules into one segment.
+  #+end_quote
+  + although the directive is named =code=, the actual segment is named
+    =*_TEXT=, same as in Unix.
+
+- =.startup= and =.exit= specify the entry region of a program, in addition to
+  =end lablename=.
+  + =.startup= generates code to set up segment registers according
+    to memory model and the processor.
+  + =.exit= generates the leaving =exit= call.
+
+**** Full
+
+- =SEGMENT=, =ENDS=: ; these directives can define segments, their alignment,
+  read-only protection, combining segments (think of C symbol linkage but with
+  segments but with functions more than that), class (for segment ordering)
+  + by default a segment aligns at the next paragraph address.
+  + The linker outputs segments in the order they appear, subject to any group,
+    class and =.DOSSEG= requirements. The user may order segments alphabetically
+    (=.alpha=), or by the MS-DOS segment-ordering convention (code,
+    non-bss-or-stack, bss class, stack class).
+    #+begin_quote
+Two segments with the same name are not combined if their class is different.
+The linker arranges segments so that all segments identified with a given class
+type are next to each other in the executable file. However, within a particular
+class, the linker arranges segments in the order encountered.
+...
+The linker processes object files in the order in which they appear on the
+command line. Within each module, it then outputs segments in the order given in
+the object file.
+    #+end_quote
+    To control the segment ordering produced by the linker, either use the
+    =.DOSSEG= convention
+    or define dummy empty segments in an include file to prescribe the ordering.
+  + =.stack=, =.code=, =.data= are some specialized segment directives to set up
+    common segments and registers.
+
+- =ASSUME= must be used to load segment registers with these segment addresses.
+  #+begin_quote
+When the assembler needs to reference an address, it must know what segment contains the
+address. It finds this by using the default segment or group addresses assigned with the ASSUME
+directive.
+...
+Using the ASSUME directive to tell the assembler which segment to associate with a segment
+register is not the same as telling the processor. The ASSUME directive affects only assembly-time
+assumptions. You may need to use instructions to change run-time conditions.
+...
+However, in either case, your program must explicitly load a segment register with a segment address
+before accessing data within the segment. ASSUME only tells the assembler to assume that the
+register is correctly initialized; it does not by itself generate any code to
+load the register.
+  #+end_quote
+
+*** Others
 
 - =DB= (define byte), =DW=, =DD=, =DQ=, =DT= (ten bytes, for packed BCD numbers
   which are never used anymore): allocate data in data memory.
