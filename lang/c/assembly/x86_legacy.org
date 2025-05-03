@@ -356,8 +356,26 @@ and the result.
 - =shr=, =shl=
   + =shr= and =shl= shifts the LSB/MSB into the carry flag.
 
+- rotating shift: =ror=, =rol= (the rotated bit is also copied into =CF=); or
+  =RCR=, =RCL=, where the register combined with =CF= is rotated: the rotated
+  bit is shifted into =CF= and then shifted out to the other end of the register.
+  + use: count the number of 1s without destroying the regiter's content.
+
 - =cmp=: comparison of *UNSIGNED* numbers. The operands themselves remain
   unchanged but the flags chagne accordingly.
+
+*** *BCD operations* (obsolete)
+
+- ASCII-BCD conversion: there are no direct translation instructions. however,
+  an unpacked BCD differs from its ASCII code only in the higher nibble, where
+  an unpacked BCD has the nibble all zero.
+
+#+include: ../../CodeOfLanguages/ASM/dos/ascbcd.asm src asm
+
+- BCD-Addition: x86 BCD addition is done by adding two packed BCD with =add= and then
+  adjust the result to a valid BCD by adding 6 if the result is more than 9 with =daa=
+
+- BCD Subtraction: =sub= or =sbb= followed by =das= to correct the result.
 
 
 * MASM
