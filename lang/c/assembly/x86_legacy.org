@@ -236,12 +236,32 @@ constructs to take advantage of the builtin support for memory model or
 otherwise may writes his own assembly code to manage the memory model.
 
 The final memory model is a result of proper segment grouping and ordering,
-as well as runtime segment register initialization. For example, tiny memory
-model groups all three segments together; small memory model groups data and
-stack together so that they are loaded into the same segment. During startup,
-the first few code does some computation to set =DS=, =SS=, =SP= so that =DS=
-and =SS= are set to the same value while =SP= still points to the bottom by
-adding the difference between =STACK= and =DGROUP=.
+as well as runtime segment register initialization:
+
+- Logical segment naming and grouping determines if logical segments are loaded into the same
+  physical segment and how many segments there are;
+  + For example, tiny memory model groups all three segments together; small
+    memory model groups data and stack together so that they are loaded into the
+    same segment.
+
+- Actual segment register values are set up at runtime even if they have some
+  initially not so reasonable values. During startup, the first few code does
+  some computation to set =DS=, =SS=, =SP=.
+  + For example, with small memory model, =DS= and =SS= are set to the same
+    value (=DGROUP=) even if their logical segments start at different addresses.
+    =SP= initially has the value of stack length, and =SS= points to the stack
+    top, which it shouldn't at runtime. With =SS= set to =DS=, =SP= should
+    still points to the bottom so the difference between =STACK= and =_DATA=
+    (suppose =_DATA= precedes =STACK=) is added to adjust =SP=.
+    #+begin_src
+# initial_SP = BOTTOM - STACK
+# adjusted_SP = BOTTOM - _DATA, or initial_SP + (STACK - _DATA)
+   BOTTOM
+
+   STACK_TOP <- initial SS
+   ...
+   _DATA   <- adjusted DS, SS
+    #+end_src
 
 *** Memory Map: How Memory Space is Used
 
