@@ -179,3 +179,8 @@ executables greater than 64KB.
 
 The loader patches certain operands and values at load time with the relocation
 table to support relocation. The table lists all addresses of which the value needs patching.
+
+For MZ executables, segment names are mostly a linker concept, segment names
+are not preserved in a produced executable but used by a linker to create such
+an executable. Still, a linker may not even understand =_TEXT=, =_DATA= or =STACK=:
+these are just conventions.
