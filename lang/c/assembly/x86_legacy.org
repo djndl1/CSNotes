@@ -175,6 +175,25 @@ The stack grows downward from upper addresses to lower addresses, opposite of =I
 =BP= (stack base) is another stack offset that represents the address of the
 current stack frame.
 
+**** Initialization
+
+The assembler needs to know which segment is associated with a register (MASM
+=ASSUME=) to generate proper code (if the assembler is able to do that). The
+processor needs to load segment registers with the correct value.
+
+A DOS MZ executable's header contains the offset of =CS= and =IP= to set the
+starting address. a .COM executable starts at the first byte of the program.
+
+#+begin_src asm
+; initialize DS
+mov     ax, DGROUP
+mov     ds, ax
+; ES can be initialized the same way
+#+end_src
+
+For an .EXE file, the stack address is encoded into the executable header and
+resolved at load time. For a .COM file, the loader sets SS equal to CS and
+initializes SP to 0FFFEh.
 
 *** Point Types
 
@@ -192,6 +211,10 @@ Pointer types are designed by Intel, not purely a programmer's invention.
   represented by different segment-offset pairs).
   + e.g. =0x15020= is in the segment =0x1502=. Then each such segment (/paragraph/) contains
     only 16 addresses and does not overlapping.
+
+For MASM, =CALL=, =JMP=, =RET= automatically generate near/far variants based on
+memory model. For far data, one may reload segment registers and restore later, or use direct
+memory operands to override temporarily.
 
 *** Memory Models
 
@@ -211,6 +234,14 @@ These memory models are used by high-level languages and assemblers, originally
 by Intel. The user needs to follow the assembler's rule and use special
 constructs to take advantage of the builtin support for memory model or
 otherwise may writes his own assembly code to manage the memory model.
+
+The final memory model is a result of proper segment grouping and ordering,
+as well as runtime segment register initialization. For example, tiny memory
+model groups all three segments together; small memory model groups data and
+stack together so that they are loaded into the same segment. During startup,
+the first few code does some computation to set =DS=, =SS=, =SP= so that =DS=
+and =SS= are set to the same value while =SP= still points to the bottom by
+adding the difference between =STACK= and =DGROUP=.
 
 *** Memory Map: How Memory Space is Used
 
