@@ -184,3 +184,11 @@ For MZ executables, segment names are mostly a linker concept, segment names
 are not preserved in a produced executable but used by a linker to create such
 an executable. Still, a linker may not even understand =_TEXT=, =_DATA= or =STACK=:
 these are just conventions.
+
+An assembler embeds the start address of a OMF module at the end of the file
+declared by NASM special symbol =..start=, or MASM =end procname= at the end of
+a module source file (exactly what OMF is doing, at the end). The linker
+retrieves this entry address and set up =CS:IP= in the MZ header. The linker
+also set =SS= to the beginning of a =STACK= segment and =SP= to the size of the
+segment. The loader loads the program and adjusts =CS=, =IP=, =SS= accordingly.
+The startup code then sets these registers again to conform to a certain memory model.
