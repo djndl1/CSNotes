@@ -433,6 +433,94 @@ and the result.
 
 - BCD Subtraction: =sub= or =sbb= followed by =das= to correct the result.
 
+** Stack Operations
+
+=pop= and =push= push/pop by machine word length, that is, 2 bytes for 8086.
+
+- =pusha=, =popa= saves/restore all general registers in one instruction.
+
+** IEEE 754 & x87 Math Coprocessor
+
+*** IEEE 754 Binary Floating-Point Numbers
+
+- *binary32*: 1 sign bit, 8 biased exponent, 23 significand (only the fraction)
+  + A binary real number in the form of \(1.xxxx \times 2^{yyyy} \)
+  + the exponent part is added to a constant of 127 so that a negative exponent
+    is expressed as non-negative number.
+  + the fraction part is placed from left to right as they are the more
+    significant bits compared to the zero after them.
+
+- *binary64*: 1 sign bit (bit 63), 53 bits for significand, 11 bits for exponent
+  + the exponent part is added to a constant of =0x3ff= so that a negative exponent
+
+*** x87 Coprocessor
+
+x87 includes 8 *data registers* =ST(i)= (shared with MMX), a *status register*,
+a *control register*, a *tag register*, a *last instruction pointer* register, a
+*last data pointer* register and an *opcode register*.
+
+**** x87 Data Registers
+
+x87 FPU has eight 80-bit registers, using 80-bit double extended floating-point
+format when computing and converts the content to/from a shorter floating-point
+format, an integer format or the packed BCD integer format.
+
+The data registers are accessed like a stack, numbered from 0 (topmost) to 8
+(bottommost) but addressed as =st(0)= (the current top, or
+simply =st=, maintained by three bits in the status register), =st(1)= (one down
+from the top), =st(2)= and so on. All addressing of the data registers is
+relative to the register on the top of the stack.
+The stack does not prevent reading registers below the top.
+
+Any load operation (push) on a full stack wraps around and overwrites an
+existing value.
+
+In cases where the stack structure causes computation bottlenecks, the FXCH
+(exchange x87 FPU register contents) instruction can be used to streamline a
+computation.
+
+**** x87 Tag Register
+
+Eight 2-bit fields that indicate the content of the eight data registers: valid
+=00=, zero =01=,
+special number =10= (NaN, infinity, denormal or unsupported format), empty=
+=11=. These tags exist so that software do not need to decode the content in a
+data register to understand its content. Tags are maintained and protected by
+x87 FPU according to the actual value of the data registers so that the user may
+not accidentally set a tag incorrectly.
+
+**** x87 Status Register
+
+The stack top, operation statuses, exception conditions are maintained in x87
+FPU status register:
+
+- *condition code*,
+
+- *exception summary status*,
+
+- *stack fault*: stack overflow or underflow
+  + sticky bit
+
+- *exception flags*: similar to how the general instruction set have a flag register.
+  Exception flags are sticky bits, remaining set unless cleared explicitly.
+  + the underflow bit and the overflow bit indicate operation statuses, not
+    stack status.
+  + may be masked by corresponding bits of the control register
+
+Before P6, condition codes
+have to be copied into =ah= and then =flags= to be used by conditional
+instructions. P6 added floating-point instructions that automatically set =eflags=
+
+*** Control Register
+
+- *Exception Mask Bits*: once masked, the corresponding exception will be blocked.
+
+- *Precision* (2-bit): single (32), double (64) or double extended (80)
+
+- *Rounding Control* (2-bit)
+
+- *Infinity Control*: no longer meaningful since 387
+
 
 * MASM
 
