@@ -459,7 +459,28 @@ x87 includes 8 *data registers* =ST(i)= (shared with MMX), a *status register*,
 a *control register*, a *tag register*, a *last instruction pointer* register, a
 *last data pointer* register and an *opcode register*.
 
-**** x87 Data Registers
+**** Data Types
+
+x87 works with IEEE binary32, IEEE binary64, extended 80-bit floating-point,
+signed 16/32/64-bit integers and packed BCD decimal integers as instruction
+operands.
+Denormal values are supported as required by IEEE 754. Denormal numbers are
+converted to 80-bit extended format and normalized if the denormal exception bit is masked.
+
+#+begin_quote
+As a general rule, values should be stored in memory in double precision format.
+This format provides sufficient range and precision to return correct results
+with a minimum of programmer attention. The single precision format is useful
+for debugging algorithms, because rounding problems will manifest themselves
+more quickly in this format. The double extended precision format is normally
+reserved for holding intermediate results in the x87 FPU registers and
+constants. Its extra length is designed to shield final results from the effects
+of rounding and over- flow/underflow in intermediate calculations.
+#+end_quote
+
+**** Registers
+
+***** x87 Data Registers
 
 x87 FPU has eight 80-bit registers, using 80-bit double extended floating-point
 format when computing and converts the content to/from a shorter floating-point
@@ -479,7 +500,7 @@ In cases where the stack structure causes computation bottlenecks, the FXCH
 (exchange x87 FPU register contents) instruction can be used to streamline a
 computation.
 
-**** x87 Tag Register
+***** x87 Tag Register
 
 Eight 2-bit fields that indicate the content of the eight data registers: valid
 =00=, zero =01=,
@@ -489,7 +510,7 @@ data register to understand its content. Tags are maintained and protected by
 x87 FPU according to the actual value of the data registers so that the user may
 not accidentally set a tag incorrectly.
 
-**** x87 Status Register
+***** x87 Status Register
 
 The stack top, operation statuses, exception conditions are maintained in x87
 FPU status register:
@@ -511,7 +532,7 @@ Before P6, condition codes
 have to be copied into =ah= and then =flags= to be used by conditional
 instructions. P6 added floating-point instructions that automatically set =eflags=
 
-*** Control Register
+***** Control Register
 
 - *Exception Mask Bits*: once masked, the corresponding exception will be blocked.
 
@@ -520,6 +541,37 @@ instructions. P6 added floating-point instructions that automatically set =eflag
 - *Rounding Control* (2-bit)
 
 - *Infinity Control*: no longer meaningful since 387
+
+***** Instruction and Data Pointers
+
+Pointers to the instruction and the data operand for the last non-control
+instruction executed as state information for exception handlers.
+
+- =FIP=, =FCS=: instruction pointer offset/segment
+
+- =FDP=:
+
+- =FDS=
+
+***** Last Instruction Opcode =FOP=
+
+The opcode of the last x87 non-control instruction
+
+**** x87 ISA
+
+x87 instructions are what 8086 defines as =ESC= instructions, monitored,
+captured and executed by a coprocessor like x87.
+
+- *control instructions*: control the state and modes of operation of x87
+  + =finit=, =fninit= initializes x87 and its internal registers to default
+    values.
+
+- *data transfer*: load from memory into =st0=, store a value in =st0= to
+  memory, move values between x87 data registers
+  + binary32 and binary64 are loaded/stored by =fld=​/​=fst=, integers and BCDs
+    are tranferred by separate instructions;
+  + various common mathematical constants are loaded by special instructions.
+
 
 
 * MASM
