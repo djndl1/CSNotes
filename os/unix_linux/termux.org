@@ -19,6 +19,7 @@
 
 There is no KVM, Xen or any hardware virtualization support on most Android
 devices. Use =--accel tcg,thread=multi= for acceleration.
+The performance is unusable even for a FreeDOS VM.
 
 *** User-Mode
 
@@ -55,3 +56,43 @@ GROUP ( /usr/x86_64-linux-gnu/lib/libc.so.6 /usr/x86_64-linux-gnu/lib/libc_nonsh
 #+begin_src shell
 clang -target riscv64-linux-gnu --sysroot=$PREFIX/riscv64-linux-gnu "$@"
 #+end_src
+
+** FreeBASIC
+
+FreeBASIC supports a GCC backend, which compiles C source files that are
+transformed BAS modules. The official site provides a bootstrap source code that
+is already transformed. The user is supposed to =make bootstrap= this codebase
+and uses the produced =fbc= to compile another one.
+
+=fbc='s GCC backend supports only GCC due to use of indirect goto thus on termux
+this requires a working GCC (the glibc environment works). Moreover, the source
+code on the specified dynamic linker needs to be modified (=fbc.bas= or =fbc.c=)
+to accomodate to termux's (under the glibc environemnt, it should be =/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1=).
+Bionc build does not seem to be able to find the CRT object and results in a
+faulty build.
+
+** QB64
+
+There is a =qb64= termux package.
+
+** Dotnet
+
+dotnet 8.0 and 9.0 and mono are in the repository.
+
+** FreePascal
+
+The official site provides android binary builds, running directly in termux.
+
+** OpenWatcom v2
+
+Build without much issue under the glibc environment.
+
+** DJGPP
+
+Build without much issue under the glibc environment except libgmp has some K&R
+style code that needs patching.
+
+** JWasm & JWLink
+
+Easy to build but JWLink requires [[https://github.com/JWasm/JWlink][this old version]]. The version from the
+original author does not build under Linux.
