@@ -27,6 +27,14 @@
 
 - *Opcode*
 
+- *ModR/M*: addressing form, three fields
+  + *mod* and *r/m*: register operand or addressing modes
+  + *reg/opcode*: additional info of opcode and registers.
+
+- *SIB*: scale-index-base addressing byte, for certain addressing modes.
+
+- *displacement* and *immediate bytes*
+
 * Bibliography
 
 #+print_bibliography:
