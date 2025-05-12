@@ -158,6 +158,7 @@ Sections are completely defined by macros.
   - ~cc~, =S= :: change the entire line
   - ~C~ ::  ~c$~
   - =ce= and =cw= :: the same even if =w= and =e= have different semantics.
+  - how to surround marked text: =c()<ESC>p=
 
 - special characters :: insert a =^V= before the character.
 
