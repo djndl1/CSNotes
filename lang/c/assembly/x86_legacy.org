@@ -323,12 +323,17 @@ mov [di], ah
 #+begin_src asm
 mov cx, [bx]+10 ; DS:BX+10, confusing, seems like plus 10 after dreferencing bx
 mov cx, [bx+10] ; DS:BX+10
-mov cx, 10[bx]  ; weird, at least not ambiguous
+mov cx, 10[bx]  ; weird, maybe bx[10] is better, at least not ambiguous
 #+end_src
 
 - *indexed relative*: Index registers =DI= or =SI= with a displacement;
   + this mode is essentially the same as based relative but uses index
     registers, supposed to access array elements.
+  + the original idea is that the displacement acts as the base and the index
+    register is added to that base address to form the effective address.
+    #+begin_src asm
+mov ax, word ptr disp[si]
+    #+end_src
 
 - *Based indexed*: the above two combined
   + the register order does not matter, the segment register is always the one
@@ -339,7 +344,10 @@ mov cl, [bx][di]+8 ; DS:(BX+DI+8)
 mov cl, [bx][si]+8 ; DS:(BX+SI+8]
 mov cl, [bp][di]+8 ; SS:(BP+DI+8)
 mov cl, [bp][si]+8 ; SS:(BP+SI+8)
+mov cl, table[bx][si]+6 ; two dimensional table
   #+end_src
+
+- Scaled indexes are only supported in 32-bit mode.
 
 *** Segment Override
 
@@ -356,6 +364,11 @@ However, one may override the default segment by explicitly specify the segment
 mov al, es:[bx]
 #+end_src
 
+** Operation on Flags
+
+- =lahf=, =sahf=: load/store flags from/to =ah=.
+
+- =pushf=, =popf=: save and restore flags onto/from the stack
 
 ** Jump & Branch
 
@@ -382,6 +395,11 @@ These instructions change the flag register depending on the operands involved
 and the result.
 
 - =add=, =adc=, =clc= (clear carry): multiword addition is actually multiple additions with carry
+  + for a signed integer, either two positive numbers cause overflow (a carry
+    from the second most
+    significant bit but not from the most significant bit) or two
+    negative numbers (a carry from the most significant bit but not from the
+    second most significant bit).
 
 - =sub=, =sbb=: subtraction is done using the adder circuitry (not the =add=
   instruction) with the subtrahend in 2's complement.
@@ -418,7 +436,7 @@ and the result.
   + use: count the number of 1s without destroying the regiter's content.
 
 - =cmp=: comparison of *UNSIGNED* numbers. The operands themselves remain
-  unchanged but the flags chagne accordingly.
+  unchanged but the flags change accordingly.
 
 *** *BCD operations* (obsolete)
 
@@ -602,6 +620,11 @@ fragmentation of stack memory.
 
 ** Data Types
 
+MASM is strange in that its memory access recognizes data types and thus
+generates different code for different memory data without specifying
+=byte/word/dword/qword ptr=, that is, it has typed
+variables instead of simple labels. NASM does not do that.
+
 Supported data types are =BYTE=, =SBYTE=, =WORD=, =SWORD=, =DWORD=, =DSWORD=,
 =FWORD=, =QWORD=, =TBYTE=, =REAL4=, =REAL8=, =REAL10=.
 
@@ -609,15 +632,40 @@ Arrays and strings are a sequence of data units.
 
 User types =STRUCT=, =UNION=, =RECORD= are supported. =TYPEDEF= are also supported.
 
+** Variables
+
+#+TODO
+
 ** Expressions
 
 The value of the expression is determined at assembly time.
 
-- =offset expr=: get the offset of the segment of the expression
+- =offset/seg expr=: get the offset/segment value of the expression
 
 - =sym EQU val= or =sym = val=: symbolic integer constants; does not declare a data item but defines a static constant, like a
   macro in C.
   + symbols defined by === may be redefined.
+
+- =[]= can be an index operator in MASM, not just a dereference operator
+  #+begin_src asm
+mov ax, array[2]
+    ; or
+mov ax, [array+2]
+mov ax, array+2
+  #+end_src
+  + MASM does not require =[]= for memory access (confusing!).
+  + NASM requires square brackets for memory references and otherwise it is
+    static-time constant. Also, NASM requires memory reference be inside the brackets.
+
+- =.= member access operator is supported to access a struct member easily
+  without manually computing the offset.
+
+- =:= segment override. The segment part cannot be a register or a name.
+  + MASM requires a segment override to mark a constant expression as a memory address.
+    #+begin_src asm
+mov     word ptr [100h], ax ; illegal
+mov     word ptr ds:[100h], ax ; ok
+    #+end_src
 
 ** Directives
 
@@ -744,6 +792,10 @@ before accessing data within the segment. ASSUME only tells the assembler to ass
 register is correctly initialized; it does not by itself generate any code to
 load the register.
   #+end_quote
+  + the assembler needs =ASSUME= to generate correct code to set up segment
+    registers. Also, =ASSUME= a address is in a certain segment generates
+    a segment override prefix if necessary and saves from the user from explicitly coding a
+    segment override.
 
 *** Others
 
@@ -770,8 +822,44 @@ load the register.
 - conditional assembly and error: =IF=, =ELSEIF=, =ELSE= =ENDIF=
   + C-like conditional directives
 
+- =ASSUME= can even assume the size or type of a register so that the code
+  requires no more size specifiers.
+  #+begin_src asm
+ASSUME bx:PTR WORD
+    inc [bx] ; the assembler just knows it's `inc word ptr [bx]`
+  #+end_src
+  + It can even disable the use of a register by assuming the register is an =ERROR=.
+
+*** Macros
+
+- =TEXTEQU=: defines a text macro
+  + use: define a name for a local variable on the stack to allow easy access.
+
+
+* Programming Tricks
+
+- =mov reg, offset [symbol]= produces smaller and faster code than =lea reg, [symbol]=.
+
+- the stack may be a good temporary location without using a register as an
+  intermediate store.
+  #+begin_src asm
+;; copy a far pointer
+push    ds
+pop     es
+mov     di, si
+  #+end_src
 
 * ABI
+
+** Data Representation
+
+- =bool=: 1-byte (watcom), 2-byte (Microsoft)
+
+- =int=, =short=: 2-byte
+
+- =long=: 4-byte
+
+- =size_t=: 2-byte
 
 ** Calling Convention
 
@@ -795,7 +883,7 @@ load the register.
     it (OpenWatcom does this).
 
 - =ax=, =bx=, =cx=, =dx=, =es=, =stX= are caller-saved
-  + =ebx= on Win32 and SysV-Intel386 is callee-ssaved, a difference between
+  + =ebx= on Win32 and SysV-Intel386 is callee-saved, a difference between
     16-bit and 32-bit MS calling convention.
 
 - =si=, =di=, =bp= =ds= are callee-saved.
