@@ -1,0 +1,52 @@
+#+title: PC BIOS
+
+* Overview
+
+#+begin_quote
+The BIOS (Basic Input Output System) is a collection of routines
+between the hardware and the systems software. The BIOS consists of
+diagnostic routines, device drivers, interrupt service routines, and
+other code and data between the hardware and the systems software.
+#+end_quote
+
+#+begin_quote
+The mechanism for the requests from programs is called an interrupt...
+Interrupts are invoked by software programs. In an assembler program, the !NT
+mnemonic is followed by an interrupt number that specifies the type of service
+and a function number that specifies the exact service to be performed.
+...
+The other side of the BIOS communicates with the hardware (video
+display, disk drives, keyboard, serial and parallel ports, and so on) in
+the language used by each device.
+The hardware side of the BIOS also handles any hardware device-
+generated interrupts.
+The BIOS controls the peripheral devices: the video display, keyboard, disk
+drives, and serial and parallel ports through device service routines. Device
+service routines are the programs that actually perform all the necessary steps
+when asked to read data from the hard disk drive. They initialize, detect and
+correct errors, set error codes, and perform all hardware-specific tasks
+associated with the activity they were asked to perform. Interrupt service
+routines handle hardware interrupts.
+...
+The last part of the BIOS interface is the operating system, which calls the
+BIOS directly. The BIOS in ISA and EISA computers supports MS-DOS and PC-DOS.
+It does not directly support operating environments such as Microsoft Windows,
+which does not directly call the BIOS. Multitasking operating systems such as
+Unix do not need BIOS services - they have their own device drivers. IBM OS/2
+uses a combination of a standard ISA BIOS, called the CBIOS, and a multitasking
+BIOS, the ABIOS. Windows NT uses HAL, the Hardware Abstraction Layer, which
+interfaces between the operating system and the BIOS on ISA and EISA systems.
+#+end_quote
+
+the Power-On Self Test executes a diagnostic and reliability test of the system,
+initializes the chip and the standard parts of the computer, sets up the
+interrupt vector table, detects optional equipment in the system and boots the OS.
+
+* Questions
+
+** Does the BIOS reside in RAM after booting?
+
+[[https://superuser.com/questions/336021/is-bios-read-from-the-bios-chip-or-copied-into-ram-on-startup][Is BIOS read from the BIOS chip or copied into RAM on startup?]]
+
+Modern x86 machine maps firmware in NVRAM into the memory address space. So the
+answer is: no, they are still there.
