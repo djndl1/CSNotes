@@ -591,6 +591,26 @@ In protected mode, memory management and interrupt handling were done
 differently than in real mode and memory that does not belong to one program is
 not accessible (intended by design), which is incompatible with existing DOS programs.
 
+** Unreal Mode
+
+A special state of the CPU not officially documented, in which the CPU acts like
+in real mode but with segment descriptors that allow it to access memory above
+the 1MB limit.
+
+Under protected mode, any memory access has to go through MMU and
+segment descriptor tables in the main memory. To resolve this issue, the CPU maintains
+a cache of segment descriptors. This cache is also used even under real mode,
+giving real-mode code a chance to access extended memory.
+
+The undocumented =loadall= instruction may be used to load the cache with a
+specific segment descriptor so that real-mode code may use that cached
+descriptor to access extended memory. Or the processor enters protected mode,
+sets up segment registers to segment descriptors that provide access to the full
+address space of 4GB, and then switches back to real mode with previous
+unsupported segment configuration in place. The descriptors that are not
+applicable to real mode are sticky, no longer touched
+by real mode code and it becomes possible to address extended memory.
+
 ** OS Support
 
 - Concurrent DOS 286: run fully in protected mode with real mode program compatibilty

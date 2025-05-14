@@ -194,11 +194,30 @@ instruction set.
 └─────────────────────────────────┘ 00000
 #+end_src
 
+There are a few techniques to make more memory available even with limited 1MB
+address space, notably *expanded
+memory* (EMS, hardware), *expanded memory* (EMS, MMU and software), *Upper Memory Blocks*
+(UMB, MMU and software), *High Memory Area* (UMB, 286 A20 bus line) or *Extended Memory Specification* (EMS, with 386 protected mode).
+
 ** Expanded Memory
 
-mapping additional memory into a 64-KB region in the UMA and
+Mapping additional memory into a 64-KB region in the UMA and
 the mapping can be changed dynamically by software, possibly with necessary
-hardware support.
+hardware support but it does not require protected mode support.
+
+Lotus, Intel and Microsoft developed a standard (EMS) to allow access of up to
+32 MB of expanded memory.
+
+*** Software Emulation (MMU Required)
+
+Pure software solution that utilizes the MMU pagination and virtual 8086 mode of 80386 to map memory
+so that an app can peek into extended memory via a 64KB windows. This emulates
+previous hardware-implemented expanded memory. Or any unused blocks in the upper
+memory area could be used to map extended memory (*Upper Memory Blocks*).
+
+- =EMM386=: MS-DOS builtin
+
+- =Jemm=: open-source solution
 
 ** Extended Memory
 
@@ -224,7 +243,24 @@ the 21st bus line A20 to zero. If this A20 line is enabled, an additional
 
 Extended memory may be accessed through the XMS API, which takes care of memory
 management and copying memory between conventional and extended memory by
-temporarily switching the processor into protected mode.
+temporarily switching the processor into protected mode (not exactly, most
+implementations used the undocumented =LOADLL= instructions without going
+through mode switching or sets up the GDT in protected mode and enters unreal
+mode).
+A driver (such as =HIMEM.SYS=) is required to manipulate the extended memory blocks.
+
+**** Implementations
+
+- =HIMEM.SYS=: from Microsoft, first included in MS Windows 2.1
+
+- =HIMEMX.SYS=: from FreeDOS
+
+*** Full Protected Mode Application
+
+A DOS extended sets up protected mode and the app runs in a 32-bit environment.
+In addition, they provide the same DOS API in protected mode and implement them
+as natively as possible without delegating to real-mode DOS: they are their own
+mini OS on top of DOS.
 
 * DOS ABI
 
