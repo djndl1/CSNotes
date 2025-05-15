@@ -101,15 +101,20 @@ in its own hands.
 
 * DOS Extender
 
-Enables software to run in a protected moe environment even the OS is only
-capable of operating in real mode.
+DOS cannot run under protected mode because DOS and BIOS are written in
+real-mode code. Even if the program does not use any DOS or BIOS services, an
+asynchronous system event would call into real-mode code and crash the system
+due to the different semantics of memory segmentation.
 
-A DOS extender is a program that "extends" DOS so that programs running in
-protected mode can transparently interface with the underlying DOS API, even
-though segmented memory is different under real mode and protected mode. It is
-also responsible for transferring data between the real-mode 1MB memory and the
-protected-mode program. For performance, a DOS extender may implement many DOS
-API in protected mode and intercepts related interrupts, similar to a miniature OS.
+A DOS extender enables software to run in a protected moe environment even the OS is only
+capable of operating in real mode. A DOS extender is a program that "extends"
+DOS so that programs running in protected mode can transparently interface with
+the underlying DOS API, even though segmented memory is different under real
+mode and protected mode. It is also responsible for transferring data between
+the real-mode 1MB memory and the protected-mode program. For performance, a DOS
+extender may implement many DOS API in protected mode and intercepts related
+interrupts, similar to a miniature OS. It also traps system events such as a
+timer tick or the keyboard interrupt and causes a switch to real mode and back.
 
 Two interface specifications were proposed: VCPI and DPMI and the later took
 over the market, primarily due to Windows 3.0 support.
@@ -137,9 +142,79 @@ protected mode using DPMI or VCPI (succeeded by DPMI).
 
 - Microsoft Windows except NT
 
-- CWSDPMI (used by DJGPP)
+**** GO32 (used by older versions of DJGPP and Free Pascal)
 
-- GO32 (used by older versions of DJGPP and Free Pascal)
+Not really a DPMI implementation
+
+- loading the COFF application and setting it up for execution
+
+- unix-style command-line expansion
+
+- floating-point emulation in protected mode
+
+- graphics support
+
+  The extender is loaded into conventional memory and occupies 130KB, which
+  means programs can only reach a nested level of 3 or 4.
+
+**** CWSDPMI (used by DJGPP)
+
+***** Startup Code
+
+A stub loader is prepended to compiled programs. This stub does a few
+preparation before loading the COFF executable:
+
+- allocate memory for the transfer buffer for passing data to and from
+  real-mode services.
+
+- check whether a DPMI server is loaded and load =cwsdpmi.exe= if none.
+  + =cwsdpmi.exe= is not loaded twice.
+
+- read the COFF executable header into memory
+
+- switch the CPU into protected mode with the help of the DPMI host.
+
+- set up the program's code and data segments
+
+- load the actual COFF executable into memory and jump to its entry point.
+
+then the library startup code takes over:
+
+- make the null page uncommitted so that a null pointer dereference triggers a
+  segfault signal.
+
+- set up memory allocation mechanism
+
+- set up run-time stack for the program.
+
+- allocate a selector (=_dos_ds=) for accessing conventional memory
+  + yes, conventional memory can be accessed under protected mode.
+
+- set up the signal handling
+
+- set up the environment array
+
+- get and expand the command-line arguments (unix-style)
+
+- set up x87 FPU and FP emulator
+
+- call static constructors
+
+- enter the =main= function.
+
+***** Transfer Buffer
+
+Data related to BIOS or DOS calls are transferred via a data buffer in the
+conventional memory (*transfer buffer*), 16 KB kong by default. Then a real-mode
+segment:offset pair to that buffer is passed to real-mode code. Similarly, data
+from real mode is copied into this buffer by DOS or BIOS and later copied from
+there to a protected-mode memory region specified by the protected mode program.
+This process is done by the library transparently.
+
+***** System Services
+
+Not anything is delegated to DOS. =malloc= may directly allocate memory in
+extended memory instead of calling into DOs to obtain conventional memory.
 
 * Memory Management
 
