@@ -4,6 +4,9 @@
 
 IDE drive, IDE CDROM, floppy drive, 256M memory.
 
+** Installation
+
+Follow this [[https://computernewb.com/wiki/QEMU/Guests/Windows_98][guide]] without much hassle.
 
 ** Drivers
 
@@ -13,6 +16,8 @@ The graphics requires a [[https://bearwindows.zcm.com.au/vbe9x.htm#2][Universal 
 colors and more resolution modes.
 
 Warning: it causes the system to hang upon running a console session or a DOS window.
+
+[[https://github.com/JHRobotics/softgpu/][SoftGPU]] seems better, with standard VGA support.
 
 *** PCI Bus
 
@@ -25,3 +30,9 @@ to install drivers including USB.
 Intel Pro 1000 MT driver (e1000) can be easily found on the Internet, execute
 the setup to extract the files do not use the GUI installer. Point the driver
 path to the Win98SE folder under the extracted driver folder.
+
+
+** Development Tools
+
+- GCC:
+  + [[https://github.com/fsb4000/gcc-for-Windows98/releases/tag/gcc11.1.0][Gcc 11.1.0 on Win98]]
