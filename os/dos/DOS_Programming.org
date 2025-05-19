@@ -211,11 +211,6 @@ from real mode is copied into this buffer by DOS or BIOS and later copied from
 there to a protected-mode memory region specified by the protected mode program.
 This process is done by the library transparently.
 
-***** System Services
-
-Not anything is delegated to DOS. =malloc= may directly allocate memory in
-extended memory instead of calling into DOs to obtain conventional memory.
-
 * Memory Management
 
 ** The First 1MB Memory Map
@@ -366,3 +361,43 @@ retrieves this entry address and set up =CS:IP= in the MZ header. The linker
 also set =SS= to the beginning of a =STACK= segment and =SP= to the size of the
 segment. The loader loads the program and adjusts =CS=, =IP=, =SS= accordingly.
 The startup code then sets these registers again to conform to a certain memory model.
+
+* Toolchains
+
+** [[http://www.delorie.com/djgpp/][DJGPP]]
+
+Still maintained and regularly updated to the latest GCCC.
+
+*** Installation
+
+There is a [[https://github.com/andrewwutw/build-djgpp/tree/master][build script]] on Github for each platform, though out of date. The
+official site provides mainly the DOS port.
+
+*** Features
+
+- C, C++, Fortran, Ada, Objective-C/C++ compilers
+
+- many Unix command line tools on DOS
+
+- ANSI and POSIX compliance
+
+- Long command line support (over 126 characters)
+  + passed via the transfer buffer
+
+- Unix-style filename globbing
+
+- Supports =system= with Unix shell emulation.
+  + external programs are preferred over the builtin in =command.com=
+
+- transparent long file name support
+
+- filesystem extensions
+  + hook for certain filesystem calls
+
+- file link emulation
+
+- a few utility tools
+  + =djtar=: archiver
+  + =djsplit=, =djmerge=: split and merge files
+  + =dtou= and =utod=: EOL converters
+  + =redir=: full Unix redirection
