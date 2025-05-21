@@ -305,8 +305,9 @@ and generates a general protection fault (segfault) if so.
 The =segment:offset= addressing format leaves some space not addressable under
 8086, the space after =0xFFFF:0x0010=
 
-80286 has a 24-bit address bus. To maintain compatibility with 8086, it wires
-the 21st bus line A20 to zero. If this A20 line is enabled, an additional
+80286 has a 24-bit address bus. To maintain compatibility with 8086 programs
+that rely on memory address wraparound, IBM wires
+the 21st bus line A20 to zero by default on the motherboard. If this A20 line is enabled, an additional
 (64KB - 16B) memory, now addressable on 8086, is available (HMA).
 
 *** Extended Memory Specification (XMS)

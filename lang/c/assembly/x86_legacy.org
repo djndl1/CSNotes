@@ -131,6 +131,12 @@ a protection mechanism.
 
 - /logical address/: a pair of a segment value and an offset address
 
+8086 was designed to be source-compatible with 8080, especially with the CP/M
+OS, thus the offset of 64KB segment. Overlapping segments allowed better and
+more efficient use of memory: code may reside in different segments and accessed
+by these segments through near pointers; programs may be loaded at a 16-byte
+boundary as most programs were smaller than 64KB.
+
 **** Code Segments
 
 The address of the next instruction is represented by the =CS:IP= register pair, where =CS= is the segment and =IP= is

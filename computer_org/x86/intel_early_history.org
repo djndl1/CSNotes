@@ -569,8 +569,7 @@ A binary-compatible cheap version of 8086, with the external data width reduced
 
 - 24-bit address width, up to 16 MB memory
 
-- On-chip MMU with virtual memory support up to 1GB via segmentation (4 pairs of
-  segment registers combined).
+- On-chip MMU with virtual memory support up to 1GB via segmentation
   + virtual memory is supported on a segment swapping basis
   + segments can be protected and marked as read-only and execute-only.
 
@@ -578,6 +577,42 @@ A binary-compatible cheap version of 8086, with the external data width reduced
 
 ** Protected Mode
 
+*** Segmentation Under Protected Mode
+
+The  value in a segment register is no longer an absolute index of a physical segment,
+but a selector value, a 8-byte aligned offset (the lower 3 bits are for requested
+privilege level and local/global descriptor table selection) into a *descriptor
+table* that maps this index to physical memory, pointed to by the
+=GDTR= and =LDTR= registers, a =table_base_address:table_size= pair, of which an entry
+of 8 bytes describes a segment of 64KB, allowing maximum virtual memory of 512MB
+per table. The descriptor tables are controlled by the OS and not exposed to user programs directly: segment addresses are completely hidden by the OS.
+
+As for memory protection, any selector out of the range of the descriptor table's size or an offset out of the range
+of a segment's limit triggers a general fault, which protects against illegal memory access.
+=CS= may point to one segment and other segment registers use another (=CS= cannot
+load a data descriptor), this somehow helps security (but now we have =NX= bit on modern x86 CPUs).
+
+The global descriptor table defines segments first. A local descriptor table is
+another type of descriptor table defined in a memory segment by the GDT and
+managed by the OS, accessible within the current task via the =LDTR= register,
+changed by the OS.
+
+A descriptor entry has the following format:
+
+- *base*: 32-bit, containing the linear address where the segment begins
+
+- *limit*: 20-bit, the maximum number of addressable unit
+
+- *access byte*: present, privilege level, type, executable, direction, readable/writable, accessed
+  + A descriptor entry may describe different types of segments: task state
+    segments, local descriptor tables or a normal segment etc.
+  + for system segments (task state segments or local descriptor tables) the access byte has 4 bits that indicate the segment type.
+
+- *flags*: granularity
+  + 1 byte for 286 or 4KB for 386 per addressable unit, that is, each segment is
+    4GB in maximum
+
+Standard-mode Windows 3.x used this 286 segmented protected mode without memory isolation.
 
 *** Limitation
 
@@ -623,34 +658,11 @@ by real mode code and it becomes possible to address extended memory.
 
 Fully 32-bit CPU (internal registers, buses and external buses).
 
-- Up to 4GB physical memory and 64 TB virtual memory ($2^14$ segment selectors
+- Up to 4GB physical memory (32-bit memory bus) and 64 TB virtual memory ($2^14$ segment selectors
   times $2^{32}$)
   + a fixed 4-KB page size
 
 - Support for parallel stages
-
-** Segmentation Under Protected Mode
-
-The  value in a segment register is no longer an absolute value for the segment,
-but a selector, an offset into the *Global Descriptor Table* (maintained by the
-=GDTR= register, loaded by =LGDT=), of which an entry
-of 8 bytes describes a segment. This GDT is controlled by the OS and exposed to
-user programs directly and segment addresses are completely by the OS.
-
-#+begin_src
-base: 32-bit, containing the linear address where the segment begins
-limit: 20-bit, the maximum addressable unit
-access byte: present, privilege level, type, executable, direction, readable/writable, accessed
-flags: granularity (1 byte or 4KB per addressable unit, that is, each segment is 4GB in maximum)
-#+end_src
-
-=CS= points to one segment and other segment registers use another (=CS= cannot
-load a data descriptor), this somehow helps security (but now we have =NX= bit
-on modern x86 CPUs).
-
-Most C compilers assume a flat-memory model, where the segment
-part is ignored. FreePascal have long pointer types that support such
-segmentation mechanism.
 
 ** Virtual 8086 Mode
 
@@ -662,6 +674,20 @@ examines what the real mode program is trying to do and acts as a proxy to
 interface with the hardware or terminates the real-mode program if the behavior
 is not allowed.
 
+** Protected Mode
+
+- The offset registers are now 32-bit long. A single segment is now up to 4GB long.
+
+- The base address of in a segment descriptor can be 32-bit, instead of 24-bit
+  on 286.
+
+- A paging unit, as a second layer of address translation, was added to allow
+  more granular control. Once enabled, the address produced by a
+  segment:offset pair is now a virtual address, requiring a further mapping.
+
+Most C compilers assume a flat-memory model, where the segment
+part is ignored. FreePascal have long pointer types that support such
+segmentation mechanism.
 
 ** 386SX
 
