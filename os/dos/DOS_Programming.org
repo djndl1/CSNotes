@@ -8,6 +8,13 @@
   at the client side.
   + =stty con= returns control to the graphics console.
 
+** Network
+
+RTL8139 doesn't seem to work well with the =rtspkt.com= driver: the connection
+drops after a few seconds' high traffic. =e1000pkt.com= fails with the e1000
+driver. =ne2000.com= seems to be an ISA card driver, rejecting the =ne2k_pci= card
+in libvirt. The =pcnet= card works well with the =pcntpk.com= driver.
+
 ** File Transfer To/From the VM
 
 - [[https://www.freedos.org/books/get-started/24-guestmount-freedos/][mount the virtual disk with =guestmount=]]
