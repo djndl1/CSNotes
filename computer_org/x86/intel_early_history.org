@@ -569,7 +569,8 @@ A binary-compatible cheap version of 8086, with the external data width reduced
 
 - 24-bit address width, up to 16 MB memory
 
-- On-chip MMU with virtual memory support up to 1GB via segmentation
+- On-chip MMU with virtual memory support up to 1GB via segmentation (local and
+  global combined)
   + virtual memory is supported on a segment swapping basis
   + segments can be protected and marked as read-only and execute-only.
 
@@ -599,9 +600,9 @@ changed by the OS.
 
 A descriptor entry has the following format:
 
-- *base*: 32-bit, containing the linear address where the segment begins
+- *base*: 24-bit for 286, 32-bit for 386, containing the linear address where the segment begins
 
-- *limit*: 20-bit, the maximum number of addressable unit
+- *limit*: 16-bit for 286, 20-bit for 386, the maximum number of addressable unit
 
 - *access byte*: present, privilege level, type, executable, direction, readable/writable, accessed
   + A descriptor entry may describe different types of segments: task state
