@@ -20,64 +20,6 @@ The Windows console subsystem itself adds overhead as it adds a few preprocessin
 
 * Unicode
 
-http://archives.miloush.net/michkap/archive/2010/10/07/10072032.html
-
-http://illegalargumentexception.blogspot.com/2009/04/i18n-unicode-at-windows-command-prompt.html
-
-http://illegalargumentexception.blogspot.com/2009/04/java-unicode-on-windows-command-line.html
-
-https://alfps.wordpress.com/2011/11/22/unicode-part-1-windows-console-io-approaches/
-
-https://devblogs.microsoft.com/cppblog/new-options-for-managing-character-sets-in-the-microsoft-cc-compiler/
-
-** Dig into the UCRT Source
-
-*** =_write=
-
-Depends on whether the output is a console, the text/binary mode,
-UTF-16/UTF-8/ANSI output mode, the function determines whether a
-second conversion to the console's code page is required and dispatch actual
-work to several different helper functions that write into =WriteFile=
-(=WriteFile= writes data and thus has only a Unicode version).
-
-For non console output:
-
-- ansi mode: no conversion before =WriteFile=, written as is.
-
-- utf16 mode: the input is assumed a utf-16 character buffer. No conversion
-  before =WriteFile=
-
-- utf8 mode: The assumed UTF-16 buffer is converted to UTF-8 before =WriteFile=.
-
-For console output:
-
-- ansi mode: double conversion from ansi to UTF-16 and then to the console's ansi.
-
-- utf16, utf8: no conversion. Each character is output to the console as it.
-
-**  Conclusions
-#+title: Console
-
-For GUI apps, console must be allocated and freed with =AllocConsole()= and
-=FreeConsole()=. A process may have only one console. The console can be
-read/written with =ReadFile()= and =WriteFile()= but =ReadConsole()=,
-=WriteConsole()= and =SetConsoleMode()= provide console-specific features.
-Console I/O operates on characters rather than bytes. =CONIN$= and =CONOUT$= are
-special file names that always refer to the console input and output.
-
-* Why Windows Console Is Slow
-
-The Windows Terminal itself is poorly written and renders slowly.
-A console app is hosted by a =conhost= process between the child process and its
-parent, which handles the three standard I/O handles, adding more IPC overhead.
-The Windows console subsystem itself adds overhead as it adds a few preprocessing.
-
-** Reference
-
-- [[https://github.com/cmuratori/refterm/blob/main/faq.md][Refterm FAQ]]
-
-* Unicode
-
 https://alfps.wordpress.com/2011/12/08/unicode-part-2-utf-8-stream-mode/
 
 http://archives.miloush.net/michkap/archive/2010/10/07/10072032.html
@@ -121,7 +63,7 @@ second conversion to the console's code page is required and dispatch actual
 work to several different helper functions that write into =WriteFile=
 (=WriteFile= writes byte data and thus has only a Unicode version) or =WriteConsoleW=.
 
-For normal console output:
+For normal console output, the mode means Win32-level input mode:
 
 - ansi mode: double conversion from CRT locale to the console's
   code page via UTF-16 before being written to =WriteFile=.
@@ -136,7 +78,8 @@ For normal console output:
   =WriteConsoleW=. The console simply accepts UTF-16 strings and renders them in
   the window without being affected by the console output code page.
 
-For non console output. =WriteFile= writes the byte data as is.
+For non console output. =WriteFile= writes the byte data as is. The mode means
+output mode.
 
 - ansi mode: no charset conversion before =WriteFile=, written as is to the file.
 
@@ -189,7 +132,7 @@ UTF-16 (the buffer is assumed already to contain UTF-16 data).
 
 For wide characters, with standard I/O, they are converted under ansi mode but
 used directly under Unicode mode. Unicode modes are for UTF-16 buffers to be
-written directly to the underlying stream. They are locale-independent.
+written directly to the underlying stream: they are locale-independent.
 
 For console output, narrow characters may have to be converted
 into the console's code page using UTF-16 as an intermediate charset.
@@ -323,8 +266,7 @@ int main(int argc, char *argv[])
 }
 #+END_SRC
 
-
-**  Conclusions
+** Conclusions
 
 Unicode modes or direct console =WriteConsoleW= are not affected by locales or the console code page.
 ANSI console with the "C" locale is as raw as possible.
@@ -358,7 +300,7 @@ translates =LF= to =CRLF=, with the following solutions:
     The conversion happens before =WriteConsole=. If the code page is incorrect,
     the output would be garbled already, with no way to convert it back with
     other tools.
-  + the file mode is set to ansi and the locale is set to "C"
+  + the file mode is set to ansi and the locale is set to ="C"=
   + the input buffer should be in UTF-8 with the =printf= family.
 
 - Unicode Console: not really UTF-8 output from the console as it is a displayed window.
@@ -378,7 +320,7 @@ translates =LF= to =CRLF=, with the following solutions:
   + the input buffer should be in UTF-16 with the =wfprintf= family.
   + this is a similar approach employed by C# and Java.
 
-** UTF-16 Solutions
+*** UTF-16 Solutions
 
 - Console: use =WriteConsoleW= or set file streams to Unicode mode.
   The console always uses UTF-16.
