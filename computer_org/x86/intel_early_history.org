@@ -576,7 +576,7 @@ A binary-compatible cheap version of 8086, with the external data width reduced
 
 - Four privilege levels
 
-** Protected Mode
+** [[https://files.osdev.org/mirrors/geezer/os/pm.htm][Protected Mode]]
 
 *** Segmentation Under Protected Mode
 
@@ -605,9 +605,8 @@ A descriptor entry has the following format:
 - *limit*: 16-bit for 286, 20-bit for 386, the maximum number of addressable unit
 
 - *access byte*: present, privilege level, type, executable, direction, readable/writable, accessed
-  + A descriptor entry may describe different types of segments: task state
-    segments, local descriptor tables or a normal segment etc.
-  + for system segments (task state segments or local descriptor tables) the access byte has 4 bits that indicate the segment type.
+  + A descriptor entry may describe different types of segments: *task state segments*, *local descriptor tables*, *gates* or a *normal segment* etc.
+  + for system segments (task state segments, local descriptor tables, gates) the access byte has 4 bits that indicate the segment type.
 
 - *flags*: granularity
   + 1 byte for 286 or 4KB for 386 per addressable unit, that is, each segment is
