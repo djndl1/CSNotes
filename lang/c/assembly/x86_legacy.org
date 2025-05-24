@@ -92,6 +92,10 @@ written directly: special flag instructions are required.
 - =DF=: direction, used to control the direction of string operations
 
 - =OF=: overflow, set whenever the result of a signed number operation overflows
+  + addition: =+= and =+= results in a =-=; + =-= and =-= results in a =+=;
+  + subtraction: =+= > =+=, the difference is =+=, no overflow ; =+= > =-= may or may or overflow, but
+    =-= if overflow, =+= if not; =-= > =-=, no overflow and the different is
+    =+=. all in all, ~=OF=SF~ and ~ZF != 1~
 
 - =R= and =U=: reserved and undefined
 
@@ -370,6 +374,18 @@ However, one may override the default segment by explicitly specify the segment
 mov al, es:[bx]
 #+end_src
 
+** Data Types
+
+*** Conversion
+
+There are machine instructions that convert between data types
+
+- *sign extension*: =cwd=, =cdq=, =cqo= (across registers, especially useful for
+  division); =cbw=, =cwde=,
+  =cdqw= (same register)
+  + unsigned integers does not need to extend: simply use a larger register.
+
+
 ** Operation on Flags
 
 - =lahf=, =sahf=: load/store flags from/to =ah=.
@@ -425,6 +441,10 @@ and the result.
   + division by zero or the quotient is too large for the assigned register
     triggers an exception.
 
+- =idiv= (signed): special in that the numerator is always double size the denominator.
+  + rounding towards zero
+  + commonly used with cross-register signed extension instructions.
+
 - =and=, =or=, =xor=
   + be careful, these operations clear =CF= and =OF=.
   + =and=: clear bits; test for a zero operand (=and al, al=, =ZF= is set if one is zero)
@@ -432,17 +452,23 @@ and the result.
   + =xor=: flip bits; test operand equality (=xor bx, cx=, =ZF= is set if
     equal); clear oneself (=xor ax, ax= clears =ax=)
 
-
 - =shr=, =shl=
   + =shr= and =shl= shifts the LSB/MSB into the carry flag.
+
+- =sar=: arithmetic shift operations
+  + mostly used for division (rounding towards negative infinity)
+  + =sal= performs the same operation as =shl=
 
 - rotating shift: =ror=, =rol= (the rotated bit is also copied into =CF=); or
   =RCR=, =RCL=, where the register combined with =CF= is rotated: the rotated
   bit is shifted into =CF= and then shifted out to the other end of the register.
   + use: count the number of 1s without destroying the regiter's content.
 
-- =cmp=: comparison of *UNSIGNED* numbers. The operands themselves remain
-  unchanged but the flags change accordingly.
+- =cmp=: comparison of numbers. The operands themselves remain unchanged but the
+  flags change accordingly. Signed numbers and unsigned numbers comparison
+  results are reflected by different flags.
+  + jump on above/below are for unsigned; jump on greater/less are for signed.
+
 
 *** *BCD operations* (obsolete)
 
