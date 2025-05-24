@@ -220,6 +220,8 @@ This process is done by the library transparently.
 
 * Memory Management
 
+There is an [[https://jeffpar.github.io/kbarchive/kb/095/Q95555/][overview article]] from Microsoft Knowledge Base about MS-DOS memory management.
+
 ** The First 1MB Memory Map
 
 Just because the 8086 processor can reference 1 MB of memory does not mean that
@@ -409,3 +411,44 @@ official site provides mainly the DOS port.
   + =djsplit=, =djmerge=: split and merge files
   + =dtou= and =utod=: EOL converters
   + =redir=: full Unix redirection
+
+*** Macros
+
+- =__DJGPP__=: the DJGPP macro
+
+- =__MSDOS__=: DOS macro
+
+*** Pitfalls
+
+- Like Windows, text mode is the default Standard I/O mode, set by the =_fmode= variable
+
+- Seeking does not work under text mode I/O due to EOL translation.
+
+- filenames are are returned in lower case by DJGPP's library.
+
+*** Runtime Environment
+
+**** DOS
+
+TODO
+
+**** [[https://sandmann.dotster.com/cwsdpmi/][CWSDPMI]]
+
+DPMI 0.9 full support; DPMI 1.0 extensions partially implemented.
+
+TODO
+
+*** ABI
+
+**** Data Representation
+
+ILP32
+
+**** Executable
+
+A COFF executable, a Unix format, completely alien to DOS, loaded by a MZ loader
+prepended to the COFF data.
+
+**** Calling Convention
+
+32-bit x86 =__cdecl=.
