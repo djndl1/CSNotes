@@ -489,6 +489,20 @@ and the result.
 
 - =pusha=, =popa= saves/restore all general registers in one instruction.
 
+** Dedicated String Operations
+
+These operations use specific registers to reference the source (=DS:SI=) and
+the destination (=ES:DI=). The direction of the string operations is controlled
+by =DF= (=cld= for upward, =std= downward).
+
+The repeated time of an operation is controlled by =CX=, enforced by the =REP=
+instruction prefix (=movsw=, =movsb=, move a string between memory), or the
+length of the register (=stosb=, =stosw=, =lodsb=, =lodsw=, move between a
+register and memory).
+
+=cmps= compares two string, =scas= scans a string and compares a string item with a
+register. Both may be prefixed with different conditions to decide whether to continue.
+
 ** IEEE 754 & x87 Math Coprocessor
 
 *** IEEE 754 Binary Floating-Point Numbers

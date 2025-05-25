@@ -711,4 +711,4 @@ The first tightly-pipelined x86 design. Production continued into the late 2000s
 
 - power saving and system management capabilities
 
-- =CMPXCHG=, =XADD= ,=BSWAP= and other atomic operation instructions
+- =CMPXCHG=, =XADD=, =BSWAP= and other atomic operation instructions
