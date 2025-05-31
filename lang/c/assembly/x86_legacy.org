@@ -491,17 +491,29 @@ and the result.
 
 ** Dedicated String Operations
 
-These operations use specific registers to reference the source (=DS:SI=) and
+There are five primitive string operations: move (transfer between memory
+locations), compare (compare two strings), scan (compare each data item in a string with a
+data item), load a string, store a string, preceded by a one-byte prefix that specifies the condition under which
+the operation repeats, allowing long strings to be processed with a software loop.
+
+These operations use specific registers to reference the source (=DS:SI=, =DS=
+may be overridden) and
 the destination (=ES:DI=). The direction of the string operations is controlled
 by =DF= (=cld= for upward, =std= downward).
 
 The repeated time of an operation is controlled by =CX=, enforced by the =REP=
 instruction prefix (=movsw=, =movsb=, move a string between memory), or the
 length of the register (=stosb=, =stosw=, =lodsb=, =lodsw=, move between a
-register and memory).
+register and memory). =stos= and =lods= themselves do not do much, rather
+they are useful in software loops as part of more complex string function built
+up from string primitives and other instructions.
 
 =cmps= compares two string, =scas= scans a string and compares a string item with a
 register. Both may be prefixed with different conditions to decide whether to continue.
+
+Repeated string operations are interruptible. The processor remembers only one
+prefix in effect at the time of the interrupt: multiple prefixes on interrupt
+may result in an improper return.
 
 ** IEEE 754 & x87 Math Coprocessor
 
