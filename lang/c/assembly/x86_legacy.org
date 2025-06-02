@@ -92,7 +92,7 @@ written directly: special flag instructions are required.
 - =DF=: direction, used to control the direction of string operations
 
 - =OF=: overflow, set whenever the result of a signed number operation overflows
-  + addition: =+= and =+= results in a =-=; + =-= and =-= results in a =+=;
+  + addition: =+= and =+= results in a =-=; =-= and =-= results in a =+=;
   + subtraction: =+= > =+=, the difference is =+=, no overflow ; =+= > =-= may or may or overflow, but
     =-= if overflow, =+= if not; =-= > =-=, no overflow and the different is
     =+=. all in all, ~=OF=SF~ and ~ZF != 1~
@@ -307,7 +307,7 @@ as well as runtime segment register initialization:
 
 - *immediate*: the operand as a constant, immediately follows the opcode in the
   instruction.
-  + Loading segment registers with immediate operands is not allowed.
+  + Loading segment registers with immediate operands or from another segment register is not allowed.
 
 The following modes manipulate data in the memory through a data pointer. The
 first two correspond to the two modes above but as data pointers.
@@ -392,6 +392,14 @@ There are machine instructions that convert between data types
 
 - =pushf=, =popf=: save and restore flags onto/from the stack
 
+** Data Transfer
+
+- =mov=: a copy, not a cut
+
+- =xchg=: between registers or a register and memory, but not between memory
+
+- (386) =movsx= (sign-extend), =movzx= (zero extend): move and extend a value
+
 ** Jump & Branch
 
 - *Far* & *Near*: intrasegment jump versus intersegment jump.
@@ -422,6 +430,8 @@ and the result.
     significant bit but not from the most significant bit) or two
     negative numbers (a carry from the most significant bit but not from the
     second most significant bit).
+  + (386) =lea= as an alternate method for multiplying quickly by constants by
+    taking advantage of its scaled index computation.
 
 - =sub=, =sbb=: subtraction is done using the adder circuitry (not the =add=
   instruction) with the subtrahend in 2's complement.
@@ -443,7 +453,7 @@ and the result.
 
 - =idiv= (signed): special in that the numerator is always double size the denominator.
   + rounding towards zero
-  + commonly used with cross-register signed extension instructions.
+  + commonly used with cross-register sign-extension instructions.
 
 - =and=, =or=, =xor=
   + be careful, these operations clear =CF= and =OF=.
@@ -451,18 +461,22 @@ and the result.
   + =or=: set bits; test for a zero operand (=or al, al=, =ZF= is set if =al= is zero)
   + =xor=: flip bits; test operand equality (=xor bx, cx=, =ZF= is set if
     equal); clear oneself (=xor ax, ax= clears =ax=)
+  + (386) =bsf=, =bsr= scan for a bit
 
 - =shr=, =shl=
   + =shr= and =shl= shifts the LSB/MSB into the carry flag.
 
 - =sar=: arithmetic shift operations
-  + mostly used for division (rounding towards negative infinity)
+  + mostly used for division (rounding towards negative infinity, unlike =idiv=
+    that rounds to zero)
   + =sal= performs the same operation as =shl=
 
 - rotating shift: =ror=, =rol= (the rotated bit is also copied into =CF=); or
   =RCR=, =RCL=, where the register combined with =CF= is rotated: the rotated
   bit is shifted into =CF= and then shifted out to the other end of the register.
   + use: count the number of 1s without destroying the regiter's content.
+  + to shift a value large than a register, combine a shift and a =rcr/rcl= to
+    shift a bit from one register to another via the carry flag.
 
 - =cmp=: comparison of numbers. The operands themselves remain unchanged but the
   flags change accordingly. Signed numbers and unsigned numbers comparison
@@ -512,7 +526,8 @@ up from string primitives and other instructions.
 register. Both may be prefixed with different conditions to decide whether to continue.
 
 Repeated string operations are interruptible. The processor remembers only one
-prefix in effect at the time of the interrupt: multiple prefixes on interrupt
+prefix in effect at the time of the interrupt (*before 80386*): multiple prefixes (including
+segment overriding prefix) on interrupt
 may result in an improper return.
 
 ** IEEE 754 & x87 Math Coprocessor
@@ -555,7 +570,6 @@ of rounding and over- flow/underflow in intermediate calculations.
 #+end_quote
 
 **** Registers
-
 ***** x87 Data Registers
 
 x87 FPU has eight 80-bit registers, using 80-bit double extended floating-point
@@ -608,6 +622,9 @@ Before P6, condition codes
 have to be copied into =ah= and then =flags= to be used by conditional
 instructions. P6 added floating-point instructions that automatically set =eflags=
 
+There is no way to move =C1= into the flag register: it has to be tested in
+memory or in a general purpose register.
+
 ***** Control Register
 
 - *Exception Mask Bits*: once masked, the corresponding exception will be blocked.
@@ -633,10 +650,63 @@ instruction executed as state information for exception handlers.
 
 The opcode of the last x87 non-control instruction
 
+**** Memory Synchronization
+
+x87 and the main processor have their own registers and cannot communicate
+directly. They exchange data through memory. x87 loads the data into its
+registers, processes the data and stores the data back to memory.
+
+Since the processor and the coprocessor work independently, they may not finish
+working on memory in the order in which you give instructions. Later, x87 became
+more integrated with the main processor. Starting with the
+80286 and the 80287, the main processor would wait for coprocessor operation to
+finish before issuing any FPU instructions on its own without having to rely on
+a =WAIT= instruction.An explicit WAIT prefix is only needed if one wants to
+observe a store or exception performed by the FPU. For modern Intel CPUs:
+
+#+begin_quote
+All of the x87 FPU instructions except a few special control instructions
+perform a wait operation (similar to the WAIT/FWAIT instructions), to check for
+and handle pending unmasked x87 FPU floating-point exceptions, before they
+perform their primary operation (such as adding two floating-point numbers).
+These instructions are called waiting instructions. Some of the x87 FPU control
+instructions, such as FSTSW/FNSTSW, have both a waiting and a non-waiting
+version. The waiting version (with the “F” prefix) executes a wait operation
+before it performs its primary operation; whereas, the non-waiting version (with
+the “FN” prefix) ignores pending unmasked exceptions.
+#+end_quote
+
+- a x87 instruction follows a processor instruction.
+  + the processor coordinates it automatically on the 80186–80486 processors.
+
+- a processor instruction accesses memory following a coprocessor instruction
+  that accesses the same memory.
+  + a =wait= is required for the main processor between the two instructions
+
 **** x87 ISA
 
 x87 instructions are what 8086 defines as =ESC= instructions, monitored,
 captured and executed by a coprocessor like x87.
+
+Typical x87 instructions can have several formats:
+
+#+begin_src asm
+; classical stack format
+; only the top item can be accessed and there's no need to specify operands
+; the top is popped and the second becomes the top and the destination
+finst             ; st, st(1)
+
+; memory fomrat: items are pushed from memory onto the register stack or popped from the top to memory
+finst   mem       ; st, mem
+
+; register format:
+finst   st(X), st ; st(X), st
+finst   st, st(X) ; st, st(X)
+
+
+; the top is popped after the operation
+finstp  st(num), st ; register pop
+#+end_src
 
 - *control instructions*: control the state and modes of operation of x87
   + =finit=, =fninit= initializes x87 and its internal registers to default
@@ -647,8 +717,6 @@ captured and executed by a coprocessor like x87.
   + binary32 and binary64 are loaded/stored by =fld=​/​=fst=, integers and BCDs
     are tranferred by separate instructions;
   + various common mathematical constants are loaded by special instructions.
-
-
 
 * MASM
 
@@ -683,16 +751,105 @@ generates different code for different memory data without specifying
 =byte/word/dword/qword ptr=, that is, it has typed
 variables instead of simple labels. NASM does not do that.
 
+*** Simple Types
+
 Supported data types are =BYTE=, =SBYTE=, =WORD=, =SWORD=, =DWORD=, =DSWORD=,
 =FWORD=, =QWORD=, =TBYTE=, =REAL4=, =REAL8=, =REAL10=.
 
+MASM has =SIZEOF= to return the size of a type.
+
+- =PTR=: =type PTR= to force an expression as having the type specified,
+  typically used with memory addressing
+
+
+*** Complex Types
+
+**** Arrays and Strings
+
 Arrays and strings are a sequence of data units.
 
-User types =STRUCT=, =UNION=, =RECORD= are supported. =TYPEDEF= are also supported.
+- =[]= can be an index operator in MASM, not just a dereference operator
+  #+begin_src asm
+mov ax, array[2] ; not supported by NASM
+    ; or
+mov ax, [array+2]
+mov ax, array+2 ; not supported by NASM
+  #+end_src
+  + MASM does not require =[]= for memory access (confusing!).
+  + NASM requires square brackets for memory references and otherwise it is
+    static-time constant. Also, NASM requires memory reference be inside the brackets.
+
+- instead of =sizeof(array)/sizeof(elem)= as in C, MASM has =LENGTHOF= to
+  determine the length of an array.
+
+- =?=: data allocated but not initialized in data declarations
+  + =?= is only set to zero when used with =DUP=
+
+- =SIZEOF=: object or type size
+
+- =TYPE=: type size, array element size
+
+- =LENGTHOF=: count of array elements
+
+**** Structures, Unions and Records
+
+User types =STRUCT=, =UNION=, =RECORD= are supported in a way similar to C.
+=TYPEDEF= are also supported.
+
+#+begin_src asm
+name STRUCT | UNION [alignment] [,NONUNIQUE]
+    variable declarations
+name ENDS
+
+struct_var typename <[initializers]>
+; unspecified values use default values, otherwise left unspecified
+#+end_src
+
+A structure/union field name need not to be unique globally. If Microsoft C
+interoperability is needed, alignment must be specified properly. Padding is
+added before a field and end of a structure to enforce alignment: the size of
+the structure must also be *evenly* (C has no such requirement)
+divisible by the structure alignment value so padding is added at the end of the structure.
+
+=.= member access operator is supported to access a struct member easily without
+manually computing the offset, as in C.
+
+#+begin_src asm
+;;; structure and union are a great way to represent a far pointer.
+FARPTR     UNION
+    dwptr     FAR PTR WORD    0
+    STRUCT
+        offs  WORD  0
+        segm  WORD  0
+    ENDS
+FARPTR     ENDS
+
+mov        ptr.segm, ds
+mov        ptr.offs, offset ThisWord
+#+end_src
+
+Records are bytes, words, or doublewords in which the individual bits or groups of bits are considered
+fields, similar to C's bit fields. =WIDTH= (bit width of a record), =MASK= (a
+bit mask for the bit positions occupied by the given field) are operators on
+records. Record field names are global, not prefixed by any variable or record
+type name.
 
 ** Variables
 
-#+TODO
+A variable is a name (without a colon) with a data allocation directive to
+indicate its type.
+An array variable is a variable initialized by a array of values.
+
+#+begin_src asm
+[[name]] directive initializer
+; initializer can be ? to indicate no initialization
+
+; multiline array
+array_name directive initializer
+           directive initializer
+; repeated initializer
+array_name directive N DUP(val)
+end_src
 
 ** Expressions
 
@@ -704,26 +861,14 @@ The value of the expression is determined at assembly time.
   macro in C.
   + symbols defined by === may be redefined.
 
-- =[]= can be an index operator in MASM, not just a dereference operator
-  #+begin_src asm
-mov ax, array[2]
-    ; or
-mov ax, [array+2]
-mov ax, array+2
-  #+end_src
-  + MASM does not require =[]= for memory access (confusing!).
-  + NASM requires square brackets for memory references and otherwise it is
-    static-time constant. Also, NASM requires memory reference be inside the brackets.
-
-- =.= member access operator is supported to access a struct member easily
-  without manually computing the offset.
-
 - =:= segment override. The segment part cannot be a register or a name.
   + MASM requires a segment override to mark a constant expression as a memory address.
     #+begin_src asm
 mov     word ptr [100h], ax ; illegal
 mov     word ptr ds:[100h], ax ; ok
     #+end_src
+
+- =N DUP(val1 [, val2, ...])=: repeats a value pattern N times
 
 ** Directives
 
@@ -865,8 +1010,6 @@ load the register.
 - =ORG= (origin): set location counter
 
 - =N DUP(initval, initval, ...)=: N number of declarations of =initval=
-
-- =?=: data allocated but not initialized in data declarations
 
 - =procname PROC=, =procname ENDP= defines a procedure.
 
