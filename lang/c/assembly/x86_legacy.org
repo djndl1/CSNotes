@@ -411,13 +411,29 @@ There are machine instructions that convert between data types
 
 - *unconditional jump* can be *short* (8-bit displacement from =ip=), *near*
   (16-bit ip-relative, register indirect offset, memory indirect offset),
-  *far* (=ip=, =cs= bot can be changed).
+  *far* (=ip=, =cs= both can be changed).
+  + MASM optimizes jumps when no =short=, =near=, =far=, =near16=, =near32=,
+    =far16=, =far32= or =proc= is specified and when the target is within the
+    segment. The user may override the assembler's choice with these keywords
+    above.
+  + for indirect jump, the pointer size in memory can be specified or the
+    default based on =.model= and he default segment size is used.
+    #+begin_src asm
+jmp     [bx]          ; depends
+jmp     word ptr [bx] ; near16
+    #+end_src
+  + for pointers in registers, the registers' size determines the pointer size
+    #+begin_src asm
+jmp     bx ; near16
+jmp     ebx ; near32
+    #+end_src
 
-- *procedure call* =CALL=, =RET=
-  + can be *near* or =far*. =CS= (for far call), =IP= are pushed onto the stack
+- *Procedure call* =CALL=, =RET=
+  + both can be *near* or *far*. =CS= (upon far call), =IP= are pushed onto the stack
     upon =CALL=.
   + =RET= directs the CPU to pop out the saved return address and jump back.
-  + the =main= entry point is required to be a far call.
+  + the entry point is required to be a far call.
+
 
 ** Arithmetic, Logical & Shift Operations
 
