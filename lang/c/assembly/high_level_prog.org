@@ -247,3 +247,29 @@ do:
 end:
     cont
 #+end_src
+
+** Jump Table
+
+#+begin_src asm
+jump_table:
+    case1,
+    case2,
+    case3,
+    end_case,
+
+    mov     jump_register, offset
+    jmp    [jump_register+jump_table]
+case1:
+    case1_body
+
+    jump endif
+case2:
+    case_body_2
+
+    jump endif
+case3:
+    else_body
+    jump end_case
+end_case:
+    continuation
+#+end_src
