@@ -402,12 +402,18 @@ There are machine instructions that convert between data types
 
 ** Jump & Branch
 
-- *Far* & *Near*: intrasegment jump versus intersegment jump.
+- *Short* (ip-relative short jump) *Far* (intrasegment jump versus )  *Near* (intersegment jump)
 
-- All *conditional jumps* are short jumps with an offset within -128 and +127
-  bytes of =ip=,
-  even if the assembly code seems to be using an absolute address, the machine
-  code is actually using an offset from =ip= (the next instruction's address).
+- All *conditional jumps* are ip-relative short jumps with an 8-bit (16-bit
+  added since 386, 32-bit in a 32-bit segment) offset
+  even if the assembly code seems to be using an absolute address
+  + =cmp= (=sub= for side effects) two values and jump on flags: above/below for unsigned values and greater
+    than/less than for signed values.
+  + =test= (=and= for side effects) a single value for bit patterns; (386) =bt= series instructions
+  + except =test R R=, =or R R=, =cmp R 0= to test zero, there are specialized
+    instructions for this: =J(E)CXZ=
+  + to conditionally jump to a distant location, add a following long jump to a
+    conditional jump instruction. /MASM automatically generates this kind of code upon long conditional jump/.
 
 - *unconditional jump* can be *short* (8-bit displacement from =ip=), *near*
   (16-bit ip-relative, register indirect offset, memory indirect offset),
@@ -885,6 +891,15 @@ mov     word ptr ds:[100h], ax ; ok
     #+end_src
 
 - =N DUP(val1 [, val2, ...])=: repeats a value pattern N times
+
+- =@@= anonymous label, referenced by =@F= (forwards) and =@B= (backwards)
+
+** High Level Constructs
+
+*** Conditional
+
+=.if=, =.elseif=, =.else=, =.endif= are not compile-time directives: they are
+meant to generate real assembly branch code.
 
 ** Directives
 
