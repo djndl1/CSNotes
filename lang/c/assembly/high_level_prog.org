@@ -273,3 +273,10 @@ case3:
 end_case:
     continuation
 #+end_src
+
+GNU C has a similar feature called *computed goto*, which allows =goto= an
+address pointer obtained from a label in the current function or a containing function.
+
+A similar structure is *tranfer vector* (e.g. a interrupt vector).
+
+[[https://www.cipht.net/2017/10/03/are-jump-tables-always-fastest.html][A jump table may not be the best implementation for a switch clause]].
