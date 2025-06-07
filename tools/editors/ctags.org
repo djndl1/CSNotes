@@ -1,7 +1,9 @@
 #+title: Ctags
 
 An indexing tool that collects names of programming languages in source files to
-aid code comprehension. It is required by the Single Unix Base Specification
+aid code comprehension. It is required by the Single Unix Base Specification.
+CTags may fall behind LSP, but it is still a useful for large projects and languages that miss
+LSP support.
 
 * Use
 
@@ -82,3 +84,9 @@ Supported by most code editors.
 
 - =pt=, =pts=, =ptj=, =ptn=, =ptp=, =ptf=, =ptp= show the tag in a preview
   window, closable with =^Wz=
+
+*** Plugins
+
+- [[https://github.com/ludovicchabant/vim-gutentags][gutentags]]: automatically generates the =tags= file in the background.
+
+- [[https://github.com/preservim/tagbar][Tagbar]]: A tag display side window.
