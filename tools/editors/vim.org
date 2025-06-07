@@ -569,12 +569,18 @@ window, where one can inspect, jump to and correct errors.
 
 ** grep
 
-Vim's grep may also take advantage of the Quickfix list.
+Vim's grep may also take advantage of the Quickfix list. 
+It is used alongside with the Quickfix list even if the result has nothing to do with compilation error.
 
-- =vim[grep]  /pattern[g][j] files= :: use builtin grep to search for a pattern
+- =vim[grep]  /pattern/[g][j] files= :: use builtin grep to search for a pattern
   + by default the result is shown in the Quickfix list.
+  + to search the current buffer, use =%= as the file
+  + to use the location list, use =lvimgrep=
 
-- =copen= :: open the Quickfix list
+- =copen= :: open the Quickfix list to see the search result
+
+- external =:grep= command :: use an external grep command
+  + the pattern is not enclosed by =/=
 
 *** ripgrep
 
@@ -594,7 +600,7 @@ To execute a copied block of vimscript, use =:@=.
 
 - =let= assigns a variable.
   + a variable may has a prefix to indicate its scope:
-    - =a= function argument
+    - =a=: function argument
     - =b=: buffer-local
     - =g=: global
     - =l=: function-local
@@ -682,9 +688,16 @@ a VCS repository, a set of interdependent plugins, "start" packages.
 Packages are stored in the paths =runtimepath= or =pack/*/start/*= paths under
 runtime paths.
 
+Plugins and packages are managed, loaded and initialized by a plug-in managers.
+
 *** Builtin Manager
 
-- =:packadd= :: enable packages on demand
+- =:packadd= :: search and source any plugin files found under =pack/*/opt/{name}=
+
+*** [[https://github.com/VundleVim/Vundle.vim][Vundle]]
+
+Vundle (=:h vundle= can download, update, search, clean up plugins, manage the runtime path of installed scripts.
+Plugins are now managed within =$MYVIMRC=, installed and updated automatically.
 
 * Other Tips
 
