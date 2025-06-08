@@ -3,7 +3,7 @@ of Vim are mentioned.
 
 * Basic Concepts
 
-~vi~ has tow modes:
+~vi~ has two modes:
 
 - command mode (normal mode):
 
@@ -36,6 +36,21 @@ commands in vi denotes both text objects and certain related commands.
 
 * Basic Operations
 
+** HOW TO EXIT
+
+- =q= :: quit
+  + =q!= or (normal mode) =ZQ=: quit without saving
+  + =cq=: quit with error
+
+- =wq= :: save  changes and quit
+  + =x= or =ZZ= (normal mode): save changes if the file is changed and quit
+
+To close all buffers, add a =a= to the command.
+
+To save as =root= when Vim is not running as =root=, use =:w !sudo tee >
+/dev/null %=. Basically, Vim pipes the current buffer to the rooted =tee= and
+=tee= writes the current buffer's file.
+
 ** Status Aware
 
 - =C-g=: show the location in a file and the file status
@@ -63,7 +78,7 @@ commands in vi denotes both text objects and certain related commands.
 - ~G~  :: go to the specified line/the end if none
    + (Vim) =gg= to the the specified line/the beginning if none
 
-- =``= or =''= :: get back to a previous mark (not down a list).
+- =`= or ='= :: get back to a previous mark 
   + call =:marks= to show a list of marks
   + a few special marks: see =:h '[=.
     - =.= (last change), ='= (before a jump),
@@ -169,7 +184,7 @@ the unnamed buffer and the named buffers.
 The unnamed buffer (deletion register) is lost when switching files;
 the named buffers (from =1= to =9= and =a= to =z=) do not,
 thus they may be used to transfer content from one file to another.
-(Vim) the lowercase register name is used to overwrite the regtister while the
+(Vim) the lowercase register name is used to overwrite the register while the
 uppercase is used to append to the previous register contents.
 
 - =x=, =X= :: delete the next/previous character
@@ -629,23 +644,27 @@ Options may be set in a =.exrc= file in the home directory.
 
 **** Tabs
 
+In VIM there are relatively complicated settings for tabs.
+
 To debug tab problem, =set list= or use =:l= command to display tabs and spaces
 or add them to =listchars=.
 
-- =tabstop= :: number of spaces that a tab in the file counts for (visually and
-  sometimes expanded space count). The length of
-  a real tab character.
+- =tabstop= :: the space boundary at which a horizontal tab character stops.
+  + the original meaning of horizontal tabs and pure visually.
+  + a horizontal tab, as a tabular separator, is supposed to stop at certain columns (confer to memory alignment)
 
-- =softtabstop= :: number of spaces that a tab in the file counts for while
-  performing editing operations, i.e. a tab key in Insert mode is no longer a
-  =tabstop= wide unless multiple tab keys combined reaches the width of
-  =tabstop=, without =expandtab=, it becomes a real tab character.
+- =softtabstop= :: not the length of a real tab character, but its effect
+  during editing. Number of spaces that a tab in the file counts for visually while
+  performing editing operations.
+  + without =expandtab=, it becomes a real tab character when the space is
+    reached.
 
 - =expandtab= :: tabs are replaced by the appropriate number of spaces in Insert
   mode. Real tabs are inserted with =^V<Tab>=.
 
 - =shiftwidth= :: number of spaces to use for each step of (auto)indent, for
   =cindent=, =<<=, =>>= etc.
+  + local to a buffer, when =0=, set to =tabstop=.
   + used in shift commands and autoindent backtabbing.
   + =^D=, =^T= moves a shiftwidth backwards/forwards.
 
