@@ -38,18 +38,20 @@ commands in vi denotes both text objects and certain related commands.
 
 ** HOW TO EXIT
 
-- =q= :: quit
-  + =q!= or (normal mode) =ZQ=: quit without saving
-  + =cq=: quit with error
+- =:q= :: quit
+  + =:q!= or (normal mode) =ZQ=: quit without saving
+  + =:cq=: quit with error
 
-- =wq= :: save  changes and quit
-  + =x= or =ZZ= (normal mode): save changes if the file is changed and quit
+- =:wq= :: save  changes and quit
+  + =:x= or =ZZ= (normal mode): save changes if the file is changed and quit
 
 To close all buffers, add a =a= to the command.
 
 To save as =root= when Vim is not running as =root=, use =:w !sudo tee >
 /dev/null %=. Basically, Vim pipes the current buffer to the rooted =tee= and
 =tee= writes the current buffer's file.
+
+- to temporarily suspend Vim, use =C-z=, or =:st(op)=, =:sus(pend)=.
 
 ** Status Aware
 
@@ -164,7 +166,10 @@ Sections are completely defined by macros.
   INSERT key in CUA: one may even restore to normal insert mode by pressing the
   =INSERT= key.
 
-- =Esc= or =^[= :: leaves the insert mode.
+- =Esc= or =^[= :: leaves the insert mode or replace mode. Finish
+  abbreviation (type some letters for a full word).
+  + =^C= ::  leaves the insert mode without trigger =InsertLeave=
+    autocommand.
 
 - ~c~ :: change, a combination of delete followed by insert, used with various
   motion commands.
