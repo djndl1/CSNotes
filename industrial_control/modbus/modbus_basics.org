@@ -2,18 +2,58 @@
 
 
 A de factor standard protocol and a commonly available means of connecting
-industrial electronic devices.
+industrial electronic devices, an industry standard method for the transfer of
+discrete/analog I/O information and register data  between industrial control
+and monitoring devices.
+
+Modbus itself is an *application protocol*, as it defines rules for organizing
+and interpreting data, but remains simply a messaging structure, independent of
+the underlying physical layer. TCP/IP or serial communication simply function as
+transport protocols.
 
 * Transport
 
-- Character serial communication lines
-  + /Modbus RTU/: compact binary representation. Framed by silent periods. uses
-    CRC checksums. Only one device can act as the client.
-  + /Modbus ASCII/: use ASCII characters for communication.
+** *Character serial communication lines*
+*** /Modbus RTU/
 
-- IP suite: any device cna send out a Modbus command.
-  + Modbus TCP/IP: communication over TCP/IP 502 port; no checksum
-  + Modbus over TCP/IP: checksummed variant
+Compact binary representation. Framed by silent periods. uses CRC checksums.
+Only one device can act as the client.
+
+*** /Modbus ASCII/
+
+Use ASCII characters for communication.
+
+** *IP suite*
+
+Any device can send out a Modbus command.
+
+*** Modbus TCP/IP
+
+Communication over TCP/IP 502 port; no checksum. The Modbus TCP/IP message is
+simply a Modbus communication encapsulated in an Ethernet TCP/IP wrapper.
+
+**** Format
+
+- ADU = Address + PDU + Error check
+  + PDU = Function code + Data. The name PDU is a carry-over from Modbus RTU,
+    not the TCP/IP PDU.
+
+#+begin_src
+┌───────────────────────┌──────────────────┌──────────────┐──────────────┌───────────────┐──────────┐
+│       2 Bytes         │   2 Bytes        │   2 Bytes    │  1 byte      │  Function Code│    Data  │
+│ Transaction/Invocation│Protocol IdentifierRemaining Msg │Unit Identifier    1 byte     │ variable │
+│ Identifier(sequence)  │ 0 for Modbus     │Bye count     │              │               │ length   │
+└───────────────────────└──────────────────└──────────────┘──────────────└───────────────┘──────────┘
+#+end_src
+
+**** Determinism over Ethernet
+
+Traditional Ethernet that uses CSMA/CD has been superceded by switched Ethernet,
+eliminating much of non-determinism.
+
+*** Modbus over TCP/IP
+
+Checksummed variant
 
 * Limitations
 
@@ -43,7 +83,3 @@ industrial electronic devices.
 
 A Modbus command reads or writes to a data object on a device.
 
-* Format
-
-- ADU = Address + PDU + Error check
-  + PDU = Function code + Data
