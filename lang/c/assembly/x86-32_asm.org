@@ -1,0 +1,21 @@
+#+title: X86-32 Assembly Programming
+
+* Registers
+
+32-bit registers are allowed under real-mode with a size prefix.
+
+Aside from extended register size, there are a few control registers:
+
+- =cr0=, =cr1=, =cr2=, =cr3=
+
+* Memory
+
+Segments are still 16-bit but an offset can be up to 4GB.
+
+** Addressing Modes
+
+- Any general-purpose 32-bit register can act as a base or index except =esp=,
+  which can only be a base register.
+
+- The index register can have a scaling factor of 1, 2, 4, or 8, specified by
+  the multiplication operator =*= and there is no performance penalty.

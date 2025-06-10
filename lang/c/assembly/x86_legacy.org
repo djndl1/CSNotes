@@ -1,143 +1,3 @@
-* General Computer System Design Steps
-
-** Specification (What-to-do)
-
-General discussion of all the functions that the system will be provided plus a
-description of the character of the inputs and outputs the system will handle.
-A system is designed to perform a certain task. The nature of the task will
-probably limit the system to performing a specific function.
-
-The specification will define the following subsections.
-
-- For each part, possible /error conditions/ must be explicitly listed.
-
-- List all input channels, output channels, all the computational functions.
-
-*** The Inputs Received by the System
-
-The inputs depends on the level of programming being performed.
-
-At the hardware level, the data path width (serial or parallel),
-data transfer speed and type (sync
-or async), accompanying control information.
-
-The input may contain /data ports/, but not always have /status ports/ (data
-availability, error conditions etc.) and
-/control ports/ (mode of operation, channel configuration).
-
-*** The Computation Performed by the System
-
-- processing raw data from the input and translating them into a form more
-  friendly to the system.
-
-- implement the actual algorithm
-
-- preparation of the data for the output
-
-*** The Outputs Created by the System (Hardware-Level)
-
-As with the input channel, there are similar major parameters for an output chanenl:
-
-- the channel's data path width
-
-- data transfer speed.
-
-- accompanying control information
-
-data ports, status ports and control ports are also of great importance for output.
-*** Revision
-
-The first version of the specification may not be the last. The design step and
-the implementation step may reveal certain functions cannot be performed given
-the conditions. It is necessary to modify the specification so that the
-conditions are changed or the offending functions are modified.
-
-** Program Design (How-To-Do)
-
-Taking the specification and detailing the steps to implement the specification
-A simple description should be available for each individual part of the system.
-For a large system, break the specification into a large number of much smaller modules.
-
-*** Considerations
-
-- *Expansion*: the program should have builtin expansion facilities: e.g. system
-  subroutines, expandable tables and lists of data, a convenient,
-  well-documented method for adding more functions to the system, and data
-  structures that are reasonably flexible.
-
-- *Modules*: the interaction and the interfaces between modules.
-
-- *Alternative Approaches*: there are multiple approaches to the design. In some
-  cases, the limitations may not be revealed until later during implementation.
-  It is necessary to consider alternatives during design in case of future
-  impediment or for a more efficient solution.
-
-** Implementation
-
-Actual coding, debugging and integrating.
-
-*** Coding
-
-- use subroutines.
-
-- documentation
-
-- ensure the code handles errors, special cases, boundary cases, trivial cases.
-
-*** Debugging and Integration
-
-Removing errors from the code and then integrating debugged modules into a final
-working system. Debugging executes the program in real hardware or a simulator, rather than
-mental desk checking.
-
-- Debug commonly used or system subroutines.
-
-- Debug each area of the specification individually.
-
-- Individual modules are combined into a subsystem and then debugged as a
-  subsystem. As each subsystem is debugged, it can then be combined with other
-  subsystems until the final system is debugged. During the integration phase,
-  ensure the interface between modules and subsystems is handled correctly.
-
-** Testing
-
-Introducing special sets of data and verifying that the correct results are produced.
-Testing is often neglected due to time consumption and it is not a well
-understood art.
-
-- enter three basic types of data:
-  + typical normal data
-  + a series of boundary conditions that exercise the system's ability to
-    perform decisions correctly
-  + a random selection of both legitimate and illegitimate data
-
-- input speed:
-  + typical rate
-  + fastest rate at which the system is supposed to function
-  + a random selection of data rates
-
-** Documentation
-
-- program documentation: how the code works, module by module and sometimes why
-  the code works the it does.
-
-- System guide
-  + the program's design
-  + development guide
-  + external interface: inputs and outputs, protocols; external consumers;
-    external data suppliers
-
-- user guide: how to use and how to interface with the system
-
-** Maintenance
-
-Altering the program to accommodate new equipment or new processing
-requirements and keeping the program functioning in a changing environment.
-
-Hardware parts, OS platforms may change. The system is supposed adapt and expand
-and these scenarios should be taken into consideration during program design and
-implementation stages.
-
 * Architecture
   :PROPERTIES:
   :CUSTOM_ID: architecture
@@ -155,6 +15,9 @@ implementation stages.
 - Data register =DX=: Used in arithmetic operations and I/O operations.
 
 - Base register =BX=. Used as a pointer to data (located in segment register DS, when in segmented mode).
+
+Technically, =DI=, =SI=, =BP= can be used as GP registers but often than not
+they are not. Only the four above can have the two 8-bit parts accessed directly.
 
 *** Stack Pointer
 
@@ -200,10 +63,14 @@ protect memory access.
 *** Program Counter
 
 - =IP=: instruction pointer
+  + =IP= cannot be read or written in any way except via side effect of some
+    instructions. =IP= is not a valid register operand.
 
 *** Flags (Status)
 
-The =EFLAGS= is a register used as a collection of boolean bits to store the results of operations and the state of the processors.
+The =EFLAGS= is a register used as a collection of boolean bits to store the
+results of operations and the state of the processors. It cannot be read or
+written directly: special flag instructions are required.
 
 - =SF=: sign, the sign of arithmetic or logic operations
 
@@ -215,7 +82,7 @@ The =EFLAGS= is a register used as a collection of boolean bits to store the res
 
 - =AF=: auxiliary carry, indicating a carry from D3 to D4 of an operation, used by BCD arithmetic
 
-- =PF=: even parity result of certain operation
+- =PF=: even parity result of the lower byte from certain operations
   + the parity result depends on the bit-length of the operation.
 
 - =IF=: enable or disable external maskable interrupt  requests
@@ -225,12 +92,17 @@ The =EFLAGS= is a register used as a collection of boolean bits to store the res
 - =DF=: direction, used to control the direction of string operations
 
 - =OF=: overflow, set whenever the result of a signed number operation overflows
+  + addition: =+= and =+= results in a =-=; =-= and =-= results in a =+=;
+  + subtraction: =+= > =+=, the difference is =+=, no overflow ; =+= > =-= may or may or overflow, but
+    =-= if overflow, =+= if not; =-= > =-=, no overflow and the different is
+    =+=. all in all, ~=OF=SF~ and ~ZF != 1~
 
 - =R= and =U=: reserved and undefined
 
 ** Memory: Representation, Addressing, Models
 
-20-bit address bus from =0x00000= to =0xFFFFF=
+20-bit address bus from =0x00000= to =0xFFFFF=.
+
 CPU after 8088 can access high memory called *extended memory*, often used for disk caches, RAM disks and print spoolers, which can be configured as *expanded memory* for programs to store data.
 
 Since a CPU register is 16-bit only, allowing only 64KB address (/segment/).
@@ -243,7 +115,7 @@ a segment register plus an offset in another register or an immediate number
 offset. There is nothing special about segment registers except that they are
 reserved specifically for pointer representation. As long as one needs to access the memory, segment registers have to be used.
 
-Code is not supposed to be load by the user and so =CS= is not normally changed
+Code is not supposed to be loaded by the user and so =CS= is not normally changed
 by user code. Different memory access instructions assume different segment registers.
 
 *** Program Segments
@@ -253,12 +125,21 @@ be memory
 regions accessed via the three segment registers (code =CS=, data =DS= and stack
 =SS=). The 8086 can only access these three segments of 64KB at any given time
 due to its limited width of registers even its physical address bus is larger.
+Segmented architecture was originally designed to enable a 16-bit processor to
+access an address space larger than 64K. The second use since 80286 is to use as
+a protection mechanism.
 
 - /physical address/: the address on the external address bus
 
 - /offset address/: an address within a 64KK range segment range
 
 - /logical address/: a pair of a segment value and an offset address
+
+8086 was designed to be source-compatible with 8080, especially with the CP/M
+OS, thus the offset of 64KB segment. Overlapping segments allowed better and
+more efficient use of memory: code may reside in different segments and accessed
+by these segments through near pointers; programs may be loaded at a 16-byte
+boundary as most programs were smaller than 64KB.
 
 **** Code Segments
 
@@ -268,6 +149,16 @@ by itself. The actual address represented by this pair is =(CS << 4) + IP=. =IP=
 increments as instruction is executed.
 
 On modern CPUs, instructions are often prefetched so the program counter only reflects the next instruction to execute but not the next one to fetch. It is a conceptual representation of the CPU's state, not an actual register.
+
+The only way to alter =CS= is when execution is switched to another segment:
+
+- far jump
+
+- far call and far return
+
+- from interrupt vector table
+
+- IRET: basically a far return
 
 **** Data Segments
 
@@ -294,6 +185,26 @@ The stack grows downward from upper addresses to lower addresses, opposite of =I
 =BP= (stack base) is another stack offset that represents the address of the
 current stack frame.
 
+**** Initialization
+
+The assembler needs to know which segment is associated with a register (MASM
+=ASSUME=) to generate proper code (if the assembler is able to do that). The
+processor needs to load segment registers with the correct value.
+
+A DOS MZ executable's header contains the offset of =CS= and =IP= to set the
+starting address. a .COM executable starts at the first byte of the program.
+
+#+begin_src asm
+; initialize DS
+mov     ax, DGROUP
+mov     ds, ax
+; ES can be initialized the same way
+#+end_src
+
+For an .EXE file, the stack address is encoded into the executable header and
+resolved at load time. For a .COM file, the loader sets SS equal to CS and
+initializes SP to 0FFFEh.
+
 *** Point Types
 
 Pointer types are designed by Intel, not purely a programmer's invention.
@@ -311,6 +222,10 @@ Pointer types are designed by Intel, not purely a programmer's invention.
   + e.g. =0x15020= is in the segment =0x1502=. Then each such segment (/paragraph/) contains
     only 16 addresses and does not overlapping.
 
+For MASM, =CALL=, =JMP=, =RET= automatically generate near/far variants based on
+memory model. For far data, one may reload segment registers and restore later, or use direct
+memory operands to override temporarily.
+
 *** Memory Models
 
 Due to 8086's memory segmentation, there are different configurations and usages
@@ -324,6 +239,39 @@ for segment registers, resulting in six memory models, listed below
 | compact | far  | near | single code segment, multiple data segments                            |                          |
 | large   | far  | far  | multiple code and data segments                                        |                          |
 | huge    | huge | far  | multiple code and data segments; single array be longer than a segment |                          |
+
+These memory models are used by high-level languages and assemblers, originally
+by Intel. The user needs to follow the assembler's rule and use special
+constructs to take advantage of the builtin support for memory model or
+otherwise may writes his own assembly code to manage the memory model.
+
+The final memory model is a result of proper segment grouping and ordering,
+as well as runtime segment register initialization:
+
+- Logical segment naming and grouping determines if logical segments are loaded into the same
+  physical segment and how many segments there are;
+  + For example, tiny memory model groups all three segments together; small
+    memory model groups data and stack together so that they are loaded into the
+    same segment.
+
+- Actual segment register values are set up at runtime even if they have some
+  initially not so reasonable values. During startup, the first few code does
+  some computation to set =DS=, =SS=, =SP=.
+  + For example, with small memory model, =DS= and =SS= are set to the same
+    value (=DGROUP=) even if their logical segments start at different addresses.
+    =SP= initially has the value of stack length, and =SS= points to the stack
+    top, which it shouldn't at runtime. With =SS= set to =DS=, =SP= should
+    still points to the bottom so the difference between =STACK= and =_DATA=
+    (suppose =_DATA= precedes =STACK=) is added to adjust =SP=.
+    #+begin_src
+# initial_SP = BOTTOM - STACK
+# adjusted_SP = BOTTOM - _DATA, or initial_SP + (STACK - _DATA)
+   BOTTOM
+
+   STACK_TOP <- initial SS
+   ...
+   _DATA   <- adjusted DS, SS
+    #+end_src
 
 *** Memory Map: How Memory Space is Used
 
@@ -359,7 +307,7 @@ for segment registers, resulting in six memory models, listed below
 
 - *immediate*: the operand as a constant, immediately follows the opcode in the
   instruction.
-  + Loading segment registers with immediate operands is not allowed.
+  + Loading segment registers with immediate operands or from another segment register is not allowed.
 
 The following modes manipulate data in the memory through a data pointer. The
 first two correspond to the two modes above but as data pointers.
@@ -385,12 +333,17 @@ mov [di], ah
 #+begin_src asm
 mov cx, [bx]+10 ; DS:BX+10, confusing, seems like plus 10 after dreferencing bx
 mov cx, [bx+10] ; DS:BX+10
-mov cx, 10[bx]  ; weird, at least not ambiguous
+mov cx, 10[bx]  ; weird, maybe bx[10] is better, at least not ambiguous
 #+end_src
 
 - *indexed relative*: Index registers =DI= or =SI= with a displacement;
   + this mode is essentially the same as based relative but uses index
     registers, supposed to access array elements.
+  + the original idea is that the displacement acts as the base and the index
+    register is added to that base address to form the effective address.
+    #+begin_src asm
+mov ax, word ptr disp[si]
+    #+end_src
 
 - *Based indexed*: the above two combined
   + the register order does not matter, the segment register is always the one
@@ -401,7 +354,10 @@ mov cl, [bx][di]+8 ; DS:(BX+DI+8)
 mov cl, [bx][si]+8 ; DS:(BX+SI+8]
 mov cl, [bp][di]+8 ; SS:(BP+DI+8)
 mov cl, [bp][si]+8 ; SS:(BP+SI+8)
+mov cl, table[bx][si]+6 ; two dimensional table
   #+end_src
+
+- Scaled indexes are only supported in 32-bit mode.
 
 *** Segment Override
 
@@ -416,4 +372,803 @@ However, one may override the default segment by explicitly specify the segment
 
 #+begin_src asm
 mov al, es:[bx]
+#+end_src
+
+** Data Types
+
+*** Conversion
+
+There are machine instructions that convert between data types
+
+- *sign extension*: =cwd=, =cdq=, =cqo= (across registers, especially useful for
+  division); =cbw=, =cwde=,
+  =cdqw= (same register)
+  + unsigned integers does not need to extend: simply use a larger register.
+
+
+** Operation on Flags
+
+- =lahf=, =sahf=: load/store flags from/to =ah=.
+
+- =pushf=, =popf=: save and restore flags onto/from the stack
+
+** Data Transfer
+
+- =mov=: a copy, not a cut
+
+- =xchg=: between registers or a register and memory, but not between memory
+
+- (386) =movsx= (sign-extend), =movzx= (zero extend): move and extend a value
+
+** Jump & Branch
+
+- *Short* (ip-relative short jump) *Far* (intrasegment jump versus )  *Near* (intersegment jump)
+
+- All *conditional jumps* are ip-relative short jumps with an 8-bit (16-bit
+  added since 386, 32-bit in a 32-bit segment) offset
+  even if the assembly code seems to be using an absolute address
+  + =cmp= (=sub= for side effects) two values and jump on flags: above/below for unsigned values and greater
+    than/less than for signed values.
+  + =test= (=and= for side effects) a single value for bit patterns; (386) =bt= series instructions
+  + except =test R R=, =or R R=, =cmp R 0= to test zero, there are specialized
+    instructions for this: =J(E)CXZ=
+  + to conditionally jump to a distant location, add a following long jump to a
+    conditional jump instruction. /MASM automatically generates this kind of code upon long conditional jump/.
+
+- *unconditional jump* can be *short* (8-bit displacement from =ip=), *near*
+  (16-bit ip-relative, register indirect offset, memory indirect offset),
+  *far* (=ip=, =cs= both can be changed).
+  + MASM optimizes jumps when no =short=, =near=, =far=, =near16=, =near32=,
+    =far16=, =far32= or =proc= is specified and when the target is within the
+    segment. The user may override the assembler's choice with these keywords
+    above.
+  + for indirect jump, the pointer size in memory can be specified or the
+    default based on =.model= and he default segment size is used.
+    #+begin_src asm
+jmp     [bx]          ; depends
+jmp     word ptr [bx] ; near16
+    #+end_src
+  + for pointers in registers, the registers' size determines the pointer size
+    #+begin_src asm
+jmp     bx ; near16
+jmp     ebx ; near32
+    #+end_src
+
+- *Procedure call* =CALL=, =RET=
+  + both can be *near* or *far*. =CS= (upon far call), =IP= are pushed onto the stack
+    upon =CALL=.
+  + =RET= directs the CPU to pop out the saved return address and jump back.
+  + the entry point is required to be a far call.
+
+
+** Arithmetic, Logical & Shift Operations
+
+These instructions change the flag register depending on the operands involved
+and the result.
+
+- =add=, =adc=, =clc= (clear carry): multiword addition is actually multiple additions with carry
+  + for a signed integer, either two positive numbers cause overflow (a carry
+    from the second most
+    significant bit but not from the most significant bit) or two
+    negative numbers (a carry from the most significant bit but not from the
+    second most significant bit).
+  + (386) =lea= as an alternate method for multiplying quickly by constants by
+    taking advantage of its scaled index computation.
+
+- =sub=, =sbb=: subtraction is done using the adder circuitry (not the =add=
+  instruction) with the subtrahend in 2's complement.
+  + Since =x - y= is computed as =x + (2^N - y)=. If =x= is greater than =y=,
+    =x-y= would be positive and the result overflows. That is, if there is no
+    borrow, the carry status is set. The borrow status is the negation of the
+    carry status. *However, here the carry flag bit is used to indicate a
+    borrow*. The carry flag is inverted.
+
+- =mul= for byte by byte, the result is in a single register, for word by word,
+  the result is in =DX:AX=
+
+- =div= (unsigned): for different operand sizes, the numerator and the result are in
+  different registers.
+  + the denominator cannot be an immediate; The numerator has fixed register(s)
+    =AH:AL= or =DX:AX=.
+  + division by zero or the quotient is too large for the assigned register
+    triggers an exception.
+
+- =idiv= (signed): special in that the numerator is always double size the denominator.
+  + rounding towards zero
+  + commonly used with cross-register sign-extension instructions.
+
+- =and=, =or=, =xor=
+  + be careful, these operations clear =CF= and =OF=.
+  + =and=: clear bits; test for a zero operand (=and al, al=, =ZF= is set if one is zero)
+  + =or=: set bits; test for a zero operand (=or al, al=, =ZF= is set if =al= is zero)
+  + =xor=: flip bits; test operand equality (=xor bx, cx=, =ZF= is set if
+    equal); clear oneself (=xor ax, ax= clears =ax=)
+  + (386) =bsf=, =bsr= scan for a bit
+
+- =shr=, =shl=
+  + =shr= and =shl= shifts the LSB/MSB into the carry flag.
+
+- =sar=: arithmetic shift operations
+  + mostly used for division (rounding towards negative infinity, unlike =idiv=
+    that rounds to zero)
+  + =sal= performs the same operation as =shl=
+
+- rotating shift: =ror=, =rol= (the rotated bit is also copied into =CF=); or
+  =RCR=, =RCL=, where the register combined with =CF= is rotated: the rotated
+  bit is shifted into =CF= and then shifted out to the other end of the register.
+  + use: count the number of 1s without destroying the regiter's content.
+  + to shift a value large than a register, combine a shift and a =rcr/rcl= to
+    shift a bit from one register to another via the carry flag.
+
+- =cmp=: comparison of numbers. The operands themselves remain unchanged but the
+  flags change accordingly. Signed numbers and unsigned numbers comparison
+  results are reflected by different flags.
+  + jump on above/below are for unsigned; jump on greater/less are for signed.
+
+
+*** *BCD operations* (obsolete)
+
+- ASCII-BCD conversion: there are no direct translation instructions. however,
+  an unpacked BCD differs from its ASCII code only in the higher nibble, where
+  an unpacked BCD has the nibble all zero.
+
+#+include: ../../CodeOfLanguages/ASM/dos/ascbcd.asm src asm
+
+- BCD-Addition: x86 BCD addition is done by adding two packed BCD with =add= and then
+  adjust the result to a valid BCD by adding 6 if the result is more than 9 with =daa=
+
+- BCD Subtraction: =sub= or =sbb= followed by =das= to correct the result.
+
+** Stack Operations
+
+=pop= and =push= push/pop by machine word length, that is, 2 bytes for 8086.
+
+- =pusha=, =popa= saves/restore all general registers in one instruction.
+
+** Dedicated String Operations
+
+There are five primitive string operations: move (transfer between memory
+locations), compare (compare two strings), scan (compare each data item in a string with a
+data item), load a string, store a string, preceded by a one-byte prefix that specifies the condition under which
+the operation repeats, allowing long strings to be processed with a software loop.
+
+These operations use specific registers to reference the source (=DS:SI=, =DS=
+may be overridden) and
+the destination (=ES:DI=). The direction of the string operations is controlled
+by =DF= (=cld= for upward, =std= downward).
+
+The repeated time of an operation is controlled by =CX=, enforced by the =REP=
+instruction prefix (=movsw=, =movsb=, move a string between memory), or the
+length of the register (=stosb=, =stosw=, =lodsb=, =lodsw=, move between a
+register and memory). =stos= and =lods= themselves do not do much, rather
+they are useful in software loops as part of more complex string function built
+up from string primitives and other instructions.
+
+=cmps= compares two string, =scas= scans a string and compares a string item with a
+register. Both may be prefixed with different conditions to decide whether to continue.
+
+Repeated string operations are interruptible. The processor remembers only one
+prefix in effect at the time of the interrupt (*before 80386*): multiple prefixes (including
+segment overriding prefix) on interrupt
+may result in an improper return.
+
+** IEEE 754 & x87 Math Coprocessor
+
+*** IEEE 754 Binary Floating-Point Numbers
+
+- *binary32*: 1 sign bit, 8 biased exponent, 23 significand (only the fraction)
+  + A binary real number in the form of \(1.xxxx \times 2^{yyyy} \)
+  + the exponent part is added to a constant of 127 so that a negative exponent
+    is expressed as non-negative number.
+  + the fraction part is placed from left to right as they are the more
+    significant bits compared to the zero after them.
+
+- *binary64*: 1 sign bit (bit 63), 53 bits for significand, 11 bits for exponent
+  + the exponent part is added to a constant of =0x3ff= so that a negative exponent
+
+*** x87 Coprocessor
+
+x87 includes 8 *data registers* =ST(i)= (shared with MMX), a *status register*,
+a *control register*, a *tag register*, a *last instruction pointer* register, a
+*last data pointer* register and an *opcode register*.
+
+**** Data Types
+
+x87 works with IEEE binary32, IEEE binary64, extended 80-bit floating-point,
+signed 16/32/64-bit integers and packed BCD decimal integers as instruction
+operands.
+Denormal values are supported as required by IEEE 754. Denormal numbers are
+converted to 80-bit extended format and normalized if the denormal exception bit is masked.
+
+#+begin_quote
+As a general rule, values should be stored in memory in double precision format.
+This format provides sufficient range and precision to return correct results
+with a minimum of programmer attention. The single precision format is useful
+for debugging algorithms, because rounding problems will manifest themselves
+more quickly in this format. The double extended precision format is normally
+reserved for holding intermediate results in the x87 FPU registers and
+constants. Its extra length is designed to shield final results from the effects
+of rounding and over- flow/underflow in intermediate calculations.
+#+end_quote
+
+**** Registers
+***** x87 Data Registers
+
+x87 FPU has eight 80-bit registers, using 80-bit double extended floating-point
+format when computing and converts the content to/from a shorter floating-point
+format, an integer format or the packed BCD integer format.
+
+The data registers are accessed like a stack, numbered from 0 (topmost) to 8
+(bottommost) but addressed as =st(0)= (the current top, or
+simply =st=, maintained by three bits in the status register), =st(1)= (one down
+from the top), =st(2)= and so on. All addressing of the data registers is
+relative to the register on the top of the stack.
+The stack does not prevent reading registers below the top.
+
+Any load operation (push) on a full stack wraps around and overwrites an
+existing value.
+
+In cases where the stack structure causes computation bottlenecks, the FXCH
+(exchange x87 FPU register contents) instruction can be used to streamline a
+computation.
+
+***** x87 Tag Register
+
+Eight 2-bit fields that indicate the content of the eight data registers: valid
+=00=, zero =01=,
+special number =10= (NaN, infinity, denormal or unsupported format), empty=
+=11=. These tags exist so that software do not need to decode the content in a
+data register to understand its content. Tags are maintained and protected by
+x87 FPU according to the actual value of the data registers so that the user may
+not accidentally set a tag incorrectly.
+
+***** x87 Status Register
+
+The stack top, operation statuses, exception conditions are maintained in x87
+FPU status register:
+
+- *condition code*,
+
+- *exception summary status*,
+
+- *stack fault*: stack overflow or underflow
+  + sticky bit
+
+- *exception flags*: similar to how the general instruction set have a flag register.
+  Exception flags are sticky bits, remaining set unless cleared explicitly.
+  + the underflow bit and the overflow bit indicate operation statuses, not
+    stack status.
+  + may be masked by corresponding bits of the control register
+
+Before P6, condition codes
+have to be copied into =ah= and then =flags= to be used by conditional
+instructions. P6 added floating-point instructions that automatically set =eflags=
+
+There is no way to move =C1= into the flag register: it has to be tested in
+memory or in a general purpose register.
+
+***** Control Register
+
+- *Exception Mask Bits*: once masked, the corresponding exception will be blocked.
+
+- *Precision* (2-bit): single (32), double (64) or double extended (80)
+
+- *Rounding Control* (2-bit)
+
+- *Infinity Control*: no longer meaningful since 387
+
+***** Instruction and Data Pointers
+
+Pointers to the instruction and the data operand for the last non-control
+instruction executed as state information for exception handlers.
+
+- =FIP=, =FCS=: instruction pointer offset/segment
+
+- =FDP=:
+
+- =FDS=
+
+***** Last Instruction Opcode =FOP=
+
+The opcode of the last x87 non-control instruction
+
+**** Memory Synchronization
+
+x87 and the main processor have their own registers and cannot communicate
+directly. They exchange data through memory. x87 loads the data into its
+registers, processes the data and stores the data back to memory.
+
+Since the processor and the coprocessor work independently, they may not finish
+working on memory in the order in which you give instructions. Later, x87 became
+more integrated with the main processor. Starting with the
+80286 and the 80287, the main processor would wait for coprocessor operation to
+finish before issuing any FPU instructions on its own without having to rely on
+a =WAIT= instruction.An explicit WAIT prefix is only needed if one wants to
+observe a store or exception performed by the FPU. For modern Intel CPUs:
+
+#+begin_quote
+All of the x87 FPU instructions except a few special control instructions
+perform a wait operation (similar to the WAIT/FWAIT instructions), to check for
+and handle pending unmasked x87 FPU floating-point exceptions, before they
+perform their primary operation (such as adding two floating-point numbers).
+These instructions are called waiting instructions. Some of the x87 FPU control
+instructions, such as FSTSW/FNSTSW, have both a waiting and a non-waiting
+version. The waiting version (with the “F” prefix) executes a wait operation
+before it performs its primary operation; whereas, the non-waiting version (with
+the “FN” prefix) ignores pending unmasked exceptions.
+#+end_quote
+
+- a x87 instruction follows a processor instruction.
+  + the processor coordinates it automatically on the 80186–80486 processors.
+
+- a processor instruction accesses memory following a coprocessor instruction
+  that accesses the same memory.
+  + a =wait= is required for the main processor between the two instructions
+
+**** x87 ISA
+
+x87 instructions are what 8086 defines as =ESC= instructions, monitored,
+captured and executed by a coprocessor like x87.
+
+Typical x87 instructions can have several formats:
+
+#+begin_src asm
+; classical stack format
+; only the top item can be accessed and there's no need to specify operands
+; the top is popped and the second becomes the top and the destination
+finst             ; st, st(1)
+
+; memory fomrat: items are pushed from memory onto the register stack or popped from the top to memory
+finst   mem       ; st, mem
+
+; register format:
+finst   st(X), st ; st(X), st
+finst   st, st(X) ; st, st(X)
+
+
+; the top is popped after the operation
+finstp  st(num), st ; register pop
+#+end_src
+
+- *control instructions*: control the state and modes of operation of x87
+  + =finit=, =fninit= initializes x87 and its internal registers to default
+    values.
+
+- *data transfer*: load from memory into =st0=, store a value in =st0= to
+  memory, move values between x87 data registers
+  + binary32 and binary64 are loaded/stored by =fld=​/​=fst=, integers and BCDs
+    are tranferred by separate instructions;
+  + various common mathematical constants are loaded by special instructions.
+
+* MASM
+
+** Syntax
+
+- Reserved words (instructions, directives, attributes, operators, predefined
+  symbols) are case-insensitive except for predefined symbols.
+
+- Predefined symbols are defined by the assembler to represent certain values
+  like filename, source line number, date, time, cpu mode, memory model etc.
+
+- integer constant radix specifier: =y= for binary, =t= for decimal, =h= for
+  hexadecimal, =o= or =q= for octet. Otherwise the radix is by default specified
+  by =.RADIX= (by default decimal). Hexadecimal numbers must always start with a
+  decimal digit, thus a leading zero is required for =0ABCh=.
+  + The default constant size is 32 bits.
+
+** Template Example Analysis
+
+#+include: ../../CodeOfLanguages/ASM/dos/template.asm src asm
+
+When the program begins executing, only =CS= and =SS= have the proper values,
+=DS= must be initialized by the program.
+
+It is strongly recommended that only one stack segment is use to prevent
+fragmentation of stack memory.
+
+** Data Types
+
+MASM is strange in that its memory access recognizes data types and thus
+generates different code for different memory data without specifying
+=byte/word/dword/qword ptr=, that is, it has typed
+variables instead of simple labels. NASM does not do that.
+
+*** Simple Types
+
+Supported data types are =BYTE=, =SBYTE=, =WORD=, =SWORD=, =DWORD=, =DSWORD=,
+=FWORD=, =QWORD=, =TBYTE=, =REAL4=, =REAL8=, =REAL10=.
+
+MASM has =SIZEOF= to return the size of a type.
+
+- =PTR=: =type PTR= to force an expression as having the type specified,
+  typically used with memory addressing
+
+
+*** Complex Types
+
+**** Arrays and Strings
+
+Arrays and strings are a sequence of data units.
+
+- =[]= can be an index operator in MASM, not just a dereference operator
+  #+begin_src asm
+mov ax, array[2] ; not supported by NASM
+    ; or
+mov ax, [array+2]
+mov ax, array+2 ; not supported by NASM
+  #+end_src
+  + MASM does not require =[]= for memory access (confusing!).
+  + NASM requires square brackets for memory references and otherwise it is
+    static-time constant. Also, NASM requires memory reference be inside the brackets.
+
+- instead of =sizeof(array)/sizeof(elem)= as in C, MASM has =LENGTHOF= to
+  determine the length of an array.
+
+- =?=: data allocated but not initialized in data declarations
+  + =?= is only set to zero when used with =DUP=
+
+- =SIZEOF=: object or type size
+
+- =TYPE=: type size, array element size
+
+- =LENGTHOF=: count of array elements
+
+**** Structures, Unions and Records
+
+User types =STRUCT=, =UNION=, =RECORD= are supported in a way similar to C.
+=TYPEDEF= are also supported.
+
+#+begin_src asm
+name STRUCT | UNION [alignment] [,NONUNIQUE]
+    variable declarations
+name ENDS
+
+struct_var typename <[initializers]>
+; unspecified values use default values, otherwise left unspecified
+#+end_src
+
+A structure/union field name need not to be unique globally. If Microsoft C
+interoperability is needed, alignment must be specified properly. Padding is
+added before a field and end of a structure to enforce alignment: the size of
+the structure must also be *evenly* (C has no such requirement)
+divisible by the structure alignment value so padding is added at the end of the structure.
+
+=.= member access operator is supported to access a struct member easily without
+manually computing the offset, as in C.
+
+#+begin_src asm
+;;; structure and union are a great way to represent a far pointer.
+FARPTR     UNION
+    dwptr     FAR PTR WORD    0
+    STRUCT
+        offs  WORD  0
+        segm  WORD  0
+    ENDS
+FARPTR     ENDS
+
+mov        ptr.segm, ds
+mov        ptr.offs, offset ThisWord
+#+end_src
+
+Records are bytes, words, or doublewords in which the individual bits or groups of bits are considered
+fields, similar to C's bit fields. =WIDTH= (bit width of a record), =MASK= (a
+bit mask for the bit positions occupied by the given field) are operators on
+records. Record field names are global, not prefixed by any variable or record
+type name.
+
+** Variables
+
+A variable is a name (without a colon) with a data allocation directive to
+indicate its type.
+An array variable is a variable initialized by a array of values.
+
+#+begin_src asm
+[[name]] directive initializer
+; initializer can be ? to indicate no initialization
+
+; multiline array
+array_name directive initializer
+           directive initializer
+; repeated initializer
+array_name directive N DUP(val)
+end_src
+
+** Expressions
+
+The value of the expression is determined at assembly time.
+
+- =offset/seg expr=: get the offset/segment value of the expression
+
+- =sym EQU val= or =sym = val=: symbolic integer constants; does not declare a data item but defines a static constant, like a
+  macro in C.
+  + symbols defined by === may be redefined.
+
+- =:= segment override. The segment part cannot be a register or a name.
+  + MASM requires a segment override to mark a constant expression as a memory address.
+    #+begin_src asm
+mov     word ptr [100h], ax ; illegal
+mov     word ptr ds:[100h], ax ; ok
+    #+end_src
+
+- =N DUP(val1 [, val2, ...])=: repeats a value pattern N times
+
+- =@@= anonymous label, referenced by =@F= (forwards) and =@B= (backwards)
+
+** High Level Constructs
+
+*** Conditional
+
+=.if=, =.elseif=, =.else=, =.endif= are not compile-time directives: they are
+meant to generate real assembly branch code.
+
+** Directives
+
+*** Segments
+
+Segments may be specified in full or simplified directives.
+A program consists of modules, which are made of segments. The main module
+contains all three segments while other modules only code and data. All modules
+must define its memory model with =.MODEL= at the beginning of the module and
+ends with =END= at the bottom of the module.
+
+**** Group
+
+A collection of segments may be grouped (=GROUP=) as *group* that is not more than 64K
+under 16-bit mode. A program addresses a code or data item in the group relative
+to the beginning of the group. Using a group that can be fit into a single
+segment saves one from reloading segment registers to access different segments.
+A segment cannot belong to more than one group.
+
+The Microsoft segment model combines =_DATA=, =_BSS=, =CONST= and =STACK= (by default) into
+the =DGROUP= group.
+
+**** Simplified
+
+- =.model=: memory model, default calling and naming conventions, operating
+  system and stack type.
+  + huge is essentially the same as large as the assembler provides no support
+    for large data items.
+  + Use JWasm
+    #+begin_quote
+NASM also does not have any directives to support different 16-bit memory models. The programmer
+has to keep track of which functions are supposed to be called with a far call and which with a near call,
+and is responsible for putting the correct form of RET instruction (RETN or RETF; NASM accepts RET itself
+as an alternate form for RETN); in addition, the programmer is responsible for coding CALL FAR
+instructions where necessary when calling external functions, and must also keep track of which
+external variable definitions are far and which are near.
+    #+end_quote
+  + naming and calling conventions can be specified as well
+    #+begin_quote
+Procedure definitions (PROC) and high-level procedure calls (INVOKE) automatically generate code
+consistent with the calling convention of the specified language. The PROC, INVOKE, PUBLIC, and
+EXTERN directives all use the naming convention of the language. These directives follow the default
+language conventions from the .MODEL directive unless you specifically override the default.
+    #+end_quote
+  + =NEARSTACK= or =FARSTACK= determines whether the stack is in the data
+    segment or not.
+
+- =.186=, =.286(P)=, =.386(P)=, =.486(P)= specifies the processor and ISA to
+  use.
+  + by default =.8087=
+
+- =.stack=: defines a stack segment, optionally with a certain size (by default
+  1024 bytes)
+
+- =.data= and its friends: creates data segments.
+  #+begin_quote
+Programs can contain both near and far data. In general, you should place important and frequently
+used data in the near data area, where data access is faster. This area can get crowded, however,
+because in 16-bit operating systems the total amount of all near data in all modules cannot exceed
+64K. Therefore, you may want to place infrequently used or particularly large data items in a far data
+segment.
+  #+end_quote
+  + *near segments*: =.data= near data segment (64K under DOS); =.data?= for
+    uninitialized data BSS
+    (zero-initialized by C startup code); =.const= for constant data. They
+    directives produce segments that are all grouped together and contribute to
+    the default data area =DGROUP=.
+  + *far segments*: =fardata=, =.fardata?=
+
+- =.code=: one can have both ear and far code segments in a module.
+  #+begin_quote
+The medium, large, and huge memory models use far code addresses by default. In
+the larger memory models, the assembler creates a different code segment for
+each module. If you use multiple code segments in the small, compact, or tiny
+model, the linker combines the .CODE segments for all modules into one segment.
+  #+end_quote
+  + although the directive is named =code=, the actual segment is named
+    =*_TEXT=, same as in Unix.
+
+- =.startup= and =.exit= specify the entry region of a program, in addition to
+  =end lablename=.
+  + =.startup= generates code to set up segment registers according
+    to memory model and the processor.
+  + =.exit= generates the leaving =exit= call.
+
+**** Full
+
+- =SEGMENT=, =ENDS=: ; these directives can define segments, their alignment,
+  read-only protection, combining segments (think of C symbol linkage but with
+  segments but with functions more than that), class (for segment ordering)
+  + by default a segment aligns at the next paragraph address.
+  + The linker outputs segments in the order they appear, subject to any group,
+    class and =.DOSSEG= requirements. The user may order segments alphabetically
+    (=.alpha=), or by the MS-DOS segment-ordering convention (code,
+    non-bss-or-stack, bss class, stack class).
+    #+begin_quote
+Two segments with the same name are not combined if their class is different.
+The linker arranges segments so that all segments identified with a given class
+type are next to each other in the executable file. However, within a particular
+class, the linker arranges segments in the order encountered.
+...
+The linker processes object files in the order in which they appear on the
+command line. Within each module, it then outputs segments in the order given in
+the object file.
+    #+end_quote
+    To control the segment ordering produced by the linker, either use the
+    =.DOSSEG= convention
+    or define dummy empty segments in an include file to prescribe the ordering.
+  + =.stack=, =.code=, =.data= are some specialized segment directives to set up
+    common segments and registers.
+
+- =ASSUME= must be used to load segment registers with these segment addresses.
+  #+begin_quote
+When the assembler needs to reference an address, it must know what segment contains the
+address. It finds this by using the default segment or group addresses assigned with the ASSUME
+directive.
+...
+Using the ASSUME directive to tell the assembler which segment to associate with a segment
+register is not the same as telling the processor. The ASSUME directive affects only assembly-time
+assumptions. You may need to use instructions to change run-time conditions.
+...
+However, in either case, your program must explicitly load a segment register with a segment address
+before accessing data within the segment. ASSUME only tells the assembler to assume that the
+register is correctly initialized; it does not by itself generate any code to
+load the register.
+  #+end_quote
+  + the assembler needs =ASSUME= to generate correct code to set up segment
+    registers. Also, =ASSUME= a address is in a certain segment generates
+    a segment override prefix if necessary and saves from the user from explicitly coding a
+    segment override.
+
+*** Others
+
+- =DB= (define byte), =DW=, =DD=, =DQ=, =DT= (ten bytes, for packed BCD numbers
+  which are never used anymore): allocate data in data memory.
+  + =DB= is the only way define an ASCII string, with a pair of single or double
+    quotes.
+
+- =ORG= (origin): set location counter
+
+- =N DUP(initval, initval, ...)=: N number of declarations of =initval=
+
+- =procname PROC=, =procname ENDP= defines a procedure.
+
+- =END procname= marks the end of a module and defines the entry point
+
+- =.crf file=: generates a cross reference file: an alphabetical of al symbols
+  and labels and the locations where they are referenced.
+
+- =.map file=: how code and data are mapped to memory
+
+- conditional assembly and error: =IF=, =ELSEIF=, =ELSE= =ENDIF=
+  + C-like conditional directives
+
+- =ASSUME= can even assume the size or type of a register so that the code
+  requires no more size specifiers.
+  #+begin_src asm
+ASSUME bx:PTR WORD
+    inc [bx] ; the assembler just knows it's `inc word ptr [bx]`
+  #+end_src
+  + It can even disable the use of a register by assuming the register is an =ERROR=.
+
+*** Macros
+
+- =TEXTEQU=: defines a text macro
+  + use: define a name for a local variable on the stack to allow easy access.
+
+
+* Programming Tricks
+
+- =mov reg, offset [symbol]= produces smaller and faster code than =lea reg, [symbol]=.
+
+- the stack may be a good temporary location without using a register as an
+  intermediate store.
+  #+begin_src asm
+;; copy a far pointer
+push    ds
+pop     es
+mov     di, si
+  #+end_src
+
+* ABI
+
+** Data Representation
+
+- =bool=: 1-byte (watcom), 2-byte (Microsoft)
+
+- =int=, =short=: 2-byte
+
+- =long=: 4-byte
+
+- =size_t=: 2-byte
+
+** Calling Convention
+
+- =BP=, =SI=, =DI= are always preserved
+
+- =DX:AX= or simply =AX= is returned.
+
+*** =__cdecl= (mostly the same as in x86-32)
+
+- the x87 register stack must be emptied before any call or return except for
+  registers used for return values
+
+- the parameters are pushed right to left so that the first parameter is nearest
+  to the top of the stack.
+  + the first parameter is at =bp+4=.
+
+- the stack is caller-cleaned
+
+- return value in =ax= or =st0= (floating-point)
+  + the caller is responsible for popping out =st0= regardless of whether to use
+    it (OpenWatcom does this).
+
+- =ax=, =bx=, =cx=, =dx=, =es=, =stX= are caller-saved
+  + =ebx= on Win32 and SysV-Intel386 is callee-saved, a difference between
+    16-bit and 32-bit MS calling convention.
+
+- =si=, =di=, =bp= =ds= are callee-saved.
+
+- =st0= to =st7= must be empty upon a function call.
+
+Function name decoration consists of a leading underscore =_funcname= for DOS
+and Windows.
+
+#+begin_src asm
+// int func(A, B, C)
+push C
+push B
+push A
+call _func
+add esp, 12
+#+end_src
+
+Passing of large structures is not specified and is platform-dependent. They may
+be placed on the stack and passed by reference under the hood or their members are pushed onto the stack.
+
+** =__pascal=
+
+Used by Turbo Pascal, Delphi and Win16 functions.
+
+No variable number of parameters.
+
+- Parameters are pushed from left to right;
+
+- Function names are converted to uppercase
+
+- returning values is relatively complex:
+  + ordinal values in =al=, =ax=, =eax= (32-bit) or =dx:ax= (16-bit).
+  + pointers in =ax=, =eax=
+  + real values returned in =dx:bx:ax=
+  + floating-point values in =st0=
+  + strings are returned in a location denoted by =@Result=.
+
+- the stack is callee-cleaned.
+
+** =__fastcall=
+
+Not standardized. Other compilers may do something similar but not compatible.
+
+=__fastcall= was typically faster only for short leaf functions.
+
+- The first parameter in =dx= and the second in =cx=
+
+* Toolchains
+
+** Use JWasm & JWlink
+
+#+begin_src shell
+jwasm [-Fl=listingfile] -6 -mz example.asm  # target an Intel P6 CPU, format DOS MZ EXE
+jwlink File example.o Name example.exe  system dos # link example.o, output as example.exe, system set to DOS
 #+end_src

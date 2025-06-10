@@ -1,0 +1,16 @@
+#+title: Privoxy
+
+* Append Proxy Credentials Automatically
+
+Create a =auth.action= file
+
+#+begin_src
+{+add-header{Proxy-Authorization: Basic ZGpuOmZyZWViaXJk}}
+#+end_src
+
+Reference this file in the config file.
+
+#+begin_src
+toggle 1 # enable action files
+actionsfile /etc/privoxy/auth.action
+#+end_src

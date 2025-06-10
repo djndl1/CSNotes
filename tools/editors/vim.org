@@ -569,12 +569,18 @@ window, where one can inspect, jump to and correct errors.
 
 ** grep
 
-Vim's grep may also take advantage of the Quickfix list.
+Vim's grep may also take advantage of the Quickfix list. 
+It is used alongside with the Quickfix list even if the result has nothing to do with compilation error.
 
-- =vim[grep]  /pattern[g][j] files= :: use builtin grep to search for a pattern
+- =vim[grep]  /pattern/[g][j] files= :: use builtin grep to search for a pattern
   + by default the result is shown in the Quickfix list.
+  + to search the current buffer, use =%= as the file
+  + to use the location list, use =lvimgrep=
 
-- =copen= :: open the Quickfix list
+- =copen= :: open the Quickfix list to see the search result
+
+- external =:grep= command :: use an external grep command
+  + the pattern is not enclosed by =/=
 
 *** ripgrep
 
@@ -594,7 +600,7 @@ To execute a copied block of vimscript, use =:@=.
 
 - =let= assigns a variable.
   + a variable may has a prefix to indicate its scope:
-    - =a= function argument
+    - =a=: function argument
     - =b=: buffer-local
     - =g=: global
     - =l=: function-local
@@ -682,11 +688,25 @@ a VCS repository, a set of interdependent plugins, "start" packages.
 Packages are stored in the paths =runtimepath= or =pack/*/start/*= paths under
 runtime paths.
 
+Plugins and packages are managed, loaded and initialized by a plug-in managers.
+
 *** Builtin Manager
 
-- =:packadd= :: enable packages on demand
+- =:packadd= :: search and source any plugin files found under =pack/*/opt/{name}=
+
+*** [[https://github.com/VundleVim/Vundle.vim][Vundle]]
+
+Vundle (=:h vundle= can download, update, search, clean up plugins, manage the runtime path of installed scripts.
+Plugins are now managed within =$MYVIMRC=, installed and updated automatically.
 
 * Other Tips
+** File Explorer
+
+- NERDTree: a side bar that displays the current workspace.
+
+** GDB Debug
+
+=termdebug=, a builtin plug-in that runs GDB from inside Vim.
 
 ** Vertical Ruler
 
@@ -753,3 +773,27 @@ buffer,
 possible (on target machines of Linux only, through ssh and ftp only).
 
 To speed up file transfer, consider ssh's =ControlMaster= feature.
+
+** Use with Shell
+
+set =EDITOR= to =vim= and =C-x C-e= to invoke the editor to edit the current
+line. use =cq= to exit to avoid executing the command.
+
+* Integrated Solutions
+
+- [[https://rapphil.github.io/vim-python-ide/][Vim as a Pyton IDE]]: a
+  full-IDE solution for Python
+
+- [[https://realpython.com/vim-and-python-a-match-made-in-heaven/][VIM and Python - A Match Made in Heaven]]: a step-by-step tutorial to set up an IDE for Python
+
+- [[https://github.com/python-mode/python-mode][Python-mode]]: seems dead,
+  but still useful as a reference
+
+- [[https://github.com/kingofctrl/vim.cpp][vim.cpp]]: a solution for C/C++,
+  no longer maintained, for reference.
+
+- [[https://puremourning.github.io/vimspector-web/][Vimspector]]: a debugging
+  solution
+
+- [[https://github.com/jez/vim-as-an-ide][Vim as an IDE]]: another tutorial
+  to set up a VIM IDE.

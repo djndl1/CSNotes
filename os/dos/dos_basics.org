@@ -64,6 +64,13 @@ TODO
 
 * Networks
 
+** Packet Drivers
+
+Running a packet driver typically sets a software interrupt number (), a IRQ
+priority level and an I/O port
+
+On DOSBOX-X, the default IRQL is 3, set to one that the ne2000 driver is using.
+
 ** SSH
 
 SSH2DOS uses obsolete algorithms, which is disabled by default by modern SSH servers.

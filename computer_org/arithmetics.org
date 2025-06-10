@@ -1,0 +1,49 @@
+#+title: Arithmetic
+
+* Two's Complement
+
+For a negative number, the smaller it is as an unsigned number, the further away it
+is from zero. It moves towards to zero as it becomes larger and finally reaches
+zero by generating a carry out.
+
+* Addition and Subtraction
+
+** Signed Number Overflow
+
+Overflow cannot occur when two operands with the different signs are added, or
+when two operands with the same signs are performing subtraction.
+
+There are two cases of overflow for addition and subtraction. Unlike x86, RISC-V
+has no overflow flag, signed overflow has to be check explicitly.
+
+*** Addition
+
+
+- =Nonnegative + Nonnegative = Negative=
+  + There is a carry into the sign bit.
+
+- =Negative + Negative = Nonnegative=
+  + under normal circumstances, the two sign bits create a carry and a lower
+    carry bit is moved into the sign bit.
+  + On overflow, the lower parts are too small and thus generates no carry into
+    the sign bit,
+    meaning the two numbers are actually far away from zero in the negative
+    direction, and yet they falsely create a nonnegative number.
+
+*** Subtraction
+
+- =Nonnegative - Negative = Negative=
+  + normally, the nonnegative number should borrow from its sign bit, due to the
+    negative number being close to zero and thus relatively large, turning the
+    sign bit into =1=, and the sign =1= offset the =1= in the negative number,
+    leaving the result to =0=.
+  + upon overflow, the negative number is small enough as an unsigned number
+    that the nonnegative number does not have to borrow the MSB and instead a
+    borrow into the sign bit of the nonnegative bit: \(10 - 1 = 1\)
+
+- =Negative - Nonnegative = Nonnegative=
+  + normally, the negative number should be large as an unsigned number
+    and thus the sign bit remains =1=, \(1 - 0 = 1\) and thus the result should be
+    =1=, still negative.
+  + upon overflow, the negative number is not large enough as an unsigned number
+    and thus borrows its sign bit, \(0 - 0 = 0\)

@@ -1,0 +1,141 @@
+#+title: Design Flow
+
+* General Computer System Design Steps
+
+** Specification (What-to-do)
+
+General discussion of all the functions that the system will be provided plus a
+description of the character of the inputs and outputs the system will handle.
+A system is designed to perform a certain task. The nature of the task will
+probably limit the system to performing a specific function.
+
+The specification will define the following subsections.
+
+- For each part, possible /error conditions/ must be explicitly listed.
+
+- List all input channels, output channels, all the computational functions.
+
+*** The Inputs Received by the System
+
+The inputs depends on the level of programming being performed.
+
+At the hardware level, the data path width (serial or parallel),
+data transfer speed and type (sync
+or async), accompanying control information.
+
+The input may contain /data ports/, but not always have /status ports/ (data
+availability, error conditions etc.) and
+/control ports/ (mode of operation, channel configuration).
+
+*** The Computation Performed by the System
+
+- processing raw data from the input and translating them into a form more
+  friendly to the system.
+
+- implement the actual algorithm
+
+- preparation of the data for the output
+
+*** The Outputs Created by the System (Hardware-Level)
+
+As with the input channel, there are similar major parameters for an output chanenl:
+
+- the channel's data path width
+
+- data transfer speed.
+
+- accompanying control information
+
+data ports, status ports and control ports are also of great importance for output.
+*** Revision
+
+The first version of the specification may not be the last. The design step and
+the implementation step may reveal certain functions cannot be performed given
+the conditions. It is necessary to modify the specification so that the
+conditions are changed or the offending functions are modified.
+
+** Program Design (How-To-Do)
+
+Taking the specification and detailing the steps to implement the specification
+A simple description should be available for each individual part of the system.
+For a large system, break the specification into a large number of much smaller modules.
+
+*** Considerations
+
+- *Expansion*: the program should have builtin expansion facilities: e.g. system
+  subroutines, expandable tables and lists of data, a convenient,
+  well-documented method for adding more functions to the system, and data
+  structures that are reasonably flexible.
+
+- *Modules*: the interaction and the interfaces between modules.
+
+- *Alternative Approaches*: there are multiple approaches to the design. In some
+  cases, the limitations may not be revealed until later during implementation.
+  It is necessary to consider alternatives during design in case of future
+  impediment or for a more efficient solution.
+
+** Implementation
+
+Actual coding, debugging and integrating.
+
+*** Coding
+
+- use subroutines.
+
+- documentation
+
+- ensure the code handles errors, special cases, boundary cases, trivial cases.
+
+*** Debugging and Integration
+
+Removing errors from the code and then integrating debugged modules into a final
+working system. Debugging executes the program in real hardware or a simulator, rather than
+mental desk checking.
+
+- Debug commonly used or system subroutines.
+
+- Debug each area of the specification individually.
+
+- Individual modules are combined into a subsystem and then debugged as a
+  subsystem. As each subsystem is debugged, it can then be combined with other
+  subsystems until the final system is debugged. During the integration phase,
+  ensure the interface between modules and subsystems is handled correctly.
+
+** Testing
+
+Introducing special sets of data and verifying that the correct results are produced.
+Testing is often neglected due to time consumption and it is not a well
+understood art.
+
+- enter three basic types of data:
+  + typical normal data
+  + a series of boundary conditions that exercise the system's ability to
+    perform decisions correctly
+  + a random selection of both legitimate and illegitimate data
+
+- input speed:
+  + typical rate
+  + fastest rate at which the system is supposed to function
+  + a random selection of data rates
+
+** Documentation
+
+- program documentation: how the code works, module by module and sometimes why
+  the code works the it does.
+
+- System guide
+  + the program's design
+  + development guide
+  + external interface: inputs and outputs, protocols; external consumers;
+    external data suppliers
+
+- user guide: how to use and how to interface with the system
+
+** Maintenance
+
+Altering the program to accommodate new equipment or new processing
+requirements and keeping the program functioning in a changing environment.
+
+Hardware parts, OS platforms may change. The system is supposed adapt and expand
+and these scenarios should be taken into consideration during program design and
+implementation stages.

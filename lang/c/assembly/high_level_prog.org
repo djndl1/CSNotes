@@ -1,0 +1,282 @@
+#+title: How to Implement High-Level Constructs
+
+* How to Compare
+
+The RISC-V situation: suppose one has =<= (signed and unsigned) and =xor=, we can have the
+other five comparison
+operations (=<==, ===, =!==, =>=, =>==):
+
+- negation: =xor= the value with all 1s (signed -1, bitwise), or a single 1 bit (logical).
+
+- =>=: swap the operands of =<=, one operation
+
+- =>==: negate the result of =<=, two operations
+
+- =<==: negate the result of =>= (swapped =<=), two operations
+
+- ===, =!==: xor or subtraction on the two operands, they are supposed to be zero if
+  they are equal or non-zero unsigned integer if not.
+  + =result unsigned< 1= to test equality
+  + =0 unsigned< result= to test inequality
+
+* Basic Control Flow
+
+** Simple IF
+
+#+begin_src c
+if (test-expr) {
+    if_body
+}
+continuation
+#+end_src
+
+In a typical assembly program, the test expression is evaluated,
+and if the result is false, a jump branches to the end of the if statement.
+
+#+begin_src asm
+...
+if:
+    test-expr
+    jump_if_test_false endif
+
+    if_body
+endif:
+    continuation
+#+end_src
+
+We could test true on =test-expr=, but that would put the if branch below the
+empty =else= branch and an additional jump is required.
+
+#+begin_src asm
+if:
+    test-expr
+    jump_if_test_true body
+
+    jump endif
+body:
+    if_body
+endif:
+    continuation
+#+end_src
+
+For a complex test expression, a =if= may be divided into two
+
+#+begin_src c
+if (A & B) {
+    body
+}
+// is
+if (A) {
+    if (B) {
+        body
+    }
+}
+
+if (a || b) {
+    body
+}
+// is
+if (a) goto do_body;
+if (b) goto do_body;
+goto cont;
+dobody:
+        body
+cont:
+// or
+if (a) goto do_body;
+if (!b) goto cont;
+dobody:
+        body
+cont:
+#+end_src
+
+This is useful especially when it is required that the programmer to use only
+conditional jumps (even used by GCC).
+
+** IF-ELSE
+
+#+begin_src c
+if (test-expr) {
+    if_body
+} else {
+    else_body
+}
+continuation
+#+end_src
+
+The execution may take either and continue on =continuation=. Then one branch
+has to jump there after executing its body.
+
+#+begin_src asm
+if:
+    test-expr
+    jump_if_test_false else
+
+    if_body
+
+    jump endif
+else:
+    else_body
+endif:
+    continuation
+#+end_src
+
+In this case, the =if= branch needs a jump to continuation while =else= already
+does not but it enters the branch with a jump.
+
+Compare with the simple-if case, here we execute the additional =else_body= when =test-expr=
+does not hold. Since fallthrough has been taken by the =else= branch, we need an
+additional jump to =continuation=.
+
+** IF-ELSEIF-ELSE
+
+#+begin_src c
+if (test-expr1) {
+    if_body
+} else if (test-expr2) {
+    if_body_2
+} else {
+    else_body
+}
+continuation
+#+end_src
+
+The assembly version is very similar to the structured version.
+
+#+begin_src asm
+if:
+    test-expr1
+    jump_if_test_false elif
+
+    if_body
+
+    jump endif
+elif:
+    test-expr2
+    jump_if_test_false else
+
+    if_body_2
+
+    jump endif
+else:
+    else_body
+endif:
+    continuation
+#+end_src
+
+Compared to =if-else=, this adds another branch of test-jump-if-false.
+
+** =while=
+
+The only difference from a =if= statement is that =if_body= is executed only
+once while =while_body= continues until the test fails.
+
+#+begin_src c
+while (test-expr) {
+    while_body
+}
+continuation
+#+end_src
+
+#+begin_src asm
+while:
+    test-expr
+    jump_if_test_false endwhile
+
+    while_body
+
+    jump while
+endwhile
+    continuation
+#+end_src
+
+** =for=
+
+A =for= loop is just a shorthand of the equivalent =while=.
+
+#+begin_src c
+for (pre; test-expr; post) {
+    body
+}
+cont
+
+//
+pre;
+while (test-expr) {
+    body
+
+    post
+}
+cont
+#+end_src
+
+which translates to
+
+#+begin_src asm
+    pre
+for:
+    test-expr
+    jump_if_test_false endwhile
+
+    body
+
+    post
+
+    jump for
+endfor
+    continuation
+#+end_src
+
+** do-while
+
+#+begin_src c
+do {
+    body
+} while (test-expr);
+cont
+#+end_src
+
+do and test and then jump back if necessary
+
+#+begin_src asm
+do:
+    body
+
+    test-expr
+    jump_if_test_true do
+end:
+    cont
+#+end_src
+
+** Jump Table
+
+#+begin_src asm
+jump_table:
+    case1,
+    case2,
+    case3,
+    end_case,
+
+    mov     jump_register, offset
+    jmp    [jump_register+jump_table]
+case1:
+    case1_body
+
+    jump endif
+case2:
+    case_body_2
+
+    jump endif
+case3:
+    else_body
+    jump end_case
+end_case:
+    continuation
+#+end_src
+
+GNU C has a similar feature called *computed goto*, which allows =goto= an
+address pointer obtained from a label in the current function or a containing function.
+
+A similar structure is *tranfer vector* (e.g. a interrupt vector).
+
+[[https://www.cipht.net/2017/10/03/are-jump-tables-always-fastest.html][A jump table may not be the best implementation for a switch clause]].

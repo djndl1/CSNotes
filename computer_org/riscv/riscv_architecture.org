@@ -1,0 +1,376 @@
+#+title: RISC-V Architecture
+
+* Myth
+
+- RISC-V is a RISC ISA and thus is fixed-length: no, it  supports optinally variable-length to both expand available instruction encoding space and to support an optional dense instruction encoding for improved performance, static code size and energy efficiency.
+
+* Basic Terminology
+
+- /Core/: a hardware component that contains an independent instruction fetch unit. It may have multiple RISCV-compatible hardware thread resources called /harts/.
+
+- /Coprocessor/: a unit that is attached to a RISC-V core which contains additional architectural state and instruction-set extensions.
+
+- /Accelerator/: a non-programmable fixed-function unit or a core that can operate autonomously, specialized for certain tasks.
+
+- /Software Execution Environment/, /Execution Environment Interface/: execution
+  environments range fromn bare-metal hardware implementations, to RISC-V OSes,
+  hypervisors to RISC-V emulators. The RISC-V specification defines EEI quite
+  broadly so that various CPU concepts may be applied to different implementations.
+  + an EEI has *harts* (an abstract execution resource that autonomous fetches and execute RISC-V
+    instructions within the execution environment)
+
+* Instruction Set Overview
+
+RISC-V is a family of related ISAs: four distinct base ISAs are designed in
+parallel as opposed to adding on later to sit on top of another. RISCV is
+designed to support customization and specialization with the differentiation of
+standard encoding, reserved encoding and custom encoding.
+
+- *base integer ISAs*, present in any implementation
+  + /RV32I/, /RV64I/, /RV32E/ (embedded, for microcontrollers), /RV128I/. Any
+    base ISA is not a strict subset of another so that each can be optimized
+    for its needs without requiring to support all the operations needed for4
+    other base ISAs.
+
+- *optional extensions*:
+  + /standard/: M (integer multiplication/division), A (atomic operations),
+    F/D/Q/L (various floating-point instructions), P (packed SIMD), V (Vector),
+    C (compressed instruction, 16-bit forms of common instructions)
+  + /reserved/: saved for future standard
+  + /custom/: never used fo4r standard extensions and available for
+    vendor-specific non-standard extensions.
+  + /non-conforming/: uses standard or reserved encoding for non-standard ISAs.
+
+** Encoding
+
+- Fix-lenght 32-bit instructions by default aligned on 32-bit boundaries
+
+- designed to support ISA extensions with variable-length instructions with lengths of 16-bit instruction parcels.
+
+* Memory Model
+
+- a single byte-addressable circular space of its bitness for all memory accesses
+
+- word = 4-bytes, halfword = 2 bytes, doubleword = 8 bytes, quadword = 16 bytes.
+
+- the address space may contain one or more I/O devices, determined by the execution environment.
+
+- Different harts may see different address spaces. A purely base-metal
+  environment has an identical address space for all harts.
+
+- Normally, implicit memory access is done to obtain the instruction to execute.
+  Other implicit memory accesses may be possible (not to be confused with
+  the load/store concept, where only instructions are discussed over)
+  + implicit reads do not raise an exception and may occur arbitrarily early and speculatively.
+
+- The EEI is responsible for memory access control.
+
+- The memory accesses (implicit or explicit) made by a hart may appear to occur
+  in a different order as perceived by another hart or by any other agent that
+  can access the same memory.
+  + the default memory consistency model for RISC-V is the *RISC-V Weak Memory
+    Ordering*. An implementation may also implements *Total Store Ordering*.
+
+
+* Exceptions, Traps, Interrupes
+
+- /Exception/: unusual condition occurring at runtime associated with an instruction in the current RISC-V hart.
+
+- /Interrupt/: an external asynchronous event that may cause a RISC-V hart to experience an unexpected transfer of control.
+
+Exceptions and interrupts are events, traps are the consequences of these events.
+
+- /trap/: the transfer of control to a trap handler caused by either an exception or an interrupt.
+
+From the perspective of software, traps can be divided into
+
+- /Contained traps/: visible to and handled by software.
+
+- /Requested traps/: The trap is a synchronous exception that is an explicit call to the execution
+environment requesting an action on behalf of software inside the execution environment. e.g. a syscall
+
+- /Invisible Traps/:  handled by the execution environment.
+  + e.g. emulating missing instructions, handling page faults
+
+- /Fatal traps/: a fator failure and causes the execution environment to terminate execution.
+
+* ISAs
+
+There are reduced versions RV32E and RV64E of RV32I and RV64I, which have only
+registers =x0= to =x16= for embedded microcontrollers (to save die area).
+
+** RV32I and RV64I Base Integer Instruction Set
+
+A total of around 40 instructions, enough to emulate all other instructions except the
+A(tomicity) extension.
+
+*** Programming Model
+
+32-bit registers for RV32 and 64-bit registers for RV64.
+
+- =x0=: zero register, hardwired to be zero
+
+- =x1=-=x31= general purpose registers
+  + the standard calling convention uses =x1= to hold the return address (link
+    register, x86 does not have such special a register) for a call and =x5= as an alternate link register, =x2= as the stack pointer.
+
+- =pc=: program counter
+
+*** Encoding and Formats
+
+Encoding and formats are important as they dictate what instructions can do,
+especially with immediates, due to the length of an instruction. Consult the ISA
+manuals for full encoding specification.
+
+*Fixed-length 32-bit instructions aligned on 32-bit boundaries*. However, RISC-V
+is designed to support variable-length ISA of the multiples of 16 bits.
+Currently all 32-bit instructions have their lowest two bits set to =11=.
+
+Bit 0-7 are always the code. =rd= (destination registers) is placed at bit 7-11,
+=rs1= at bit 15-19, =rs2= at bit 20-24. Immediates are always sign-extended and
+the sign bit is placed at bit 31 of the instruction, and the length is either 12
+or 20.
+
+- R(egister)-type: =op rd, rs1, rs2=
+
+- I(mmediate)-type: =op rd, rs1, imm12= or =op, rd, imm12(rs1)=
+  + the resultant immediate is =imm12= sign extended to 32 bits
+
+- S(tore)/B(ranch)-type: =op rs2, imm12(rs1)=
+  + the B-type is S-type with two bits of the immediate swapped and the
+    12-bit-encoded immediate is actually a 13-bit number with bit 0 equal to
+    zero, to represent branch a offset in multiples of 2 since all instructions
+    are aligned at least on 16-bit boundaries (for extended instructions with
+    length of 16-bit multiples).
+  + For S-type, the resultant immediate is =imm12= sign extended to 32 bits
+  + For B-type, the resultant immediate is =imm12= shifted left by 1 and then sign extended to 32 bits
+
+- U/J(ump)-type: =op rd, imm20=
+  + the J-type is to the U-type as the B-type is to the S-type.
+  + For U-type, the resultant immediate is =imm20= shifted left by 12, occupying
+    the upper part.
+  + for J-type, the resultant immediate is =imm20= shifted left by 1 (21 bits) and then
+    sign extended.
+
+*** Integer Computation Instruction
+
+Register-immediate: I type format; Register-Register: R-type
+
+- arithmetic (mostly I- or R-type): =ADDI=, =ADD=; =SUB=
+  + overflow check is done with a comparison-branch instruction that compares
+    the result with an operand.
+  + =mv rd, rs1= implemented as =addi rd, rs1, 0=
+  + =nop= implemented as =addi x0, x0, 0=, may be used to align code segments or
+    leave space for inline code modifications. Although the same effect may be
+    achieved via other instructions, this is the chosen canonical one (see HINT instructions).
+
+- logical: =ANDI=, =ORI=, =XORI=; =AND=, =OR=, =XOR=
+  + =NOT rd, rs= implemented =XORI rd, rs1, -1=, where -1 is all 1s).
+
+- shifts (I-type): =SLLI=, =SRLI=; =SRAI=; =SLL=; =SRL=; =SRA=
+
+- less-than comparison, signed and unsigned: =SLTI=, =SLTIU=; =SLT=, =SLTU=
+  + =SEQZ rd, rs= (set true if equal to zero) implemented as =SLTIU rd, rs1, 1=
+  + =SNEZ rd, rs= (set true if not equal to zero) implemented as =SLTU rd, x0, rs2=
+
+- special addition: =LUI= (load upper immediate), =AUIPC= (add upper immediate to pc) (U-type): used to build 32-bit constants, with a number of
+  which the upper 20 bits are explicitly encoded (=LUI=), or a number generated
+  by the upper 20-bit immediate added to the =pc= (=AUIPC=).
+  + the upper 20 bits in =LUI= or =AUIPC=, combined with an 12-bit immediate can
+    construct a 32-bit number(absolute, or pc-relative which adds =pc= to the
+    32-bit offset), and thus provides a way to construct large memory address.
+  + =AUIPC= is better for obtaining the current PC with =auipc rd, 0= than
+    =JAL+4= since it does not interfere with the branch predictor.
+  + =la rd, symbol=: load the address of a symbol
+    #+begin_src asm
+// .option nopic
+auipc   rd, symbol[31:12] // pc + upper_imm20
+addi    rd, rd, symbol[11:0] // pc + lower_imm12
+// .option pic
+auipc       rd, symbol@GOT[31:12] // the upper part of the entry's address
+l{w|d}      rd, symbolGOT[11:0](rd) // the actual address is saved in the global offset table
+    #+end_src
+  + =lla rd, symbol=: load load address, nopic =la=
+  + =lga rd, symbol=: load global address, pic =la=
+
+RV64 contains additional the =*W= series instructions for performance reason. All 32-bit values
+(unsigned integers included) are
+held in a sign-extended format in 64-bit registers by the compiler and calling
+convention.
+
+#+begin_quote
+The compiler and calling convention maintain an invariant that all 32-bit values are held
+in a sign-extended format in 64-bit registers. Even 32-bit unsigned integers extend bit 31
+into bits 63 through 32. Consequently, conversion between unsigned and signed 32-bit
+integers is a no-op, as is conversion from a signed 32-bit integer to a signed 64-bit integer.
+Existing 64-bit wide SLTU and unsigned branch compares still operate correctly on
+unsigned 32-bit integers under this invariant. Similarly, existing 64-bit wide logical
+operations on 32-bit sign-extended integers preserve the sign-extension property. A few
+new instructions (ADD[I]W/SUBW/SxxW) are required for addition and shifts to ensure
+reasonable performance for 32-bit values.
+#+end_quote
+
+- =ADDWI=; =ADDW=, =SUBW=
+  + =SEXT.W rd, rs1= (sign-extend a word) as =ADDIW, rd, rs1, 0=
+
+- =SLL[I]W=, =SRL[I]W=, =SRA[I]W=
+
+*** Load/Store
+
+Only load and store instructions access memory and arithmetic instructions only
+operate on CPU registers. Loads into =x0= raises exceptions.
+
+Endianness is byte-address invariant on RISC-V: if a byte is stored to memory
+at some address in some endianness, then a byte-sized load from that address in
+any endianness returns the stored value. Endianness is defined by the EEI.
+
+- (I-type) =LD rd, imm12(rs1)= (load dword), =LW= (load word), =LWU= (for RV64
+  only); =LH=, =LHU=; =LB=, =LBU=
+  + The loaded value is zero/sign-extended to fit into the register if necessary.
+
+- (S-Type) =SD rs2, imm12(rs1)=, =SW=, =SH=, =SB=
+
+Loads and stores are supposed to have an effective address aligned to the
+referenced datatype (divisible by the size of the access in bytes), otherwise it
+is *dependent on the EEI* (there are reasons for some implementations to allow
+misaligned accesses). Naturally aligned loads and stores are guaranteed to
+execute atomically.
+
+*** Control Transfer
+
+The target should be four-byte aligned.
+
+All jumps/branches except the indirect jump =JALR= are pc-relative. However, the
+actual use of =JALR= is mostly pc-relative.
+
+**** Unconditional Jump
+
+- =JAL rd, imm20= (J-type): jump and link (the =pc= register), a near jump.
+  the offset is actually a range of $\pm 1$ MB (21-bits) and the base register is
+  implicitly the =pc=.
+  + =J imm20= (jump by pc-relative offset) implemented as =jal x0, imm20=,
+    unconditional pc-relative jump without saving a return address
+  + =jal imm20= (jump and save to the default link register =x1=), implemented
+    as =jal x1, imm20=, used to make a function call
+
+- =JALR rd, rs1, imm12= (I-type): jump and link register (indirect jump)
+  + the target address is =rs1 + imm12= with the least-significant bit set to
+    zero. Note this =imm12= is not a multiple of 2 bytes (I-type after all),
+    this reduction in range is not significant due to being used with a base
+    register.
+    Also, the cleared low bit can be used to store auxiliary information in a
+    function pointer without being used with jump instructions.
+  + this instruction is supposed to be combined with =LUI= and =AUIPC= to jump
+    to a far address (up to 2GB). For farther addresses (under RV64), there are
+    other techniques (GOT, PLT, jump tables, etc.) to load the address in a register and indirectly jump beyond 2GB.
+  + =jr rs= implemented as =jalr x0, rs, 0=, indirect jump without saving
+  + =jalr rs= implemented as =jalr x1, rs, 0=,
+  + =ret= implemented as =jalr x0, x1, 0=, return from a subroutine by using the
+    link register as the target address.
+  + =call=
+    #+begin_src asm
+// pc-relative far call, call pc-relative-offset
+// upper_imm20 + pc + lower_imm12
+auipc   x1, imm20
+jalr    x1, x1, imm12
+    #+end_src
+
+RISC-V does not have a set of many jump instructions but two with the ability to
+save the next instruction address that, combined with certain registers, is able
+to implement a short jump, a long jump, an indirect jump, a function call, a
+function return.
+
+**** Conditional Branches
+
+All branch instructions are B-type, meaning all immediates are actually 13-bit
+offset ($\pm 4$KB) relative to =pc=.
+
+(equal or inequal) =BEQ=, =BNE=; (less than) =BLT=, =BLTU= (unsigned); (greater
+than or equal) =BGE=, =BGEU= (unsigned).
+
+With the instructions above, other comparison pseudosinstructions =BGT=, =BLTU=,
+=BGE= and =BGEU= can be easily synthesized.
+
+**** Memory Ordering Instructions (FENCE)
+
+Used to order device I/O and memory accesses as viewed by other harts and
+external devices or co-processors. No other RISC-V hart or external device can
+observe any operation in the successor set following a FENCE before any
+operation in the predecessor set preceding the FENCE. The FENCE instruction also
+orders memory reads and writes made by the hart as observed by memory reads and
+writes made by an external device.
+
+#+begin_quote
+The EEI will define what I/O operations are possible, and in particular, which
+memory addresses when accessed by load and store instructions will be treated
+and ordered as device input and device output operations respectively rather
+than memory reads and writes.
+#+end_quote
+
+**** Environment Call and Breakpoints
+
+=ECALL= (service request to the environment, basically syscall) and =EBREAK=
+
+** M Standard Extension
+
+- =MUL= (lower half); =MULH=, =MULHU=, =MULHSU= (upper half)
+
+- =MULW= (RV64)
+
+- =DIV=; =DIVU=; =DIVW=, =DIVUW=
+
+- =REM=, =REMU=; =REMW=, =REMUW=
+
+#+begin_src asm
+# full multiplication
+MULH((S)H) rdh, rs1, rs2
+MUL rdl, rs1, rs2=
+
+# full division
+DIV(U) rdq, rs1, rs2
+REM(U) rdr, rs1, rs2=.
+#+end_src
+
+Microarchtectures can fuse the two into a single multipy operation.
+
+** F Standard Extension: Single-Precision Floating-Point Computational Instructions
+
+- =f0=-=f31= 32-bit wide register; =fscr= control and status reegsiter, which contains the operating mode and exception status of the floating-point unit.
+
+** D Standard Extension: Double-Precision Floating-Point
+
+=f0= through =f32= are widened to 64 bits
+
+* ABI
+
+** Standard ABI
+
+*** Registers
+
+- =x1=: =ra= (return address)
+
+- =x2=: =sp= stack pointer
+
+- =x3=: =gp= global pointer
+
+- =x4=: =tp= Thread pointer
+
+- =x5=-=x7=: =t0=-=t2=, =x28=-=x31=: =t3=-=t6= temporary registers
+
+- =x8=-=x9=: =s0=-=s1=, =x18=-=x27=: =s2=-=s11=: callee-saved registers
+
+- =x10=-=x17=: =a0=-=a7= argument registers
+
+- =f0-f7=, =f28=-=f31=: temporary registers
+
+- =f8=-=f9=, =f18=-=f27=: callee-saved registers
+
+- =f10=-=f17=: argument registers
+
+*** Calling Convention
+
+**** Integer Calling Convetion
+
+- =a0=-=a7=: for scalars smaller than XLEN.
+
+- the stack is empty-descending and the stack pointer is aligned to a 128-bit boundary upon procedure entry.

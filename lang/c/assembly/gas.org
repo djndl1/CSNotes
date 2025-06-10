@@ -17,11 +17,13 @@ expressed in the same line.
 ** Comments
 
 Line comment characters are ISA-dependent (=//= for Aarch64, =@= for ARM, =#=
-for x86, RISC-V)
+for x86, RISC-V).
 Comment-line (the whole line is a comment): =#= begins a comment for ARM,
 Aarch64, x86.
 
-General multi-line comment is the C-style =/* */=
+General multi-line comment is the C-style =/* */.
+
+Use C89 style comments in case of confusion.
 
 ** Instructions
 
@@ -36,19 +38,59 @@ character ='c=.
 
 Binary integers are supported: =0b1011=.
 
+** Expressions
+
+The result must be an absolute number or an offset into a particular section.
+
+- empty expression: no value
+
+- integer expressions: one or more arguments delimited by operators, where
+  arguments may be symbols (evaluated as section number), numbers and subexpressions.
+
 ** Symbols
 
-Labels are automatically converted into symbols by =as=. One may use =.set= to
+Symbols are a central concept: the programmer uses symbols to name things, the linker
+uses symbols to link, and the debugger uses symbols to debug.
+
+Labels are automatically converted into symbols by =as=. One may use =.set= (or ~=~) to
 explicitly create symbols. Symbol names are limited to letters, digits and =$= (machine-specific),
 =.=, =_= and multibyte characters.
+
+A local symbol starts with certain prefixes (=.L= for ELF). They are not saved
+in object files and not visible when debugging.
+
+*** the Dot Symbol =.=
+
+The current address being assembled.
+
+*** Attributes
+
+Symbols have attributes:
+
+- *value*: usually 32 bits.
+  + A label symbol's value is determined during relocation. An undefined symbol
+    of the value 0 requires the linker to find its value. Non-zero undefined
+    symbols simply have a name and represent a =.comm= common declaration and
+    the value is the number of allocated space.
+
+- *type*: relocation information and any flag settings
+  + =.type= directive
+
+- other symbol attributes, some are specific to a file format.
 
 ** Labels
 
 Symbolic labels are identifiers followed by =:= and are placed into the symbol
-table. Numeric labels (=<Number>:=) are for local use and are not included in
+table.
+
+Numeric labels (a.k.a /local labels/ =<Number>:=) are for local use and are not included in
 the symbol table and thus can be repeatedly defined in the same assembly
-program. A reference to a numeric label contains a suffix =b= (before) or =f=
-(after) to indicate its position relative to the reference.
+program. A reference to a numeric label contains a suffix =b= (backwards) or =f=
+(forwards) to indicate its position relative to the reference. Numeric labels are
+converted into symbols by some predefined scheme.
+
+Some targets support scoped local labels, valid for only a small region of the
+input source code, typically suffixed with a =$=.
 
 ** Directives
 
@@ -56,11 +98,16 @@ Used to control the assembler.
 
 *** Add Data Values
 
-=.byte=, =.half=, =.word=, =.dword= add data (comma separated expressions) to
-the active section.
+- =.dc= (per number), =.dcb=, =.ds=, =.fill= (customizable size unit), =.zero=, =.space= (=.skip=, byte unit)
 
-=.string= or =.asciz= (null terminated strings), =.ascii= (string without NULL
-character) add strings to the active section.
+- =.byte=, =.word= (machine-specific, 2 bytes for x86), =.short= (machine-specific), =.hword= (2 bytes),
+  =.int= (=.long=, machine-specific, 4 bytes for x86), =.quad= (8 bytes), =.octa= (16 bytes),
+  =.double=, =.float= (=.single=),
+
+
+- =.string= or =.asciz= (null terminated strings), =.string8=, =.string16=,
+  =.string32=, =.ascii= (string without NULL character) add strings to the
+  active section.
 
 Note that these directives will not align the data at a proper boundary. Use
 =.align= for that.
@@ -68,6 +115,15 @@ Note that these directives will not align the data at a proper boundary. Use
 *** =.section=
 
 Changes the active section. =.segment= is not supported by GAS.
+A section is the basic unit of linking. Sections of the same category are linked together.
+The linker also assigns runtime addresses to sections (*relocation*).
+The linker deals with named section, text section, data section, 
+bss section, absolute section (always relocated to runtime address 0),
+undefined section.
+
+To merge data or text in different parts in an assembly source so that they are near each other, 
+they can be placed under the same subsection. By default everything is placed under subsection 0 
+unless explicitly specified otherwise with =.subsection=, =.text= or =.data=.
 
 =.rodata= (read-only data), =.data= (initialized global data), =.text=
 (instructions), =.bss= (uninitialized global variables).
@@ -75,28 +131,75 @@ Changes the active section. =.segment= is not supported by GAS.
 =.text [subsection]=, =.data [subsection]=, =.bss [subsection]= are also used as directives to add subsections.
 
 =.bss= sections have only symbols, =.skip size [fill_byte_value]= is required to
-allocate memory space.
+allocate memory space. =.lcomm= and =.comm= may also be used to declare common variables in bss sections.
 
 #+begin_src asm
 .section .bss
-x:  .skip 4 0 # allocate 4 bytes with the value initialized to 0
+x:  .skip/.space 4 0 # allocate 4 bytes with the value initialized to 0
 #+end_src
 
-*** =.set=, =.equ=
+*** Set Symbols: =.set=, =.equ=, =.equiv=
 
-Sets the value of a symbol to an constant expression. By default it creates a local
-symbol if none.
+Sets the value of a symbol to an constant expression. By default =.set= and
+=.equ= creates a local symbol if none.
+
+=.equiv=: signals an error if the symbol is already define. =.eqv= is like
+=.equiv= but evaluates the expression immediately instead of on site.
+
+#+begin_src asm
+.ifdef SYM
+.err
+.endif
+.equ SYM, VAL
+#+end_src
+
+*** =.comm=, =.lcomm=: common symbol
+
+When linking, a common symbol in one object file may be merged with a defined or
+common symbol of the same name in another object file (compare to =extern=). If
+no definition is found, only uninitialized memory is allocated for it.
 
 *** =.globl=, =.global=
 
 Makes the symbol visible to the linker. A C's =extern= declaration.
 
-*** =.align=
+*** =.local=: Local Symbols
+
+for ELF. The symbols will not be externally visible.
+
+*** =.internal=, =.hidden=, =.protected=
+
+ELF visibility directives.
+
+*** =.align [alignment, [fill_byte, [max_skip_bytes_allowed]]]=
+
+Pad the location counter in current subsection to a particular storage boundary.
+The exact =alignment= specification is target-specific: some indicate the
+alignment request in bytes (see =.balign=, e.g. i386), others (arm, risc-v) indicate then
+number of low-order zero bits the location counter must have after advancement,
+effectively $2^{N}$ byte boundary.
 
 Instructions and data are not automatically aligned. The programmer is
 responsible for keeping data and instructions aligned. The compiler usually
-inserts a =.align N= (multiple of $2^{N}$) directive before routine labels to ensure the routine
+inserts a =.align N= directive before routine labels to ensure the routine
 instructions start on aligned addresses.
+
+*** Conditional Assembly
+
+=.if=, =.ifdef=, =.ifb=, =.ifc=, =.else=, =.elseif=, =.endif=
+
+Compare to C's =#if= preprocessing directives.
+
+*** Including Files
+
+- =.incbin=: includes the file verbatim at the current location, especially
+  binary data.
+
+- =.include=: includes a supporting source file
+
+*** NOP operations
+
+=.nop=, =.nops=
 
 * Assembling Process
 
@@ -108,16 +211,65 @@ instructions start on aligned addresses.
 The location counter of each section is initialized. The assembler scans the
 source, adds a symbol to the symbol table when encountering a label, increment
 the location counter of the current section while translating instructions.
+=.offset loc=, =.org=, =.p2align= can set the location counter.
 
 =as= has basically none preprocessing capability (=.include= only). Name the
 source file suffixed with =.S= and feed it into =gcc= to get C-style
 preprocessing.
 
+* Macro Programming
 
+=\@= (all macros), =\+= (the containing macro) may be used to keep a counter of
+how many times macros have been executed.
+
+- =.rept=: repat the sequence of lines between =.rept= and =.endr=.
+
+- =.irp=, =.irpc=: expands to a list of statements based on the input parameter list
+
+  #+begin_src asm
+.irp    param,1,2,3
+    move d\param, sp@-
+.endr
+# equivalent to
+move d1, sp@-
+move d2, sp@-
+move d3, sp@-
+  #+end_src
+
+- =.macro macname macargs ...=, =.endm=: macro definitiones
+  +  recursive calls are supported
+  #+begin_src asm
+.macro sum from=0, to=5
+.long \from
+.if \to-\from
+sum "(\from+1)",\to
+.endif
+.endm
+/*
+    .long 0
+    .long 1
+    .long 2
+    .long 3
+    .long 4
+    .long 5
+,*/
+  #+end_src
+  + macro arguments may force a non-blank value (through =:req=), takes
+    variable-length arguments (suffixed with =:vararg=), or have default value ~=default_value~.
+  + Arguments may be specified by position or by keyword ~sum to=17, from=9~.
+  + Within the body, a parameter is referenced by prefixing the name with a =\=.
+  + a parameter may be skipped with an empty argument (and thus multiple
+    successive commas)
+  + to exit from a macro, use =.exitm=.
 
 
 * How to Use =as=
 
 =as= accepts more than one files concatenated.
-Use =-D= to enable debugging. =-I= to add an =.include= search path. =--MD= to
+Use =-D= to enable backend debugging. =-g= to generate debug info for each
+assembler source line. =-I= to add an =.include= search path. =--MD= to
 generate a dependency file for use with =make=; =-o= output file name.
+=a[<various_switches]= (=l= assembly source, =h= high-level source, =s= symbols) to generate a listing so that no disassembling is required to see the result.
+
+=as= does not have to be invoked directly, but via =gcc=: options can be passed
+via =-Wa,...=

@@ -1,4 +1,6 @@
 #+title: Intel Early History
+#+bibliography: x86_ref.bib
+#+cite_export: basic
 
 This note covers the history of Intel CPU before modern Core microarchitectures
 since 8086.
@@ -39,38 +41,517 @@ since 8086.
 
 * 8086 (launched in 1978)
 
-A non-strict extension of 8080,basically the same microarchitecture as 8085.
+A non-strict extension of 8080, basically the same microarchitecture as 8085.
 
 A mixture of random logic and microcode.
 
-- clock frequency 5MHz - 10Hmz
+** Intended Use
+
+Intel did not design these microchips for later IBM "PC"s: they were meant as
+generic building blocks for computing machines and thus the multiprocessing
+capability and various bus configurations. 8086/8088 may be configured in
+minimum mode, where pins transfer control signals directly to memory and I/O, or
+in maximum mode, where these pins take on different functions to help build
+large systems, especially for multiprocessing systems.
+
+An additional 8284 clock generator and a 8288 bus controller are required. There
+was a 8089 I/O coprocessor (optimized for data transfer), which was not used by IBM and the series was later abandoned.
+Intel provided a product line containing 8086/8088, 8089 I/O processor, 8259 programmable
+interrupt controller, 8082/8083 octal latch, 8286/8287 octal bus transceiver etc.
+
+** Basic Specification
+
+- clock frequency 5MHz - 10MHz
 
 - 40-pin DIP package.
 
 - 16 bit data width: all internal registers as well as internal and external
   data buses are 16-bit wide.
-  + multiplexed with the address bus.
+  + multiplexed with the address bus. An address transmission is followed by a
+    data transmission over a subset of the same physical lines.
 
-- 20 bit address width
+- 20 bit address width; 1MB memory along with a separate 64KB I/O space.
 
 - two-stage pipeling: BIU (instructions fetched into the instruction queue), EU
   (execution of fetched instructions). Certain instructions (jump) may require
   flushing the queue (and thus the pipeline), causing a /branch penalty/.
 
-8086 is divided into an Execution Unit (EU) and a Bus interface Unit (BIU). The
-BIU is responsible for handling all interfaces with external bus. When the EU
+** Architecture (Microarchitecture Maybe)
+
+8086 is divided into an /Execution Unit/ (EU) and a /Bus interface Unit/ (BIU). The
+BIU is responsible for handling all interfaces with external bus (fetching
+instructions and data, writing results). When the EU
 needs to access memory, it make a request to the BIU. When there is no requests
 from the EU, the BIU fetches machine instructions from the memory into the
-instruction queue.
+instruction queue (up to 6 instruction bytes).
 
-An additional 8284 clock generator and a 8288 bus controller are required.
+*** *Execution Unit*
 
-8086 is designed to work in a multiprocessing system.
+A 16-bit ALU maintains the CPU status and control flags, and manipulates the
+general registers and instruction operands.
+
+Instructions are obtained from a queue maintained by the BIU and any
+memory access is done by the BIU as a proxy.
+
+*** *Bus Interface Unit*
+
+Accesses memory for the EU and prefetches instructions whenever the queue has some
+empty bytes (one byte per transfer for 8088 and two bytes for 8086, there is a
+reason for memory alignment). However, a branch/jump resets the queue and
+instructions are fetched from the new address.
+
+*** Registers
+
+**** General Registers
+
+- A set of 16-bit H-L registers that can be used as two sets of 8-bit registers.
+
+- pointer and index registers (=SP=, =BP=, =DI=, =SI=)
+
+**** Segment Registers
+
+The memory space is divided into segments, pointed to by segment registers:
+
+=CS= (code), =SS= (stack), =DS= (data), =ES= (extra)
+
+**** Instruction Pointer
+
+It contains the offset of the next instruction from the beginning of the current
+code segment, updated by the BIU. The actual value is the offset of the next
+instruction to fetch. Programs have no other way to access the register except
+pushing it onto the stack. However, whenever the value is pushed onto the stack,
+the value actually saved is the offset of the next instructions to be executed.
+
+**** Flags
+
+six 1-bit status flags and three additional control flags (single-step trap
+enabled; string operation direction; interrupt enabled flag)
+
+#+begin_src
+[TF DF IF] (OF SF ZF AF PF CF)
+#+end_src
+
+**** Mode Selection
+
+The strap pin $\text{MX} / \overline{\text{MX}}$ defines the function of certain
+CPU pins so that the CPU operates under either the minimum mode or the maximum mode.
+
+** Multiprocessing
+
+8086 is designed to work in a multiprocessing system for efficiency,
+performance, robustness, parallelism. Two kinds of proccessors are supported:
+
+- Independent processors: 8086, 8088, 8089.
+
+- Coprocessor: the coprocessor monitors instructions fetched by the host and
+  recognizes certain of these as its own and executes them.
+
+There are built-in solutions for multiprocessing coordination:
+
+- *bus arbitration* by 8289 or the bus request/grant logic in a processor
+
+- *mutual exclusion*: *LOCK* bus signal prevents other processors from obtaining
+  a shared system bus. A processor may lock the bus during data transfer so that
+  the other processor may not access the target of the transfer. 8086 has
+  built-in support for mutexes and semaphores with bus lock and special instructions.
+
+*** Bus Lock \(\overline{\text{LOCK}}\)
+
+The LOCK signal is active during execution of the instruction following the LOCK prefix.
+The LOCK signal is only a hint: other processors on the shared bus may choose to
+ignore it.
+
+#+begin_quote
+LOCK may be used in multiprocessing systems to
+coordinate access to a common resource, such as
+a buffer or a pointer. If access to the resource is
+not controlled, one processor can read an
+erroneous value from the resource when another
+processor is updating it
+#+end_quote
+
+Combined with the =XCHG= instruction, LOCK can implement a semaphore to
+force mutual exclusion.
+
+#+begin_src asm
+; a spin lock
+    mov al, 1
+wait:
+    lock xchg al, semaphore
+    test  al, al
+    jnz wait
+    ; use resource
+    ; ...
+    ; done
+    mov semaphore, 0
+#+end_src
+
+
+*** ​WAIT and Synchronize on External Events
+
+A =WAIT= instruction stays idle and waits for the \(\overline{\text{TEST}}\) to become active.
+
+*** Notify Another Processor with =ESC=
+
+Processor A starts an =ESC=; Processor B monitors the bus and control lines
+ and
+captures the =ESC= and its operand. Processor B begins to prepare data for A. A
+=WAIT= until B sends a \(\overline{\text{TEST}}\) signal to notify that the data is ready.
+
+The instruction queue may be monitored through =QS0= and =QS1= in maximum mode.
+
+*** Request/Grant Lines
+
+In maximum mode, =HOLD= and =HLDA= lines are called
+\(\overline{\text{RQ}}/\overline{\text{GT0}}\) and
+\(\overline{\text{RQ}}/\overline{\text{GT1}}\), used as a bus request/grant
+signal line.
+
+A processor sends a request pulse on the line; the CPU returns an acknowledge
+pulse on the line and disconnects from the line. The other processor takes the
+line while the CPU continues its own execution until a bus access is required.
+The other processor finishes its job and sends a final pulse to relinquish the bus.
+
+*** Multibus Support
+
+Configured in maximum mode and used with 8288 Bus Controller.
+
+** Bus Organization
+
+Microprocessors are always connected to a local bus and memory and I/O
+components usually reside on a system bus. Standard memory and I/O components
+are are not attached to the local bus.
+
+*** Local Bus
+
+A set of processors may be connected to the same local bus and coordinated.
+Other processors may be connected to another *remote* local bus.
+
+The processors and bus interface groups that are connected by a local bus form
+a *processing module*.
+
+*** System Bus
+
+Five sets of signals:
+
+- address bus
+
+- data bus
+
+- control lines
+
+- interrupt lines
+
+- arbitration lines
+
+Local buses are connected to a system bus via a group of bus interface
+components. Memory and I/O may be connected a private system bus only for a
+single local bus or to a public system bus serving multiple processing modules.
+The access of the modules are controlled by bus arbiters of the modules.
+
+** Memory
+
+*** Alignment
+
+Odd addressed (unaligned) words do not take advantage of the 8086's ability to
+transfer 16-bits at a time. There is no alignment requirement: Instructions, byte
+data and word data may be freely stored at any byte address without regard for
+alignment thereby saving memory space by allowing code to be densely packed in
+memory. Unaligned word access requires two bus cycles, one byte at a time.
+16-bit data should be stored at even addresses.
+
+Word alignemnt is totally transparent to software (except for low performance).
+
+#+begin_quote
+The 8086 always fetches the instruction stream in
+words from even addresses except that the first
+fetch after a program transfer to an odd address
+obtains a byte. The instruction stream is
+disassembled inside the processor and instruction
+alignment will not materially affect the per-
+formance of most systems.
+#+end_quote
+
+*** Segmentation
+
+All segments begin on 16-byte (formed by the 4 bit left shift of a segment
+register) memory boundaries. Segments may be adjacent, disjoint, partially
+overlapped or fully overlapped.
+
+8086 terms the segment and offset pair "logical address", compared to "physical
+address" on the address lines, formed by =Segment << 4 + Offset=, called
+*effective address*.
+
+Instructions are always fetched from the current code segment; =IP= contains the
+offset of the target instruction from the beginning of the segment. =SP=
+contains the offset of the top of the stack (the last pushed item). These are
+fixed combinations: =IP= and =SP= cannot be paired with othe segment registers.
+=BP=, normally as a frame base pointer, may be used as a base pointer and may be
+combined with any currently addressable segments.
+
+For a string operation, the source is specified by =CS/DS/ES/SS:SI= and the destination
+by =ES:DI= and updated by the instruction automatically.
+
+**** Position-Independent Code (Dynamically Relocatable)
+
+Segmentation makes it possible to write position-independent programs and allows
+a multiprogramming or multitasking system to make particularly effective use of
+available memory, combined with swap mechanism.
+
+However, this forces a program to avoid altering its segment registers and make
+far jumps/calls. All offsets in the program must be relative to fixed values in
+the segment registers.
+
+*** Stacks
+
+A stack is limited up to 64KB. However, the system is free to create any number
+of stacks. Push and pop operate in an unit of 16 bits, or a word. The stack
+grows down in memory toward its base address (the segment base, or the limit address maybe?).
+
+*** Reserved Memory
+
+- =0x0= to =0x7F= and =0xFFFF0= to =0xFFFFF= for interrupt and system reset processing.
+
+** I/O
+
+There is a 64KB separate I/O address space (read and write by the =IN= and =OUT=
+instructions). =0xF8= through =0xFF= is reserved by Intel.
+
+*** Memory-Mapped I/O
+
+I/O devices may also be placed in
+the memory space to bring the power of the full ISA and addressing modes to I/O
+processing.
+
+*** DMA
+
+Un minimum mode, 8086 is compatible with traditional DMA controllers.
+
+** Interrupts & Traps
+
+Terms: *INTR* -> interrupt request, *ISR* -> Interrupt Service Routine a.k.a
+Interrupt Procedure
+
+8086 can handle up to 256 different interrupt types.
+
+Generally, the processor checks for interrupts after completion of the current
+instruction, first internal interrupt (=INT= instruction), then external
+interrupts (=NMI= and =INTR= signal lines). It will continues execution of the
+next instruction after any or none interrupt handling. During handling before
+executing the user interrupt procedure, an =NMI= or a single-step trap may interrupt
+the current interrupt. The interrupt service procedures are linked with
+interrupt type codes by the *interrupt pointer table* (a.k.a *interrupt
+vector*). Consult the 8086 manual (Figure 2-29) for the full processing
+sequence[cite:@8086Man].
+
+*** Interrupt Priority
+
+- Most internal interrupts: divide error, =INT n=, =INTO=
+
+- =NMI=
+
+- =INTR=: The =INTR= is generally ignored during interrupt handling since =IF=
+  is cleared before any ISR and restored after the ISR, unless otherwise enabled
+  during execution.
+
+- Single-step: disabled before execution of the first instruction of an ISR and
+  restored after the ISR unless otherwise enabled. It is special in that when
+  enabled, it has
+  a chance to execute its ISR before the real execution of the mainline ISR begins.
+
+The priority issue does not only arise on simultaneous arrival of multiple
+interrupts: if an interrupt is being serviced, another interrupt may even interrupt
+that interrupt handling. Not only are the initial priority of =INTR= and single
+step at a lower level, they are even cleared during any ISR execution to
+prevent preemption unless desired otherwise.
+
+*** Interrupt Sources
+
+By source, an interrupt may come from: external devices (8259A), CPU exceptions
+(divide by zero, overflow) ,
+software-initiated (=INT=).
+
+
+**** External Interrupts
+
+- =INTR= line: interrupt request, level-triggered, usually controlled by a interrupt controller
+  such as 8259A
+  + 8259A is a programmable interrupt controller that appears to software as a set
+    of I/O ports.
+  + The interrupt controller accepts requests from the device, determines which
+    requesting device has the highest priority and then activate the =INTR= line
+    according to the priority.
+  + Interrupts on =INTR= are determined by the interrupt flag, enabled by an
+    =STI= instruction and disabled by a =CLI= instruction. If =IF= is clear,
+    then interrupts on =INTR= are masked and ignored. The interrupt signal is
+    not latched by the CPU and must be held until a response or a withdraw.
+    Interrupts can also be selectively masked in 8259A.
+  + The CPU then acknowledges the interrupt by executing two consecutive
+    interrupt acknowledge (\(\overline{\text{INTA}}\)) bus cycles (and locking
+    the bus in maximum mode). 8259A responds by placing the 1-byte interrupt
+    type code (0-255) on the data bus during the second cycle, used by the
+    processor to call the corresponding interrupt service procedure. The interrupt
+    type is configured by software during the initialization of 8259A.
+
+- =NMI= line: Non-maskable (cannot be disabled) interrupt, edge-triggered.
+  + Generally used to signal a catastrophic event: imminent loss of power;
+    memory error detection or bus parity error.
+  + Higher prieority than =INTR=.
+  + Defined by type 2.
+  + =NMI= results directly in interrupt handling, no acknowledge required.
+
+Interrupt response requires some latency, usually the remaining clock periods of
+the current executed instruction.
+
+**** Internal Interrupts
+
+The =INT= instruction generates an interrupt and supplies a type code. Any type
+code is allowed and thus =INT= may be used to test interrupt procedure written
+to service external devices or inserting breakpoints (type 3), a one-byte long
+instruction can be easily inserted into an existing program and replace another
+instruction for temporary debugging.
+
+Certain conditions may also trigger an interrupt:
+
+- Overflow: type 4
+
+- divide error: type 0
+
+- single-step trap: type 1. The trap flag =TF= generates an interrupt every single
+  instruction, a debugging tool.
+  + The single-step is executed between two instructions, but not under every
+    situation when it is enabled, at least only once when another interrupt takes place.
+  + The ISR needs not to stop execution; it may act merely as a hook. The
+    single-step ISR may act as a window to monitor the system
+    instruction-by-instruction.
+  + The single-step mode is honored once before the ISR of another interrupt,
+    and it may choose to run the mainline ISR in full speed or single step with
+    this opportunity. This call to the single-step ISR is not recursive since
+    =TF= has already been cleared when the mainline ISR is entered.
+  + the processor is not in single-step mode when the single-step interrupt
+    procedure is entered: it runs in full speed as it clears =TF= as well,
+    preventing recursive entries into the single-step ISR.
+
+
+No acknowledge is required and internal interrupts cannot be disabled (except
+for single-step). *Internal interrupts (except single-step) have higher priority
+than any external interrupts*.
+
+
+*** Interrupt Vector
+
+#+begin_quote
+An interrupt type
+code and the procedure that has been designated
+to service interrupts associated with that code.
+#+end_quote
+
+the first 1KB bytes of low memory, up to 256 entries (at least the first 256
+bytes are reserved), each of which a doubleword
+(4 bytes)
+containing a =CS:IP= pair far pointer value to an interrupt procedure.
+
+The CPU saves the current =CS:IP= on the stack, calls the pointer in the
+corresponding entry of the type code.
+
+=TF= (single-step) and =IF= (=INTR=) are cleared before every call of an ISR.
+
+*** Interrupt Procedure
+
+Flags, =CS=, =IP= are saved onto the stack. The procedure may reenable external
+interrupts with =STI=.
+
+An interrupt procedure may be interrupted by a request on =NMI=, software- or
+processor-initiated interrupts.
+
+Care must be taken so that the type of interrupt being serviced by the procedure
+does not itself inadvertently occur within the procedure to avoid endless
+recursive interrupt calls.
+
+#+begin_quote
+It is good practice for an interrupt procedure to enable external interrupts for
+all but "critical sections" of code (those sections that cannot be interrupted
+without risking erroneous results). If external interrupts are disabled for too
+long in a procedure, interrupt requests on INTR can potentially be lost.
+#+end_quote
+
+The actual processing done by an ISR is dependent upon the application:
+
+- for an external interrupt, the ISR should instructs the device to remove its
+  interrupt request and then takes action accordingly.
+
+- for software-initiated interrupt:
+
+  #+begin_quote
+Software-initiated interrupt procedures may be used as service routines
+("supervisor calls") for other programs in the system. In this case, the
+interrupt procedure is activated when a program, rather than an external device,
+needs attention. (The "attention" might be to search a file for a record, send a
+message to another program, request an allocation of free memory, etc.) Software
+interrupt procedures can be advantageous in systems that dynamically relocate
+programs during execution. Since the interrupt pointer table is at a fixed
+storage location, procedures may "call" each other through the table by issuing
+software interrupt instructions. This provides a stable communication "exchange"
+that is independent of procedure addresses. The interrupt procedures may
+themselves be moved so long as the interrupt pointer table always is updated to
+provide the linkage from the "calling" program via the interrupt type code.
+  #+end_quote
+
+** System Reset
+
+The =RESET= edge-triggered signal, clears flags, =IP=, =DS=, =SS=, =ES=, sets
+=CS=, empties the instruction queue.
+
+#+begin_quote
+Since the code segment register contains FFFFH
+and the instruction pointer contains 0H, the processor executes its first
+instruction following system reset from absolute memory location FFFF0H. This
+location normally contains an inter segment direct JMP instruction whose target
+is the actual beginning of the system program.
+...
+As external (maskable) interrupts are disabled by system reset, the system
+software should reenable interrupts as soon as the system is initialized to the
+point where they can be processed.
+#+end_quote
+
+** System Halt =HLT=
+
+All operations are stopped until an external interrupt occurs or the system is reset.
+
+#+begin_quote
+The halt state can be used when an event prevents the system from functioning
+correctly. An example might be a power-fail interrupt. After recognizing that
+loss of power is imminent, the CPU could use the remaining time to move
+registers, flags and vital variables to (for example) a battery-powered CMOS RAM
+area and then halt until the return of power was signaled by an interrupt or
+system reset.
+#+end_quote
+
+
+** Software Development
+
+Intel provided a series of software tools and hardware development boards, running on the  Intellec Series II
+Microcomputer Development System.
+
+- PL/M compiler
+
+- Assembler: ASM-86
+
+- LINK-86: Linker
+
+- LOC-86: assigns absolute memory, a relocator.
+
+- OH-86: handles program format.
+
+- LIB-86: library archiver
+
+The SDk-86 development kit (a development board) had a monitor program and even
+supported single stepping, basically a debugger.
 
 ** 8088
 
 A binary-compatible cheap version of 8086, with the external data width reduced
-8-bit, thus more compatible with then 8-bit compouter design for IBM.
+8-bit, thus more compatible with then 8-bit computer design for IBM.
 
 * 80286 (1982)
 
@@ -88,15 +569,50 @@ A binary-compatible cheap version of 8086, with the external data width reduced
 
 - 24-bit address width, up to 16 MB memory
 
-- On-chip MMU with virtual memory support up to 1GB via segmentation (4 pairs of
-  segment registers combined).
+- On-chip MMU with virtual memory support up to 1GB via segmentation (local and
+  global combined)
   + virtual memory is supported on a segment swapping basis
   + segments can be protected and marked as read-only and execute-only.
 
 - Four privilege levels
 
-** Protected Mode
+** [[https://files.osdev.org/mirrors/geezer/os/pm.htm][Protected Mode]]
 
+*** Segmentation Under Protected Mode
+
+The  value in a segment register is no longer an absolute index of a physical segment,
+but a selector value, a 8-byte aligned offset (the lower 3 bits are for requested
+privilege level and local/global descriptor table selection) into a *descriptor
+table* that maps this index to physical memory, pointed to by the
+=GDTR= and =LDTR= registers, a =table_base_address:table_size= pair, of which an entry
+of 8 bytes describes a segment of 64KB, allowing maximum virtual memory of 512MB
+per table. The descriptor tables are controlled by the OS and not exposed to user programs directly: segment addresses are completely hidden by the OS.
+
+As for memory protection, any selector out of the range of the descriptor table's size or an offset out of the range
+of a segment's limit triggers a general fault, which protects against illegal memory access.
+=CS= may point to one segment and other segment registers use another (=CS= cannot
+load a data descriptor), this somehow helps security (but now we have =NX= bit on modern x86 CPUs).
+
+The global descriptor table defines segments first. A local descriptor table is
+another type of descriptor table defined in a memory segment by the GDT and
+managed by the OS, accessible within the current task via the =LDTR= register,
+changed by the OS.
+
+A descriptor entry has the following format:
+
+- *base*: 24-bit for 286, 32-bit for 386, containing the linear address where the segment begins
+
+- *limit*: 16-bit for 286, 20-bit for 386, the maximum number of addressable unit
+
+- *access byte*: present, privilege level, type, executable, direction, readable/writable, accessed
+  + A descriptor entry may describe different types of segments: *task state segments*, *local descriptor tables*, *gates* or a *normal segment* etc.
+  + for system segments (task state segments, local descriptor tables, gates) the access byte has 4 bits that indicate the segment type.
+
+- *flags*: granularity
+  + 1 byte for 286 or 4KB for 386 per addressable unit, that is, each segment is
+    4GB in maximum
+
+Standard-mode Windows 3.x used this 286 segmented protected mode without memory isolation.
 
 *** Limitation
 
@@ -110,6 +626,26 @@ In protected mode, memory management and interrupt handling were done
 differently than in real mode and memory that does not belong to one program is
 not accessible (intended by design), which is incompatible with existing DOS programs.
 
+** Unreal Mode
+
+A special state of the CPU not officially documented, in which the CPU acts like
+in real mode but with segment descriptors that allow it to access memory above
+the 1MB limit.
+
+Under protected mode, any memory access has to go through MMU and
+segment descriptor tables in the main memory. To resolve this issue, the CPU maintains
+a cache of segment descriptors. This cache is also used even under real mode,
+giving real-mode code a chance to access extended memory.
+
+The undocumented =loadall= instruction may be used to load the cache with a
+specific segment descriptor so that real-mode code may use that cached
+descriptor to access extended memory. Or the processor enters protected mode,
+sets up segment registers to segment descriptors that provide access to the full
+address space of 4GB, and then switches back to real mode with previous
+unsupported segment configuration in place. The descriptors that are not
+applicable to real mode are sticky, no longer touched
+by real mode code and it becomes possible to address extended memory.
+
 ** OS Support
 
 - Concurrent DOS 286: run fully in protected mode with real mode program compatibilty
@@ -122,11 +658,36 @@ not accessible (intended by design), which is incompatible with existing DOS pro
 
 Fully 32-bit CPU (internal registers, buses and external buses).
 
-- Up to 4GB physical memory and 64 TB virtual memory ($2^14$ segment selectors
+- Up to 4GB physical memory (32-bit memory bus) and 64 TB virtual memory ($2^14$ segment selectors
   times $2^{32}$)
   + a fixed 4-KB page size
 
 - Support for parallel stages
+
+** Virtual 8086 Mode
+
+A hardware-virtualization technique under protected mode.
+
+A V86 monitor at ring 0 and in protected mode monitors the 8086 real-mode
+program at ring 3. The CPU traps certain events and calls the V86 monitor which
+examines what the real mode program is trying to do and acts as a proxy to
+interface with the hardware or terminates the real-mode program if the behavior
+is not allowed.
+
+** Protected Mode
+
+- The offset registers are now 32-bit long. A single segment is now up to 4GB long.
+
+- The base address of in a segment descriptor can be 32-bit, instead of 24-bit
+  on 286.
+
+- A paging unit, as a second layer of address translation, was added to allow
+  more granular control. Once enabled, the address produced by a
+  segment:offset pair is now a virtual address, requiring a further mapping.
+
+Most C compilers assume a flat-memory model, where the segment
+part is ignored. FreePascal have long pointer types that support such
+segmentation mechanism.
 
 ** 386SX
 
@@ -150,4 +711,4 @@ The first tightly-pipelined x86 design. Production continued into the late 2000s
 
 - power saving and system management capabilities
 
-- =CMPXCHG=, =XADD= ,=BSWAP= and other atomic operation instructions
+- =CMPXCHG=, =XADD=, =BSWAP= and other atomic operation instructions

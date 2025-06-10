@@ -6,9 +6,17 @@
 
 - /Virtualization/: execute the guest code directly on the host CPU.
 
-* System Emulation
+* [[https://gist.github.com/apivovarov/98120ffb2d92f9dfce39925801271606][System Emulation]]
 
-=qemu-system-=
+=qemu-system-riscv64=
+
+** Bootloader
+
+A riscv64_smode U-boot EFI loader (prebuilt binaries downloadable from Debian) is required as a kernel to actually boot the system.
+
+** Linux Image
+
+A premade image can be downloaded from [[https://people.debian.org/~gio/dqib/][here]] to avoid installation.
 
 ** Device Emulation
 
