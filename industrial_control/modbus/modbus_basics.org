@@ -32,11 +32,14 @@ Any device can send out a Modbus command.
 Communication over TCP/IP 502 port; no checksum. The Modbus TCP/IP message is
 simply a Modbus communication encapsulated in an Ethernet TCP/IP wrapper.
 
+Multiple client connections to a single server may be supported.
+
 **** Format
 
 - ADU = Address + PDU + Error check
   + PDU = Function code + Data. The name PDU is a carry-over from Modbus RTU,
     not the TCP/IP PDU.
+  + A TCP frame must transport only one Modbus Application Data Unit (ADU) at a time.
 
 #+begin_src
 ┌───────────────────────┌──────────────────┌──────────────┐──────────────┌───────────────┐──────────┐
@@ -45,6 +48,18 @@ simply a Modbus communication encapsulated in an Ethernet TCP/IP wrapper.
 │ Identifier(sequence)  │ 0 for Modbus     │Bye count     │              │               │ length   │
 └───────────────────────└──────────────────└──────────────┘──────────────└───────────────┘──────────┘
 #+end_src
+
+- transaction identifier is set by the client and is meant to be unique to
+  identify this transaction (possibly a sequence number) and match the request
+  with the response in case of multiple pending requests.
+  + typically from 1 to 16 but may vary.
+
+- protocol identifier is always =00= for Modbus.
+
+- Unit Identifier is =0x00= or =0xFF= in Modbus TCP/IP, unless the message is
+  meant to reach a RTU slave.
+
+All fields are encoded in big-endian format.
 
 **** Determinism over Ethernet
 
@@ -71,15 +86,87 @@ Checksummed variant
 
 * Object Types
 
-- /Coil/ (1-bit RW)
+Modbus functions operate on memory registers to configure, monitor, and control
+device I/O. Modbus devices usually include a Register Map.
 
-- /Discrete input/ (1-bit RO)
+- /Coil/ (RW discrete outputs): 1-bit RW
+  + =0xxxx=
 
-- /Input Register/ (16-bit RO)
+- /Discrete input/: 1-bit RO
+  + =1xxxx=
 
-- /Holding Register/ (16-bit RW)
+- /Input Register/: 16-bit RO
+  + =2xxxx=
+
+- /Holding Register/: 16-bit RW
+  + =3xxxx=
+
+The type prefix digit may be redundant and is not specified in the data address
+field as the type is already specified in the function code.
+The actual address number in use may leave out the leading prefix, use a
+zero-based address, or a one-based address.
 
 * Command
 
 A Modbus command reads or writes to a data object on a device.
 
+The service request (Modbus Protocol Data Unit) is comprised of a function
+code, and some number of additional data bytes, depending on the function.
+In most cases, the additional data is usually a variable reference, such as a
+register address, as most Modbus functions operate on registers.
+The data field typically includes register addresses, count values, and written
+data.
+
+Function code (1-byte) 65-72 and 100-110 are for user-defined services.
+
+** Typical Functions
+
+Register words are formatted big-endian.
+
+- =01= :: read coil status. The query is not restricted to one coil: multiple
+  boolean values may be returned in a sequence of bits.
+  + request: =(u8 function_code = 1, u16 starting_address, u16 number_of_points)=
+  + response: =(u8 function_error_code, u8 data_byte_count, u8[data_byte_count] data)=
+
+- =03= :: read holding registers
+  + request: =(u8 function_code = 3, u16 starting_address, u16 number_of_points)=
+  + response: =(u8 function_error_code, u8 data_byte_count, u16[data_byte_count / 2] data_words)=
+
+- =04= :: read input registers
+  + request: =(u8 function_code = 4, u16 starting_address, u16 number_of_points)=
+  + response: =(u8 function_error_code, u8 data_byte_count, u16[data_byte_count / 2] data_words)=
+
+- =05= :: force single coil
+  + request: =(u8 function_code = 5, u16 coid_address, u16 force_data)= =0xff00=
+    for =true= and =0x0000= for =false=
+  + response: =(u8 function_error_code, u16 coid_address, u16 force_data)=. An
+    echo of the request.
+
+- =15= :: force multiple coils
+  + request: =(u8 function_code = 15, u16 coid_address, u16 number_of_coils, u8
+    force_data_byte_count, u8[force_data_byte_count] force_data)=,
+    the =force_data= contains forced bits for coils.
+  + response: =(u8 function_error_code, u16 coid_address, u16 number_of_coils)=. An
+    echo of the request.
+
+- =06= :: preset single holding register
+  + request: =(u8 function_code = 6, u16 register_address, u16 preset_data)=
+  + request: =(u8 function_error_code = 6, u16 register_address, u16
+    preset_data)=. An echo of the request
+
+- =16= :: force multiple coils
+  + request: =(u8 function_code = 16, u16 starting_address, u16 number_of_registers, u16[number_of_registers] force_data)=,
+    the =force_data= contains forced bits for coils.
+  + response: =(u8 function_error_code, u16 starting_address, u16 number_of_numbers)=. An
+    echo of the request.
+
+** Error Handling
+
+When the slave device responds to the master, it uses the function code
+field to indicate either a normal (error-free) response, or that some kind of
+error has occurred (an exception response).
+
+A normal response simply echoes the original function code of the query, while
+an exception response returns a code that is equivalent to the original function
+code with its most significant bit (msb) set to logic 1 and  the data field is
+set to a 1-byte exception code.
