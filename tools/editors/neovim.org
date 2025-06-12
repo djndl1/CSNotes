@@ -1,3 +1,13 @@
-* [[https://github.com/nvim-lua/kickstart.nvim][Kickstarter script]]
+* Difference from Vim
 
+** Architecture
+
+Neovim uses runtime *providers* to implement some features whose behavior may
+depend on the system and environment, unlike Vim 8, where these features may
+be enabled at compile time.
+
+e.g. to enable python support
+#+begin_src shell
+python -m pip install neovim
+#+end_src
 
