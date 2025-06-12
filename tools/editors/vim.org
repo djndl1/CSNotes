@@ -627,6 +627,8 @@ function SetTimeOfDayColors()
 endfunction
 #+end_src
 
+- to execute a function in command mode, =:call funcname()=
+
 - Arrays: =[elm1, elm2, elm3, elm4, ...]
 
 - =&option_name=: retrieve the vale of an option
@@ -655,8 +657,10 @@ function CheckFileType()
 endfunction
 #+end_src
 
+- to execute a script, run =source scriptfile=.
 
-* Plugins
+
+* Plugins (Since Vim 6)
 
 A plugin is simply a Vim script file that is loaded automatically when Vim
 starts to extend Vim's functionality. Plugins may be
@@ -667,9 +671,9 @@ starts to extend Vim's functionality. Plugins may be
       =lzma=, =xz=, =lzip=, =zstd= files.
     - =netrw=: similar to Emacs' =TRAMP=. Transparent editing of files on other machines.
     - =tar=, =zip=: similar to =gzip=.
-    - a global plugin is added by dropping the copy in the right directory
-      + per user: =~/.local/share/nvim/site/plugin/= and its subdirectories
-      + globally: =$VIMRUNTIME/plugin= and =$VIMRUNTIME/macros=, =$VIM/vimfiles/pack/dist/opt/=
+  + a global plugin is added by dropping the copy in the right directory
+    - per user: =~/.local/share/nvim/site/plugin/= and its subdirectories
+    - globally: =$VIMRUNTIME/plugin= and =$VIMRUNTIME/macros=, =$VIM/vimfiles/pack/dist/opt/=
 
 - *filetype plugins* (*ftplugins*): used for a specific type of file.
   + typically put under the =ftplugin= directory
@@ -680,26 +684,54 @@ starts to extend Vim's functionality. Plugins may be
 The plugin directory (=plugin= or =ftplugin=) can be in any of the directories in the =runtimepath=
 option. To debug plugin loading, start Vim with =-V2=.
 
+When a plugin is placed in =runtimepath= (and thus installed), Vim
+automatically sources the scripts it finds under these subdirectories.
+
 ** Package Management
 
-A *package* is a directory that contains *plugins*. It may be a separate directory,
+A *package* (since Vim 8) is a directory that contains *plugins*. It may be a separate directory,
 a VCS repository, a set of interdependent plugins, "start" packages.
 
-Packages are stored in the paths =runtimepath= or =pack/*/start/*= paths under
-runtime paths.
+Packages may be stored in the paths =&runtimepath= or =.vim/pack/=. The
+plugins under =pack/*/start= are added to =&runtimepath= and are automatically loaded.
 
 Plugins and packages are managed, loaded and initialized by a plug-in managers.
 
 *** Builtin Manager
 
-- =:packadd= :: search and source any plugin files found under =pack/*/opt/{name}=
+- =:packadd= :: search and source any plugin files found under =pack/*/opt/{name}=.
+  That is, an optional plugin may be installed but under =opt= it is not loaded
+  automatically.
 
 *** [[https://github.com/VundleVim/Vundle.vim][Vundle]]
 
 Vundle (=:h vundle= can download, update, search, clean up plugins, manage the runtime path of installed scripts.
 Plugins are now managed within =$MYVIMRC=, installed and updated automatically.
 
+*** Other Package Managers
+
+- [[https://github.com/k-takata/minpac][minpac]] :: a minimal package manager
+  for modern Vim (Vim 8 and Neovim) that takes advantage of modern Vim
+  package functionality and job control.
+
+- [[https://github.com/junegunn/vim-plug][vim-plug]] :: very similar to
+  Vundle
+
+- [[https://github.com/tpope/vim-pathogen][vim-pathogen]] :: no really a
+  package manager, but a solution to manage =runtimepath= before Vim 8
+
+*** Documentation
+
+After a plugin or a package is installed, the user or the package manager
+should run =helptags= to parse, index documentation files and build a tags file.
+
 * Other Tips
+** Quick Search
+
+- =fzf= and =ripgrep= are two great tools that enables the user to search for
+  files and matching text.
+  + the =fzf-vim= plugin integrates =fzf= and =ripgrep= with Vim.
+
 ** File Explorer
 
 - NERDTree: a side bar that displays the current workspace.
