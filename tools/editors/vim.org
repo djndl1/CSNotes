@@ -374,8 +374,12 @@ requires saving and may be unhidden.
 
 - help
 
-- quickfix: the list of errors created by a command or the location list,
+- quickfix: list of errors created by a command or the location list,
   typically used with edit-compile-debug cycle
+  + a quickfix has a quickfix ID, unique to a Vim session, and a title.
+
+- location list: a window-local quicfix list, independent of the quickfix
+  list.
 
 - scratch
 
@@ -558,14 +562,24 @@ set syntax=idl.c
 
 * QuickFix: Edit-Compile-Edit Cycle
 
-=:make= builds the project and collects the result text in the =Quickfix List=
-window, where one can inspect, jump to and correct errors.
+=:make= synchronously builds lints) the project and collects the result text in the =Quickfix List=
+window, where one can inspect, jump to and correct errors. Error meesages are
+parsed according to the =errorformat=.  Vim also supports compiling without a
+Makefile (simply =:make filename_no_ext=) for a quick compilation and comes with some compiler plugins to
+support this feature.
 
 - =:cnext=, =:cprevious=: move in the error list
+
+- =colder [count]=, =:cnewer [count]=, =:chistory=: there may be more than
+  one quicfix lists. these commands switch between these lists.
+
+- =:cdo {cmd}=: do a commmand after relocation by each entry of a quickfix list to operate on those locations that generate errors.
 
 - =errorformat=: an option defining a format of errors returned from a compile
 
 - =makeprg=: an option containing the name of the build instruction
+
+Almost all quickfix commands have location list counterparts.
 
 ** grep
 
@@ -582,6 +596,13 @@ It is used alongside with the Quickfix list even if the result has nothing to do
 - external =:grep= command :: use an external grep command
   + the pattern is not enclosed by =/=
 
+
+*** Grepper
+
+A convenience wrapper (but asynchronous) around =gepprg= and =grepformat=. 
+=ag=, =ack=, =grep=, =findstr=, =rg=, =pt=, =sift=, =git grep= are all
+supported.
+
 *** ripgrep
 
 #+begin_src vimscript
@@ -589,6 +610,12 @@ set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
 set grepformat+=%f:%l:%c:%m
 #+end_src
 
+
+*** fzf
+
+- =fzf= and =ripgrep= are two great tools that enables the user to search for
+  files and matching text.
+  + the =fzf-vim= plugin integrates =fzf= and =ripgrep= with Vim.
 
 * Vimscripts
 
@@ -726,12 +753,6 @@ After a plugin or a package is installed, the user or the package manager
 should run =helptags= to parse, index documentation files and build a tags file.
 
 * Other Tips
-** Quick Search
-
-- =fzf= and =ripgrep= are two great tools that enables the user to search for
-  files and matching text.
-  + the =fzf-vim= plugin integrates =fzf= and =ripgrep= with Vim.
-
 ** File Explorer
 
 - NERDTree: a side bar that displays the current workspace.
