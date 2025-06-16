@@ -120,6 +120,20 @@ Mostly based on POSIX regex.
 
 - =\cC=, =\CC= categories =describe-categories=
 
+* Vim Regex
+
+Supposedly derives from POSIX BRE but with much more features.
+
+- =\+=, not =+=
+
+- =\( ... \)= not =(...)=
+
+- ~x\=~, not ~x?~
+
+- =x\{n,m}=, not =x{n, m}=
+
+See =:h perl-patterns= for difference from perlregex.
+
 * Shell Pattern Matching
 
 - =*= :: zero or more characters
