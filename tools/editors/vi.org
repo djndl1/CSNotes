@@ -80,6 +80,8 @@ To save as =root= when Vim is not running as =root=, use =:w !sudo tee >
 - ~G~  :: go to the specified line/the end if none
    + (Vim) =gg= to the the specified line/the beginning if none
 
+- =NN%= :: goto the =NN=-th percent of the buffer.
+
 - =`= or ='= :: get back to a previous mark 
   + call =:marks= to show a list of marks
   + a few special marks: see =:h '[=.
@@ -113,7 +115,7 @@ To save as =root= when Vim is not running as =root=, use =:w !sudo tee >
 
 - =h=, =SPACE=; =l=, =BACKSPACE= (also as =^h=) ::
 
-- =w=, =b=; =W=, =B=; ~e~, =E=  :: move to the next/last word. The upper
+- =w=, =b=; =W=, =B=; ~e~, =E=, =ge=, =gE= :: move to the next/last word beginning/end. The upper
   case version ignores punctuation, splits words by whitespaces.
 
 - ~n|~ :: move to column n
@@ -158,6 +160,8 @@ Sections are completely defined by macros.
     line; =^W= erases a word; =^I= inserts a tab; =^[= is the escape key.
   + In case some other operations are required under
     insert mode, use =^o= to access normal mode commands.
+  + =gI= starts insert mode at the column 1, the exact opposite of =A=. =I=
+    starts at the first non-blank character.
 
 - ~ra~ :: replace the current char with ~a~, no need to enter the insert mode;
   + replace =&&= with =||=: type =2r|=
@@ -212,6 +216,11 @@ registers 1-9, accessible by ="n=.
 
 - ~p~, ~P~ :: put after/before the line/the cursor
   + =xp= :: to transpose two characters
+
+- =i_Ctrl-R= under insert mode :: insert the contents of a register.
+  + not every paste has to be performed under normal mode. The unnamed
+    register is named ="=. There is also an expression register ===, which
+    evaluates an expression and converts the result to a string to be pasted.
 
 - ~Y~ :: curiously = ~yy~, not yank to the end of the line.
   + under Neovim,  more consistently defined as =y$=
@@ -327,6 +336,7 @@ The =ex= editor has five modes:
   + Different elements of an =ex= command may be separated by spaces.
   + multiple commands on a single line are separated by =|= in the same way a
     semicolon separates a shell command.
+  + (Vim) =Ctrl-D= to list all possible completion options.
 
 - *text input mode* :: gathers input lines and places them in the file; the
   =append=, =insert= and =change= commands use text input mode. A dot =.= line exits
