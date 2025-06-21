@@ -93,8 +93,9 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 * New Modes
 
 See =:h mode-switching= for mode switching operations. =C-\ C-N/G= can be used to
-go to Normal mode from any other mode.  Type =gQ= (Neovim) or =Q= (Vim) under normal
-mode.
+go to Normal mode from any other mode.  
+
+Type =gQ= (Neovim) or =Q= (Vim) under normal mode to enter =ex= mode.
 
 ** Visual Mode =v=
 
@@ -122,11 +123,7 @@ Define selections visually and perform editing commands on the visual selection.
 *** Operating on Selection
 
 Most of the commands operate under Select mode without much semantic
-change. See =:h visual-operators=. There are also a set of motion commands
-usable /only under Visual mode or after an operator/, see =:h object-select=,
-which makes a distinction between *inner part of a text object and a full text
-object* (a word without/with the surrounding whitespace, a quoted string
-with/without the quote marks).
+change. See =:h visual-operators=. 
 
 =\%V= limits the match inside the selected visual area.
 

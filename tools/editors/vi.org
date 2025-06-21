@@ -235,6 +235,32 @@ registers 1-9, accessible by ="n=.
 
 - ~J~ :: join
 
+*** Repeat the Last Change
+
+- =.=: repeat the change since the last time of entering the insert mode
+
+*** Text Objects (Vim)
+
+There is a conceptual distinction between motion commands and text objects.
+Motion commands operate on a text range defined by motion after an operator =h:
+operator=.  However, there are special commands that indicate text objects (words,
+sentences, paragraphs, =[]= blocks, =()= blocks, =<>= blocks, 
+={}= blocks, XML =<tag></tag>= blocks, =""= blocks, =''= blocks, =``= blocks) 
+only after an operation =h: text-objects=. These commands operate on text
+range defined by text objects, not by motion.
+
+- =aw=, =iw=: different from =w= in that the word under the cursor is operated on,
+  rather than the text across which a word motion includes. The inner version
+  only selects the object itself, not its preceding or following whitespace.
+
+- for a block object, the inner version excludes the surrounding pair.
+
+- Under visual mode, if the selected region is more than one character, text
+  object commands extend the region according to the semantics of the text
+  object and the direction depends on the position of the cursor.
+
+- For tag blocks, non-matching tags are ignored.
+
 ** Search/Replace
 
 *** Pattern Search
