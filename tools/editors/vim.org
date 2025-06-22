@@ -405,6 +405,8 @@ requires saving and may be unhidden.
 - =$VIMRUNTIME=: used to locate various support files: documentation, syntax
   highlighting files, plugins.
 
+There is a =defaults.vim= since Vim 8.0 if none is found.
+
 * Folding
 
 Folding define what parts of the file to see. Folds are not simply defined by

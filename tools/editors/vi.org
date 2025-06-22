@@ -156,7 +156,7 @@ Sections are completely defined by macros.
     repetition of the inserted text.
   + Under =vi=, =a= only appends, =i= only inserts: they cannot modify existing
     text and backspace deleting characters are not instantly displayed as deleted.
-  + Under insert mode (ASCII caret notation), =^H= is backspace, =^U= deletes the input on the current
+  + Under insert mode (ASCII caret notation =man ascii= and look at the "Char" column), =^H= is backspace, =^U= deletes the input on the current
     line; =^W= erases a word; =^I= inserts a tab; =^[= is the escape key.
   + In case some other operations are required under
     insert mode, use =^o= to access normal mode commands.
@@ -279,11 +279,11 @@ range defined by text objects, not by motion.
   + =n=, =N= continue the search in the same/opposite direction.
   + (vim) a history of search commands is maintained, retrievable with arrow keys or =^p=, =^n=.
   + the final =/= or =?= is optional without the offset
-  + use =\%>= and =\%<= to limit the search range.
+  + use =\%>= and =\%<= to limit the column search range.
   + =/= are =?= are not suited for every situation, use ex global =g/pattern/#=
     to list all matching lines and jump there.
-  + Unlike =C-P= which completes the previous
-  + to search a word under the cursor, use =*= (forward) and =#= (backward)
+  + to search a word under the cursor, use =*= (forward) and =#= (backward),
+    see the next command.
     
 - =*=, =#= :: search forward/backward for the count'th occurrence of the word nearest to the cursor.
   + a =g= prefix may be added to indicate no word boundaries.
@@ -294,7 +294,7 @@ range defined by text objects, not by motion.
   current line; =;=
   repeats the previous search.
   + =t= and =T= is a version of =f= that goes to the position before the searched character.
-  + =;=​/​=,= repeats the previous find command in the same/opposite direction.
+  + =;= and =,= repeats the previous find command in the same/opposite direction.
   + use =``= or =''= to return to the position/line before the search.
 
 Substitution is mostly done through the =substitute= ex command.
@@ -327,7 +327,7 @@ Substitution is mostly done through the =substitute= ex command.
 
 ** Combination For Special Tasks
 
-- =dwelp= :: swap the two words. Delete the word, go over the next word and a step forward, put the
+- =dwelp= :: swap two words. Delete the word, go over the next word and a step forward, put the
   deleted word.
 
 - =lb=, =he= :: move to the beginning/end of a word; =l=​/​=h= here guards against the case
@@ -674,6 +674,10 @@ Options may be set in a =.exrc= file in the home directory.
 - =showmode= :: the modeline
 
 - (Vim) =whichwrap= :: allow certain operations to move out of its line, e.g. =<BS>=.
+
+- (Vim) =wrap= :: wraps long lines visually
+
+- (Vim) =list= :: show tabs
 
 **** Search
 
