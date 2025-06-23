@@ -39,6 +39,8 @@ Used by =awk=
 - *branch*: one or more concatenated pieces.  
   A BRE regex consists of one or more nonempty *branches* separated by =|=, 
   which matches anythign that matches one of the branches.
+  + =|= has the lowest precedence: the two operands can be as long as they
+    can.
 
 *** Bracket Expressions (Groups of Characters Within Brackets)
 
