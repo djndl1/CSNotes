@@ -539,8 +539,12 @@ dictionary words and even entire lines. Completion includes
 
 * Syntax Highlighting
 
-=:syntax enable=, =:syntax on=, =set syntax=filetype=. Syntax definition files
-are stored in =$VIMRUNTIME/syntax=. User color schemes are placed under =~/.config/nvim/colors=.
+=:syntax enable=, =:syntax on= enable syntax highlighting. 
+Syntax is normally deduced from =filetype=, however, ~:set syntax=filetype~ can 
+set the current syntax set in use, typically a file type name.
+
+Syntax definition files are stored in =$VIMRUNTIME/syntax=.
+User color schemes are placed under =~/.config/nvim/colors=.
 
 #+begin_src
 # sets color scheme to "evening"
