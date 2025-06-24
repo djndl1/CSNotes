@@ -46,7 +46,9 @@ ip a | awk '$1 == "inet" { print $2} '
 awk -f programFile inputfiless...
   #+end_src
 
-- =$1=, =$2= ... fields; =$0= the entire line; =NF=: the number of fields; =$NF=: the last field. Any expression can be used after =$= to denote a field number; =NR=: current line number
+- =$1=, =$2= ... fields; =$0= the entire line; =NF=: the number of fields; 
+  =$NF=: the last field. Any expression can be used after =$= to denote a field number; 
+  =NR=: current line number (number of record)
 
 #+begin_src awk
 # much like Python's print
@@ -100,7 +102,7 @@ END { print nlines }
 
 * Language
 
-- The opening brace of an action muyst be on the same line as the pattern it accompanies.
+- The opening brace of an action must be on the same line as the pattern it accompanies.
 
 - statements can be broken after backslashes, commas.
 
@@ -119,7 +121,11 @@ END { print nlines }
 
 *** Regex Matching
 
-- =/regex/=: matches the input line. In a matching expression, a quoted string can normally be used interchangeably with a regex enclosed in slashes. However, in quoted strings, =\\= is needed to escape a character.One level of protecting backslashes is removed when a quoted string is parsed by awk.
+- =/regex/=: matches the input line. In a matching expression, a quoted string 
+  can normally be used interchangeably with a regex enclosed in slashes. 
+  However, in quoted strings, =\\= is needed to escape a character:
+  ="\+"= means =+=, ="\\+"= means =\+=, that is, a literal =+=,
+  because one level of protecting backslashes is removed when a quoted string is parsed by awk.
 
 - =expression ~ /regex/=: matches the string value of the expression
 
@@ -143,24 +149,45 @@ A range pattern matches multiple lines.
 ** Action
 
 - expression:
-  + variables:
-    - builtin: =FNR= (line number of the current file), =NF= (reset when =$0= changes or when a new field is created by assigning to a field variable), =NR=. =RLENGTH=/=RSSTART= change as a result of =match= call.
-    - variables are initialized by defaut to =""= or =0=freebird
-  - arithemtic operators: =^=: exponentiation
-  - =i in arr= is supported.
-
+  + variables: variables may be /user-defined/, /builtin/ or /fields/.
+    - builtin: =FNR= (line number of the current file), =NF= 
+    (reset when =$0= changes or when a new field is created by assigning to a field variable), 
+    =NR= (number of record). =RLENGTH= and =RSSTART= change as a result of =match= call.
+    - fields: =$0= to =$NF=. Fields can be assigned to. One may create a new
+      field simply by assigning a value to it.
+    - Uninitialized variables are created with the numeric value 0 and the string value "". 
+      Nonexistent fields and fields that are explicitly null have only the
+      string value ""; they are not numeric, but when coerced to numbers they
+      acquire the numeric value 0.
+  + arithemtic operators: =^=: exponentiation. All arithmetic is done in
+    floating point.
+  + Strings can act as regex: =$2 ~ mystring=.
+  + ~v = e~ and =v= acquire the type of =e=; ~x == y~ the comparison is
+    numeric only if both operands are numeric.
+    Any field is by default a string but it may also acquire a numeric type
+    if it is a valid numeric token.
+    
 - Arrays are string-subscripted associative arrays. An array element may be deleted with =delete array[subscript]=.
-
+  + Array elements cannot themselves be arrays. Multidimensional arrays are actually associative arrays 
+    with keys formed by concatenated subscripts: =array[i, j]= has keys a key
+    =i SUBSEP j=, where =SUBSEP= is a builtin variable to separate
+    subscripts. Testing for array membership =if((i, j) in arr)= works.
+  
 - Control flow: all C constructs are supported
+  + =for (key in array)= loop is supported.
   + =next=: the next iteration of main input loop
   + =exit=: to the =END= action; exit the program if already within the =END= action.
 
-- user defined function
+- user defined function, defined anywhere a pattern-action statement can.
   + scalars are passed by values while arrays are passed by reference.
   + function-local variables are only created through the paramter list (strange design).
+    All other parameters are global. To define a local variable, it has be
+    added to the parameter list. Fortunately, a function call is not
+    required to supply every parameter with an argument.
+  + For a function call statement =funcname()= is okay, =funcname ()= is not.
 
 - output
-  + =>= and =>>= are used with =print=/=printf= to write into files.
+  + =>= and =>>= are used with =print= or =printf= to write into files.
   + =|= pipes are also used with printing functions.
   + files are pipes are identified by their names (file name or pipe command string)  inside a awk program.
   = =close= a file/pipe is necessary if the file is read later.
