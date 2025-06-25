@@ -150,7 +150,7 @@ A range pattern matches multiple lines.
 
 - expression:
   + variables: variables may be /user-defined/, /builtin/ or /fields/.
-    - builtin: =FNR= (line number of the current file), =NF= 
+    - builtin: =FS= (field separator, by default a single blank) =FNR= (line number of the current file), =NF= 
     (reset when =$0= changes or when a new field is created by assigning to a field variable), 
     =NR= (number of record). =RLENGTH= and =RSSTART= change as a result of =match= call.
     - fields: =$0= to =$NF=. Fields can be assigned to. One may create a new
@@ -197,11 +197,39 @@ A range pattern matches multiple lines.
 
 * Common Operations
 
+** Input
+
+- =FS= can be a regex so that a file can have different separators as long as
+  it matches the pattern.
+
+- =RS=: the record separator is by default a line separator =\n=. Set it to
+  other character to enable multiline records.
+
+- =getline=: read a line from the current input or a file without waiting for
+  the main loop to proceed.
+
+- =-f progname= and =-F sep= are ignored in =ARGV= and =ARGC=
+
 ** Output
 
 - =print=: similar to Python's =print=
+  + =OFS= separates the arguments in the output
 
 - =printf=: C's =printf=.
+  + dynamic precision or field width denoted by =*= is not supported.
+
+- =>= and =>>= redirection is supported.
+  + A redirection opens a file only once and each successive =print= or
+    =printf= statement adds more data to the open file, even if =>= is used. 
+    The only difference =>>= shows is to clear the file when first used on a file.
+  + A comparison =>= at the end of a =print(f)= must be quoted.
+  + files opened by =>=, =>>= or =|= need to be explicitly closed.
+
+- =|= piping is also supported.
+  + A pipe is closed by its command string.
+** Invoke External Programs
+
+- =system= function
 
 ** Selection & Filtering
 
