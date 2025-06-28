@@ -90,6 +90,21 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 - =Ctrl-O=, =Ctrl-I= :: jump back/forward in the jump list
   + call =:jumps= to show the jump list.
 
+* Record & Playback
+
+More than key mappign or macro, this records complex command sequences 
+and replays them to save typing.
+
+- =q<RegisterName>= to start recording, =q= again to stop. =@<RegisterName>=
+  to replay the commands. To append commands to a register,
+  =q<UppercaseRegisterName>.
+
+* Format
+
+- =gq=: format the specified text object (by motion or text objects).
+  + this proves to be useful when writing markdown or orgmode text to avoid
+    manually breaking lines.
+
 * New Modes
 
 See =:h mode-switching= for mode switching operations. =C-\ C-N/G= can be used to
@@ -379,6 +394,12 @@ requires saving and may be unhidden.
   list.
 
 - scratch
+
+** Diff
+
+Under vimdiff
+
+- =]c= and =[c= to jump to the next/last change.
 
 * Initialization
 
