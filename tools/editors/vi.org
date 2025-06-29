@@ -130,7 +130,10 @@ To save as =root= when Vim is not running as =root=, use =:w !sudo tee >
 - ~(~​/​~)~, ~{~​/​~}~, ~[[~​/​~]]~ :: move to
   beginning of current/next sentence/paragraph/section
 
-- =%= :: move to the matching parenthesis
+- =%= :: move to the matching parenthesis. (Vim) for more structured text, it
+  jumps to the match text sequence (=if= to =endif= etc.).
+  - (Vim) =[(=, =[{=, =])=, =]}=: while between a pair, these commands move
+    to one side of the pair.
 
 - Commands that change text can be combined with ~/~ and ~?~ ::
 

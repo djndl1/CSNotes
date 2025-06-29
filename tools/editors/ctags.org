@@ -82,7 +82,7 @@ Supported by most code editors.
 
 *** Preview
 
-- =pt=, =pts=, =ptj=, =ptn=, =ptp=, =ptf=, =ptp= show the tag in a preview
+- =:pt=, =:pts=, =:ptj=, =:ptn=, =:ptp=, =:ptf=, =:ptp= show the tag in a preview
   window, closable with =^Wz=
 
 *** Plugins

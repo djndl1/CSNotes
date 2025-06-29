@@ -1,0 +1,43 @@
+** Moving Around Quickly
+
+- Use [[https://github.com/easymotion/vim-easymotion][vim-easymotion]] 
+
+- Fold text to see an outline.
+
+- Use =*= to search the word under the cursor instead of typing it manually.
+
+- Use =%=, =[(=, =])= to move to parentheses.
+
+- Use =gd= and =gD= for a local variable declaration.
+
+- Use =[ CTRL-I= and =] CTRL-I= to search and jump to a word
+
+** Save Some Typing
+
+- Repeat with =.=
+
+- Use insert mode completion =C-n=
+
+- Record and replay
+
+** Fix Mistyping
+
+- abbreviate some common errors, such as =:abbr hte the=
+
+** Sort Text
+
+Use a filter: =RangeOfText !sort=
+
+** Reverse Lines
+
+=:global/^/move 0= reverses all lines. Set a range and a proper target to
+reverse a certain range.
+
+** Trim Trailing Whitespaces
+
+- =%s/\s\+$//
+
+** Editing Files Containing a Certain Word
+
+=vim $(grep -l keyword myfiles*.ext)
+

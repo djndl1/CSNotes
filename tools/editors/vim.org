@@ -2,6 +2,8 @@
 
 This note is intended to be read with =vi.org= to introduce basic Vi/Vim editing.
 
+* What's New
+
 Vi is part of POSIX, with little change over the years. Vim extended its feature
 set and gained a large community around it. It emphasizes modality and touch
 editing but provides features for less experienced users (=evim=, =vimtutor=,
@@ -92,7 +94,7 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 * Record & Playback
 
-More than key mappign or macro, this records complex command sequences 
+More than key mappign or macro, this records complex command sequences
 and replays them to save typing.
 
 - =q<RegisterName>= to start recording, =q= again to stop. =@<RegisterName>=
@@ -108,7 +110,7 @@ and replays them to save typing.
 * New Modes
 
 See =:h mode-switching= for mode switching operations. =C-\ C-N/G= can be used to
-go to Normal mode from any other mode.  
+go to Normal mode from any other mode.
 
 Type =gQ= (Neovim) or =Q= (Vim) under normal mode to enter =ex= mode.
 
@@ -138,7 +140,7 @@ Define selections visually and perform editing commands on the visual selection.
 *** Operating on Selection
 
 Most of the commands operate under Select mode without much semantic
-change. See =:h visual-operators=. 
+change. See =:h visual-operators=.
 
 =\%V= limits the match inside the selected visual area.
 
@@ -355,7 +357,7 @@ args file list, Vim can hide a window but retain the buffer.
   + =a= active (loaded and visible) buffer, =h= hidden buffer
   + =-=, ===, not modifiable. === is read-only and never modifiable
   + =+= modified, =x= read error
-  
+
 
 A buffer may be hidden by opening another file if the =hidden= option is set.
 =:hide= quits the current windows. The hidden window is not closed and does not
@@ -560,8 +562,8 @@ dictionary words and even entire lines. Completion includes
 
 * Syntax Highlighting
 
-=:syntax enable=, =:syntax on= enable syntax highlighting. 
-Syntax is normally deduced from =filetype=, however, ~:set syntax=filetype~ can 
+=:syntax enable=, =:syntax on= enable syntax highlighting.
+Syntax is normally deduced from =filetype=, however, ~:set syntax=filetype~ can
 set the current syntax set in use, typically a file type name.
 
 Syntax definition files are stored in =$VIMRUNTIME/syntax=.
@@ -607,7 +609,7 @@ Almost all quickfix commands have location list counterparts.
 
 ** grep
 
-Vim's grep may also take advantage of the Quickfix list. 
+Vim's grep may also take advantage of the Quickfix list.
 It is used alongside with the Quickfix list even if the result has nothing to do with compilation error.
 
 - =vim[grep]  /pattern/[g][j] files= :: use builtin grep to search for a pattern
@@ -623,7 +625,7 @@ It is used alongside with the Quickfix list even if the result has nothing to do
 
 *** Grepper
 
-A convenience wrapper (but asynchronous) around =gepprg= and =grepformat=. 
+A convenience wrapper (but asynchronous) around =gepprg= and =grepformat=.
 =ag=, =ack=, =grep=, =findstr=, =rg=, =pt=, =sift=, =git grep= are all
 supported.
 
@@ -776,7 +778,21 @@ Plugins are now managed within =$MYVIMRC=, installed and updated automatically.
 After a plugin or a package is installed, the user or the package manager
 should run =helptags= to parse, index documentation files and build a tags file.
 
-* Other Tips
+* Other Issues
+** Read Man Pages
+
+- =K=: look up the keyword under the cursor, by default using =man=.
+
+- =Man= after =runtime! ftplugin/man.vim=.
+
+** Read GNU Info
+
+- Use [[https://gitlab.com/HiPhish/info.vim][info.vim]]
+
+** Spell Check
+
+=set spell= for certain file types. Use ~z=~ to show spell suggestions.
+
 ** File Explorer
 
 - NERDTree: a side bar that displays the current workspace.
