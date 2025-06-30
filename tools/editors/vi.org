@@ -27,8 +27,10 @@ are mentioned.
 
 The general form of ~vi~ commands is
 
-#+begin_src [(command)][(number)](text object) [(number)][(command)](text
-object) #+end_src
+#+begin_src 
+[(command)][(number)](text object) [(number)][(command)](text
+object) 
+#+end_src
 
 Where =text object= is commands like =w=, =b=, regexes etc, that is, certain
 commands in vi denotes both text objects and certain related commands.
@@ -515,7 +517,10 @@ They may be used with =e=, =r=, =!cmd=.
     pattern, under which case, =/re/= may be omitted as =//= to denote the
     search pattern.
 
-    #+begin_src vim :g/editer/s//editor/g #+end_src
+    #+begin_src 
+    vim :g/editer/s//editor/g 
+    #+end_src
+
   + =options= may be =g= global, =c= asking for confirmation
   + =&= repeats the previous substitute command with possibly different
     flags.
@@ -618,31 +623,43 @@ Aside from literal characters, the replacement contains a few metacharacters.
 
 - move a block of XML
 
-#+begin_src ex :g /<syntax>/.,<syntax\/>/ move /<parameters>-1/ #+end_src
+#+begin_src ex 
+:g /<syntax>/.,<syntax\/>/ move /<parameters>-1/ 
+#+end_src
  
 - delete all blank lines plus any lines that contain only whitespace
 
-#+begin_src :g/^[ tab]*$/d #+end_src
+#+begin_src 
+:g/^[ tab]*$/d 
+#+end_src
 
 - delete all leading spaces
 
-#+begin_src :%s/^  *\(.*\)/\1/ #+end_src
+#+begin_src 
+:%s/^  *\(.*\)/\1/ 
+#+end_src
 
 - insert a ~>  ~ at the start of every line in a file
 
-#+begin_src :%s/^/>  / #+end_src
+#+begin_src 
+:%s/^/>  / 
+#+end_src
 
 - reverse the order of lines in a file
 
-#+begin_src :g/.*/mo0 #+end_src
+#+begin_src 
+:g/.*/mo0 
+#+end_src
 
 - repeat a command
 
 #+begin_src 
 # copy lines 12-17 to the end of the file ten times
-:1,10g/^/ 12,17t$ #+end_src
+:1,10g/^/ 12,17t$ 
+#+end_src
 
-* Advanced Usage ** How To Exit
+* Advanced Usage 
+** How To Exit
 
 Inside Emacs or VSCode terminal, beside =Ctrl-[= and =Esc=, =Ctrl-C= escapes
 insert mode, =Ctrl-o= gives a chance to execute normal mode command (in which
@@ -675,7 +692,9 @@ Definitions are not recursively expanded.
 modifiable, similar to Emacs' =customize=. To set an option to its default
 =set option_name&=.
 
-#+begin_src :set option :set nooption #+end_src
+#+begin_src 
+:set option :set nooption 
+#+end_src
 
 ~:set all~ displays all options. =set option!= (vim) toggle the value of an
 option. =set option?= shows the current value of the option.
@@ -730,13 +749,16 @@ To debug tab problem, =set list= or use =:l= command to display tabs and
 spaces or add them to =listchars=.
 
 - =tabstop= :: the space boundary at which a horizontal tab character stops.
-  + the original meaning of horizontal tabs and pure visually.
+  + the original meaning of horizontal tabs and *pure visually*.
   + a horizontal tab, as a tabular separator, is supposed to stop at certain
     columns (compare it to memory alignment)
 
-- =softtabstop= :: not the length of a real tab character, but its effect
-  during editing. Number of spaces that a tab in the file counts for visually
-  while performing editing operations.
+- =softtabstop= :: not the length of a real tab character, but *its effect
+  during editing* (how a tab key work). Number of spaces that a tab in the file counts for 
+  while performing editing operations, e.g. if =softtabstop= is twice the
+  =tabstop= option, a tab key operation may actually result in two tab character.
+  If =softtabstop= is smaller than =tabstop=, a tab key operation may not
+  produce a tab character, but a sequence of space characters.
   + without =expandtab=, it becomes a real tab character when the space is
     reached.
 
@@ -762,7 +784,7 @@ There are two flavors of macros:
   + =:map!= causes the mapping to apply to input mode.
   + special characters are input with =^V= prefixed. Vertical bar =|= can
     never be escaped as it is used as the crucial =ex= separator.
-  + Keys are also represented as sequence =<Nul>, =<Home>= etc. see =:h
+  + Keys are also represented as sequence =<Nul>=, =<Home>= etc. see =:h
     keycodes=.
   + =:unmap= deletes a macro.
   + =#0= through =#9= mean function keys.
