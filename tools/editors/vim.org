@@ -63,7 +63,7 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - ~-b~: in binary mode
 
-- ~+command~ ,~c command~: execute command as an =ex= command
+- ~+command~, ~c command~: execute command as an =ex= command
 
 - ~-C~: vi-compatible mode (not fully compatible)
 
@@ -83,8 +83,6 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 * New Commands
 
-- =n CTRL-END= :: to the end of the file
-
 - =line_count_percent%= :: go to the line count percent into the file
 
 - =:go n=, =:n go= :: go to the nth byte in the buffer
@@ -99,7 +97,7 @@ and replays them to save typing.
 
 - =q<RegisterName>= to start recording, =q= again to stop. =@<RegisterName>=
   to replay the commands. To append commands to a register,
-  =q<UppercaseRegisterName>.
+  =q<UppercaseRegisterName>=.
 
 * Format
 
@@ -186,6 +184,9 @@ There is a normal mode and a job mode (shell, CLI apps) in the terminal buffer.
   + Vim uses =C-W= key sequences to control terminal mode. See =:h terminal-typing=.
 
 - =C-\ C-N= enters Normal mode.
+
+There is an older command =:shell= that forks vim and synchronously run a
+shell. Only after the shell exits does vim resume.
 
 *** Terminal Debug
 
@@ -442,7 +443,8 @@ A folded block acts as a line for line operations.
 ** Define Folds
 
 The =foldmethod= option defines how folds are defined/created and accepts the
-following methods.
+following methods. Folding methods are mutually exclusive: with =syntax=
+enabled, one cannot manually define a fold.
 
 - =diff= :: defined the difference between two files
 
@@ -459,17 +461,17 @@ following methods.
 
 ** Fold Commands
 
-- =zA= :: toggle fold state
-  + =za= :: toggle teh state of one fold
+- =zA= :: toggle the state of a fold recursively
+  + =za= :: toggle the state of one fold
 
-- =zC= :: close folds, recursively
+- =zC= :: close a fold, recursively
   + =zc= :: close one fold
 
 - =zD= :: delete/undefine folds, recursively (not the content in the folds)
   + =zd= :: delete one fold
   + =zE= ::  delete all fields
 
-- =zO= :: open folds recursively
+- =zO= :: open a fold recursively
   + =zo= :: open one fold
 
 - =zf= :: create a fold from the current line to the one where the following
@@ -478,8 +480,10 @@ following methods.
   + =Count= + =zF= :: fold count lines. The count number here counts for visual lines
     on the screen.
 
-- =zM= :: set =foldlevel= to zero
+- =zM= :: close all folds, set =foldlevel= to zero.
   + =zm=, =zr= :: decrement/increment =foldlevel=
+
+- =zR= :: open (reduce) all folds
 
 - =zN=, =zn= :: set/reset =foldenable= option
   + =zi= :: toggle =foldenable=
@@ -520,7 +524,7 @@ Indentation options may cause indentation problems when pasting text into the
 file. Set the =paste= option before pasting and reset it afterward..
 
 - =^N=, =^P= Move in the candidate list; =Enter= to select the match; =^E= to
-  halt the match ithout substituting any text.
+  halt the match without substituting any text.
 
 * Autocompletion
 
@@ -553,7 +557,7 @@ dictionary words and even entire lines. Completion includes
 
 - Omni =^X-^O= :: use filetype-specific functions to determine the candidate
   list
-  + C, CSS, HTML, JaaScript, PHP, Python, Ruby, SQL and XML.
+  + C, CSS, HTML, JavaScript, PHP, Python, Ruby, SQL and XML.
 
 - Spelling correction =^X-^S= :: if the word at the location appears to be badly
   spelled, "more correct" spellings are offered
@@ -779,6 +783,28 @@ After a plugin or a package is installed, the user or the package manager
 should run =helptags= to parse, index documentation files and build a tags file.
 
 * Other Issues
+** History
+
+There are five histories: =:= command history, search history, expression
+history, input line history and a history for debug mode commands. 
+
+When using =<Up>= to retrieve a previous command, the completion does not
+simply use the last one, but the last one that completes the current one.
+
+=q:= opens a command line window that behaves like a normal window of the command
+history
+so that complex commands may be composed and executed. Hitting =<Enter>= in
+the window executes the line at the cursor.
+
+Histories are saved a =viminfo= file after exiting vim.
+
+*** Recent Files
+
+- =:oldfiles=: list recent files without interactively choosing one.
+  + =:e #<N= to open the Nth file.
+
+- =:browse oldfiles=: choose a file to edit before after hitting =q=
+
 ** Read Man Pages
 
 - =K=: look up the keyword under the cursor, by default using =man=.
@@ -834,12 +860,25 @@ original Vim graphics =TOhtml=.
 - *viminfo*: a global session file that saves command line history, search
   string history, input line history, non-empty registers, file marks, last
   search/substitute pattern, the buffer list and global variables.
+  + =viminfo= is great: one can restore where he left by simply typing ='0=
+    to return to the last mark.
 
 - *Session*: addition to viminfo, a view is a collection of settings that apply
   to one window; a session keeps the views for all windows plus the global
   setting.
   + =:mksession session_filename.vim=: a session file, similar to a vimrc script
-    file, is created
+    file, is created. The user is supposed to =:source= the script to restore
+    the session or =vim -S session.vim=.
+
+- *View*: the properties for a window used to restore the contents of a
+  window. Views are part of a session.
+  + =:mkview=, =:loadview=
+
+** Modelines
+
+Just like Emacs and Python can have some settings in the text, modelines of
+Vim are some commands placed at the beginning of a file to enable Vim to set
+certain options for that file.
 
 ** Truecolor Support
 
