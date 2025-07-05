@@ -59,6 +59,7 @@ To save as =root= when Vim is not running as =root=, use =:w !sudo tee >
 ** Status Aware
 
 - =C-g=: show the location in a file and the file status
+  + =g C-G= shows more details.
 
 - =set ruler= shows the current cursor position on the lower right corner of
   the screen.
@@ -162,6 +163,10 @@ completely defined by macros.
 ** Change Text
 
 *** Insert Mode
+
+- (Vim) =CTRL-V u hexUnicode= type unicode characte:r.
+  + On Windows, use =CTRL-Q=
+  + some special characters may be input by using digraphs =:digraphs=
 
 - =o= / =O= :: insert a newline below/above and enter the insert mode.
 
@@ -690,7 +695,7 @@ Definitions are not recursively expanded.
 
 (Vim) for a list of options, =:options=. The options in the option window are
 modifiable, similar to Emacs' =customize=. To set an option to its default
-=set option_name&=.
+=set option_name&=. To query an option, =set option_name?=.
 
 #+begin_src 
 :set option :set nooption 

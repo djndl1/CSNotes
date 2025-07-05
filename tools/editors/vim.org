@@ -531,6 +531,16 @@ file. Set the =paste= option before pasting and reset it afterward..
 Insertion completion from programming language specific keywords to filenames,
 dictionary words and even entire lines. Completion includes
 
+To accept the current match, =CTRL-Y=, to stop the completion =CTRL-E=
+
+- Comprehensive complete =^N=, =^P= :: defined by the =complete= option.
+
+** Completion Types
+
+- Omni =^X-^O= :: use filetype-specific functions to determine the candidate
+  list
+  + C, CSS, HTML, JavaScript, PHP, Python, Ruby, SQL and XML.
+
 - Whole Lines =^X-^L= :: look backwards for a line matching the typed characters
 
 - Keyword =^X-^N= :: not PL-specific keywords, possibly any word in the file,
@@ -547,6 +557,8 @@ dictionary words and even entire lines. Completion includes
   for keywords matching tags.
 
 - filename =^X-^F= :: searches for filenames in the current directory matching the keyword at the current cursor.
+  + useful when inserting paths, without any external plugin support (e.g.
+    VSCode path completion).
 
 - macro and definition names =^X-^D= :: =#define=
 
@@ -555,14 +567,8 @@ dictionary words and even entire lines. Completion includes
 
 - =^X-^U= :: use the completion method defined by a custom function =completefunc=.
 
-- Omni =^X-^O= :: use filetype-specific functions to determine the candidate
-  list
-  + C, CSS, HTML, JavaScript, PHP, Python, Ruby, SQL and XML.
-
 - Spelling correction =^X-^S= :: if the word at the location appears to be badly
   spelled, "more correct" spellings are offered
-
-- Comprehensive complete =^N= :: defined by the =complete= option.
 
 * Syntax Highlighting
 
@@ -783,6 +789,11 @@ After a plugin or a package is installed, the user or the package manager
 should run =helptags= to parse, index documentation files and build a tags file.
 
 * Other Issues
+** Current Directory
+
+Every window can have a local current directory =:lcd= instead the global
+=:pwd=. Every tab has a tab-local current directory =:tcd=
+
 ** History
 
 There are five histories: =:= command history, search history, expression
@@ -822,6 +833,8 @@ Histories are saved a =viminfo= file after exiting vim.
 ** File Explorer
 
 - NERDTree: a side bar that displays the current workspace.
+  + NERDTree supports bookmarks, which remembers directories as bookmarks to
+    quickly navigate to a root.
 
 ** GDB Debug
 
@@ -840,9 +853,14 @@ Histories are saved a =viminfo= file after exiting vim.
 ** Binary Files
 
 =-b= or =:set binary=. =textwidth=, =wrapmargin= are set to zero. =modeline= and
-=expandtab= are unset=. Another editor designed to edit binaries is =bvi=.
+~expandtab= are unset~.
+To show bytes as hex, =:set display=uhex=. To show what normal hex editors
+would display, run =%!xxd= to convert and =%!xxd -r= to convert back. This is
+still not perfect and prone to destroy the original file.
 
-To show bytes as hex, =:set display=uhex=. See =:h using-xxd=.
+Another editor designed to edit binaries is =bvi=.  =vim -b= is not designed
+to edit binary files, use =bvi= for that.
+
 
 ** Display Buffers as HTML
 
@@ -910,6 +928,14 @@ To speed up file transfer, consider ssh's =ControlMaster= feature.
 
 set =EDITOR= to =vim= and =C-x C-e= to invoke the editor to edit the current
 line. use =cq= to exit to avoid executing the command.
+
+** Encryption
+
+*** The Builtin Solution
+
+- start a file with =-x= to start in encryption mode.
+
+- ~set key=encryption_key~ to enable encryption mode.
 
 * Integrated Solutions
 

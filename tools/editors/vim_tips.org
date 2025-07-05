@@ -20,9 +20,25 @@
 
 - Record and replay
 
+- =CTRL-O= to execute a normal-mode command under insert mode.
+
 ** Fix Mistyping
 
 - abbreviate some common errors, such as =:abbr hte the=
+
+** Quick Insertion & Deletion
+
+- =CTRL-W= to delete a word
+
+- =CTRL-U= to delete text up to the cursor.
+
+- =CTRl-A= and =CTRL-@= (exits insert mode) to insert the text inserted last time.
+
+- =CTRL-Y= inserts the character above the cursor 
+  + for repeating the previous line but with some variations.
+
+- =CTRL-R= insets a register without entering normal mode and use yanking.
+
 
 ** Sort Text
 
