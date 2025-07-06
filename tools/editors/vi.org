@@ -81,6 +81,7 @@ To save as =root= when Vim is not running as =root=, use =:w !sudo tee >
   + (Vim) =zt=, =zz=, =zb= are the same except that they put the cursor in
     the same column, whereas the original three put the cursor at first
     non-blank in the line.
+  + (Vim) =zh=, =zH=, =zl=, =zL=, =zs= horizontal scroll
 
 *** Go to a Position
 
@@ -144,6 +145,12 @@ To save as =root= when Vim is not running as =root=, use =:w !sudo tee >
   character on the current line. =t= move to the character just before the
   specified character. =;= and =,= repeats the movement in the same/opposite
   direction.
+
+- =g0= (first), =g^= (first non-blank), =gm= (middle of screen), =gM= (middle of the line), =g$= (last character in screen) :: move to visible positions of the current
+  screen line 
+  + useful when =wrap= is off and the line is too long to fit in the screen.
+
+- =gj=, =gk= :: move only by screen (visual) lines.
 
 *** High Level Text Objects
 

@@ -104,6 +104,14 @@ and replays them to save typing.
 - =gq=: format the specified text object (by motion or text objects).
   + this proves to be useful when writing markdown or orgmode text to avoid
     manually breaking lines.
+  + controlled by =formatoptions=
+
+** Alignment
+
+- =:center=, =:right=, =:left=
+
+There is also a builtin package =justify= that deals with plain text
+justification.
 
 * New Modes
 
@@ -490,6 +498,8 @@ enabled, one cannot manually define a fold.
 
 * Auto and Smart Indenting
 
+Indentation width is controlled by =shiftwidth=.
+
 - =autoindent= :: similar to vi's, differs subtly as to where the cursor is
   placed after indentation is deleted.
   + understands comments
@@ -511,6 +521,8 @@ enabled, one cannot manually define a fold.
 
 - =indentexpr= :: custom indentation rules
   + not a trivial task to define. Predefined expressions are under =$VIMRUNTIME/indent=.
+
+- Use =:retab= to fix inconsistent tabs.
 
 #+begin_comment
 TODO learn more about cindent customization and indent expressions
@@ -929,6 +941,23 @@ To speed up file transfer, consider ssh's =ControlMaster= feature.
 set =EDITOR= to =vim= and =C-x C-e= to invoke the editor to edit the current
 line. use =cq= to exit to avoid executing the command.
 
+** Editing Tables
+
+There is no builtin  support for tables, but the =virtualedit= option makes
+editing a table easier. It eliminates the need to insert any whitespace
+characters and allows the cursor to simply move to a column. To replace text
+in the table, use =gr= and =gR= (virtual replace mode) for proper tabulation
+(maybe also useful for ASCII art).
+
+** Run a Script on Files
+
+=vim -e -s $file < script.vim= runs in =ex= mode, with =-e= it runs in normal
+mode. To generate a normal mode script, use =-w= to record operations.
+
+** Read From STDIN
+
+=vim -=
+
 ** Encryption
 
 *** The Builtin Solution
@@ -936,6 +965,18 @@ line. use =cq= to exit to avoid executing the command.
 - start a file with =-x= to start in encryption mode.
 
 - ~set key=encryption_key~ to enable encryption mode.
+
+** Automatic Line Breaks
+
+Set by =textwidth= (fixed width) and =wrapmargin= (wrap at the margin of
+screen).
+A line is only broken automatically under insert mode and when appending to a
+line. To break existing lines, use =gq=.
+
+=wrap= (unconditionally) =linebreak= (at word boundaries) control where lines are break visually (not physically with a
+line ending).
+
+See =:h ins-textwidth=
 
 * Integrated Solutions
 

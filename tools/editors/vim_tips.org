@@ -22,6 +22,19 @@
 
 - =CTRL-O= to execute a normal-mode command under insert mode.
 
+- =gv= to select the last selected region.
+
+** Change a Word in Multiple Files
+
+This may be useful in code editing, which may be accomplished by a language
+server, but this technique is not restricted to code only.
+
+- =:args *.c=
+
+- =:argdo %s/text_replaced/text_replacement/ge | update=: every argument, not
+  every buffer or window to avoid unnecessary edits and finally update the
+  changed files.
+
 ** Fix Mistyping
 
 - abbreviate some common errors, such as =:abbr hte the=
@@ -51,9 +64,12 @@ reverse a certain range.
 
 ** Trim Trailing Whitespaces
 
-- =%s/\s\+$//
+- =%s/\s\+$//=
 
 ** Editing Files Containing a Certain Word
 
-=vim $(grep -l keyword myfiles*.ext)
+=vim $(grep -l keyword myfiles*.ext)=
 
+** Join Many Lines of a Paragraph Into One Physical Line
+
+=g/./,/^$/join=: join all the way to an empty line.
