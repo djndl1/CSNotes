@@ -24,6 +24,9 @@
 
 - /Mode line/ :: the status line at the bottom.
   + =**= modified modifiable buffer, =%*= modified readonly buffer, =%%= otherwise
+  + =FN= the Nth frame
+
+- /Menu Bar/ :: mouse-clickable or =F10=
 
 * Input Concepts
 
@@ -337,7 +340,9 @@ There are two ways to do rectangle operations.
 
 - =recenter=, =C-l= (=recenter-to-bottom=, with arguments, this scroll the page to put the point at a certain line in the window, =C-u C-l= recenters), =C-M-l= (=reposition=).
 
-- =view-mode=: =SPC= and =S-SPC= to scroll
+- =view-mode=: =SPC= and =DEL= to scroll a page, =d= and =u= to scroll half a page. =RET= and =y= to scroll by one line.
+  =e= to exit view-mode. =q= quits and *closes* the current buffer.
+  + =view-mode= may be entered by =view-file=.
 
 - =follow-mode=: scroll two buffers that shows the same buffer together
 
