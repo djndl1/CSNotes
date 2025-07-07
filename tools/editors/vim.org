@@ -454,16 +454,21 @@ The =foldmethod= option defines how folds are defined/created and accepts the
 following methods. Folding methods are mutually exclusive: with =syntax=
 enabled, one cannot manually define a fold.
 
-- =diff= :: defined the difference between two files
+- =diff= :: defined the difference between two files, used by diffmode.
 
 - =expr= :: defined by regular expressions
+  + simple to specify
 
 - =indent= :: corresponds to the indentation of text and =shiftwidth=
+  + works for many files but not always very well.
 
 - =manual= :: result from user Vim commands
+  + for unstructured text. Use =:mkview= to create a view to save folds.
   + =zf=, =nzF=
 
-- =marker= :: predefined markers in the file specify fold boundaries
+- =marker= :: predefined markers in the file specify fold boundaries, e.g
+  ={=, =}=.
+  + this requires modification of the original file.
 
 - =syntax= :: defined by the semantics of a file's language.
 
