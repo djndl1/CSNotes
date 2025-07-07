@@ -133,9 +133,17 @@ Supposedly derives from POSIX BRE but with much more features.
 
 - ~x\=~, not ~x?~
 
-- =x\{n,m}=, not =x{n, m}=
+- =x\{n,m}=, not =x{n, m}= or =\{n, m\}=. To match as little as possible, use
+  =\{-n, m}=. =\{-}= matches zer or more times as few as possible.
 
 See =:h perl-patterns= for difference from perlregex.
+
+- =\&= is to =\&= what =and= is to =or=. =\&= requires both operands to match
+  but only the last will be used. =foobar\&foo= will match =foobar= in =foo foobar=.
+
+Any character classes and ranges can be modified by inserting a =_= to add
+line break to the range/class. e.g. =\_s= matches any whitespace and a line
+break.
 
 * Shell Pattern Matching
 
