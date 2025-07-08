@@ -1,4 +1,4 @@
-** Moving Around Quickly
+* Moving Around Quickly
 
 - Use [[https://github.com/easymotion/vim-easymotion][vim-easymotion]] 
 
@@ -8,11 +8,11 @@
 
 - Use =%=, =[(=, =])= to move to parentheses.
 
-- Use =gd= and =gD= for a local variable declaration.
+- Use =gd= and =gD= for a variable declaration.
 
-- Use =[ CTRL-I= and =] CTRL-I= to search and jump to a word
+- Use =[I=, =]I= to search and =[ CTRL-I= and =] CTRL-I= to jump to a word
 
-** Save Some Typing
+* Save Some Typing
 
 - Repeat with =.=
 
@@ -24,7 +24,7 @@
 
 - =gv= to select the last selected region.
 
-** Change a Word in Multiple Files
+* Change a Word in Multiple Files
 
 This may be useful in code editing, which may be accomplished by a language
 server, but this technique is not restricted to code only.
@@ -35,11 +35,11 @@ server, but this technique is not restricted to code only.
   every buffer or window to avoid unnecessary edits and finally update the
   changed files.
 
-** Fix Mistyping
+* Fix Mistyping
 
 - abbreviate some common errors, such as =:abbr hte the=
 
-** Quick Insertion & Deletion
+* Quick Insertion & Deletion
 
 - =CTRL-W= to delete a word
 
@@ -53,23 +53,38 @@ server, but this technique is not restricted to code only.
 - =CTRL-R= insets a register without entering normal mode and use yanking.
 
 
-** Sort Text
+* Sort Text
 
 Use a filter: =RangeOfText !sort=
 
-** Reverse Lines
+* Reverse Lines
 
 =:global/^/move 0= reverses all lines. Set a range and a proper target to
 reverse a certain range.
 
-** Trim Trailing Whitespaces
+* Trim Trailing Whitespaces
 
 - =%s/\s\+$//=
 
-** Editing Files Containing a Certain Word
+* Editing Files Containing a Certain Word
 
 =vim $(grep -l keyword myfiles*.ext)=
 
-** Join Many Lines of a Paragraph Into One Physical Line
+* Join Many Lines of a Paragraph Into One Physical Line
 
 =g/./,/^$/join=: join all the way to an empty line.
+
+* Extract Matching Text
+
+- =:s/^\(.*\)\(match_pattern\)\(.*$\)/\2/g=
+
+- =!awk 'match($0, "match_pattern") { print substr($0, RSTART, RLENGTH) }' >> %=
+
+* Moving Across ={]= Code Blocks
+
+- =[[=, =]]=, =][=, =[]=
+
+- =[{=, =[(=, =])=, =]}= to enclosing block pairs.
+
+- =[m=, =]m=, =[M=, =]M
+

@@ -59,13 +59,16 @@ Supported by most code editors.
 
 ** Vim/Vi
 
+Tag search supports not only tag names but also patterns.
+
 - /Go to a tag/: =:ta[g] tagname | /regex=
   + =:stag=, =Ctrl-W= + =]= in a split window
 
 - /Go to the tag at the cursor/: =^]=, =g<LeftMouse>=, =<C-LeftMouse>=
 
 - Searched tags are saved into a stack of tag locations. One may return to a
-  saved location using =^T=, =<C-RightMouse=, =g<RightMouse>=.
+  saved location using =^T=, =<C-RightMouse=, =g<RightMouse>=. The proper way
+  to return is =^T=, even if =^O= also works.
   + useful for navigating up and down a call hierarchy.
   + =tags= shows the contents of the tag stack.
 
@@ -79,10 +82,11 @@ Supported by most code editors.
 
 - /Jump to the next/previous matching tag/: =tn[ext]=, =tp[revious]=,
   =tf[irst]= (the first matching tag), =tl[ast]= (to the last matching tag)
+  + a tag may be defined in multiple locations.
 
 *** Preview
 
-- =:pt=, =:pts=, =:ptj=, =:ptn=, =:ptp=, =:ptf=, =:ptp= show the tag in a preview
+- =CTRl-W_}=, =:pt=, =:pts=, =:ptj=, =:ptn=, =:ptp=, =:ptf=, =:ptp= show the tag in a preview
   window, closable with =^Wz=
 
 *** Plugins
