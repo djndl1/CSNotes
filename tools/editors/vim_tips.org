@@ -1,3 +1,19 @@
+* Do Not Leave the Main Area
+
+- =i_CTRL-C=: quit insert mode back to normal mode.
+
+- =i_CTRL-H=: backspace key
+
+- =i_CTRL-I=: tab key
+
+- =i_CTRL-J=, =i_CTRL-M= enter newlines.
+
+- =i_CTRL-U=: kill all before the cursor
+
+- =i_CTRL-W=: delete the word before the cursor.
+
+- =i_CTRL-[=: ESC
+
 * Moving Around Quickly
 
 - Use [[https://github.com/easymotion/vim-easymotion][vim-easymotion]] 
@@ -53,7 +69,6 @@ server, but this technique is not restricted to code only.
   + for repeating the previous line but with some variations.
 
 - =CTRL-R= insets a register without entering normal mode and use yanking.
-
 
 * Sort Text
 
