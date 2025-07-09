@@ -764,9 +764,14 @@ spaces or add them to =listchars=.
   + the original meaning of horizontal tabs and *pure visually*.
   + a horizontal tab, as a tabular separator, is supposed to stop at certain
     columns (compare it to memory alignment)
+  + this option is not supposed to be changed due to the different value on
+    different platforms (software and hardware) and relying on its value may
+    make the file look different on different platforms.
 
-- =softtabstop= :: not the length of a real tab character, but *its effect
-  during editing* (how a tab key work). Number of spaces that a tab in the file counts for 
+- =softtabstop= (Vim) :: not the length of a real tab character, but *its
+  effect during editing* (how long a tab key pushes the cursor, but not the
+  actual characters it inputs, might be a combination of tabs and spaces). Dedicated to the cursor.
+  Number of spaces that a tab in the file counts for 
   while performing editing operations, e.g. if =softtabstop= is twice the
   =tabstop= option, a tab key operation may actually result in two tab character.
   If =softtabstop= is smaller than =tabstop=, a tab key operation may not
@@ -774,11 +779,14 @@ spaces or add them to =listchars=.
   + without =expandtab=, it becomes a real tab character when the space is
     reached.
 
-- =expandtab= :: tabs are replaced by the appropriate number of spaces in
+- =expandtab= (Vim) :: tabs are replaced by the appropriate number of spaces in
   Insert mode. Real tabs are inserted with =^V<Tab>=.
+  + Historically tabs are preferred due to a few saved bytes; nowadays,
+    a consistent look matters more and spaces replacing tabs.
 
 - =shiftwidth= :: number of spaces to use for each step of (auto)indent, for
   =cindent=, =<<=, =>>= etc.
+  + the canonical way to change indentation.
   + local to a buffer, when =0=, set to =tabstop=.
   + used in shift commands and autoindent backtabbing.
   + =^D=, =^T= moves a shiftwidth backwards/forwards.

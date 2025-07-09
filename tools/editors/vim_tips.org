@@ -12,6 +12,8 @@
 
 - Use =[I=, =]I= to search and =[ CTRL-I= and =] CTRL-I= to jump to a word
 
+- =]*=, =]/=, =[*=, =[/= to move around C comment blocks =/**/=
+
 * Save Some Typing
 
 - Repeat with =.=

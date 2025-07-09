@@ -501,6 +501,11 @@ enabled, one cannot manually define a fold.
 - =zN=, =zn= :: set/reset =foldenable= option
   + =zi= :: toggle =foldenable=
 
+* Comments
+
+Defined by the ='comments'= option. Vim is able to understand comment formats
+and format or navigate around them.
+
 * Auto and Smart Indenting
 
 Indentation width is controlled by =shiftwidth=.
@@ -515,7 +520,7 @@ Indentation width is controlled by =shiftwidth=.
     keywords =cinwords=
   + a new line before/after a =}=
 
-- =cindent= :: richer awareness of C syntax and supports customization
+- =Cindent= :: richer awareness of C syntax and supports customization
   + =cinkeys= :: keyboard keys under insert mode that triggers reindenting.
     Reindenting means to indent to an appropriate position.
      A set of expressions are used to define this option.
@@ -527,7 +532,8 @@ Indentation width is controlled by =shiftwidth=.
 - =indentexpr= :: custom indentation rules
   + not a trivial task to define. Predefined expressions are under =$VIMRUNTIME/indent=.
 
-- Use =:retab= to fix inconsistent tabs.
+- Use =:retab= to fix inconsistent tabs. Be careful, with =expandtab= this
+  may expand tab characters in a string. Use =\t= as a tab for in a string.
 
 #+begin_comment
 TODO learn more about cindent customization and indent expressions
@@ -615,15 +621,15 @@ set syntax=idl.c
 
 * QuickFix: Edit-Compile-Edit Cycle
 
-=:make= synchronously builds lints) the project and collects the result text in the =Quickfix List=
+=:make= synchronously builds (or lints) the project using ='makeprg'= and collects the result text in the =Quickfix List=
 window, where one can inspect, jump to and correct errors. Error meesages are
 parsed according to the =errorformat=.  Vim also supports compiling without a
 Makefile (simply =:make filename_no_ext=) for a quick compilation and comes with some compiler plugins to
-support this feature.
+support this feature (=:compiler= to switch the compiler).
 
 - =:cnext=, =:cprevious=: move in the error list
 
-- =colder [count]=, =:cnewer [count]=, =:chistory=: there may be more than
+- =colder [count]= (c-older), =:cnewer [count]=, =:chistory=: there may be more than
   one quicfix lists. these commands switch between these lists.
 
 - =:cdo {cmd}=: do a commmand after relocation by each entry of a quickfix list to operate on those locations that generate errors.
@@ -631,6 +637,9 @@ support this feature.
 - =errorformat=: an option defining a format of errors returned from a compile
 
 - =makeprg=: an option containing the name of the build instruction
+
+If =:make= cannot capture the output, one can always redirect the output to a
+file and load that file with =:cfile=.
 
 Almost all quickfix commands have location list counterparts.
 
