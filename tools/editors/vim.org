@@ -679,6 +679,17 @@ set grepformat+=%f:%l:%c:%m
   files and matching text.
   + the =fzf-vim= plugin integrates =fzf= and =ripgrep= with Vim.
 
+* Multilevel Undo
+
+Undo/redo is not linear in Vim. If some modification is made after an undo, a
+new branch is made. This branch will be the new sequence of undo and redo by
+default. 
+
+To jump to another branch, use =:undo change_number= (listed by =:undolist=). Or =g-=​=g+= to move in
+time rather along the branch.
+Undo and redo in time can be also done by =:earlier= or =:later= besides
+keybindings. There is also =:echo undotree()= to show more details.
+
 * Vimscripts
 
 To execute a copied block of vimscript, use =:@=.

@@ -61,6 +61,8 @@ To save as =root= when Vim is not running as =root=, use =:w !sudo tee >
 - =C-g=: show the location in a file and the file status
   + =g C-G= shows more details.
 
+- =:set lines?=, =set columns?= the current size by rows and columns.
+
 - =set ruler= shows the current cursor position on the lower right corner of
   the screen.
 
