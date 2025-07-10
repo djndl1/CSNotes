@@ -24,7 +24,7 @@
 
 - /Mode line/ :: the status line at the bottom.
   + =**= modified modifiable buffer, =%*= modified readonly buffer, =%%= otherwise
-  + =FN= the Nth frame
+  + =FN= the Nth 
 
 - /Menu Bar/ :: mouse-clickable or =F10=
 
@@ -123,7 +123,8 @@ TODO
 
 - =C-o=, =open-line=: insert a blank line after the cursor.
 
-- =C-j=: newline (useful in minibuffer) without automatic indentation.
+- =C-j=: newline (the caret notation of newline, useful in minibuffer) without automatic indentation.
+  + =C-m= (caret notation of carriage return, bound to =newline=) seems to automatically indent somehow while =C-j= (=electri-newline-and-maybe-indent=) does not.
   
 - =C-x C-o= (=delete-blank-lines=): delete blank lines and leave only one.
 
@@ -139,7 +140,8 @@ TODO
 
 - =M-f= =forward-word=; =M-b= =backward-word=
 
-- =M-r= =move-to-window-line-top-bottom=
+- =M-r= =move-to-window-line-top-bottom=: reposition the point (cursor)
+  on the left upper, middle and lower of the window.
 
 - =M-<= =beginning-of-buffer=; =M->= =end-of-buffer=
 
@@ -148,8 +150,6 @@ TODO
 - =M-g <TAB>=: =move-to-column=
 
 - =M-g c=, =goto-char=: to the nth char in the buffer
-
-- =M-g TAB=: move to column
 
 - To navigate a line visually, set =line-move-visual= to =t=
 
