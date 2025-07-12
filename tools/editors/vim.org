@@ -711,7 +711,8 @@ keybindings. There is also =:echo undotree()= to show more details.
 
 * Vimscripts
 
-To execute a copied block of vimscript, use =:@=.
+To execute a copied block of vimscript, use =:@=. 
+To execute a selected region, use =(vim9) so= in command mode.
 
 - conditions are not required to be surrounded by parentheses.
 
@@ -727,9 +728,14 @@ To execute a copied block of vimscript, use =:@=.
     - =t=: tab-level
     - =v=: controlled by Vim
     - =w=: window-level
-  + by default variables are global =g=
+  + by default variables are global =g=, Vimscript9 solves this with a
+    dedicated =var= keyword to declare a local variable.
+  + =:let= without arguments lists global variables 
+
+- =unlet=: delete variable and its related objects.
 
 - =.= string concatenation
+  + (Vim9script): =..= 
 
 - =execute=: execute a string as vimscript
 
@@ -748,7 +754,15 @@ endfunction
 
 - to execute a function in command mode, =:call funcname()=
 
-- Arrays: =[elm1, elm2, elm3, elm4, ...]
+- Arrays/Lists: =[elm1, elm2, elm3, elm4, ...]
+  + =for n in lst=
+
+- Python-like tuple
+
+- Python-like Dictionaries
+
+- Line continuation =\= before (not after) a line 
+  + Vim9script eliminates some use of =\=
 
 - =&option_name=: retrieve the vale of an option
 
@@ -778,6 +792,36 @@ endfunction
 
 - to execute a script, run =source scriptfile=.
 
+** Vim9script
+
+Vim9script is strongly-typed.
+
+#+begin_src vimscript
+vim9script
+
+# local variable
+var variable_name = value
+var typed_string: string = "String_value" 
+# string may be double quoted now, the rule is similar to that of Unix shell
+# global variable
+g:global_variable_name = value
+while condition
+      loop_body # continue, break are supported
+endwhile
+
+# there's even interpolated string
+var s = $"name: {name}"
+# coalesce operator
+echo name ?? "No name given"
+
+for v in range(1, 4)
+      loop_body
+endfor
+
+def {name)(params_list): return-type
+      function_body
+enddef
+#+end_src
 
 * Plugins (Since Vim 6)
 
