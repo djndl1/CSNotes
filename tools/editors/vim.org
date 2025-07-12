@@ -54,6 +54,7 @@ and some third-party tutorials: OpenVim, Vim Adventures).
   + there is an =index=  help file listing all commands.
   + =:h help-summary= to learn how to help.
 
+- =:go n=, =:n go= :: go to the nth byte in the buffer
 
 * GUI gVim
 
@@ -81,14 +82,13 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - ~ex~: ex mode, useful in scripts
 
-* New Commands
+* Customizing Commands
 
-- =line_count_percent%= :: go to the line count percent into the file
+- =:command= defines a command
+  + arguments can be defined and later referenced using keywords (predefined
+    variables).
 
-- =:go n=, =:n go= :: go to the nth byte in the buffer
-
-- =Ctrl-O=, =Ctrl-I= :: jump back/forward in the jump list
-  + call =:jumps= to show the jump list.
+- =:delcommand= deletes a user command.
 
 * Record & Playback
 
@@ -617,6 +617,25 @@ set syntax=idl.c
 :syntax manual # enable syntax highlighting but not automatically when editing a buffer,
 :set syntax=ON # requires explicit setting to turn on syntax highlighting for the current buffer
 #+end_src
+
+
+* Responding to Events
+
+Autocommands are event handlers executed automatically in response to some
+event. Auotcommands are grouped into =augroup=.
+
+- =autocmd [group] {events} {file-pattern} [++nested] {command}=
+  + =group= is optional
+  + =events= are a comma separated list
+  + the command is limited to =file-pattern=
+
+- Autocommands can trigger another event but by default they don't.
+
+- Autocommands can be executed manually using =:doautocmd= and =:doautoall=.
+
+- To delete an autocommand, redefine it without any command argument.
+
+- =autocmd= lists autocommands.
 
 
 * QuickFix: Edit-Compile-Edit Cycle

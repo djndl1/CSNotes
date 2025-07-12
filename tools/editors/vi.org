@@ -802,7 +802,9 @@ There are two flavors of macros:
 
 - the macro body is put in a buffer register =x=, =@x= invokes the macro.
 
-- =:map macro macro_body= defines a key macro
+*** Key Mappings
+
+- =:map macro macro_body= defines a key macro for insert and command mode.
   + =:map!= causes the mapping to apply to input mode.
   + special characters are input with =^V= prefixed. Vertical bar =|= can
     never be escaped as it is used as the crucial =ex= separator.
@@ -811,7 +813,31 @@ There are two flavors of macros:
   + =:unmap= deletes a macro.
   + =#0= through =#9= mean function keys.
 
-- Vim has an internal leader key (=\= by default, and denoted in macro
+- mapping target may be commands separated by =|=.
+
+- =noremap= is not about mapping when there is no mapping, it maps only the
+  specified keys without recursively checking if the target is also mapped.
+  + =map Q gq= and =map gQ Q= actually maps =gQ= to =gq=. =noremap= simply
+    maps the literal one.
+
+- =map <unique>= fails when the mapping already exists
+
+- =map <buffer>= and =map <script>= defines maps for a buffer or a script
+  only.
+
+- =map local/
+
+A mapping can be recursive and run until there is an error. =:map ,,
+:s/5.1/5.2/<CR>:wnext<CR>,,= keeps substituting until there is no more =5.1=.
+
+- =[v/n/o/i/c]unmap= deletes a mapping. 
+
+There are commands that define key mappings under different modes. Mapping
+definition commands used without arguments list all existing mappings.
+
+*** Leader Key
+
+Vim has an internal leader key (=\= by default, and denoted in macro
   definition as =<leader>=) for prefixing in order not to overload other
   keys. This leader key is defined with =mapleader=.
 
