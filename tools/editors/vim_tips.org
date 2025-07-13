@@ -124,3 +124,11 @@ The first is the most versatile.
 
 Normal commands in Command mode can be combined with ranges and complement
 the inadequate editing capability of =:substitute=.
+
+* Move Under Insert Mode
+
+- Use =Ctrl-O= to temporarily execute a normal mode command.
+  + to move to the beginning or the end of a line, using =CTRL-O CTRL-A/I= is
+    better than =$= and =0=.
+
+- Map =CTRL-B= to =<Left>=, =CTRL-F= to =<Right>=.
