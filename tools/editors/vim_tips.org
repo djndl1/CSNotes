@@ -34,6 +34,8 @@
 
 - Repeat with =.=
 
+- Change one character with =s=.
+
 - Use insert mode completion =C-n=
 
 - Record and replay
@@ -103,5 +105,22 @@ reverse a certain range.
 
 - =[{=, =[(=, =])=, =]}= to enclosing block pairs.
 
-- =[m=, =]m=, =[M=, =]M
+- =[m=, =]m=, =[M=, =]M=
 
+* Appending Text to Lines
+
+- ~range g/pattern/ s/$/line_ending/~
+  + or with =normal Aline_ending=
+
+- Visual select and =$a=
+
+- Start recording, =a= and insert text and then move down one line, stop recording. 
+  =N@register_name= to execute the recorded change N times.
+  + or use =.= to repeat
+
+The first is the most versatile.
+
+* Use Normal Commands in Command Mode
+
+Normal commands in Command mode can be combined with ranges and complement
+the inadequate editing capability of =:substitute=.
