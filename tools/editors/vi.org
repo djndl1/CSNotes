@@ -704,10 +704,15 @@ Definitions are not recursively expanded.
 
 (Vim) for a list of options, =:options=. The options in the option window are
 modifiable, similar to Emacs' =customize=. To set an option to its default
-=set option_name&=. To query an option, =set option_name?=.
+=set option_name&=. To query an option, =set option_name?=. To toggle an
+option =set option_name!=. Buffer-local settings are set by =setlocal=
+instead of =set=.
 
 #+begin_src 
-:set option :set nooption 
+:set option 
+:set nooption 
+"set is not limited to one option
+set option1=value1 option2=value2
 #+end_src
 
 ~:set all~ displays all options. =set option!= (vim) toggle the value of an
@@ -841,3 +846,4 @@ Vim has an internal leader key (=\= by default, and denoted in macro
   definition as =<leader>=) for prefixing in order not to overload other
   keys. This leader key is defined with =mapleader=.
 
+In addition, there is a =maplocalleader= for certain buffers.
