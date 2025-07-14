@@ -624,12 +624,19 @@ set syntax=idl.c
 * Responding to Events
 
 Autocommands are event handlers executed automatically in response to some
-event. Auotcommands are grouped into =augroup=.
+event. Autocommands are grouped into =augroup=. Any commands not in an
+explicit group is defined in the default group.
 
 - =autocmd [group] {events} {file-pattern} [++nested] {command}=
   + =group= is optional
   + =events= are a comma separated list
   + the command is limited to =file-pattern=
+
+- =augroup= is not simply used to group autocommands: =autocmd!= inside a
+  =augroup= clears all commands in it. This can be used to prevent duplicated
+  definitons of autocommands.
+  + the canonical way to use groups is to put =autocmd!= at the first line of
+    the group to delete any previous definitions.
 
 - Autocommands can trigger another event but by default they don't.
 
