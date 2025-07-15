@@ -28,6 +28,9 @@ To execute a selected region, use =(vim9) so= in command mode.
 
 - =unlet=: delete variable and its related objects.
 
+- ~==~ on strings is affected by =ignorecase= and should not be used for string comparison.
+  + use ~==?~ and ~==#~ for case-insensitive and case-sensitive comparison.
+
 - =.= string concatenation
   + (Vim9script): =..= 
 
