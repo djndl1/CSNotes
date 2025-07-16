@@ -8,6 +8,8 @@ Besides =echo=, there  is =echom= that echo into the =:messages= buffer.
 To execute a copied block of vimscript, use =:@=. 
 To execute a selected region, use =(vim9) so= in command mode.
 
+- =Number= (integer) is normally 64-bit (=v:numbersize=), =Float= is a double.
+
 - conditions are not required to be surrounded by parentheses.
 
 - =elseif=, not =else if=; =if= ends with an =endif=
@@ -27,6 +29,8 @@ To execute a selected region, use =(vim9) so= in command mode.
   + =:let= without arguments lists global variables 
 
 - =unlet=: delete variable and its related objects.
+
+- =''= quotes literal strings, where only ='= should be escaped by =''=.
 
 - ~==~ on strings is affected by =ignorecase= and should not be used for string comparison.
   + use ~==?~ and ~==#~ for case-insensitive and case-sensitive comparison.
@@ -89,6 +93,18 @@ endfunction
 
 - to execute a script, run =source scriptfile=.
 
+** Functions
+
+- Vim functions must *start with a capital letter if they are unscoped*.
+
+- A function without a =return= returns 0.
+
+- An argument reference should be prefixed with =a:= to indicate its scope.
+
+- Variadic arguments are either referenced by =a:N= (zero-based index) or =a:000= as a list.
+
+- An argument variable cannot be reassigned.
+
 ** Vim9script
 
 Vim9script is strongly-typed.
@@ -99,7 +115,7 @@ vim9script
 # local variable
 var variable_name = value
 var typed_string: string = "String_value" 
-# string may be double quoted now, the rule is similar to that of Unix shell
+# string quote rule is similar to that of Unix shell
 # global variable
 g:global_variable_name = value
 while condition
