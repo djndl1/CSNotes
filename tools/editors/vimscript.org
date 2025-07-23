@@ -33,7 +33,8 @@ To execute a selected region, use =(vim9) so= in command mode.
 - =''= quotes literal strings, where only ='= should be escaped by =''=.
 
 - ~==~ on strings is affected by =ignorecase= and should not be used for string comparison.
-  + use ~==?~ and ~==#~ for case-insensitive and case-sensitive comparison.
+  + suffix operators ~?~ and ~#~ for case-insensitive and case-sensitive comparison.
+  + there is also ~=~~ for regexp matching.
 
 - =.= string concatenation
   + (Vim9script): =..= 
@@ -101,7 +102,11 @@ endfunction
 
 - An argument reference should be prefixed with =a:= to indicate its scope.
 
-- Variadic arguments are either referenced by =a:N= (zero-based index) or =a:000= as a list.
+- Variadic arguments are either referenced by =a:N= (one-based index, =a:0= is the number of extra arguments) or =a:000= as a list.
+
+- Option arguments with a default value (runtime evaluated) are also supported.
+  To use the default value, one can pass =v:none=.
+  + it's even possible to refer to preceding arguments as a default value.
 
 - An argument variable cannot be reassigned.
 
