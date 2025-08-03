@@ -219,7 +219,7 @@ Plot org tables graphically using Gnuplot or in ASCII art.
 #+end_src
 
 =[=, =]=, at some =\= needs to be escaped. Use the =org-link-escape= function to
-escape a link. Edit the link part with =org-insert-link=.
+escape a link. Edit the link part with =org-insert-link= =(C-c C-l)=.
 
 A link may be
   + /External Link/: [[https://orgmode.org/manual/External-Links.html][many schemes]] are supported.
