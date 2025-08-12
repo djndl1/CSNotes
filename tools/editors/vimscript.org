@@ -2,6 +2,11 @@
 
 Besides =echo=, there  is =echom= that echo into the =:messages= buffer.
 
+* Vim Operator
+
+An operator is used before a motion command, defined by ='operatorfunc'=
+and then invoked by the =g@= command.
+
 * Vimscripts
 
 
