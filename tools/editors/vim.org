@@ -721,7 +721,9 @@ keybindings. There is also =:echo undotree()= to show more details.
 * Plugins (Since Vim 6)
 
 A plugin is simply a Vim script file that is loaded automatically when Vim
-starts to extend Vim's functionality. Plugins may be
+starts to extend Vim's functionality. 
+
+Plugins may be
 
 - *global plugins*: for all kinds of files.
   + A set of standard plugins are automatically loaded upon startup.
@@ -745,21 +747,50 @@ option. To debug plugin loading, start Vim with =-V2=.
 When a plugin is placed in =runtimepath= (and thus installed), Vim
 automatically sources the scripts it finds under these subdirectories.
 
+There are some conventions of how plugin files should be placed under each runtime path:
+
+- =plugin/=: compulsory plugins
+
+- =colors/=: color schemes
+
+- =ftdetect/=: set up autocommand that detect and set the file type of files.
+
+- =ftplugin/=: filetype-specific scripts that vim uses to set up a filetype.
+
+- =indent/=: filetype-specific indentation scripts
+
+- =compiler/=: compiler-related options in the current buffer based on their names
+
+- =after/=: after the files in =plugin/=
+
+- =autoload/=: deferred loading
+
+- =doc/=: documentation
+
 ** Package Management
 
-A *package* (since Vim 8) is a directory that contains *plugins*. It may be a separate directory,
-a VCS repository, a set of interdependent plugins, "start" packages.
-
-Packages may be stored in the paths =&runtimepath= or =.vim/pack/=. The
-plugins under =pack/*/start= are added to =&runtimepath= and are automatically loaded.
+A *package* is a directory that contains *plugins*. 
+It may be a separate directory, a VCS repository, a set of interdependent plugins, "start" packages.
+Packages are easier to manage, update.  
+There is nothing special about packages: there are directories that are added to 
+=runtimepath= automatically upon detection and they may have the same structure as any other =runtimepath= directory,
+with =plugin=, =colors= etc.
 
 Plugins and packages are managed, loaded and initialized by a plug-in managers.
 
-*** Builtin Manager
+*** Builtin Manager (Vim 8)
 
-- =:packadd= :: search and source any plugin files found under =pack/*/opt/{name}=.
-  That is, an optional plugin may be installed but under =opt= it is not loaded
-  automatically.
+Packages may be stored in the paths  =pack/<AnyDirectory>/{start,opt}/= under each =&packpath=. 
+If there is any, they are added to =runtimepath= and all plugins are loaded.
+(a little confusing with an additional level of directory, possibly as a bundle of packages).
+The plugins under =pack/*/start= are added to =&runtimepath= and are automatically loaded
+while =pack/*/opt= are loaded only if =:packadd=ed. 
+
+Installing a package means placing a directory of plugins under =.vim/pack/AnyDirectory/=
+
+=start= packages are loaded automatically; =opt= packages requires =:packadd= to load them.
+=:packadd= searches and sources any plugin files found under =pack/*/opt/{name}=.
+That is, an optional plugin may be installed but under =opt= it is not loaded automatically.
 
 *** [[https://github.com/VundleVim/Vundle.vim][Vundle]]
 
@@ -777,6 +808,16 @@ Plugins are now managed within =$MYVIMRC=, installed and updated automatically.
 
 - [[https://github.com/tpope/vim-pathogen][vim-pathogen]] :: no really a
   package manager, but a solution to manage =runtimepath= before Vim 8
+
+**** Pathogen
+
+Since Vim 6, adding a plugin to Vim means adding a path to =runtimepath=. 
+Any scripts under =plugin= runtime directories  (=plugin= or =ftplugin/= ) are sourced.
+The original plugin support from Vim 6 only searches plugin scripts under certain =plugin= 
+directories but not any subdirectories, making it difficult to manage plugins in separate directories.
+
+Pathogen places all packages under =.vim/bundle= (customizable) 
+and adds any subdirectories to =runtimepath= automatically.
 
 *** Documentation
 
