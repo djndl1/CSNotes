@@ -866,11 +866,17 @@ Histories are saved a =viminfo= file after exiting vim.
 
 =set spell= for certain file types. Use ~z=~ to show spell suggestions.
 
-** File Explorer
+** File Explorer/Project Drawer
+
+- [[https://github.com/tpope/vim-vinegar][vim-vinegar]]
 
 - NERDTree: a side bar that displays the current workspace.
   + NERDTree supports bookmarks, which remembers directories as bookmarks to
     quickly navigate to a root.
+
+The problem with project drawers (like NERDTree) is that when opening a file in it, 
+it is difficult for the user to predict which window the file will occupy.
+Unlike NERDTree, the builtin netrw is a split explorer that opens a file in the window it occupies.
 
 ** GDB Debug
 
