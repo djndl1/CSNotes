@@ -824,6 +824,53 @@ and adds any subdirectories to =runtimepath= automatically.
 After a plugin or a package is installed, the user or the package manager
 should run =helptags= to parse, index documentation files and build a tags file.
 
+* File Types
+
+Vim can detect the type of file being edited by checking the file name or its content.
+
+Filetype-related functionalities includes /detection/, /plugins/ and /indentation/.
+
+** Enable File Types
+
+- =:filetype on= (detection) enables detection of file types (loading =filetype.vim=).
+Vim detects the file type and sets the ='filetype'= option 
+executes the corresponding =FileType= autocommand matching the option's value.
+Setting ='filetype'= is done by a ftdetect script.
+
+- =:filetype plugin on= (detection, plugins) also enables the plugin files for specific file types (loading =ftplugin.vim=).
+When a file is edited, its plugins are loaded.
+
+=:filetype indent on= (detection, indent) enable loading the indent file for specific file types (loading =indent.vim=).
+
+** File Type Detection
+
+Detection is carried typically by an autocommand on buffer read or creation (see =:h ftdetect=).
+
+*** Differentiate Different Types of the Same Extensions
+
+The user may set certail =g:filetype_ext= global variables to force a file type.
+
+** File Type Plugins
+
+Options, mappings in file type plugins are local to the buffer, typically under =ftplugin/=.
+
+=maplocaleader=, =<Plug>= are provided to map in a plugin-specific manner.
+=<Plug>= mappings at as a public interface for users to customize key mappings 
+without wiring keys directly to target actions.
+
+*** Built-in Filetype Plugins
+
+asciidoc, awk, fortran, freebasic, go, html, java, json, lua, man, markdown, org, plsql, python, rst,
+rust, sql,  tex, yaml, zig,
+
+Some of them offer great features and are worth reading:
+
+- =:Man=
+
+- =ft_sql.txt=
+
+- =ft_rust.txt=
+
 * Other Issues
 ** Current Directory
 
