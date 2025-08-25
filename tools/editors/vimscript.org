@@ -7,6 +7,11 @@ Besides =echo=, there  is =echom= that echo into the =:messages= buffer.
 An operator is used before a motion command, defined by ='operatorfunc'=
 and then invoked by the =g@= command.
 
+* Autoloading (Lazy Loading)
+
+Vim functions may be lazily loaded by prefixing the function name with its script name
+ (=scriptname#funcname=) and placing the script under =autoload/=.
+
 * Vimscripts
 
 
@@ -61,8 +66,11 @@ endfunction
 
 - to execute a function in command mode, =:call funcname()=
 
-- Arrays/Lists: =[elm1, elm2, elm3, elm4, ...]
+- Python-like Lists: =[elm1, elm2, elm3, elm4, ...]=
   + =for n in lst=
+  + =lst[lower:upper]= is inclusive at both ends., use =slice()= for an exclusive index.
+    Slice indices beyond the last item or the last index is before the first item is allowed.
+  + negative index cannot be used with an string.
 
 - Python-like tuple
 
