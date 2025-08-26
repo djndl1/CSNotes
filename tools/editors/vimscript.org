@@ -12,6 +12,20 @@ and then invoked by the =g@= command.
 Vim functions may be lazily loaded by prefixing the function name with its script name
  (=scriptname#funcname=) and placing the script under =autoload/=.
 
+* Documentation
+
+Vim help files are text files with simple markup  to represent tags.
+
+- =*tag*=: a tag
+
+- =|tag|=: a link tag to another =*tag*=
+
+- =`:command`=: code tag or inline code
+
+- ='option'=: option tag
+
+More details see =:help-writing=
+
 * Vimscripts
 
 
