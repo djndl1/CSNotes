@@ -503,6 +503,21 @@ enabled, one cannot manually define a fold.
 - =zN=, =zn= :: set/reset =foldenable= option
   + =zi= :: toggle =foldenable=
 
+** Folding Theory
+
+*** Folding by Expresson
+
+Folds are defined by their foldlevel.
+
+- Each line in a file has a /fold level/
+  
+- Lines with a fold level of zero are never folded
+  
+- Adjacent lines with the same  fold level are folded together
+
+- If a fold of level N is closed, then any subsequent lines with a fold level greater than N are folded
+  until a line with a level less than N.
+
 * Comments
 
 Defined by the ='comments'= option. Vim is able to understand comment formats
