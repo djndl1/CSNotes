@@ -132,3 +132,9 @@ the inadequate editing capability of =:substitute=.
     better than =$= and =0=.
 
 - Map =CTRL-B= to =<Left>=, =CTRL-F= to =<Right>=.
+
+* Get the Current Directory
+
+Use =:h= modifier after =%=, see =:h expand()=
+
+e.g. =cd %:h
