@@ -71,7 +71,7 @@ fail to start, even RDP.
   + Launch Permission: Default; Access Permissions: Default; Configuration
     Permissions: Customize and add remote principals.
 
-- Configure the firewall, well documented.
+- Configure the firewall, allow dynamic port range from 49152-65535
 
 - Start the client application with the common user and connect to the server.
 
