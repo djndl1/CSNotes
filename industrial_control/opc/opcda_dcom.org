@@ -1,19 +1,18 @@
 #+title: OPC DA DCOM Remote
 
-* DCOM Concepts
-
-An app uses its own hardcoded/configurable security settings or respect settings
-found in Component Services, either the system Defaults or its own specific
-settings if there is an entry for it.
-First, an app may explicitly set its authentication level, which may be not modified
-by administrators. If not, it attempts to use the per-application setting, and
-falls back to the system defaults if not found. The authentication level is both a
-requirement for incoming request and outbound calls. A client may receive
-callbacks from the server, thus a client may also act as a server.
+* DCOM Security Settings (Authentication)
 
 DCOM relies on MSRPC authentication, which provides several level of security:
-default, none, per-connection, per-call, per-package, per-package with data
-integrity, per-package with encryption.
+/default/, /none/, /per-connection/, /per-call/, /per-package/, /per-package with data
+integrity/, /per-package with encryption/.
+
+A process may declare its desired authentication level when it initializes COM.
+The client and the server specify their authentication level respectively.
+Then the authentication level is negotiated between the two parties: the server
+dictates a minimum level of authentication that it requires and the final result
+is =MAX(client, server)=. If the client chooses a higher level, the server is fine
+with that (if it can receive such calls of the level); 
+if the server uses a higher level, the client fails to authenticate with the server.
 
 The actual permission of the =RPC_C_AUTHN_LEVEL_DEFAULT= option, if used by an app in its
 code, is controlled by the system's =Default= permission. There is also a
@@ -21,9 +20,32 @@ code, is controlled by the system's =Default= permission. There is also a
 =RPC_C_AUTHN_LEVEL_CONNECT=, now after hardening only =RPC_C_AUTHN_LEVEL_PKT_INTEGRITY= and
 =RPC_C_AUTHN_PKG_PRIVACY= are accepted for non-anonymous DCOM.
 
+An app uses its own hardcoded/configurable security settings or respects settings
+found in Component Services, either the system Defaults or its own specific
+settings if there is an entry for it.
+First, an app may explicitly set its authentication level, which may be not modified
+by administrators. If not, it attempts to use the per-application setting, and
+falls back to the system defaults if not found. 
+
+The authentication level is a requirement for both /incoming request and outbound calls/. 
+A client may receive callbacks from the server, thus a client may also act as a server.
+
+* Permission Requirement (Authorization)
+
+For a client to access the server, the server's per-app security entry (if any,
+otherwise the system Defaults is use) should
+allow the client's security principal to access, activate and possibly launch the server. The
+server system should also lift =Edit Limits= for the client principal.
+
+The client needs to allow remote DCOM access to the client application, most
+likely the Defaults permissions.
+
+Do not remove =Everyone= from any ACL lists, which may cause local services to
+fail to start, even RDP.
+
 There are a few permission settings in Component Services:
 
-- *Defaults* Permissions: DCOM apps use unless a per-app entry is used
+- *Defaults* Permissions: used by DCOM apps unless a per-app entry is used
 
 - *Limits* Permissions: will be enforced even if per-app settings exceed these
   settings, that is, restriction policy.
@@ -33,19 +55,6 @@ There are a few permission settings in Component Services:
 - *Launch* Permission: start new servers of this class
 
 - *Activation* Permission: COM object activation
-
-* Permission Requirement
-
-For a client to access the server, the server's per-app security entry (if any,
-otherwise use the system Defaults) should
-allow the client's security principal to access, activate and possibly launch the server. The
-server system should also lift =Edit Limits= for the client principal.
-
-The client needs to allow remote DCOM access to the client application, most
-likely the Defaults permissions.
-
-Do not remove =Everyone= from any ACL lists, which may cause local services to
-fail to start, even RDP.
 
 * Typical Steps
 
@@ -103,8 +112,8 @@ without first adding an a tag in the DA device.
 
 Hardening of DCOM authentication with A service-side enforcement. DCOM servers
 will simply not accept non-anonymous connections from DCOM client using
-authentication level that is below Packet Integrity. The solution also raises
-process default authentication level[1] for activation to
+authentication level that is below /Packet Integrity/. The solution also raises
+process default authentication level for activation to
 =RPC_C_AUTHN_LEVEL_PKT_INTEGRITY= if it's below Packet Integrity in Windows COM
 layer on DCOM clients.
 
@@ -113,8 +122,10 @@ since March 2023.
 All non-anonymous activation requests are raised to
 =RPC_C_AUTHN_LEVEL_PKT_INTEGRITY= if a client machine has received the update.
 The server side also automatically work with new client authentication level
-after the update. The authencation level requirement on the server simply
+after the update. The authentication level requirement on the server simply
 becomes more strict. It is the client that should take action to mitigate the issue.
+Later updates to client systems have raised authentication level for all non-anonymous
+activation requests up to Packet Integrity to conform to hardened server settings.
 
 This does not affect anonymous activation. That is, in the case where the server
 is patched and the client is not, one may enable anonymous login (insecure!).
@@ -134,6 +145,8 @@ This requires machine-wide =Edit Limits= Remote Access and Remote Activation for
 
 ** Client-Side Mitigation
 
+Unfortunately, most OPC DA clients uses hardcoded authentication level.
+
 - Fix the client code and use the appropriate authentication level, which is not
   always possible.
 
@@ -146,8 +159,10 @@ This requires machine-wide =Edit Limits= Remote Access and Remote Activation for
     Integrity= and reboot both.
     This forces clients uses package integrity.
 
-- Client Side Auto-Elevation (with client-side Windows patches): configure the client and the server into the same
-  domain or to use known user accounts.
+- Client Side Auto-Elevation (with client-side Windows patches): 
+  Microsoft adds client update patches to simply elevate the authentication
+	level to the minimum supported level for all non-anonymous clients if it is too low,
+	regardless of how it set the authentication level before.
 
 * Local Security Policy =secpol=
 
@@ -185,3 +200,5 @@ The Windows Event Logs has logon/logoff auditing messages and DCOM-related error
 - [[https://serverfault.com/questions/135867/how-to-grant-network-access-to-localsystem-account][How To Grant Network Access to LocalSystem Account]]
 
 - [[http://web.archive.org/web/20061219191308/http://msdn.microsoft.com/library/en-us/dndcom/html/cis.asp][COM Internet Services]]
+
+- [[https://www.codeproject.com/Articles/5370249/Dealing-with-DCOM-Hardening-Part-1][Dealing with DCOM Hardening]]
