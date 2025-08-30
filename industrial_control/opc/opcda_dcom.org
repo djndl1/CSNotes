@@ -106,7 +106,7 @@ local or remote client.
 
 The DA Driver even supports automatically automatic addressing
 (=DAChannelName.DADeviceName.[TagAddressInRemoteOPCServer]=)
-without first adding an a tag in the DA device.
+without first adding an tag in the DA device.
 
 * [[https://support.microsoft.com/en-us/topic/kb5004442-manage-changes-for-windows-dcom-server-security-feature-bypass-cve-2021-26414-f1400b52-c141-43d2-941e-37ed901c769c][DCOM Hardening]]
 
