@@ -61,7 +61,7 @@ There are a few permission settings in Component Services:
 - Create a common user with the same password on both machines.
 
 - Configure the OPC Server's DCOM security (application-specific entry and the
-  machine-wide limits) so that this user or its belonging
+  *machine-wide limits*) so that this user or its belonging
   group are allowed for remote activation, access and optionally launch.
 
 - Configure the OPC Client machine so that the server has Access Permissions to
@@ -87,14 +87,23 @@ There are a few permission settings in Component Services:
 
 ** Final Result
 
+- *Enable DCOM logging during troubleshooting* (*Important*): 
+  set some registry keys and restart the OPC server. Especially on modern Windows, which is disabled by default.
+	+ Also, KEPServerEX has a diagnostics tool for OPC DA.
+
 - For the client to access the server, I created a named user =OPCRemote= and
   added it a group =OPCRemoteGroup= on both the client and the server.
-  Allow this group on the server in KEPServerEX's DCOM Remote Access,
-  Remote Activation settings and in machine-wide limits. This gives the client
-  access to the server.
+  Allow this group on the server in KEPServerEX's DCOM *Remote Access*,
+  *Remote Activation* settings and in *machine-wide limits* (very important on modern Windows). 
+	This gives the client access to the server.
 
-- Created a named user =KEPServerRuntime= for KEPServerEX 6.4 Windows service and
-  added it to the client's machine-wide Defaults Remote Access and Remote Access Limits.
+- Created a named user =KEPServerRuntime= for KEPServerEX Windows service and
+  added it to the client's *machine-wide Defaults Remote Access and Remote Access Limits*.
+	+ This is required simply because the server needs to call back to the client.
+	  Do put this user in proper user groups on the client ("Users", "Distributed COM Users" etc.)
+	  Using different accounts for the client and the user is hard to get callback right.
+	  This easiest way to avoid this is probably using the same account for both the client and the server.
+		After all, for the server user to log onto the client system, the client probably already knows its credential.
   + Do not use the default =LocalSystem= with KEPServerEX. It presents to remote
     computers (the client) the computer credential, which is not available
     without a domain, although it can steal credentials of logged-on users.
@@ -107,6 +116,16 @@ local or remote client.
 The DA Driver even supports automatically automatic addressing
 (=DAChannelName.DADeviceName.[TagAddressInRemoteOPCServer]=)
 without first adding an tag in the DA device.
+
+** Pitfalls
+
+- machine-wide limits and settings must be set for remote users.
+
+- A KEPServerEX service account may require "Administrators" to run the service.
+
+- Possibly add to these users to "Distributed COM Users" group.
+
+- A remote account needs be in "Users" to log onto a remote computer.
 
 * [[https://support.microsoft.com/en-us/topic/kb5004442-manage-changes-for-windows-dcom-server-security-feature-bypass-cve-2021-26414-f1400b52-c141-43d2-941e-37ed901c769c][DCOM Hardening]]
 
