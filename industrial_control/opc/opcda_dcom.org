@@ -1,5 +1,10 @@
 #+title: OPC DA DCOM Remote
 
+*DCOM Security in still in play even for IPC on the same computer*. By default
+"Everyone" is allowed for =Local Access= and =Local Activation/Launch=. 
+If both computers are in  the same domain, the permissions are controlled by the domain.
+Otherwise, both should have identical local accounts.
+
 * DCOM Security Settings (Authentication)
 
 DCOM relies on MSRPC authentication, which provides several level of security:
@@ -56,7 +61,7 @@ There are a few permission settings in Component Services:
 
 - *Activation* Permission: COM object activation
 
-* Typical Steps
+* Typical Steps For Computers Not in the Same Domain
 
 - Create a common user with the same password on both machines.
 
@@ -199,6 +204,16 @@ Unfortunately, most OPC DA clients uses hardcoded authentication level.
 
 TLDR: use a VPN
 
+** Firewall
+
+DCOM uses dynamic port range, unfriendly ot firewalls.
+
+Ports should be opened for both parties to allow callback.
+
+- MSRCP requires the TCP port 135
+
+- The ephemeral dynamic port range (49152-65535) should be open.
+
 ** NAT
 
 DCOM by default does not work with NAT: the server calls back to the incoming
@@ -211,6 +226,8 @@ it doesn't support callback.
 The Windows Event Logs has logon/logoff auditing messages and DCOM-related errors.
 
 * References
+
+- [[https://docs.aveva.com/bundle/dcom-security-and-configuration/page/1011053.html][DCOM Security and Configuration]]
 
 - [[https://www.softwaretoolbox.com/dcom/html/background.html][Software Toolbox DCOM Tutorial]]
 
