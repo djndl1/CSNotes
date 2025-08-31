@@ -14,6 +14,11 @@ https://www.codeproject.com/Articles/12441/OPC-Technology
 
 * OPC Classic
 
+OPC Class is more a programming interface and programming model than a communication protocol.
+It utilizes DCOM/COM between clients and servers, which reside on PCs. The real
+communication between devices (PLCs, PCs) are vensor-specific protocols, whereas OPC UA
+defines its own communication protocol like any fieldbus protocols.
+
 ** Scope
 
 The specification include a set of custom COM interfaces (and a set of OLE Automation interfaces) for use by client and server writers
