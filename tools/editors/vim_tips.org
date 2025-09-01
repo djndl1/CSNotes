@@ -137,4 +137,12 @@ the inadequate editing capability of =:substitute=.
 
 Use =:h= modifier after =%=, see =:h expand()=
 
-e.g. =cd %:h
+e.g. =cd %:h=
+
+* Generate a Number Sequence
+
+Anything starts with =\== within a substitution text can be an expression.
+
+#+begin_src vim
+let counter=0|g/matched/let counter=counter+1|s/matched/\=counter
+#+end_src
