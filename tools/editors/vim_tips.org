@@ -146,3 +146,11 @@ Anything starts with =\== within a substitution text can be an expression.
 #+begin_src vim
 let counter=0|g/matched/let counter=counter+1|s/matched/\=counter
 #+end_src
+
+* How to Abort Git Commit Message
+
+- delete all commit text
+
+or
+
+- =:cq=
