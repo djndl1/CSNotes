@@ -134,6 +134,9 @@ without first adding an tag in the DA device.
 
 - Configuration Permissions should be ignored: they are required for remote access as well.
 
+- the =netlogon= service has to be running to allow remote users to log into the system. Otherwise, connection
+  from either side may fail.
+
 * [[https://support.microsoft.com/en-us/topic/kb5004442-manage-changes-for-windows-dcom-server-security-feature-bypass-cve-2021-26414-f1400b52-c141-43d2-941e-37ed901c769c][DCOM Hardening]]
 
 Hardening of DCOM authentication with A service-side enforcement. DCOM servers
