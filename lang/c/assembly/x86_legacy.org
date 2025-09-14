@@ -163,11 +163,11 @@ The only way to alter =CS= is when execution is switched to another segment:
 **** Data Segments
 
 Data are supposed to be put in certain memory regions called data segments and
-are accessed through the =CS= segment and an offset register (=BX=, =DI= or
+are accessed through the =DS= segment and an offset register (=BX=, =DI= or
 =SI=).
 
 #+begin_src asm
-mov al, [bx] // relative to CS
+mov al, [bx] // relative to DS
 #+end_src
 
 **** Extra Segment
@@ -452,19 +452,19 @@ and the result.
     significant bit but not from the most significant bit) or two
     negative numbers (a carry from the most significant bit but not from the
     second most significant bit).
-  + (386) =lea= as an alternate method for multiplying quickly by constants by
-    taking advantage of its scaled index computation.
-
 - =sub=, =sbb=: subtraction is done using the adder circuitry (not the =add=
   instruction) with the subtrahend in 2's complement.
   + Since =x - y= is computed as =x + (2^N - y)=. If =x= is greater than =y=,
-    =x-y= would be positive and the result overflows. That is, if there is no
+    =x-y= would be positive and the result unsigned overflows. That is, if there is no
     borrow, the carry status is set. The borrow status is the negation of the
-    carry status. *However, here the carry flag bit is used to indicate a
-    borrow*. The carry flag is inverted.
+    carry status. *However, here with x86 the carry flag bit is used to indicate a
+    borrow*: The carry flag is inverted.
 
 - =mul= for byte by byte, the result is in a single register, for word by word,
   the result is in =DX:AX=
+  + (386) =lea= as an alternate method for multiplying quickly by constants by
+    taking advantage of its scaled index computation.
+
 
 - =div= (unsigned): for different operand sizes, the numerator and the result are in
   different registers.
@@ -871,7 +871,7 @@ array_name directive initializer
            directive initializer
 ; repeated initializer
 array_name directive N DUP(val)
-end_src
+#+end_src
 
 ** Expressions
 
