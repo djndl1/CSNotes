@@ -2,9 +2,10 @@
 
 * List
 
-In Lisp, both data and programs are represented the same way; that is, they are both lists of words, numbers, or other lists, separated by whitespace and surrounded by parentheses.
+In Lisp, both data and programs are represented the same way;
+that is, they are both lists of words, numbers, or other lists, separated by whitespace and surrounded by parentheses.
 
-#+begin_src elisp
+#+begin_src lisp
 '(rose violet diasy buttercup)
 (+ 1 2)
 
@@ -40,7 +41,7 @@ An ordered pair of two objects =(car . cdr)=, also called /dotted pair/;
 Evaluating a symbolic expression most commonly causes the Lisp interpreter to
 return a value and perhaps carry out a side effect; or else produce an error.
 
-- quote: if a list is not quoted, it is evaluated.
+- quote: if a list or symbol is not quoted, it is evaluated.
 
 - a symbol out of any parentheses is treated as a variable.
 
