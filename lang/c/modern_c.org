@@ -47,6 +47,25 @@ optimizer can vectorize them. C's syntax provides little information about this.
 C adds padding at the end of a structure. A copy of a =struct= must retain its
 padding. A large portion of runtime copying is just for copying the padding.
 
+* Code Style Used by the Modern C Book
+
+
+- bind modifers, qualifiers and attributes to the left: they are placed on the right.
+  + =char* var= not =char *var=
+
+- no more continued declarations: one variable in a declaration.
+
+- array notatiion for pointer parameters that cannot be null 
+  to emphasize the constraint and nature of the pointer.
+
+- function notation for function pointer parameters for not-null function pointers.
+
+- define variables as close to their first use to avoid uninitialized variables.
+
+- block ={= immediately follows its introducing statement to indicate its purpose and its extent.
+
+- use C23 digit separator ='=.
+
 * Struct Initialization
 
 Designated initialization, nested initialization and compound literals leads API
