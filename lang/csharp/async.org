@@ -215,7 +215,8 @@ An asynchronous task is not necessarily on a new thread, IO-bound async tasks ar
 
 **** UI App
 
-For an async task invoked on the UI thread, regardless of whether the await statements occur within an iteration or as separate entries, they will execute serially, one after the other and in the same order they were invoked from the calling thread.
+For an async task invoked on the UI thread, regardless of whether the await statements occur within an iteration or as separate entries, 
+they will execute serially, one after the other and in the same order they were invoked from the calling thread.
 
 One of the key advantages of the =async=/=await= pattern is that it
 leverages the synchronization context to ensure that continuation
@@ -311,6 +312,15 @@ Never block on the UI thread and
 =.ConfigureAwaiter(false)= may not work because one cannot be sure
 any somewhere down the call stack some one forgot =ConfigureAwaiter(false)= and
 captured the synchornization context.
+
+*** Custom =TaskScheduler=
+
+They are totally unnecessary and may even cause deadlocks, similar to that on a UI thread.
+If a =TaskScheduler= has limited threads, once the pool is depleted and the threads are waiting 
+synchronously for a task for return, deadlocks may occur: the new task is implicitly
+managed by the scheduler but the scheduler has no thread to start
+the new task while all other tasks are waiting for that task to start and return.
+
 
 ** =async void=: Non-Option
   :PROPERTIES:

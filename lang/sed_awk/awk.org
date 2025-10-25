@@ -4,25 +4,57 @@ A sequence of patterns and actions that tell what to look for in the input data
 and what to do when it's found. A set of files arae searched for lines matched by
 any of the patterns and the corresponding action is performed on a matching line.
 
+Awk can print fields, select input and transform data.
+
 * Basics
 
-- Pattern-action statement: =pattenr { action }=. Each awk program is a sequence of one or more pattern-action statements.
+The whole process is a loop over every line, a pattern is a condition that
+filters a line and the pairing action operates on the matching line. =BEGIN=
+and =END= runs before the first line and at the last line.
+
+#+begin_src awk
+# conceptual process
+BEGIN_ACTION
+while (has_line) {
+      if (match(pattern)) {
+            action
+      }
+      if (last_line) {
+            END_ACTION
+      }
+}
+#+end_src
+
+- Pattern-action statement: =pattern { action }=. Each awk program is a sequence of one or more pattern-action statements.
   + a pattern without an action prints all lines matching the pattern
   + actions are separated by newlines or semicolons
 
-#+begin_src awk
+  #+begin_src shell
+// quick start
+// one liner
+awk 'program text' input_file1 input_file2
+// program file
+awk -f progfile input_files... 
+// without an input file, stdin is read
+  #+end_src
+
+  #+begin_src awk
+  pattern { action }
+  pattern { action }
+
 ip a | awk '$1 == "inet" { print $2} '
 awk -f programFile inputfiless...
-#+end_src
+  #+end_src
 
-- =$1=, =$2= ... fields; =$0= the entire line; =NF=: the number of fields; =$NF=: the last field. Any expression can be used after =$= to denote a field number; =NR=: number of lines
+- =$1=, =$2= ... fields; =$0= the entire line; =NF=: the number of fields; 
+  =$NF=: the last field. Any expression can be used after =$= to denote a field number; 
+  =NR=: current line number (number of record)
 
 #+begin_src awk
+# much like Python's print
 { print } # or
 { print $0 }
 #+end_src
-
-- the C-style =printf= format print is also supported.
 
 - =BEGIN= matches before the first line of the first input file; =END= matches after the last line of the last file;
   Used to do anything before/after the actual matching.
@@ -33,11 +65,8 @@ awk -f programFile inputfiless...
 { pay += $2 * $3 }; END { printf "total pay %.2f\n", pay } # pay is defined the first time it's used and is used afterwards
   #+end_src
 
-- string are concatenated by a blank between them.
-
-#+begin_src awk
-'{ names = names $1 " " }; END { print names }'
-#+end_src
+- string are concatenated by a blank between them, similar to C's string
+  literal concatenation.
 
 - NR retains its value in an =END= action, =$0= does not (but =gawk= and =mawk= does preserve =$0=)
 
@@ -46,7 +75,7 @@ awk -f programFile inputfiless...
 { last = $0 }; END { print last } # END { print $0 } works for some implementation
 #+end_src
 
-- C-style if-else, while and for clauses are available.
+- C-style =if=-=else=, =while= and =for= clauses are available.
 
 - Arrays are more powerful than C arrays, with automatic resizing.
 
@@ -59,7 +88,6 @@ END {
 }
 #+end_src
 
-
 ** Some Oneliners
 
 #+begin_src awk
@@ -69,12 +97,12 @@ NR = 10 # print the tenth line
 
 # print the count of lines containing "Beth"
 /Beth/ { nlines += 1 }
-END { print nliens }
+END { print nlines }
 #+end_src
 
 * Language
 
-- The opening brace of an action muyst be on the same line as the pattern it accompanies.
+- The opening brace of an action must be on the same line as the pattern it accompanies.
 
 - statements can be broken after backslashes, commas.
 
@@ -93,66 +121,169 @@ END { print nliens }
 
 *** Regex Matching
 
-- =/regex/=: matches the input line. In a matching expression, a quoted string can normally be used interchangeably with a regex enclosed in slashes. However, in quoted strings, =\\= is needed to escape a character.One level of protecting backslashes is removed when a quoted string is parsed by awk.
+- =/regex/=: matches the input line. In a matching expression, a quoted string 
+  can normally be used interchangeably with a regex enclosed in slashes. 
+  However, in quoted strings, =\\= is needed to escape a character:
+  ="\+"= means =+=, ="\\+"= means =\+=, that is, a literal =+=,
+  because one level of protecting backslashes is removed when a quoted string is parsed by awk.
 
 - =expression ~ /regex/=: matches the string value of the expression
 
-=expression !~ /regex/=: matches if the string value of the expression does not contain a substring matched by the regex.
+- =expression !~ /regex/=: matches if the string value of the expression does not contain a substring matched by the regex.
 
 Gawk uses the POSIX extended regex.
 
 - metacharacters: =\=, =^=, =$=, =.=, =[=, =]=, =|=, =(=, =)=, =*=, =+=, =?=
 
-- A basic regex
-  + a nonmetacharacter that matches itself
-  + an escape character e.g. =\t=
-  + a quoted metacharacter: =\*=
-  + =^= and =$= that matches the beginning and the end of a string
-  + =.=: any single character
-  + a character class. Quoting metacharacters is not always needed inside a character class.
-
-- operators conmbine regexes into larger ones (=A= and =B= are regexes): ordered by precedence from the lowest to the highest
-  + alternation: =A|B= matches =A= or =B=
-  + concatenation: =AB=
-  + closure =*=: matches zero or more of the previous regex.
-  + positive closure =+=: one or more of the previous regex.
-  + zero or one =?=
-  + grouping =(r)=: matches the same strings as the pattern =r= does.
-    parentheses can often be omitted since groupings take precedence.
-
 - =$1 ~ $2= is a useful way to test regexes.
 
 *** Range Pattern
 
-A range pattern matches multiple lines. If the second pattern is not found, the match goes on.
+A range pattern matches multiple lines. 
+
+- the first pattern matches first and the range continues until the second
+  pattern is matched. The first pattern may then match again.
+
+- If the second pattern is not found, the match goes on.
 
 ** Action
 
 - expression:
-  + variables:
-    - builtin: =FNR=, =NF= (reset when =$0= changes or when a new field is created by assigning to a field variable), =NR=. =RLENGTH=/=RSSTART= change as a result of =match= call.
-    - variables are initialized by defaut to =""= or =0=freebird
-  - arithemtic operators: =^=: exponentiation
-  - =i in arr= is supported.
-
+  + variables: variables may be /user-defined/, /builtin/ or /fields/.
+    - builtin: =FS= (field separator, by default a single blank) =FNR= (line number of the current file), =NF= 
+    (reset when =$0= changes or when a new field is created by assigning to a field variable), 
+    =NR= (number of record). =RLENGTH= and =RSSTART= change as a result of =match= call.
+    - fields: =$0= to =$NF=. Fields can be assigned to. One may create a new
+      field simply by assigning a value to it.
+    - Uninitialized variables are created with the numeric value 0 and the string value "". 
+      Nonexistent fields and fields that are explicitly null have only the
+      string value ""; they are not numeric, but when coerced to numbers they
+      acquire the numeric value 0.
+  + arithemtic operators: =^=: exponentiation. All arithmetic is done in
+    floating point.
+  + Strings can act as regex: =$2 ~ mystring=.
+  + ~v = e~ and =v= acquire the type of =e=; ~x == y~ the comparison is
+    numeric only if both operands are numeric.
+    Any field is by default a string but it may also acquire a numeric type
+    if it is a valid numeric token.
+    
 - Arrays are string-subscripted associative arrays. An array element may be deleted with =delete array[subscript]=.
-
+  + Array elements cannot themselves be arrays. Multidimensional arrays are actually associative arrays 
+    with keys formed by concatenated subscripts: =array[i, j]= has keys a key
+    =i SUBSEP j=, where =SUBSEP= is a builtin variable to separate
+    subscripts. Testing for array membership =if((i, j) in arr)= works.
+  
 - Control flow: all C constructs are supported
+  + =for (key in array)= loop is supported.
   + =next=: the next iteration of main input loop
   + =exit=: to the =END= action; exit the program if already within the =END= action.
 
-- user defined function
+- user defined function, defined anywhere a pattern-action statement can.
   + scalars are passed by values while arrays are passed by reference.
   + function-local variables are only created through the paramter list (strange design).
+    All other parameters are global. To define a local variable, it has be
+    added to the parameter list. Fortunately, a function call is not
+    required to supply every parameter with an argument.
+  + For a function call statement =funcname()= is okay, =funcname ()= is not.
 
 - output
-  + =>= and =>>= are used with =print=/=printf= to write into files.
+  + =>= and =>>= are used with =print= or =printf= to write into files.
   + =|= pipes are also used with printing functions.
   + files are pipes are identified by their names (file name or pipe command string)  inside a awk program.
   = =close= a file/pipe is necessary if the file is read later.
 
 - multiline record
   + =RS=: record separator, by default =\n=
+
+* Common Operations
+
+** Input
+
+- =FS= can be a regex so that a file can have different separators as long as
+  it matches the pattern.
+
+- =RS=: the record separator is by default a line separator =\n=. Set it to
+  other character to enable multiline records.
+
+- =getline=: read a line from the current input or a file without waiting for
+  the main loop to proceed.
+
+- =-f progname= and =-F sep= are ignored in =ARGV= and =ARGC=
+
+** Output
+
+- =print=: similar to Python's =print=
+  + =OFS= separates the arguments in the output
+
+- =printf=: C's =printf=.
+  + dynamic precision or field width denoted by =*= is not supported.
+
+- =>= and =>>= redirection is supported.
+  + A redirection opens a file only once and each successive =print= or
+    =printf= statement adds more data to the open file, even if =>= is used. 
+    The only difference =>>= shows is to clear the file when first used on a file.
+  + A comparison =>= at the end of a =print(f)= must be quoted.
+  + files opened by =>=, =>>= or =|= need to be explicitly closed.
+
+- =|= piping is also supported.
+  + A pipe is closed by its command string.
+** Invoke External Programs
+
+- =system= function
+
+** Selection & Filtering
+
+- comparsion ~$2 >= 5~, ~$2 * $2 > 50~, ~$1 == "Susie"~
+
+- regex ~/Susie/~
+
+Match conditoins may be combined with parentheses and logical operators =&&=,
+=||=, =!=
+
+** First or Last Item
+
+- ~NR == 1~ for the first line 
+
+- To find the first maching line, add a =exit= in the action to process only
+  one line.
+
+- =END= for the last line.
+
+** Aggregation
+
+Use =BEGIN= to initialize variables and =END= to perform postprocessing
+
+#+begin_src awk
+# sum matching lines
+$3 > 15 { emp = emp + 1 }
+END { print emp }
+#+end_src
+
+#+begin_src awk
+# map and then sum/average
+{ pay = pay + $2 * $3 }
+END { print pay, pay / NR }
+
+# concatenate strins
+{ names = names $1 " " }; 
+END { print names }
+
+#+end_src
+
+** Reverse
+
+Save in an array and print in a loop in postprocessing
+
+#+begin_src
+{ line[NR] = $0 }
+END {
+  i = NR
+  while (i > 0) {
+      print line[i]
+      i = i - 1
+  }
+}
+#+end_src
 
 * Data Processing
 

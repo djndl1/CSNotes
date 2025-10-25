@@ -163,11 +163,11 @@ The only way to alter =CS= is when execution is switched to another segment:
 **** Data Segments
 
 Data are supposed to be put in certain memory regions called data segments and
-are accessed through the =CS= segment and an offset register (=BX=, =DI= or
+are accessed through the =DS= segment and an offset register (=BX=, =DI= or
 =SI=).
 
 #+begin_src asm
-mov al, [bx] // relative to CS
+mov al, [bx] // relative to DS
 #+end_src
 
 **** Extra Segment
@@ -402,22 +402,44 @@ There are machine instructions that convert between data types
 
 ** Jump & Branch
 
-- *Far* & *Near*: intrasegment jump versus intersegment jump.
+- *Short* (ip-relative short jump) *Far* (intrasegment jump versus )  *Near* (intersegment jump)
 
-- All *conditional jumps* are short jumps with an offset within -128 and +127
-  bytes of =ip=,
-  even if the assembly code seems to be using an absolute address, the machine
-  code is actually using an offset from =ip= (the next instruction's address).
+- All *conditional jumps* are ip-relative short jumps with an 8-bit (16-bit
+  added since 386, 32-bit in a 32-bit segment) offset
+  even if the assembly code seems to be using an absolute address
+  + =cmp= (=sub= for side effects) two values and jump on flags: above/below for unsigned values and greater
+    than/less than for signed values.
+  + =test= (=and= for side effects) a single value for bit patterns; (386) =bt= series instructions
+  + except =test R R=, =or R R=, =cmp R 0= to test zero, there are specialized
+    instructions for this: =J(E)CXZ=
+  + to conditionally jump to a distant location, add a following long jump to a
+    conditional jump instruction. /MASM automatically generates this kind of code upon long conditional jump/.
 
 - *unconditional jump* can be *short* (8-bit displacement from =ip=), *near*
   (16-bit ip-relative, register indirect offset, memory indirect offset),
-  *far* (=ip=, =cs= bot can be changed).
+  *far* (=ip=, =cs= both can be changed).
+  + MASM optimizes jumps when no =short=, =near=, =far=, =near16=, =near32=,
+    =far16=, =far32= or =proc= is specified and when the target is within the
+    segment. The user may override the assembler's choice with these keywords
+    above.
+  + for indirect jump, the pointer size in memory can be specified or the
+    default based on =.model= and he default segment size is used.
+    #+begin_src asm
+jmp     [bx]          ; depends
+jmp     word ptr [bx] ; near16
+    #+end_src
+  + for pointers in registers, the registers' size determines the pointer size
+    #+begin_src asm
+jmp     bx ; near16
+jmp     ebx ; near32
+    #+end_src
 
-- *procedure call* =CALL=, =RET=
-  + can be *near* or =far*. =CS= (for far call), =IP= are pushed onto the stack
+- *Procedure call* =CALL=, =RET=
+  + both can be *near* or *far*. =CS= (upon far call), =IP= are pushed onto the stack
     upon =CALL=.
   + =RET= directs the CPU to pop out the saved return address and jump back.
-  + the =main= entry point is required to be a far call.
+  + the entry point is required to be a far call.
+
 
 ** Arithmetic, Logical & Shift Operations
 
@@ -430,19 +452,19 @@ and the result.
     significant bit but not from the most significant bit) or two
     negative numbers (a carry from the most significant bit but not from the
     second most significant bit).
-  + (386) =lea= as an alternate method for multiplying quickly by constants by
-    taking advantage of its scaled index computation.
-
 - =sub=, =sbb=: subtraction is done using the adder circuitry (not the =add=
   instruction) with the subtrahend in 2's complement.
   + Since =x - y= is computed as =x + (2^N - y)=. If =x= is greater than =y=,
-    =x-y= would be positive and the result overflows. That is, if there is no
+    =x-y= would be positive and the result unsigned overflows. That is, if there is no
     borrow, the carry status is set. The borrow status is the negation of the
-    carry status. *However, here the carry flag bit is used to indicate a
-    borrow*. The carry flag is inverted.
+    carry status. *However, here with x86 the carry flag bit is used to indicate a
+    borrow*: The carry flag is inverted.
 
 - =mul= for byte by byte, the result is in a single register, for word by word,
   the result is in =DX:AX=
+  + (386) =lea= as an alternate method for multiplying quickly by constants by
+    taking advantage of its scaled index computation.
+
 
 - =div= (unsigned): for different operand sizes, the numerator and the result are in
   different registers.
@@ -849,7 +871,7 @@ array_name directive initializer
            directive initializer
 ; repeated initializer
 array_name directive N DUP(val)
-end_src
+#+end_src
 
 ** Expressions
 
@@ -869,6 +891,15 @@ mov     word ptr ds:[100h], ax ; ok
     #+end_src
 
 - =N DUP(val1 [, val2, ...])=: repeats a value pattern N times
+
+- =@@= anonymous label, referenced by =@F= (forwards) and =@B= (backwards)
+
+** High Level Constructs
+
+*** Conditional
+
+=.if=, =.elseif=, =.else=, =.endif= are not compile-time directives: they are
+meant to generate real assembly branch code.
 
 ** Directives
 

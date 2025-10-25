@@ -113,7 +113,7 @@ real-mode code. Even if the program does not use any DOS or BIOS services, an
 asynchronous system event would call into real-mode code and crash the system
 due to the different semantics of memory segmentation.
 
-A DOS extender enables software to run in a protected moe environment even the OS is only
+A DOS extender enables software to run in a protected mode environment even the OS is only
 capable of operating in real mode. A DOS extender is a program that "extends"
 DOS so that programs running in protected mode can transparently interface with
 the underlying DOS API, even though segmented memory is different under real
@@ -282,7 +282,8 @@ memory* (EMS, hardware), *expanded memory* (EMS, MMU and software), *Upper Memor
 
 Mapping additional memory into a 64-KB region in the UMA and
 the mapping can be changed dynamically by software, possibly with necessary
-hardware support but it does not require protected mode support.
+hardware support but it does not require protected mode support. Expanded
+memory emphasizes the use of more memory without necessarily adding more address space.
 
 Lotus, Intel and Microsoft developed a standard (EMS) to allow access of up to
 32 MB of expanded memory.
@@ -301,7 +302,7 @@ memory area could be used to map extended memory (*Upper Memory Blocks*).
 ** Extended Memory
 
 Any memory above 1MB under DOS, which cannot be directly accessed under real
-mode or virtual x86 mode.
+mode or virtual x86 mode. Extended memory emphasizes the use of higher memory addresses.
 
 Under protected mode (286), the MMU takes charge of all memory access and the segment
 becomes an index into the GDT or LDT table, a data structures that maintains the

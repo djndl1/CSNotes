@@ -1,0 +1,40 @@
+* Toolchains
+
+- MSVC: catching up in recent years but still with no C23 support as of 2025.
+  + Standard C features are not always implemented.
+  + PDB debug files are used, incompatible with DWARF and thus GDB.
+  + NMAKE is not POSIX-complete and the shell environment is different: Makefiles
+    are not portable.
+
+- Mingw-w64: relies on either the old MSVCRT with its only patches or the new UCRT.
+  + =__USE_MINGW_ANSI_STDIO= is no longer required with support out of the box.
+  + PIE now mandatory.
+
+- Clang: one of the two flavors relies directly on the official Windows SDK.
+  + GDB and DWARF support.
+
+There is a commercial debugger called =RemedyBG= that seems to work well without
+using any IDE. WinDbg's UX is horrible.
+
+* File I/O Problem
+
+MSVCRT is mostly broken in terms of Unicode support. Even if the new UCRT kind of fixed that,
+it is still subtly imcompatible with standard C. When dealing with file I/O, there is a 
+[[../../os/windows/WinAPI/console.org][complex mechanism]] with encoding and character sets, not just simply using the ANSI-version 
+of Win32 API. By default, the I/O runs in ANSI mode, which depends on the CRT locale
+and any program that uses only the narrow I/O cannot guarantee portability.
+There are [[https://github.com/skeeto/scratch/tree/master/libwinsane][some fixes and workarounds]] but not perfect.
+Anyway, portable C programs on Windows are not portable.
+
+Also, on Windows, there is a difference between text mode and binary mode.
+Under text mode, the CRT translates newline characters automatically, which is
+allowed by the C standard. If the Unix behavior is desired, use the following 
+snippet:
+
+#+begin_src c
+    #ifdef _WIN32
+    int _setmode(int, int);
+    _setmode(0, 0x8000);
+    _setmode(1, 0x8000);
+    #endif
+#+end_src

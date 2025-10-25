@@ -1,0 +1,156 @@
+* Do Not Leave the Main Area
+
+- =i_CTRL-C=: quit insert mode back to normal mode.
+
+- =i_CTRL-H=: backspace key
+
+- =i_CTRL-I=: tab key
+
+- =i_CTRL-J=, =i_CTRL-M= enter newlines.
+
+- =i_CTRL-U=: kill all before the cursor
+
+- =i_CTRL-W=: delete the word before the cursor.
+
+- =i_CTRL-[=: ESC
+
+* Moving Around Quickly
+
+- Use [[https://github.com/easymotion/vim-easymotion][vim-easymotion]] 
+
+- Fold text to see an outline.
+
+- Use =*= to search the word under the cursor instead of typing it manually.
+
+- Use =%=, =[(=, =])= to move to parentheses.
+
+- Use =gd= and =gD= for a variable declaration.
+
+- Use =[I=, =]I= to search and =[ CTRL-I= and =] CTRL-I= to jump to a word
+
+- =]*=, =]/=, =[*=, =[/= to move around C comment blocks =/**/=
+
+* Save Some Typing
+
+- Repeat with =.=
+
+- Change one character with =s=.
+
+- Use insert mode completion =C-n=
+
+- Record and replay
+
+- =CTRL-O= to execute a normal-mode command under insert mode.
+
+- =gv= to select the last selected region.
+
+* Change a Word in Multiple Files
+
+This may be useful in code editing, which may be accomplished by a language
+server, but this technique is not restricted to code only.
+
+- =:args *.c=
+
+- =:argdo %s/text_replaced/text_replacement/ge | update=: every argument, not
+  every buffer or window to avoid unnecessary edits and finally update the
+  changed files.
+
+* Fix Mistyping
+
+- abbreviate some common errors, such as =:abbr hte the=
+
+* Quick Insertion & Deletion
+
+- =CTRL-W= to delete a word
+
+- =CTRL-U= to delete text up to the cursor.
+
+- =CTRl-A= and =CTRL-@= (exits insert mode) to insert the text inserted last time.
+
+- =CTRL-Y= inserts the character above the cursor 
+  + for repeating the previous line but with some variations.
+
+- =CTRL-R= insets a register without entering normal mode and use yanking.
+
+* Sort Text
+
+Use a filter: =RangeOfText !sort=
+
+* Reverse Lines
+
+=:global/^/move 0= reverses all lines. Set a range and a proper target to
+reverse a certain range.
+
+* Trim Trailing Whitespaces
+
+- =%s/\s\+$//=
+
+* Editing Files Containing a Certain Word
+
+=vim $(grep -l keyword myfiles*.ext)=
+
+* Join Many Lines of a Paragraph Into One Physical Line
+
+=g/./,/^$/join=: join all the way to an empty line.
+
+* Extract Matching Text
+
+- =:s/^\(.*\)\(match_pattern\)\(.*$\)/\2/g=
+
+- =!awk 'match($0, "match_pattern") { print substr($0, RSTART, RLENGTH) }' >> %=
+
+* Moving Across ={]= Code Blocks
+
+- =[[=, =]]=, =][=, =[]=
+
+- =[{=, =[(=, =])=, =]}= to enclosing block pairs.
+
+- =[m=, =]m=, =[M=, =]M=
+
+* Appending Text to Lines
+
+- ~range g/pattern/ s/$/line_ending/~
+  + or with =normal Aline_ending=
+
+- Visual select and =$a=
+
+- Start recording, =a= and insert text and then move down one line, stop recording. 
+  =N@register_name= to execute the recorded change N times.
+  + or use =.= to repeat
+
+The first is the most versatile.
+
+* Use Normal Commands in Command Mode
+
+Normal commands in Command mode can be combined with ranges and complement
+the inadequate editing capability of =:substitute=.
+
+* Move Under Insert Mode
+
+- Use =Ctrl-O= to temporarily execute a normal mode command.
+  + to move to the beginning or the end of a line, using =CTRL-O CTRL-A/I= is
+    better than =$= and =0=.
+
+- Map =CTRL-B= to =<Left>=, =CTRL-F= to =<Right>=.
+
+* Get the Current Directory
+
+Use =:h= modifier after =%=, see =:h expand()=
+
+e.g. =cd %:h=
+
+* Generate a Number Sequence
+
+Anything starts with =\== within a substitution text can be an expression.
+
+#+begin_src vim
+let counter=0|g/matched/let counter=counter+1|s/matched/\=counter
+#+end_src
+
+* How to Abort Git Commit Message
+
+- delete all commit text
+
+or
+
+- =:cq=

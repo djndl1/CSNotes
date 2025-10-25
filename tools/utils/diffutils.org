@@ -23,6 +23,9 @@ determined simply by comparing corresponding lines.
 
 - /hunks/ :: groups of differing lines
 
+=diff= may also be applied to directories, creating a single patch file for
+multiple files.
+
 *** Ignore Changes
 
 **** Regex Pattern
@@ -72,15 +75,43 @@ mode, but in binary mode, =CR= is processed as is.
 **** Report
 
 - =-q= :: brief report without differing lines
+  + most widely supported
   +  especially useful when comparing the contents of two directories.
   + this output format is also used when one of the compared files is binary.
 
 
 #+begin_src
-< # first (left) file
-> # second (right) file
+< # first (left, original) file
+> # second (right, updated) file
 --- # separated by
 c # change
 a # append
 d # delete, typically the line number after d may be ignored, which is the position a difference is found
 #+end_src
+
+- =-u= :: unified view, typically used by Git
+
+- =-c= :: copied context format
++ context lines and file names saves us from some typing when applying
+  patches
+
+** patch
+
+#+begin_src shell
+# patch a single file
+patch file patch_file.patch
+patch original -i patch_file.patch -o updated
+patch -i patch_file.patch -o updated # patch file with file names
+
+# patch a directory
+
+patch -pN -i patch_file.patch 
+# the N number depends on the CWD relative to the original directory
+
+# reverse a patch
+patch -pN -R -i patch_file.patch
+
+# with git
+git apply [--check] patch_file.patch
+#+end_src
+

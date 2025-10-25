@@ -192,3 +192,16 @@ git checkout -b <new_branch> <remote>/<remote_branch> # there's always the stand
 
 git branch -vv
 #+end_src
+
+* Worktree
+
+=git stash= is commonly used when one needs to switch to another branch to
+some work. If one needs to have multiple work trees to work on multiple
+branches, he has to clone the repository in another directory. =git worktree= 
+can allow multiple directories to use the same Git repository without
+cloning and cleaning up various out-of-Git artifacts.
+
+#+begin_src
+# at the current worktree
+git worktree add ../another_worktree another_branch
+#+end_src

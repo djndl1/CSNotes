@@ -24,6 +24,9 @@
 
 - /Mode line/ :: the status line at the bottom.
   + =**= modified modifiable buffer, =%*= modified readonly buffer, =%%= otherwise
+  + =FN= the Nth 
+
+- /Menu Bar/ :: mouse-clickable or =F10=
 
 * Input Concepts
 
@@ -120,7 +123,8 @@ TODO
 
 - =C-o=, =open-line=: insert a blank line after the cursor.
 
-- =C-j=: newline (useful in minibuffer) without automatic indentation.
+- =C-j=: newline (the caret notation of newline, useful in minibuffer) without automatic indentation.
+  + =C-m= (caret notation of carriage return, bound to =newline=) seems to automatically indent somehow while =C-j= (=electri-newline-and-maybe-indent=) does not.
   
 - =C-x C-o= (=delete-blank-lines=): delete blank lines and leave only one.
 
@@ -136,7 +140,8 @@ TODO
 
 - =M-f= =forward-word=; =M-b= =backward-word=
 
-- =M-r= =move-to-window-line-top-bottom=
+- =M-r= =move-to-window-line-top-bottom=: reposition the point (cursor)
+  on the left upper, middle and lower of the window.
 
 - =M-<= =beginning-of-buffer=; =M->= =end-of-buffer=
 
@@ -145,8 +150,6 @@ TODO
 - =M-g <TAB>=: =move-to-column=
 
 - =M-g c=, =goto-char=: to the nth char in the buffer
-
-- =M-g TAB=: move to column
 
 - To navigate a line visually, set =line-move-visual= to =t=
 
@@ -183,15 +186,21 @@ TODO
 Some commands interpret the prefix numeric argument as a repetition count.
 
 - =digit-argument= =M-<number>=; =negative-argument= =M--= with a following number argument
+  + multiple digits are supported
   
-- =universal-argument= =C-u=: specifies arguments
+- =universal-argument= =C-u=: the universal way to  specify arguments
    for the next command (not necessarily a repetition).
    To force a repetition, use =C-x z= after the command.
+   + =C-u= itself can be represent 4 times.
 
-- =C-u= also ends any argument input operation.
+- =C-u= also ends any argument input operation, especially if the following input is a digit.
   + to insert 5 copies of 0, type =M-5 C-u 0=
     
 To use arguments with a named command, specify the argument before running =M-x= with the command.
+
+A numeric argument is not the only way to repeat a command: type =C-x z= to repeat a command,
+more =z= to repeat more times, similar to how vim =.= works.
+
 
 ** Minibuffer
 
@@ -227,23 +236,42 @@ The area under the modeline, used also by the echo area.
 
 * Region, Mark
 
+- *Region*: selected text  between the mark and the current point.
+  + a region may be deactivated. To deactivate a region, use =C-g=;
+    to activate a region, use =C-x C-x= (=exchange-point-and-mark=),
+    it also switches between the cursor and the mark.
+
 - *Mark*: the initially starting end of the selected region.
 
-- *Mark Ring*: each buffer remembers previous locations of the mark in the *mark ring*. Setting a mark and then releasing it saves the mark in the mark ring.
+- *Mark Ring*: each buffer remembers previous locations of the mark in the *mark ring*.
+  Setting a mark and then releasing it saves the mark in the mark ring.
   + =C-u C-SPC=: move the cursor back to the previous mark.
-  + A global mark ring exists alongside the buffers' ring. =C-x C-SPC= jumps to the buffer and position of the latest entry in the global ring (saved at the same time as in a buffer's ring).
+    An argument N indicates the last Nth mark.
+  + A global mark ring exists alongside the buffers' rings.
+    =C-x C-SPC= jumps to the buffer and position of the latest entry
+     in the global ring (saved at the same time as in a buffer's ring).
 
-- =C-SPC=, =C-@=: set the mark at point, enter the mark mode
+ Marks and regions are highly related in Emacs
+ and that is why =C-SPC= sets a mark and activate a region at the same time.
 
-- =C-x C-x= (=exchange-point-and-mark=): switch between the cursor and the mark
+- =C-SPC=: set the mark at point, enter the mark mode. Hit twice to simply set a mark
+  without marking a region.
 
 - =SHIFT=-selection together with certain cursor motion commands: =S-M-f=
 
-- =M-@=: move mark to the end of the next word, =C-M-@=: mark to the end of following balanced expression.
+- =M-@=: move mark to the end of the next word;
+  =C-M-@=: mark to the end of following balanced expression.
 
-- =C-x h=: =mark-whole-buffer=; =C-x C-p= (=mark-page=)
+  Many commands that insert text set the mark at the other end of the inserted text
+  without activating it.
+
+  There are also commands that [[info:emacs#Marking Objects][mark textual objects]]. Unlike norma CUA editors, activating a region and
+  inserting some text does not delete the region unless delete selection mode is enabled.
 
 ** Operating on the Region
+
+Killing, yanking, changing case, undo, query replace, indentation, filling, spell check,
+saving to a register, saving to a buffer or a file.
 
 - =C-w=: =kill-region=, =M-w=: =kill-ring-save=.
 
@@ -297,7 +325,8 @@ There are two ways to do rectangle operations.
 
 * Register
 
-- *Register*: positions, text, rectangles, numbers, windows configurations, a file name are saved for later use.
+- *Register*: positions, text, rectangles, numbers, windows configurations,
+  a file name are saved for later use.
 
 - *Bookmark*: records files and positions.
 
@@ -337,7 +366,9 @@ There are two ways to do rectangle operations.
 
 - =recenter=, =C-l= (=recenter-to-bottom=, with arguments, this scroll the page to put the point at a certain line in the window, =C-u C-l= recenters), =C-M-l= (=reposition=).
 
-- =view-mode=: =SPC= and =S-SPC= to scroll
+- =view-mode=: =SPC= and =DEL= to scroll a page, =d= and =u= to scroll half a page. =RET= and =y= to scroll by one line.
+  =e= to exit view-mode. =q= quits and *closes* the current buffer.
+  + =view-mode= may be entered by =view-file=.
 
 - =follow-mode=: scroll two buffers that shows the same buffer together
 

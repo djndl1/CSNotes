@@ -17,7 +17,7 @@ The syntax of regular expressions varies across application programs.
 
 - *Anchors* :: position of the pattern in relation to a line of text
 
-- *Character sets* :: used to match one or more characters in a single positioned
+- *Character sets* :: used to match one or more characters in a single position
 
 - *Modifiers* :: repeated count of a character set
 
@@ -25,17 +25,22 @@ The syntax of regular expressions varies across application programs.
 
 Used by =awk=
 
-- *atom* :: a regular expresison enclosed in =()=, an empty set of =()=
-  (matching the null string), a *bracket expression*, =.= (any single
-  character), =^=, =$=, =\= followed by a special character, or a single regular
-  character.
+- *atom*: indivisible basic unit:
+  + a regular expresison enclosed in =()= (group)
+  + an empty set of =()= (matching the null string) 
+  + a *bracket expression* in =[]=
+  + =.= (any single character)
+  + =^=, =$=, =\= followed by a special character
+  + a single regular character.
   + ={= followed by a non-digit character is a normal character.
 
-- *piece* :: an *atom* followed by a single =*=, =+=, =?= or *bound* (={m[,[n]]}=)
+- *piece*: an *atom* followed by a single =*=, =+=, =?= or *bound* (={m[,[n]]}=)
 
-- *branch* :: one or more concatenated pieces.
-
-A BRE regex consists of one or more nonempty *branches* separated by =|=, which matches anythign that matches one of the branches.
+- *branch*: one or more concatenated pieces.  
+  A BRE regex consists of one or more nonempty *branches* separated by =|=, 
+  which matches anythign that matches one of the branches.
+  + =|= has the lowest precedence: the two operands can be as long as they
+    can.
 
 *** Bracket Expressions (Groups of Characters Within Brackets)
 
@@ -53,6 +58,7 @@ Beside literal characters, bracket expressions comprise of
   + =[:alnum:]=, =[:alpha:]=, =[:blank:]=, =[:cntrl:]=, =[:digit:]=,
     =[:graph:]=, =[:lower:]=, =[:print:]=, =[:punct:]=, =[:space:]=,
     =[:upper:]=, =[:xdigit:]=
+  + character classes are not used alone but always in a bracket expression.
 
 - *Collating symbols*, *Collating element* =[.CollatingSymbol.]= a
   single character or a multicharacter sequence treated as a unit while sorting.
@@ -74,17 +80,14 @@ simple regular expressions on Unix.
 
 ** Difference From BRE
 
-- =|=, =+=, =?=, ={=, =}= are regular characters. Use bounds as the alternative.
-  In ERE, =(=, =)=, =[=, =]=, =.=, =*=, =?=, =+=, =^=, =$= are fully special
-  characters and always require a =\= to escape as a literal character.
+- Characters that supposed to represent bounds ={}=, bracket expressions =[]=,
+  subexpressions =()= need to be prefixed by =\= to have special meanings.
 
-- Bounds are escaped =\{\}=
-
-- Subexpressions are also escaped =\(\)=. =(=, =)= are regular characters.
+- =|=, =+=, =?= are regular characters. Use bounds as the alternative.
 
 - =^=, =$= are regular chracters unless positioned at the beginning/end of a regex.
 
-- =*= is regular if positioned at the beginning of a regex or a subexpression.
+- =*= as an modifier is supposed but is regular if positioned at the beginning of a regex or a subexpression.
 
 - BRE supports backreferences as an atom.
 
@@ -99,7 +102,7 @@ simple regular expressions on Unix.
 
 * Emacs Regexp
 
-Mostly based on POSIX regex.
+Mostly based on POSIX basic regex but extended.
 
 - =\w= (word constituent), =\W= (non-word constituent), =\b= (the beginning or
   the end of a word), =\B= (empty string that is not the two ends of a word), =\<=, =\>=; =\`=, =\'= (start/end of the buffer or string),
@@ -119,6 +122,28 @@ Mostly based on POSIX regex.
   table. =\s-= (whitespace characters)
 
 - =\cC=, =\CC= categories =describe-categories=
+
+* Vim Regex
+
+Supposedly derives from POSIX BRE but with much more features.
+
+- =\+=, not =+=
+
+- =\( ... \)= not =(...)=
+
+- ~x\=~, not ~x?~
+
+- =x\{n,m}=, not =x{n, m}= or =\{n, m\}=. To match as little as possible, use
+  =\{-n, m}=. =\{-}= matches zer or more times as few as possible.
+
+See =:h perl-patterns= for difference from perlregex.
+
+- =\&= is to =\&= what =and= is to =or=. =\&= requires both operands to match
+  but only the last will be used. =foobar\&foo= will match =foobar= in =foo foobar=.
+
+Any character classes and ranges can be modified by inserting a =_= to add
+line break to the range/class. e.g. =\_s= matches any whitespace and a line
+break.
 
 * Shell Pattern Matching
 

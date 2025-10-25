@@ -1,0 +1,170 @@
+* Echo
+
+Besides =echo=, there  is =echom= that echo into the =:messages= buffer.
+
+* Vim Operator
+
+An operator is used before a motion command, defined by ='operatorfunc'=
+and then invoked by the =g@= command.
+
+* Autoloading (Lazy Loading)
+
+Vim functions may be lazily loaded by prefixing the function name with its script name
+ (=scriptname#funcname=) and placing the script under =autoload/=.
+
+* Documentation
+
+Vim help files are text files with simple markup  to represent tags.
+
+- =*tag*=: a tag
+
+- =|tag|=: a link tag to another =*tag*=
+
+- =`:command`=: code tag or inline code
+
+- ='option'=: option tag
+
+More details see =:help-writing=
+
+* Vimscripts
+
+
+To execute a copied block of vimscript, use =:@=. 
+To execute a selected region, use =(vim9) so= in command mode.
+
+- =Number= (integer) is normally 64-bit (=v:numbersize=), =Float= is a double.
+
+- conditions are not required to be surrounded by parentheses.
+
+- =elseif=, not =else if=; =if= ends with an =endif=
+
+- =let= assigns a variable.
+  + a variable may has a prefix to indicate its scope:
+    - =a=: function argument
+    - =b=: buffer-local
+    - =g=: global
+    - =l=: function-local
+    - =s=: script-level
+    - =t=: tab-level
+    - =v=: controlled by Vim
+    - =w=: window-level
+  + by default variables are global =g=, Vimscript9 solves this with a
+    dedicated =var= keyword to declare a local variable.
+  + =:let= without arguments lists global variables 
+
+- =unlet=: delete variable and its related objects.
+
+- =''= quotes literal strings, where only ='= should be escaped by =''=.
+
+- ~==~ on strings is affected by =ignorecase= and should not be used for string comparison.
+  + suffix operators ~?~ and ~#~ for case-insensitive and case-sensitive comparison.
+  + there is also ~=~~ for regexp matching.
+
+- =.= string concatenation
+  + (Vim9script): =..= 
+
+- =execute=: execute a string as vimscript
+
+#+begin_src vim
+let g:Favcolorschemes = ["darkblue", "morning", "shine", "evening"]
+function SetTimeOfDayColors()
+    " currentHour will be 0, 1, 2, or 3
+    let g:CurrentHour = strftime("%H") / 6
+    if g:colors_name !~ g:Favcolorschemes[g:CurrentHour]
+    execute "colorscheme " . g:Favcolorschemes[g:CurrentHour]
+    echo "execute " "colorscheme " . g:Favcolorschemes[g:CurrentHour]
+    redraw
+    endif
+endfunction
+#+end_src
+
+- to execute a function in command mode, =:call funcname()=
+
+- Python-like Lists: =[elm1, elm2, elm3, elm4, ...]=
+  + =for n in lst=
+  + =lst[lower:upper]= is inclusive at both ends., use =slice()= for an exclusive index.
+    Slice indices beyond the last item or the last index is before the first item is allowed.
+  + negative index cannot be used with an string.
+
+- Python-like tuple
+
+- Python-like Dictionaries
+
+- Line continuation =\= before (not after) a line 
+  + Vim9script eliminates some use of =\=
+
+- =&option_name=: retrieve the vale of an option
+
+Vim uses /events/ to execute commands (/autocommands/) e.g. =BufNewFile=, =BufReadPre=, =BufRead=,
+=BufReadPost=, =BufWrite=, =BufWritePre=, =FileType=, =VimResized=, =WinEnter=,
+=WinLeave=, =CursorMoved=, =CursorMovedI=.
+
+#+begin_src vim
+augroup newFileDetection
+# everytime the cursor moved under Insert mode.
+    autocmd CursorMovedI * call CheckFileType()
+augroup END
+
+function CheckFileType()
+    if exists("b:countCheck") == 0
+        let b:countCheck = 0
+    endif
+        let b:countCheck += 1
+    " Don't start detecting until approx. 20 chars.
+    if &filetype == "" && b:countCheck > 20 && b:countCheck < 200
+        filetype detect
+    elseif b:countCheck >= 200 || &filetype != ""
+        autocmd! newFileDetection # delete the commands within the group, deleting a group doesn't delete its commands.
+    endif
+endfunction
+#+end_src
+
+- to execute a script, run =source scriptfile=.
+
+** Functions
+
+- Vim functions must *start with a capital letter if they are unscoped*.
+
+- A function without a =return= returns 0.
+
+- An argument reference should be prefixed with =a:= to indicate its scope.
+
+- Variadic arguments are either referenced by =a:N= (one-based index, =a:0= is the number of extra arguments) or =a:000= as a list.
+
+- Option arguments with a default value (runtime evaluated) are also supported.
+  To use the default value, one can pass =v:none=.
+  + it's even possible to refer to preceding arguments as a default value.
+
+- An argument variable cannot be reassigned.
+
+** Vim9script
+
+Vim9script is strongly-typed.
+
+#+begin_src vimscript
+vim9script
+
+# local variable
+var variable_name = value
+var typed_string: string = "String_value" 
+# string quote rule is similar to that of Unix shell
+# global variable
+g:global_variable_name = value
+while condition
+      loop_body # continue, break are supported
+endwhile
+
+# there's even interpolated string
+var s = $"name: {name}"
+# coalesce operator
+echo name ?? "No name given"
+
+for v in range(1, 4)
+      loop_body
+endfor
+
+def {name)(params_list): return-type
+      function_body
+enddef
+#+end_src
+

@@ -45,6 +45,24 @@ Msbuild uses imported MSBuild XML files with extensions like =.props= and =.targ
 </Project>
 #+end_src
 
+* Installation
+
+MSBuild installation is nothing on Windows, but on typical Linux where Mono comes without MSBuild.
+One has to install it manually to make OmniSharp happy.
+
+- Download the last working mono msbuild [[https://github.com/mono/msbuild/releases/][here]]
+  + better build one instead of this bootstrap msbuild.
+
+- extract to =/usr/lib/mono/msbuild/Current/=
+
+- make a symlink in =Current= to itself. OmniSharp expects to find MSBuild under =/usr/lib/mono/msbuild/Current/Bin=
+
+- replace =Roslyn= with a newer version.
+
+** Nuget Installation
+
+TODO
+
 * Basic Elements
 
 The work of building an application is done with =Target= and =Task= elements.

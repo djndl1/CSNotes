@@ -2,6 +2,8 @@
 
 This note is intended to be read with =vi.org= to introduce basic Vi/Vim editing.
 
+* What's New
+
 Vi is part of POSIX, with little change over the years. Vim extended its feature
 set and gained a large community around it. It emphasizes modality and touch
 editing but provides features for less experienced users (=evim=, =vimtutor=,
@@ -52,6 +54,9 @@ and some third-party tutorials: OpenVim, Vim Adventures).
   + there is an =index=  help file listing all commands.
   + =:h help-summary= to learn how to help.
 
+- =:go n=, =:n go= :: go to the nth byte in the buffer
+
+- =:message=: a message buffer
 
 * GUI gVim
 
@@ -61,7 +66,7 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - ~-b~: in binary mode
 
-- ~+command~ ,~c command~: execute command as an =ex= command
+- ~+command~, ~c command~: execute command as an =ex= command
 
 - ~-C~: vi-compatible mode (not fully compatible)
 
@@ -79,22 +84,43 @@ Separate =.gvimrc= in =$HOME= and local directories are used for gVim only.
 
 - ~ex~: ex mode, useful in scripts
 
-* New Commands
+* Customizing Commands
 
-- =n CTRL-END= :: to the end of the file
+- =:command= defines a command
+  + arguments can be defined and later referenced using keywords (predefined
+    variables).
 
-- =line_count_percent%= :: go to the line count percent into the file
+- =:delcommand= deletes a user command.
 
-- =:go n=, =:n go= :: go to the nth byte in the buffer
+* Record & Playback
 
-- =Ctrl-O=, =Ctrl-I= :: jump back/forward in the jump list
-  + call =:jumps= to show the jump list.
+More than key mappign or macro, this records complex command sequences
+and replays them to save typing.
+
+- =q<RegisterName>= to start recording, =q= again to stop. =@<RegisterName>=
+  to replay the commands. To append commands to a register,
+  =q<UppercaseRegisterName>=.
+
+* Format
+
+- =gq=: format the specified text object (by motion or text objects).
+  + this proves to be useful when writing markdown or orgmode text to avoid
+    manually breaking lines.
+  + controlled by =formatoptions=
+
+** Alignment
+
+- =:center=, =:right=, =:left=
+
+There is also a builtin package =justify= that deals with plain text
+justification.
 
 * New Modes
 
 See =:h mode-switching= for mode switching operations. =C-\ C-N/G= can be used to
-go to Normal mode from any other mode.  Type =gQ= (Neovim) or =Q= (Vim) under normal
-mode.
+go to Normal mode from any other mode.
+
+Type =gQ= (Neovim) or =Q= (Vim) under normal mode to enter =ex= mode.
 
 ** Visual Mode =v=
 
@@ -122,11 +148,7 @@ Define selections visually and perform editing commands on the visual selection.
 *** Operating on Selection
 
 Most of the commands operate under Select mode without much semantic
-change. See =:h visual-operators=. There are also a set of motion commands
-usable only under Visual mode or after an operator, see =:h object-select=,
-which makes a distinction between inner part of a text object and a full text
-object (a word without/with the surrounding whitespace, a quoted string
-with/without the quote marks).
+change. See =:h visual-operators=.
 
 =\%V= limits the match inside the selected visual area.
 
@@ -172,6 +194,9 @@ There is a normal mode and a job mode (shell, CLI apps) in the terminal buffer.
   + Vim uses =C-W= key sequences to control terminal mode. See =:h terminal-typing=.
 
 - =C-\ C-N= enters Normal mode.
+
+There is an older command =:shell= that forks vim and synchronously run a
+shell. Only after the shell exits does vim resume.
 
 *** Terminal Debug
 
@@ -343,7 +368,7 @@ args file list, Vim can hide a window but retain the buffer.
   + =a= active (loaded and visible) buffer, =h= hidden buffer
   + =-=, ===, not modifiable. === is read-only and never modifiable
   + =+= modified, =x= read error
-  
+
 
 A buffer may be hidden by opening another file if the =hidden= option is set.
 =:hide= quits the current windows. The hidden window is not closed and does not
@@ -374,10 +399,20 @@ requires saving and may be unhidden.
 
 - help
 
-- quickfix: the list of errors created by a command or the location list,
+- quickfix: list of errors created by a command or the location list,
   typically used with edit-compile-debug cycle
+  + a quickfix has a quickfix ID, unique to a Vim session, and a title.
+
+- location list: a window-local quicfix list, independent of the quickfix
+  list.
 
 - scratch
+
+** Diff
+
+Under vimdiff
+
+- =]c= and =[c= to jump to the next/last change.
 
 * Initialization
 
@@ -404,6 +439,8 @@ requires saving and may be unhidden.
 - =$VIMRUNTIME=: used to locate various support files: documentation, syntax
   highlighting files, plugins.
 
+There is a =defaults.vim= since Vim 8.0 if none is found.
+
 * Folding
 
 Folding define what parts of the file to see. Folds are not simply defined by
@@ -416,34 +453,40 @@ A folded block acts as a line for line operations.
 ** Define Folds
 
 The =foldmethod= option defines how folds are defined/created and accepts the
-following methods.
+following methods. Folding methods are mutually exclusive: with =syntax=
+enabled, one cannot manually define a fold.
 
-- =diff= :: defined the difference between two files
+- =diff= :: defined the difference between two files, used by diffmode.
 
 - =expr= :: defined by regular expressions
+  + simple to specify
 
 - =indent= :: corresponds to the indentation of text and =shiftwidth=
+  + works for many files but not always very well.
 
 - =manual= :: result from user Vim commands
+  + for unstructured text. Use =:mkview= to create a view to save folds.
   + =zf=, =nzF=
 
-- =marker= :: predefined markers in the file specify fold boundaries
+- =marker= :: predefined markers in the file specify fold boundaries, e.g
+  ={=, =}=.
+  + this requires modification of the original file.
 
 - =syntax= :: defined by the semantics of a file's language.
 
 ** Fold Commands
 
-- =zA= :: toggle fold state
-  + =za= :: toggle teh state of one fold
+- =zA= :: toggle the state of a fold recursively
+  + =za= :: toggle the state of one fold
 
-- =zC= :: close folds, recursively
+- =zC= :: close a fold, recursively
   + =zc= :: close one fold
 
 - =zD= :: delete/undefine folds, recursively (not the content in the folds)
   + =zd= :: delete one fold
   + =zE= ::  delete all fields
 
-- =zO= :: open folds recursively
+- =zO= :: open a fold recursively
   + =zo= :: open one fold
 
 - =zf= :: create a fold from the current line to the one where the following
@@ -452,13 +495,37 @@ following methods.
   + =Count= + =zF= :: fold count lines. The count number here counts for visual lines
     on the screen.
 
-- =zM= :: set =foldlevel= to zero
+- =zM= :: close all folds, set =foldlevel= to zero.
   + =zm=, =zr= :: decrement/increment =foldlevel=
+
+- =zR= :: open (reduce) all folds
 
 - =zN=, =zn= :: set/reset =foldenable= option
   + =zi= :: toggle =foldenable=
 
+** Folding Theory
+
+*** Folding by Expresson
+
+Folds are defined by their foldlevel.
+
+- Each line in a file has a /fold level/
+  
+- Lines with a fold level of zero are never folded
+  
+- Adjacent lines with the same  fold level are folded together
+
+- If a fold of level N is closed, then any subsequent lines with a fold level greater than N are folded
+  until a line with a level less than N.
+
+* Comments
+
+Defined by the ='comments'= option. Vim is able to understand comment formats
+and format or navigate around them.
+
 * Auto and Smart Indenting
+
+Indentation width is controlled by =shiftwidth=.
 
 - =autoindent= :: similar to vi's, differs subtly as to where the cursor is
   placed after indentation is deleted.
@@ -470,7 +537,7 @@ following methods.
     keywords =cinwords=
   + a new line before/after a =}=
 
-- =cindent= :: richer awareness of C syntax and supports customization
+- =Cindent= :: richer awareness of C syntax and supports customization
   + =cinkeys= :: keyboard keys under insert mode that triggers reindenting.
     Reindenting means to indent to an appropriate position.
      A set of expressions are used to define this option.
@@ -481,6 +548,9 @@ following methods.
 
 - =indentexpr= :: custom indentation rules
   + not a trivial task to define. Predefined expressions are under =$VIMRUNTIME/indent=.
+
+- Use =:retab= to fix inconsistent tabs. Be careful, with =expandtab= this
+  may expand tab characters in a string. Use =\t= as a tab for in a string.
 
 #+begin_comment
 TODO learn more about cindent customization and indent expressions
@@ -494,12 +564,22 @@ Indentation options may cause indentation problems when pasting text into the
 file. Set the =paste= option before pasting and reset it afterward..
 
 - =^N=, =^P= Move in the candidate list; =Enter= to select the match; =^E= to
-  halt the match ithout substituting any text.
+  halt the match without substituting any text.
 
 * Autocompletion
 
 Insertion completion from programming language specific keywords to filenames,
 dictionary words and even entire lines. Completion includes
+
+To accept the current match, =CTRL-Y=, to stop the completion =CTRL-E=
+
+- Comprehensive complete =^N=, =^P= :: defined by the =complete= option.
+
+** Completion Types
+
+- Omni =^X-^O= :: use filetype-specific functions to determine the candidate
+  list
+  + C, CSS, HTML, JavaScript, PHP, Python, Ruby, SQL and XML.
 
 - Whole Lines =^X-^L= :: look backwards for a line matching the typed characters
 
@@ -517,6 +597,8 @@ dictionary words and even entire lines. Completion includes
   for keywords matching tags.
 
 - filename =^X-^F= :: searches for filenames in the current directory matching the keyword at the current cursor.
+  + useful when inserting paths, without any external plugin support (e.g.
+    VSCode path completion).
 
 - macro and definition names =^X-^D= :: =#define=
 
@@ -525,19 +607,17 @@ dictionary words and even entire lines. Completion includes
 
 - =^X-^U= :: use the completion method defined by a custom function =completefunc=.
 
-- Omni =^X-^O= :: use filetype-specific functions to determine the candidate
-  list
-  + C, CSS, HTML, JaaScript, PHP, Python, Ruby, SQL and XML.
-
 - Spelling correction =^X-^S= :: if the word at the location appears to be badly
   spelled, "more correct" spellings are offered
 
-- Comprehensive complete =^N= :: defined by the =complete= option.
-
 * Syntax Highlighting
 
-=:syntax enable=, =:syntax on=, =set syntax=filetype=. Syntax definition files
-are stored in =$VIMRUNTIME/syntax=. User color schemes are placed under =~/.config/nvim/colors=.
+=:syntax enable=, =:syntax on= enable syntax highlighting.
+Syntax is normally deduced from =filetype=, however, ~:set syntax=filetype~ can
+set the current syntax set in use, typically a file type name.
+
+Syntax definition files are stored in =$VIMRUNTIME/syntax=.
+User color schemes are placed under =~/.config/nvim/colors=.
 
 #+begin_src
 # sets color scheme to "evening"
@@ -556,25 +636,77 @@ set syntax=idl.c
 #+end_src
 
 
+* Responding to Events
+
+Autocommands are event handlers executed automatically in response to some
+event. Autocommands are grouped into =augroup=. Any commands not in an
+explicit group is defined in the default group.
+
+- =autocmd [group] {events} {file-pattern} [++nested] {command}=
+  + =group= is optional
+  + =events= are a comma separated list
+  + the command is limited to =file-pattern=
+
+- =augroup= is not simply used to group autocommands: =autocmd!= inside a
+  =augroup= clears all commands in it. This can be used to prevent duplicated
+  definitons of autocommands.
+  + the canonical way to use groups is to put =autocmd!= at the first line of
+    the group to delete any previous definitions.
+
+- Autocommands can trigger another event but by default they don't.
+
+- Autocommands can be executed manually using =:doautocmd= and =:doautoall=.
+
+- To delete an autocommand, redefine it without any command argument.
+
+- =autocmd= lists autocommands.
+
+
 * QuickFix: Edit-Compile-Edit Cycle
 
-=:make= builds the project and collects the result text in the =Quickfix List=
-window, where one can inspect, jump to and correct errors.
+=:make= synchronously builds (or lints) the project using ='makeprg'= and collects the result text in the =Quickfix List=
+window, where one can inspect, jump to and correct errors. Error meesages are
+parsed according to the =errorformat=.  Vim also supports compiling without a
+Makefile (simply =:make filename_no_ext=) for a quick compilation and comes with some compiler plugins to
+support this feature (=:compiler= to switch the compiler).
 
 - =:cnext=, =:cprevious=: move in the error list
+
+- =colder [count]= (c-older), =:cnewer [count]=, =:chistory=: there may be more than
+  one quicfix lists. these commands switch between these lists.
+
+- =:cdo {cmd}=: do a commmand after relocation by each entry of a quickfix list to operate on those locations that generate errors.
 
 - =errorformat=: an option defining a format of errors returned from a compile
 
 - =makeprg=: an option containing the name of the build instruction
 
+If =:make= cannot capture the output, one can always redirect the output to a
+file and load that file with =:cfile=.
+
+Almost all quickfix commands have location list counterparts.
+
 ** grep
 
 Vim's grep may also take advantage of the Quickfix list.
+It is used alongside with the Quickfix list even if the result has nothing to do with compilation error.
 
-- =vim[grep]  /pattern[g][j] files= :: use builtin grep to search for a pattern
+- =vim[grep]  /pattern/[g][j] files= :: use builtin grep to search for a pattern
   + by default the result is shown in the Quickfix list.
+  + to search the current buffer, use =%= as the file
+  + to use the location list, use =lvimgrep=
 
-- =copen= :: open the Quickfix list
+- =copen= :: open the Quickfix list to see the search result
+
+- external =:grep= command :: use an external grep command
+  + the pattern is not enclosed by =/=
+
+
+*** Grepper
+
+A convenience wrapper (but asynchronous) around =gepprg= and =grepformat=.
+=ag=, =ack=, =grep=, =findstr=, =rg=, =pt=, =sift=, =git grep= are all
+supported.
 
 *** ripgrep
 
@@ -584,76 +716,29 @@ set grepformat+=%f:%l:%c:%m
 #+end_src
 
 
-* Vimscripts
+*** fzf
 
-To execute a copied block of vimscript, use =:@=.
+- =fzf= and =ripgrep= are two great tools that enables the user to search for
+  files and matching text.
+  + the =fzf-vim= plugin integrates =fzf= and =ripgrep= with Vim.
 
-- conditions are not required to be surrounded by parentheses.
+* Multilevel Undo
 
-- =elseif=, not =else if=; =if= ends with an =endif=
+Undo/redo is not linear in Vim. If some modification is made after an undo, a
+new branch is made. This branch will be the new sequence of undo and redo by
+default. 
 
-- =let= assigns a variable.
-  + a variable may has a prefix to indicate its scope:
-    - =a= function argument
-    - =b=: buffer-local
-    - =g=: global
-    - =l=: function-local
-    - =s=: script-level
-    - =t=: tab-level
-    - =v=: controlled by Vim
-    - =w=: window-level
-  + by default variables are global =g=
+To jump to another branch, use =:undo change_number= (listed by =:undolist=). Or =g-=​=g+= to move in
+time rather along the branch.
+Undo and redo in time can be also done by =:earlier= or =:later= besides
+keybindings. There is also =:echo undotree()= to show more details.
 
-- =.= string concatenation
-
-- =execute=: execute a string as vimscript
-
-#+begin_src vim
-let g:Favcolorschemes = ["darkblue", "morning", "shine", "evening"]
-function SetTimeOfDayColors()
-    " currentHour will be 0, 1, 2, or 3
-    let g:CurrentHour = strftime("%H") / 6
-    if g:colors_name !~ g:Favcolorschemes[g:CurrentHour]
-    execute "colorscheme " . g:Favcolorschemes[g:CurrentHour]
-    echo "execute " "colorscheme " . g:Favcolorschemes[g:CurrentHour]
-    redraw
-    endif
-endfunction
-#+end_src
-
-- Arrays: =[elm1, elm2, elm3, elm4, ...]
-
-- =&option_name=: retrieve the vale of an option
-
-Vim uses /events/ to execute commands (/autocommands/) e.g. =BufNewFile=, =BufReadPre=, =BufRead=,
-=BufReadPost=, =BufWrite=, =BufWritePre=, =FileType=, =VimResized=, =WinEnter=,
-=WinLeave=, =CursorMoved=, =CursorMovedI=.
-
-#+begin_src vim
-augroup newFileDetection
-# everytime the cursor moved under Insert mode.
-    autocmd CursorMovedI * call CheckFileType()
-augroup END
-
-function CheckFileType()
-    if exists("b:countCheck") == 0
-        let b:countCheck = 0
-    endif
-        let b:countCheck += 1
-    " Don't start detecting until approx. 20 chars.
-    if &filetype == "" && b:countCheck > 20 && b:countCheck < 200
-        filetype detect
-    elseif b:countCheck >= 200 || &filetype != ""
-        autocmd! newFileDetection # delete the commands within the group, deleting a group doesn't delete its commands.
-    endif
-endfunction
-#+end_src
-
-
-* Plugins
+* Plugins (Since Vim 6)
 
 A plugin is simply a Vim script file that is loaded automatically when Vim
-starts to extend Vim's functionality. Plugins may be
+starts to extend Vim's functionality. 
+
+Plugins may be
 
 - *global plugins*: for all kinds of files.
   + A set of standard plugins are automatically loaded upon startup.
@@ -661,9 +746,9 @@ starts to extend Vim's functionality. Plugins may be
       =lzma=, =xz=, =lzip=, =zstd= files.
     - =netrw=: similar to Emacs' =TRAMP=. Transparent editing of files on other machines.
     - =tar=, =zip=: similar to =gzip=.
-    - a global plugin is added by dropping the copy in the right directory
-      + per user: =~/.local/share/nvim/site/plugin/= and its subdirectories
-      + globally: =$VIMRUNTIME/plugin= and =$VIMRUNTIME/macros=, =$VIM/vimfiles/pack/dist/opt/=
+  + a global plugin is added by dropping the copy in the right directory
+    - per user: =~/.local/share/nvim/site/plugin/= and its subdirectories
+    - globally: =$VIMRUNTIME/plugin= and =$VIMRUNTIME/macros=, =$VIM/vimfiles/pack/dist/opt/=
 
 - *filetype plugins* (*ftplugins*): used for a specific type of file.
   + typically put under the =ftplugin= directory
@@ -674,19 +759,190 @@ starts to extend Vim's functionality. Plugins may be
 The plugin directory (=plugin= or =ftplugin=) can be in any of the directories in the =runtimepath=
 option. To debug plugin loading, start Vim with =-V2=.
 
+When a plugin is placed in =runtimepath= (and thus installed), Vim
+automatically sources the scripts it finds under these subdirectories.
+
+There are some conventions of how plugin files should be placed under each runtime path:
+
+- =plugin/=: compulsory plugins
+
+- =colors/=: color schemes
+
+- =ftdetect/=: set up autocommand that detect and set the file type of files.
+
+- =ftplugin/=: filetype-specific scripts that vim uses to set up a filetype.
+
+- =indent/=: filetype-specific indentation scripts
+
+- =compiler/=: compiler-related options in the current buffer based on their names
+
+- =after/=: after the files in =plugin/=
+
+- =autoload/=: deferred loading
+
+- =doc/=: documentation
+
 ** Package Management
 
-A *package* is a directory that contains *plugins*. It may be a separate directory,
-a VCS repository, a set of interdependent plugins, "start" packages.
+A *package* is a directory that contains *plugins*. 
+It may be a separate directory, a VCS repository, a set of interdependent plugins, "start" packages.
+Packages are easier to manage, update.  
+There is nothing special about packages: there are directories that are added to 
+=runtimepath= automatically upon detection and they may have the same structure as any other =runtimepath= directory,
+with =plugin=, =colors= etc.
 
-Packages are stored in the paths =runtimepath= or =pack/*/start/*= paths under
-runtime paths.
+Plugins and packages are managed, loaded and initialized by a plug-in managers.
 
-*** Builtin Manager
+*** Builtin Manager (Vim 8)
 
-- =:packadd= :: enable packages on demand
+Packages may be stored in the paths  =pack/<AnyDirectory>/{start,opt}/= under each =&packpath=. 
+If there is any, they are added to =runtimepath= and all plugins are loaded.
+(a little confusing with an additional level of directory, possibly as a bundle of packages).
+The plugins under =pack/*/start= are added to =&runtimepath= and are automatically loaded
+while =pack/*/opt= are loaded only if =:packadd=ed. 
 
-* Other Tips
+Installing a package means placing a directory of plugins under =.vim/pack/AnyDirectory/=
+
+=start= packages are loaded automatically; =opt= packages requires =:packadd= to load them.
+=:packadd= searches and sources any plugin files found under =pack/*/opt/{name}=.
+That is, an optional plugin may be installed but under =opt= it is not loaded automatically.
+
+*** [[https://github.com/VundleVim/Vundle.vim][Vundle]]
+
+Vundle (=:h vundle= can download, update, search, clean up plugins, manage the runtime path of installed scripts.
+Plugins are now managed within =$MYVIMRC=, installed and updated automatically.
+
+*** Other Package Managers
+
+- [[https://github.com/k-takata/minpac][minpac]] :: a minimal package manager
+  for modern Vim (Vim 8 and Neovim) that takes advantage of modern Vim
+  package functionality and job control.
+
+- [[https://github.com/junegunn/vim-plug][vim-plug]] :: very similar to
+  Vundle
+
+- [[https://github.com/tpope/vim-pathogen][vim-pathogen]] :: no really a
+  package manager, but a solution to manage =runtimepath= before Vim 8
+
+**** Pathogen
+
+Since Vim 6, adding a plugin to Vim means adding a path to =runtimepath=. 
+Any scripts under =plugin= runtime directories  (=plugin= or =ftplugin/= ) are sourced.
+The original plugin support from Vim 6 only searches plugin scripts under certain =plugin= 
+directories but not any subdirectories, making it difficult to manage plugins in separate directories.
+
+Pathogen places all packages under =.vim/bundle= (customizable) 
+and adds any subdirectories to =runtimepath= automatically.
+
+*** Documentation
+
+After a plugin or a package is installed, the user or the package manager
+should run =helptags= to parse, index documentation files and build a tags file.
+
+* File Types
+
+Vim can detect the type of file being edited by checking the file name or its content.
+
+Filetype-related functionalities includes /detection/, /plugins/ and /indentation/.
+
+** Enable File Types
+
+- =:filetype on= (detection) enables detection of file types (loading =filetype.vim=).
+Vim detects the file type and sets the ='filetype'= option 
+executes the corresponding =FileType= autocommand matching the option's value.
+Setting ='filetype'= is done by a ftdetect script.
+
+- =:filetype plugin on= (detection, plugins) also enables the plugin files for specific file types (loading =ftplugin.vim=).
+When a file is edited, its plugins are loaded.
+
+=:filetype indent on= (detection, indent) enable loading the indent file for specific file types (loading =indent.vim=).
+
+** File Type Detection
+
+Detection is carried typically by an autocommand on buffer read or creation (see =:h ftdetect=).
+
+*** Differentiate Different Types of the Same Extensions
+
+The user may set certail =g:filetype_ext= global variables to force a file type.
+
+** File Type Plugins
+
+Options, mappings in file type plugins are local to the buffer, typically under =ftplugin/=.
+
+=maplocaleader=, =<Plug>= are provided to map in a plugin-specific manner.
+=<Plug>= mappings at as a public interface for users to customize key mappings 
+without wiring keys directly to target actions.
+
+*** Built-in Filetype Plugins
+
+asciidoc, awk, fortran, freebasic, go, html, java, json, lua, man, markdown, org, plsql, python, rst,
+rust, sql,  tex, yaml, zig,
+
+Some of them offer great features and are worth reading:
+
+- =:Man=
+
+- =ft_sql.txt=
+
+- =ft_rust.txt=
+
+* Other Issues
+** Current Directory
+
+Every window can have a local current directory =:lcd= instead the global
+=:pwd=. Every tab has a tab-local current directory =:tcd=
+
+** History
+
+There are five histories: =:= command history, search history, expression
+history, input line history and a history for debug mode commands. 
+
+When using =<Up>= to retrieve a previous command, the completion does not
+simply use the last one, but the last one that completes the current one.
+
+=q:= opens a command line window that behaves like a normal window of the command
+history
+so that complex commands may be composed and executed. Hitting =<Enter>= in
+the window executes the line at the cursor.
+
+Histories are saved a =viminfo= file after exiting vim.
+
+*** Recent Files
+
+- =:oldfiles=: list recent files without interactively choosing one.
+  + =:e #<N= to open the Nth file.
+
+- =:browse oldfiles=: choose a file to edit before after hitting =q=
+
+** Read Man Pages
+
+- =K=: look up the keyword under the cursor, by default using =man=.
+
+- =Man= after =runtime! ftplugin/man.vim=.
+
+** Read GNU Info
+
+- Use [[https://gitlab.com/HiPhish/info.vim][info.vim]]
+
+** Spell Check
+
+=set spell= for certain file types. Use ~z=~ to show spell suggestions.
+
+** File Explorer/Project Drawer
+
+- [[https://github.com/tpope/vim-vinegar][vim-vinegar]]
+
+- NERDTree: a side bar that displays the current workspace.
+  + NERDTree supports bookmarks, which remembers directories as bookmarks to
+    quickly navigate to a root.
+
+The problem with project drawers (like NERDTree) is that when opening a file in it, 
+it is difficult for the user to predict which window the file will occupy.
+Unlike NERDTree, the builtin netrw is a split explorer that opens a file in the window it occupies.
+
+** GDB Debug
+
+=termdebug=, a builtin plug-in that runs GDB from inside Vim.
 
 ** Vertical Ruler
 
@@ -701,9 +957,14 @@ runtime paths.
 ** Binary Files
 
 =-b= or =:set binary=. =textwidth=, =wrapmargin= are set to zero. =modeline= and
-=expandtab= are unset=. Another editor designed to edit binaries is =bvi=.
+~expandtab= are unset~.
+To show bytes as hex, =:set display=uhex=. To show what normal hex editors
+would display, run =%!xxd= to convert and =%!xxd -r= to convert back. This is
+still not perfect and prone to destroy the original file.
 
-To show bytes as hex, =:set display=uhex=. See =:h using-xxd=.
+Another editor designed to edit binaries is =bvi=.  =vim -b= is not designed
+to edit binary files, use =bvi= for that.
+
 
 ** Display Buffers as HTML
 
@@ -721,12 +982,25 @@ original Vim graphics =TOhtml=.
 - *viminfo*: a global session file that saves command line history, search
   string history, input line history, non-empty registers, file marks, last
   search/substitute pattern, the buffer list and global variables.
+  + =viminfo= is great: one can restore where he left by simply typing ='0=
+    to return to the last mark.
 
 - *Session*: addition to viminfo, a view is a collection of settings that apply
   to one window; a session keeps the views for all windows plus the global
   setting.
   + =:mksession session_filename.vim=: a session file, similar to a vimrc script
-    file, is created
+    file, is created. The user is supposed to =:source= the script to restore
+    the session or =vim -S session.vim=.
+
+- *View*: the properties for a window used to restore the contents of a
+  window. Views are part of a session.
+  + =:mkview=, =:loadview=
+
+** Modelines
+
+Just like Emacs and Python can have some settings in the text, modelines of
+Vim are some commands placed at the beginning of a file to enable Vim to set
+certain options for that file.
 
 ** Truecolor Support
 
@@ -753,3 +1027,64 @@ buffer,
 possible (on target machines of Linux only, through ssh and ftp only).
 
 To speed up file transfer, consider ssh's =ControlMaster= feature.
+
+** Use with Shell
+
+set =EDITOR= to =vim= and =C-x C-e= to invoke the editor to edit the current
+line. use =cq= to exit to avoid executing the command.
+
+** Editing Tables
+
+There is no builtin  support for tables, but the =virtualedit= option makes
+editing a table easier. It eliminates the need to insert any whitespace
+characters and allows the cursor to simply move to a column. To replace text
+in the table, use =gr= and =gR= (virtual replace mode) for proper tabulation
+(maybe also useful for ASCII art).
+
+** Run a Script on Files
+
+=vim -e -s $file < script.vim= runs in =ex= mode, with =-e= it runs in normal
+mode. To generate a normal mode script, use =-w= to record operations.
+
+** Read From STDIN
+
+=vim -=
+
+** Encryption
+
+*** The Builtin Solution
+
+- start a file with =-x= to start in encryption mode.
+
+- ~set key=encryption_key~ to enable encryption mode.
+
+** Automatic Line Breaks
+
+Set by =textwidth= (fixed width) and =wrapmargin= (wrap at the margin of
+screen).
+A line is only broken automatically under insert mode and when appending to a
+line. To break existing lines, use =gq=.
+
+=wrap= (unconditionally) =linebreak= (at word boundaries) control where lines are break visually (not physically with a
+line ending).
+
+See =:h ins-textwidth=
+
+* Integrated Solutions
+
+- [[https://rapphil.github.io/vim-python-ide/][Vim as a Pyton IDE]]: a
+  full-IDE solution for Python
+
+- [[https://realpython.com/vim-and-python-a-match-made-in-heaven/][VIM and Python - A Match Made in Heaven]]: a step-by-step tutorial to set up an IDE for Python
+
+- [[https://github.com/python-mode/python-mode][Python-mode]]: seems dead,
+  but still useful as a reference
+
+- [[https://github.com/kingofctrl/vim.cpp][vim.cpp]]: a solution for C/C++,
+  no longer maintained, for reference.
+
+- [[https://puremourning.github.io/vimspector-web/][Vimspector]]: a debugging
+  solution
+
+- [[https://github.com/jez/vim-as-an-ide][Vim as an IDE]]: another tutorial
+  to set up a VIM IDE.

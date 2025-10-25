@@ -1,0 +1,7 @@
+* Common Issues Related to udev
+
+- external disks are not powering off:
+  + add a rule to =/etc/udev/rules.d/=
+  #+begin_src
+  ACTION=="add|change", DRIVERS=="usb-storage|uas", SUBSYSTEM=="scsi_disk", ATTR{manage_system_start_stop}="1"
+  #+end_src
