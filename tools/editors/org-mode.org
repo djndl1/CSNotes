@@ -1,11 +1,15 @@
 #+title: Org Mode
 #+author: djndl1
+#+latex_header: \usepackage[utf8x]{inputenc}
+#+latex_header: \usepackage{unicode-math}
+#+latex_compiler: xelatex
 #+OPTIONS: ^:{}
 #+FILETAGS: :org:orgmode:org-mode:
 
 * Rich Text
 
-Paragraphs are separated by at least one empty line. A line break can be forced
+Paragraphs are separated by at least one empty line. A line break can be \\
+forced \\
 with =\\=.
 
 To write literal text
@@ -30,7 +34,6 @@ Example blocks are typeset in monospace.
 =*=, =#+= must be prefixed with a =,= in the blocks above to avoid conflicts.
 Example block and source code blocks can be used with a =-n= number switch.
 
-
 =^= and =_= are used to indicate superscripts and subscripts (along with ={}=
 as in LaTeX). These behaviors may get in the way. Use =OPTIONS: ^:{}= to limit
 them only to the LaTeX-style notation or simply use LaTeX.
@@ -38,6 +41,11 @@ them only to the LaTeX-style notation or simply use LaTeX.
 Special symbols can be inserted using LaTeX-like syntax. See [[elisp:org-entities-help][org-entities-help]].
 
 =-----= is exported as a horizontal line.
+
+-----
+
+To mark words, /mark the region/ and use =org-emphasize= to surround the region
+with the markers.
 
 ** LaTeX
 
