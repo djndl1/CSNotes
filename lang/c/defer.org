@@ -1,0 +1,57 @@
+#+bibliography: ref.bib
+
+An RAII mechanism for C like that in Golang, not necessarily keyword =defer= in future C standards.
+This note serves as an introduction to this mechanism and in broader scope, resource management.
+
+#+begin_quote
+The defer mechanism can restore a previously known property or invariant that is altered during
+the processing of a code block. The defer mechanism is useful for paired operations, where one
+operation is performed at the start of a code block and the paired operation is performed before
+exiting the block. Because blocks can be exited using a variety of mechanisms, operations are
+frequently paired incorrectly. The defer mechanism in C is intended to help ensure the proper
+pairing of these operations. This pattern is common in resource management, synchronization,
+and outputting balanced strings (e.g., parenthesis or HTML).
+#+end_quote
+
+This defer mechanism is not limited resource management: mutex locking and unlocking are clearly
+not resource management in the strict sense.
+
+* Rationale
+
+** Resource Management
+
+#+begin_quote
+A resource is a physical or virtual component with limited availability.
+.  Resources include memory, persistent storage, file handles, network connections, 
+timers, and anything that exists in limited quantities.
+These resources need to be managed, meaning that they must be acquired and
+released.
+#+end_quote
+
+Resource acquisition may fail and programs may choose to take action based on their requirement:
+terminating execution for correctness and security, remaining operational and recovering for resilience
+and availability. *Resource acquisition can introduce potential failure points*.
+
+Dynamically allocated memory is of the greatest concern when dealing with resource management. 
+GC requires a great amount of memory, incurs high performance penalty and is unpredictable.
+For thread-specific storage, there is a difference between the TSS slot itself and the data stored in the slot.
+
+The developer must release each resource when it is no longer used.
+Releasing resources is required sometimes once and only once. Any more releasing action
+may result in undefined behavior and unreported due to various API designs or underlying implementations.
+
+** Synchronization Primitives
+
+It is critical for the proper functioning of a system that locked mutexes are properly unlocked.
+Acquiring and releasing mutexes is a strong use case for
+a defer mechanism which can help ensure that locking and unlocking are properly paired.
+
+** Error Handling
+
+Resource acquisition may fail and error handling may be required to recover from such failures.
+In this sense, resource management and error handling are closely related.
+
+
+* Bibliography
+
+#+print_bibliography:
