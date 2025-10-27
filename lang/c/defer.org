@@ -46,11 +46,66 @@ It is critical for the proper functioning of a system that locked mutexes are pr
 Acquiring and releasing mutexes is a strong use case for
 a defer mechanism which can help ensure that locking and unlocking are properly paired.
 
+** Security
+
+Being unable to properly control and limit the use of resources is a security vulnerability.
+Double free of memory is a common security hole.
+
 ** Error Handling
 
 Resource acquisition may fail and error handling may be required to recover from such failures.
 In this sense, resource management and error handling are closely related.
 
+#+begin_quote
+Reasonable behavior for error handling means that resources are not leaked, and that the
+program remains in a well-defined state so that execution can continue.
+#+end_quote
+A software component might provide one of the following safety guarantees:
+
+1. The basic guarantee (valid states): that the invariants of the component are preserved, and no
+resources are leaked.
+  + the user either destructs or resets the component to some known state before futher use.
+
+2. The strong guarantee (commit-or-rollback): that the operation has either completed successfully or indicated
+an error, leaving the program state exactly as it was before the operation started.
+
+3. Failure transparency (always succeeds): operations are guaranteed to succeed and satisfy all requirements
+even in exceptional situations. If an error occurs, it will be handled internally and not
+observed by clients.
+  + e.g. most C++ destructors.
+
+The defer mechanism may provide these three levels of safety guarantees.
+
+The performance of error handling paths is of little importance if handling the error requires human interaction
+or long-running actions while safety-critical systems may need to respond to failures as quickly as possible.
+
+* Issues
+
+#+begin_quote
+A defer statement defers the execution of a deferred statement until the containing guarded
+block terminates. A defer statement is associated with its nearest enclosing guarded block or
+function body. Its deferred statement is sequenced in last-in-first out (LIFO) order after all
+statements that are contained in that guarded block and before the guarded block itself
+terminates. The primary use of a defer statement is to release acquired resources independent
+of how a block exits. Consequently, deferred statements should avoid allocating new resources
+and must provide failure transparency.
+#+end_quote
+
+** Dynamic or Static
+
+Deferred statements could be added dynamically.
+In this case, some runtime resources have to be allocated at runtime, 
+which implies potential failures. Or the compiler statistically allocates 
+the required resources at compile time.
+
+** Capturing Object Values or Not
+
+A defer statement may reference some objects but the objects' values may change
+when the defer statement is actually executed.
+A simple survey shows most programmers prefer not to capture the values.
+This issue remains to be solved, together with lambdas.
+
+Golang captures the value at the defer statement.
 
 * Bibliography
 
