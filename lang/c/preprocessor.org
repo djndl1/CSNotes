@@ -61,6 +61,11 @@ turned off.
 
 - diagnostics: detect problems at compile time
 
+** Macro Expansion Order
+
+Normally, the actual arguments of a function-like macro are macro expanded before the function-like macro 
+is expanded. However, if either parameter is used as an operator of =#= or =##=, the actual argument is not expanded first. That is why stringization or concatenation requires two-level macro expansion.
+
 * Include Guards and Pragma Once
 
 #+begin_quote
