@@ -107,6 +107,15 @@ This issue remains to be solved, together with lambdas.
 
 Golang captures the value at the defer statement.
 
+** Explicit Guarded Block or Not
+
+It is an open design question whether the defer block should be marked explicitly by a =guard=
+keyword or implicit. Without the =guard= keyword, a deferred statement may be executed either
+at the end of the closest enclosing block or the end of the function body.
+
+A guard block may introduce some lifetime issues: a deferred statement runs 
+with some out-of-scope variables.
+
 * Bibliography
 
 #+print_bibliography:
