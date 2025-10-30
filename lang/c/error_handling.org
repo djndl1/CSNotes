@@ -1,0 +1,57 @@
+* Error Handling & Propogation
+
+** The Ostrich algorithm
+
+Pretend nothing bad has happened and do nothing.
+
+** Simply Crash on Error
+
+** Return an Error Code
+
+** Return =NULL=
+
+** Return a boolean or an Error Code and Take an Out Parameter
+
+The C# =Try*= method idiom.
+
+** Return a boolean or an Error Code and Take an Out Parameter as the Result and Other Out Parameters to Further Describe the Error
+
+More structured error information.
+
+** =errno= style thread-local static value.
+
+Not favored.
+
+** Return a Tagged Union
+
+Similar to the Rust approach.
+
+#+begin_src c
+enum ParseNaturalNumberResultKind {
+    PARSE_NATURAL_SUCCESS,
+    PARSE_NATURAL_EMPTY_STRING,
+    PARSE_NATURAL_BAD_CHARACTER
+};
+
+struct BadCharacter {
+    size_t index;
+    char c;
+};
+
+struct ParseNaturalNumberResult {
+    enum ParseNaturalNumberResultKind kind;
+    union {
+        int success;
+        struct BadCharacter bad_character;
+    } data;
+};
+#+end_src
+
+** Full OOP Structured Error Object
+
+An error object with a common interface (vtable) and an optional data member.
+This error object may be used as returned structured erorr info in the approaches above.
+
+* Reference
+
+- [[https://mccue.dev/pages/7-27-22-c-errors][The Different Ways to Handle Errors in C]]
