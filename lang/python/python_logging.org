@@ -1,0 +1,19 @@
+* Built-in =logging=
+
+** Architecture
+
+Each module creates its own =logging.Logger= with the module name as the logger's name.
+=logging.Logger= is what the application code uses to output logs.
+
+A logger dispatches log records to *handlers* (targets) 
+and handlers send the log records to appropriate destinations.
+
+Formatters are responsible to format log records into the final output.
+
+Filters provide a finer grainted facility for determining which log records to output.
+
+** Logger
+
+Loggers are created by =logging.getLogger= and maintained by the library with its name as the key.
+Loggers may be organized into a hierarchy like modules and packages, named like =pacakge.module.submodule=.
+
