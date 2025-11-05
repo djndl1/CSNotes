@@ -9,6 +9,7 @@ A logger dispatches log records to *handlers* (targets)
 and handlers send the log records to appropriate destinations.
 
 Formatters are responsible to format log records into the final output.
+Log records have a number of attributes that are used by formatters to generate log messages.
 
 Filters provide a finer grainted facility for determining which log records to output.
 
@@ -16,4 +17,13 @@ Filters provide a finer grainted facility for determining which log records to o
 
 Loggers are created by =logging.getLogger= and maintained by the library with its name as the key.
 Loggers may be organized into a hierarchy like modules and packages, named like =pacakge.module.submodule=.
+A logger at a lower level is a child of the its upper level. A child logger without setting a log level (=NOTSET=) will inhereits its parent's, that is, delegates the message to its parent. But unless set so, a child logger will not propagate its log records to its parent.
 
+** Formatting
+
+Formatting here means two things:
+
+- the mapping of attributes of a log record to the log template.
+  + three formatting styles in Python are supported.
+
+- the formatting of a message with its arguments.
