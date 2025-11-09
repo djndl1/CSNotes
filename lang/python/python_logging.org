@@ -24,6 +24,15 @@ A logger at a lower level is a child of the its upper level. A child logger with
 Formatting here means two things:
 
 - the mapping of attributes of a log record to the log template.
-  + three formatting styles in Python are supported.
+  + three formatting styles in Python are supported. 
+  + Completely orthogonal to how an individual message is contructed.
 
 - the formatting of a message with its arguments.
+  + only =%= formatting operator is supported.
+  + Logging calls only take positional parameters for the actual logging message itself.
+
+*** Problems
+
+**** Displaying date/time in a message
+
+use the =%(asctime)s= and =%(msecs)%= attributes.
