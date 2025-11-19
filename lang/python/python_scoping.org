@@ -1,0 +1,102 @@
+* Dynamic or Static
+
+There is no dynamic scoping in Python. Although it seems so
+when resolving a name from local up to enclosing (since 2.1), module and global.
+A nested function is using a variable from its caller but this is 
+not strictly determined dynamically
+and it can be actually determined statically.
+
+In dynamic scoping, the value of a variable is determined by the closest
+calling namespace where a value is set. A nested function in Python might 
+use a variable of its enclosing function but it does always so while in 
+dynamic scoping, even a non-nested function may use a variable that is 
+defined by its caller, which may only occur in Python with a nested function.
+
+* Variable Scopes
+
+*Only classes, functions and modules provide scope in Python*. =if= does not count.
+This differs greatly from C, where ={}= blocks and =if= statements create scopes.
+
+Python variables are scoped to the innermost function, class, or module in which they're assigned. 
+Control blocks like if and while blocks don't count, 
+so a variable assigned inside an if is still scoped to a function, class, or module.
+
+** Statiscally Nested Scope (Python 2.1)
+
+Since 2.1, a nested function may reference a name in its enclosing function.
+This turned lambda expressions and nested functions into real closures.
+
+#+begin_quote
+A code block or region, such as a module, class definition, or function body, 
+is the basic unit of a program.
+ ...
+The name binding operations are argument declaration, assignment, class and function definition, 
+import statements, for statements, and except clauses. 
+Each name binding occurs within a block defined by a class or function definition or 
+at the module level (the top-level code block).
+...
+If a name is used within a code block, but it is not bound there and is not declared global, 
+the use is treated as a reference to the nearest enclosing function region. 
+(Note: If a region is contained within a class definition, 
+the name bindings that occur in the class block are not visible to enclosed functions.)
+#+end_quotes
+
+
+#+begin_quote
+Names in class scope are not accessible. 
+(This rule prevents odd interactions between class attributes and local variable access.)
+The =global= statement short-circuits the normal rules. 
+#+end_quote
+
+#+begin_quote
+Variables are not declared.
+If a name binding operation occurs anywhere in a function, 
+then that name is treated as local to the function 
+and all references refer to the local binding.
+#+end_quote
+
+- If a variable is referenced in an enclosed scope, it is an error to delete the name.
+
+- The value of this referenced variable in the enclosing scope is dynamic:
+  not the value at definition but at execution.
+  + this is still static as the variable referenced by the nested function
+  is in the enclosing scope: a free function at module level won't behave the same.
+
+  #+begin_src python
+  i = 6
+  def f(x):
+      def g():
+          print(i) # the enclosing one, even if not yet defined
+      i = 5
+      # ...
+      # skip to the next page
+      # ...
+      g() # reference the i defined in the enclosing scope 
+      for i in x:  # ah, i *is* local to f, so this is what g sees
+          pass
+      g() # still the i in the enclosing scope
+
+  f([1, 2])
+  # prints 5 and then 2
+  #+end_src
+
+#+begin_quote
+An assignment operation can only bind a name in the current scope or in the global scope. 
+The lack of declarations and the inability to rebind names in enclosing scopes 
+are unusual for lexically scoped languages
+#+end_quote
+
+- (Change since Python 3.0) a =nonlocal= statement is required to modify an outer variable.
+
+#+begin_src python
+def outer():
+    a = 5
+    def inner():
+        a = 3
+        return a
+    inner()
+    return a
+
+outer() # returns 5
+# returns 3 with `nonlocal a` at the beginning of  `inner()`
+#+end_src
