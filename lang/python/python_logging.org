@@ -13,6 +13,8 @@ Log records have a number of attributes that are used by formatters to generate 
 
 Filters provide a finer grainted facility for determining which log records to output.
 
+Log event information is passed between loggers, handlers, filters and formatters in a =LogRecord= instance.
+
 ** Logger
 
 Loggers are created by =logging.getLogger= and maintained by the library with its name as the key.
@@ -36,3 +38,15 @@ Formatting here means two things:
 **** Displaying date/time in a message
 
 use the =%(asctime)s= and =%(msecs)%= attributes.
+
+* =warning= Module
+
+Not for logging but a tool to warn users of obsolete or deprecated features, more like a weakened exception.
+Warnings can be suppressed; warnings are typically issued only once to avoid overwhelming the user.
+Warnings can be turned into errors should some features are forbidden.
+
+Like log levels, there are only a few warning built-in categories.
+
+By default, warnings are sent to =sys.stderr= but they can also be turned into exceptions or sent to other files.
+
+Warning filters determine what and how a warning is handled.
