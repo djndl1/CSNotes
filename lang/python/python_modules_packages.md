@@ -143,3 +143,34 @@ This may be useful if submodules under certain directories are preferred by prep
 
 - `-c commands`: one or more statements.
   - `sys.argv[0]` is `-c`
+
+# Package Distribution & Installation
+
+## Pip (Preferred installer)
+
+```shell
+python -m pip
+```
+
+## distutils (Builtin, Deprecated in Python 3.10 and Removed in 3.12) 
+
+`setup.py` is the center of all activity of building, distributing and installing modules using Distutils.
+
+```shell
+# first build
+python setup.py build [--build-base=my-build-dir] 
+
+# or install it directly into an instalation directory
+python setup.py install  
+# one may specify an alternative installation directory using --user --home- --prefix --exec-prefix --install-base
+```
+
+## [Setuptools](https://setuptools.pypa.io/en/latest/index.html) (the Modern Successor to distutils)
+
+Not in the standard library but typically included in a Python distribution.
+Typically, this shoud be used with a frontend (build)[https://pypi.org/project/build/] 
+and `build` will download and install `setuptools`.
+
+with `build` as the frontend, Setuptools uses `pyproject.toml` instead of `setup.py`.
+`pyproject.toml` requires the specification of a certain backend (here `setuptools`).
+`setup.py` is still supported but not recommended.
