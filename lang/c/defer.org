@@ -116,6 +116,27 @@ at the end of the closest enclosing block or the end of the function body.
 A guard block may introduce some lifetime issues: a deferred statement runs 
 with some out-of-scope variables.
 
+* Existing Practice
+
+** C
+
+Existing error handling and resource management relies heavily on 
+error codes, out parameters, unreadable nested if blocks or potentially 
+dangerous =goto=.
+
+** C++
+
+exception mechanism and RAII.
+Defer meachanism is also easily implemented (e.g. =Boost.ScopeGuard=).
+
+** Dlang
+
+=try-finally=, scoped guard statements.
+
+** Golang
+
+=defer=, =panic= and =recover=.
+
 * Bibliography
 
 #+print_bibliography:
