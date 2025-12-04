@@ -74,3 +74,57 @@ never its ancestors' method with the same name unless `super()` is used.
   - be careful with the order in which `super().__init__()` and other code are placed: it might cause unexpected results.
   
 See [OOP Test Code](../CodeOfLanguages/python_tutorial/python_oop_test.py)
+
+# Object Models
+
+An object has an _identity_ `id()` and a _value_ (mutale or immutable), determined (including mutability) by its _type_.
+
+Operations that compute new values may actually return a reference to any existing object with the same type and value, while for mutable objects this is not allowed: `1` may or may not be the same integer object.
+
+## Type Hierarchy
+
+- `None`: a single value/object.
+
+- `NotImplemented`: retruned by unimplemented numeric or rich comparison methods.
+
+- `...` or `Ellipsis`: a single object/value
+
+- numeric types
+
+- Various container types
+
+- Callable: 
+  - built-in functions
+  - built-in methods
+  - classes (as factories for new instances)
+  - class instances with `__class__()`
+  - user-defined functions
+  - instance methods: an instance method is a function bound to a class instance, with the instance 
+    as its first argument.
+  - generator functions
+  - coroutine function (async)
+  - asynchronous generator functions
+
+- modules
+  - a module has a namespace (`module.__dict__`)
+
+- Custom classes
+  - `__dict__`: class namespace that contains class attributes (but not the only way)
+  - `type.mro()`: called to create `__mro__` and may be overridden
+  - `__subclasses__()`: its direct subclasses
+
+- Class instances
+  - `__class__`: its class object instance
+  - `__dict__`: an object's writable attributes. Some objects have `__slots__` instead of `__dict__`
+
+- File objects
+
+## `__dict__`
+
+Most if not all objects have a special attribute `__dict__` that stores its dynamic writable attributes (including data attributes, methods, metadata etc.). Class members and instance members are typically stored in it. Builtin types, their instances, and builtin functions and those objects with a `__slot__` attribute do not have it. The `__slots__` attribute is intended to be a memory-efficient, immutable alternative to `__dict__`. Types with a `__dict__` supports dynamic addition and deletion of an attribute by assigning or `del` the attribute directly.
+
+using `vars()` for introspection and debugging is more Pythonic than using the `__dict__` attribute directly.
+
+### What about `setattr`, `getattr`, `delattr`, `hasattr` 
+
+These are generally the better tools to manipulate attributes.
