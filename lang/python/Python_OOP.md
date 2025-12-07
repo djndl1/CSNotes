@@ -119,6 +119,83 @@ Operations that compute new values may actually return a reference to any existi
 
 - File objects
 
+## Special Methods
+
+For operator overloading, constructors, initializers and finalizers.
+
+### Object Construction
+
+The `__new__(cls, args...)` static method is called first and creates an instance of the class,
+and then the initializer `__init__(self, args...)` is called to further customize the instance (the reason 
+ why it has the `self` reference to the instance). Both methods accept the same set of arguments.
+
+Explicit calls to `__init__` and `__new__` of the superclass are necessary to create and initialize the parents data: there is the ultimate superclass' `object.__new__()` that is responsible for allocating memory for the object.
+
+Improperly implementing `__new__` and `__init__` can result in [some weird result](https://pdarragh.github.io/blog/2017/05/22/oddities-in-pythons-new-method/)
+
+#### Some Examples of `__new__`:
+
+```python
+# create an object without using __init__
+class Person:
+    def __new__(cls, name):
+        instance = object.__new__(cls)
+        return instance
+
+# as a hook
+class LowerCaseTuple(tuple):
+   def __new__(cls, iterable):
+      lower_iterable = (l.lower() for l in iterable)
+      return super().__new(cls, lower_iterable)
+
+# inherit int
+class SuperInt(int):
+    def __new__(cls, value):
+        return super().__new__(cls, value ** 2)
+
+# singleton
+class Singleton:
+    instance_ = None
+
+    def __new__(cls):
+        if cls.instance_ is None:
+            cls.instance = super().__new__(cls)
+        return cls.instance_
+```
+
+
+
+### Object Finalization
+
+`__del__(self)` is called before an object is destroyed. Note that this is not the method being called 
+when the `del` operator is used, which simply decrease the refcount.
+
+Explicit calls to a superclass' `__del__` is required to properly dispose an object.
+
+### `__bytes__`, `__str__`, `__repr__` and `__format__(self, format_spec)`
+
+The official wording is somewhat confusing.
+`repr` is mean to be unambiguous and `__str__` readable. `__repr__` for authors (debugging, logging etc.) and `__str__` for users.  `__bytes__` returns a byte string representation.
+ 
+`str` uses `repr` if no `__str__` is defined. `__format__` generates a formatted string depending on the input specification.
+
+### `__eq__` and `__hash__`
+
+The purpose of a hash function is to find equivalent objects in a hashed collection.
+Equal objects should return the same hash:
+
+1. If `___eq__` is not defined then `__hash__` has no meaning and thus should be not defined (`__hash__ = None`).
+
+2. An object with `__eq__` but not `__hash__`  cannot be hashed (implicitly set to `None` by Python) and thus cannot be used in a hashed collection
+
+3. mutable objects should not implement `__hash__` since its hash would be mutable.
+
+`__hash__` and `__eq__` are inherited from `object`, which uses identity comparison.
+
+### `__bool__`
+
+Called to implement truth values and for `bool()` to use. Otherwise `__len__()` is called. If None are defined, all instances are considered true.
+
 ## `__dict__`
 
 Most if not all objects have a special attribute `__dict__` that stores its dynamic writable attributes (including data attributes, methods, metadata etc.). Class members and instance members are typically stored in it. Builtin types, their instances, and builtin functions and those objects with a `__slot__` attribute do not have it. The `__slots__` attribute is intended to be a memory-efficient, immutable alternative to `__dict__`. Types with a `__dict__` supports dynamic addition and deletion of an attribute by assigning or `del` the attribute directly.
