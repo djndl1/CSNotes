@@ -131,7 +131,10 @@ and then the initializer `__init__(self, args...)` is called to further customiz
 
 Explicit calls to `__init__` and `__new__` of the superclass are necessary to create and initialize the parents data: there is the ultimate superclass' `object.__new__()` that is responsible for allocating memory for the object.
 
-Improperly implementing `__new__` and `__init__` can result in [some weird result](https://pdarragh.github.io/blog/2017/05/22/oddities-in-pythons-new-method/)
+Improperly implementing `__new__` and `__init__` can result in [some weird result](https://pdarragh.github.io/blog/2017/05/22/oddities-in-pythons-new-method/).
+
+`__new__` is not used much as Python is dynamic enough to create attributes in `__init__` 
+or even defining new classes in a function.
 
 #### Some Examples of `__new__`:
 
@@ -148,12 +151,12 @@ class LowerCaseTuple(tuple):
       lower_iterable = (l.lower() for l in iterable)
       return super().__new(cls, lower_iterable)
 
-# inherit int
+# subclassing an immutable class
 class SuperInt(int):
     def __new__(cls, value):
         return super().__new__(cls, value ** 2)
 
-# singleton
+# singleton. But module-level constant is probably a better way
 class Singleton:
     instance_ = None
 
