@@ -23,17 +23,20 @@
   + Many basic types have methods for parsing from and converting to strings.
 
 - =string=: immutable UTF-8 character string.
+  + =string16=, =string32= are available as well.
   + Similar to C#, ==== and =!== compare the content of two strings.
   + Python-style slicing =[start:end]= is partially supported (the start and end parameters
     can not be left out). No run-time bounds checking is implemented.
   + =in= can be used to determine whether one string contains another.
-  + string templates (interpolation), with implementation similar to =str.printf()=; verbatim string (escape sequences are not
-    interpreted and supports multiline)
-#+BEGIN_EXAMPLE vala
-int a = 6, b = 7;
-// string template
-string s = @"$a * $b = $(a * b)";  // => "6 * 7 = 42"
-#+END_EXAMPLE
+  + string templates (interpolation =@= prefixed, =$= references expressions, Perl-like).
+  + verbatim string (escape sequences are not interpreted and supports multiline).
+    The syntax is similar to Python's multiline string.
+  #+BEGIN_EXAMPLE vala
+  int a = 6, b = 7;
+  // string template
+  string s = @"$a * $b = $(a * b)";  // => "6 * 7 = 42"
+  #+END_EXAMPLE
+  
 
 - /array/: directly mapped to its C equivalent (not even =GArray=) with no
   run-time bounds checking.
@@ -62,11 +65,11 @@ string s = @"$a * $b = $(a * b)";  // => "6 * 7 = 42"
   + =sizeof=, =is=, =typeof=
   + =??=: null coalescing
   + =in=: works on arrays, strings, collections or any other type that has
-  an appropriate =contain()= method.
+  an appropriate =contain()= method. (Python-like)
   + Operators/functions/methods cannot be overloaded. Choose slightly
   different names to avoid a name clash. However, default argument is
   supported.
-  + Index access are mapped to =get(index)=​/​=set(index, item)= methods.
+  + Index access are mapped to =get(index)=​/​=set(index, item)= methods (Python-like).
   =[start:end]= is mapped to =slice(long start, long end)=. =in= is
   mapped to =contains()=; =foreach/in= loop is mapped to =iterator()=;
   string template is implemented with =to_string()=.
@@ -91,33 +94,33 @@ string s = @"$a * $b = $(a * b)";  // => "6 * 7 = 42"
   + Related errors are grouped into error domains. Vala error domains do not
     form a class hierarchy (=GError=​s are not =GObject=).
 
-#+BEGIN_SRC vala
-public errordomain MathError
-{
-    DivisionByZero,
-    Overflow,
-    //...
-}
-
-public int division(int dividend, int divisor) throws MathError
-{
-    if (divisor == 0) {
-        throw new MathError.DivisionByZero("divided by zero");
-    }
-
-    return dividend / divisor;
-}
-
-try {
-    var x = division(30, 20);
-} catch (MathError.Overflow e) {
-    ...
-} catch (MathError e) {
-    ...
-} finally {
-   ...
-}
-#+END_SRC
+  #+BEGIN_SRC vala
+  public errordomain MathError
+  {
+      DivisionByZero,
+      Overflow,
+      //...
+  }
+  
+  public int division(int dividend, int divisor) throws MathError
+  {
+      if (divisor == 0) {
+          throw new MathError.DivisionByZero("divided by zero");
+      }
+  
+      return dividend / divisor;
+  }
+  
+  try {
+      var x = division(30, 20);
+  } catch (MathError.Overflow e) {
+      ...
+  } catch (MathError e) {
+      ...
+  } finally {
+     ...
+  }
+  #+END_SRC
 
 - /Method Contracts/
   + for unrecoverable errors
@@ -135,14 +138,16 @@ try {
   :END:
 
 - A class may or may not (pure/plain/lightweight class and compact class) inherit from
-  =GLib.Object=.
+  =GLib.Object=. GObject classes have property notification and other nice features that
+  are suitable for GUI (read GTK) development.
 
 - Construction
   + default constructor
-  + named constructor
+  + named constructor: method overloading is not supported. Different constructors have a different 
+    postfix =.postfix= after the class name =ClassName.PostFix(args)=
   + /construction blocks/ are only available only for =GLib.Object=.
   + /static construction block/: exactly once in a program where such a class is used.
-  + constructor delegation is supported.
+  + constructor delegation (one constructor uses another constructor in its body) is supported.
   + /class construct/: executed once at the first use of its class and once at each
     subclass of this class.
 
@@ -155,20 +160,20 @@ try {
     parameter passed to =.connect()=.
   + no need to declare a delegate type before declare a signal, as in C#.
 
-#+begin_src vala
-class ... {
-    public signal void ring(int a); // have to be public and everyone can trigger it
-
-    public void trigger()
-    {
-        ring(counter++); // unlike C#, no need for a null check
-    }
-}
-
-t.ring.connect((source, a) => { // the source and any trailing parameters can be omitted
-    stdout.print("%d\n", a);
-});
-#+end_src
+  #+begin_src vala
+  class ... {
+      public signal void ring(int a); // have to be public and everyone can trigger it
+  
+      public void trigger()
+      {
+          ring(counter++); // unlike C#, no need for a null check
+      }
+  }
+  
+  t.ring.connect((source, a) => { // the source and any trailing parameters can be omitted
+      stdout.print("%d\n", a);
+  });
+  #+end_src
 
 - /notification/: every =GLib.Object= has a signal called =notify=, emitted
   whenever a change of property occurs.
@@ -182,30 +187,30 @@ t.ring.connect((source, a) => { // the source and any trailing parameters can be
   + vala interface may have a class as a prerequisite so that its implementation
     subclasses that class.
 
-#+BEGIN_EXAMPLE vala
-interface Foo {
-    public abstract int m();
-}
-
-interface Bar {
-    public abstract string m();
-}
-
-class Cls: Foo, Bar {
-    public int Foo.m() {
-        return 10;
-    }
-
-   public string Bar.m() {
-        return "bar";
-    }
-}
-
-void main () {
-    var cls = new Cls();
-    message("%d %s", ((Foo) cls).m(), ((Bar) cls).m());
-}
-#+END_EXAMPLE
+  #+BEGIN_EXAMPLE vala
+  interface Foo {
+      public abstract int m();
+  }
+  
+  interface Bar {
+      public abstract string m();
+  }
+  
+  class Cls: Foo, Bar {
+      public int Foo.m() {
+          return 10;
+      }
+  
+     public string Bar.m() {
+          return "bar";
+      }
+  }
+  
+  void main () {
+      var cls = new Cls();
+      message("%d %s", ((Foo) cls).m(), ((Bar) cls).m());
+  }
+  #+END_EXAMPLE
 
 - RTTI
   + =is=: check type
