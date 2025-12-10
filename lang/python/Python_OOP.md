@@ -205,6 +205,22 @@ Most if not all objects have a special attribute `__dict__` that stores its dyna
 
 using `vars()` for introspection and debugging is more Pythonic than using the `__dict__` attribute directly.
 
+When accessing to a class attributes, `__dict__` in the child class is searched first and then its parents `__dict__`.
+Instance attribute access searches only the child's, even although `super().__init__()` adds parents' attributes to a child instance.
+
+### Use
+
+- memoizing without defining a callable user class, a normal function is enough to hold attributes with `__dict__`.
+
+- introspecing and debugging attributes
+
+- Serialization, instead of serializing the object itself.
+
+- Avoid infinite recursion by bypassing descriptors 
+  when writing descriptors due to attribute naming 
+  collides with that of the descriptor's implementation.
+
 ### What about `setattr`, `getattr`, `delattr`, `hasattr` 
 
 These are generally the better tools to manipulate attributes.
+The support more attribute implementation other than `__dict__` including `__slots__`
