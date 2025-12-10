@@ -27,3 +27,35 @@ Python supports named format fields since the old-style string interpolation.
 - (*Deprecated*) /string interpolation/: old-style printf-style ='%format_specs' % arg_tuple/arg_dict=
   + =%[(mapping_key, a.k.a argument name)][conversion_flags, #/0/-/ /+][field_width][.precision][useless_length_modifiern_in_python]conversion_type_as_in_C=.
     This is where named parameters =%s(param_name)s= in DB-API 2.0 come from.
+
+* Unicode
+
+Unicode was introduced in Python 2.0 (enhanced in 2.2 with full Unicode support) and coexisted with legacy byte strings until Python 3 took over
+where byte strings are no longer named "strings" but simply =bytes= and thus lost 
+its implication of text strings.
+
+In Python 2, byte strings are implicitly coerced into Unicode strings by a global encoding scheme (by default ASCII).
+
+** Internal Format
+
+TODO
+
+** Source Code Encoding & Unicode Literal (PEP 263)
+
+Without Unicode-encoded source code, the only reliable way to write 
+Unicode string literals is to use Unicode escape sequence.
+An encoding hint may be added to the beginning of a source file
+so that the interpreter can treat the file as in a certain encoding.
+
+#+begin_src python
+^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)
+#+end_src
+
+#+begin_quote
+Python’s tokenizer/compiler combo will need to be updated to work as follows:
+read the file
+decode it into Unicode assuming a fixed per-file encoding
+convert it into a UTF-8 byte string
+tokenize the UTF-8 content
+compile it, creating Unicode objects from the given Unicode data and creating string objects from the Unicode literal data by first reencoding the UTF-8 data into 8-bit string data using the given file encoding
+#+end_quote
