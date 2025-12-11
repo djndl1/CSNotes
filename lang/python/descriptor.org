@@ -1,4 +1,8 @@
-#+title: Descriptor
+#+title: Descriptor (Sinece 2.2)
+
+#+begin_quote
+The one big idea underlying the new class model is that an API for describing the attributes of an object using descriptors has been formalized. Descriptors specify the value of an attribute, stating whether it’s a method or a field. With the descriptor API, static methods and class methods become possible, as well as more exotic constructs.
+#+end_quote
 
 #+begin_quote
 In general, a descriptor is an object attribute with “binding behavior”, one
@@ -9,6 +13,9 @@ those methods are defined for an object, it is said to be a descriptor.
 The default behavior for attribute access is to get, set, or delete the
 attribute from an object’s dictionary.
 #+end_quote
+
+Basically, when descriptor are used as object/class attributes, they act 
+as attributes but with behaviors defined in their own classes.
 
 * Mechanism
 
@@ -32,3 +39,7 @@ descr.__delete__(self, obj) -> None
 A descriptor can be called directly by its method name, or automatically invoked
 upon attribute access if the attribute defines the corresponding descriptor
 method. Descriptors are invoked by the =__getattribute__()= method.
+
+* Reference
+
+- [[https://piccolo-orm.com/blog/the-power-of-python-descriptors/][The Power of Python Descriptors]]
