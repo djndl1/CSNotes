@@ -24,7 +24,7 @@ developers have built by using DCOM.
   + *Socket*
   + *RPC*
     - /Interface Definition Language/
-    - /Marshaling/, the process of passing parameters from one context to another.
+    - /Marshaling/, the process of passing data from one context to another (not the same as serialization but broader)
     - /stub/
 
 - Distributed Objects
@@ -43,8 +43,9 @@ developers have built by using DCOM.
   + *easy administration* since business rules are now centralized.
 
 - Challenges of Distributed Applications
-  + /Performance/: communication tends to be chunky. Properties access and
-    callbacks require roundtrips and are expensive.
+  + /Performance/: communication tends to be chunky. Remote property access and
+    callbacks require expensive roundtrips. The best optimization 
+    is to avoid making distributed calls whenever possible: /chatty vs. chunky trade-off/
     - .NET Remoting: comparable to that of DCOM
   + /Network and Firewall/: the message should be easily passed across the
     Internet and various firewalls.
@@ -85,10 +86,12 @@ unmanaged application-per-process model.
 - /Contexts/ :: a further division within an application domain where a common
   set of constraints and usage semantics will govern all access to the objects
   within it.
+  + e.g. synchronization context (where only a single thread is allowed). Each
+  appdomain contains at least one context and has a default context if not specifically required.
 
 A remotable object can be either *marshal-by-value* (=SerializableAttribute=),
 *marshal-by-reference* (=System.MarshalByRefObject= subtypes)
-or *context-bound* (=System.ContextBoundObject=).
+or *context-bound* (=System.ContextBoundObject=, TODO).
 
 ** Object Activation
 
@@ -96,6 +99,7 @@ or *context-bound* (=System.ContextBoundObject=).
   + Marshal-by-reference types support [[#server_activation][*server activation*]] and [[#client_activation][*client activation*]].
   + Marshal-by-value types are copied via serialization and activated upon
     deserialization.
+  + A type's activation is determined by the configuration of the .NET Remoting infrastructure rather than the type itself.
 
 - Metadata distribution
   + The client may reference the server assembly directly to obtain the metadata.of remotable objects.
@@ -114,7 +118,11 @@ or *context-bound* (=System.ContextBoundObject=).
 By MS .NET Remoting[cite:@scott_mclean_microsoft_2002], the mechanism works like this.
 
 #+begin_quote
-The .NET Remoting infrastructure refers to server-activated types as well-known object types because the server application publishes the type at a well-known Uniform Resource Identifier (URI) before activating object instances. The server process hosting the remotable type is responsible for configuring the type as a well-known object, publishing it at a specific well-known endpoint or address, and activating instances of the type only when necessary.
+The .NET Remoting infrastructure refers to server-activated types as well-known object types 
+because the server application publishes the type at a well-known Uniform Resource Identifier (URI) before activating object instances. 
+The server process hosting the remotable type is responsible 
+for configuring the type as a well-known object, 
+publishing it at a specific well-known endpoint or address, and activating instances of the type only when necessary.
 #+end_quote
 
 Objects can be either activated in /singleton-mode/ or /single-call mode/.
@@ -124,10 +132,22 @@ Objects can be either activated in /singleton-mode/ or /single-call mode/.
   as the application.
   + stateful
   + lifetime can be configured.
+  #+begin_src csharp
+  // server registration
+ RemotingConfiguration.RegisterWellKnownServiceType(typeof(MySingletonType), "SomeURI", WellKnownObjectModes.Singleton); 
+ // client configuration
+ RemotingConfiguration.RegisterWellKnownClientType(typeof(MySingletonType), "MyUri");
+  #+end_src
 
 - /Single Call/ :: a new instance of that type for every method invocation a
   client makes.
-  + stateless, but still an OOP object though with a very limited lifetime.
+  + stateless, for more traditional RPC, but still an OOP object though with a very limited lifetime.
+  #+begin_src csharp
+  // server registration
+ RemotingConfiguration.RegisterWellKnownServiceType(typeof(MySingleCallType), "SomeURI", WellKnownObjectModes.SingleCall); 
+ // client configuration
+ RemotingConfiguration.RegisterWellKnownClientType(typeof(MySingleCallType), "MyUri");
+  #+end_src
 
 A server-activated object can be created with =new= after registration
 (instantiable object), or with =Activator.GetObject()= if it is returned as an interface.
@@ -145,6 +165,13 @@ A client activated object can be created with the =new= operator after
 registration (instantiable object)
 or by a server-activated factory object, especially when the client-activated object
 is returned as an interface.
+
+#+begin_src csharp
+// server side registration
+RemotingConfiguration.RegisterActivatedServiceType(typeof(ClientSideActivatedType));
+// client side configuration
+RemotingConfiguration.RegisterActivatedClientType(typeof(ClientSideActivatedType), "http://someURL");
+#+end_src
 
 ** Lease-based Object Lifetime Management
 
