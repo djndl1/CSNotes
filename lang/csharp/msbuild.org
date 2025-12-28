@@ -51,7 +51,8 @@ MSBuild installation is nothing on Windows, but on typical Linux where Mono come
 One has to install it manually to make OmniSharp happy.
 
 - Download the last working mono msbuild [[https://github.com/mono/msbuild/releases/][here]]
-  + better build one instead of this bootstrap msbuild.
+  + better build one instead of this bootstrap msbuild. One can successfully build one on 
+    =debian/1%16.10.1+xamarinxplat.2021.05.26.14.00-0xamarin2=
 
 - extract to =/usr/lib/mono/msbuild/Current/=
 
