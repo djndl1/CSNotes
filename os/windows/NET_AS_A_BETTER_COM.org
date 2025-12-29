@@ -2,12 +2,30 @@
 
 * A Platform for Software Integration
 
-Dotnet provides /CLR/ (integrating software within a single OS process) and /XML web services/ (integrate software at Internet scale), both of which rely on /strongly typed contracts between components and encapsulation/. These contracts rely heavily on /metadata/ and /virtualization/.
+.NET provides /CLR/ (integrating software within a single OS process) and /XML web services/ (integrate software at Internet scale), 
+both of which rely on /strongly typed contracts between components and encapsulation/. 
+These contracts rely heavily on /metadata/ and /virtualization/.
 
-- Metadata: CLR and XML Web Services rely on high-fidelity, ubiquitous and extensible metadata to convey programmer intention. e.g. Object-to-XML mapping are captured in metadata for use by the CLR's XML serializer to avoid explicitly coding the deserialization.
+- Metadata: CLR and XML Web Services rely on high-fidelity, ubiquitous and extensible metadata to convey programmer intention. 
+e.g. Object-to-XML mapping are captured in metadata for use 
+by the CLR's XML serializer to avoid explicitly coding the deserialization.
 
-- Virtualization: separation of sematnic intentions from phsical implementation details
+- Virtualization: separation of semantic intentions from physical implementation details. The metadata
+  for both work at an abstract structural level rather than in terms of low-level data representations and 
+  implementation techniques. The underlying platform is free to express the contracts in the most appropriate manner available.
+  e.g Web Service as XML or binary.
 
+- CLR loader: 
+  + version-aware and provides flexible configuration of version policies and code repositories.
+  + security-aware
+  + type-aware and provides a runtime for explicit management and creation of types independent of programming languages.
+
+#+begin_quote
+System wonks often view programming languages as facades or skins over the underlying constructs of the CLR.
+...
+However, programming languages are a necessary lens through which even low-level systems plumbers view the CLR.
+#+end_quote
+ 
 * A Better COM
 
 ** COM
