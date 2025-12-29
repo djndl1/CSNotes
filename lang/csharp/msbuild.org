@@ -60,6 +60,8 @@ One has to install it manually to make OmniSharp happy.
 
 - replace =Roslyn= with a newer version.
 
+- =System.Reflection.Metadata= 5.0.0 is required instead of a symlink to the one used by Roslyn. Download it from Nuget.
+
 ** Nuget Installation
 
 TODO
