@@ -30,38 +30,68 @@ However, programming languages are a necessary lens through which even low-level
 
 ** COM
 
-Component technologies focus on the /contracts/ between independently developed and deployed programs.The design paradigm of COM was that component contracts are expressed as /type definitions/. COM was a major advance because it brought the dynamic loading of code and the type system together in a fairly self-consistent manner.
+Component technologies focus on the /contracts/ between independently developed and deployed programs.
+The design paradigm of COM was that component contracts are expressed as /type definitions/. 
+COM was a major advance because it brought the dynamic loading of code 
+and the type system together in a fairly self-consistent manner.
 
-COM is both a programming model and a supporting platform technology.
+COM is both a programming model and a supporting platform technology but the platform technology facade
+does not hold up as well as the former.
 
 *** Problems
 
-Most if not all of the problems with the COM platform can be traced back to the nature of contracts between components. In an ideal world, the contracts between components would be expressed purely in terms of the /semantic guarantees/ and /assumptions that exist between the consumer and the component/. The closest practice is
+In an ideal world, the contracts between components would be expressed purely in terms of the /semantic guarantees/ 
+and /assumptions that exist between the consumer and the component/. The closest practice is
 
 #+begin_quote
 use programmatic type definitions along with human-readable documentation that describes the semantics of those types.
 #+end_quote
 
-COM has the following problems:
+COM's contract representation has the following problems:
 
-1. No standardized interchange format for contract definitions. The COM specification assumed that the type definitions of a contract would be communicated via some out-of-band technique that was outside the scope of COM proper. MIDL and TLB are not isomorphic in functionality. Also, COM does not address the problem of /dependencies/.
+- the data representation of the contracts in COM is not defined in the standard: MS defined MIDL and TypeLib but they 
+  are /not equivalent in functionality/ and there is /no mechanism to express dependencies/.
 
-2. COM's contract is binary/physical in nature, addressing problems such as calling stack, object reference format, vtable offset, data structure layout, utterly free of semantic content. This binary contract forces component authors to pay attention to some implementation details instead of pure semantics so as to not to break their users' code.
+- lack of extensibility in its contract description format. MTS teams tried using declarative attributes but MIDL
+  is used mostly by C++ programmers and VB programmers had no way to customize TypeLib generation.
+
+Furthermore, the contract itself is the problem:
+
+COM's design is inspired by C++ polymorphism, binary/physical in nature, addressing problems such as calling convention, 
+object reference format, vtable offset, data structure layout, memory management, utterly free of semantic content. 
+There is no proper component versioning.
+
+This binary contract forces component authors to pay attention to some implementation details 
+instead of pure semantics so as to not to break their users' code.
 
 ** CLR: A Better COM
+
+To address these problems, COM and MTS teams designed CLR (a.k.a. COM+ Runtime, Common Object Runtime, not the COM+ as we know)
 
 A fully specified machine-readable extensible strongly typed format (/metadata/) for describing component contract.
 
 - Standardized full-specified contract defintion
 
 #+begin_quote
-the CLR provides facilities that let programs read and write metadata without knowledge of the underlying file format. CLR metadata is cleanly and easily extensible via custom attributes, which are themselves strongly typed. CLR metadata also contains component dependency and version information, allowing the use of a new range of techniques to handle component versioning. Finally, the presence of CLR metadata is mandatory
+the CLR provides facilities that let programs read and write metadata without knowledge of the underlying file format. 
+CLR metadata is cleanly and easily extensible via custom attributes, which are themselves strongly typed. 
+CLR metadata also contains component dependency and version information, 
+allowing the use of a new range of techniques to handle component versioning. 
+Finally, the presence of CLR metadata is mandatory
 #+end_quote
 
-- Logical structure of types as the contract. The CLR defers the physical structure layout to execution time. To implement this deferred reification of contracts, CLR-based components use Common Intermediate Language (CIL) for their method implementations instead of machine code. The CLR knowns the name/types of the methods and fields it tries to access.
+- Logical structure of types as the contract.
+  The CLR defers the physical structure layout to execution time.
+  To implement this deferred reification of contracts, 
+  CLR-based components use Common Intermediate Language (CIL) for their method implementations instead of machine code.
+  The CLR knowns the name/types of the methods and fields it tries to access.
 
  #+begin_quote
-Contracts in the CLR specifically do not describe the in-memory representation of anything. The CLR postpones the decisions regarding in-memory representations until the type is first loaded at runtime. This gives the CLR a great deal of flexibility with respect to virtual method table layout, stack discipline, alignment, and parameter passing conventions, all of which could change between versions of the CLR without the need to recompile components.
+Contracts in the CLR specifically do not describe the in-memory representation of anything.
+The CLR postpones the decisions regarding in-memory representations until the type is first loaded at runtime.
+This gives the CLR a great deal of flexibility with respect to virtual method table layout,
+stack discipline, alignment, and parameter passing conventions,
+all of which could change between versions of the CLR without the need to recompile components.
  #+end_quote
 
 ** A New Programming Model
