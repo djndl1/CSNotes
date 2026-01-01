@@ -66,25 +66,28 @@ instead of pure semantics so as to not to break their users' code.
 
 ** CLR: A Better COM
 
-To address these problems, COM and MTS teams designed CLR (a.k.a. COM+ Runtime, Common Object Runtime, not the COM+ as we know)
+To address these problems, COM and MTS teams designed CLR a.k.a. COM3, COM+ Runtime (not the COM+ as we know) or Common Object Runtime.
 
-A fully specified machine-readable extensible strongly typed format (/metadata/) for describing component contract.
+A fully specified machine-readable extensible strongly typed format (/metadata/) for describing logical component contracts
+to solve the problems posed by COM, described above.
 
-- Standardized full-specified contract defintion
+- Standardized fully-specified contract definition
 
-#+begin_quote
-the CLR provides facilities that let programs read and write metadata without knowledge of the underlying file format. 
-CLR metadata is cleanly and easily extensible via custom attributes, which are themselves strongly typed. 
-CLR metadata also contains component dependency and version information, 
-allowing the use of a new range of techniques to handle component versioning. 
-Finally, the presence of CLR metadata is mandatory
-#+end_quote
+  #+begin_quote
+  the CLR provides facilities that let programs read and write metadata without knowledge of the underlying file format. 
+  CLR metadata is cleanly and easily extensible via custom attributes, which are themselves strongly typed. 
+  CLR metadata also contains component dependency and version information, 
+  allowing the use of a new range of techniques to handle component versioning. 
+  Finally, the presence of CLR metadata is mandator.
+  #+end_quote
 
-- Logical structure of types as the contract.
-  The CLR defers the physical structure layout to execution time.
-  To implement this deferred reification of contracts, 
-  CLR-based components use Common Intermediate Language (CIL) for their method implementations instead of machine code.
-  The CLR knowns the name/types of the methods and fields it tries to access.
+- Logical structure of types as the contract. The CLR defers the physical structure layout to execution time.
+  + To implement this deferred reification of contracts, CLR-based components use Common Intermediate Language (CIL) 
+  for their method implementations instead of machine code.
+  The CLR knows the name/types of the methods and fields it tries to access. The CIL does not merely serves as a 
+  processor-neutral instruction set: it abstracts away physical structure in the contract and there is nothing 
+  about method offsets or addresses in CIL. JIT compilation makes CLR's performance on par with native code
+  while still maintaining logical component contract.
 
  #+begin_quote
 Contracts in the CLR specifically do not describe the in-memory representation of anything.
@@ -96,15 +99,25 @@ all of which could change between versions of the CLR without the need to recomp
 
 ** A New Programming Model
 
-CLR is built around types and type safety. The CLR encourages a worldview in which everything is a type, an object, or a value.
+Type centric: CLR is built around types and type safety. The CLR encourages a worldview 
+in which everything is a type, an object, or a value. The code can be verifiably type-safe,
+preventing malicious code from hijacking an object reference and invoking methods 
+not part of the contract.
 
 #+begin_quote
-the CLR provides a range of services that collectively are called managed execution. Under managed execution, the CLR is omniscient and has complete information about all aspects of a running program. This includes knowledge of the state and liveness of local variables in a method. This includes knowledge of where the code for each stack frame originated. This includes knowledge of all extant objects and object references, including reachability information.
+the CLR provides a range of services that collectively are called managed execution. 
+Under managed execution, the CLR is omniscient and has complete information about all aspects of a running program. 
+This includes knowledge of the state and liveness of local variables in a method.
+This includes knowledge of where the code for each stack frame originated.
+This includes knowledge of all extant objects and object references, including reachability information.
 #+end_quote
 
-Programmers are encouraged to give up the explicit management of memory and instead allocate and use instances of types. Similarly, programmers are encouraged to give up manual thread management and instead use the CLR's facilities for concurrent method execution.
+Programmers are encouraged to give up the explicit management of memory and instead allocate and use instances of types.
+Similarly, programmers are encouraged to give up manual thread management 
+and instead use the CLR's facilities for concurrent method execution.
 
-Also, metadata makes /generative programming/ possible. The CLR has CodeDOM for this.
+Also, metadata makes /generative programming/ possible. The CLR has CodeDOM to be constructed in memory as 
+a strongly-typed object model rather than a text stream.
 
 * Components
 
