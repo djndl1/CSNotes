@@ -1,14 +1,45 @@
-* MDbg: CLI Managed Code Debugger
+* Debuggers
+
+** vsdbg: Microsoft Official Debugger
+
+Not legally usable outside of Microsoft's products.
+
+** MDbg: CLI Managed Code Debugger (.NET Framework Only)
+
+Source-code level debugger. A sample debugger that is never meant for everyday use and is not maintained anymore.
+The source code is available [[https://github.com/SymbolSource/Microsoft.Samples.Debugging][here]] even if it is not 
+real open source.
 
 To debug 32-bit applications, use =CorFlags= to modify =MDbg= to force it to run under 32-bit.
-It doesn't seem to be able to load symbols.
+To load symbols, the pdb file in use has to be =Full=: ~dotent build -p:DebugType=Full~, remember to =dotnet clean=.
 
-* DnSpy 
+It failed to load source code somehow.
 
-Windows only, supports .NET FX, .NET Core and Mono, with a fully-featured GUI and IDE-like experience. 
+** =sdb=: CLI Mono Debugger
+
+Not maintained and basically feature complete. The =attach= command is not implemented but =remote/connect= seems 
+to be the real =attach= command to use. The =breakpoint= command has a different syntax from that of gdb.
+
+The source code seems to be easily to read and modify, at least at the application level.
+
+** DnSpy 
+
+Decompilation and reverse engineer with debug feature, useful for every .NET implementation.
+
+Runs on Windows only, supports .NET FX, .NET Core and Mono, with a fully-featured GUI and IDE-like experience. 
 Capable of decompiling assemblies, editing compiled code and recompiling edited code.
 Capable of Launch debug and attach debug.
 
-* WinDbg
+** WinDbg
 
- TODO
+TODO 
+
+** netcoredbg
+
+TODO
+
+** SharpDbg
+
+TODO
+
+** LLVM
