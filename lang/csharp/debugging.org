@@ -22,6 +22,10 @@ to be the real =attach= command to use. The =breakpoint= command has a different
 
 The source code seems to be easily to read and modify, at least at the application level.
 
+** =vscode-mono-debug=: VSCode Mono Soft Debugger
+
+Feature complete, uses the same backend as =sdb=.
+
 ** DnSpy 
 
 Decompilation and reverse engineer with debug feature, useful for every .NET implementation.
@@ -30,16 +34,38 @@ Runs on Windows only, supports .NET FX, .NET Core and Mono, with a fully-feature
 Capable of decompiling assemblies, editing compiled code and recompiling edited code.
 Capable of Launch debug and attach debug.
 
-** WinDbg
-
-TODO 
-
 ** netcoredbg
 
-TODO
+#+begin_src shell
+file dotnet # use the dotnet loader
+set args MyAssembly.dll # set args to .NET Programs
+b Main
+run
+#+end_src
 
-** SharpDbg
+Otherwise, netcoredbg may not find the PDB. Also, for the debugger to show source code, =<EmbedAllSource>true</EmbedAllSource=
+is required while building (possibly leaking source code if a debug build is leaked).
 
-TODO
+** [[https://github.com/MattParkerDev/sharpdbg/][SharpDbg]]
 
-** LLVM
+Intended as a drop-in replacement for netcoredbg.
+
+** WinDbg LLDB 
+
+They are not much different from each other: they do not debug .NET managed code;
+rather they look into the runtime and debug JIT-ed native code. 
+Both requires the SOS extensions and understanding 
+of the .NET runtime itself. LLDB is limited to modern .NET while Windbg (and its friends) 
+can debug .NET FX. Technically one could use gdb for .NET binary debugging but there is 
+no extension. =dotnet-debugger-extensions= is the successor to =dotnet-sos= and offers more features.
+
+* Managed Code Debugging
+
+** Stop at Entry
+
+[https://reverseengineering.stackexchange.com/questions/9583/how-to-stop-debugger-right-after-the-execution]
+
+** Debugging Tests
+
+set =VSTEST_HOST_DEBUG= to =1= and dotnet will wait for a debugger to attach.
+
