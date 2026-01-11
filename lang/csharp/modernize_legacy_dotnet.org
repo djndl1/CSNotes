@@ -1,0 +1,72 @@
+* Scenario 1: Stuck on Old .NET Runtimes
+
+.NETFX 3.5 and .NETFX 4.0/4.5 are still in use and 3.5 is even supported on Windows.
+However, as of 2026, one has to use at least .NET 4.6.1 (with .NETStandard 2.0 support)
+to access modern ecosystem.
+
+** Use Polyfills to Access Modern Language Features and APIs
+
+- [[https://github.com/Sergio0694/PolySharp][PolySharp]]: Mainly support for language features, not APIs.
+  + Certain types can be excluded and types can be public.
+  + .NET Standard 2.0 or later
+  + not really actively developed.
+  + Conditionally generated source code.
+
+- [[https://github.com/SimonCropp/Polyfill][Polyfill]]: 
+  + Source only package to provide newer APIs and language features.
+  + .NET Standard 2.0 or later
+  + actively developed and supports the latest C#A.
+  + including extension methods to provide new APIs.
+
+  The above two packages provide support for newer .NETFX to access latest language features, coupled 
+  with various nuget packages, relative modern programs may be written.
+
+- [[https://github.com/Tyrrrz/PolyShim][PolyShim]]
+  + similar to Polyfill but provides broader target frameworks, down to .NETFX 3.5.
+  + Unsafe code switch is required for full features.
+
+- [[https://github.com/djndl1/Theraot/][Theraot.Core]]
+  + An independent library.
+  + The original author hasn't been active for a few years and the support is only up to .NET 5/6.
+  + Relatively comprehensive and includes plenty of API support.
+
+- Various other nuget packages listed or referenced in the projects above called =*Bridge=,  =Net40*=, =Net35*=, =Polyfill.*=
+  and there are even [[https://www.nuget.org/profiles/cuteant][packages]] that port Microsoft extension libraries 
+  (presumbly from .NET Core 2.1) to .NETFX 4.0.
+
+- For await/async, =Microsoft.Bcl.Async= (for .NETFX 4.0) or other similar bridge libraries (various AsyncBridge or =Theraot.Core=)
+  are required.
+
+** Other Third Party Packages
+
+*** Json
+
+=System.Text.Json= is not available, use =Newtonsoft.Json=.
+
+*** MessagePack
+
+Available as =MsgPack.Cli=
+
+*** NLog
+
+Still supported
+
+*** NUnit
+
+Version 3.x
+
+*** IoC
+
+Ninject, Dryloc.dll 4.x, Castle.Windsor 3.x
+
+*** ZeroMQ
+
+NetMQ 4.0.0.207 (NETFX 4.0), 4.0.0.1 (NETFX 3.5)
+
+*** MoreLINQ
+
+2.10.0
+
+*** KGySoft
+
+Available
