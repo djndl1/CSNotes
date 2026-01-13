@@ -82,3 +82,13 @@ grouping; more generally, format to help readability.
     the variable may be used before the assignment, regardless of evaluation order.
   + Function arguments are evaluated before the call: do not assume the arguments
     are lazily evaluated and think some argument's value depends on another.
+
+* Function Macros (C/C++)
+
+Avoid them, use =inline= functions):
+
+- Arguments are evaluated multiple times in the definition, instead of being evaluated once at the call site.
+  If the evaluation has side effects, the side effects occur twice, causing either outright errors or performance degradation.
+
+- Parenthesize the macro body to avoid running into evaluation order issues if a macro is required.
+
