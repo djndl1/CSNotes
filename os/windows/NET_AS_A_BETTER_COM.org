@@ -149,9 +149,14 @@ CLR modules are valid win32 PE executables with a few extensions.
 └────────────────────┘
 #+END_SRC
 
- An assembly is a logical collection of one or more modules. Modules are physical constructs that exist as byte streams.
-A module is generally affiliated with only one assembly.
+/Modules/ are physical constructs that exist as byte streams.
+A module is generally affiliated with only one assembly. A CLR module contains code, metadata and resources: 
 
+- Metadata: describes the types defined in the module, including names, inheritance, method signatures and dependency information.
+
+- Resources: static read-only data such as strings, bitmaps and other aspects of the program not stored as executable code.
+
+An /assembly/ is a logical collection of one or more modules. 
 Assemblies are the "atom" of deployment in the CLR and are used to package, load, distribute, and version CLR modules.
 
 - dependency problem: Modules typically rely on types from other assemblies.Every CLR module contains a list of assembly names that identifies which assemblies are used by this module. These external assembly references use the logical name of the assembly, which contains no remnants of the underlying module names or locations. It is the job of the CLR to convert these logical assembly names into module pathnames at runtime
