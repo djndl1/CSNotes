@@ -1,0 +1,84 @@
+#+begin_quote
+The purpose of style is to make the code easy to read for yourself and others,
+and good style is crucial to good programming.
+...
+There is more to writing a program than getting the syntax right, fixing the bugs,
+and making it run fast enough. Programs are read not only by computers but also by
+programmers. A well-written program is easier to understand and to modify than a
+poorly-written one. The discipline of writing well leads to code that is more likely to
+be correct.
+#+end_quote
+
+#+begin_quote
+Code should be clear and simple-straightforward logic, 
+natural expression, conventional language use, meaningful names, 
+neat formatting, helpful comments and it should avoid clever tricks and
+unusual constructions.
+Consistency is important because others will find it easier to
+read your code, and you theirs, if you all stick to the same style.
+#+end_quote
+
+* Names
+
+#+begin_quote
+A name should be informative, concise, memorable, and pronounceable if possible. 
+Much information comes from context and scope; the
+broader the scope of a variable, the more information should be conveyed by its name.
+#+end_quote
+
+Therefore, a loop variable named =i= is find as long as the loop body isn't too long and 
+the reader can easily stop its declaration and understand its intention.
+
+- Use descriptive names for globals, short names for locals.
+  + Global names are less described by the context and thus should be more descriptive.
+  + Clarity is often achieved through brevity: long local names may not be very helpful.
+  + packages or namespaces in some languages provide further context information for names.
+  + A prefix in a name is not needed if the context or scope (including namespaces) can provide that.
+
+- Be consistent: Give related things related names that show their relationship an highlight their difference.
+  + use one term for a single concept.
+
+- Use active names for functions: based on active verbs with optional nouns followed.
+  + a predicate function should be named so that the return value is unambiguous.
+
+- Be accurate: a name should conveyor information to the reader, not confuse them.
+
+* Expressions and Statements
+
+#+begin_quote
+write expressions and statements in a way that makes their meaning as transparent as possible.
+Write the clearest code that does the job. Use spaces around operators to suggest
+grouping; more generally, format to help readability.
+#+end_quote
+
+- /Indent to show structure/: a consistent indentation style is the lowest-energy way to
+  make a program's structure self-evident.
+
+- /Use the natural form for expressions/: Write expressions as you might speak them
+  aloud. 
+  + Conditional expressions that include negations are always hard to understand:
+
+- /Parenthesize to resolve ambiguity/
+  + When mixing unrelated operators, though, it's a good idea to parentheses. operator
+    precedence is difficult to master. When in doubt, use parentheses.
+  + Even if parentheses aren't necessary, they can help if the grouping is hard to grasp
+    at first glance. 
+
+- /Break up complex compressions/
+  + Also a chance to introduce local variables to describe intermediate results.
+
+- /Be clear/
+  + The goal is to write clear code, not clever code.
+  + Clarity is not the same as brevity. Often the clearer code will be shorter, but sometimes longer.
+  + When boolean expressions are more concise and clear, they should be preferred to conditional constructs.
+    No more =if (true) return true else return false=.
+  + Ternary conditional operator is not a general replace to conditional statements.
+
+- /Be careful with side effects/
+  + Increment and decrement operators are subject to misuse due to side effects.
+  C's undefined evaluation order makes the problem worse.
+  + I/O and other behind-the-scene action also have side-effects.
+  + Be careful when assigning to a variable and using it in the same statement, 
+    the variable may be used before the assignment, regardless of evaluation order.
+  + Function arguments are evaluated before the call: do not assume the arguments
+    are lazily evaluated and think some argument's value depends on another.
