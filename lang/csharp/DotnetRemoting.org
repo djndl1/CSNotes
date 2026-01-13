@@ -104,7 +104,7 @@ or *context-bound* (=System.ContextBoundObject=, TODO).
 - Metadata distribution
   + The client may reference the server assembly directly to obtain the metadata.of remotable objects.
   + create a metadata assembly of stand-in class definitions with the same name as the server's implementation
-    assembly's.
+    assembly's but empty implementation (not really used).
   + both sides reference the same contract assembly that contains only
     interfaces and parameter/retval/​=EventArgs= type definitions. This requires the use of
     =Activator.GetObject= and server-activated factory objects for object activation.
@@ -237,7 +237,7 @@ Everything placed in an =IMessage=, including object references, has to be seria
 
 ** Proxies
 
-The client uses the proxy object to interact with the remote object.
+The client uses a proxy object to interact with the remote object by some IPC.
 
 Remotable =MarshalByRefObject= are represented and serialized as =ObjRef= to
 cross .NET Remoting boundaries. The server sends an =ObjRef= to the client and
@@ -247,6 +247,8 @@ identity info and the transport channel info)
 provided in the =ObjRef= instance.
 The receiver is expected to have access to the assembly defining the type's
 implementation since only metadata is sent.
+
+=MarshalByRefObject= is used mostly for cross-appdomain object reference.
 
 - *Transparent Proxy* ::  the one that the client directly access, generated on
   the fly with an =ObjRef=.
@@ -269,7 +271,7 @@ support a wide variety of protocols and wire formats.
 
 - *Channel Sinks* :: plug-in points that allow access to the underyling messages
   flowing through the channel as well as the stream used by the transport
-  mechanism to send messages to a remote object.
+  mechanism to send messages to a remote object. Sinks are processors along the chain.
   + a sink receives a stream and the message from the previous sink in the
     chain; performs some action on the message or stream and passes the result
     to the next sink in the chain.
@@ -281,6 +283,25 @@ support a wide variety of protocols and wire formats.
 :ID:       403a89e0-f26b-4c4c-a1c5-4425e685e030
 :END:
 
+** Implement Remoting
+
+- Make types remotable: =Serializable= or =MarshalByRefObject=
+
+- Choose a host appdomain: console app, winforms app, windows services, IIS, COM+
+  + console app: great for development and debugging, requires explicit startup
+  + winforms: with a GUI
+  + windows service: automatic startup and constantly running
+  + IIS: easy security configuration; HTTP only
+  + COM+: distributerd transactions and object pooling.
+
+- Choose an activation model
+
+- Choose a channel and a port
+
+- Choose how clients obtain the server's metadata
+
+There last three steps can be configured via a configuration file.
+
 ** Events
 
 A remote event is basically a method call from the server back to the client,
@@ -288,6 +309,8 @@ thus requiring that the client be itself a server, i.e., the client must have a
 channel that is able to receive messages. Also,
 both sides should be able to deserialize delegates, i.e.
 with a binary formatter provider of =TypeFilterLevel.Full=.
+In .NET Remoting, a callback to the client requires a separate channel, not the original one
+(typically the client's TCP channel).
 
 Event handlers may be executed on the server or on the client depending on
 whether the object is on the client or on the server. If the server knows
@@ -327,6 +350,31 @@ public class EventWrapper : MarshalByRefObject
     }
 }
 #+end_src
+
+* =IMessage=
+
+.NET Remoting uses =IMessage= objects throughout the Remoting architecture.
+A few child interfaces are defined to further describe .NET Remoting messages of various types
+
+- =IMethodMessage=: describes stack-based methods
+
+- =IMethodReturnMessage=: describes all messages returning to the client.
+
+- =IMethodCallMessage=: 
+
+- =IConstructionCallMessage=: activates a client-activated object.
+
+- =IConstructionReturnMessage=: as a response to object activation
+
+* Proxies
+
+.NETFX creates a =TransparentProxy= dynamically by reflecting on the metadata of the remote object to act as a standin.
+TransparentProxy intercepts a method call on it and creates a =MessageData= to describe the method call
+and then passes to the =RealProxy= to create the remoting message. =TransparentProxy= is created by the framework
+and the user can only customize =RealProxy=.
+
+Proxy customization does not require server-side cooperation. However, if both sides need customization, better use message
+sinks.
 
 * Bibliography
 
