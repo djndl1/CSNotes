@@ -1,3 +1,17 @@
+# Use
+
+## Use without X
+
+By default `wine` starts `explorer.exe`. 
+To disable this, set `WINEDLLOVERRIDES="explorer.exe=d"`.
+
+## Fonts
+
+One may link linux fonts to `$WINEPREFIX/drive_c/windows/Fonts`.
+and set `FREETYPE_PROPERTIES="truetype:interpreter-version=35"`
+
+There are other font rendering configuration, refer to archwiki.
+
 # Architecture
 
 `wineserver` provides services, which implement basic Windows functionality, integrates with the X windowing system, and translation of signals into native Windows exceptions. Wine allows for loading both Windows DLLs and Unix shared objects for its Windows programs. Wine has builtin implementation of the most basic Windows DLLs, namely `ntdll`, `kernel32`, `gdi32`, `user32`.
