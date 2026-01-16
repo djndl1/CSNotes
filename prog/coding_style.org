@@ -83,6 +83,38 @@ grouping; more generally, format to help readability.
   + Function arguments are evaluated before the call: do not assume the arguments
     are lazily evaluated and think some argument's value depends on another.
 
+* Idioms & Consistency
+
+Consistency leads to better programs.
+
+#+begin_quote
+But if the same computation is done the same way every time it appears,
+any variation suggests a genuine difference, one worth noting.
+#+end_quote
+
+- Consistent indentation and brace style.
+  + Consistency is more important than the style itself.
+  + pay attention to missing brances with =if=, especially when there is a following =else=.
+
+- Use /idioms/ for consistency.
+  + programming languages have idioms: conventional ways that experienced programmers write common pieces of code.
+    A central part of learning any language is developing a familiarity with its idioms.
+
+  #+begin_quote
+The do-whi1e statement is used much less often than for and while, because it
+always executes at least once, testing at the bottom of the loop instead of the top. In
+many cases, that behavior is a bug waiting to bite
+  #+end_quote
+
+- A sequence of nested if statements is often a warning of awkward code, if not
+  outright errors.
+
+  #+begin_quote
+The sequence of ifs requires us to maintain a mental pushdown stack of what tests
+were made, so that at the appropriate point we can pop them until we determine the
+corresponding action (if we can still remember).
+  #+end_quote
+
 * Function Macros (C/C++)
 
 Avoid them, use =inline= functions):
