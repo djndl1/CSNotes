@@ -55,8 +55,9 @@ same UUIDs. Some IDLs import them
 both (e.g. OPC DA). Only =stdole2.tlb= is needed actually. There seems to be an
 older version of the typelib file format (1.0).
 
-Also, the microsoft =midl= seems to be case-insensitive with certain identifiers
-while =widl= requires strictly equal cases.
+Many MIDL files assume case-insensitivity with identifiers while on Linux, MINGW WIDL 
+does not work with these files (on Windows WIDL works).
+
 
 ** Cross Compilation
 
