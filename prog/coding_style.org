@@ -1,3 +1,6 @@
+#+title: Coding Style
+#+bibliography: ./codingstyle.bib
+
 #+begin_quote
 The purpose of style is to make the code easy to read for yourself and others,
 and good style is crucial to good programming.
@@ -156,3 +159,7 @@ reader with elaborate typographical displays.
 - Do not contradict the code.
 
 - Clarify, do not confuse.
+
+* Bibliography
+
+#+print_bibliography:
