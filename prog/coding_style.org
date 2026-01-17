@@ -117,10 +117,42 @@ corresponding action (if we can still remember).
 
 * Function Macros (C/C++)
 
-Avoid them, use =inline= functions):
+Avoid them, use =inline= functions:
 
 - Arguments are evaluated multiple times in the definition, instead of being evaluated once at the call site.
   If the evaluation has side effects, the side effects occur twice, causing either outright errors or performance degradation.
 
 - Parenthesize the macro body to avoid running into evaluation order issues if a macro is required.
 
+* Magic Numbers
+
+- Give names to magic numbers.
+
+- (C/C++) Define numbers as constants, not macros 
+  + for C, one can use =enum= for integer constants.
+
+- (C/C++) Use character constants, not integers.
+
+- (C/C++) use the language to calculate the size of an object
+  + =sizeof= and =(sizeof(array) / sizeof(array[0])=
+
+* Comments
+
+#+begin_quote
+They do not help by saying things the code already plainly says, 
+or by contradicting the code, or by distracting the
+reader with elaborate typographical displays.
+#+end_quote
+
+- Do not belabor the obvious:
+  + Comments should add something that is not immediately evident from the code, 
+    or collect into one place information that is spread through the source.
+  + Comments should explain the code or complement the code.
+
+- Comment functions and global data.
+
+- Do not comment bad code, rewrite it.
+
+- Do not contradict the code.
+
+- Clarify, do not confuse.
