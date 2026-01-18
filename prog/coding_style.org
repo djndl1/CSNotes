@@ -70,12 +70,32 @@ grouping; more generally, format to help readability.
 - /Break up complex compressions/
   + Also a chance to introduce local variables to describe intermediate results.
 
-- /Be clear/
-  + The goal is to write clear code, not clever code.
+- /Be clear/: Write clearly, don't be too clever.
+  + The goal is to write clear code, not clever code. It is more important to make the purpose
+    of the code unmistakable than to display virtuosity. Don't make debugging and modification
+    more difficult.
   + Clarity is not the same as brevity. Often the clearer code will be shorter, but sometimes longer.
   + When boolean expressions are more concise and clear, they should be preferred to conditional constructs.
     No more =if (true) return true else return false=.
   + Ternary conditional operator is not a general replace to conditional statements.
+  #+begin_src fortran
+! one may be tempted to create an identity matrix like  
+        do i = 1, N
+          do j = 1, N
+              V(i, j) = (i / j) * (j / i)
+! unless i equals j, the result is zero, otherwise one
+          enddo
+        enddo
+! it looks clever but not very easy to understand, also 
+! performance-wise, it requires two divisions and one multiplication.
+! a 
+        do i = 1, N
+          do j = 1, N
+              V(i, j) = 0.0 ! zero the row
+          V(i, i) = 1.0     ! make the one at the diagonal
+          enddo
+        enddo
+  #+end_src
 
 - /Be careful with side effects/
   + Increment and decrement operators are subject to misuse due to side effects.
