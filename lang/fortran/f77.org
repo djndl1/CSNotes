@@ -1,0 +1,167 @@
+* Basics
+
+** Tools
+
+gfortran has legacy support (~-std=legacy~) for f77 and non-standard extensions.
+The default =gnu= mode is similar but with warning for obsolete extensions.
+
+Valid f77 programs are valid f95 programs.
+Most standard-conforming f77 code can be compiled with gfortran without issues 
+due to the backward compatibility of the language
+
+#+begin_quote
+Compiler capability is quite extensive and includes nearly all g77 features. 
+Legacy g77 code will compile fine in almost all cases.
+#+end_quote
+
+*** Fortran Package Manager (fpm)
+
+TODO
+
+** Program Organization
+
+A main program (driver) and possibly subprograms (procedures or subroutines).
+
+#+begin_src fortran
+    program name
+
+    declarations
+
+    statements
+
+    stop
+    end
+#+end_src
+
+** Fixed Format
+
+f77 is not a free-format language: it has a strict set of rules for how source code should be formatted.
+
+- column 1: blank, =c= or =*= for comments
+
+- column 1-5 for statement label
+
+- column 6 continuation of previous line. Long statements from the last line may continue at the column.
+
+- column 7-72: statements
+
+- column 73-80: sequence number
+
+f90 and later versions permit free format, there is no need to adhere to fixed format.
+
+For gfortran
+
+#+begin_quote
+Source files with .f, .for, .fpp, .ftn, .F, .FOR, .FPP, and .FTN extensions are treated as fixed form.
+Source files with .f90, .f95, .f03, .f08, .F90, .F95, .F03 and .F08 extensions are treated as free form.
+The capitalized versions of either form are run through preprocessing.
+Source files with the lower case .fpp extension are also run through preprocessing. 
+#+end_quote
+
+** Types & Declaratios
+
+The widths of primitive data types are configurable in modern fortran
+with =KIND= type parameter and =SELECTED_INT_KIND=, =SELETED_REAL_KIND=
+to ensure portability. Primitive types can have many "kinds" 
+(of different sizes, ranges and even semantics).
+
+The widths are not specified by the standard.
+In gfortran, by default =integer= is 4-byte, =real= 4-byte, =double precision= 8 byte, character 1-byte.
+
+#+begin_src fortran
+    type var1, var2, var3
+c define some constants
+    parameter (pi = 3.14159)
+#+end_src
+
+*** Array
+
+- by default,  1-based. Like BASIC, the range may be explicitly specified.
+
+- =real A(3, 5)= is a matrix
+
+- the memory storage format is different from that of a C matrix: 2-dimensional arrays are stored by /column/!
+  $addr[A(i,j)] = addr[A(1,1)] + (j-1)*lda + (i-1)$
+
+- up to 7 dimensions
+
+- (obsolete) =dimension array_variable(size)=, compare this to BASIC =redim=.
+
+** Control Flow
+
+- =elseif=. =endif= is used to end an =if= block.
+  + gfortran supports =else if=
+
+- there is the one and only standard loop construct =do= loop, similar to a range-for.
+  + the label has to be a number.
+  + the three expressions are only evaluated once, right before the loop body runs.
+
+  #+begin_src fortran
+          do label var = start_expr, end_expression[, step_expression]
+            statements
+   label  continue
+  #+end_src
+
+- ~/=~ for =.ne.= in modern fortran. Modern symbol-like relational operators are not supported by f77.
+  + ~==~ (=.ne.=) and ~/=~ (=.eq.=) are undefined for logical types.
+    =.eqv.= and =.neqv.= should be used for logical comparison.
+    g77 manual argues for this for reason of more explicit precedence order.
+
+- =enddo= in place of =label continue=, =while () do enddo=, =do while () enddo=, =do until ()= exist 
+  as extensions.
+  + the standard way is to use =if= with =goto=.
+  + gfortran supports =do while=, =enddo= and =end do=, but not  =do until=, =while do=.
+  + modern fortran has =exit= (breaking out of the loop) and =cycle= (continue the next iteration).
+    Tags (text labels) are used to label a loop to allow easier =exit= or =cycle= without resorting a 
+    flag variable.
+
+  #+begin_src fortran
+c a while loop
+ 10    if (condition) 
+          loop body
+
+          goto 10
+       endif
+  #+end_src
+
+** Subprograms (Functions & Subroutines)
+
+- F77 syntax: the function name serves as the return variable, similar to BASIC.
+  The function has be to declared where it is used. It has a type, its return type.
+
+  #+begin_src Fortran
+  real function r(m, t)
+  integer m
+  real t
+
+  r = 0.1 * t + (m ** 2 + 14 * m + 46)
+  if (r .LT. 0) r = 0.0
+
+  return 
+  end
+  #+end_src
+  A =subroutine= returns nothing but its parameters may be used to return multiple values.
+  
+- F77 uses call by reference (similar to BASIC). There is a reason why modern Fortran encourages
+  parameter intent (in, out, inout): to avoid unexpected assignment of outer variables.
+  #+begin_src fortran
+      subroutine iswap (a, b)
+      integer a, b
+c Local variables
+      integer tmp
+
+      tmp = a
+      a = b
+      b = tmp
+
+      return
+      end
+  #+end_src 
+
+- In modern Fortran, return value can be specified by naming the variable.
+  parameters are declared like in old-style C, below the subprogram declaration,
+  with type and =intent(in/out/inout)=.
+
+- Builtin subprograms may be type-generic even though F77 itself is not.
+
+- F77 does not support recursion: many compilers did support it.
