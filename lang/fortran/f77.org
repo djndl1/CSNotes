@@ -1,3 +1,5 @@
+#+title: Fortran 77
+
 * Basics
 
 ** Tools
@@ -74,7 +76,15 @@ c define some constants
     parameter (pi = 3.14159)
 #+end_src
 
+- Common blocks are shared global static storage in F77, accessible from various compilation units. 
+  Each time it is used by a subprogram, it has to be declared inside the subprogram using the same declaration 
+  (possibly with different variable names).
+
 *** Array
+
+All arrays' sizes are determined at compile-time and arrays may reside on the stack 
+or in static storage. In gfortran, a local variable larger than =-fmax-stack-var-size=
+will be moved out of the stack. Otherwise, gfortran treats variable storage in a similar to how C does.
 
 - by default,  1-based. Like BASIC, the range may be explicitly specified.
 
@@ -82,10 +92,61 @@ c define some constants
 
 - the memory storage format is different from that of a C matrix: 2-dimensional arrays are stored by /column/!
   $addr[A(i,j)] = addr[A(1,1)] + (j-1)*lda + (i-1)$
+  + to treat a column as a vector, use =A(1, j)= since column elements are adjacent.
+  + to scale a matrix, we simply treat it as a vector of length $m \times n$ 
+  and scale it using a vector routine as long as the matrix' declared dimension matches
+  that of the underlying real matrix.
 
 - up to 7 dimensions
 
+- variable-length arrays are declared as =real A(*)=: however, they know nothing about their length in F77.
+
 - (obsolete) =dimension array_variable(size)=, compare this to BASIC =redim=.
+
+#+begin_src fortran
+      subroutine saxpy (n, alpha, x, y)
+      integer n
+      real alpha, x(*), y(*)
+c
+c Saxpy: Compute y := alpha*x + y,
+c where x and y are vectors of length n (at least).
+c
+c Local variables
+      integer i
+c
+      do 10 i = 1, n
+         y(i) = alpha*x(i) + y(i)
+   10 continue
+c
+      return
+      end
+
+      subroutine matvec (m, n, A, lda, x, y)
+      integer m, n, lda
+      real x(*), y(*), A(lda,*)
+c
+c Compute y = A*x, where A is m by n and stored in an array
+c with leading dimension lda.
+c
+c Local variables
+      integer i, j
+      
+c Initialize y
+      do 10 i = 1, m
+         y(i) = 0.0
+   10 continue
+
+c Matrix-vector product by saxpy on columns in A.
+c Notice that the length of each column of A is m, not n!
+c We use A(1,j), a pointer to the first element of each column
+c this fortran matrix * vector is not how linear algebra typical handles multiplication
+      do 20 j = 1, n
+         call saxpy (m, x(j), A(1,j), y)
+   20 continue
+
+      return
+      end
+#+end_src
 
 ** Control Flow
 
