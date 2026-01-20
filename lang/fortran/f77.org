@@ -16,10 +16,6 @@ Compiler capability is quite extensive and includes nearly all g77 features.
 Legacy g77 code will compile fine in almost all cases.
 #+end_quote
 
-*** Fortran Package Manager (fpm)
-
-TODO
-
 ** Program Organization
 
 A main program (driver) and possibly subprograms (procedures or subroutines).
@@ -79,6 +75,27 @@ c define some constants
 - Common blocks are shared global static storage in F77, accessible from various compilation units. 
   Each time it is used by a subprogram, it has to be declared inside the subprogram using the same declaration 
   (possibly with different variable names).
+  + to initialize common block data, use =block data= statements, which runs before the main program.
+  #+begin_src fortran
+    block data  
+    integer nmax
+    parameter (nmax = 20)
+    real v(nmax), alpha, beta
+    common /vector/v, alpha, beta
+    data v/20*100, 0/, alphaa/3.14/, beta/2.71/
+    end
+  #+end_src
+  =block data= statement identifies a subprogram that initializes variables and arrays 
+  in labeled common blocks.
+
+- /Data statements/ are another way to declare/define static data.
+
+  #+begin_src fortran
+    data m/10/, n/20/, x/2.5/  
+    real A(10, 20)
+c also used to initialize arrays.
+    data A/ 200 * 0.0/
+  #+end_src
 
 *** Array
 
@@ -226,3 +243,31 @@ c Local variables
 - Builtin subprograms may be type-generic even though F77 itself is not.
 
 - F77 does not support recursion: many compilers did support it.
+
+** I/O
+
+Each file is associated with a /unit number/, between 1 and 99 (5 for stdin and 6 for stdout).
+The File I/O API design is similar to that of Unix, with =open=, =close=, =read= and =write=,
+except that these commands support formatted I/O.
+
+both =read= and =write= accepts =*= to indicate a default parameter 
+(standard I/O and implicit default format). If the user requires explicit format control,
+the second parameter is a label to a =format= statement. One may also write the format as a string
+as a parameter.
+
+Unlike C's =scanf=, each call to =read= automatically reads at least one line 
+(could be more than one if one is not enough): anything on the line that is not read is discarded.
+
+One good thing about =write= in fortran is that it supports implicit loop to quickly print an array.
+
+#+begin_src fortran
+      do 10 i = 1, 5
+         write(*,1000) (a(i,j), j=1,10)
+   10 continue
+ 1000 format (I6)
+
+c write 10 integers each line 5 times.
+       write(*,1010) (x(i), i=1,50)
+ 1010 format (10I6)
+c more complex usage should be avoided.
+#+end_src
