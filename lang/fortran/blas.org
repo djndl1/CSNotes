@@ -1,0 +1,60 @@
+* Overview
+
+The de facto standard low-level routines for linear algebra libraries.
+
+** Implementations
+
+Aside from the reference implementation Netlib BLAS (since 1979), many implementations exist even if they are not named "BLAS".
+
+- ATLAS: an open source BLAS for C and F77.
+
+- cuBLAS, NVBLAS: for nvidia GPU
+
+- rocBLAS: ROCm AMD GPU
+
+- Intel MKL: both BLAS and LAPACK
+
+- clBLAS: OpenCL implementation by AMD
+
+- Eigen BLAS: implemented on top of Eigen.
+
+- GotoBLAS: abandoned
+
+- BLIS: a superset with BLAS and CBLAS interfaces but also with two more APIs.
+
+- GNU Scientific Library (gsl): contains a CBLAS interface.
+
+- OpenBLAS: optimized fork of GotoBLAS, also includes LAPACK
+
+- uBLAS: from Boost, not really BLAS.
+
+** =lda=: Leading Dimension of Array A
+
+The declared/allocated number of rows of a 2D array, 
+used as a stride to find the starting point of the next column in memory,
+crucial for proper memory addressing.
+
+The logical dimension of an matrix may be different from that of the allocated 
+2D array and =lda= has to be used to find the next adjacent row entry.
+
+** Levels
+
+- Level 1: vector-vector
+- Level 2: matrix-vector
+- Level 3: matrix-matrix
+
+** Subprogram Versions
+
+- =S=: single precision real
+- =D=: double precision real
+- =C=: single precision complex
+- =Z=: double precision complex
+
+* LAPACK
+
+Replacing LINPACK and EISPACK.
+
+A collection of Fortran subprograms based on BLAS for advanced linear algebra problems 
+like solving systems of simulataneous linear equations, least-square solutions of linear systems
+of equations, eigenvalue problems, and singular value problems.
+
