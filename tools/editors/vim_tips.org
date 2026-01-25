@@ -154,3 +154,9 @@ let counter=0|g/matched/let counter=counter+1|s/matched/\=counter
 or
 
 - =:cq=
+
+* Paste without Normal Mode
+
+- =C-r=: insert text from a register followed by this command
+
+- =C-a=: insert last inserted text.
