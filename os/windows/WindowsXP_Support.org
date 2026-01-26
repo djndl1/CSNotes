@@ -168,3 +168,11 @@ fixed only since Roslyn 2.0, which unforunately requires .NET 4.6.
 * SQL Server
 
 SQL Server 2008R2 is last version supported.
+
+* Oracle 
+
+11.2, both client and server.
+
+* MariaDB 
+
+10.1.13
