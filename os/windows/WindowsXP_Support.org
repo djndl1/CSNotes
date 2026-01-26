@@ -56,6 +56,8 @@ the last supported version is 3.7.1, which is only better than GCC 4.
 
 Visual Studio 2010; Windows SDK 7.1 (MSVC 16.00)
 
+If A different MSVC Redistributable 2010 is installed, it should be uninstalled so that SDK 7.1 installer may run.
+
 * Python
 
 The last officially supported version of Python is 3.4.4 (EOL March 2019), and pip version 19.1.1.
