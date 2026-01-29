@@ -30,7 +30,11 @@ In the era of [[https://en.wikipedia.org/wiki/Rapid_application_development][Rap
 8. event-driven programming, modular programming and half OOP.
 
 VB keywords and identifiers are Case-Insensitive. Be careful, many common words
-used in other language are keywords in VB (e.g. =Open=, =Close= etc.)
+used in other language are keywords in VB (e.g. =Open=, =Close= etc.).
+Sometimes these words can't even appear as part of a token.
+
+Read [[https://www.aivosto.com/articles/obscure-vb.html][Obscure and Obsolete VB syntax]] before blindly learning
+any VB syntax.
 
 * Concepts
 
@@ -121,6 +125,8 @@ Type value may be surrounded by =[TypeName]=.
   + String constants such as =vbTab=, =vbCrLf=, =vbNewLine=, =vbCr=, =vbLf= are available.
   + =NULL= and =""= are equivalent for =BSTR=. See
     [[https://nolongerset.com/check-for-empty-strings-in-vba/][Check for Empty Strings in VBA]]: TLDR use =Len(str) = 0=
+  + =+= concatenation does work but it when used with an integer, it becomes arithmetic addition.
+    Better use =&=
 
 - =Date= ([[https://learn.microsoft.com/en-us/cpp/atl-mfc-shared/date-type?view=msvc-170][OLE =DATE=]], 8-bytes, a double-precision float): one-second precision. Each integer represents a day.
   + ~#12/3/2013#~, ~#2024-01-03 13:21:33#~ ~#13:21:33#~ (since the Epoch). No subsecond precision.
@@ -515,6 +521,9 @@ This does not work with external procedure declarations and types.
 - Logical operator with ===, =<>=; =And=, =Or=, =Xor=, =Not= bitwise operator
   (for boolean there's no difference)
   + be careful when using these operators with integers in conditional expressions.
+  + =Eqv=: performs a logical equivalence on two expressions, not limited to boolean types 
+    but also integers (bitwise comparison) and even =Null=, this is similar to =Not (A Xor B)=.
+
 
 - =If () Then ... ElseIf () Then ... Else ...=; multi-line branch statement
    requires a =End If=.
@@ -546,6 +555,8 @@ End Select
 
 - =GoSub=, =Return=, =On .. GoSub=: a primitive form of procedure call, where
   =GoSub= and =On ... GoSub= enter the procedure and =Return= leaves the procedure
+  This is the only to call and implement a subroutine before =Sub= and =Function= keywords
+  are introduced.
 
 *** Functions
 
@@ -581,7 +592,8 @@ For v = 1 to 10
 ' array: the bound variable must be of the Variant type and is Set/Let assigned based on te typo of the array
 '        the enumeration order starts at the lowest index of the lowest dimension
 ' non-array enumerable object: the bound variable is first Let/Set assigned to the frist element in the collection
-'                              and later Set-asigned to the next element
+'                              and later Set-asigned to the next element of the collection, that is, 
+'                              referencing that element.
 For Each item In Col
 ...  ' Exit For
 Next [item]
@@ -605,7 +617,7 @@ Loop [while/until boolean-expr]
 
 ** Procedure
 
-- Public procedures of a public module can be called through COM. =Public= is
+- Public procedures of a public procedural module cannot be called through COM. =Public= is
   the default scope attribute for procedures.
 
 - All event procedures are =Private=
@@ -657,6 +669,7 @@ ProcedureName(positional-param, Optional [ByVal/ByRef] paramName [ = constant-ex
   + if a =ByRef= parameter type is a type other than the passed-in but
     compatible, the parameter is passed =ByVal= to the local parameter variable
     but later assigned back to the outer variable after the procedure terminates.
+    (pure implementation detail?)
   + =ByVal= performs possible type conversion for values passed in
   + =ByVal= may not be used with an array type.
   + A =ByRef Variant= accepts arguments of any types and always forms a reference
@@ -671,9 +684,12 @@ ProcedureName(positional-param, Optional [ByVal/ByRef] paramName [ = constant-ex
   + Use =ByVal= whenever possible.
 
 - Passing User Defined Types is restricted
-  + a =Public= UDT defined in a =BAS= module cannot be only be passed into
+  + a =Public= UDT defined in a =BAS= module can only be passed into
     =Public= procedures defined in BAS modules. (Such UDT types are unknown to COM)
-  + Define a COM-aware UDT in a class module or a form module.
+  + To use structures across the COM/OLE boundary, define a class module in place of the UDT 
+    or define the UDT in a object/class module (the generated typelib contains the definition).
+    See [[https://stackoverflow.com/questions/975982/user-defined-type-udt-as-parameter-in-public-sub-in-class-module-vb6][UDT in Class Module]].
+
 
 - A type private to a project can be used as a parameter or the return value of
   procedure that can be called from outside the project.
@@ -737,6 +753,23 @@ check. The default policy is to pass the =Err= object and control to the parent 
   + =Exit Sub= or =Exit Function= with the calling code receiving a zero error code.
 
 - =On Error Goto 0=: disable any previous =On Error=
+
+- (Obscure) =On Error Goto -1=: clears the error that just occurred in praperation
+  for a new one to occur. Useful in a error handler to handler error.
+
+  #+begin_src vba
+  On Error GoTo mainhandler
+  Error 5
+
+mainhandler:
+  MsgBox "Error occurred"
+  On Error GoTo -1 ' Clear the error, without it, nestedhandler will not be executed.
+  On Error GoTo nestedhandler
+  Error 6
+  
+nestedhandler:
+  MsgBox "Error occurred in error handler"  
+  #+end_src
 
 If any error inside an event handler goes unhandled, the program terminates.
 Error that go unhandled in event procedures terminates the program immediately.
