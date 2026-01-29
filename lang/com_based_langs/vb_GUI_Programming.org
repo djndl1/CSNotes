@@ -3,6 +3,16 @@
 in VB6, controls can be classified into (1) /Standard Controls/, managed by the
 Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself.
 
+* IDE & Designer
+
+- Ctrl + drag to place a control multiple times
+
+- select a control, use Ctrl + Arrow to move and Shift + Arrow to resize.
+
+- Use Ctrl-Shift-Initial to quickly locate a property.
+
+- the Format menu are used to align, resize controls.
+
 * Form Properties
 
 - =Tag=: VB extender properties that is always available, no specific use,
@@ -80,3 +90,10 @@ Forms expose a special property, the =Controls= collection, which contains all t
 * The =Controls= Collection
 
 Container of all the controls currently loaded on the form itself.
+
+* Tab order and Hotkey (Alt + Initial)
+
+Set a label's tabindex one smaller than that of the control to activate.
+
+There'is an add-in that comes with VB IDE called =TabOrder.vbp= that can
+automatically set tab orders.
