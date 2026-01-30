@@ -2,11 +2,11 @@
 
 * WinForms and Resources
 
-- Dotnet SDK 3.0 introduces a new [[https://github.com/dotnet/msbuild/issues/4704][way]] to embed a resource file. If the project
+- Dotnet SDK 3.0 introduces a new [[https://github.com/dotnet/msbuild/issues/4704][way]] to embed a resource file (=System.Resources.Extensions=). If the project
   targets the old netframework, without
   =<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>=
   and referencing =System.Resources.Extensions=, it won't build with =dotnet
-  (ms)build= and The old =msbuild.exe= would use the old way to embed a file.
+  (ms)build=. The old =msbuild.exe= would work as it uses the old way (=resgen.exe= with =BinaryFormatter=) to embed a file.
 
 - There is another [[https://github.com/dotnet/runtime/issues/39078][problem]] that causes no =System.Resources.Extensions.dll= not
   found at runtime. This requires binding autoredirects.
