@@ -69,3 +69,42 @@ no extension. =dotnet-debugger-extensions= is the successor to =dotnet-sos= and 
 
 set =VSTEST_HOST_DEBUG= to =1= and dotnet will wait for a debugger to attach.
 
+** Memory Leak or High Memory Usage
+
+Monitor memory usage of 
+
+- Process/Virtual Bytes
+
+- Process/Private Bytes
+
+- .net CLR Memory/# Bytes in all Heaps
+
+- .net CLR Memory/% Time in GC
+
+- .net CLR Memory/Large Object Heap size
+
+- .net CLR Loading/Bytes in Loader Heap
+
+- .net CLR Loading/Current Assemblies
+
+*** Find Out Which Part Caused Meomory Leak
+
+#+begin_quote
+If the private bytes keep increasing but # Bytes in all Heaps do not, 
+you’re likely looking at a native memory leak (i.e. you are leaking in a COM component or similar) 
+but if # Bytes in all heaps increase at the same rate 
+as private bytes your leak is likely in managed code.
+#+end_quote
+
+**** Examples
+
+- [[https://github.com/dotnet/runtime/issues/20326][Memory leak in System.Data.Common.DbCommand]]:
+   memory leak caused by .NET not unregistering cancellation callback. 
+   + Fixed in .NET Core 2.0 in 2017, .NETFX still suffers from this in 2026.
+   + Workaround: use a temporary =CancellationTokenSource= that links the long alived one
+     to cancel but avoid accumulating callbacks.
+
+* References
+
+- [[https://www.tessferrandez.com/][Tess Ferandez's Blog]]: Principal Software Engineer at Microsoft,
+   specialized in .NET debugging.
