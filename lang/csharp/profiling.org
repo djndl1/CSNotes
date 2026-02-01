@@ -1,0 +1,6 @@
+
+
+* References
+
+- [[https://learn.microsoft.com/en-us/shows/perfview-tutorial/][Perfview Tutorial]]: PerfView .NET profiling tutorial
+  by Vance Morrison, Visual Studio Performance architect
