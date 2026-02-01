@@ -1,0 +1,12 @@
+* Memory Management
+
+** Log Memory Allocation and Access
+
+This can be done by defining a few wrapper functions that track memory usage and detect potential leaks
+under =DEBUG= mode.
+
+* Debug Something Wrong in a Loop
+
+Use a conditional no-op to break on, which only breaks every a few times.
+
+* Use an Infinite Loop to Repeat the Behavior under False Preconditions to Ease Debugging.
