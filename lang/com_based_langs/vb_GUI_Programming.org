@@ -13,6 +13,8 @@ Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself
 
 - the Format menu are used to align, resize controls.
 
+- One can evaluate an expression by typing in the immediate window, prefixed with =?=.
+
 * Form Properties
 
 - =Tag=: VB extender properties that is always available, no specific use,
@@ -22,7 +24,14 @@ Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself
   only to standard Windows controls.
 
 - =Enabled=, =Visible=: disabled controls don't react to user's actions.
-  Invisible controls are automatically disabled. All mouse events for disabled or invisible controls are passed to the underlying container or to the form itself.
+  Invisible controls are automatically disabled. 
+  All mouse events for disabled or invisible controls are passed to the underlying container or to the form itself.
+
+* Form Methods
+
+- =SetFocus=: raises a runtime error if the control is currently dissabled or invisible, e.g. in the =Form_Load= event.
+
+- =ZOrder=: standard controls are always  placed before lightweight  controls.
 
 * Form Lifecycle
 
@@ -75,17 +84,60 @@ Forms expose a special property, the =Controls= collection, which contains all t
 
 * Form Events
 
-- =Click=, =DblClick=: triggered not only by actual mouse clicks.
+- =Click=, =DblClick=: triggered not only by actual mouse clicks but also code, 
+  and possibly by some actions more than clicking: value change in an =OptionButto= or a =CheckBox=,
+  selected index change of a =ListBox= or a =ComboBox=.
+  + When a control is double-clicked, both events are raised.
+  + =CommandButton= has no =DblClick=
+  #+begin_src vba
+' A module-level variable
+Dim isClick As Boolean
 
-- =GetFocus=, =LostFocus=
+Private Sub Form_Click()
+    Dim t As Single
+    isClick = True
+    ' Wait for the second click for half a second.
+    t = Timer
+    Do
+        DoEvents
+        ' If the DblClick procedure canceled this event, 
+        ' bail out.
+        If Not isClick Then Exit Sub
+        ' The next test accounts for clicks 
+    Loop Until Timer > t + .5 Or Timer < t
+    ' Do your single-click processing here.
+    ...
+End Sub
+
+Private Sub Form_DblClick()
+    ' Cancel any pending click.
+    isClick = False
+    ' Do your double-click processing here.
+    ...
+End Sub  
+  #+end_src
+
+- =GetFocus=, =LostFocus=: not suitable for validation due to their fire order.
+  + Forms have both but only fire them when no control can receive the input focus.
+  + Use the =Validate= event for validation.
 
 - =Change=: its behavior is not consistent across VB controls. Not available for =CheckBox= and =OptionButton=, which fires a
   =Click= event when its content is changed.
 
-- =KeyPress=, =KeyDown= (the key translated into ANSI numeric code), =KeyUp=: Only keys that correspond to control keys (Ctrl+x, BackSpace, Enter, and Escape) and printable characters activate the =KeyPress= event.
+- =KeyPress=, =KeyDown= (the key translated into ANSI numeric code), =KeyUp=: Only keys 
+  that correspond to control keys (Ctrl+x, BackSpace, Enter, and Escape) 
+  and printable characters activate the =KeyPress= event.
+  + order: =KeyDown=, =KeyPress=, =KeyUp=
+  + the key code in =KeyPress= may be changed to affect how the program interprets the key.
+  + The =KeyPreview= property of a form lets the form receive all key events before any of the contained control.
 
 - =MouseDown=, =MouseUp=, =MouseMove=: mouse button state, Shift/Ctrl/Alt state
   and the cursor's location are passed.
+  + if the mouse is captured by a control, =MouseUp= is raised when and the mouse is released 
+    and may receive negative coordinates.
+  + for a single click: =MouseDown=, =DownUp=, =Click=, =MouseMove=
+  + for a double click: =MouseDown=, =MouseUp=, =Click=, =MouseMove=, =DblClick=, =MouseUp=, =MouseMove=,
+    there is no second =MouseDown=
 
 * The =Controls= Collection
 
