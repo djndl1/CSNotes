@@ -165,6 +165,12 @@ positional argument the source file (under mono, =csc.exe= is the second
 argument),
 fixed only since Roslyn 2.0, which unforunately requires .NET 4.6.
 
+No good source line debuggers exist for modern PDB files. Nor is it possible 
+to remote debug on Windows XP. =mdbg= works at CIL level.
+
+Strangely, programs built by =dotnet build= on a samba host requires full =rwx= to run 
+over SMB by XP.
+
 * SQL Server
 
 SQL Server 2008R2 is last version supported.
