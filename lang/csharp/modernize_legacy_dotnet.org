@@ -55,6 +55,8 @@ Still supported
 
 Version 3.x
 
+To run NUnit tests, download the NUnit Console Runner (3.4 works on Windows XP, 3.22 doesn't).
+
 *** IoC
 
 Ninject, Dryloc.dll 4.x, Castle.Windsor 3.x
@@ -70,3 +72,47 @@ NetMQ 4.0.0.207 (NETFX 4.0), 4.0.0.1 (NETFX 3.5)
 *** KGySoft
 
 Available
+
+*** Redis Client
+
+There is this relatively mature [[https://www.nuget.org/packages/NServiceKit.Redis][NServiceKit.Redis]]
+and this newer [[https://www.nuget.org/packages/SharpRedis#readme-body-tab][SharpRedis]]
+and the common [[https://www.nuget.org/packages/StackExchange.Redis/1.2.1#dependencies-body-tab][StackExchange.Redis]]
+
+*** Database Access
+
+**** CYQ
+
+An ORM with .NET 3.5 support (at least for some drivers).
+
+**** NHibernate
+
+#+begin_src xml
+<!-- for net40 -->
+<PackageReference Include="NHibernate" Version="4.1.2.4000" />
+<!-- for net35 -->
+<PackageReference Include="NHibernate" Version="3.4.1.4000" />
+#+end_src
+
+**** Dapper
+
+1.50.2 for net40, 1.42.0 for net35
+
+**** MySql.Data
+
+6.9.12 for net40;
+
+6.7.9 for net35
+
+**** Npgsql
+
+2.2.7 for net35 and net40
+
+**** dotConnect.Express.for.*
+
+The basic, free versions of dotConnect ADO.NET drivers.
+
+*** RabbitMQ.NET
+
+3.4.x for .NET 3.5. No longer available on Nuget.
+The package is available on [[https://github.com/rabbitmq/rabbitmq-dotnet-client/releases/download/rabbitmq_v3_4_3/rabbitmq-dotnet-client-3.4.3-dotnet-3.5.zip][Github release]] though.
