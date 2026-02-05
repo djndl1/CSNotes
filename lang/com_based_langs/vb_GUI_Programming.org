@@ -39,8 +39,8 @@ Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself
    controls are created
 
 2. =Load=: triggered when properties and controls are referenced. The windows
-   and its child controls are created. Graphical operations will not work.
-   A form is visible after its =Show= method is called.
+   and its child controls have been created. Graphical operations will not work.
+   A form is only visible after its =Show= method is called.
 
 3. =Resize=: visible or sized changed
 
@@ -48,7 +48,11 @@ Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself
 
 5. =Deactivate=: end user switches to another form
 
-6. =Paint=: the form refreshes itself (fired only if =AutoRedraw= is =False=)
+6. =Paint=: the form refreshes itself (fired only if =AutoRedraw= is =False=).
+   The user is expected to redraw the form's contents using graphic methods.
+   + executed whenever the form needs to be refreshed: on resizing, recovering from being covered.
+     It does not fire upon shrinking.
+   + the first =Paint= occurs immediately after the =Activate= event.
 
 7. =QueryUnload=: =OnClosing=
 
@@ -64,7 +68,8 @@ Private Sub Form_QueryUnload(Cancel As Integer, _
 End Sub
 #+end_src
 
-8. =Unload=: a last chance to prevent the closure of the form
+8. =Unload=: a last chance to prevent the close of the form
+  + the form will be destroyed after this event.
 
 #+begin_src vba
 ' This is a module-level variable.
@@ -78,11 +83,10 @@ Private Sub Form_Unload(Cancel As Integer)
 End Sub
 #+end_src
 
-9. =Terminate=: deallocate the memory for the Form
+9. =Terminate=: cleanup code.
+  + By the time this event is raised, the form has already been destroyed.
 
-Forms expose a special property, the =Controls= collection, which contains all the controls that are currently loaded on the form itself.
-
-* Form Events
+* Control Events
 
 - =Click=, =DblClick=: triggered not only by actual mouse clicks but also code, 
   and possibly by some actions more than clicking: value change in an =OptionButto= or a =CheckBox=,
@@ -139,9 +143,24 @@ End Sub
   + for a double click: =MouseDown=, =MouseUp=, =Click=, =MouseMove=, =DblClick=, =MouseUp=, =MouseMove=,
     there is no second =MouseDown=
 
+* The =AutoRedraw= Property
+
+By default =False= for performance.
+
+Whether a form is backed up by a persistent bitmap (as large as the largest size for the form, screen size for resizable forms) 
+so that when it's covered by another form and then uncovered, it can be quickly restored from the bitmap.
+
 * The =Controls= Collection
 
 Container of all the controls currently loaded on the form itself.
+
+#+begin_src vba
+Dim ctrl As Control
+On Error Resume Next
+For Each ctrl In Controls
+    ctrl.Text = ""
+Next
+#+end_src
 
 * Tab order and Hotkey (Alt + Initial)
 
