@@ -36,6 +36,17 @@ Sometimes these words can't even appear as part of a token.
 Read [[https://www.aivosto.com/articles/obscure-vb.html][Obscure and Obsolete VB syntax]] before blindly learning
 any VB syntax.
 
+* Help & Documentation
+
+- Install the MSDN Library Visual Studio 6.0, which holds most of the authoritative documentation. 
+  One can simply click =Help= menu option and the help page for that entry (method, property, etc) pops up.
+
+- The Archived Online [[https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa232759(v=vs.60)][site]].
+  + Not the best experience but contains a few articles not in the original MSDN library.
+
+- [[https://learn.microsoft.com/en-us/office/vba/api/overview/language-reference][VBA Language Reference]]
+  + Not the same with VB6 but basically the same language.
+
 * Concepts
 
 - *Data Value* :: a single element from a specific finite domain of such
