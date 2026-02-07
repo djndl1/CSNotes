@@ -168,3 +168,175 @@ Set a label's tabindex one smaller than that of the control to activate.
 
 There'is an add-in that comes with VB IDE called =TabOrder.vbp= that can
 automatically set tab orders.
+
+* Intrinsic Controls
+
+** TextBox
+
+*** Usage 
+
+- Multiline: =MultiLine= property
+
+- left/right/center Alignment is supported
+
+- =Locked= property for read-only access
+
+- =PasswordChar= property to hide the text
+
+*** Text Selection and Manipulation
+
+- =SelText= property for selected text; =SelStart= property for 
+  the start position of the selected and =SelLength= 
+  for the length of the selected text.
+  + to append text to a =TextBox=, set =SelStart= to =Len(txtBox.Text)= 
+  and set =SelText=
+  + to select the entire contents of =TextBox=
+  ~SelStart = 0: SelLength = Len(txtBox.Text)~.
+
+*** Monitor and Trapping Key Input
+
+- Use a =KeyPress= to limit what keys the user may input.
+  + do not forbid control keys lower than 32, the user needs them 
+    for proper editing.
+
+  There is no buitin =NumericUpDown= in VB6, one could 
+  use =KeyDown= along with Arrow keys to implement one.
+
+  #+begin_src vba
+ Private Sub Text1_KeyDown(KeyCode As Integer, Shift As Integer)
+    Select Case KeyCode
+        Case vbKeyUp
+            Text1.Text = CDbl(Text1.Text) + 1
+        Case vbKeyDown
+            Text1.Text = CDbl(Text1.Text) - 1
+    End Select
+End Sub 
+  #+end_src
+
+** Data Validation
+
+Key trapping isn't enough for data validation in a text box:
+the user may copy-paste to prevent the user from checking key input.
+
+*** Handcrafted Awkward Solution
+
+Use =Change= event: restore its previous valid value
+if the control's value doesn't pass the test.
+
+#+begin_src vba
+' Form-level variables
+Dim saveText As String
+Dim saveSelStart As Long
+
+Private Sub Text1_GotFocus()
+    ' Save values when the control gets the focus.
+    saveText = Text1.Text
+    saveSelStart = Text1.SelStart
+End Sub
+
+' user using arrow keys to move the caret
+Private Sub Text1_KeyUp(KeyCode As Integer, Shift As Integer)
+    saveSelStart = Text1.SelStart
+End Sub
+
+' the user is using mouse to move the caret
+Private Sub Text1_MouseDown(Button As Integer, _
+    Shift As Integer, X As Single, Y As Single)
+    saveSelStart = Text1.SelStart
+End Sub
+Private Sub Text1_MouseMove(Button As Integer, _
+    Shift As Integer, X As Single, Y As Single)
+    saveSelStart = Text1.SelStart
+End Sub
+
+Private Sub Text1_Change()
+    ' Avoid nested calls.
+    Static nestedCall As Boolean
+    If nestedCall Then Exit Sub
+
+    ' Test the control's value here.
+    If IsNumeric(Text1.Text) Then
+        ' If value is OK, save values.
+        saveText = Text1.Text
+        saveSelStart = Text1.SelStart
+    Else
+        ' Prepare to handle a nested call. 
+        nestedCall = True
+        Text1.Text = saveText
+        nestedCall = False
+        Text1.SelStart = saveSelStart
+    End If
+End Sub
+#+end_src
+
+Each time an incorrect input is entered, the prompt is 
+pushed back: this is not ideal for input that requires
+a few edits before being correct.
+
+*** =Validate= & =CauseValidation= Comes to Save
+
+Extender features.
+
+=CauseValidation= (causing validation of other controls) property sets whether 
+the control causes validation of the previous control
+that will lose focus. A =False= =Cancel= gives focus back to the previous contorl gives focus back to the previous control.
+
+One could call =ValidateControls= to force validation on last controls before exiting the form.
+e.g. Validating upon closing.
+#+begin_src vba
+Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
+    ' You can't close this form without validating the current field.
+    If UnloadMode = vbFormControlMenu Then
+        On Error Resume Next
+        ValidateControls
+        If Err = 380 Then
+            ' The current field failed validation.
+            Cancel = True
+        End If
+    End If
+End Sub
+#+end_src
+
+A more generic code to validate each control on the form:
+
+#+begin_src vba
+' Handles the QueryUnload event to prevent form closure when validation fails.
+' This event triggers when the user attempts to close the form via the control menu (X button).
+' It iterates through all controls, attempting to set focus and validate each one.
+' If any control validation fails (error 380), the form close is cancelled.
+Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
+    ' You can't close this form without validating all the fields on it.
+    If UnloadMode <> vbFormControlMenu Then
+      Exit Sub
+    End If
+
+    On Error Resume Next
+    Dim ctrl As Control
+    ' Give the focus to each control on the form, and then
+    ' validate it.
+    For Each ctrl In Controls
+        Err.Clear
+        ctrl.SetFocus
+        If Err = 0 Then
+            ' Don't validate controls that can't receive input focus.
+            ValidateControls
+            If Err = 380 Then
+                ' Validation failed, refuse to close.
+                Cancel = True: Exit Sub
+            End If
+        End If
+    Next
+End Sub
+#+end_src
+
+** Help the User Tab
+
+Go to the next control as soon as the text reaches the required length.
+
+#+begin_src vba
+Private Sub Text1_Change()
+    If Len(Text1.Text) = Text1.MaxLength Then SendKeys "{Tab}"
+End Sub  
+#+end_src
+
+** Text Formatting
