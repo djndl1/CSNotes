@@ -339,4 +339,109 @@ Private Sub Text1_Change()
 End Sub  
 #+end_src
 
-** Text Formatting
+** =Label=
+
+To provide a descriptive caption and possibly an associated hotkey for other controls
+such as =TextBox=, =ListBox=, and =ComboBox=.
+
+Aside from =Caption=, =BorderStyle= and =Aligment= may be useful for presentation.
+=WordWrap= for multiline support or =AutoSize= to accomodate longer capture strings.
+
+To avoid activate hotkeys with =&=, set =UseMnemonics= to =False= to bind external data safely
+to a label.
+
+** =Frame=
+
+Can serve as captions for controls that don't but mainly as containers.
+
+The user must cut and paste a control into a frame to make it a child of the frame,
+simply placing the control on the frame won't do.
+
+** Buttons
+
+Make state changes.
+
+*** =CommandButton=
+
+Transient state change
+
+To make a button the default (responds to Enter key) of a form, set its =Default= property to =True=.
+
+To programmatically click a button, set the =Value= property to =True=
+
+A button can be shown as pictures (clicked or not or even disabled) in the graphical mode instead of boring text.
+
+*** =CheckBox=
+
+Persistent dual states.
+
+State change triggers the =Click= event.
+
+*** =OptionButton= (Radio Button)
+
+A set of persistent mutuallly exclusive options.
+
+All the OptionButton controls on a form's surface belong to the same group of mutually exclusive selections.
+The only way to tell Visual Basic which controls belong 
+to which group is by gathering them inside a container control such as =Frame=.
+
+** =ListBox= & =ComboBox=
+
+Listing and Selection
+
+*** =ListBox=
+
+=Columns= makes a list box show items in a horizontal layout.
+
+=IntegralHeight= controls whether the list box will automatically resize to avoid showing partial items.
+Set this to =False= to freely resize the list box.
+
+Unlike WinForms in C#, where one can bind complex data collections to a control, VB6 =ListBox=
+has to rely on =ItemData= to manually store actual data items, indexed by the same index of =ListBox.List=.
+
+#+begin_src vba
+Type ProductUDT
+    Name As String
+    Description As String
+    Price As Currency
+End Type
+Dim Products() As ProductUDT, i As Long
+
+Private Sub Form_Load()
+    ' Load product list from database into Products.
+    ' ... (code omitted)
+    ' Load product names into a sorted ListBox.
+    For i = LBound(Products) To UBound(Products)
+        lstProducts.AddItem Products(i).Name
+        ' Remember where this product comes from.
+        lstProducts.ItemData(lstProducts.NewIndex) = i
+    Next
+End Sub
+
+Private Sub lstProducts_Click()
+    ' Show the description and price of the item
+    ' currently selected, using two companion labels.
+    i = lstProducts.ItemData(lstProducts.ListIndex)
+    lblDescription.Caption = Products(i).Description
+    lblPrice.Caption = Products(i).Price
+End Sub
+#+end_src
+
+- =MultiSelect= property enables the user to select multiple items at the same time.
+  + =SelCount=, =Selected= (not selected items, but item selection status)
+  + a =ListBox= of =1-CheckBox= =Style= is always =MultiSelect=
+  + to select/deselect all items in a list box, make it invisible and set =.Selected= and then restore
+
+*** =ComboBox=
+
+A mixture between a =ListBox= and a =TextBox=, the three styles are already there as in WinForms.
+
+Basically the same as =ListBox= except for no =MultiSelect=. 
+
+** Decorative Controls
+
+Provided so that users do not need to draw shapes themselves.
+
+- =Line=
+
+- =Shape=
