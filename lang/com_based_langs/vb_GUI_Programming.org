@@ -29,7 +29,7 @@ Windows OS, and the (2) /Lightweight Controls/, handled by the VB runtime itself
 
 * Form Methods
 
-- =SetFocus=: raises a runtime error if the control is currently dissabled or invisible, e.g. in the =Form_Load= event.
+- =SetFocus=: raises a runtime error if the control is currently disabled or invisible, e.g. in the =Form_Load= event.
 
 - =ZOrder=: standard controls are always  placed before lightweight  controls.
 
@@ -89,7 +89,7 @@ End Sub
 * Control Events
 
 - =Click=, =DblClick=: triggered not only by actual mouse clicks but also code, 
-  and possibly by some actions more than clicking: value change in an =OptionButto= or a =CheckBox=,
+  and possibly by some actions more than clicking: value change in an =OptionButton= or a =CheckBox=,
   selected index change of a =ListBox= or a =ComboBox=.
   + When a control is double-clicked, both events are raised.
   + =CommandButton= has no =DblClick=
@@ -121,28 +121,26 @@ Private Sub Form_DblClick()
 End Sub  
   #+end_src
 
-- =GetFocus=, =LostFocus=: not suitable for validation due to their fire order.
+- =GotFocus=, =LostFocus=: not suitable for validation due to their fire order.
   + Forms have both but only fire them when no control can receive the input focus.
   + Use the =Validate= event for validation.
 
-- =Change=: its behavior is not consistent across VB controls. Not available for =CheckBox= and =OptionButton=, which fires a
-  =Click= event when its content is changed.
+- =Change=: its behavior is not consistent across VB controls. Not available for =CheckBox= and =OptionButton=, which fire a
+  =Click= event when their content is changed.
 
 - =KeyPress=, =KeyDown= (the key translated into ANSI numeric code), =KeyUp=: Only keys 
   that correspond to control keys (Ctrl+x, BackSpace, Enter, and Escape) 
   and printable characters activate the =KeyPress= event.
   + order: =KeyDown=, =KeyPress=, =KeyUp=
   + the key code in =KeyPress= may be changed to affect how the program interprets the key.
-  + The =KeyPreview= property of a form lets the form receive all key events before any of the contained control.
-
+  + The =KeyPreview= property of a form lets the form receive all key events before any of the contained controls.
 - =MouseDown=, =MouseUp=, =MouseMove=: mouse button state, Shift/Ctrl/Alt state
   and the cursor's location are passed.
-  + if the mouse is captured by a control, =MouseUp= is raised when and the mouse is released 
+  + if the mouse is captured by a control, =MouseUp= is raised when the mouse is released 
     and may receive negative coordinates.
-  + for a single click: =MouseDown=, =DownUp=, =Click=, =MouseMove=
+  + for a single click: =MouseDown=, =MouseUp=, =Click=, =MouseMove=
   + for a double click: =MouseDown=, =MouseUp=, =Click=, =MouseMove=, =DblClick=, =MouseUp=, =MouseMove=,
     there is no second =MouseDown=
-
 * The =AutoRedraw= Property
 
 By default =False= for performance.
@@ -166,7 +164,7 @@ Next
 
 Set a label's tabindex one smaller than that of the control to activate.
 
-There'is an add-in that comes with VB IDE called =TabOrder.vbp= that can
+There's an add-in that comes with VB IDE called =TabOrder.vbp= that can
 automatically set tab orders.
 
 * Intrinsic Controls
@@ -199,11 +197,11 @@ automatically set tab orders.
   + do not forbid control keys lower than 32, the user needs them 
     for proper editing.
 
-  There is no buitin =NumericUpDown= in VB6, one could 
+  There is no builtin =NumericUpDown= in VB6, one could 
   use =KeyDown= along with Arrow keys to implement one.
 
   #+begin_src vba
- Private Sub Text1_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub Text1_KeyDown(KeyCode As Integer, Shift As Integer)
     Select Case KeyCode
         Case vbKeyUp
             Text1.Text = CDbl(Text1.Text) + 1
@@ -213,12 +211,12 @@ automatically set tab orders.
 End Sub 
   #+end_src
 
-** Data Validation
+*** Data Validation
 
 Key trapping isn't enough for data validation in a text box:
 the user may copy-paste to prevent the user from checking key input.
 
-*** Handcrafted Awkward Solution
+**** Handcrafted Awkward Solution
 
 Use =Change= event: restore its previous valid value
 if the control's value doesn't pass the test.
@@ -273,13 +271,13 @@ Each time an incorrect input is entered, the prompt is
 pushed back: this is not ideal for input that requires
 a few edits before being correct.
 
-*** =Validate= & =CauseValidation= Comes to Save
+**** =Validate= & =CauseValidation= Comes to Save
 
 Extender features.
 
 =CauseValidation= (causing validation of other controls) property sets whether 
 the control causes validation of the previous control
-that will lose focus. A =False= =Cancel= gives focus back to the previous contorl gives focus back to the previous control.
+that will lose focus. A =False= =Cancel= gives focus back to the previous control.
 
 One could call =ValidateControls= to force validation on last controls before exiting the form.
 e.g. Validating upon closing.
@@ -329,7 +327,7 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
 End Sub
 #+end_src
 
-** Help the User Tab
+*** Help the User Tab
 
 Go to the next control as soon as the text reaches the required length.
 
@@ -344,8 +342,8 @@ End Sub
 To provide a descriptive caption and possibly an associated hotkey for other controls
 such as =TextBox=, =ListBox=, and =ComboBox=.
 
-Aside from =Caption=, =BorderStyle= and =Aligment= may be useful for presentation.
-=WordWrap= for multiline support or =AutoSize= to accomodate longer capture strings.
+Aside from =Caption=, =BorderStyle= and =Alignment= may be useful for presentation.
+=WordWrap= for multiline support or =AutoSize= to accomodate longer caption strings.
 
 To avoid activate hotkeys with =&=, set =UseMnemonics= to =False= to bind external data safely
 to a label.
@@ -397,7 +395,7 @@ Listing and Selection
 Set this to =False= to freely resize the list box.
 
 Unlike WinForms in C#, where one can bind complex data collections to a control, VB6 =ListBox=
-has to rely on =ItemData= to manually store actual data items, indexed by the same index of =ListBox.List=.
+has to rely on =ItemData= (indexed by the same index of =ListBox.List=) to manually store actual data item keys.
 
 #+begin_src vba
 Type ProductUDT
@@ -445,3 +443,79 @@ Provided so that users do not need to draw shapes themselves.
 - =Line=
 
 - =Shape=
+
+** =PictureBox= and =Image=
+
+Pictures are loaded by the =LoadPicture= function and assigned to =pBox.Picture=
+
+The core method is =PaintPicture=, which accepts a source picture, or part of it,
+transforms it (resizes, crops, flips: minus location) and draws it on itself, 
+all by manipulating the arguments. The method requires specifying 
+a portion of the source picture , the size and the location of the destination canvas.
+
+** =HScrollBar=, =VScrollBar=
+
+Scroll bars are not only used for scrolling pages: they can be used for other user input:
+The =Value= property is the input.
+
+It's legal for =Min= to be greater than =Max=: swapping them reverses the behavior of vertical
+scrollbars so that the zero is near the bottom of the form.
+
+=Scroll= fires when the indicator is dragged 
+and =Change= fires when the indicator is dragged or the scroll bar arrows is clicked.
+
+Unlike in Winforms, in VB6 scrollable forms have to be made with two scrollbars and a =PictureBox=
+that contains all the other controls. Scrolling is simply moving the picture box:
+scrolling down moves the picture box up (negative) and up moves the picture box down (positive).
+
+#+begin_src vb
+' size of scrollbars in twips
+Const SB_WIDTH = 300    ' width of vertical scrollbars
+Const SB_HEIGHT = 300   ' height of horizontal scrollbars
+
+Sub MoveCanvas()
+    picCanvas.Move -HScroll1.Value, -VScroll1.Value
+End Sub
+
+Private Sub Form_Resize()
+    ' Resize the scroll bars along the form.
+    HScroll1.Move 0, ScaleHeight - SB_HEIGHT, ScaleWidth - SB_WIDTH
+    VScroll1.Move ScaleWidth - SB_WIDTH, 0, SB_WIDTH, _
+        ScaleHeight - SB_HEIGHT
+    cmdFiller.Move ScaleWidth - SB_WIDTH, ScaleHeight - SB_HEIGHT, _
+        SB_WIDTH, SB_HEIGHT
+
+    ' Put these controls on top.
+    HScroll1.ZOrder 
+    VScroll1.ZOrder
+    cmdFiller.ZOrder
+    picCanvas.BorderStyle = 0
+
+    ' A click on the arrow moves one pixel.
+    HScroll1.SmallChange = ScaleX(1, vbPixels, vbTwips)
+    VScroll1.SmallChange = ScaleY(1, vbPixels, vbTwips)
+    ' A click on the scroll bar moves 16 pixels.
+    HScroll1.LargeChange = HScroll1.SmallChange * 16
+    VScroll1.LargeChange = VScroll1.SmallChange * 16
+
+    ' If the form is larger than the picCanvas picture box,
+    ' we don't need to show the corresponding scroll bar.
+    If ScaleWidth < picCanvas.Width + SB_WIDTH Then
+        HScroll1.Visible = True
+        HScroll1.Max = picCanvas.Width + SB_WIDTH - ScaleWidth
+    Else
+        HScroll1.Value = 0
+        HScroll1.Visible = False
+    End If
+    If ScaleHeight < picCanvas.Height + SB_HEIGHT Then
+        VScroll1.Visible = True
+        VScroll1.Max = picCanvas.Height + SB_HEIGHT - ScaleHeight
+    Else
+        VScroll1.Value = 0
+        VScroll1.Visible = False
+    End If
+    ' Make the filler control visible only if necessary.
+    cmdFiller.Visible = (HScroll1.Visible Or VScroll1.Visible)
+    MoveCanvas
+End Sub
+#+end_src
