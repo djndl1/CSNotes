@@ -203,8 +203,8 @@ basically a structure or record type.
 + Structures can contain substructures.
 
 + UDTs in VB are limited in that if they are used with classes, they must be
-  declared in a public object module, that is, a DLL or ActiveX EXE class module so that they
-  may be marshaled by COM.
+  declared in a public object module, that is, a DLL or ActiveX EXE (standard EXE is not a COM server) 
+  class module so that they may be marshaled by COM.
 
 #+begin_src vba
 Private Type EmployeeUDT
