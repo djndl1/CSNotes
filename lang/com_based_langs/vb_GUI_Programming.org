@@ -519,3 +519,29 @@ Private Sub Form_Resize()
     MoveCanvas
 End Sub
 #+end_src
+
+** Menu
+
+Both a menu on the toolbar and a context menu (popup menu).
+
+A form shows its popup menu by calling =PopupMenu menuVar=.
+These popup menus have to live somewhere, even if Invisible:
+create an invisible top-level menu and add all the popup menus as submenus.
+
+** Control Arrays
+
+Unlike C# where one can subscribe to events programmatically, in VB6 event
+subscribing is compile-time and for more than one controls to be associated with
+the same event hander, one has to use *control arrays*: a few control of the same type
+of which the =Index= property is set to non-negative value and share the same =Name=.
+
+Control arrays are not VBA arrays; they are control collections counted as a single control 
+by a form.
+
+Controls in a control array share the same set of event handlers. Their event handlers 
+accept an extra =Index= argument.
+
+A slot in a control array may be empty: one can load that slot with =Load= at runtime without
+using =New=.
+
+To iterate over a control array, use =For Each=, which avoids =Nothing= controls.
