@@ -237,14 +237,15 @@ hence =Dim= and =ReDim=, declared and accessed through =ElementType()= and =Arra
     - =ReDim Preserve= tries to preserve the original values.
       Only the last dimension can resized with =Preserve=
 
-+ Array can be assigned to a =Variant= with =var = arr()= by physically copying.
++ Array can be assigned to a =Variant= with ~var = arr()~ by physically copying.
     - an array and an =Variant= can be assigned to each other.
     - an array in =Variant= has its =VarType(v) = vbArray + vbElementType=.
     - an array passed into a procedure as an =Variant= by ref while assignment
       makes an array copy itself.
 
-+ Array assignment only works if the target is a dynamic array and requires
-  special syntax: =b() = a()=.
++ Array assignment only works if the target is a dynamic array and both syntax (w/o =()=)
+  forms are copy assignment.
+  + one cannot alias an array by assignment.
 
 + Byte Array: a string can be assigned to a byte array with all its Unicode
     characters converted to its proper binary representation. The opposite is
