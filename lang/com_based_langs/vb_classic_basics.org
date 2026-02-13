@@ -221,6 +221,8 @@ emp1 = emp2 ' copy one UDT to another
 Creating an array is called *dimensioning* (defining the size of) the array,
 hence =Dim= and =ReDim=, declared and accessed through =ElementType()= and =ArrayObject(N)=.
 
++ The number in =Dim arr(num) As TypeName= is the upper bound, the actual length is =num - 1=.
+
 + Up to 60 dimensions. Initially no dimension as a declared variable.
 
 + can be static or dynamic. Dynamic arrays can be first declared =Dim arr() As
