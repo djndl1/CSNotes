@@ -97,6 +97,8 @@ grouping; more generally, format to help readability.
         enddo
   #+end_src
 
+- turn relational tests around if it makes the program easier to understand
+
 - /Be careful with side effects/
   + Increment and decrement operators are subject to misuse due to side effects.
   C's undefined evaluation order makes the problem worse.
