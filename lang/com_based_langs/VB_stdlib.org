@@ -14,6 +14,8 @@ The project name is =VBA=, present in every VBA environment.
 - =LSet=, =RSet=: weird statements that assign the RHS strings (possibly
   appended/prepended with spaces or truncated) to the LHS variable. That is, the
   result is the content of the RHS with its length aligned with the LHS.
+  Designed to left-align and right-align text in a string variable, apparently
+  for fixed-length strings, common during DOS era.
 
 
 - =LBound=, =UBound=
