@@ -1,0 +1,10 @@
+#+title: Linux User Management
+
+* Authentication and [[https://github.com/linux-pam/linux-pam][PAM]]
+
+Modern day Linux (since 1996.4) utilizes PAM as a framework for user authnetication
+instead of a single =login= program, supporting
+- local passwords
+- LDAP
+- fingerprint readers etc.
+integrating low-level  authentication schemes into a high-level API.

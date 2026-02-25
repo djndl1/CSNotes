@@ -15,11 +15,28 @@ resources of a computer and allocated them among its users.
 * Terminal
 
 Every character typed into the terminal is sent to the computer and echoed back
-on the terminal unless some secret passwords are typed.
+on the terminal unless some secret passwords are typed. 
+
+Classic Unix's =RETURN= is =CTRL-M=, that is ASCII carriage return (the reason why
+in Crush AI Ctrl-J is newline while Ctrl-M finishes the input.)
 
 #+begin_quote
 Tab stops on UNIX systems are eight spaces apart.
 #+end_quote
+
+* Logging
+
+The classic unix/linux's =init= starts several =getty= (nowadays =agetty= in =util-linux=), 
+which watch the screen and keyboard, waiting for users to type in user names and passwords.
+Upon receiving input, it starts a =login= program to handle the authentication. After successful
+login, the login program starts the user's shell according to the user configuration.
+
+Modern linux users PAM (Pluggable Authentication Modules) for user authentication.
+Refer to [[file:linux_user_management.org]] for more details.
+
+* Some Programs
+
+- =who= and =whoami=: users online and the current user.
 
 - =mail= reads and sends emails.
 
