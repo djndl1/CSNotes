@@ -8,3 +8,22 @@ instead of a single =login= program, supporting
 - LDAP
 - fingerprint readers etc.
 integrating low-level  authentication schemes into a high-level API.
+
+** Some Concepts
+
+- *Message digest*: MD5, SHA256 SHA512, the common checksum we see
+  + CRC32 or parity bit are checksum but not message digests.
+
+- *Message Authentication Code* (MAC): shared key between the two parties
+
+- *Digital signature*: asymmetric keys
+
+** /etc/shadow
+
+=/etc/shadow= stores the hashed password and the salt for each user.
+A hash function hashes the combination of the salt and the input password
+and compare the result with the stored hashed password. 
+
+Without the salt, the password would be too simple and the hash result 
+would be vulnerable to precomputed attacks like rainbow tables. Salt
+adds randomness. Salt is generated each time the password is updated.
