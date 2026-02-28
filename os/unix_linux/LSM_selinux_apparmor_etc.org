@@ -4,9 +4,25 @@ instead of owners' /discretion/ (DAC).
 
 SELinux conflicts with AppArmor if run simultaneously.
 
-* Basics
+SELinux applies albels to files, AppArmor works with profiles (policy associated with file paths).
+AppArmor is filesystem-agnostic while SELinux requires a filesystem with support for security labels.
+AppArmor being path-based means that access control to a file is matched against a path name, while SELinux
+stores that rule in the filesystem along with a file (Labels MAC).
 
-** Terms & Concepts
+* [[https://docs.kernel.org/security/lsm.html][The Linux Security Modules]]
+
+#+begin_quote
+LSM was designed in order to answer all the requirements for successfully implementing a mandatory access control module,
+while imposing the fewest possible changes to the Linux kernel.
+LSM inserts "hooks" (upcalls to the module) at every point in the kernel where a user-level system-call is about to result
+with an access to an important internal kernel-object like inodes and process control blocks.
+#+end_quote
+
+* SELinux
+
+** Basics
+
+*** Terms & Concepts
 
 A /subject/ requests access (controlled by *access vector rules*) to an object (from /object manager/);
 /object manager/ (the Linux Security Modules) queries permissions from /security center/ (/access vector cache/ is tried first);
@@ -43,7 +59,7 @@ security center (in the kernel) makes decisions based on the security policy
 	  a subject must have a clearance level that dominates the object's sensitivity level.
 	+ *categories* =cN=: similar to senstivities but without hierarchies.
 
-* Security Policies
+** Security Policies
 
 There is a reference policy defined by the SELinux project, which is then customized by distributions.
 
@@ -51,11 +67,9 @@ Security policies are defined in special syntax (M4) in files and requires compi
 To add a rule, write a =te= file and compile it (=make module_name.pp=
 with the =Makefile= from =/usr/share/selinux/devel/Makefile=) and then install it (=semoduel -i=).
 
-* The Linux Security Modules
+*** Troubleshooting
 
-* Troubleshooting
-
-** SELinux Logs
+*** SELinux Logs
 
 =/var/log/audit= or =/var/log/audit/audit=.log
 
@@ -64,3 +78,32 @@ or =sealert= or =ausearch=
 #+begin_src shel
 ausearch -m AVC # search for AVC (denials)
 #+end_src
+
+* [[https://gitlab.com/apparmor/apparmor/-/wikis/][AppArmor]]
+
+Restricts programs' capabilities with per-program profiles. 
+Profiles can allow capabilities like network access, raw socket
+access, and the permission to read, write, or execute files on matching paths.
+
+AppArmor confines individual programs to a set of files, capabilities, network access and rlimits, collectively known as
+the AppArmor policy for the program, or simply as a profile. AppArmor is designed to only restrict applications 
+for which there are profiles defined so if AppArmor is not enabled or no profiles are loaded 
+it is unlikely AppArmor is causing the problem.
+
+AppArmor is selective in its confinement such that some programs on the
+system may be confined, while others not. Unconfined programs are run under standard Linux Discretionary Access
+Control (DAC) security. DAC is always checked in addition to the AppArmor permission checks. As such,
+AppArmor cannot override DAC to provide more access than what would
+be normally allowed.
+
+AppArmor supports per-profile learning mode.
+
+** Status
+
+=aa-status=
+
+Also, check out these logs for =APPARMOR=
+
+- =/var/log/kern.log=
+- =/var/log/messages=
+- =/var/log/audit/audit.log=
