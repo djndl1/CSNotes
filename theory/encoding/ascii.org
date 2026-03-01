@@ -45,6 +45,10 @@ It is now up to the computer whether to interpret the key press as control chara
 - =EOT=, =0x04=, =^D= :: end of transmission, may place terminals on standby.
   + releasing circuits, disconnecting terminals, signal end of file (which is not
     really a character, but a condition) in Unix.
+  + On modern systems, there isn't really a character used in processing or storage 
+    that indicates this EOT or EOF, rather, EOT is now more a condition or a signal.
+    EOTs are used to trigger the condition in terminal communication rather than 
+    being embedded in files as a universal end marker.
 
 - =ENQ=, =WRU=, =0x05=, =^E= :: enquiry, send a response to the receiving end to
 see if it is still present. The receiver is supposed to send back some
