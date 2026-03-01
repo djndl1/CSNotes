@@ -20,6 +20,7 @@ of statements with similar syntax to C.
     by the programmer.
   + =scale=: default to 0; affects how some operations use fractional parts.
     Legal values are in the range of a C integer.
+    + *set this to non-zero otherwise every division results in an integer*.
   + =ibase=, =obase= the conversion base for input/output numbers, default
     to 10.
   + =last= or =.=: last printed number.
