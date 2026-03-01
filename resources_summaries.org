@@ -1,0 +1,7 @@
+| filepath | summary |
+|----------|---------|
+| resources/root.bib | bibliographic reference file containing citation data in BibTeX format used with LaTeX document preparation systems |
+| resources/root.json | JSON configuration or data file supporting documentation referencing system |
+| resources/gb7714-2005-author-date.csl | Citation Style Language implementation of Chinese national standard GB/T 7714-2005 for author-date citation formatting |
+| resources/gb7714-2005-numeric.csl | Citation Style Language implementation of Chinese national standard GB/T 7714-2005 for numeric citation formatting |
+

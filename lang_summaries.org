@@ -1,0 +1,82 @@
+| filepath | summary |
+|----------|---------|
+| lang/c/abi_compiler_et_al.md | library creation static ar shared fPIC dynamic linker strace ldd readelf LD_LIBRARY_PATH LD_PRELOAD libgcc runtime |
+| lang/c/assembly/gcc_inline_asm.md | GCC inline assembly GAS syntax AT&T format basic asm extended asm operands constraints clobbers examples |
+| lang/c/c_cpp_inline_mud.md | inline semantics C99 external linkage default C++ ODR GNU89 extension multiple translation units |
+| lang/c/c_shoot_yourself_in_the_foot.md | C pitfalls strict aliasing violations pointers versus arrays decay equivalence |
+| lang/c/ELF.md | ELF binary format headers segments sections program section dynamic linking PLT GOT relocation symbol visibility default protected hidden internal |
+| lang/c/glib.md | GLib memory allocation wrappers macros stringification static assertions offsetof atomic operations compiler intrinsics mutexes memory barriers |
+| lang/c/gobject.md | GObject type system GType registration type nodes fundamental derived GLib concurrency threads mutexes condition variables once-initialization TLS |
+| lang/c/idioms.md | C idioms pointer iteration skip characters type-safe struct allocation sizeof ptr non-zero sentinel uninitialized debugging |
+| lang/cpp/abstract_containers.org | STL abstract containers deque map multimap set multiset stack unordered complex numbers operations |
+| lang/cpp/a_tour_of_cpp.org | C++17 overview basics classes concrete abstract hierarchies templates modules error handling RAII generic programming concepts |
+| lang/cpp/a_tour_of_std_library.org | C++ standard library strings I/O streams containers algorithms iterators utilities smart pointers numerics concurrency |
+| lang/cpp/carbon/CarbonAsSuccessorToCpp.org | Carbon language C++ successor cleaner syntax bidirectional interoperability memory safety improved tooling |
+| lang/cpp/c_cpp_diff.org | C C++ differences main function type checking enums nullptr casts namespaces attributes Unicode |
+| lang/cpp/container.org | STL containers pair tuple allocators array vector list queue priority_queue deque map set operations |
+| lang/cpp/cpp20.org | C++20 features ranges views span links resources |
+| lang/cpp/cpp_concurrency.org | C++ multithreading threads synchronization mutexes condition variables atomics futures promises packaged_task |
+| lang/cpp/cpp_oop.org | C++ OOP classes inheritance polymorphism memory allocation special member functions move semantics copy elision |
+| lang/cpp/exceptions.org | C++ exception handling try-catch standard exceptions system_error guarantees basic strong nothrow function try-blocks |
+| lang/cpp/Functions.org | function objects lambda expressions operator overloading enums user-defined literals |
+| lang/cpp/generics.org | C++ templates function class nontype parameters variadic perfect forwarding argument deduction CRTP |
+| lang/cpp/io_stream_library.org | iostream architecture ios_base ios class input output stream redirection streambuf |
+| lang/cpp/language.org | C++ range-based for-loops iterator requirements Koenig lookup |
+| lang/cpp/modern_practice.org | Modern C++ compiler preprocessor const correctness RAII smart pointers leak-free design |
+| lang/cpp/namespaces.org | namespaces name conflicts anonymous using declarations Koenig lookup nested |
+| lang/cpp/smart_ptr.org | smart pointers shared_ptr ownership custom deleters alias weak_ptr cycles unique_ptr exclusive |
+| lang/cpp/STL.org | Standard Template Library function objects iterators five categories inserters algorithms |
+| lang/cpp/templates.org | templates function class nontype variadic fold expressions argument deduction SFINAE |
+| lang/cpp/utility.org | utility reference_wrapper function wrappers min max swap relational operators |
+| lang/csharp/basics.md | C# fundamentals syntax predefined types strings value reference tuples arrays operators control flow namespaces |
+| lang/csharp/Collections_LINQ.md | collections IEnumerable IEnumerator LINQ query operators anonymous types query expressions |
+| lang/csharp/COM_interop.org | COM interoperability RCW CCW wrappers interop assemblies marshaling type conversion events connection points manual definitions |
+| lang/csharp/comment_documentation.org | XML documentation comments MSBuild configuration generation NDoc Docfx Doxygen |
+| lang/csharp/GC.org | garbage collection mark-compact generations finalization weak references dispose pattern |
+| lang/csharp/generic.md | C# generics constraints variance covariance contravariance runtime value reference types |
+| lang/csharp/interface_trait.org | interfaces explicit implicit implementation inheritance C# 8.0 default methods virtual extension |
+| lang/csharp/misc_topics.org | loop variable closures C# 5.0 foreach capture semantics |
+| lang/csharp/modernize_legacy_dotnet.org | modernizing legacy .NET Framework polyfill packages compatible third-party libraries |
+| lang/csharp/msbuild.org | MSBuild properties items tasks targets incremental build configuration |
+| lang/csharp/Native_Interop.org | SafeHandle native interop critical finalization reliable handle cleanup |
+| lang/csharp/pattern_matching.org | pattern matching declaration type constant relational logical property var positional discard list |
+| lang/csharp/Runtime.org | CLR runtime CIL assemblies manifests modules JIT AOT type system metadata |
+| lang/csharp/threading.org | threading Thread ThreadPool timers TLS synchronization Monitor Mutex Semaphore ReaderWriterLock concurrent collections atomic |
+| lang/csharp/type.md | type design Equals GetHashCode indexers operator overloading lazy initialization |
+| lang/java/android_dev.md | Android architecture stack app components activities services broadcast receivers content providers intents manifest lifecycle MVC resources |
+| lang/java/BigNumbers.md | BigInteger arbitrary-precision integers BigDecimal arbitrary-precision decimals immutable mathematical operations |
+| lang/java/corejava1.md | Java fundamentals data types strings arrays OOP classes inheritance interfaces abstract lambda inner classes exceptions assertions logging generics type erasure wildcards reflection |
+| lang/java/groovy/gvy_in_action.md | Groovy optionally-typed dynamic Java platform syntax enhanced features libraries GDK additions |
+| lang/java/java_collections.md | Collections Framework Collection Map interfaces iterators ArrayList LinkedList HashSet TreeMap HashMap views wrappers algorithms |
+| lang/java/java_gui.md | Java GUI AWT Swing JavaFX frames components 2D graphics event handling listeners adapters actions key mouse event hierarchy |
+| lang/java/java_interfaces.md | Comparator custom ordering Cloneable shallow deep copying functional interfaces lambda targets |
+| lang/java/java_io.md | Java I/O InputStream OutputStream Reader Writer chaining text binary Scanner Console Path Files file operations |
+| lang/java/java_koans_notes.md | default Object equals reference comparison |
+| lang/java/java_streams.md | Java 8 streams declarative processing creation transformations filter map flatMap intermediate terminal operations |
+| lang/java/java_time_date.md | time standards UTC GMT ISO 8601 zones DST legacy Date Calendar issues java.time Instant LocalDate ZonedDateTime Period Duration formatting |
+| lang/lua/basics.org | Lua programming language fundamentals |
+| lang/macros/m4.org | m4 macro processor |
+| lang/python/containers_iterators.md | Python iterator protocol __iter__ __next__ container iteration generators yield expressions zip |
+| lang/python/intermediate_python.md | intermediate Python args kwargs variadic arguments map filter reduce functional |
+| lang/python/koans_nots.md | Python triple quotes reduce escapes None object |
+| lang/python/Python_OOP.md | Python OOP composition inheritance duck typing classes super MRO __new__ __init__ special methods __repr__ __hash__ __dict__ |
+| lang/python/python_builtin.md | Python unexpected features if scope for while else clauses match pattern position-only keyword-only mutable default arguments slicing |
+| lang/python/python_datetime.md | datetime module timedelta tzinfo timezone time date datetime naive aware objects operations |
+| lang/python/python_execution_model.md | Python program structure code blocks execution frames name binding scoping global nonlocal resolution |
+| lang/python/python_http.md | HTTP protocol request response status codes caching URL structure http.client urllib httplib2 requests |
+| lang/python/python_IO.md | io module RawIOBase BufferedIOBase TextIOBase StringIO BytesIO open gzip standard streams |
+| lang/python/python_lexical_analysis.md | Python tokens logical physical lines encoding line joining identifiers keywords literals operators delimiters |
+| lang/python/python_modules_packages.md | Python modules import search paths relative absolute imports packages regular namespace PEP 420 __all__ pip setuptools pyproject.toml |
+| lang/python/python_regex.md | regex syntax special characters quantifiers character classes grouping lookahead assertions flags re compile search match split sub |
+| lang/python/python_serialization.md | pickle binary serialization deserialization json cross-language interchange |
+| lang/python/python_special_methods.md | special magic methods reference iterators computed attributes callable sequences numbers construction destruction |
+| lang/python/python_XML.md | XML elements attributes encoding schemas xml.etree.ElementTree lxml DOM API |
+
+| lang/cmd/batch.org | Windows batch scripting cmd.exe basics COMSPEC variable syntax ECHO OFF REM comments debugging print-only doskey macros history F7 F8 editing tips clipboard selection type assoc ftype clip runas dir copy xcopy move ren del pushd popd wmic reg taskkill tasklist echo exit setlocal compound statements error chaining caret escape variables environment PATH PATHEXT arguments shift delayed expansion call two-level expansion substitution modifiers dpnx ERRORLEVEL conditional IF EXIST DEFINED EQU FOR loops labels functions goto eof tee logging |
+| lang/lua/basics.org | Lua fundamentals quick start -i -e -l flags dofile chunk concept operators left-associative types nil boolean false nil falsiness number integer float math.type hex literals floor division modulo string immutability length concatenation tostring quoting multiline escape thread function table |
+| lang/macros/m4.org | M4 macro processor token scanning recursive expansion built-in macros define undefine pushdef popdef dnl delete-newline quoting suppression changequote comments changecom ifdef ifelse eval arithmetic incr decr string operations len substr index translit regexp patsubst include undivert defn renaming builtin syscmd esyscmd sysval mkstemp macro arguments positional parameters name count list shift recursion examples debugging -dV errprint dumpdef best practices prefix nesting quoting pitfalls |
+| lang/random_programming_tools.org | programming tools overview uuidgen libuuid Python uuid module UUID GUID generation utilities |
+| lang/regex/posix_regex.org | POSIX regular expressions matching mechanism first longest greedy matching anchors character sets modifiers ERE extended atoms groups brackets dots anchors pieces branches alternation bracket expressions POSIX character classes collating symbols equivalence classes BRE basic escaped bounds backreferences word boundaries Emacs regex extensions word syntax categories Vim regex differences quantifiers alternation backreferences shell pattern matching glob extglob pattern-list operators |
+| lang/retro/FreeBASIC.org | FreeBASIC language C-style header system False negative-one bitwise Not complement string literal escaping Var type inference shadowed outer scope access Extern external linkage Common shared variables Static storage class Shared visibility QuickBASIC compatibility OOP C++03 imitation default copy constructors This parameter scope destruction Public Private Protected VB-style indexed properties |
+| lang/retro/FreePascal.org | Free Pascal compiler Turbo Pascal Delphi compatibility modes TP FPC objfpc DELPHI DELPHIUNICODE MACPAS ISO ExtendedPascal dialects source codepage UTF8 BOM systemcodepage string literal conversion numeric types enums scoped sets binary octal hex literals Boolean ByteBool WordBool LongBool integral types shortInt byte smallInt word longInt cardinal int64 NativeInt Real Single Double Extended Comp Currency text types Char WideChar PChar PWideChar null-terminated ShortString length-prefixed AnsiString UTF8String UnicodeString WideString UTF16String assignment conversion wide string manager LC_CTYPE control operators bitwise logical short-circuit if-then-else begin-end blocks case statement no fallthrough for-to-downto while-do repeat-until for-in enumerators Result variable Exit procedure calls subrange classes reintroduce is as properties Self TObject private strict private protected public inherited Assign AssignTo cloning TPersistent records objects inheritance virtual methods constructors destructors class methods static class variables properties helpers interface COM delegation reference counting TInterfacedObject TComponent resource management New Dispose GetMem AllocMem FreeMem FreeAndNil finally ownership TFPGObjectList free notification units interface implementation initialization finalization generics specialize constraints local closures method types record case unions operator overloading class operator fpcunit testing |
+| lang/tricks.org | loop countdown patterns while n-- greater 0 decrement timing execution counts n n-1 n+1 variations do-while pre-post check differences |

@@ -1,0 +1,48 @@
+| filepath | summary |
+|----------|---------|
+| theory/encoding/ascii.org | ASCII character encoding 8-bit structure control characters C0 C1 printer terminal control printable characters |
+| theory/encoding/unicode.org | Unicode comprehensive guide design principles encoding forms UTF-8 UTF-16 UTF-32 normalization collation algorithms character properties implementation details |
+| theory/SICP/SIPC.org | SICP philosophical introduction programs models processes standard program structures building large systems |
+| theory/uuid_guid.org | UUID 128-bit unique identifiers versions 1-5 variants format specifications generation tools platforms |
+| software/CleanArchitecture.org | Clean Architecture principles dependency inversion core domain project structure infrastructure separation Domain-Driven Design entities aggregates |
+| software/design.org | Inversion of Control design patterns Mediator Specification C# code examples |
+| software/design_flow.org | software development lifecycle specification design implementation testing documentation maintenance |
+| software/MVC.org | MVVM architecture View UI code ViewModel domain logic Model data transport layers separation |
+| software/performance_tuning.org | .NET 6 performance improvement delegates file I/O blog posts links |
+| software/SOLID.org | SOLID principles Single Responsibility Open Closed Liskov Substitution Interface Segregation Dependency Inversion object-oriented design |
+| tools/editors/ctags.org | source code indexing tag generation navigation symbols definitions |
+| tools/editors/editorconfig.org | coding style consistency configuration file format editor support |
+| tools/editors/ed.org | Unix ed line editor basic commands text manipulation |
+| tools/editors/emacs.magit.org | Magit Git integration Emacs interface version control operations |
+| tools/editors/emacs.org | Emacs comprehensive UI frames windows buffers editing commands search modes packages version control LSP support |
+| tools/editors/emacs-tricks.org | Emacs tips tricks productivity enhancements configurations |
+| tools/editors/neovim.org | Neovim runtime provider architecture Vim 8 compile-time feature approach comparison |
+| tools/editors/org-mode.org | Org-mode rich text headlines folding tables calculations links tags properties TODO source code blocks Babel |
+| tools/editors/vim.org | Vim modes navigation multiwindow folding autocompletion syntax highlighting plugins IDE configurations |
+| tools/editors/vimium_vim_in_browser.org | Vimium browser extension Vim-style keyboard navigation web browsing |
+| tools/editors/vimscript.org | Vimscript scripting language plugin development automation |
+| tools/editors/vim_tips.org | Vim tips tricks efficient editing techniques |
+| tools/editors/vi.org | vi classic Unix text editor basic operations modes |
+| tools/latex/latex_basic.org | LaTeX TeX implementations pdfTeX XeTeX LuaTeX distributions document structure sectioning lists math notation |
+| tools/latex/PlainTex.org | Plain TeX base format fundamental typesetting commands |
+| tools/learning_methods/bibtex.org | BibTeX bibliography management citation references LaTeX documents |
+| tools/learning_methods/org-citation-ref.org | Org-mode citation references academic writing integration |
+| tools/learning_methods/org-roam.org | Org-roam networked note-taking Zettelkasten methodology personal knowledge management |
+| tools/learning_methods/Zettelkasten.basics.org | Zettelkasten note-taking method atomic notes linking slip-box organization knowledge building |
+| tools/programming_without_ide.org | IDE-free programming development workflows text editors command-line tools |
+| tools/terminals/truecolors.org | terminal true color 24-bit RGB support capabilities |
+| tools/tmux.org | tmux terminal multiplexer server session window pane hierarchy commands clipboard layouts |
+| tools/utils/coreutils.org | GNU coreutils essential Unix commands file text shell operations |
+| tools/utils/curl.org | empty file title only |
+| tools/utils/diffutils.org | diff comparison utilities file differences patch generation |
+| tools/utils/findutils.org | find utilities file search locate xargs command execution |
+| tools/utils/grep_ripgrep.org | grep ripgrep text search options patterns performance PowerShell Select-String comparison |
+| tools/vcs/git.org | Git version control three states commit history branching merging rebasing remotes tagging worktree |
+
+| numpy.org | NumPy array library fundamentals numpy.array creation parameters dtype copy order subok ndmin ndarray class multidimensional homogeneous fixed-size items memory layout strides offset calculation itemsize flags data nbytes attributes T dtype shape size ndim flat real imag methods item fill flatten ravel squeeze resize transpose conj trace nonzero sum mean std var cumprod cumsum dot max min prod ptp round all any argmax argmin partition argpartition sort argsort choose clip take put compress repeat broadcasting rules broadcast_to broadcast_arrays array creation zeros ones empty arange linspace eye identity indexing boolean arrays structural tools newaxis data types bool int uint float complex iinfo finfo structured dtypes fields binary text file I/O save load savetxt loadtxt binary_repr base_repr |
+| pandas.org | Pandas data analysis library API selections loc iloc assign head nlargest tail filter boolean indexing isna notna groupby count size agg merge join concat drop_duplicates updating Series one-dimensional labeled ndarray dict-like alignment DataFrame 2-dimensional column-oriented different types SQL table spreadsheet dict of Series list of dicts column deletion essential operations Nan handling equals combine_first combine value_counts cut qcut pipe apply aggregate transform applymap map reindex align drop rename string processing sorting sort_index sort_values iteration iterrows itertuples items |
+| TLDP.md | Linux Documentation Project HOWTO collection links Secure Programs Cluster Serial Assembly Software Release Practice Project Management Building Debian documentation FAQ Reference Securing Debian APT Guide Packaging Tutorial Policy Maintainer Guide |
+| topics.md | topic reference links C++ Java inheritance private public protected subclass private fields C C++ function inlining static inline linkage template instantiation coding style headers source multiple return techniques error handling Result type ABI binary objects API difference ELF PE format shared libraries libc compilation debugging GCC optimization crt0 runtime startup JPEG libjpeg mozjpeg libjpeg-turbo shell programming Bash debugging Python attributes super multiple inheritance metaprogramming |
+| topics.org | topic collection C++11 rvalue references inheritance visibility linkage inline functions FAQ headers templates coding style includes headers source multiple returns error handling ABI binary objects ELF PE shared libraries libc GNU IFUNC compilation debugging optimization crt0 startup JPEG libraries shell debugging Python attributes super inheritance metaprogramming C preprocessor tricks |
+| ui_design.md | UI design concepts modal modeless interface patterns modal window behavior |
+| TODO.org | todo list Emacs Lisp reading tasks Orgzly learning PGP OpenPGP Standard GnuPG usage Emacs encryption cryptography basics x86 computer organization mechanism policy separation |
