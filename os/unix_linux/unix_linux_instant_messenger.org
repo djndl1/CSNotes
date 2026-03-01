@@ -1,0 +1,17 @@
+* Primitive
+
+** =write= (Since Research Unix 5th edition)
+
+=write= to another user on the same system. Suppressed by =mesg=.
+There is no way to redirect the messages from other users.
+
+** =talk= and =talkd= from =inetutils=
+
+Requires =talkd= be running. Also, talk and talkd have no 
+open standard protocol.
+
+** Use =tmux= and attach to the same session
+
+* Modern 
+
+- iptux
