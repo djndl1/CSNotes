@@ -8,6 +8,8 @@
 
 - =-u= :: use access time (atime), =-c= use create time (ctime)
 
+- =-S= :: file size
+
 - =-r= :: reverse the order
 
 * =pr=
@@ -22,45 +24,37 @@ count lines, words, characters or bytes of a file.
 
 * =sort=
 
-Lines are compared by specified by fields/keys (=-k=), or the entire line if
-none. Equal lines are ordered according to the entire line unless stable sort =-s=
-(=--stable=) is specified, which retains the original order. Output may be saved
-to a file =-o=.
-
-=sort= by defaults sorts concatenated files, otherwise checks if the files are
-sorted (=-c=, =-C=), or merges already-sorted files without sorting them (=-m=).
+- *Comparison*: By key (=-k=) or entire line.
+- *Stability*: Unstable by default; =-s= preserves original order of equals.
+- *Output*: Write to file via =-o=.
+- *Operations*:
+  - Default: Sort input.
+  - =-c=, =-C=: Verify sortedness.
+  - =-m=: Merge pre-sorted inputs.
 
 ** Key Definition
 
-A key is a segment of a line, specified as the part between two endpoints
-(inclusive) =-k POS1[,POS2]=. The endpoint is specified in the format of
-=EndpointFieldNumber.EndpointCharacterNumber.OrderingOption=. The end of line is
-used if the end is not specified. The field end is used if the character number
-of the second endpoint is not specified. The count starts at 1 not
-0, which denotes the last one.
+A key specifies a sorting segment using =-k POS1[,POS2]=.
 
-Separators are specified by =-t=, by default unintuitively the empty string between a
-non-blank character and a blank character, not blank characters.
-
-Multiple key definitions of different ordering options are supported, used
-in the order on the command line
+- *Endpoint Format*: =FieldNumber.CharacterNumber.OrderingOption=
+- *Defaults*:
+  - Omitted end position: End of line.
+  - Omitted character number: End of field.
+- *Indexing*: 1-based.
+- *Separator* (= -t=): Field delimiter. Default is a space or a tab.
+- *Multiple Keys*: Applied in command-line order.
 
 ** Order
 
-By default in ascending order, =-r= makes it descending. =-s= enables stable
-sort by retaining the original order of equal lines.
-
+- Default: Ascending order
+- =-r=: Makes it descending
+- =-s=: Enables stable sort by retaining the original order of equal lines
 ** Comparison Rules
 
-By default, keys
-are compared using the collating sequence of =LC_COLLATE=. All these sort
-options including =-r= may be used as options within the key definition to
-override the global ordering for that key. All modifiers excpet =-b= apply to
-the associated field, regardless of whether the modifier character is attached
-to the field-start or the field-end part of the key specifier.
-
-As a last resort, any equal results are sorted by using the the entire keys
-unless stable sort is used.
++ By default Keys are compared using the =LC_COLLATE= collating sequence.
++ Per-key options (including =-r=) override global settings.
++ Modifiers (except =-b=) apply to the full field, regardless of specifier position.
++ Any equal results are sorted by comparing the entire key, unless stable sort is enabled.
 
 - leading blanks may be ignored =-b=
 
@@ -123,3 +117,24 @@ From command line or files. Zero-terminated filenames are supported with =--file
 # Decorate-Sort-Undecorate: add a length field, sort by length, remove the length field
 awk '{print length, $0}' /etc/passwd | sort -n | cut -f2- -d' '
 #+end_src
+
+* =file= (Non-coreutils)
+
+- =-i=: output mime type
+
+- =-0=: output =\0= after the end of the filename
+
+* =od=
+
+Not limited to octal format
+
+- =-j= skip bytes and =-N= read N bytes
+
+- =-t=: format (hexadecimal), unsigned decimal, signed decimal, floating point, .
+  octal, named character, printable character or backslash escape
+  + a size number after the format specifier indicates the number of bytes per group.
+  + =z= prefix to print data as printable characters
+  + =-A=: the address format, that is, the first number of each line that indicates
+    the current address of the line beginning.
+
+- =-w=: N bytes per line 
