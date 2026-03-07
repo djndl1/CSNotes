@@ -1,0 +1,19 @@
+#+title: Debugging
+
+* Debugging a DLL
+
+It can be debugged: either specify a startup application that uses this ActiveX DLL
+or waiting for a user app to create this component.
+
+#+begin_quote
+To see the output, you must run the DLL project within the VB6 IDE and configure an executable to call it: 
+    Open your VB6 DLL project (.vbp) in the Visual Basic 6.0 IDE.
+    Go to the Project menu and select [Your Dll Name] Properties....
+    Select the Debugging tab in the Project Properties dialog.
+    Choose the Start external program option and enter the full path to an executable (.exe) that uses your DLL (e.g., your test application or Dllhost.exe with appropriate arguments).
+    Place a breakpoint in your DLL's code where you want to start debugging.
+    Press F5 or select Run -> Start in the VB6 IDE. This will launch the external program.
+    When the external program calls the DLL function containing your breakpoint, the VB6 IDE will stop execution at that point.
+    Open the Immediate Window by pressing Ctrl + G or going to View -> Immediate Window.
+    Step through your code using F8 (Step Into) or Shift + F8 (Step Over) and observe the output from your Debug.Print statements in the Immediate Window. 
+#+end_quote
