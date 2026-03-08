@@ -138,3 +138,67 @@ Not limited to octal format
     the current address of the line beginning.
 
 - =-w=: N bytes per line 
+
+* =cut=: Selects Part of Lines
+
+confer. =Select= in PowerShell. 
+
+Selects by bytes, characters (currently still as byte characters, not Unicode code points),
+or fields, 
+
+Byte-based, does not understand Unicode. Also, cut outputs fields in the original read order. 
+=awk= or =sed= is required by POSIX and available on nearly every Linux distro (cannot be removed on Debian)
+unless it's a stripped-down system with only a stripped-down =busybox= (even =busybox= has =awk= but it may not be configured.).
+
+#+begin_src 
+asserter_20260307_231427328.log
+asserter_20260307_231635953.log
+asserter_20260307_231650640.log
+asserter_20260307_231711250.log
+asserter_20260307_231720125.log
+asserter_20260307_231818468.log
+asserter_20260307_231832015.log
+asserter_20260307_231905781.log
+asserter_20260307_231923687.log
+asserter_20260307_233052109.log
+asserter_20260307_233602578.log
+asserter_20260307_233919562.log
+#+end_src
+
+- format: item list (=a,b,c,d=), or ranges (=N1-N2[,more ranges],=)
+  + list of items, or list of ranges.
+  + missing one end of a range means =1= or end of line
+  + overlapping ranges or repeated elements only result in a single write.
+    in the original order.
+    #+begin_src shell
+   ls *.log -1 | cut -f 3,2,1,1,1 -d '_'
+asserter_20260307_231427328.log
+asserter_20260307_231635953.log
+asserter_20260307_231650640.log
+asserter_20260307_231711250.log
+asserter_20260307_231720125.log
+asserter_20260307_231818468.log
+asserter_20260307_231832015.log
+asserter_20260307_231905781.log
+asserter_20260307_231923687.log
+asserter_20260307_233052109.log
+asserter_20260307_233602578.log
+asserter_20260307_233919562.log
+    #+end_src
+
+- the number of bytes, characters or fields starts at *1*.
+
+* =join=
+
+We have =cut= to select, we might as well have =join= to join lines by a field as the key.
+This command is supposed to process a table (e.g. csv, possibly with a header line.
+
+- =join= does not force the input files be in a sorted order but requires so.
+
+- the exact field as the join key can be specified as options..
+
+- the output field can be specified by =-o=, =-o FileN.FieldM[,FileN,FieldM]=
+
+- =-t= field delimiter.
+
+TODO
