@@ -18,6 +18,12 @@ A paginator that make text into forms suitable for paper pages, possibly in
 multiple columns. By default 66 lines per page. Not a replacement for =troff= or
 =nroff=. For real printing, consider =lp= and =lpr=.
 
+* =date=
+
+#+begin_src shell
+date +%FT%T.%6N # millisecond
+#+end_src
+
 * =wc=
 
 count lines, words, characters or bytes of a file.
@@ -116,6 +122,8 @@ From command line or files. Zero-terminated filenames are supported with =--file
 #+begin_src shell
 # Decorate-Sort-Undecorate: add a length field, sort by length, remove the length field
 awk '{print length, $0}' /etc/passwd | sort -n | cut -f2- -d' '
+
+sort -u file1 file2 # union of unsorted files
 #+end_src
 
 * =file= (Non-coreutils)
@@ -188,6 +196,10 @@ asserter_20260307_233919562.log
 
 - the number of bytes, characters or fields starts at *1*.
 
+* =paste=
+
+concatenate one line from a file and one file from another file.
+
 * =join=
 
 We have =cut= to select, we might as well have =join= to join lines by a field as the key.
@@ -201,4 +213,27 @@ This command is supposed to process a table (e.g. csv, possibly with a header li
 
 - =-t= field delimiter.
 
-TODO
+- for outer join, consider =-a= (specify left join, right join or full join) and =-e= (default value for missing fields)
+
+#+begin_src shell
+# -t '' takes the entire line as the key
+join -t '' -a1 -a2 file1 file2     # Union of sorted files
+join -t '' file1 file2             # Intersection of sorted files
+join -t '' -v2 file1 file2         # Difference of sorted files
+join -t '' -v1 -v2 file1 file2     # Symmetric Difference of sorted files
+#+end_src
+
+* =uniq=
+
+Like =join=, the input should be presorted: only repeated adjacent lines are processed.
+
+- Set intersection or difference =-d= (repeated lines only)
+  + =sort file1 file2 | uniq -d= intersection unsorted files
+  + =sort file1 file1 file2 | uniq -u= difference of unsorted files, all lines in =file1= are repeated, any line in =file2= what is also 
+    in =file1= is also repeated.
+
+- Symmetric difference =-u= (unique lines only, repeated lines are not printed.)
+
+* =tail=
+
+- =-n +N= skip =N-1= lines.
