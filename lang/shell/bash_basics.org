@@ -2,11 +2,12 @@
 
 * Features Particular to Bash
 
-- =[[= conditional
+- =[[= conditional: regex matching, string pattern matching and logical operators =&&= and =||= without extra escapes
 
 - shell arithmetic with one of the shell expansions or =let=
 
 - =alias= and =unalias=: aliases are expanded upon a command/function is read.
+  + usually not expanded by non-interactive shells.
 
 - one-dimensional non-contiguous array variable declared by =declare=
 
@@ -32,7 +33,7 @@ non-interactive at the same time.
   + =~/.bashrc= the environment file. A login shell may read this file inside =.profile=
   + It does not read =/etc/profile=, but usually it inherits a login shell.
 
-- Non-Interactive Shell reads an additional =BASH_ENV= file
+- Non-Interactive Shell reads only =BASH_ENV= file
   + a shell may be non-interactive and login or non-login. So it may reads
     =/etc/profile= and others.
 
@@ -48,7 +49,7 @@ An interactive shell has some features enabled:
 
 - /job control/ enabled
 
-- prompts are set
+- prompts =PS1= are set
 
 - commands are read from the command line with =readline=
 
@@ -75,6 +76,36 @@ An interactive shell has some features enabled:
 *** Builtin Commands
 
 Contained within the shell itself.
+
+- =cd -P=: cd to the physical path of the target, even if the target is a symlink.
+  + by default =cd= follows symlinks instead of going to the actual directory.
+
+- =eval=: take the input strings as a shell command
+  + e.g. the output of certain commands can be =eval= to run.
+
+- =export -p=  lists exported variables
+
+- =hash=: shell caches commands' paths in a hashtable. This command manipulates the cache.
+  + =-r=: flush the cache
+
+- =readonly=: marks an exiting variable or creates a read-only variable
+
+- =set= shell options, not variables.
+   + =unset= does unset shell variables and functions.
+
+- =trap=: installs signal handlers
+
+- =getopts=: the command counterpart of [[man:getopt(3)][getopt]]
+
+- =bind= (bashism): set key bindings
+
+- =declare= (bashism): declare various variables, possibly with data types or cetain attributes..
+
+- =let= (bashism): use =$((arithmetic_express))=
+
+- =local= local variable, not POSIX but still portable in basically every shell.
+
+- =printf=: C style output
 
 POSIX-mode bash requires special builtins be found before shell functions during command
 looup; if a special builtin returns an error status, a non-interactive shell
@@ -135,7 +166,39 @@ TODO
 
 ** Parameter and Variable Expansion
 
-TODO
+Variables can be *global* (envrionment variables, exported variables, by convention UPPERCASE) 
+or *shell*-local variables (by convention lowercase)
+
+*** Common Useful Variables & Parameters.
+
+- =CDPATH=: a searchpath for =cd= without full path
+
+- =PWD= and =OLDPWD=
+
+- =BASH_VERSION=, =BASH_VERSINFO=: bash version, the latter is an array of major, minor, patch, release/beta, arch.
+
+- =LINES=, =COLUMNS=: current terminal height and width.
+
+- =DIRSTACK=: an array containing the directory stack (list of recently visited directories.)
+
+- =UID=, =EUID=: real and effective current user ID
+
+- =FUNCNAME=: the currently executing function's name
+
+- =LIENO=: the current line number of the script
+
+- =MACHTYPE=: arch triplet
+
+- =RANDOM=: a random number generator
+
+- =$$=: current shell PID
+
+- =$!=: recent background command PID
+
+- =$@=: positional parameters, each parameter expands to a separate word when double quoted (peculiar but prefered to =$*=); 
+  =$#= count of positional parameters
+
+- =$?=: recent exit status
 
 ** Command Substitution
 
@@ -171,10 +234,15 @@ Pay attention to:
 
 *** Verbose Output and Traces
 
-Traces of each command plus its arguments are printed to stdout after the
-commands have been expanded but before execution. This option may also be
-enabled with =set -x= or =set -o xtrace= and disabled with =set +x= or =set +o xtrace= to trace only part of a script.
-Other options such as =-v= (=verbose=) are also avaiable.
+- Traces of each command plus its arguments are printed to stdout after the
+  commands have been expanded but before execution.
+  + =set -x= or =set -o xtrace= and disabled with =set +x= or =set +o xtrace= 
+   to trace only part of a script. 
+  + =bash -x= enables tracing of the entire script.
+
+- =-v= verbose output: prints shell input lines as they are read.
+
+=-v= prints the raw input while =-x= shows the actual command executed.
 
 *** Source-Level Debugger
 
