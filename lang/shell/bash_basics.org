@@ -28,6 +28,7 @@ non-interactive at the same time.
   + =~/.bash_profile=, =~/.bash_login=, =~/.profile=: the user login files. First readable file is read
   + =~/.bash_logout= upon logout
   + OpenSSH opens a non-login shell with a following command argument
+  + =-bash= indicates a login shell.
 
 - Interactive Non-Login Shells
   + =~/.bashrc= the environment file. A login shell may read this file inside =.profile=
@@ -158,16 +159,43 @@ shell waits for them to complete.
 
 ** Brace Expansion
 
-TODO
+#+begin_src shel
+{a,b,c}1 # a1 b1 c1
+#+end_src
+
+Brace expansion is performed before any other expansions, and any characters special to other expansions are
+preserved in the result.
 
 ** Tilde Expansion
 
-TODO
+=~TildePrefix= anything after a =~= and before =/=. Tilde expansion is more than =$HOME=. 
+
+#+begin_src shell
+~UserName # UserName's home directory
+
+~ # $HOME
+
+~+ # $PWD
+
+~- #OLDPWD
+
+~N+/- # up/down directory stack
+#+end_src
 
 ** Parameter and Variable Expansion
 
 Variables can be *global* (envrionment variables, exported variables, by convention UPPERCASE) 
 or *shell*-local variables (by convention lowercase)
+
+#+begin_src shell
+${PARAMTER}
+
+A=B
+B=C
+echo ${!A} # C indirect expansion
+
+echo ${VAR:=value} # default value if undefined.
+#+end_src
 
 *** Common Useful Variables & Parameters.
 
@@ -202,33 +230,72 @@ or *shell*-local variables (by convention lowercase)
 
 ** Command Substitution
 
-TODO
+=$(command)= or =`command`= (old-style): performs the command and replace with the stdout of the command.
 
-** Arithmetic Expansion
+** Arithmetic Expansion 
 
-TODO
+=$((expression))=
+Integer arimethic Only, useless. Use =bc= or =awk= for more complete arimethic.
+
+All tokens in the expression undergo parameter expansion, command expansion and quote removal.
+
+The expression is similar to that of C.
+
+** Process Substitution (Bash, ksh, zsh, not POSIX)
+
+A named pipe or a file under =/dev/fd/= is provided to a command as stdin or stdout.
+
+- =>(command)=: =command= uses the file as input
+
+- =<(command)=: =command= uses the file as output
+
+The expansion returns the path to that file and another command may use the file
+as input or output.
+
+#+begin_src shell
+while read line; do
+      echo "$line"
+done < <(grep "pattern" file.txt)
+#+end_src
 
 ** Word Splitting
 
-TODO
+=$IFS= is used as a list of delimiters to split the output of other expansions into words.
+By default the delimiters are space, tab and newline.
+
+Note that quoted strings are not inherently an inseparable unit in Bash:
+they are subject to word splitting.
+
+#+begin_src 
+expoort IFS=';'
+for word in "a;b;c"; do
+  eco $word
+done
+#+end_src
 
 ** Filename Expansion
 
-TODO
+=*=, =?= and =[= as glob pattern.
+
+* Aliases
+
+For interactive Use only.
+
+- Aliases are not recursively expanded in replacement text.
+  One may alias =ls= to =ls -F=
+
+- Aliases are not in a non-interactive shell unless explicitly set.
+
+- Aliases are not expanded until the line is read. 
+  + Thus, an alias within a compound command is not available for subsequent commands.
+  + Aliases used in a function are expanded when the function is read.
+  + Aliases defined in a function are only enabled after that function is executed.
+
+- Aliases are not inherited by child processes.
+
+- While aliases are easier to understand, shells functions are preferred over aliases for almost every purpose.
 
 * Developing Good Scripts
-
-Pay attention to:
-
-- User interaction
-
-- Information storage
-
-- Possible file creation
-
-- Commands to use
-
-- User notification
 
 ** Debugging
 
