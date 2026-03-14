@@ -147,17 +147,97 @@ shell waits for them to complete.
 - executes the command in a separate execution environment; if the file is not
   executable and not a directory, it is assumed a shell script.
 
-** Command History
+** Command History (Bashism)
 
-- =fc=, =history= show history
+Saved in =HISTFILE= (default =~/.bash_history=)
 
-- =fc -s event_number= reexecute the numbered command.
+- =history= shows history, manages history
+  + =-d= deletes, =-c= clears, =-a= append to the history file, 
+  + =-n= load certain history lines from the history file
+  + =-r= read all history lines from the history file.
+  + =-w= overwrite the history file
+
+- ~fc -s pat=rep~:  replaces matching patterns and reexecutes the result.
+
+- =fc -e event_number=: selects a range of commands to edit and reexecutes them.
 
 - =^R=, =^S= searches the history, for the next candidate, press =^R= or =^S= again.
 
+*** Concepts
+
+- =event= (historic event): The entry selected from the history 
+
+- =word=: the portions of that entry that are acted upon
+
+*** A Few Variable that Controls the Behavior
+
+- =HISTSIZE=: Sets the maximum number of commands to retain in the history list.
+- =HISTIGNORE= Defines a pattern-based filter to prevent specific commands from being saved to the history list.
+- =HISTCONTROL= Provides finer control over which commands are entered into the history based on specific rules.
+  + =ignorespace=: Commands that start with a space character are not saved.
+  + =ignoredups=: Consecutive duplicate commands are not saved (only the first instance is kept).
+  + =ignoreboth=: Enables both ignorespace and ignoredups.
+  + =erasedups=: Removes all previous instances of a command from the history before saving the new one.
+
+*** History Substitution (Bash Reference Manual 9.3.1)
+
+To reuse and modify previous commands (not simply to repeat previous commands).
+
+=set -H=, enabled by default in interactive shell.
+Performed immediately after a complete line is read before tokenization.
+
+#+begin_src shell
+![event][:word_designator][modifiers]
+#+end_src
+
+**** Event Designators
+
+#+begin_quote
+If a word designator is supplied without an event specification,
+the previous command is used as the event, equivalent to !!.
+#+end_quote
+
+#+begin_quote
+Unless the reference is absolute, events are relative to the current position in the history list.
+#+end_quote
+
+- =!!=: previous entry
+
+- =!n=: the nth entry (in order).
+
+- =!-n=: the history entry minus n (reverse order)
+
+- =!string=: the most recent command starting with  =string=.
+
+- =?string?=: the most recent command preceding the current position in the history list containing string
+
+- =^string1^string2^=: Repeat the last command, replacing =string1= with =string2=
+
+**** Word Designators (Optional)
+
+Word designators are used to select desired words from the event.
+Not using a word designator means using the entire event.
+
+- =n=: the nth word
+  + the first word is =0=
+
+- =^=, =$=: first/last word
+
+- =%=: the matching word of the most recent =?string?= search.
+
+- range: =x-y= (x to y)
+  + =-y=: =0-y=
+  + =*=: =1-$=
+  + =x*=: =x-$= including the last word
+  + =x-=: =x-$= excluding the last word
+
+**** Modifiers (9.3.3)
+
+Modifiers modify, or edit, the word or words selected from the history event.
+
 * Shell Expansions
 
-** Brace Expansion
+** Brace Expansion (Bashism)
 
 #+begin_src shel
 {a,b,c}1 # a1 b1 c1
@@ -298,6 +378,13 @@ For interactive Use only.
 * Developing Good Scripts
 
 ** Debugging
+
+
+*** Dry Run
+
+- =-n=: read but does not execute  (syntax check only)
+
+or =set -o noexec=
 
 *** Verbose Output and Traces
 
