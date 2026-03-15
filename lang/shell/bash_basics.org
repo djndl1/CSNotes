@@ -11,10 +11,10 @@
 
 - one-dimensional non-contiguous array variable declared by =declare=
 
-- directory stack with =pushd=, =popd=, and =dirs=
+- (ksh, mksh, zsh, not in ash) directory stack with =pushd=, =popd=, and =dirs=
 
 - POSIX mode =set -o posix=, =--posix= or the envvar =POSIXLY_CORRECT= makes =bash= try to behave as compliant as possible
-to the POSIX stnadard.
+  to the POSIX stnadard.
 
 - restricted shell: certain operations and features are disallowed or disabled
 
@@ -42,13 +42,13 @@ non-interactive at the same time.
   + login: =/etc/profile= + =~/.profile=
   + interactive: =$ENV=
 
-* Interactive Shells
+* Interactive Shells Settings
 
 echo =$-= to check if the current shell is interactive (the result contains an
 =i=).
 An interactive shell has some features enabled:
 
-- /job control/ enabled
+- /job control/ enabled =monitor=
 
 - prompts =PS1= are set
 
@@ -56,7 +56,7 @@ An interactive shell has some features enabled:
 
 - the =ignoreeof= option is checked instead of exiting immediately upon EOF.
 
-- /command history/ and /history expansion/ enabled
+- =history=, =histexpand= /command history/ and /history expansion/ enabled
 
 - /alias expansion/ enabled
 
@@ -70,6 +70,51 @@ An interactive shell has some features enabled:
 
 - Parser syntax errors do not cause the shell to exit.
 
+* Command Line Editing
+
+Basically the emacs experience.
+
+Number argument is supported.
+
+#+begin_src shelj
+bind -P
+#+end_src
+
+- =C-i= tab, or complete
+
+- =C-x C-u= undo
+
+** Edit
+
+- =M-c= capitalize-word
+
+- =M-u=: upcase-word
+
+- =C-v=: quoted-insert, or raw input
+
+- =C-t=: transpose-chars
+
+- =M-t=: transpose-words
+
+** Mark
+
+Supposedly, one should set a mark and use some other region-related commands to operate on the region.
+
+- =C-@= or =M-Space=
+
+- =C-x C-x=: exchange-point-and-mark
+
+** Kill
+
+- =C-u=: kill to the beginning of the line
+
+- =C-x C-?= (requires a shift to enter =?=)
+
+** Use Editors
+
+- =C-X C-E=: invoke the =edit-and-execute-command= function using editors 
+  in  =$VISUAL=, =$EDITOR= and =emacs=
+
 * Commands
 
 ** Classification
@@ -78,23 +123,25 @@ An interactive shell has some features enabled:
 
 Contained within the shell itself.
 
-- =cd -P=: cd to the physical path of the target, even if the target is a symlink.
+- =cd -P= (POSIX): cd to the physical path of the target, even if the target is a symlink.
   + by default =cd= follows symlinks instead of going to the actual directory.
 
 - =eval=: take the input strings as a shell command
   + e.g. the output of certain commands can be =eval= to run.
 
-- =export -p=  lists exported variables
+- =export -p= (POSIX)  lists exported variables
 
 - =hash=: shell caches commands' paths in a hashtable. This command manipulates the cache.
   + =-r=: flush the cache
 
-- =readonly=: marks an exiting variable or creates a read-only variable
+- =readonly= (POSIX): marks an exiting variable or creates a read-only variable
 
 - =set= shell options, not variables.
+   + most options are POSIX compliant. =vi=, =emacs= and =pipefail= and a few other options related to Bash features
+     are bashisms.
    + =unset= does unset shell variables and functions.
 
-- =trap=: installs signal handlers
+- =trap= (POSIX): installs signal handlers
 
 - =getopts=: the command counterpart of [[man:getopt(3)][getopt]]
 
@@ -106,10 +153,12 @@ Contained within the shell itself.
 
 - =local= local variable, not POSIX but still portable in basically every shell.
 
+- =shopt= (bashism): set, unset and query optional extended features of Bash.
+
 - =printf=: C style output
 
 POSIX-mode bash requires special builtins be found before shell functions during command
-looup; if a special builtin returns an error status, a non-interactive shell
+lookup; if a special builtin returns an error status, a non-interactive shell
 exits; variable assignments before a (special builtin ???) command stay in effect after the command completes.
 
 TODO
@@ -129,18 +178,24 @@ Executed in a new process.
 
 ** Execution Steps
 
-Input is separated by /metacharacters/ and tokenized. Then alias expansion is
-performed. Various shell expansions are then performed. Redirection is performed
+Input is separated by /metacharacters/ and tokenized.
+Various shell expansions are then performed. Redirection is performed
 if necessary. Variable assignments are saved. Commands are then executed and the
 shell waits for them to complete.
 
 *** Command Search
 
+- alias expansion (bypassed by =command=)
+
+- reserved words
+
+- function lookup (builtin can be overriden)
+
+- builtin commands (forced by =builtin=)
+
+- hashed regular utilities and then =PATH=.
+
 - search in the known function list
-
-- search in the builtins
-
-- search the =PATH=, cached in a hash table (=hash=).
 
 - error 127 if not found
 
@@ -321,7 +376,7 @@ All tokens in the expression undergo parameter expansion, command expansion and 
 
 The expression is similar to that of C.
 
-** Process Substitution (Bash, ksh, zsh, not POSIX)
+** Process Substitution (Bash, ksh93, zsh, not POSIX or mksh)
 
 A named pipe or a file under =/dev/fd/= is provided to a command as stdin or stdout.
 
@@ -404,19 +459,85 @@ bash supports extended debugging mode by loading the debugger profile.
 
 - [[https://github.com/rocky/bashdb][bashdb]] :: a full-fledged debugger
 
-* Job Control
+* Job Control =monitor=
 
-Enabled by the =monitor= option. Job control is a shell feature to allow
-multiple processes to run in a single shell: foreground/background (=fg=, =bg=,
-=&=), suspend (=suspend=, =^Z=), status (=jobs=, =ps=). =$$= displays the current
-shell PID, =$!= shows the the PID of the last command moved to the background.
+Job control is part of POSIX shell but some specific features in Bash are not.
 
-Each command (job) entered is identifiied by a /job number/, (/job ID/). A job
-refers to all the processes that are necessary to interpret an entire command
-line. Jobs are controlled by the shell.
+Job control refers to the ability to selectively suspend the execution of processes and
+resume their execution at a later point.:
+- foreground/background (=fg=, =bg=, =&=),
+- suspend (=suspend=, =^Z=), 
+- status (=jobs=, =ps=).
+- =$$= displays the current
+  shell PID, 
+- =$!= shows the PID of the last command moved to the background.
 
-A foreground job may be suspended by =^Z=, then resumed by =fg=. When the user
-logs out, all suspended jobs are terminated automatically. The current shell may
-be suspended with =suspend= if it is not a login shell. =bg= is useful when the
-command is not started with a =&= but later needs moving to the background (by
-first suspending it).
+Job control may be related to asynchronous background processes but not limited to.
+Job control is useful when there is no terminal multiplexer
+
+=&= always works to run a command asynchronously;
+the =monitor= option only changes how the shell manages and reports that background process.
+Without job control, it simply means we have no way to control the command started with =&=.
+
+** Concepts
+
+- *job*: A set of processes comprising a pipeline, and any processes descended from it,
+  that are all in the same process group.
+  + identified by a /job number/ (or /job ID/).
+  + a job is specified in commands by a /jobspec/: 
+    - =%n=: job number N
+    - =%%=, =%+=, =%=: the current job, the last job stopped in the foreground or started in the background.
+    - =%-=: the previous job or the only job.
+    - =%string=: a job of which the name starts with =string=
+    - =%?string=: a job of which the name contains =string=
+    - naming a job can be used to bring it foreground or set it to background with =&= after the specification.
+ + a job is associated with a pipeline.
+
+- *foreground/background process*
+  + only foreground processes are allowed to read from or write to the terminal.
+    Background processes are suspended when trying to read from or write to the terminal.
+  + the current terminal process group (foreground job) receives /keyboard-generated signals/.
+    Background processes are immune to such signals.
+
+** Controlling Jobs
+
+*** Query Jobs
+
+- =jobs=
+
+*** Waiting For a Job
+
+- =wait=: wait for job completion and return exit status
+
+*** Suspending a Job
+
+- =^Z= suspend the current program
+
+- =suspend=: suspends the current non-login shell until a =SIGCONT= is received.
+  + Generate =SIGCONT= with =kill=
+
+- =^Y=:  delay-suspend the current program
+  + only suspended when it attempts to read input from the terminal
+
+*** Setting to Foreground/background
+
+=fg= and =bg= put suspended jobs to foreground/background.
+
+When the user logs out, all suspended jobs are terminated automatically. 
+
+*** Stopping a Job
+
+- =kill jobspec|pid=
+
+*** Detaching a Job
+
+- =disown= (bashism) removes a job from the job table so that the shell can no longer 
+  control the job.
+  - default the current job
+  - =-h= option set =nohup= for the job so that when the shell exists, the job
+    does not receive a =SIGHUB= when the shell receives one.
+
+*** Autoresuming  Job
+
+With the variable =auto_resume=, if properly set, Bash will treat single word commands
+matching a pattern as a command to resume certain jobs, not as starting a new command.
