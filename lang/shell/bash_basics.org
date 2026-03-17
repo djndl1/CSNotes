@@ -541,3 +541,33 @@ When the user logs out, all suspended jobs are terminated automatically.
 
 With the variable =auto_resume=, if properly set, Bash will treat single word commands
 matching a pattern as a command to resume certain jobs, not as starting a new command.
+
+* Control Flow
+
+** Conditional
+
+#+begin_src shell
+if TEST-COMMANDS; then CONSEQUENT-COMMANDS; fi
+
+if TEST-COMMANDS; then
+  CONSEQUENT-COMMANDS;
+elif MORE-TEST-COMMANDS; then
+  MORE-CONSEQUENT-COMMANDS;
+else 
+  ALTERNATE-CONSEQUENT-COMMANDS;
+fi
+#+end_src
+
+Without =then=, the following tokens may be mistaken for arguments to test commands.
+
+=[= is an alias for =test=, =]= is an argument to =test= to mark the end of arguments.
+
+Most options of =test= test if a certain kind of file exists:
+- compare strings (especially with empty strings), =>=, =<=, ~==~, ~!=~
+- compare integers (=-eq=, =-ne=, =-lt=, =-le=, =-gt=, =-ge=)
+- the three boolean operators
+- =test= conditions can be normal commands: =0= exit status indicates true.
+
+With =[[= bash condition, one can even use :
+- regex match
+- prevents pathname expansion
