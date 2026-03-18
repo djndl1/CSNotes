@@ -393,6 +393,18 @@ while read line; do
 done < <(grep "pattern" file.txt)
 #+end_src
 
+*** Coprocess (Since Bash 4.0)
+
+Similar to mksh's coprocess in functionality.
+
+#+begin_src bash
+coproc NAME { command; }
+# or
+coproc command [args ...] # NAME is COPROC
+#+end_src
+
+Then other job can access the stdin/stdout of this coprocess via =NAME[0]= (stdout) and =NAME[1]= (stdin).
+
 ** Word Splitting
 
 =$IFS= is used as a list of delimiters to split the output of other expansions into words.
@@ -466,7 +478,7 @@ Job control is part of POSIX shell but some specific features in Bash are not.
 Job control refers to the ability to selectively suspend the execution of processes and
 resume their execution at a later point.:
 - foreground/background (=fg=, =bg=, =&=),
-- suspend (=suspend=, =^Z=), 
+- suspend (=suspend=, =^Z= sends a SIGTSTP), 
 - status (=jobs=, =ps=).
 - =$$= displays the current
   shell PID, 
@@ -511,7 +523,7 @@ Without job control, it simply means we have no way to control the command start
 
 *** Suspending a Job
 
-- =^Z= suspend the current program
+- =^Z= suspend the current program by sending =SIGTSTP=
 
 - =suspend=: suspends the current non-login shell until a =SIGCONT= is received.
   + Generate =SIGCONT= with =kill=
@@ -527,7 +539,8 @@ When the user logs out, all suspended jobs are terminated automatically.
 
 *** Stopping a Job
 
-- =kill jobspec|pid=
+- =kill jobspec|pid= 
+  + kill is builtin in bash
 
 *** Detaching a Job
 
@@ -546,6 +559,7 @@ matching a pattern as a command to resume certain jobs, not as starting a new co
 
 ** Conditional
 
+*** if statement
 #+begin_src shell
 if TEST-COMMANDS; then CONSEQUENT-COMMANDS; fi
 
@@ -567,7 +581,30 @@ Most options of =test= test if a certain kind of file exists:
 - compare integers (=-eq=, =-ne=, =-lt=, =-le=, =-gt=, =-ge=)
 - the three boolean operators
 - =test= conditions can be normal commands: =0= exit status indicates true.
+  + one may use arithmetic expansion as conditions.
 
 With =[[= bash condition, one can even use :
 - regex match
 - prevents pathname expansion
+
+*** case statement
+
+#+begin_src shell
+case EXPRESSION in 
+CASE1) COMMAND-LIST;; 
+CASE2) COMMAND-LIST;; 
+... 
+CASEN) COMMAND-LIST;; 
+*) COMMAND-LIST;;  # default
+esac
+#+end_src
+
+* Signal Handling
+
+An interactive Bash ignores =SIGTERM= and =SIGQUIT= (=^\=).
+If job control is enabled, =SIGTTIN=, =SIGTTOU= 
+(sent by the kernel to background processes to suspend them upon terminal access)
+and =SIGTSTP= are also ignored.
+
+An interactive shell will send a SIGHUP to all jobs upon exit.
+
