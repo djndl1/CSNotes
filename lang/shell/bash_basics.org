@@ -319,6 +319,9 @@ preserved in the result.
 
 ** Parameter and Variable Expansion
 
+Shell programming seems to group variables, position parameters and special parameters 
+under the term *parameter*.
+
 Variables can be *global* (environment variables, exported variables, by convention UPPERCASE) 
 or *shell*-local variables (by convention lowercase)
 
@@ -331,6 +334,42 @@ echo ${!A} # C indirect expansion
 
 echo ${VAR:=value} # default value if undefined.
 #+end_src
+
+*** =declare= and Variable Type
+
+With =declare=, we can force typing on variables.
+
+- =-p= (reflection): print a variable's attributes
+
+- =-a= 0-based heterogeneous indexed array (bashism) by integers
+  + An array element is basically a variable and thus requires =$arr[i]= to access it.
+    - =${arr[*/@]}= dereferences all elements: Use this for iteration.
+      #+begin_src bash
+for elm in ${arr[*]}; do ... done; //
+      #+end_src
+  + sparse in nature
+  + negative indices are supported.
+  + =arr[index]= indexing syntax
+  + ~(value1 value2 [2]=value3)~ initializer list
+  + no need to manually allocate a slot before assigning to it.
+    Bash arrays are dynamically and automatically expanded upon assignment.
+  + *test for an element*: use =[[ -v ]]= to test if a slot is occupied.
+  + *delete an element*: =unset arr[i]=
+  + Doesn't seem to be used much.
+
+- =-A= associative array (bashism)
+
+- =-f= function only
+
+- =-i= integer
+
+- =-r=, also as a separate keyword =readonly= (POSIX), and thus also used for *constants*.
+  + However, =readonly= in a function declares a global variable by default
+    and there is no way to combine =local= with =readonly=, use =declare -r= for that.
+
+- =-t= trace this variable only
+
+- =-x= export
 
 *** Common Useful Variables & Parameters.
 
@@ -599,6 +638,22 @@ CASEN) COMMAND-LIST;;
 esac
 #+end_src
 
+* Functions
+
+#+begin_src bash
+function FUNCTION { COMMANDS; }
+FUNCTION () { COMMANDS; }
+#+end_src
+
+- The curly braces must be separated from the body by spaces, otherwise they are interpreted in the wrong way.
+
+- *Parameters*: Functions are like mini-scripts that accept parameters. However, the arguments starts with actual arguments at =$1=,
+  =$0= would be the shell name (=$@= and =$#= excludes it).
+
+- *local variables*: Functions support =local= parameters.
+
+- =type funcname= (coreutils's =which= cannot do hits) to display its definitions
+
 * Signal Handling
 
 An interactive Bash ignores =SIGTERM= and =SIGQUIT= (=^\=).
@@ -608,3 +663,21 @@ and =SIGTSTP= are also ignored.
 
 An interactive shell will send a SIGHUP to all jobs upon exit.
 
+#+begin_src shell
+trap [COMMANDS] [SIGNALS]
+#+end_src
+
+** Use
+
+- Cleanup upon exit
+  #+begin_src bash
+LOCKFILe=/var/lock/mylock.lock 
+[ -f $LOCKFILE ] && exit 0
+
+trap  "{ rm -f $LOCKFILE ; exit 255; }" EXIT
+
+touch $LOCKFILE
+....
+
+exit 0
+  #+end_src
