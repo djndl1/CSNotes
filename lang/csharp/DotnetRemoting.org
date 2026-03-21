@@ -24,7 +24,7 @@ developers have built by using DCOM.
   + *Socket*
   + *RPC*
     - /Interface Definition Language/
-    - /Marshaling/, the process of passing parameters from one context to another.
+    - /Marshaling/, the process of passing data from one context to another (not the same as serialization but broader)
     - /stub/
 
 - Distributed Objects
@@ -43,8 +43,9 @@ developers have built by using DCOM.
   + *easy administration* since business rules are now centralized.
 
 - Challenges of Distributed Applications
-  + /Performance/: communication tends to be chunky. Properties access and
-    callbacks require roundtrips and are expensive.
+  + /Performance/: communication tends to be chunky. Remote property access and
+    callbacks require expensive roundtrips. The best optimization 
+    is to avoid making distributed calls whenever possible: /chatty vs. chunky trade-off/
     - .NET Remoting: comparable to that of DCOM
   + /Network and Firewall/: the message should be easily passed across the
     Internet and various firewalls.
@@ -85,10 +86,12 @@ unmanaged application-per-process model.
 - /Contexts/ :: a further division within an application domain where a common
   set of constraints and usage semantics will govern all access to the objects
   within it.
+  + e.g. synchronization context (where only a single thread is allowed). Each
+  appdomain contains at least one context and has a default context if not specifically required.
 
 A remotable object can be either *marshal-by-value* (=SerializableAttribute=),
 *marshal-by-reference* (=System.MarshalByRefObject= subtypes)
-or *context-bound* (=System.ContextBoundObject=).
+or *context-bound* (=System.ContextBoundObject=, TODO).
 
 ** Object Activation
 
@@ -96,11 +99,12 @@ or *context-bound* (=System.ContextBoundObject=).
   + Marshal-by-reference types support [[#server_activation][*server activation*]] and [[#client_activation][*client activation*]].
   + Marshal-by-value types are copied via serialization and activated upon
     deserialization.
+  + A type's activation is determined by the configuration of the .NET Remoting infrastructure rather than the type itself.
 
 - Metadata distribution
   + The client may reference the server assembly directly to obtain the metadata.of remotable objects.
   + create a metadata assembly of stand-in class definitions with the same name as the server's implementation
-    assembly's.
+    assembly's but empty implementation (not really used).
   + both sides reference the same contract assembly that contains only
     interfaces and parameter/retval/​=EventArgs= type definitions. This requires the use of
     =Activator.GetObject= and server-activated factory objects for object activation.
@@ -114,7 +118,11 @@ or *context-bound* (=System.ContextBoundObject=).
 By MS .NET Remoting[cite:@scott_mclean_microsoft_2002], the mechanism works like this.
 
 #+begin_quote
-The .NET Remoting infrastructure refers to server-activated types as well-known object types because the server application publishes the type at a well-known Uniform Resource Identifier (URI) before activating object instances. The server process hosting the remotable type is responsible for configuring the type as a well-known object, publishing it at a specific well-known endpoint or address, and activating instances of the type only when necessary.
+The .NET Remoting infrastructure refers to server-activated types as well-known object types 
+because the server application publishes the type at a well-known Uniform Resource Identifier (URI) before activating object instances. 
+The server process hosting the remotable type is responsible 
+for configuring the type as a well-known object, 
+publishing it at a specific well-known endpoint or address, and activating instances of the type only when necessary.
 #+end_quote
 
 Objects can be either activated in /singleton-mode/ or /single-call mode/.
@@ -124,10 +132,22 @@ Objects can be either activated in /singleton-mode/ or /single-call mode/.
   as the application.
   + stateful
   + lifetime can be configured.
+  #+begin_src csharp
+  // server registration
+ RemotingConfiguration.RegisterWellKnownServiceType(typeof(MySingletonType), "SomeURI", WellKnownObjectModes.Singleton); 
+ // client configuration
+ RemotingConfiguration.RegisterWellKnownClientType(typeof(MySingletonType), "MyUri");
+  #+end_src
 
 - /Single Call/ :: a new instance of that type for every method invocation a
   client makes.
-  + stateless, but still an OOP object though with a very limited lifetime.
+  + stateless, for more traditional RPC, but still an OOP object though with a very limited lifetime.
+  #+begin_src csharp
+  // server registration
+ RemotingConfiguration.RegisterWellKnownServiceType(typeof(MySingleCallType), "SomeURI", WellKnownObjectModes.SingleCall); 
+ // client configuration
+ RemotingConfiguration.RegisterWellKnownClientType(typeof(MySingleCallType), "MyUri");
+  #+end_src
 
 A server-activated object can be created with =new= after registration
 (instantiable object), or with =Activator.GetObject()= if it is returned as an interface.
@@ -145,6 +165,13 @@ A client activated object can be created with the =new= operator after
 registration (instantiable object)
 or by a server-activated factory object, especially when the client-activated object
 is returned as an interface.
+
+#+begin_src csharp
+// server side registration
+RemotingConfiguration.RegisterActivatedServiceType(typeof(ClientSideActivatedType));
+// client side configuration
+RemotingConfiguration.RegisterActivatedClientType(typeof(ClientSideActivatedType), "http://someURL");
+#+end_src
 
 ** Lease-based Object Lifetime Management
 
@@ -210,7 +237,7 @@ Everything placed in an =IMessage=, including object references, has to be seria
 
 ** Proxies
 
-The client uses the proxy object to interact with the remote object.
+The client uses a proxy object to interact with the remote object by some IPC.
 
 Remotable =MarshalByRefObject= are represented and serialized as =ObjRef= to
 cross .NET Remoting boundaries. The server sends an =ObjRef= to the client and
@@ -220,6 +247,8 @@ identity info and the transport channel info)
 provided in the =ObjRef= instance.
 The receiver is expected to have access to the assembly defining the type's
 implementation since only metadata is sent.
+
+=MarshalByRefObject= is used mostly for cross-appdomain object reference.
 
 - *Transparent Proxy* ::  the one that the client directly access, generated on
   the fly with an =ObjRef=.
@@ -242,7 +271,7 @@ support a wide variety of protocols and wire formats.
 
 - *Channel Sinks* :: plug-in points that allow access to the underyling messages
   flowing through the channel as well as the stream used by the transport
-  mechanism to send messages to a remote object.
+  mechanism to send messages to a remote object. Sinks are processors along the chain.
   + a sink receives a stream and the message from the previous sink in the
     chain; performs some action on the message or stream and passes the result
     to the next sink in the chain.
@@ -254,6 +283,25 @@ support a wide variety of protocols and wire formats.
 :ID:       403a89e0-f26b-4c4c-a1c5-4425e685e030
 :END:
 
+** Implement Remoting
+
+- Make types remotable: =Serializable= or =MarshalByRefObject=
+
+- Choose a host appdomain: console app, winforms app, windows services, IIS, COM+
+  + console app: great for development and debugging, requires explicit startup
+  + winforms: with a GUI
+  + windows service: automatic startup and constantly running
+  + IIS: easy security configuration; HTTP only
+  + COM+: distributerd transactions and object pooling.
+
+- Choose an activation model
+
+- Choose a channel and a port
+
+- Choose how clients obtain the server's metadata
+
+There last three steps can be configured via a configuration file.
+
 ** Events
 
 A remote event is basically a method call from the server back to the client,
@@ -261,6 +309,8 @@ thus requiring that the client be itself a server, i.e., the client must have a
 channel that is able to receive messages. Also,
 both sides should be able to deserialize delegates, i.e.
 with a binary formatter provider of =TypeFilterLevel.Full=.
+In .NET Remoting, a callback to the client requires a separate channel, not the original one
+(typically the client's TCP channel).
 
 Event handlers may be executed on the server or on the client depending on
 whether the object is on the client or on the server. If the server knows
@@ -300,6 +350,31 @@ public class EventWrapper : MarshalByRefObject
     }
 }
 #+end_src
+
+* =IMessage=
+
+.NET Remoting uses =IMessage= objects throughout the Remoting architecture.
+A few child interfaces are defined to further describe .NET Remoting messages of various types
+
+- =IMethodMessage=: describes stack-based methods
+
+- =IMethodReturnMessage=: describes all messages returning to the client.
+
+- =IMethodCallMessage=: 
+
+- =IConstructionCallMessage=: activates a client-activated object.
+
+- =IConstructionReturnMessage=: as a response to object activation
+
+* Proxies
+
+.NETFX creates a =TransparentProxy= dynamically by reflecting on the metadata of the remote object to act as a standin.
+TransparentProxy intercepts a method call on it and creates a =MessageData= to describe the method call
+and then passes to the =RealProxy= to create the remoting message. =TransparentProxy= is created by the framework
+and the user can only customize =RealProxy=.
+
+Proxy customization does not require server-side cooperation. However, if both sides need customization, better use message
+sinks.
 
 * Bibliography
 

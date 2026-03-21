@@ -1,0 +1,82 @@
+| filepath | summary |
+|----------|---------|
+| os/concurrency.org | OS concurrency concepts covering synchronization mechanisms mutual exclusion semaphores monitors message passing thread coordination |
+| os/concepts/case_study.md | UNIX Linux evolution MULTICS MINIX lineage Linux internals processes memory CFS scheduling synchronization Windows NTOS kernel layers subsystems boot process modern apps versus desktop |
+| os/concepts/filesystems.md | file system fundamentals file abstraction types operations directory structures allocation strategies contiguous linked FAT inodes log-structured journaling VFS disk-space management backup consistency checking performance optimization MS-DOS UNIX CD-ROM |
+| os/concepts/IO.md | I/O hardware device controllers DMA transfer modes interrupts precise imprecise programmed interrupt-driven DMA methods four-layer software architecture blocking non-blocking disk clock keyboard mouse X Window GUI WIMP touch screens resistive capacitive power management ACPI |
+| os/concepts/memory_management.md | memory protection relocation IBM-360 protection keys base-limit registers address spaces swapping compaction virtual memory paging segmentation page tables multilevel TLB replacement algorithms placement policies shared libraries mapped files cleanup daemons Intel x86 segmentation LDT GDT position-independent code |
+| os/concepts/overview.md | operating systems dual role extended machine abstraction resource manager five generations batch mobile mainframes sensor nodes hardware CPU cache services processes filesystems protection system calls Win32 API monolithic layered microkernel virtual machine exokernel unikernel |
+| os/concepts/processes_threads.md | process model execution states transitions thread resource grouping userspace-kernel-hybrid IPC race conditions mutual exclusion busy waiting semaphores mutexes futexes condition variables monitors barriers producer-consumer readers-writers dining philosophers message passing mailboxes rendezvous scheduling batch interactive real-time fair-share lottery Unix nice load balancing |
+| os/concepts/security.md | OS security CIA triad confidentiality integrity availability trusted computing base reference monitor access control lists capabilities tagged architectures cryptography symmetric asymmetric Kerckhoffs digital signatures certificates PKI TPM authentication knowledge possession biometrics salted hashed passwords OTP exploitation buffer overflows shellcode stack canaries DEP ASLR return-to-libc ROP gadgets format strings dangling pointers null dereference integer overflow command injection TOCTOU |
+| os/concepts/virtualization_cloud.md | virtualization history IBM SIMMON CP-67 hypervisors Type 1 Type 2 efficiency safety fidelity binary translation paravirtualization trap-emulate VT SVM nested page tables EPT balloon reclaiming I/O MMU passthrough SR-IOV cloud IaaS PaaS SaaS live migration pre-copy VMware multicore elasticity resource pooling |
+| os/dos/dos_basics.org | DOS commands file operations memory conventional upper extended XMS expanded EMS network protocols packet drivers SSH obsolete algorithms |
+| os/dos/DOS_Programming.org | DOS architecture BIOS interrupts DOS kernel INT 21H freeDOS extenders DPMI VCPI protected mode DJGPP CWSDPMI memory management COFF COM EXE binaries |
+| os/dos/pcbios.org | PC BIOS hardware-software interface diagnostic routines device drivers interrupt service routines booting hardware initialization system control software interrupts |
+| os/OSCode/unix/deps/modernlib/README.org | Modernlib C utility library generic types functions macro-based templates three-file module structure interface implementation macro headers |
+| os/OSCode/win32/deps/modernlib/README.org | Modernlib C utility library generic types functions macro-based templates three-file module structure interface implementation macro headers |
+| os/unix_linux/adio.md | advanced I/O nonblocking record locking multiplexing select poll POSIX asynchronous memory-mapped system calls structures |
+| os/unix_linux/APUE.md | Unix system overview system calls standardization ISO C POSIX SUS implementation limits signals primitive data types Advanced Programming UNIX Environment |
+| os/unix_linux/classic_unix.org | classic Unix 7th Edition System V BSD philosophy small composable programs terminal operation login utilities who mail write |
+| os/unix_linux/fileio.org | POSIX file I/O open read write lseek close file descriptors process table file table v-node nonblocking atomic synchronized fsync O_SYNC multiplexed select poll epoll buffered wide character temporary files |
+| os/unix_linux/fsdir.org | filesystem inodes hard symbolic links file types permissions ownership timestamps directory operations device special files stat structure |
+| os/unix_linux/ipc.md | Unix IPC half-duplex pipes related processes full-duplex FIFOs named pipes unrelated XSI message queues semaphores shared memory POSIX named unnamed |
+| os/unix_linux/linux_distro/init.org | init systems SysV runlevels rc scripts OpenRC Runit systemd units targets service management journalctl logging |
+| os/unix_linux/Linux_From_Scratch/build_process.org | LFS build host installation partitions packages cross toolchains chroot final system compilation |
+| os/unix_linux/Linux_From_Scratch/cross_toolchain.org | GCC Canadian Cross LFS three stages host-LFS cross compiler LFS-LFS cross native LFS compiler |
+| os/unix_linux/Linux_From_Scratch/System_components.org | LFS components toolchains GCC binutils glibc libraries zlib ncurses readline utilities coreutils bash system services binaries |
+| os/unix_linux/linux_programming_interface.org | universal I/O model Linux process architecture PID memory layout virtual memory argv env setjmp longjmp malloc break sbrk debugging credentials real effective saved setuid setgid filesystem UID GID |
+| os/unix_linux/linux_sockets.md | socket domains UNIX IPv4 IPv6 types stream datagram TCP/IP layers address structures DNS resolution server client connection |
+| os/unix_linux/linux_syscall_misc.org | Linux syscalls unimplemented errno thread-local error indicator system calls library functions |
+| os/unix_linux/linux_terminal.org | terminal special characters Ctrl-H Ctrl-M Ctrl-D termcap terminfo curses terminal driver architecture tcgetattr tcsetattr stty configuration |
+| os/unix_linux/linux_user_management.org | Linux PAM Pluggable Authentication Modules shadow passwords salt four aspects account authentication password session |
+| os/unix_linux/LSM_selinux_apparmor_etc.org | Linux MAC frameworks LSM hooks SELinux security contexts policies AppArmor path-based profiles process confinement |
+| os/unix_linux/network_sockets.md | network socket descriptors addressing IPv4 IPv6 structures byte order conversion connection establishment data transfer DNS service resolution |
+| os/unix_linux/processes.md | process organization command-line arguments environment variables memory layout setjmp longjmp termination exit _exit abort signals resource limits PIDs fork exec user group IDs interpreter system function job control daemons |
+| os/unix_linux/security_mechanism.org | Unix security /etc/passwd /etc/shadow passwords /etc/group authentication crypt getpass login program user group lookup system calls |
+| os/unix_linux/signals.org | Unix signals asynchronous notifications hardware user software synchronization IPC SIGINT SIGTERM SIGSEGV dispositions default ignore catch sigaction masks pending reliability |
+| os/unix_linux/static_shared_lib.md | static libraries ar archives shared libraries -fPIC -shared dynamic linking versioning sonames symbol visibility dlopen LD_PRELOAD |
+| os/unix_linux/system_datafiles_info.md | system data /etc/passwd /etc/shadow passwords /etc/group groups supplementary IDs login utmp wtmp uname identification |
+| os/unix_linux/system_programming_concepts.org | system programming kernel calls library calls errno portability feature test macros _POSIX_C_SOURCE _XOPEN_SOURCE _GNU_SOURCE _DEFAULT_SOURCE standardized types |
+| os/unix_linux/termux.org | Termux Android development Python packages QEMU emulation limitations cross-compilation sysroots compilers FreeBASIC DJGPP OpenWatcom |
+| os/unix_linux/threads.md | POSIX threads pthreads creation termination mutexes reader-writer locks condition variables spin locks barriers thread-specific data reentrancy cancellation attributes safety |
+| os/unix_linux/time.md | Unix timekeeping calendar time_t Epoch process CPU user system wall-clock clock_gettime high-resolution conversion struct tm gmtime localtime mktime strftime strptime |
+| os/unix_linux/unix_history.org | Unix history Bell Labs BSD AT&T System V standardization POSIX X/Open SUS Linux GNU tools filesystem hierarchy |
+| os/unix_linux/unix_linux_instant_messenger.org | Unix Linux messaging write talk talkd tmux sharing iptux LAN |
+| os/unix_linux/unix_mail.org | email MUA Mail User Agents Mutt IMAP POP3 SMTP |
+| os/unix_linux/userland/coreutils_impl.org | getopt getopt_long command-line arguments repeated calls argc argv option specifications |
+| os/unix_linux/userland/manpages.org | manpage browsing MANPAGER neovim apropos listing /etc/man_db.conf configuration sections paths |
+| os/unix_linux/userland/system_monitor.org | monitoring ps POSIX pstree trees fuser file-using top interactive sorting filtering management |
+| os/unix_linux/userland/timezone_mgmt.org | timezone /etc/localtime tzdata timedatectl dpkg-reconfigure /etc/timezone POSIX TZ environment |
+| os/unix_linux/userland/udev.org | udev rules external disk power-off manage_system_start_stop usb-storage uas drivers |
+| os/unix_linux/winehq.md | Wine architecture wineserver IPC builtin DLLs ntdll kernel32 user32 prefix structure DLL loading built-in native virtual desktop WINEDEBUG channels |
+| os/windows/ATL.org | ATL COM CComObjectRootEx IUnknown CComCoClass factory COM_MAP QueryInterface collections enumerators IDispatch |
+| os/windows/cli.org | Windows console IOCTL ConPTY pseudo-console UTF-8 ANSI VT ConHost condrv Unicode limitations Windows 10 improvements |
+| os/windows/COM_WinRT/COM.org | COM interface inheritance implementation IDL GUID IUnknown queryInterface reference counting apartments STA MTA activation registry monikers out-of-process |
+| os/windows/COM_WinRT/WinRT.org | Windows Runtime modern COM replacement component model |
+| os/windows/MINGW.org | MinGW-w64 GCC distributions gendef widl cross-compilation triplets Unicode wmain C99 printf PSEH structured exceptions |
+| os/windows/NET_AS_A_BETTER_COM.org | .NET improved COM CLR metadata CIL intermediate assemblies manifests version-aware loading security signing |
+| os/windows/package_manager.org | Scoop apps buckets Git JSON manifests user-specific shims versioned junctions folders apps buckets cache persist shims |
+| os/windows/win10_sys_programming.org | Windows 10 process thread kernel objects handles creation termination UWP AppContainers session isolation user mode HAL |
+| os/windows/win32_abi.org | Win32 ABI SystemV-Intel386-pSABI ILP32 calling conventions __cdecl __stdcall __fastcall name decoration parameters return values stack alignment |
+| os/windows/win98_support.org | Windows 98 QEMU installation VBE graphics PCI bus Intel Pro 1000 network GCC 11.1.0 port |
+| os/windows/windows_crt.org | Universal CRT UCRT VCRuntime AppCRT DesktopCRT ucrtbase.dll deployment system-wide embedded API sets OneCore.lib Win32 portability |
+| os/windows/WinAPI/console.org | console I/O UTF-16 UTF-8 ANSI code pages UCRT _write fwrite printf WriteConsoleW WriteFile raw Unicode locale |
+| os/windows/WinAPI/dll.org | DLL linking implicit load-time .lib .def explicit runtime LoadLibrary GetProcAddress DllMain symbol visibility side-by-side assemblies Component Store |
+| os/windows/WinAPI/io.org | Windows I/O filesystem links hard junctions symlinks mount points naming MAX_PATH CreateFile ReadFile WriteFile CloseHandle standard handles |
+| os/windows/WinAPI/memory.org | memory management HeapCreate GetProcessHeap memory-mapped CreateFileMapping MapViewOfFile C library Win32 APIs relationship |
+| os/windows/WinAPI/overview.org | WinAPI fundamentals kernel objects handles long names HANDLE DWORD BSTR types ANSI Unicode compilation UTF-8 Boost.NoWide |
+| os/windows/WinAPI/process.org | process CreateProcess inheritable handles information retrieval ExitProcess TerminateProcess WaitForSingleObject environment job objects |
+| os/windows/WinAPI/security.org | security LSA SAM Active Directory Security Reference Monitor ACLs ACEs security descriptors SIDs impersonation privileges kernel objects |
+| os/windows/WinAPI/seh.org | Structured Exception Handling __try __except __finally filter expressions EXECUTE_HANDLER CONTINUE_SEARCH CONTINUE_EXECUTION console control VEH Vectored |
+| os/windows/WinAPI/thread.org | thread CreateThread ExitThread identity GetCurrentThread GetCurrentThreadId suspend resume termination waiting TLS TlsAlloc TlsSetValue boss worker work crew client server models |
+| os/windows/WinAPI/time.org | FILETIME 100-nanosecond ticks 1601-01-01 UTC ULARGE_INTEGER QuadPart alignment faults Win64 |
+| os/windows/WinAPI/winsdk.org | Windows SDK _WIN32_WINNT WINVER targeting _In_ _Out_ _Outptr_ annotations WORD HANDLE LPSTR BOOL BOOLEAN types |
+| os/windows/Windows10_Support.org | Windows 10 APIs Windows 7 WebSocket XAudio2 Windows Runtime WinUI UWP Visual Studio 2022 build 1909+ 64-bit |
+| os/windows/Windows7_Support.org | Windows 7 APIs XP conditional variables threadpools Direct2D DirectWrite GCC PowerShell MSVC Python 3.8 Java 11 Go 1.20 .NET 4.8 |
+| os/windows/Windows_XP_Internals/Architecture.org | Windows XP design goals user kernel mode executive Object Manager I/O Manager Memory Manager HAL drivers Smss Csrss Winlogon Lsass |
+| os/windows/Windows_XP_Internals/concepts.org | XP terminology WinAPI native services kernel routines Windows services 9x differences multiprocessor security 32-bit protected memory |
+| os/windows/Windows_XP_Internals/System_mechanisms.org | XP kernel trap interrupt exception IRQL DPC APC worker threads LPC WoW64 synchronization primitives |
+| os/windows/WindowsXP_Support.org | XP software GCC w64devkit MinGW-w64 v11 Python 3.4.4 2.7.9 Java JDK 8 Go 1.10 .NET 4.0 SQL Server 2008R2 Oracle 11.2 |
+| os/windows/Windows7_Support.org | Windows 7 support APIs XP tools compatibility |
+| os/windows/Windows10_Support.org | Windows 10 support modern APIs features |
+

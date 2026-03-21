@@ -1,19 +1,3 @@
-# OOP design
-
-An object is a collection of dat and associated behaviors.
-
-- OO analysis -> identifies the objects and interactions between those objects;
-
-- OO design -> converting the resulting requirements of OOA into an implementation specification.
-
-- OO programming -> converting the design into a working program.
-
-Most twenty-first century development happens in an iterative development model. In iterative development, a small part of the task is modeled, designed, and programmed, then the program is reviewed and expanded to improve each feature and include new features in a series of short development cycles.
-
-Objects: attributes, behaviors
-
-Objects are an abstraction of a real concept. Abstraction means dealing with the level of detail that is most appropriate to a given task. Abstrction is the process of encapsulating information with separate public and private interfaces.
-
 ## Two basic OO principles
 
 - Composition is the act of collecting several objects together to create a new one. Aggregation is almost exactly like composition. The difference is that aggregate objects can exist independently.
@@ -29,28 +13,6 @@ PEP8 recommends that classes be named using CamelCase notation.
 The one difference between methods and normal functions is that all methods have one required argument `self`, a reference to the objet that the method is being invoked on.
 
 Python has a constructor (`__new__()`) and an initializer (`__init__()`).
-
-Besides not cluttering up our namespace, `import`  instead of `from aaa import *` at the beginning of the file is more clear on what is available.
-
-A module is just a file. A __package__ is a collection of modules in a folder, where `__init__.py` is placed. The name of the package is the name of the folder. Absolute imports specify the complete path to the module, function, or path, which will work from any module. Relative imports are basically a way of saying find class, function, or module as it is positioned relative to the current module. Suppose we have the following package hierarchy:
-
-```bash
-parent_directory/
-    main.py
-    ecommerce/
-        __init__.py
-        database.py
-        products.py
-        payments/
-            __init__.py
-            square.py
-            stripe.py
-```
-
-```python
-from .database import Database   # products.py imports database.py
-from ..database import Dataqbase # from the payments folder
-```
 
 Private attributes are prefixed by `__` (on which name mangling will be performed), internal attributes with `_` (still accessible).
 
@@ -112,3 +74,153 @@ never its ancestors' method with the same name unless `super()` is used.
   - be careful with the order in which `super().__init__()` and other code are placed: it might cause unexpected results.
   
 See [OOP Test Code](../CodeOfLanguages/python_tutorial/python_oop_test.py)
+
+# Object Models
+
+An object has an _identity_ `id()` and a _value_ (mutale or immutable), determined (including mutability) by its _type_.
+
+Operations that compute new values may actually return a reference to any existing object with the same type and value, while for mutable objects this is not allowed: `1` may or may not be the same integer object.
+
+## Type Hierarchy
+
+- `None`: a single value/object.
+
+- `NotImplemented`: retruned by unimplemented numeric or rich comparison methods.
+
+- `...` or `Ellipsis`: a single object/value
+
+- numeric types
+
+- Various container types
+
+- Callable: 
+  - built-in functions
+  - built-in methods
+  - classes (as factories for new instances)
+  - class instances with `__class__()`
+  - user-defined functions
+  - instance methods: an instance method is a function bound to a class instance, with the instance 
+    as its first argument.
+  - generator functions
+  - coroutine function (async)
+  - asynchronous generator functions
+
+- modules
+  - a module has a namespace (`module.__dict__`)
+
+- Custom classes
+  - `__dict__`: class namespace that contains class attributes (but not the only way)
+  - `type.mro()`: called to create `__mro__` and may be overridden
+  - `__subclasses__()`: its direct subclasses
+
+- Class instances
+  - `__class__`: its class object instance
+  - `__dict__`: an object's writable attributes. Some objects have `__slots__` instead of `__dict__`
+
+- File objects
+
+## Special Methods
+
+For operator overloading, constructors, initializers and finalizers.
+
+### Object Construction
+
+The `__new__(cls, args...)` static method is called first and creates an instance of the class,
+and then the initializer `__init__(self, args...)` is called to further customize the instance (the reason 
+ why it has the `self` reference to the instance). Both methods accept the same set of arguments.
+
+Explicit calls to `__init__` and `__new__` of the superclass are necessary to create and initialize the parents data: there is the ultimate superclass' `object.__new__()` that is responsible for allocating memory for the object.
+
+Improperly implementing `__new__` and `__init__` can result in [some weird result](https://pdarragh.github.io/blog/2017/05/22/oddities-in-pythons-new-method/).
+
+`__new__` is not used much as Python is dynamic enough to create attributes in `__init__` 
+or even defining new classes in a function.
+
+#### Some Examples of `__new__`:
+
+```python
+# create an object without using __init__
+class Person:
+    def __new__(cls, name):
+        instance = object.__new__(cls)
+        return instance
+
+# as a hook
+class LowerCaseTuple(tuple):
+   def __new__(cls, iterable):
+      lower_iterable = (l.lower() for l in iterable)
+      return super().__new(cls, lower_iterable)
+
+# subclassing an immutable class
+class SuperInt(int):
+    def __new__(cls, value):
+        return super().__new__(cls, value ** 2)
+
+# singleton. But module-level constant is probably a better way
+class Singleton:
+    instance_ = None
+
+    def __new__(cls):
+        if cls.instance_ is None:
+            cls.instance = super().__new__(cls)
+        return cls.instance_
+```
+
+
+
+### Object Finalization
+
+`__del__(self)` is called before an object is destroyed. Note that this is not the method being called 
+when the `del` operator is used, which simply decrease the refcount.
+
+Explicit calls to a superclass' `__del__` is required to properly dispose an object.
+
+### `__bytes__`, `__str__`, `__repr__` and `__format__(self, format_spec)`
+
+The official wording is somewhat confusing.
+`repr` is mean to be unambiguous and `__str__` readable. `__repr__` for authors (debugging, logging etc.) and `__str__` for users.  `__bytes__` returns a byte string representation.
+ 
+`str` uses `repr` if no `__str__` is defined. `__format__` generates a formatted string depending on the input specification.
+
+### `__eq__` and `__hash__`
+
+The purpose of a hash function is to find equivalent objects in a hashed collection.
+Equal objects should return the same hash:
+
+1. If `___eq__` is not defined then `__hash__` has no meaning and thus should be not defined (`__hash__ = None`).
+
+2. An object with `__eq__` but not `__hash__`  cannot be hashed (implicitly set to `None` by Python) and thus cannot be used in a hashed collection
+
+3. mutable objects should not implement `__hash__` since its hash would be mutable.
+
+`__hash__` and `__eq__` are inherited from `object`, which uses identity comparison.
+
+### `__bool__`
+
+Called to implement truth values and for `bool()` to use. Otherwise `__len__()` is called. If None are defined, all instances are considered true.
+
+## `__dict__`
+
+Most if not all objects have a special attribute `__dict__` that stores its dynamic writable attributes (including data attributes, methods, metadata etc.). Class members and instance members are typically stored in it. Builtin types, their instances, and builtin functions and those objects with a `__slot__` attribute do not have it. The `__slots__` attribute is intended to be a memory-efficient, immutable alternative to `__dict__`. Types with a `__dict__` supports dynamic addition and deletion of an attribute by assigning or `del` the attribute directly.
+
+using `vars()` for introspection and debugging is more Pythonic than using the `__dict__` attribute directly.
+
+When accessing to a class attributes, `__dict__` in the child class is searched first and then its parents `__dict__`.
+Instance attribute access searches only the child's, even although `super().__init__()` adds parents' attributes to a child instance.
+
+### Use
+
+- memoizing without defining a callable user class, a normal function is enough to hold attributes with `__dict__`.
+
+- introspecing and debugging attributes
+
+- Serialization, instead of serializing the object itself.
+
+- Avoid infinite recursion by bypassing descriptors 
+  when writing descriptors due to attribute naming 
+  collides with that of the descriptor's implementation.
+
+### What about `setattr`, `getattr`, `delattr`, `hasattr` 
+
+These are generally the better tools to manipulate attributes.
+The support more attribute implementation other than `__dict__` including `__slots__`

@@ -1,0 +1,35 @@
+* Formatter-based Serialization: The Legacy Serialization 
+
+Obsolete since .NET 8, provided by a package =System.Runtime.Serialization=.
+
+** =SerializableAttribute= and =ISerializable=
+
+=SerializableAttribute= indicates that a class can be serialized by .NETFx using 
+binary =BinaryFormatter=, XML (=XmlObjectSerializer=) serialization or some other custom serializers
+(the builtin serialization mechanism since .NET 1.1).
+
+=ISerializable= defines an interface for serialization; an additional special constructor
+that has the same signature as =GetObjectData= should also be defined for deserialization 
+(an implicit requirement of the interface). The two parameters (=SerializationInfo= is created 
+passed in and used by by a formatter)
+
+#+begin_quote
+The ISerializable interface implies a constructor with the signature 
+constructor(SerializationInfo information, StreamingContext context). 
+At deserialization time, the current constructor is called only after the data in the SerializationInfo 
+has been deserialized by the formatter.
+In general, this constructor should be protected if the class is not sealed.
+#+end_quote
+
+=MarshalByRefObject= can also be serialized, however these custom serialization is overriden by =ObjRef=
+under .NET Remoting.
+
+** =IDeserializationCallback= Completion Notification
+
+One may want to be notified when deserialization is complete by implementing =IDeserializationCallback=
+
+** Surrogate Selector
+
+Every formatter can have a =SurrogateSelector= (=ISurrogateSelector=).
+A surrogate =ISerializationSurrogate= is an object that handles the deserialization of another object, 
+which decouples the definition of a class from its serialization.

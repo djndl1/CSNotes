@@ -56,6 +56,8 @@ the last supported version is 3.7.1, which is only better than GCC 4.
 
 Visual Studio 2010; Windows SDK 7.1 (MSVC 16.00)
 
+If A different MSVC Redistributable 2010 is installed, it should be uninstalled so that SDK 7.1 installer may run.
+
 * Python
 
 The last officially supported version of Python is 3.4.4 (EOL March 2019), and pip version 19.1.1.
@@ -163,6 +165,20 @@ positional argument the source file (under mono, =csc.exe= is the second
 argument),
 fixed only since Roslyn 2.0, which unforunately requires .NET 4.6.
 
+No good source line debuggers exist for modern PDB files. Nor is it possible 
+to remote debug on Windows XP. =mdbg= works at CIL level.
+
+Strangely, programs built by =dotnet build= on a samba host requires full =rwx= to run 
+over SMB by XP.
+
 * SQL Server
 
 SQL Server 2008R2 is last version supported.
+
+* Oracle 
+
+11.2, both client and server.
+
+* MariaDB 
+
+10.1.13

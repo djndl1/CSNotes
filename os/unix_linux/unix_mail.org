@@ -1,0 +1,21 @@
+#+begin_quote
+Electronic mail was there from the start.
+#+end_quote
+
+* History
+
+** CTSS
+
+- Used privileged ATTACH call to switch to recipient's file directory
+- Added messages to user's PRIVATE mode mailbox file on disk
+- Messages limited to 2592 BCD characters (one disk record) due to scarce disk space
+- File locking prevented interference between readers/writers
+- LOGIN command would print "YOU HAVE MAIL BOX" at login
+- Features: user-to-user, asynchronous, file-based, persistent, secure
+
+* Basic Terms & Concepts
+
+- /Mail User Agent/: mail client
+  + Mutt (IMAP, POP3, SMTP)
+
+

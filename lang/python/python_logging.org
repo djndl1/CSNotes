@@ -1,0 +1,52 @@
+* Built-in =logging=
+
+** Architecture
+
+Each module creates its own =logging.Logger= with the module name as the logger's name.
+=logging.Logger= is what the application code uses to output logs.
+
+A logger dispatches log records to *handlers* (targets) 
+and handlers send the log records to appropriate destinations.
+
+Formatters are responsible to format log records into the final output.
+Log records have a number of attributes that are used by formatters to generate log messages.
+
+Filters provide a finer grainted facility for determining which log records to output.
+
+Log event information is passed between loggers, handlers, filters and formatters in a =LogRecord= instance.
+
+** Logger
+
+Loggers are created by =logging.getLogger= and maintained by the library with its name as the key.
+Loggers may be organized into a hierarchy like modules and packages, named like =pacakge.module.submodule=.
+A logger at a lower level is a child of the its upper level. A child logger without setting a log level (=NOTSET=) will inhereits its parent's, that is, delegates the message to its parent. But unless set so, a child logger will not propagate its log records to its parent.
+
+** Formatting
+
+Formatting here means two things:
+
+- the mapping of attributes of a log record to the log template.
+  + three formatting styles in Python are supported. 
+  + Completely orthogonal to how an individual message is contructed.
+
+- the formatting of a message with its arguments.
+  + only =%= formatting operator is supported.
+  + Logging calls only take positional parameters for the actual logging message itself.
+
+*** Problems
+
+**** Displaying date/time in a message
+
+use the =%(asctime)s= and =%(msecs)%= attributes.
+
+* =warning= Module
+
+Not for logging but a tool to warn users of obsolete or deprecated features, more like a weakened exception.
+Warnings can be suppressed; warnings are typically issued only once to avoid overwhelming the user.
+Warnings can be turned into errors should some features are forbidden.
+
+Like log levels, there are only a few warning built-in categories.
+
+By default, warnings are sent to =sys.stderr= but they can also be turned into exceptions or sent to other files.
+
+Warning filters determine what and how a warning is handled.

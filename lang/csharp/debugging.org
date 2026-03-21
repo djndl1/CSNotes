@@ -1,0 +1,110 @@
+* Debuggers
+
+** vsdbg: Microsoft Official Debugger
+
+Not legally usable outside of Microsoft's products.
+
+** MDbg: CLI Managed Code Debugger (.NET Framework Only)
+
+Source-code level debugger. A sample debugger that is never meant for everyday use and is not maintained anymore.
+The source code is available [[https://github.com/SymbolSource/Microsoft.Samples.Debugging][here]] even if it is not 
+real open source.
+
+To debug 32-bit applications, use =CorFlags= to modify =MDbg= to force it to run under 32-bit.
+To load symbols, the pdb file in use has to be =Full=: ~dotent build -p:DebugType=Full~, remember to =dotnet clean=.
+
+It failed to load source code somehow.
+
+** =sdb=: CLI Mono Debugger
+
+Not maintained and basically feature complete. The =attach= command is not implemented but =remote/connect= seems 
+to be the real =attach= command to use. The =breakpoint= command has a different syntax from that of gdb.
+
+The source code seems to be easily to read and modify, at least at the application level.
+
+** =vscode-mono-debug=: VSCode Mono Soft Debugger
+
+Feature complete, uses the same backend as =sdb=.
+
+** DnSpy 
+
+Decompilation and reverse engineer with debug feature, useful for every .NET implementation.
+
+Runs on Windows only, supports .NET FX, .NET Core and Mono, with a fully-featured GUI and IDE-like experience. 
+Capable of decompiling assemblies, editing compiled code and recompiling edited code.
+Capable of Launch debug and attach debug.
+
+** netcoredbg
+
+#+begin_src shell
+file dotnet # use the dotnet loader
+set args MyAssembly.dll # set args to .NET Programs
+b Main
+run
+#+end_src
+
+Otherwise, netcoredbg may not find the PDB. Also, for the debugger to show source code, =<EmbedAllSource>true</EmbedAllSource=
+is required while building (possibly leaking source code if a debug build is leaked).
+
+** [[https://github.com/MattParkerDev/sharpdbg/][SharpDbg]]
+
+Intended as a drop-in replacement for netcoredbg.
+
+** WinDbg LLDB 
+
+They are not much different from each other: they do not debug .NET managed code;
+rather they look into the runtime and debug JIT-ed native code. 
+Both requires the SOS extensions and understanding 
+of the .NET runtime itself. LLDB is limited to modern .NET while Windbg (and its friends) 
+can debug .NET FX. Technically one could use gdb for .NET binary debugging but there is 
+no extension. =dotnet-debugger-extensions= is the successor to =dotnet-sos= and offers more features.
+
+* Managed Code Debugging
+
+** Stop at Entry
+
+[https://reverseengineering.stackexchange.com/questions/9583/how-to-stop-debugger-right-after-the-execution]
+
+** Debugging Tests
+
+set =VSTEST_HOST_DEBUG= to =1= and dotnet will wait for a debugger to attach.
+
+** Memory Leak or High Memory Usage
+
+Monitor memory usage of 
+
+- Process/Virtual Bytes
+
+- Process/Private Bytes
+
+- .net CLR Memory/# Bytes in all Heaps
+
+- .net CLR Memory/% Time in GC
+
+- .net CLR Memory/Large Object Heap size
+
+- .net CLR Loading/Bytes in Loader Heap
+
+- .net CLR Loading/Current Assemblies
+
+*** Find Out Which Part Caused Meomory Leak
+
+#+begin_quote
+If the private bytes keep increasing but # Bytes in all Heaps do not, 
+you’re likely looking at a native memory leak (i.e. you are leaking in a COM component or similar) 
+but if # Bytes in all heaps increase at the same rate 
+as private bytes your leak is likely in managed code.
+#+end_quote
+
+**** Examples
+
+- [[https://github.com/dotnet/runtime/issues/20326][Memory leak in System.Data.Common.DbCommand]]:
+   memory leak caused by .NET not unregistering cancellation callback. 
+   + Fixed in .NET Core 2.0 in 2017, .NETFX still suffers from this in 2026.
+   + Workaround: use a temporary =CancellationTokenSource= that links the long alived one
+     to cancel but avoid accumulating callbacks.
+
+* References
+
+- [[https://www.tessferrandez.com/][Tess Ferandez's Blog]]: Principal Software Engineer at Microsoft,
+   specialized in .NET debugging.

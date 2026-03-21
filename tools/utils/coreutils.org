@@ -8,6 +8,8 @@
 
 - =-u= :: use access time (atime), =-c= use create time (ctime)
 
+- =-S= :: file size
+
 - =-r= :: reverse the order
 
 * =pr=
@@ -16,51 +18,49 @@ A paginator that make text into forms suitable for paper pages, possibly in
 multiple columns. By default 66 lines per page. Not a replacement for =troff= or
 =nroff=. For real printing, consider =lp= and =lpr=.
 
+* =date=
+
+#+begin_src shell
+date +%FT%T.%6N # millisecond
+#+end_src
+
 * =wc=
 
 count lines, words, characters or bytes of a file.
 
 * =sort=
 
-Lines are compared by specified by fields/keys (=-k=), or the entire line if
-none. Equal lines are ordered according to the entire line unless stable sort =-s=
-(=--stable=) is specified, which retains the original order. Output may be saved
-to a file =-o=.
-
-=sort= by defaults sorts concatenated files, otherwise checks if the files are
-sorted (=-c=, =-C=), or merges already-sorted files without sorting them (=-m=).
+- *Comparison*: By key (=-k=) or entire line.
+- *Stability*: Unstable by default; =-s= preserves original order of equals.
+- *Output*: Write to file via =-o=.
+- *Operations*:
+  - Default: Sort input.
+  - =-c=, =-C=: Verify sortedness.
+  - =-m=: Merge pre-sorted inputs.
 
 ** Key Definition
 
-A key is a segment of a line, specified as the part between two endpoints
-(inclusive) =-k POS1[,POS2]=. The endpoint is specified in the format of
-=EndpointFieldNumber.EndpointCharacterNumber.OrderingOption=. The end of line is
-used if the end is not specified. The field end is used if the character number
-of the second endpoint is not specified. The count starts at 1 not
-0, which denotes the last one.
+A key specifies a sorting segment using =-k POS1[,POS2]=.
 
-Separators are specified by =-t=, by default unintuitively the empty string between a
-non-blank character and a blank character, not blank characters.
-
-Multiple key definitions of different ordering options are supported, used
-in the order on the command line
+- *Endpoint Format*: =FieldNumber.CharacterNumber.OrderingOption=
+- *Defaults*:
+  - Omitted end position: End of line.
+  - Omitted character number: End of field.
+- *Indexing*: 1-based.
+- *Separator* (= -t=): Field delimiter. Default is a space or a tab.
+- *Multiple Keys*: Applied in command-line order.
 
 ** Order
 
-By default in ascending order, =-r= makes it descending. =-s= enables stable
-sort by retaining the original order of equal lines.
-
+- Default: Ascending order
+- =-r=: Makes it descending
+- =-s=: Enables stable sort by retaining the original order of equal lines
 ** Comparison Rules
 
-By default, keys
-are compared using the collating sequence of =LC_COLLATE=. All these sort
-options including =-r= may be used as options within the key definition to
-override the global ordering for that key. All modifiers excpet =-b= apply to
-the associated field, regardless of whether the modifier character is attached
-to the field-start or the field-end part of the key specifier.
-
-As a last resort, any equal results are sorted by using the the entire keys
-unless stable sort is used.
++ By default Keys are compared using the =LC_COLLATE= collating sequence.
++ Per-key options (including =-r=) override global settings.
++ Modifiers (except =-b=) apply to the full field, regardless of specifier position.
++ Any equal results are sorted by comparing the entire key, unless stable sort is enabled.
 
 - leading blanks may be ignored =-b=
 
@@ -122,4 +122,118 @@ From command line or files. Zero-terminated filenames are supported with =--file
 #+begin_src shell
 # Decorate-Sort-Undecorate: add a length field, sort by length, remove the length field
 awk '{print length, $0}' /etc/passwd | sort -n | cut -f2- -d' '
+
+sort -u file1 file2 # union of unsorted files
 #+end_src
+
+* =file= (Non-coreutils)
+
+- =-i=: output mime type
+
+- =-0=: output =\0= after the end of the filename
+
+* =od=
+
+Not limited to octal format
+
+- =-j= skip bytes and =-N= read N bytes
+
+- =-t=: format (hexadecimal), unsigned decimal, signed decimal, floating point, .
+  octal, named character, printable character or backslash escape
+  + a size number after the format specifier indicates the number of bytes per group.
+  + =z= prefix to print data as printable characters
+  + =-A=: the address format, that is, the first number of each line that indicates
+    the current address of the line beginning.
+
+- =-w=: N bytes per line 
+
+* =cut=: Selects Part of Lines
+
+confer. =Select= in PowerShell. 
+
+Selects by bytes, characters (currently still as byte characters, not Unicode code points),
+or fields, 
+
+Byte-based, does not understand Unicode. Also, cut outputs fields in the original read order. 
+=awk= or =sed= is required by POSIX and available on nearly every Linux distro (cannot be removed on Debian)
+unless it's a stripped-down system with only a stripped-down =busybox= (even =busybox= has =awk= but it may not be configured.).
+
+#+begin_src 
+asserter_20260307_231427328.log
+asserter_20260307_231635953.log
+asserter_20260307_231650640.log
+asserter_20260307_231711250.log
+asserter_20260307_231720125.log
+asserter_20260307_231818468.log
+asserter_20260307_231832015.log
+asserter_20260307_231905781.log
+asserter_20260307_231923687.log
+asserter_20260307_233052109.log
+asserter_20260307_233602578.log
+asserter_20260307_233919562.log
+#+end_src
+
+- format: item list (=a,b,c,d=), or ranges (=N1-N2[,more ranges],=)
+  + list of items, or list of ranges.
+  + missing one end of a range means =1= or end of line
+  + overlapping ranges or repeated elements only result in a single write.
+    in the original order.
+    #+begin_src shell
+   ls *.log -1 | cut -f 3,2,1,1,1 -d '_'
+asserter_20260307_231427328.log
+asserter_20260307_231635953.log
+asserter_20260307_231650640.log
+asserter_20260307_231711250.log
+asserter_20260307_231720125.log
+asserter_20260307_231818468.log
+asserter_20260307_231832015.log
+asserter_20260307_231905781.log
+asserter_20260307_231923687.log
+asserter_20260307_233052109.log
+asserter_20260307_233602578.log
+asserter_20260307_233919562.log
+    #+end_src
+
+- the number of bytes, characters or fields starts at *1*.
+
+* =paste=
+
+concatenate one line from a file and one file from another file.
+
+* =join=
+
+We have =cut= to select, we might as well have =join= to join lines by a field as the key.
+This command is supposed to process a table (e.g. csv, possibly with a header line.
+
+- =join= does not force the input files be in a sorted order but requires so.
+
+- the exact field as the join key can be specified as options..
+
+- the output field can be specified by =-o=, =-o FileN.FieldM[,FileN,FieldM]=
+
+- =-t= field delimiter.
+
+- for outer join, consider =-a= (specify left join, right join or full join) and =-e= (default value for missing fields)
+
+#+begin_src shell
+# -t '' takes the entire line as the key
+join -t '' -a1 -a2 file1 file2     # Union of sorted files
+join -t '' file1 file2             # Intersection of sorted files
+join -t '' -v2 file1 file2         # Difference of sorted files
+join -t '' -v1 -v2 file1 file2     # Symmetric Difference of sorted files
+#+end_src
+
+* =uniq=
+
+Like =join=, the input should be presorted: only repeated adjacent lines are processed.
+
+- Set intersection or difference =-d= (repeated lines only)
+  + =sort file1 file2 | uniq -d= intersection unsorted files
+  + =sort file1 file1 file2 | uniq -u= difference of unsorted files, all lines in =file1= are repeated, any line in =file2= what is also 
+    in =file1= is also repeated.
+
+- Symmetric difference =-u= (unique lines only, repeated lines are not printed.)
+
+* =tail=
+
+- =-n +N= skip =N-1= lines.

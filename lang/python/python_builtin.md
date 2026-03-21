@@ -1,5 +1,8 @@
 # Unexpected Python Features
 
+- `if` does not create a new scope in Python. Variables created inside an `if` statement
+  is accessible. However, if the `if` statement is not executed, the variable then is not defined.
+
 - `else`  of `for` and `while`: executed after the loop reaches its final iteration without a `break`.
 
 ## `match` Pattern Match Statement(PEP 636, since Python 3.10)

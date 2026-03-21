@@ -1,0 +1,4 @@
+| filepath | summary |
+|----------|---------|
+| math/Mathematica_SageMath.org | comparative guide between Mathematica and SageMath computer algebra systems covering basic calculation syntax exponentiation nested power Log trigonometric functions numerical approximation high-precision arithmetic Block scoping Plot graphics sine cardinal function visualization multi-function plotting legend labels tick formatting LaTeX output rendering Python numeric digit methods numerical approximations |
+

@@ -86,3 +86,19 @@ Python 2 with at least 32 bits is dropped.
 - various =backports.*= packages and packages named the same as in the standard libraries.
 
 For more, see [[https://wiki.python.org/moin/StandardLibraryBackports][Standard Library Backports]]
+
+* Porting to Python 3
+
+The fixers provided by the following tools are also a guide to port Python 2 code to Python 3.
+
+** lib2to3
+
+Built in Python until 3.13
+
+** [[https://github.com/PyCQA/modernize][modernize]]
+
+Reads Python 2 code and applies a series of /fixers/ to transform it into code compatible with both Python 3 and Python 2.7
+
+** [[https://pypi.org/project/pyupgrade/][pyupgrade]]
+
+Convert code compatible with Python 2 and Python 3 to full Python 3 without backwards-compatibility.

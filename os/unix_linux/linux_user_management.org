@@ -1,0 +1,80 @@
+#+title: Linux User Management
+
+* Authentication and [[https://github.com/linux-pam/linux-pam][PAM]]
+
+User programs do not need to implement every authentication scheme themselves, instead, they
+rely on PAM with dynamically configurable authentication, determined by the sysadmin.
+Even the standard =login= program relies on PAM.
+
+Modern day Linux (since 1996.4) utilizes PAM as a framework for user authentication
+instead of a single =login= program, supporting
+- local passwords
+- LDAP
+- fingerprint readers etc.
+integrating low-level authentication schemes into a high-level API.
+
+** Some Concepts
+
+- *Message digest*: MD5, SHA256 SHA512, the common checksum we see
+  + CRC32 or parity bit are checksum but not message digests.
+
+- *Message Authentication Code* (MAC): shared key between the two parties
+
+- *Digital signature*: asymmetric keys
+
+** /etc/shadow
+
+=/etc/shadow= stores the hashed password and the salt for each user.
+A hash function hashes the combination of the salt and the input password
+and compare the result with the stored hashed password. 
+
+Without the salt, the password would be too simple and the hash result 
+would be vulnerable to precomputed attacks like rainbow tables. Salt
+adds randomness. Salt is generated each time the password is updated.
+
+There is also =/etc/gshadow= for group passwords. A group can have a password
+for users outside the group to temporarily obtain its privilege. 
+An inherent security hole, where the password is shared among potentially any user.
+
+** Configuration
+
+PAM is dynamically configurable through config files under =/etc/pam.d= 
+or =/usr/lib/pam.d=. These configuration files define how a service
+will authenticate users.
+
+* Four Aspects of PAM
+
+These four aspects are what we are configuring in these files.
+
+#+begin_src 
+type control module-path module-arguments
+#+end_src
+
+- =control= tells PAM what should be done if authentication fails
+  + =requisite= immediate denial;
+  + =required=: will process other modules even if denial will be delivered to the user
+  + =sufficient=: immediate success if there is no pending denial. Ignored if failed
+  + =optional=: only matters when it is the only module of its type
+    (which makes it non-optional)
+
+** Account
+
+Determines whether the user is allowed to access the service, whether their passwords has
+expired, etc.
+
+Account verification: expiration, permission.
+
+** Authentication
+
+Determines whether the user is who they claim to be.
+
+Authenticate a user and set up user credentials
+
+** Password
+
+Provides a mechanism for the user to change their authentication.
+
+** Session
+
+Provides an opening and closing hook for modules 
+to affect the services available to users.

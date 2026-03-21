@@ -1,5 +1,1 @@
-#+title: Intel Architecture
-
-The basic components are the CPU, memory controller, and I/O controller.
-Additional supporting components are non-volatile memory, power supplies and
-some glue logic.
+#+title: Intel Microarchitecture

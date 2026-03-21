@@ -1,0 +1,21 @@
+* Builtin APIs
+
+** =App=
+
+Represents the application being executed. A few properties and methods are provided
+
+- =EXEName= and the =Path=: the /name/ and the /path/ of the executable file
+
+- =PrevInstance=: another (compiled) instance of the application
+
+- =TaskVisible= whether the application is visible in the task list
+
+A few other properties are some information filled at design time as project properties..
+
+** =Clipboard=
+
+Exchanging information with other applications through the system clipboard might seem a bit old-fashioned,
+but it is a fact that the clipboard remains one of the simplest and most effective ways for end users to quickly copy data among applications.
+
+The clipboard supports plain text, rich text (RTF), DDE conversations, bitmap, metafile, device independent bitmap, color palette.
+Check the format =GetFormat= before using its data =GetData()=

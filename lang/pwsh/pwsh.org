@@ -823,7 +823,7 @@ $shell = New-Object -ComObject Shell.Application
 $shell.Explore('C:\Temp') # this opens up the file explorer and navigates to C:\Temp
 #+end_src
 
-There are some problems with Pwsh's support for COM. Many COM components are 32-bit and a 32-bit pwsh must be launched to use them. Also, some COM objects have different .NET wrappers, giving them different interfaces.
+There are some problems with Pwsh's support for COM. Many COM components are 32-bit and a 32-bit pwsh must be launched to use them. Also, some COM objects have different .NET wrappers, giving them different interfaces. Some COM objects' members are not exposed: one has to resort to reflection, even so, when dealing with some methods with =ref= or =out= parameters, pwsh is powerless.
 
 ** CIM
 
