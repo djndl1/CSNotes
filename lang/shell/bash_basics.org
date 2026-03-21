@@ -332,7 +332,50 @@ A=B
 B=C
 echo ${!A} # C indirect expansion
 
+# for Shell the following two are the same
+VAR=       # still an assignment that assigns ""
+VAR=""     # better because of being clear
+# Null strings are empty strings: there is no special null value.
+
 echo ${VAR:=value} # default value if undefined.
+
+# a simple expression
+${VAR:-DEFAULT_RETURN_VALUE_IF_UNDEFINED_OR_EMPTY}
+
+# side effect: assigns the default value to $VAR
+${VAR:=DEFAULT_ASSIGNED_VALUE_IF_UNDEFINED_OR_EMPTY}
+
+# display error and exit
+${VAR:?error_message_if_undefined_or_empty}
+
+# use the value if $VAR is not empty otherwise empty.
+# $VAR value used only as test condition.
+# if [ -n $VAR ]; then
+#   return $VALUE
+# endif
+${VAR:+RETURN_VALUE_IF_VAR_NON_EMPTY}
+
+# : removed: tests only if parameter is defined.
+
+# substring, START can be negative
+${VAR:START:LENGTH}
+
+# strip matching prefix
+v=abc123
+${v#abc} # shortest match
+${v##abc} # longest match
+
+# strip matching suffix
+v=abc123
+${v%123} # shortest match
+${v%%123} # longest match
+
+# BASISM match and replace
+${VAR/PATTE%RN/REPLACEMENT}  # replace the first match
+${VAR//PATTE%RN/REPLACEMENT} # replace all
+# for ${array[@]} # each element is matched and replaced separately
+
+echo {x%.c}.o # replace the suffix
 #+end_src
 
 *** =declare= and Variable Type
@@ -355,6 +398,8 @@ for elm in ${arr[*]}; do ... done; //
     Bash arrays are dynamically and automatically expanded upon assignment.
   + *test for an element*: use =[[ -v ]]= to test if a slot is occupied.
   + *delete an element*: =unset arr[i]=
+  + *append*: =array+=(element1 element2)=
+  + *length*: =${#array[@]}= (=${#var}= length of characters in a variable)
   + Doesn't seem to be used much.
 
 - =-A= associative array (bashism)
@@ -680,4 +725,38 @@ touch $LOCKFILE
 ....
 
 exit 0
+  #+end_src
+
+* Redirection
+
+** HERE Document (POSIX)
+
+- =<<DELIMITER= can be followed by other commands or pipes: the real input comes at the next line.
+
+Shell expansion in the HEERDOC is controlled by whether the starting DELIMITER is quoted 
+(quoted delimieter turn the expansion off).
+
+*** Tab Stripping Heredoc
+
+=<<-DELIMIETER=: strips  leading tabs =\t= of each line. Tab characters only.
+To type =\t= in Shell, use =Ctrl-V + tab=, otherwise it only triggers tab completion.
+Seems to break easily if the script is reformatted by converting tabs to spaces.
+
+** Bashism
+
+- (Bash 4+) HEREDOC to variable
+  #+begin_src bash
+# IFS=""  read the entire text
+# -r raw text without escaping
+# -d ereads entire input
+IFS= read -r -d '' var <<'EOF'
+line 1
+line 2
+line 3
+EOF
+  #+end_src
+
+- (Bash & Zsh)HERE strings 
+  #+begin_src shell
+cat <<< "Hello World"   # always expanded
   #+end_src
