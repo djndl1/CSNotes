@@ -727,22 +727,78 @@ touch $LOCKFILE
 exit 0
   #+end_src
 
-* Redirection
+* Input/Output
 
-** HERE Document (POSIX)
+** Output
+
+- =echo=
+  + =-e=: escape special characters
+  + =-n=: no newline is appended
+
+** Input
+
+- =read=: reads each token into provided variables. Line by line
+  + tokens are separated by =$IFS=.
+  + =-a= store the result into an array
+  + =-d=: end of input
+  + =-e=: readline support
+  + =-p=: display a prompt
+  + =-r=: raw, no escaping 
+  + =-s=: silent input
+  + =-t=: read timeout
+  + =-u=: use a file descriptor
+
+** Redirection
+
+*** Mechanism
+
+Redirection is executed in order:
+
+- stdin redirected to the pipe
+
+- stdout redirected to the pipe
+
+- redirection for the current command is processed from left to right
+  + =2>&1= has to come after =1>=
+  + =&> FILE= is => file 2>&1=
+
+- =N>&M=: not limited to =2>&1=
+
+- =N<&-= closes a file descriptor
+
+- the command starts executing.
+
+*** Open a New File 
+
+One can use =exec= without a command and with redirection to change the standard input/Output 
+or even open a new file (associate a file with a file descriptor).
+
+#+begin_src bash
+exec 4> result.txt # fd 4 is now result.txt, this opens a file.
+exec 4<&- # closes the file
+#+end_src
+
+Avoid using file descriptors under 10.
+
+*** File Descriptors as a File
+
+- With =/dev/fd= a program can use pathname arguments to handle stdin/stdout.
+  + not every program accepts =-= to indicate =stdin=.
+
+*** HERE Document (POSIX)
 
 - =<<DELIMITER= can be followed by other commands or pipes: the real input comes at the next line.
 
 Shell expansion in the HEERDOC is controlled by whether the starting DELIMITER is quoted 
 (quoted delimieter turn the expansion off).
 
-*** Tab Stripping Heredoc
+**** Tab Stripping Heredoc
 
 =<<-DELIMIETER=: strips  leading tabs =\t= of each line. Tab characters only.
 To type =\t= in Shell, use =Ctrl-V + tab=, otherwise it only triggers tab completion.
 Seems to break easily if the script is reformatted by converting tabs to spaces.
 
-** Bashism
+*** Bashism
 
 - (Bash 4+) HEREDOC to variable
   #+begin_src bash
