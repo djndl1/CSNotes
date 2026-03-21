@@ -80,3 +80,34 @@
 | lang/retro/FreeBASIC.org | FreeBASIC language C-style header system False negative-one bitwise Not complement string literal escaping Var type inference shadowed outer scope access Extern external linkage Common shared variables Static storage class Shared visibility QuickBASIC compatibility OOP C++03 imitation default copy constructors This parameter scope destruction Public Private Protected VB-style indexed properties |
 | lang/retro/FreePascal.org | Free Pascal compiler Turbo Pascal Delphi compatibility modes TP FPC objfpc DELPHI DELPHIUNICODE MACPAS ISO ExtendedPascal dialects source codepage UTF8 BOM systemcodepage string literal conversion numeric types enums scoped sets binary octal hex literals Boolean ByteBool WordBool LongBool integral types shortInt byte smallInt word longInt cardinal int64 NativeInt Real Single Double Extended Comp Currency text types Char WideChar PChar PWideChar null-terminated ShortString length-prefixed AnsiString UTF8String UnicodeString WideString UTF16String assignment conversion wide string manager LC_CTYPE control operators bitwise logical short-circuit if-then-else begin-end blocks case statement no fallthrough for-to-downto while-do repeat-until for-in enumerators Result variable Exit procedure calls subrange classes reintroduce is as properties Self TObject private strict private protected public inherited Assign AssignTo cloning TPersistent records objects inheritance virtual methods constructors destructors class methods static class variables properties helpers interface COM delegation reference counting TInterfacedObject TComponent resource management New Dispose GetMem AllocMem FreeMem FreeAndNil finally ownership TFPGObjectList free notification units interface implementation initialization finalization generics specialize constraints local closures method types record case unions operator overloading class operator fpcunit testing |
 | lang/tricks.org | loop countdown patterns while n-- greater 0 decrement timing execution counts n n-1 n+1 variations do-while pre-post check differences |
+| lang/golang/concurrency.org | Go concurrency patterns using goroutines and channels with select for timed waits, synchronization examples showing worker completion tracking |
+| lang/golang/database_access.org | Go database access using sql.DB connection pool, prepared statements, transactions, query row scanning, and NULL handling best practices |
+| lang/golang/kernighan_golang.org | Tour of Go covering language design choices simplicity garbage collection packages first-class functions lexical scope UTF-8 strings pointers CSP |
+| lang/golang/lang_basics.org | Go language basics covering constants iota enum-like patterns for loop while semantics if with init statement defer type embedding formatted I/O |
+| lang/golang/modules_packages.org | Go modules and packages import paths visibility main package go.mod go.sum dependency management |
+| lang/golang/slice_array.org | Go arrays slices make append copy len cap underlying array pointer length capacity relationship |
+| lang/golang/time_date_support.org | Go time package Time Duration Location timezone parsing formatting LoadLocation nanosecond precision |
+| lang/golang/database_access.org | Go database access sql.DB connection pool prepared statements transactions query row scan NULL handling |
+| lang/golang/kernighan_golang.org | Tour of Go design choices simplicity garbage collection packages first-class functions lexical scope UTF-8 strings pointers CSP |
+| lang/golang/lang_basics.org | Go language basics constants iota for loop while equivalent idiomatic expressions |
+| lang/golang/modules_packages.org | Go modules packages import paths visibility main package go.mod go.sum |
+| lang/golang/slice_array.org | Go arrays slices make append copy len cap underlying array pointer length capacity |
+| lang/golang/time_date_support.org | Go time package Time Duration Location timezone parsing formatting LoadLocation |
+| lang/lisp/ansi_common_lisp.org | Common Lisp overview cons cell atom S-expression proper list cycle quote evaluation special forms macros functions variables data types |
+| lang/lisp/emacs-lisp.org | Emacs Lisp fundamentals list manipulation cons car cdr quote eval defun let flet labels recursion text buffer |
+| lang/perl/modern_perl.org | Modern Perl philosophy expressivity context void scalar list coercion CPAN modules perldoc default variables |
+| lang/pwsh/Utiltiy.org | PowerShell utility commands Sort-Object Compare stable sort property expression hash table |
+| lang/pwsh/pwsh.org | PowerShell object-based shell CLI scripting pipeline cmdlets parameter binding CIM WMI remote administration |
+| lang/regex/posix_regex.org | POSIX regex BRE ERE anchors character classes quantifiers backreferences word boundaries |
+| lang/sed_awk/awk.org | Awk pattern-action language fields records NF NR OFS ORS BEGIN END regex arithmetic operations |
+| lang/sed_awk/sed.org | Sed stream editor pattern space hold space substitution address range commands regex |
+| lang/sed_awk/sed_awk.org | Sed AWK quick reference text processing pattern matching substitution stream editing |
+| lang/shell/ABS.org | Advanced Bash-Scripting Guide covering shell scripting basics special characters quoting parameter expansion loops branches command substitution arithmetic |
+| lang/shell/bash_basics.org | Bash-specific features startup files login non-login interactive POSIX mode restricted shell command-line editing key bindings job control history |
+| lang/shell/bc.org | bc arbitrary precision calculator language with scale variable ibase obase bases math library functions expressions |
+| lang/shell/posix_shell.org | POSIX shell history from Bourne to ksh ash dash bash zsh variants POSIX compliance standards |
+| lang/shell/unix_terminal.org | Unix terminal fundamentals teletype software flow control XON XOFF stty configuration |
+| lang/vala/vala_basics.org | Vala language basics C#-style syntax namespaces enum string slicing nullable types lambda expressions class inheritance GObject |
+| lang/zig/basics.org | Zig language overview emphasizing no hidden control flow no hidden allocations comptime build modes purity |
+| lang/nim/memory_model.org | Nim memory model stack heap refs ptr unsafeAddr sizeof garbage collection reference tracing pointers |
+| lang/nim/nim_basics.org | Nim language basics types var let const proc func tuple object exception handling enums sets bit fields |
