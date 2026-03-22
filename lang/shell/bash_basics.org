@@ -683,7 +683,29 @@ CASEN) COMMAND-LIST;;
 esac
 #+end_src
 
-* Functions
+** Loop
+
+- =for= loop: a foreach loop.
+  + The return status is the exit status of the last command that executes.
+  + to avoid problems with quoting and separators, =for f in path/*= instead of using =ls=
+
+- =while= loop: =while conditions; do commands; done=
+
+- =until= loop: =until conditions; do commands; done=
+
+- (Bashism) =select= loop:  automatically makes a menu then asks for an option, then matched, 
+  the loop body is executed with that option.
+  #+begin_src shell
+select variable [in words]; do
+    commands
+done
+  #+end_src
+
+- =break=, =continue= exist and support breaking N looping or continuing the Nth enclosing loop.
+
+Loop constructs can be used with I/O redirection or part of a pipeline.
+
+** Functions
 
 #+begin_src bash
 function FUNCTION { COMMANDS; }
