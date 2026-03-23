@@ -140,6 +140,7 @@ Contained within the shell itself.
    + most options are POSIX compliant. =vi=, =emacs= and =pipefail= and a few other options related to Bash features
      are bashisms.
    + =unset= unsets shell variables and functions.
+   + lists all variables without any option.
 
 - =trap= (POSIX): installs signal handlers
 
@@ -323,7 +324,19 @@ Shell programming seems to group variables, position parameters and special para
 under the term *parameter*.
 
 Variables can be *global* (environment variables, exported variables, by convention UPPERCASE) 
-or *shell*-local variables (by convention lowercase)
+or *shell*-local variables (by convention lowercase).
+
+An environment variable does not have to be exported:
+- it may not be a shell variable: environment variable is an OS concept
+  and a process may =setenv= by itself.
+- ~VAR=VALUE command~ also defines an environment variable
+  without exporting it.
+  + for external commands and regular built-ins, this defines the environment of the new processes.
+  + for normal functions, the assignments shall affect the current execution
+    environment during the execution of the function (whether the value is restored is unspecified).
+  + for special built-ins, the assignments affect the current execution environment
+    and remain in effect after the commands.
+- an *invalid* shell variable (badly named) may be a valid environment variable.
 
 #+begin_src shell
 ${PARAMETER}
@@ -341,6 +354,8 @@ echo ${VAR:=value} # default value if undefined.
 
 # a simple expression
 ${VAR:-DEFAULT_RETURN_VALUE_IF_UNDEFINED_OR_EMPTY}
+
+${VAR:+RETURN_VALUE_IF_NON_EMPTY}
 
 # side effect: assigns the default value to $VAR
 ${VAR:=DEFAULT_ASSIGNED_VALUE_IF_UNDEFINED_OR_EMPTY}

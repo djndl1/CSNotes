@@ -19,11 +19,13 @@ language. It also requires familiarity with the individual Unix programs.
     shell on most Linux distros.
   + KornShell (ksh), the POSIX shell is a subset of Korn shell, an enhanced
     version the Bourne shell.
-  + Public domain Korn shell (pdksh)
+    - ksh93 is the one commonly used.
+  + Public domain Korn shell (pdksh): a clone of KornShell
+    - the original pdksh development has ceased.
     - MirBSD Korn shell (mksh), used by Android as =/system/bin/sh=.
   + Z shell: a relatively modern shell compatible with bash.
 
-- C shell: modelled after the C programming language. The TENEX C shell as an
+- C shell (not POSIX-compliant): modelled after the C programming language. The TENEX C shell as an
   improved version is a modern alternative.
 
 * Dash
@@ -39,7 +41,14 @@ It also reads =$ENV= if defined.
 
 * =expr= Expression Evaluator
 
-=expr= performs /arithmetic/, /logical/, /relational/ or /string/ operations.
+=expr= (for Bash, it's part of coreutils as a separate command)
+performs /arithmetic/, /logical/, /relational/ or /string/ operations.
+
+- The traditional way to perform arithmetic before arithmetic expansion is introduced.
+  Useful if arithmetic expansion is not available or suitable.
+  Non-integer arithmetic is still not supported.
+
+- Each token must be a separate argument.
 
 - Equality test is done by ~=~ not ~==~
 
@@ -49,8 +58,14 @@ It also reads =$ENV= if defined.
 - If only one expression is given, then =expr= simply echos it.
 
 - to avoid some variables that are themselves an operator string, append an =x= to them
-  and another operand
-  before string comparison.
+  and another operand before string comparison.
+
+- String matching =:= or =match= via *REGEXP* (BRE) is supported!
+  + The pattern has an implicit =^= at the start, i.e. it matches at the beginning of the word.
+  + the POSIX standard way to perform eregex matching directly in a pipeline.
+
+- Note that =expr= prints the result while set the exit status at the same time.
+  Be careful when using =expr= in a conditional construct.
 
 * Variables
 
@@ -65,7 +80,7 @@ It also reads =$ENV= if defined.
 
 - to append strings to a variable, use =${x}appended=, =$x"appended"=.
 
-- ~var=~ assigns null to =var=; =unset var= unsets it.
+- ~var=~ assigns null/empty to =var=; =unset var= undefines it.
 
 ** Common Environment Variables
 
@@ -79,6 +94,8 @@ It also reads =$ENV= if defined.
 - =PS1=, =PS2= :: normal propmt before each command and the secondary prompt in
   a multiline command.
 
+- =IFS= :: the characters used to tokenize the input.
+
 ** Parameter Substitution
 
 - =${var?error_message}= :: complain with =error_message= if undefined
@@ -90,7 +107,7 @@ It also reads =$ENV= if defined.
 - =${var+option_on_defined}= :: use the new value if defined
   + this form may be used to add a debug message.
 
-- =${var=new_definition_if_undefined}= :: use and define new value if undefined
+- ~${var=new_definition_if_undefined}~ :: use and define new value if undefined
 
 The special expression in the back is executed in the current shell rather than
 a subshell.
@@ -103,30 +120,46 @@ whether the variable is null or undefined instead of simply undefined.
 
 Wildcards (=*=, =?=, =[=, =]=) in POSIX shells expands only filenames, not
 random strings. They are not simplified regexp. They are expanded automatically when
-they occurs in a shell.
+they occurs in a shell. However, these filenames are still strings, passed to shell commands:
+If a file =-i= exists and =rm *= is executed, it will turn =rm= into interactive =rm=.
 
-- Files whose name starts with a dote are not normally listed and various
+- Files whose name starts with a dot are not normally listed and various
   shells, utilities follow this convention.
+  + =.*= is required to list all files, otherwise only visible files are listed.
 
 * Quoting
 
-Metacharacters are commonly used in shell. They must be quoted or escaped to be
-treated as regular characters. But quoted characters do not have a
-special meaning. Double quotes are weak in that most metacharacters except =$=,
-=`=, =\= retain their special meanings. The easiest way to quote a quotation
-mark is to
-use another type of quotation marks.
+*Quoting in Shell does not mark string literals as in C*!
 
-POSIX shells supports multiline strings with ='= and ="=.
+Metacharacters (including space) are commonly used in shell.
+Quoted characters do not have a special meaning.
+Metacharacters must be quoted or escaped to be treated as regular characters. 
 
-The quotation marks in the shell are not used to define a string: they are used
-to disable or enable interpretation of meta-characters.
+POSIX shells supports multiline strings with ='= and ="= because =\n= 
+retains its literal value.
 
 #+begin_src shell
-echo 'string1'"string2"'string3' # string1string2string3
-echo 'My home directory is '"$HOME"', and my account is '"$USER"
+# these are equivalent
+rm 'file1 file2'
+rm file1' 'file2
+rm f'ile1 file'2
 #+end_src
 
+Double quotes are weak in that certain meta-characters retain their special meaning:
+- =$=: parameter expansion, command substitution, arithmetic expansion
+- =``=: command substitution
+- =\=: as the escape sequence prefix with =$=, =`=, ="=, =\=, newline
+  + However, in ="$()"= and ="${...}"= the double quotes have no effect on special characters handling.
+
+The easiest way to quote a quotation mark is to use another type of quotation marks.
+
+- /Dollar single quotes/ =$'...'= allows ANSI C-style escape sequences to be interpreted within a quoted string.
+  It is still strong quoting except that it escapes C-style sequences.
+  #+begin_src shell
+echo $'abc\nefg'  # we don't need -e anymore
+  #+end_src
+  + =\u= unicode escape sequence is required to be supported (supported by Bash, zsh, mksh, not by dash).
+    For better portability, use =print= or =echo=
 
 * Command Substitution
 
