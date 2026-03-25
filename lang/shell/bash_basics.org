@@ -7,6 +7,7 @@
 - shell arithmetic with one of the shell expansions or =let=
 
 - =alias= and =unalias=: aliases are expanded upon a command/function is read.
+  + alias is available in most shells (bash, dash, ksh, zsh, tcsh, mksh and even in busybox ash) even if it is not POSIX.
   + usually not expanded by non-interactive shells.
 
 - one-dimensional non-contiguous array variable declared by =declare=
@@ -140,7 +141,7 @@ Contained within the shell itself.
    + most options are POSIX compliant. =vi=, =emacs= and =pipefail= and a few other options related to Bash features
      are bashisms.
    + =unset= unsets shell variables and functions.
-   + lists all variables without any option.
+   + lists all variables without any option or set positional parameters.
 
 - =trap= (POSIX): installs signal handlers
 
@@ -152,7 +153,14 @@ Contained within the shell itself.
 
 - =let= (bashism): use =$((arithmetic_expression))=
 
-- =local= local variable, not POSIX but still portable in basically every shell.
+- =local= local variable, not POSIX but still portable in basically every shell
+    =bash=, =dash=, =busybox ash=, =zsh= have =local= while =ksh=, =mksh= have =typeset=
+  #+begin_quote
+The shell uses dynamic scoping, so that if you make the
+variable x local to function f, which then calls function g,  references
+to  the  variable  x made inside g will refer to the variable x declared
+inside f, not to the global variable named x.  
+  #+end_quote
 
 - =shopt= (bashism): set, unset and query optional extended features of Bash.
 
@@ -176,6 +184,30 @@ Executed in the current shell context.
 *** Other Programs
 
 Executed in a new process.
+
+*** Complex Commands
+
+A command can be 
+- *simple*
+- *pipeline*
+- *list or compound list*: a sequence of commands separated 
+  by control operators (=;=, =&=, =&&=, =||=, newline)
+- *compound command*: 
+  #+begin_quote
+The shell has several programming constructs that are 'compound commands', which provide
+control flow for commands. Each of these compound commands has a reserved word or control
+operator at the beginning, and a corresponding terminator reserved word or operator at the
+end. Compound commands are created using the following reserved words. These words are only
+recognised if they are unquoted and if they are used as the first word of a command (i.e.
+they can't be preceded by parameter assignments or redirections).
+  #+end_quote
+  + grouping =( command-list )= (in a subshell) and ={ command-list; }= 
+    (in the current shell, functions considered complex named groupings.) 
+    - Treated as a whole with redirection.
+    - Strangely, =$$= remains the same value in a subshell.
+  + for, while, until loop
+  + if conditional, case conditional
+- *function definition*
 
 ** Execution Steps
 
@@ -333,7 +365,8 @@ An environment variable does not have to be exported:
   without exporting it.
   + for external commands and regular built-ins, this defines the environment of the new processes.
   + for normal functions, the assignments shall affect the current execution
-    environment during the execution of the function (whether the value is restored is unspecified).
+    environment during the execution of the function.
+    Whether the value is restored is unspecified but in bash and dash they are.
   + for special built-ins, the assignments affect the current execution environment
     and remain in effect after the commands.
 - an *invalid* shell variable (badly named) may be a valid environment variable.
@@ -365,11 +398,9 @@ ${VAR:?error_message_if_undefined_or_empty}
 
 # use the value if $VAR is not empty otherwise empty.
 # $VAR value used only as test condition.
-# if [ -n $VAR ]; then
-#   return $VALUE
-# endif
 ${VAR:+RETURN_VALUE_IF_VAR_NON_EMPTY}
 
+[ -z "$VAR" ] || VAR=VAL
 # : removed: tests only if parameter is defined.
 
 # substring, START can be negative
@@ -384,6 +415,11 @@ ${v##abc} # longest match
 v=abc123
 ${v%123} # shortest match
 ${v%%123} # longest match
+
+# faster than basename and dirname
+SRC=/path/to/foo.c
+BASE=${SRC##*/}
+DIR=${SRC%"$BASE"}
 
 # BASISM match and replace
 ${VAR/PATTE%RN/REPLACEMENT}  # replace the first match
@@ -453,7 +489,7 @@ for elm in ${arr[*]}; do ... done; //
 
 - =RANDOM=: a random number generator
 
-- =$$=: current shell PID
+- =$$=: current shell PID. A subshell also shows the same =$$=.
 
 - =$!=: recent background command PID
 
@@ -736,6 +772,17 @@ FUNCTION () { COMMANDS; }
 
 - =type funcname= (coreutils's =which= cannot do hits) to display its definitions
 
+*** Argument Passing
+
+- passing a variable by reference is possible: passing its name and then use =eval= to avoid immediate parameter expansion.
+
+#+begin_src bash
+inc() { eval $1=$(expr $$1 + 1); }
+
+A=10
+inc A
+#+end_src
+
 * Signal Handling
 
 An interactive Bash ignores =SIGTERM= and =SIGQUIT= (=^\=).
@@ -786,6 +833,30 @@ exit 0
   + =-u=: use a file descriptor
 
 ** Redirection
+
+the destination and the source of a redirection can be 
+a file path or a file descriptor.
+
+#+begin_src shell
+# files
+[n]> file   Redirect standard output (or n) to file.
+[n]< file   Redirect standard input (or n) from file.
+[n]>| file  Same, but override the -C option.
+[n]>> file  Append standard output (or n) to file.
+[n]<> file  Open  file  for  reading and writing on standard input (or n).
+
+# file descriptor
+[n1]<&n2    Copy file descriptor n2 as stdout (or fd n1).  fd n2.
+[n1]>&n2    Copy file descriptor n2 as stdin (or fd n1).  fd n2.
+
+[n]<&-      Close standard input (or n).
+[n]>&-      Close standard output (or n).
+
+# stdin
+[n]<< delimiter
+      here-doc-text ...
+delimiter
+#+end_src
 
 *** Mechanism
 

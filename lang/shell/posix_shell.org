@@ -37,7 +37,8 @@ Linux distros and its fully POSIX compliance. On Debian, Ubuntu and termux, =das
 * Login & Non-Login Shell
 
 A login shell (=-l=) first reads commands from the files =/etc/profile= and =.profile=.
-It also reads =$ENV= if defined.
+It also reads =$ENV= if defined. In any case, there is no =.bashrc= or related startup scripts
+for a POSIX shell. One has to rely on =$ENV= to set up for interactive shells.
 
 * =expr= Expression Evaluator
 
@@ -143,6 +144,11 @@ retains its literal value.
 rm 'file1 file2'
 rm file1' 'file2
 rm f'ile1 file'2
+
+# However these are the same: 
+# the substitutions in a variable assignment aren't subject to further expansion
+a=$b
+a="$b"
 #+end_src
 
 Double quotes are weak in that certain meta-characters retain their special meaning:
@@ -160,93 +166,6 @@ echo $'abc\nefg'  # we don't need -e anymore
   #+end_src
   + =\u= unicode escape sequence is required to be supported (supported by Bash, zsh, mksh, not by dash).
     For better portability, use =print= or =echo=
-
-* Command Substitution
-
-=$(command)= or =`command`=: Execute a command in a /child process/ and return its result as a
-string. The new version =$()= supports nesting.
-
-* Control Flow Structure
-
-- list :: a series of command that ends with a semicolon or ends with a newline character.
-  A list can have more than one command: the last one is used to make a
-  decision.  A list cannot be empty: empty statement =:= must be used.
-
-** Conditional
-
-*** if
-
-#+begin_src shell
-if list then list fi
-if list then list else list fi
-if list then list elif list then list fi
-if list then list elif list then list elif list then list fi
-if list then list elif list then list else list fi
-#+end_src
-
-=if= may be nested.
-
-*** case
-
-#+begin_src shell
-case word in esac
-case word in pattern ) list ;; esac
-case word in pattern | pattern) list ;; esac
-#+end_src
-
-#+begin_src shell
-echo answer yes or no
-read word
-case "$word" in
-    yes | YES )
-        echo you answered yes
-        ;;
-    no | NO )
-        echo you answered no
-        ;;
-esac
-#+end_src
-
-** Iteration
-
-*** while
-
-#+begin_src shell
-while list do list done
-#+end_src
-
-#+begin_src shell
-while read msg
-do
-    echo "$msg"
-done
-#+end_src
-
-*** until
-
-#+begin_src shell
-until list do list done
-#+end_src
-
-*** for
-
-#+begin_src shell
-for name do list done # use positional arguments
-for name in word ... do list done # use the word list
-#+end_src
-
-#+begin_src shell
-for args in "a A" "b B" "c C"
-do
-  set $args
-  echo lower case is $1, upper case is $2
-done
-#+end_src
-
-** break & continue
-
-They work the way as in C.
-
 
 * Bibliography
 
