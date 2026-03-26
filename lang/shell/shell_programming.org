@@ -1,0 +1,1075 @@
+#+title: Shell Programming
+#+bibliography: posix_shell_ref.bib
+
+* History
+
+- Thompson Shell (Ken Thompson, Unix Version 1 throughout 6), modeled after the Multics shell =RUNCOM=,
+  hence the =rc= configuration.
+
+- Bourne Shell (Stephen Bourne, Unix Version 7). There are some modern alternatives:
+  + *Almquist Shell* (Ash): a clone of the original Bourne shell 
+    - all major BSDs use Ash.
+    - dash: Debian/Ubuntu's default shell. Also incorporated into =Busybox=, although later with some 
+       bashisms added.
+  + *Bourne-Again Shell*: the GNU shell as a superset, the default shell on most Linux distros.
+    - Only some Debian-related distros use Dash, most others use Bash.
+  + *KornShell* (ksh): the POSIX shell is a subset of Korn shell, an enhanced
+    version the Bourne shell.
+    - ksh93 is the one commonly used.
+    - Public domain Korn shell (pdksh): a clone of KornShell
+      - the original pdksh development has ceased.
+      - MirBSD Korn shell (mksh), used by Android as =/system/bin/sh=.
+
+- Z shell (Zsh): a relatively modern shell compatible with bash but not entire POSIX compliant.
+    - the default shell on macOS and some other Unixes.
+
+- C shell (not POSIX-compliant): modelled after the C programming language. The TENEX C shell as an
+  improved version is a modern alternative.
+
+* POSIX Shell Fundamentals
+
+** Login & Non-Login Shell
+
+A shell may be a login shell or a non-login one and interactive or
+non-interactive at the same time.
+
+*** POSIX Style
+
+A login shell (=-l=) first reads commands from the files =/etc/profile= and =.profile=.
+It also reads =$ENV= if defined. In any case, there is no =.bashrc= or related startup scripts
+for a POSIX shell. One has to rely on =$ENV= to set up for interactive shells.
+
+*** Bash Style
+
+- Login Shells
+  + =/etc/profile= the system login file
+  + =~/.bash_profile=, =~/.bash_login=, =~/.profile=: the user login files. First readable file is read
+  + =~/.bash_logout= upon logout
+  + OpenSSH opens a non-login shell when given a command argument
+  + =-bash= indicates a login shell.
+
+- Interactive Non-Login Shells
+  + =~/.bashrc= the environment file. A login shell may read this file inside =.profile=
+  + It does not read =/etc/profile=, but usually it inherits a login shell.
+
+- Non-Interactive Shell reads the =BASH_ENV= file
+  + a shell may be non-interactive and login or non-login. So it may reads
+    =/etc/profile= and others.
+
+- Running as POSIX =sh=
+  + login: =/etc/profile= + =~/.profile=
+  + interactive: =$ENV=
+
+** =expr= Expression Evaluator
+
+=expr= (for Bash, it's part of coreutils as a separate command)
+performs /arithmetic/, /logical/, /relational/ or /string/ operations.
+
+- The traditional way to perform arithmetic before arithmetic expansion is introduced.
+  Useful if arithmetic expansion is not available or suitable.
+  Non-integer arithmetic is still not supported.
+
+- Each token must be a separate argument.
+
+- Equality test is done by ~=~ not ~==~
+
+- Some operators (=*=, =&=, =|=, =<=, =>=, =(=, =)=) are special metacharacters
+  and they must be quoted or escaped.
+
+- If only one expression is given, then =expr= simply echos it.
+
+- to avoid some variables that are themselves an operator string, append an =x= to them
+  and another operand before string comparison.
+
+- String matching =:= or =match= via *REGEXP* (BRE) is supported!
+  + The pattern has an implicit =^= at the start, i.e. it matches at the beginning of the word.
+  + the POSIX standard way to perform eregex matching directly in a pipeline.
+
+- Note that =expr= prints the result while set the exit status at the same time.
+  Be careful when using =expr= in a conditional construct.
+
+** Quoting
+
+/Quoting in Shell does not mark string literals as in C!/
+
+Metacharacters (including space) are commonly used in shell.
+Quoted characters do not have a special meaning.
+Metacharacters must be quoted or escaped to be treated as regular characters.
+
+POSIX shells supports multiline strings with ='= and ="= because =\n=
+retains its literal value.
+
+#+begin_src shell
+# these are equivalent
+rm 'file1 file2'
+rm file1' 'file2
+rm f'ile1 file'2
+
+# However these are the same:
+# the substitutions in a variable assignment aren't subject to further expansion
+a=$b
+a="$b"
+#+end_src
+
+Double quotes are weak in that certain meta-characters retain their special meaning:
+- =$=: parameter expansion, command substitution, arithmetic expansion
+- =``=: command substitution
+- =\=: as the escape sequence prefix with =$=, =`=, ="=, =\=, newline
+  + However, in ="$()"= and ="${...}"= the double quotes have no effect on special characters handling.
+
+The easiest way to quote a quotation mark is to use another type of quotation marks.
+
+- /Dollar single quotes/ =$'...'= allows ANSI C-style escape sequences to be interpreted within a quoted string.
+  It is still strong quoting except that it escapes C-style sequences.
+  #+begin_src shell
+  echo $'abc\nefg'  # we don't need -e anymore
+  #+end_src
+  + =\u= unicode escape sequence is required to be supported (supported by Bash, zsh, mksh, not by dash).
+    For better portability, use =print= or =echo=
+
+** Commands
+
+*** Classification
+
+**** Builtin Commands
+
+Contained within the shell itself.
+
+- =cd -P= (POSIX): cd to the physical path of the target, even if the target is a symlink.
+  + by default =cd= follows symlinks instead of going to the actual directory.
+
+- =eval=: takes the input strings as a shell command
+  + e.g. the output of certain commands can be =eval= to run.
+
+- =export -p= (POSIX) lists exported variables
+
+- =hash=: shell caches commands' paths in a hash table. This command manipulates the cache.
+  + =-r=: flush the cache
+
+- =readonly= (POSIX): marks an existing variable or creates a read-only variable
+
+- =set= shell options, not variables.
+   + most options are POSIX compliant. =vi=, =emacs= and =pipefail= and a few other options related to Bash features
+     are bashisms.
+   + =unset= unsets shell variables and functions.
+   + lists all variables without any option or set positional parameters.
+
+- =trap= (POSIX): installs signal handlers
+
+- =getopts=: the command counterpart of [[man:getopt(3)][getopt]]
+
+- =bind= (bashism): set key bindings
+
+- =declare= (bashism): declare various variables, possibly with data types or certain attributes.
+
+- =let= (bashism): use =$((arithmetic_expression))=
+
+- =local= local variable, not POSIX but still portable in basically every shell
+    =bash=, =dash=, =busybox ash=, =zsh= have =local= while =ksh=, =mksh= have =typeset=
+  #+begin_quote
+The shell uses dynamic scoping, so that if you make the
+variable x local to function f, which then calls function g,  references
+to  the  variable  x made inside g will refer to the variable x declared
+inside f, not to the global variable named x.
+  #+end_quote
+
+- =shopt= (bashism): set, unset and query optional extended features of Bash.
+
+- =printf=: C style output
+
+POSIX-mode bash requires special builtins be found before shell functions during command
+lookup; if a special builtin returns an error status, a non-interactive shell
+exits; variable assignments before a (special builtin) command stay in effect after the command completes.
+
+TODO
+
+**** Scripts
+
+A new bash process is forked to execute a script. A script name as an argument
+to =bash= is searched first in the current directory and then in the =PATH= variable.
+
+**** Functions
+
+Executed in the current shell context.
+
+**** Other Programs
+
+Executed in a new process.
+
+**** Complex Commands
+
+A command can be
+- *simple*
+- *pipeline*
+- *list or compound list*: a sequence of commands separated
+  by control operators (=;=, =&=, =&&=, =||=, newline)
+- *compound command*:
+  #+begin_quote
+The shell has several programming constructs that are 'compound commands', which provide
+control flow for commands. Each of these compound commands has a reserved word or control
+operator at the beginning, and a corresponding terminator reserved word or operator at the
+end. Compound commands are created using the following reserved words. These words are only
+recognised if they are unquoted and if they are used as the first word of a command (i.e.
+they can't be preceded by parameter assignments or redirections).
+  #+end_quote
+  + grouping =( command-list )= (in a subshell) and ={ command-list; }=
+    (in the current shell, functions considered complex named groupings.)
+    - Treated as a whole with redirection.
+    - Strangely, =$$= remains the same value in a subshell.
+  + for, while, until loop
+  + if conditional, case conditional
+- *function definition*
+
+*** Execution Steps
+
+Input is separated by metacharacters and tokenized.
+Various shell expansions are then performed. Redirection is performed
+if necessary. Variable assignments are saved. Commands are then executed and the
+shell waits for them to complete.
+
+**** Command Search
+
+- alias expansion (bypassed by =command=)
+
+- reserved words
+
+- function lookup (builtin can be overridden)
+
+- builtin commands (forced by =builtin=)
+
+- hashed regular utilities and then =PATH=.
+
+- search in the known function list
+
+- returns error 127 if not found
+
+- executes the command in a separate execution environment; if the file is not
+  executable and not a directory, it is assumed to be a shell script.
+
+** Shell Expansions
+
+*** Tilde Expansion
+
+=~TildePrefix= anything after a =~= and before =/=. Tilde expansion is more than =$HOME=.
+
+#+begin_src shell
+~UserName # UserName's home directory
+
+~ # $HOME
+
+~+ # $PWD
+
+~- #OLDPWD
+
+~N+/- # up/down directory stack
+#+end_src
+
+*** Parameter Expansion
+
+Variables can be *global* (environment variables, exported variables, by convention UPPERCASE)
+or *shell*-local variables (by convention lowercase).
+
+**** Variables
+
+- No space before and after ===
+- =set= prints all current variables
+- Environment variables are exported variables, which propagate to subprocesses.
+  Environment variables are inherited by child processes and cannot be
+  propagated back to the parent.
+  + =env= prints all current environment variables
+- to append strings to a variable, use =${x}appended=, =$x"appended"=.
+- ~var=~ assigns null/empty to =var=; =unset var= undefines it.
+
+***** Environment Variables
+
+An environment variable does not have to be exported:
+- it may not be a shell variable: environment variable is an OS concept
+  and a process may =setenv= by itself.
+- ~VAR=VALUE command~ also defines an environment variable
+  without exporting it.
+  + for external commands and regular built-ins, this defines the environment of the new processes.
+  + for normal functions, the assignments shall affect the current execution
+    environment during the execution of the function.
+    Whether the value is restored is unspecified but in bash and dash they are.
+  + for special built-ins, the assignments affect the current execution environment
+    and remain in effect after the commands.
+- an *invalid* shell variable (badly named) may be a valid environment variable.
+
+Common Environment Variables:
+- =PATH= :: the command search path
+- =HOME= :: the user home
+- =CDPATH= :: a list of directories for =cd= to find the destination directory in, in addition to =PWD=
+- =PWD= :: current working directory
+- =OLDPWD= :: previous working directory
+- =PS1=, =PS2= :: normal prompt before each command and the secondary prompt in a multiline command
+- =IFS= :: the characters used to tokenize the input
+- =$$= :: current shell PID. A subshell also shows the same =$$=
+- =$!= :: recent background command PID
+- =$@= :: positional parameters, each parameter expands to a separate word when double quoted
+- =$#= :: count of positional parameters
+- =$?= :: recent exit status
+- =FUNCNAME= :: the currently executing function's name
+- =LINENO= :: the current line number of the script
+- =RANDOM= :: a random number generator
+- =MACHTYPE= :: arch triplet
+- =UID=, =EUID= :: real and effective current user ID
+- =BASH_VERSION=, =BASH_VERSINFO= :: bash version, the latter is an array of major, minor, patch, release/beta, arch
+- =LINES=, =COLUMNS= :: current terminal height and width
+- =DIRSTACK= :: an array containing the directory stack (list of recently visited directories)
+
+*** Expansion Forms
+
+Most scripts don't care about the difference between undefined variable and a
+null variable. =:?=, =:-=, =:+=, =:== variations of the above forms check
+whether the variable is null or undefined instead of simply undefined.
+
+The special expression is executed in the current shell rather than a subshell.
+
+- Basic: =${PARAMETER}= expands to the value of PARAMETER
+  #+begin_src shell
+  echo ${PATH}
+  #+end_src
+
+- Indirect expansion: =${!var}= expands to the value of the variable named by var
+  #+begin_src shell
+  A=B; B=C; echo ${!A}  # prints "C"
+  #+end_src
+
+- Default values:
+  - =${var-default_option}= :: use default_option if undefined
+  - =${var:=new_definition}= :: use new_definition and assign if undefined or empty
+  #+begin_src shell
+  echo ${VAR:-default}       # use default if undefined/empty
+  ${VAR:=default}            # assign default if undefined/empty
+  #+end_src
+
+- Check if set:
+  - =${var:+option_on_defined}= :: use option_on_defined if defined and non-empty
+  #+begin_src shell
+  echo ${VAR:+DEFINED}  # prints if VAR is set and non-empty
+  #+end_src
+
+- Error if unset:
+  - =${var:?error_message}= :: error and exit if undefined or empty
+  #+begin_src shell
+  ${VAR:?ERROR}  # exits with error if VAR is unset
+  #+end_src
+
+- Substring: =${var:start:length}=
+  #+begin_src shell
+  ${VAR:1:3}
+  #+end_src
+
+- Pattern prefix removal:
+  - =${var#pattern}= :: shortest match
+  - =${var##pattern}= :: longest match
+  #+begin_src shell
+  v=abc123; echo ${v#abc}    # "123"
+  echo ${v##*abc}            # ""
+  #+end_src
+
+- Pattern suffix removal:
+  - =${var%pattern}= :: shortest match
+  - =${var%%pattern}= :: longest match
+  #+begin_src shell
+  v=abc123; echo ${v%123}    # "abc"
+  echo ${v%%123*}            # "abc"
+  #+end_src
+
+- Pattern replacement:
+  - =${var/pattern/replacement}= :: replace first match
+  - =${var//pattern/replacement}= :: replace all matches
+  #+begin_src shell
+  echo ${VAR/pat/rep}   # first match
+  echo ${VAR//pat/rep}  # all matches
+  #+end_src
+
+*** Arithmetic Expansion
+
+=$((expression))=
+Integer arithmetic Only, useless. Use =bc= or =awk= for more complete arithmetic.
+
+All tokens in the expression undergo parameter expansion, command expansion and quote removal.
+
+The expression is similar to that of C.
+
+*** Word Splitting
+
+=$IFS= is used as a list of delimiters to split the output of other expansions into words.
+By default the delimiters are space, tab and newline.
+
+#+begin_quote
+After parameter expansion, command substitution, and  arithmetic  expansion
+the  shell scans the results of expansions and substitutions that
+did not occur in double-quotes for field splitting and  multiple  fields
+can result.
+#+end_quote
+
+Note that quoted strings are not inherently an inseparable unit in Bash:
+they are subject to word splitting.
+
+#+begin_src shell
+export IFS=';'
+for word in "a;b;c"; do
+  echo $word
+done
+#+end_src
+
+#+begin_example
+echo $(ls)      # the output is separated by newlines, but then split and joined again by spaces by `echo`
+echo "$(ls)"    # the output is separated by newlines and output as is.
+#+end_example
+
+*** Filename Expansion
+
+Wildcards (=*=, =?=, =[=, =]=) in POSIX shells expands only filenames, not
+random strings. They are not simplified regexp. They are expanded automatically when
+they occurs in a shell. However, these filenames are still strings, passed to shell commands:
+If a file =-i= exists and =rm *= is executed, it will turn =rm= into interactive =rm=.
+
+- Files whose name starts with a dot are not normally listed and various
+  shells, utilities follow this convention.
+  + =.*= is required to list all files, otherwise only visible files are listed.
+
+*** Command Substitution
+
+=$(command)= or =`command`= (old-style): performs the command and replaced with the stdout of the command.
+
+** Control Flow
+
+*** Conditional
+
+**** if statement
+#+begin_src shell
+if TEST-COMMANDS; then CONSEQUENT-COMMANDS; fi
+
+if TEST-COMMANDS; then
+  CONSEQUENT-COMMANDS;
+elif MORE-TEST-COMMANDS; then
+  MORE-CONSEQUENT-COMMANDS;
+else
+  ALTERNATE-CONSEQUENT-COMMANDS;
+fi
+#+end_src
+
+Without =then=, the following tokens may be mistaken for arguments to test commands.
+
+=[= is an alias for =test=, =]= is an argument to =test= to mark the end of arguments.
+
+Most options of =test= test if a certain kind of file exists:
+- compare strings (especially with empty strings), =>=, =<=, ~==~, ~!=~
+- compare integers (=-eq=, =-ne=, =-lt=, =-le=, =-gt=, =-ge=)
+- the three boolean operators
+- =test= conditions can be normal commands: =0= exit status indicates true.
+  + one may use arithmetic expansion as conditions.
+
+With =[[= bash condition, one can even use :
+- regex match
+- prevents pathname expansion
+
+**** case statement
+
+#+begin_src shell
+case EXPRESSION in
+CASE1) COMMAND-LIST;;
+CASE2) COMMAND-LIST;;
+...
+CASEN) COMMAND-LIST;;
+**) COMMAND-LIST;;  # default
+esac
+#+end_src
+
+*** Loop
+
+- =for= loop: a foreach loop.
+  + The return status is the exit status of the last command that executes.
+  + to avoid problems with quoting and separators, =for f in path/*= instead of using =ls=
+
+- =while= loop: =while conditions; do commands; done=
+
+- =until= loop: =until conditions; do commands; done=
+
+- (Bashism) =select= loop:  automatically makes a menu then asks for an option, then matched,
+  the loop body is executed with that option.
+  #+begin_src shell
+  select variable [in words]; do
+      commands
+  done
+  #+end_src
+
+- =break=, =continue= exist and support breaking N looping or continuing the Nth enclosing loop.
+
+Loop constructs can be used with I/O redirection or part of a pipeline.
+
+*** Functions
+
+#+begin_src bash
+function FUNCTION { COMMANDS; }
+FUNCTION () { COMMANDS; }
+#+end_src
+
+- The curly braces must be separated from the body by spaces, otherwise they are interpreted in the wrong way.
+
+- *Parameters*: Functions are like mini-scripts that accept parameters. However, the arguments starts with actual arguments at =$1=,
+  =$0= would be the shell name (=$@= and =$#= excludes it).
+
+- *local variables*: Functions support =local= parameters.
+
+- =type funcname= (coreutils's =which= cannot do hits) to display its definitions
+
+**** Argument Passing
+
+- passing a variable by reference is possible: passing its name and then use =eval= to avoid immediate parameter expansion.
+
+#+begin_src bash
+inc() { eval $1=$(expr $$1 + 1); }
+
+A=10
+inc A
+#+end_src
+
+** Signal Handling
+
+An interactive Bash ignores =SIGTERM= and =SIGQUIT= (=^\=).
+If job control is enabled, =SIGTTIN=, =SIGTTOU=
+(sent by the kernel to background processes to suspend them upon terminal access)
+and =SIGTSTP= are also ignored.
+
+An interactive shell will send a SIGHUP to all jobs upon exit.
+
+#+begin_src shell
+trap [COMMANDS] [SIGNALS]
+#+end_src
+
+*** Use
+
+- Cleanup upon exit
+  #+begin_src bash
+  LOCKFILe=/var/lock/mylock.lock
+  [ -f $LOCKFILE ] && exit 0
+
+  trap  "{ rm -f $LOCKFILE ; exit 255; }" EXIT
+
+  touch $LOCKFILE
+  ....
+
+  exit 0
+  #+end_src
+
+** Input/Output
+
+*** Output
+
+- =echo=
+  + =-e=: escape special characters
+  + =-n=: no newline is appended
+
+*** Input
+
+- =read=: reads each token into provided variables. Line by line
+  + tokens are separated by =$IFS=.
+  + =-a= store the result into an array
+  + =-d=: end of input
+  + =-e=: readline support
+  + =-p=: display a prompt
+  + =-r=: raw, no escaping
+  + =-s=: silent input
+  + =-t=: read timeout
+  + =-u=: use a file descriptor
+
+*** Redirection
+
+the destination and the source of a redirection can be
+a file path or a file descriptor.
+
+#+begin_src shell
+# files
+[n]> file   Redirect standard output (or n) to file.
+[n]< file   Redirect standard input (or n) from file.
+[n]>| file  Same, but override the -C option.
+[n]>> file  Append standard output (or n) to file.
+[n]<> file  Open  file  for  reading and writing on standard input (or n).
+
+# file descriptor
+[n1]<&n2    Copy file descriptor n2 as stdout (or fd n1).  fd n2.
+[n1]>&n2    Copy file descriptor n2 as stdin (or fd n1).  fd n2.
+
+[n]<&-      Close standard input (or n).
+[n]>&-      Close standard output (or n).
+
+# stdin
+[n]<< delimiter
+      here-doc-text ...
+delimiter
+#+end_src
+
+**** Mechanism
+
+Redirection is executed in order:
+
+- stdin redirected to the pipe
+
+- stdout redirected to the pipe
+
+- redirection for the current command is processed from left to right
+  + =2>&1= has to come after =1>=
+  + =&> FILE= is => file 2>&1=
+
+- =N>&M=: not limited to =2>&1=
+
+- =N<&-= closes a file descriptor
+
+- the command starts executing.
+
+**** Open a New File
+
+One can use =exec= without a command and with redirection to change the standard input/Output
+or even open a new file (associate a file with a file descriptor).
+
+#+begin_src bash
+exec 4> result.txt # fd 4 is now result.txt, this opens a file.
+exec 4<&- # closes the file
+#+end_src
+
+Avoid using file descriptors under 10.
+
+**** File Descriptors as a File
+
+- With =/dev/fd= a program can use pathname arguments to handle stdin/stdout.
+  + not every program accepts =-= to indicate =stdin=.
+
+**** HERE Document (POSIX)
+
+- =<<DELIMITER= can be followed by other commands or pipes: the real input comes at the next line.
+
+Shell expansion in the HEERDOC is controlled by whether the starting DELIMITER is quoted
+(quoted delimieter turn the expansion off).
+
+***** Tab Stripping Heredoc
+
+=<<-DELIMIETER=: strips  leading tabs =\t= of each line. Tab characters only.
+To type =\t= in Shell, use =Ctrl-V + tab=, otherwise it only triggers tab completion.
+Seems to break easily if the script is reformatted by converting tabs to spaces.
+
+**** Bashism
+
+- (Bash 4+) HEREDOC to variable
+  #+begin_src bash
+  # IFS=""  read the entire text
+  # -r raw text without escaping
+  # -d ereads entire input
+  IFS= read -r -d '' var <<'EOF'
+  line 1
+  line 2
+  line 3
+  EOF
+  #+end_src
+
+- (Bash & Zsh)HERE strings
+  #+begin_src shell
+  cat <<< "Hello World"   # always expanded
+  #+end_src
+
+** Job Control =monitor=
+
+Job control is part of POSIX shell but some specific features in Bash are not.
+
+Job control refers to the ability to selectively suspend the execution of processes and
+resume their execution at a later point.:
+- foreground/background (=fg=, =bg=, =&=),
+- suspend (=suspend=, =^Z= sends a SIGTSTP),
+- status (=jobs=, =ps=).
+- =$$= displays the current
+  shell PID,
+- =$!= shows the PID of the last command moved to the background.
+
+Job control may be related to asynchronous background processes but not limited to.
+Job control is useful when there is no terminal multiplexer
+
+=&= always works to run a command asynchronously;
+the =monitor= option only changes how the shell manages and reports that background process.
+Without job control, it simply means we have no way to control the command started with =&=.
+
+*** Concepts
+
+- *job*: A set of processes comprising a pipeline, and any processes descended from it,
+  that are all in the same process group.
+  + identified by a /job number/ (or /job ID/).
+  + a job is specified in commands by a /jobspec/:
+    - =%n=: job number N
+    - =%%=, =%+=, =%=: the current job, the last job stopped in the foreground or started in the background.
+    - =%-=: the previous job or the only job.
+    - =%string=: a job of which the name starts with =string=
+    - =%?string=: a job of which the name contains =string=
+    - naming a job can be used to bring it foreground or set it to background with =&= after the specification.
+  + a job is associated with a pipeline.
+
+- *foreground/background process*
+  + only foreground processes are allowed to read from or write to the terminal.
+    Background processes are suspended when trying to read from or write to the terminal.
+  + the current terminal process group (foreground job) receives /keyboard-generated signals/.
+    Background processes are immune to such signals.
+
+*** Controlling Jobs
+
+**** Query Jobs
+
+- =jobs=
+
+**** Waiting For a Job
+
+- =wait=: wait for job completion and return exit status
+
+**** Suspending a Job
+
+- =^Z= suspend the current program by sending =SIGTSTP=
+
+- =suspend=: suspends the current non-login shell until a =SIGCONT= is received.
+  + Generate =SIGCONT= with =kill=
+
+- =^Y=: delay-suspend the current program
+  + only suspended when it attempts to read input from the terminal
+
+**** Setting to Foreground/background
+
+=fg= and =bg= put suspended jobs to foreground/background.
+
+When the user logs out, all suspended jobs are terminated automatically.
+
+**** Stopping a Job
+
+- =kill jobspec|pid=
+  + kill is builtin in bash
+
+**** Detaching a Job
+
+- =disown= (bashism) removes a job from the job table so that the shell can no longer
+  control the job.
+  - default the current job
+  - =-h= option set =nohup= for the job so that when the shell exits, the job
+    does not receive a =SIGHUP= when the shell receives one.
+
+**** Autoresuming  Job
+
+With the variable =auto_resume=, if properly set, Bash will treat single word commands
+matching a pattern as a command to resume certain jobs, not as starting a new command.
+
+* Bash-Specific Features
+
+** Features Particular to Bash
+
+- =[[= conditional: regex matching, string pattern matching and logical operators =&&= and =||= without extra escapes
+
+- shell arithmetic with one of the shell expansions or =let=
+
+- =alias= and =unalias=: aliases are expanded upon a command/function is read.
+  + alias is available in most shells (bash, dash, ksh, zsh, tcsh, mksh and even in busybox ash) even if it is not POSIX.
+  + usually not expanded by non-interactive shells.
+
+- one-dimensional non-contiguous array variable declared by =declare=
+
+- (ksh, mksh, zsh, not in ash) directory stack with =pushd=, =popd=, and =dirs=
+
+- POSIX mode =set -o posix=, =--posix= or the envvar =POSIXLY_CORRECT= makes =bash= try to behave as compliant as possible
+  to the POSIX standard.
+
+- restricted shell: certain operations and features are disallowed or disabled
+
+** Brace Expansion
+
+#+begin_src shell
+{a,b,c}1 # a1 b1 c1
+#+end_src
+
+Brace expansion is performed before any other expansions, and any characters special to other expansions are
+preserved in the result.
+
+#+begin_quote
+Tilde  expansions,  parameter  expansions, command substitutions,
+arith metic expansions, and quote removals that occur within a single word
+expand to a single field.  It is only field splitting or  pathname
+expansion that can create multiple fields from a single word.
+#+end_quote
+
+When dealing with shell, one cannot simply consider expansion as pure text macro expansion.
+~$a=$b~ simply assigns =b= to =a=, rather than expands =b= and evaluates the result text expression.
+
+** Process Substitution (Bash, ksh93, zsh, not POSIX or mksh)
+
+A named pipe or a file under =/dev/fd/= is provided to a command as stdin or stdout.
+
+- =>(command)=: =command= uses the file as input
+
+- =<(command)=: =command= uses the file as output
+
+The expansion returns the path to that file and another command may use the file
+as input or output.
+
+#+begin_src shell
+while read line; do
+      echo "$line"
+done < <(grep "pattern" file.txt)
+#+end_src
+
+*** Coprocess (Since Bash 4.0)
+
+Similar to mksh's coprocess in functionality.
+
+#+begin_src bash
+coproc NAME { command; }
+# or
+coproc command [args ...] # NAME is COPROC
+#+end_src
+
+Then other job can access the stdin/stdout of this coprocess via =NAME[0]= (stdout) and =NAME[1]= (stdin).
+
+** =declare= and Variable Types
+
+With =declare=, we can force typing on variables.
+
+- =-p= (reflection): print a variable's attributes
+
+- =-a= 0-based heterogeneous indexed array (bashism) by integers
+  + An array element is basically a variable and thus requires =$arr[i]= to access it.
+    - =${arr[*/@]}= dereferences all elements: Use this for iteration.
+      #+begin_src bash
+      for elm in ${arr[*]}; do ... done; //
+      #+end_src
+  + sparse in nature
+  + negative indices are supported.
+  + =arr[index]= indexing syntax
+  + ~(value1 value2 [2]=value3)~ initializer list
+  + no need to manually allocate a slot before assigning to it.
+    Bash arrays are dynamically and automatically expanded upon assignment.
+  + *test for an element*: use =[[ -v ]]= to test if a slot is occupied.
+  + *delete an element*: =unset arr[i]=
+  + *append*: =array+=(element1 element2)=
+  + *length*: =${#array[@]}= (=${#var}= length of characters in a variable)
+  + Doesn't seem to be used much.
+
+- =-A= associative array (bashism)
+
+- =-f= function only
+
+- =-i= integer
+
+- =-r=, also as a separate keyword =readonly= (POSIX), and thus also used for *constants*.
+  + However, =readonly= in a function declares a global variable by default
+    and there is no way to combine =local= with =readonly=, use =declare -r= for that.
+
+- =-t= trace this variable only
+
+- =-x= export
+
+** Command History (Bashism)
+
+Saved in =HISTFILE= (default =~/.bash_history=)
+
+- =history= shows history, manages history
+  + =-d= deletes, =-c= clears, =-a= append to the history file,
+  + =-n= load certain history lines from the history file
+  + =-r= read all history lines from the history file.
+  + =-w= overwrite the history file
+
+- ~fc -s pat=rep~: replaces matching patterns and re-executes the result.
+
+- =fc -e event_number=: selects a range of commands to edit and re-executes them.
+
+- =^R=, =^S= searches the history, for the next candidate, press =^R= or =^S= again.
+
+*** Concepts
+
+- =event= (historical event): The entry selected from the history
+
+- =word=: the portions of that entry that are acted upon
+
+*** A Few Variables that Control the Behavior
+
+- =HISTSIZE=: Sets the maximum number of commands to retain in the history list.
+- =HISTIGNORE= Defines a pattern-based filter to prevent specific commands from being saved to the history list.
+- =HISTCONTROL= Provides finer control over which commands are entered into the history based on specific rules.
+  + =ignorespace=: Commands that start with a space character are not saved.
+  + =ignoredups=: Consecutive duplicate commands are not saved (only the first instance is kept).
+  + =ignoreboth=: Enables both ignorespace and ignoredups.
+  + =erasedups=: Removes all previous instances of a command from the history before saving the new one.
+
+*** History Substitution (Bash Reference Manual 9.3.1)
+
+To reuse and modify previous commands (not simply to repeat previous commands).
+
+=set -H=, enabled by default in interactive shell.
+Performed immediately after a complete line is read before tokenization.
+
+#+begin_src shell
+![event][:word_designator][modifiers]
+#+end_src
+
+**** Event Designators
+
+#+begin_quote
+If a word designator is supplied without an event specification,
+the previous command is used as the event, equivalent to !!.
+#+end_quote
+
+#+begin_quote
+Unless the reference is absolute, events are relative to the current position in the history list.
+#+end_quote
+
+- =!!=: previous entry
+
+- =!n=: the nth entry (in order).
+
+- =!-n=: the history entry minus n (reverse order)
+
+- =!string=: the most recent command starting with =string=.
+
+- =?string?=: the most recent command preceding the current position in the history list containing string
+
+- =^string1^string2^=: Repeat the last command, replacing =string1= with =string2=
+
+**** Word Designators (Optional)
+
+Word designators are used to select desired words from the event.
+Not using a word designator means using the entire event.
+
+- =n=: the nth word
+  + the first word is =0=
+
+- =^=, =$=: first/last word
+
+- =%=: the matching word of the most recent =?string?= search.
+
+- range: =x-y= (x to y)
+  + =-y=: =0-y=
+  + =*=: =1-$=
+  + =x*=: =x-$= including the last word
+  + =x-=: =x-$= excluding the last word
+
+**** Modifiers (9.3.3)
+
+Modifiers modify, or edit, the word or words selected from the history event.
+
+** Aliases
+
+For interactive use only.
+
+- Aliases are not recursively expanded in replacement text.
+  One may alias =ls= to =ls -F=
+
+- Aliases are not in a non-interactive shell unless explicitly set.
+
+- Aliases are not expanded until the line is read.
+  + Thus, an alias within a compound command is not available for subsequent commands.
+  + Aliases used in a function are expanded when the function is read.
+  + Aliases defined in a function are only enabled after that function is executed.
+
+- Aliases are not inherited by child processes.
+
+- While aliases are easier to understand, shell functions are preferred over aliases for almost every purpose.
+
+* Interactive Shells
+
+** Interactive Shell Settings
+
+echo $- to check if the current shell is interactive (the result contains an
+=i=).
+An interactive shell has some features enabled:
+
+- Job control enabled =monitor=
+
+- prompts =PS1= are set
+
+- commands are read from the command line using readline
+
+- the =ignoreeof= option is checked instead of exiting immediately upon EOF.
+
+- =history=, =histexpand= /command history/ and /history expansion/ enabled
+
+- /alias expansion/ enabled
+
+- in the absence of traps, =SIGTERM= is ignored, =SIGINT= is caught and handled.
+
+- =SIGHUP= to all jobs on exit is configured with =huponexit=.
+
+- Redirection errors from built-in commands do not cause the shell to exit
+
+- Failure of =exec= does not exit the shell.
+
+- Parsing syntax errors do not cause the shell to exit.
+
+** Command Line Editing
+
+Basically the emacs experience.
+
+Numeric arguments are supported.
+
+#+begin_src shell
+bind -P
+#+end_src
+
+*** Edit
+
+- =C-i= tab, or complete
+
+- =C-x C-u= undo
+
+- =M-c= capitalize-word
+
+- =M-u=: upcase-word
+
+- =C-v=: quoted-insert, or raw input
+
+- =C-t=: transpose-chars
+
+- =M-t=: transpose-words
+
+*** Mark
+
+Supposedly, one should set a mark and use some other region-related commands to operate on the region.
+
+- =C-@= or =M-Space=
+
+- =C-x C-x=: exchange-point-and-mark
+
+*** Kill
+
+- =C-u=: kill to the beginning of the line
+
+- =C-x C-?= (requires a shift to enter =?=)
+
+*** Use Editors
+
+- =C-X C-E=: invoke the =edit-and-execute-command= function using editors
+  in =$VISUAL=, =$EDITOR= or =emacs=
+
+* Developing Good Scripts
+
+** Debugging
+
+*** Dry Run
+
+- =-n=: read but does not execute  (syntax check only)
+
+or =set -o noexec=
+
+*** Verbose Output and Traces
+
+- Traces of each command plus its arguments are printed to stdout after the
+  commands have been expanded but before execution.
+  + =set -x= or =set -o xtrace= and disabled with =set +x= or =set +o xtrace=
+   to trace only part of a script.
+  + =bash -x= enables tracing of the entire script.
+
+- =-v= verbose output: prints shell input lines as they are read.
+
+=-v= prints the raw input while =-x= shows the actual command executed.
+
+*** Source-Level Debugger
+
+bash supports extended debugging mode by loading the debugger profile.
+
+- [[https://github.com/rocky/bashdb][bashdb]] :: a full-fledged debugger
+
+* Bibliography
+
+#+print_bibliography:
