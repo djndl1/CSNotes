@@ -7,12 +7,15 @@
   hence the =rc= configuration.
 
 - Bourne Shell (Stephen Bourne, Unix Version 7). There are some modern alternatives:
-  + *Almquist Shell* (Ash): a clone of the original Bourne shell 
-    - all major BSDs use Ash.
-    - dash: Debian/Ubuntu's default shell. Also incorporated into =Busybox=, although later with some 
-       bashisms added.
+  + *Almquist Shell* (Ash): a clone of the original Bourne shell, a replacement for commercial Unix shells.
+    - the most widespread modern Unix shell: all major BSDs, Debian/Ubuntu, various small-sized Linux through =BusyBox=.
+    - dash: Debian/Ubuntu's default shell. Dash on linux tends to be compiled with limited interactive
+       convenience for better performance on running scripts.
+      + Also incorporated into =Busybox=, although later with some bashisms added.
+    - For the forking story of Ash, see [[https://www.in-ulm.de/~mascheck/various/ash/][Ash Variants]]
   + *Bourne-Again Shell*: the GNU shell as a superset, the default shell on most Linux distros.
-    - Only some Debian-related distros use Dash, most others use Bash.
+    - Only some Debian-related distros use Dash, some smaller distros may use =BusyBox=, 
+      most others (including Redhat family, OpenSUSE, Arch, Gentoo) use Bash.
   + *KornShell* (ksh): the POSIX shell is a subset of Korn shell, an enhanced
     version the Bourne shell.
     - ksh93 is the one commonly used.
@@ -21,6 +24,7 @@
       - MirBSD Korn shell (mksh), used by Android as =/system/bin/sh=.
 
 - Z shell (Zsh): a relatively modern shell compatible with bash but not entire POSIX compliant.
+    - not POSIX-compliant but can be made compatible 
     - the default shell on macOS and some other Unixes.
 
 - C shell (not POSIX-compliant): modelled after the C programming language. The TENEX C shell as an
@@ -433,7 +437,8 @@ If a file =-i= exists and =rm *= is executed, it will turn =rm= into interactive
 
 *** Command Substitution
 
-=$(command)= or =`command`= (old-style): performs the command and replaced with the stdout of the command.
+=$(command)= or =`command`= (already old-style by 1989): 
+performs the command and replaced with the =stdout= of the command.
 
 ** Control Flow
 
