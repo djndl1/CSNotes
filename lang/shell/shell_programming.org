@@ -11,6 +11,7 @@
     - the most widespread modern Unix shell: all major BSDs, Debian/Ubuntu, various small-sized Linux through =BusyBox=.
     - dash: Debian/Ubuntu's default shell. Dash on linux tends to be compiled with limited interactive
        convenience for better performance on running scripts.
+      + even the man page of Dash is similar to that of Ash.
       + Also incorporated into =Busybox=, although later with some bashisms added.
     - For the forking story of Ash, see [[https://www.in-ulm.de/~mascheck/various/ash/][Ash Variants]]
   + *Bourne-Again Shell*: the GNU shell as a superset, the default shell on most Linux distros.
@@ -64,37 +65,11 @@ for a POSIX shell. One has to rely on =$ENV= to set up for interactive shells.
   + login: =/etc/profile= + =~/.profile=
   + interactive: =$ENV=
 
-** =expr= Expression Evaluator
-
-=expr= (for Bash, it's part of coreutils as a separate command)
-performs /arithmetic/, /logical/, /relational/ or /string/ operations.
-
-- The traditional way to perform arithmetic before arithmetic expansion is introduced.
-  Useful if arithmetic expansion is not available or suitable.
-  Non-integer arithmetic is still not supported.
-
-- Each token must be a separate argument.
-
-- Equality test is done by ~=~ not ~==~
-
-- Some operators (=*=, =&=, =|=, =<=, =>=, =(=, =)=) are special metacharacters
-  and they must be quoted or escaped.
-
-- If only one expression is given, then =expr= simply echos it.
-
-- to avoid some variables that are themselves an operator string, append an =x= to them
-  and another operand before string comparison.
-
-- String matching =:= or =match= via *REGEXP* (BRE) is supported!
-  + The pattern has an implicit =^= at the start, i.e. it matches at the beginning of the word.
-  + the POSIX standard way to perform eregex matching directly in a pipeline.
-
-- Note that =expr= prints the result while set the exit status at the same time.
-  Be careful when using =expr= in a conditional construct.
-
 ** Quoting
 
 /Quoting in Shell does not mark string literals as in C!/
+
+Quoting is probably the most confusing aspect of shell programming (even on Windows).
 
 Metacharacters (including space) are commonly used in shell.
 Quoted characters do not have a special meaning.
@@ -121,6 +96,15 @@ Double quotes are weak in that certain meta-characters retain their special mean
 - =\=: as the escape sequence prefix with =$=, =`=, ="=, =\=, newline
   + However, in ="$()"= and ="${...}"= the double quotes have no effect on special characters handling.
 
+/A quote after an identical quote immediately ends the quoting/.
+#+begin_src shell
+echo 'abc\'' # this does not work
+echo 'abc'\' # you cannot escape a quote after another.
+
+
+# to pass variable values to other scripts
+awk '{ print '$1'  }' # $1 has to be unquoted but is still concatenated.
+#+end_src
 The easiest way to quote a quotation mark is to use another type of quotation marks.
 
 - /Dollar single quotes/ =$'...'= allows ANSI C-style escape sequences to be interpreted within a quoted string.
@@ -139,30 +123,65 @@ The easiest way to quote a quotation mark is to use another type of quotation ma
 
 Contained within the shell itself.
 
+*Special built-ins*: =.= =:= =break= =continue= =eval= =exec= =exit= =export= =readonly= 
+=return= =set= =shift= =times= =trap= =unset= must be implemented as built-in commands within the shell itself. 
+
+POSIX-mode bash requires special builtins be found before shell functions during command
+lookup; if a special builtin returns an error status, a non-interactive shell
+exits; variable assignments before a (special builtin) command stay in effect 
+after the command completes.
+
+*Intrinsic utilities*: not subject to a =PATH= search unlike regular builtins during command search and execution are thus 
+required to be builtins.
+
+Some other utilities are typically builtin and are included here.
+
 - =cd -P= (POSIX): cd to the physical path of the target, even if the target is a symlink.
   + by default =cd= follows symlinks instead of going to the actual directory.
 
-- =eval=: takes the input strings as a shell command
-  + e.g. the output of certain commands can be =eval= to run.
+- =eval=: combined the input strings into a shell command and the execute it.
+  + e.g. the output of certain commands can be for =eval= to run.
 
-- =export -p= (POSIX) lists exported variables
+- =export= 
+  + =-p= (POSIX) lists exported variables
+  + =-f= (Bashism) exports functions to subshells.
 
 - =hash=: shell caches commands' paths in a hash table. This command manipulates the cache.
   + =-r=: flush the cache
 
 - =readonly= (POSIX): marks an existing variable or creates a read-only variable
+  + =readonly -p= (POSIX) lists read-only parameters
+
+- =times= (POSIX): help profile shell scripts.
 
 - =set= shell options, not variables.
    + most options are POSIX compliant. =vi=, =emacs= and =pipefail= and a few other options related to Bash features
      are bashisms.
-   + =unset= unsets shell variables and functions.
+   + sets positional parameters if no option is used.
+   + =unset= unsets shell variables, positional parameters and functions.
    + lists all variables without any option or set positional parameters.
 
 - =trap= (POSIX): installs signal handlers
 
+- =type=: display information about commands: paths, aliases, functions
+
+- =alias=, =unalias= (POSIX)
+
+- =command=: force the execution of the specified name as a *simple command*
+  + shell functions, aliases are ignored.
+  + =-v=, =-V= describe the command.
+
+- =ulimit=: report or set resource limit in the process in which it is executed.
+  + core file block count (default 0 means no core files)
+  + data segment size
+  + file size
+  + stack size
+  + cpu time
+  + virtual memory
+
 - =getopts=: the command counterpart of [[man:getopt(3)][getopt]]
 
-- =bind= (bashism): set key bindings
+- =bind= (bashism): set key bindings with readline
 
 - =declare= (bashism): declare various variables, possibly with data types or certain attributes.
 
@@ -181,11 +200,26 @@ inside f, not to the global variable named x.
 
 - =printf=: C style output
 
-POSIX-mode bash requires special builtins be found before shell functions during command
-lookup; if a special builtin returns an error status, a non-interactive shell
-exits; variable assignments before a (special builtin) command stay in effect after the command completes.
+- =source= (Bash, mksh, zsh, tcsh, not in Dash)
+  + PowerShell has =.= but not =source=
 
-TODO
+- =expr= (for Bash, it's part of coreutils as a separate command)
+   performs /arithmetic/, /logical/, /relational/ or /string/ operations.
+  - The traditional way to perform arithmetic before arithmetic expansion is introduced.
+    Useful if arithmetic expansion is not available or suitable.
+    Non-integer arithmetic is still not supported.
+  - Each token must be a separate argument.
+  - Equality test is done by ~=~ not ~==~
+  - Some operators (=*=, =&=, =|=, =<=, =>=, =(=, =)=) are special metacharacters
+    and they must be quoted or escaped.
+  - If only one expression is given, then =expr= simply echos it.
+  - to avoid some variables that are themselves an operator string, append an =x= to them
+    and another operand before string comparison.
+  - String matching =:= or =match= via *REGEXP* (BRE) is supported!
+    + The pattern has an implicit =^= at the start, i.e. it matches at the beginning of the word.
+    + the POSIX standard way to perform eregex matching directly in a pipeline.
+  - Note that =expr= prints the result while set the exit status at the same time.
+    Be careful when using =expr= in a conditional construct.
 
 **** Scripts
 
@@ -203,7 +237,8 @@ Executed in a new process.
 **** Complex Commands
 
 A command can be
-- *simple*
+- *simple*: ~[VAR=VAL] command_name [arguments] [redirection]~
+  + as opposed to complex command constructs.
 - *pipeline*
 - *list or compound list*: a sequence of commands separated
   by control operators (=;=, =&=, =&&=, =||=, newline)
@@ -435,9 +470,28 @@ If a file =-i= exists and =rm *= is executed, it will turn =rm= into interactive
   shells, utilities follow this convention.
   + =.*= is required to list all files, otherwise only visible files are listed.
 
+** Aliases (POSIX)
+
+For interactive use only.
+
+- Aliases are not recursively expanded in replacement text.
+  One may alias =ls= to =ls -F=
+
+- Aliases are not in a non-interactive shell unless explicitly set.
+
+- Aliases are not expanded until the line is read.
+  + Thus, an alias within a compound command is not available for subsequent commands.
+  + Aliases used in a function are expanded when the function is read.
+  + Aliases defined in a function are only enabled after that function is executed.
+
+- Aliases are not inherited by child processes.
+
+- While aliases are easier to understand, shell functions are preferred over aliases for almost every purpose.
+
 *** Command Substitution
 
-=$(command)= or =`command`= (already old-style by 1989): 
+=$(command)= (introduced in 1983 by ksh, standardized in 1992, implemented by Ash in 1989) 
+or =`command`= (I'm not sure why this syntax form is still taught): 
 performs the command and replaced with the =stdout= of the command.
 
 ** Control Flow
@@ -953,24 +1007,6 @@ Not using a word designator means using the entire event.
 **** Modifiers (9.3.3)
 
 Modifiers modify, or edit, the word or words selected from the history event.
-
-** Aliases
-
-For interactive use only.
-
-- Aliases are not recursively expanded in replacement text.
-  One may alias =ls= to =ls -F=
-
-- Aliases are not in a non-interactive shell unless explicitly set.
-
-- Aliases are not expanded until the line is read.
-  + Thus, an alias within a compound command is not available for subsequent commands.
-  + Aliases used in a function are expanded when the function is read.
-  + Aliases defined in a function are only enabled after that function is executed.
-
-- Aliases are not inherited by child processes.
-
-- While aliases are easier to understand, shell functions are preferred over aliases for almost every purpose.
 
 * Interactive Shells
 
