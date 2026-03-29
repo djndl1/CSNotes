@@ -44,6 +44,11 @@ A login shell (=-l=) first reads commands from the files =/etc/profile= and =.pr
 It also reads =$ENV= if defined. In any case, there is no =.bashrc= or related startup scripts
 for a POSIX shell. One has to rely on =$ENV= to set up for interactive shells.
 
+** Options & Arguments
+
+POSIX Utility Syntax Guidelines require that options and their option-arguments come 
+before positional arguments.
+
 *** Bash Style
 
 - Login Shells
@@ -96,7 +101,8 @@ Double quotes are weak in that certain meta-characters retain their special mean
 - =\=: as the escape sequence prefix with =$=, =`=, ="=, =\=, newline
   + However, in ="$()"= and ="${...}"= the double quotes have no effect on special characters handling.
 
-/A quote after an identical quote immediately ends the quoting/.
+/A single quote after an identical quote immediately ends the quoting and thus cannot escaped/.
+A double quote can be escaped.
 #+begin_src shell
 echo 'abc\'' # this does not work
 echo 'abc'\' # you cannot escape a quote after another.
@@ -506,7 +512,7 @@ if TEST-COMMANDS; then
   CONSEQUENT-COMMANDS;
 elif MORE-TEST-COMMANDS; then
   MORE-CONSEQUENT-COMMANDS;
-else
+else                  # there is no `then`
   ALTERNATE-CONSEQUENT-COMMANDS;
 fi
 #+end_src
@@ -523,8 +529,33 @@ Most options of =test= test if a certain kind of file exists:
   + one may use arithmetic expansion as conditions.
 
 With =[[= bash condition, one can even use :
-- regex match
+- regex match 
+  + ~==~, ~!=~ :=extglob=.
+  + ~=~~: ERE
+  + Quoted part of the pattern is matched literally. 
+  + To avoid quoting problems, consider storing the pattern in a variable.
+  + partial matching is still considered a successful matching.
+  + Since filename expansion is not performed on the pattern, most special 
+    characters stay what they are. Quoted portion may be seen as escaped pattern:
+    ='\.'= is =\\\.= when sent to the regex engine.
+  #+begin_quote
+any backslashes remaining in parts of the pattern that were originally not quoted can remove the
+special meaning of pattern characters. If any part of the pattern is quoted, the
+shell does its best to ensure that the regular expression treats those remaining
+backslashes as literal, if they appeared in a quoted portion.
+...
+the regular expression parser will interpret any
+unquoted backslashes remaining in the pattern after shell expansion according
+to its own rules. The intention is to avoid making shell programmers quote
+things twice as much as possible, so shell quoting should be sufficient to quote
+special pattern characters where that’s necessary.
+  #+end_quote
+  If not sure, look into =$BASH_REMATCH= ([0] is the full matched text, the rest are matched subexpressions) 
+  to find out what is actually matched.
 - prevents pathname expansion
+The words in between do not undergo word splitting and filename expansion:
+tilde expansion, parameter and variable expansion, arithmetic expansion,
+command substitution, process substitution, and quote removal are still performed.
 
 **** case statement
 
@@ -537,6 +568,14 @@ CASEN) COMMAND-LIST;;
 **) COMMAND-LIST;;  # default
 esac
 #+end_src
+
+- =CASEX=  and =EXPRESSION= undergo tilde expansion, parameter expansion,  command substitution,
+  arithmetic expansion, quote removal.
+
+- three terminators are used after each case:
+  + =;;=: break immeidate
+  + =;&=: fall through
+  + =;;&=: test the next case and execute if matched.
 
 *** Loop
 
