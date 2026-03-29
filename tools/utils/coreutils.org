@@ -1,5 +1,9 @@
 #+title: Coreutils
 
+* =tac=
+
+A simpler to reverse the input.
+
 * =ls=
 
 - =-1= :: one line per file
@@ -12,11 +16,45 @@
 
 - =-r= :: reverse the order
 
-* =pr=
+* Formatting 
 
-A paginator that make text into forms suitable for paper pages, possibly in
-multiple columns. By default 66 lines per page. Not a replacement for =troff= or
-=nroff=. For real printing, consider =lp= and =lpr=.
+- =pr=:w A paginator that make text into forms suitable for paper pages, possibly in
+  multiple columns. By default 66 lines per page. Not a replacement for =troff= or
+  =nroff=. For real printing, consider =lp= and =lpr=.
+
+- =fmt=: join lines and fill to make lines of specified length.
+  + don't even know what text is suitable for its use.
+
+- =fold= (most useful): breaking lone lines
+  + not suitable for code
+
+* Output Part of a File
+
+=head= and =tail= can also count the size of part of a file by size (=--bytes=),
+not just lines. Also, an offset from the beginning/end of the file can be specified
+to set the starting point of the output.
+
+- =head=
+  + =-n -N= output up to (not including) the last Nth line.
+
+- =tail=
+  + =-n +N= skip =N-1= lines before output
+  + =-f= or =--follow= supports following a file by =name= so that 
+    even if the file is renamed or rotated, it will be detected (but not reopening automatically).
+    The default behavior tracks the file by file descriptor.
+    + File change can be notified if the OS supports, otherwise =tail= polls the 
+      file change every ~--sleep-interval=N~ seconds.
+  + =-F=: ~--follow=name~ and =--retry= opening a file. Useful against rotated logs.
+  + =--pid= tracks a process (use =$!= for example) and terminates accordingly.
+
+- =split=: split a file into a series of files with a common prefix in their names.
+  + by line or by size or by record (custom separator instead of newlines) or by count.
+    + ~--number=N~: 6 different distribution methods that split files into N files (not all are output).
+    + =--line-bytes= size-based splitting with line preservation. Only breaks a line if that line
+      itself is too long.
+  + =--filter=: specifies a filter before writing to output files e.g. compressing the output.
+  + =--numeric-suffixes=: by default the names of the output end with letter-based suffixes =aa=, =ab= ...
+    this uses numeric digits as suffixes.
 
 * =date=
 
@@ -136,6 +174,8 @@ sort -u file1 file2 # union of unsorted files
 
 Not limited to octal format
 
+- =+N= to skip bytes before actual output
+
 - =-j= skip bytes and =-N= read N bytes
 
 - =-t=: format (hexadecimal), unsigned decimal, signed decimal, floating point, .
@@ -233,7 +273,6 @@ Like =join=, the input should be presorted: only repeated adjacent lines are pro
     in =file1= is also repeated.
 
 - Symmetric difference =-u= (unique lines only, repeated lines are not printed.)
+* ASCII Encoding =base64=, =base32=, =baseenc=
 
-* =tail=
-
-- =-n +N= skip =N-1= lines.
+Base16/32/64 z85 encoder/decoder
