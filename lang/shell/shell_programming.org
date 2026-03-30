@@ -293,6 +293,16 @@ shell waits for them to complete.
 
 ** Shell Expansions
 
+#+begin_quote
+Tilde  expansions,  parameter  expansions, command substitutions,
+arith metic expansions, and quote removals that occur within a single word
+expand to a single field.  It is only field splitting or  pathname
+expansion that can create multiple fields from a single word.
+#+end_quote
+
+When dealing with shell, one cannot simply consider expansion as pure text macro expansion.
+~$a=$b~ simply assigns =b= to =a=, rather than expands =b= and evaluates the result text expression.
+
 *** Tilde Expansion
 
 =~TildePrefix= anything after a =~= and before =/=. Tilde expansion is more than =$HOME=.
@@ -310,6 +320,10 @@ shell waits for them to complete.
 #+end_src
 
 *** Parameter Expansion
+
+A variable is a parameter denoted by a name. A variable
+has a value and zero or more attributes. Attributes are assigned using the =declare=
+builtin command (Bashism).
 
 Variables can be *global* (environment variables, exported variables, by convention UPPERCASE)
 or *shell*-local variables (by convention lowercase).
@@ -353,6 +367,7 @@ Common Environment Variables:
 - =$@= :: positional parameters, each parameter expands to a separate word when double quoted
 - =$#= :: count of positional parameters
 - =$?= :: recent exit status
+- =${N}= :: positional parameters (N can be larger than 10 even for POSIX shells).
 - =FUNCNAME= :: the currently executing function's name
 - =LINENO= :: the current line number of the script
 - =RANDOM= :: a random number generator
@@ -476,6 +491,14 @@ If a file =-i= exists and =rm *= is executed, it will turn =rm= into interactive
   shells, utilities follow this convention.
   + =.*= is required to list all files, otherwise only visible files are listed.
 
+*** Quote Removal
+
+The quotes are removed after all other expansions, leaving only the literal content to be passed to commands.
+
+#+begin_quote
+Special quotes get reemoved, literal quotes stay.
+#+end_quote
+
 ** Aliases (POSIX)
 
 For interactive use only.
@@ -573,7 +596,7 @@ esac
   arithmetic expansion, quote removal.
 
 - three terminators are used after each case:
-  + =;;=: break immeidate
+  + =;;=: break immediately
   + =;&=: fall through
   + =;;&=: test the next case and execute if matched.
 
@@ -602,8 +625,8 @@ Loop constructs can be used with I/O redirection or part of a pipeline.
 *** Functions
 
 #+begin_src bash
-function FUNCTION { COMMANDS; }
-FUNCTION () { COMMANDS; }
+function FUNCTION { COMMANDS; } # bash, mksh, busybox ash
+FUNCTION() { COMMANDS; } # POSIX, dash
 #+end_src
 
 - The curly braces must be separated from the body by spaces, otherwise they are interpreted in the wrong way.
@@ -873,24 +896,20 @@ matching a pattern as a command to resume certain jobs, not as starting a new co
 
 - restricted shell: certain operations and features are disallowed or disabled
 
-** Brace Expansion
+** Brace Expansion (Bash, mksh, zsh,)
 
 #+begin_src shell
+# list
 {a,b,c}1 # a1 b1 c1
+# sequence
+{1..10..2}.txt # 1 to 10 step 2
+{a..z..2} # a to z every two letters
 #+end_src
+
+- Either Prefixes or suffixes are required: a naked brace will not expand.
 
 Brace expansion is performed before any other expansions, and any characters special to other expansions are
 preserved in the result.
-
-#+begin_quote
-Tilde  expansions,  parameter  expansions, command substitutions,
-arith metic expansions, and quote removals that occur within a single word
-expand to a single field.  It is only field splitting or  pathname
-expansion that can create multiple fields from a single word.
-#+end_quote
-
-When dealing with shell, one cannot simply consider expansion as pure text macro expansion.
-~$a=$b~ simply assigns =b= to =a=, rather than expands =b= and evaluates the result text expression.
 
 ** Process Substitution (Bash, ksh93, zsh, not POSIX or mksh)
 
@@ -958,6 +977,11 @@ With =declare=, we can force typing on variables.
 - =-t= trace this variable only
 
 - =-x= export
+
+- =-n= nameref, that is, a variable reference.
+  + Whenever the nameref variable is referenced, assigned to, unset, or has its attributes modified (other
+    than using or changing the nameref attribute itself), the operation is actually performed on
+    the variable specified by the nameref variable’s value.
 
 ** Command History (Bashism)
 
