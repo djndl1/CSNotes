@@ -245,6 +245,7 @@ Executed in a new process.
 A command can be
 - *simple*: ~[VAR=VAL] command_name [arguments] [redirection]~
   + as opposed to complex command constructs.
+  + variable assignment occurs before redirections.
 - *pipeline*
 - *list or compound list*: a sequence of commands separated
   by control operators (=;=, =&=, =&&=, =||=, newline)
@@ -367,6 +368,11 @@ Common Environment Variables:
 - =$@= :: positional parameters, each parameter expands to a separate word when double quoted
 - =$#= :: count of positional parameters
 - =$?= :: recent exit status
+  + 127: command not found
+  + 126: found but not executable.
+  + 2: incorrect usage of builtins
+  + >125 for bash specially
+  + 128+N for termination status on a fatal signal
 - =${N}= :: positional parameters (N can be larger than 10 even for POSIX shells).
 - =FUNCNAME= :: the currently executing function's name
 - =LINENO= :: the current line number of the script
@@ -415,7 +421,7 @@ The special expression is executed in the current shell rather than a subshell.
   ${VAR:?ERROR}  # exits with error if VAR is unset
   #+end_src
 
-- Substring: =${var:start:length}=
+- Substring: =${var:start:length}=, or =${var:start:negative_index}=
   #+begin_src shell
   ${VAR:1:3}
   #+end_src
@@ -436,13 +442,26 @@ The special expression is executed in the current shell rather than a subshell.
   echo ${v%%123*}            # "abc"
   #+end_src
 
-- Pattern replacement:
+- Pattern replacement: quoted portions are not replaced of expanded 
   - =${var/pattern/replacement}= :: replace first match
   - =${var//pattern/replacement}= :: replace all matches
+  - =${var/#pattern/replacement}= :: replace the match at the beginning
+  - =${var/%pattern/replacement}= :: replace the match at the end
   #+begin_src shell
   echo ${VAR/pat/rep}   # first match
   echo ${VAR//pat/rep}  # all matches
   #+end_src
+
+- String transformation: transform the parameter with certion operations.
+  + =U=, =u=, =L=. Uppercase/lowercase conversion
+  + =E=: escape C escape sequences
+  + =K=, =k=: pretty-print arrays
+
+- Uppercase/lowercase Conversion: converts matching text
+  + =${parameter^pattern}= convert to the first character to uppercase
+  + =${parameter^^pattern}=convert to to uppercase
+  + =${parameter,pattern}=convert to the first character to lowercase
+  + =${parameter,,pattern}=convert to to lowercase
 
 *** Arithmetic Expansion
 
@@ -480,6 +499,16 @@ echo $(ls)      # the output is separated by newlines, but then split and joined
 echo "$(ls)"    # the output is separated by newlines and output as is.
 #+end_example
 
+#+begin_quote
+Explicit null arguments ("" or ’’) are retained and passed to commands as empty strings.
+Unquoted implicit null arguments, resulting from the expansion of parameters that have
+no values, are removed. If a parameter with no value is expanded within double quotes, a
+null argument results and is retained and passed to a command as an empty string. When
+a quoted null argument appears as part of a word whose expansion is non-null, the null
+argument is removed. That is, the word -d’’ becomes -d after word splitting and null
+argument removal.
+#+end_quote
+
 *** Filename Expansion
 
 Wildcards (=*=, =?=, =[=, =]=) in POSIX shells expands only filenames, not
@@ -490,6 +519,9 @@ If a file =-i= exists and =rm *= is executed, it will turn =rm= into interactive
 - Files whose name starts with a dot are not normally listed and various
   shells, utilities follow this convention.
   + =.*= is required to list all files, otherwise only visible files are listed.
+
+- =**=  match all files and zero or more directories and subdirectories.
+  If followed by a ‘/’, two adjacent ‘*’s will match only directories and subdirectories.
 
 *** Quote Removal
 
@@ -657,10 +689,28 @@ If job control is enabled, =SIGTTIN=, =SIGTTOU=
 and =SIGTSTP= are also ignored.
 
 An interactive shell will send a SIGHUP to all jobs upon exit.
+Stopped jobs are sent =SIGCONT= so that they may receive =SIGHUB=.
+Disowned (detached) jobs are ignored.
+
+The exact behavior regarding signal handling of Bash and command completion is quite complex:
+- sync waitiing for a foreground job: the trap runs after command completion;
+- sync =wait= for an async job: =wait= immediate returns and then immediately the trap is executed; 
+- job not enabled, the shell receives keyboard-generated signals when Bash is waiting for a foreground command.
+  For =SIGINT=, the command waits until the foreground command terminates and then decides what to do:
+  + if the command terminates due to =SIGINT=, Bash treats the signal as fatal and
+    acts on the =SIGINT= by running the trap or exiting itself.
+  + if not, the shell assumes =SIGINT= was used as part of the programm's normal operation or deliberately 
+    discarded. HOwever, any trap set for it is still executed.
 
 #+begin_src shell
 trap [COMMANDS] [SIGNALS]
 #+end_src
+
+Traps caught by the shell are reset to the values inherited from the shell’s parent, and
+traps ignored by the shell are ignored
+
+Traps set by the parent shell are reset in the subshell to the initial state of the parent shell.
+The Traps ignored by the parent shell, however, are ignored in the subshell as well.
 
 *** Use
 
@@ -700,6 +750,8 @@ trap [COMMANDS] [SIGNALS]
 
 *** Redirection
 
+Redirection modifies open file descriptors. Open files are inherited by the shell at invocation.
+
 the destination and the source of a redirection can be
 a file path or a file descriptor.
 
@@ -709,11 +761,13 @@ a file path or a file descriptor.
 [n]< file   Redirect standard input (or n) from file.
 [n]>| file  Same, but override the -C option.
 [n]>> file  Append standard output (or n) to file.
-[n]<> file  Open  file  for  reading and writing on standard input (or n).
+[n]<> file  Open file for reading and writing on standard input (or n).
 
-# file descriptor
-[n1]<&n2    Copy file descriptor n2 as stdout (or fd n1).  fd n2.
-[n1]>&n2    Copy file descriptor n2 as stdin (or fd n1).  fd n2.
+# file descriptor duplication
+# the only difference from the above is 
+# that the input source/output target is now a file descriptor
+[n1]<&n2    
+[n1]>&n2   
 
 [n]<&-      Close standard input (or n).
 [n]>&-      Close standard output (or n).
@@ -750,6 +804,11 @@ or even open a new file (associate a file with a file descriptor).
 #+begin_src bash
 exec 4> result.txt # fd 4 is now result.txt, this opens a file.
 exec 4<&- # closes the file
+
+# with a variable, bash allocates a file descriptor automatically. 
+exec {fd}>output.txt
+# now use $fd instead of explicitly specified number
+echo "hello" >&$fd
 #+end_src
 
 Avoid using file descriptors under 10.
@@ -773,6 +832,33 @@ To type =\t= in Shell, use =Ctrl-V + tab=, otherwise it only triggers tab comple
 Seems to break easily if the script is reformatted by converting tabs to spaces.
 
 **** Bashism
+
+- ={var}redirect_op=: a new file descriptor stored in =var= opened for that redirection
+  or the file description in =var= is closed.
+  #+begin_src bash
+# files
+# bind the fd of file to var
+{var}> file   
+{var}< file   
+{var}>| file  
+{var}>> file  
+{var}<> file  
+
+# duplicate the file descriptor n2 on var
+{var}<&n2     # reading from var is reading from n2
+{var}>&n2     # writing to var is writing to n2
+
+{var}<&-      # Close fd var
+{var}>&-      # Close fd var
+
+# read the here doc into the file stream of fd var
+{var}<< delimiter
+      here-doc-text ...
+delimiter
+#+end_src
+
+- Moving File descriptors =[n]<&digit-=, =[n]>&digit-=
+  + after duplication the =digit= file descriptor is closed.
 
 - (Bash 4+) HEREDOC to variable
   #+begin_src bash
@@ -810,6 +896,9 @@ Job control is useful when there is no terminal multiplexer
 =&= always works to run a command asynchronously;
 the =monitor= option only changes how the shell manages and reports that background process.
 Without job control, it simply means we have no way to control the command started with =&=.
+
+For an async job, its =stdin= is the parent one if job control is active, 
+otherwise it reads from =/dev/null=.
 
 *** Concepts
 
