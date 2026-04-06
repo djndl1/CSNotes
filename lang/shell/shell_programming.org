@@ -471,14 +471,28 @@ The special expression is executed in the current shell rather than a subshell.
   + =${parameter,pattern}=convert to the first character to lowercase
   + =${parameter,,pattern}=convert to to lowercase
 
-*** Arithmetic Expansion
+*** Arithmetic Expansion (Bash, ksh, mksh)
 
-=$((expression))=
+=$((expression))= (=$[] legacy deprecated)
 Integer arithmetic Only, useless. Use =bc= or =awk= for more complete arithmetic.
 
 All tokens in the expression undergo parameter expansion, command expansion and quote removal.
+Variables inside the expression are not required to have the =$= prefix.
 
-The expression is similar to that of C.
+The expression is similar to that of C, even including the comma operator =,=.
+
+**** Arithmetic Evaluation
+
+Without =$=, the result of the expression is not returned.
+Only its exit status (0 for non-zero value, 1 for 0) in =$?= is useful:
+=((expr))= are typically used for conditional check or 
+computation with side effects.
+
+#+begin_src shell
+if ((count > 10)); then
+  echo "Count is greater than 10"
+fi
+#+end_src
 
 *** Word Splitting
 
