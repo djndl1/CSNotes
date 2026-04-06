@@ -42,7 +42,13 @@ non-interactive at the same time.
 
 A login shell (=-l=) first reads commands from the files =/etc/profile= and =.profile=.
 It also reads =$ENV= if defined. In any case, there is no =.bashrc= or related startup scripts
-for a POSIX shell. One has to rely on =$ENV= to set up for interactive shells.
+for a POSIX interactive shell. One has to rely on =$ENV= for the startup file.
+
+*** With =sshd=
+
+For a interactive session, it's an interactive login shell.
+For a one-shot ssh command, it generally does not source profile or rc files
+unless =-t= is specified.
 
 ** Options & Arguments
 
@@ -374,7 +380,7 @@ Common Environment Variables:
   + >125 for bash specially
   + 128+N for termination status on a fatal signal
 - =${N}= :: positional parameters (N can be larger than 10 even for POSIX shells).
-- =FUNCNAME= :: the currently executing function's name
+- =FUNCNAME= :: all the shell functions currently in the execution call stack. The top is the current one.
 - =LINENO= :: the current line number of the script
 - =RANDOM= :: a random number generator
 - =MACHTYPE= :: arch triplet
@@ -382,6 +388,8 @@ Common Environment Variables:
 - =BASH_VERSION=, =BASH_VERSINFO= :: bash version, the latter is an array of major, minor, patch, release/beta, arch
 - =LINES=, =COLUMNS= :: current terminal height and width
 - =DIRSTACK= :: an array containing the directory stack (list of recently visited directories)
+- =BASH_SOURCE= :: An array variable whose members are the source filenames 
+  where the corresponding shell function names in the FUNCNAME array variable are defined.
 
 *** Expansion Forms
 
@@ -964,6 +972,12 @@ When the user logs out, all suspended jobs are terminated automatically.
 With the variable =auto_resume=, if properly set, Bash will treat single word commands
 matching a pattern as a command to resume certain jobs, not as starting a new command.
 
+** Bash POSIX Mode
+
+=bash --posix=, =set -o posix= or running as =sh=
+
+- =POSIXLY_CORRECT= is set so that some GNU utilities enters POSIX mode.
+
 * Bash-Specific Features
 
 ** Features Particular to Bash
@@ -979,11 +993,29 @@ matching a pattern as a command to resume certain jobs, not as starting a new co
 - one-dimensional non-contiguous array variable declared by =declare=
 
 - (ksh, mksh, zsh, not in ash) directory stack with =pushd=, =popd=, and =dirs=
+  + a stack of recently visited directories (only =pushd=, not =cd=)
+  + =pushd=, =popd= can manipulate the stack without changing the current directory.
 
 - POSIX mode =set -o posix=, =--posix= or the envvar =POSIXLY_CORRECT= makes =bash= try to behave as compliant as possible
   to the POSIX standard.
 
 - restricted shell: certain operations and features are disallowed or disabled
+  + =cd=
+  + command containing slashes
+  + sourcing a file of which the name contains a slash
+  + function definitions from the shell environment
+  + output redirection
+  + =exec= another command
+  #+begin_quote
+  The restricted shell mode is only one component of a useful restricted environment. It
+should be accompanied by setting PATH to a value that allows execution of only a few verified
+commands (commands that allow shell escapes are particularly vulnerable), changing the
+current directory to a non-writable directory other than $HOME after login, not allowing the
+restricted shell to execute shell scripts, and cleaning the environment of variables that cause
+some commands to modify their behavior (e.g., VISUAL or PAGER).
+Modern systems provide more secure ways to implement a restricted environment, such
+as jails, zones, or containers.
+  #+end_quote
 
 ** Brace Expansion (Bash, mksh, zsh,)
 
@@ -1038,6 +1070,7 @@ With =declare=, we can force typing on variables.
 - =-a= 0-based heterogeneous indexed array (bashism) by integers
   + An array element is basically a variable and thus requires =$arr[i]= to access it.
     - =${arr[*/@]}= dereferences all elements: Use this for iteration.
+      The difference between the two are the same as that between ="$*"= and ="$@"=
       #+begin_src bash
       for elm in ${arr[*]}; do ... done; //
       #+end_src
@@ -1048,12 +1081,13 @@ With =declare=, we can force typing on variables.
   + no need to manually allocate a slot before assigning to it.
     Bash arrays are dynamically and automatically expanded upon assignment.
   + *test for an element*: use =[[ -v ]]= to test if a slot is occupied.
-  + *delete an element*: =unset arr[i]=
+  + *delete an element*: =unset arr[i]=, =unset arr[@]= clears the array
   + *append*: =array+=(element1 element2)=
   + *length*: =${#array[@]}= (=${#var}= length of characters in a variable)
   + Doesn't seem to be used much.
+  + =${!arr[@]}= expands to the indices assigned in =arr=.
 
-- =-A= associative array (bashism)
+- =-A= string-keyed associative array (bashism)
 
 - =-f= function only
 
@@ -1162,9 +1196,17 @@ Modifiers modify, or edit, the word or words selected from the history event.
 
 * Interactive Shells
 
+#+begin_quote
+An interactive shell is one started without non-option arguments (unless -s is specified)
+and without specifying the -c option, whose input and error output are both connected to
+terminals (as determined by isatty(3)), or one started with the -i option.
+...
+An interactive shell generally reads from and writes to a user’s terminal.
+#+end_quote
+
 ** Interactive Shell Settings
 
-echo $- to check if the current shell is interactive (the result contains an
+=echo $-= or =[ -z $PS1 ]= to check if the current shell is interactive (the result contains an
 =i=).
 An interactive shell has some features enabled:
 
