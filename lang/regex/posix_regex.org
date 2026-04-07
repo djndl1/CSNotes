@@ -11,13 +11,14 @@ The syntax of regular expressions varies across application programs.
 
 - Match lengths are measured in characters.
 
-- a null string is considered than no match at all.
+- a null string is considered no match at all.
 
 * Components
 
 - *Anchors* :: position of the pattern in relation to a line of text
 
-- *Character sets* :: used to match one or more characters in a single position
+- *Character sets* :: used to match one or more characters in a single position.
+  Not the *character set* as in character encoding.
 
 - *Modifiers* :: repeated count of a character set
 

@@ -57,6 +57,8 @@ readelf -S
 
 ## Sections
 
+By default GNU `as` adds all the information to the `.text` section unless a `.section secname` is specified.
+
 ### `.text`
 
 ### `.rodata`

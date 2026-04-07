@@ -56,6 +56,7 @@ type control module-path module-arguments
   + =sufficient=: immediate success if there is no pending denial. Ignored if failed
   + =optional=: only matters when it is the only module of its type
     (which makes it non-optional)
+  + these four are aliases for more complex control rules, which defines the action upon certain conditions.
 
 ** Account
 

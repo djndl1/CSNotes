@@ -18,9 +18,14 @@
 
 - Registration
   + automatically if there is a file in ~META-INF/services/java.sql.Driver~ in its jar.
-  + ~Class.forName("org.postgresql.Driver")~; ~java. -Djdbc.drivers=org.postgresql.Driver ProgramName~; ~System.setProperty("jdbc.drivers", "org.postgresql.Driver")~
+  + Manual: ~Class.forName("org.postgresql.Driver")~ loads the driver and
+    therefore executes an initializer; ~java. -Djdbc.drivers=org.postgresql.Driver ProgramName~; ~System.setProperty("jdbc.drivers", "org.postgresql.Driver")~
 
 ** JDBC Connection
+
+The driver manager iterates through the registered drivers to find a driver that
+can use the subprotocol specified in the database URL.
+
 
 - use =java.sql.DriverManager.getConnection()= to dynamically get a connection with the appropriate JDBC driver.
 

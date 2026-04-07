@@ -106,6 +106,7 @@
 | lang/shell/bash_basics.org | Bash-specific features startup files login non-login interactive POSIX mode restricted shell command-line editing key bindings job control history |
 | lang/shell/bc.org | bc arbitrary precision calculator language with scale variable ibase obase bases math library functions expressions |
 | lang/shell/posix_shell.org | POSIX shell history from Bourne to ksh ash dash bash zsh variants POSIX compliance standards |
+| lang/shell/shell_programming.org | Shell programming guide combining POSIX shell fundamentals (history variables quoting parameter substitution expr) with bash-specific features (arrays brace expansion history substitution process substitution coprocesses) interactive shell job control I/O redirection debugging |
 | lang/shell/unix_terminal.org | Unix terminal fundamentals teletype software flow control XON XOFF stty configuration |
 | lang/vala/vala_basics.org | Vala language basics C#-style syntax namespaces enum string slicing nullable types lambda expressions class inheritance GObject |
 | lang/zig/basics.org | Zig language overview emphasizing no hidden control flow no hidden allocations comptime build modes purity |

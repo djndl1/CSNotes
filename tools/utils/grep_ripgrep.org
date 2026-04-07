@@ -71,6 +71,9 @@ prints matching lines to stdin by default.
 - =grep= does not always read all its input, especially with =-q=, which cause premature exits for
   upstream commands while piping.
 
+-To grep against a hyphen, quote the pattern and surround the hyphen with a pair of brackets: =grep '[-]i'=.
+  + or use =-e= to explicitly specify the following token is a pattern.
+
 ** Performance Issues
 
 Backreferences require backtracking, which is inefficient, espcially with
