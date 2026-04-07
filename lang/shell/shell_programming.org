@@ -148,6 +148,16 @@ required to be builtins.
 
 Some other utilities are typically builtin and are included here.
 
+- =:=: NOP
+  + besides a NOP, it's command and thus can be followed by various arguments
+    that may be some expansions.
+  #+begin_src shell
+: ${1?"Usage: $0 ARGUMENT"}   # checks the argument
+: ${HOSTNAME?} ${USER?} ${MAIL?}
+# truncation
+: > data.xxx
+  #+end_src
+
 - =cd -P= (POSIX): cd to the physical path of the target, even if the target is a symlink.
   + by default =cd= follows symlinks instead of going to the actual directory.
 
@@ -471,7 +481,7 @@ The special expression is executed in the current shell rather than a subshell.
   + =${parameter,pattern}=convert to the first character to lowercase
   + =${parameter,,pattern}=convert to to lowercase
 
-*** Arithmetic Expansion (Bash, ksh, mksh)
+*** Arithmetic Expansion
 
 =$((expression))= (=$[] legacy deprecated)
 Integer arithmetic Only, useless. Use =bc= or =awk= for more complete arithmetic.
@@ -479,9 +489,13 @@ Integer arithmetic Only, useless. Use =bc= or =awk= for more complete arithmetic
 All tokens in the expression undergo parameter expansion, command expansion and quote removal.
 Variables inside the expression are not required to have the =$= prefix.
 
-The expression is similar to that of C, even including the comma operator =,=.
+The expression is similar to that of C, even including the comma operator =,=
+and ternary operator =? :=.
 
-**** Arithmetic Evaluation
+- =%= and =/= truncate the quotient to zero just like C.
+  + =bc=, =awk=, =viml= all truncate the quotient.
+
+**** Arithmetic Evaluation (Bash, ksh, mksh)
 
 Without =$=, the result of the expression is not returned.
 Only its exit status (0 for non-zero value, 1 for 0) in =$?= is useful:
@@ -581,6 +595,13 @@ performs the command and replaced with the =stdout= of the command.
 
 *** Conditional
 
+Test commands do not have to be =test= or =[[ expr  ]]=,
+any command will do as long as it returns an exit status.
+Use =!= to negate the exit status.
+#+begin_src shell
+! grep -e pattern file # $? for whether pattern not found
+#+end_src
+
 **** if statement
 #+begin_src shell
 if TEST-COMMANDS; then CONSEQUENT-COMMANDS; fi
@@ -601,6 +622,7 @@ Without =then=, the following tokens may be mistaken for arguments to test comma
 Most options of =test= test if a certain kind of file exists:
 - compare strings (especially with empty strings), =>=, =<=, ~==~, ~!=~
 - compare integers (=-eq=, =-ne=, =-lt=, =-le=, =-gt=, =-ge=)
+- file comparison (=ot= older than, =nt= newer than, =ef= the same file after canonicalization).
 - the three boolean operators
 - =test= conditions can be normal commands: =0= exit status indicates true.
   + one may use arithmetic expansion as conditions.
@@ -659,6 +681,13 @@ esac
 - =for= loop: a foreach loop.
   + The return status is the exit status of the last command that executes.
   + to avoid problems with quoting and separators, =for f in path/*= instead of using =ls=
+  + (Bash, ksh but not mksh, zsh) C-style for loop. Not arithmetic evaluation.
+    #+begin_src bash
+for ((i = 1, j = 1; i < 10 && j < 10; i++, j++ ))
+do   
+  echo $((i + j))
+done  
+    #+end_src
 
 - =while= loop: =while conditions; do commands; done=
 
@@ -1255,6 +1284,58 @@ Numeric arguments are supported.
 #+begin_src shell
 bind -P
 #+end_src
+
+Ctrl-Key may generate a signal (by the terminal line discipline), 
+or call a readline function (bash readline)
+or generate an ASCII control character (few unless using =C-V= to input raw control characters).
+Many originally came from their ASCII counterpart 
+but these days they are simply bound to readline functions that
+have similar semantics.
+
+Typing ASCII characters using Ctrl-KEY and the effects of Ctrl-KEY
+in Bash and various terminal programs are not the same thing.
+These effects may be inspired by ASCII characters and show
+similar semantics but they are no longer directly related.
+
+The terminal settings (=stty=) work beyond shells (line discipline)
+but they may be overridden by applications in raw mode (Bash).
+
+- =^A=: =beginning-of-line= 
+- =^B=: =backward-char= 
+- =^C=: =SIGINTR= signal (=stty -a=)
+- =^D=: =delete-char= in bash. the =eof= terminal setting (terminate the input), from ASCII end of transmission
+  + the readline function is called when there are characters before the cursor.
+- =^E=: =end-of-line=
+- =^F=: =forward-char=
+- =^G=: ASCII bell =\a=
+- =^H=: =backward-delete-char= (from ASCII backspace =\b=). However as an ASCII character, it's 
+  backspace and embedding this character in a string erases the character before it
+  (the terminal understands the character and acts accordingly).
+- =^I=: =complete= (from ASCII horizontal tab)
+- =^J=: =accept-line= (from ASCII newline, also called linefeed LF, 
+  newline leaves the cursor at the next line)
+- =^K=: =kill-line=
+- =^L=: =clear-screen= (from ASCII formfeed)
+- =^M=: =accept-line= (from ASCII carriage return, on a terminal this does move the cursor to the line beginning)
+  + the character itself in the terminal does move the cursor back to the first column
+- =^N=: =next-history=
+- =^O=: =operate-and-get-next= =accept-line= and fetch the 
+  next line relative to the current line form the history for editing.
+  + also the =discard= terminal setting (discarding of output, typically to =/dev/null=)
+  + only shows any difference when traversing historical commands.
+- =^P=: =previous-history=
+- =^Q=: the =start= terminal setting (from ASCII XON)
+- =^R=: =reverse-search-history=; =rprnt= (redraw the current line)
+- =^S=: the =stop= terminal setting (from ASCII XOFF)
+- =^T=: =transpose-chars=
+- =^U=: =unix-line-discard=; the =kill= terminal setting (line erasing)
+- =^V=: =quoted-insert=
+- =^W=: =unix-word-rubout=; the =werase= terminal setting (erase the last word typed)
+- =^X=: not typically used independently
+- =^Y=: =yank= (paste). the =lnext= terminal setting (enter the next character quoted)
+- =^Z=: the terminal =susp= setting (sending =SIGTSTP=)
+- =^\=: the terminal =quit= setting (sending =SIGQUIT=)
+
 
 *** Edit
 
