@@ -187,6 +187,10 @@ Some other utilities are typically builtin and are included here.
 
 - =type=: display information about commands: paths, aliases, functions
 
+- =shift [N]=: if =N= is greater than =$#=, the exit status is negative and may get stuck in a loop.
+
+- =exit=: the exit status is the one of the last command unless it's specified.
+
 - =alias=, =unalias= (POSIX)
 
 - =command=: force the execution of the specified name as a *simple command*
