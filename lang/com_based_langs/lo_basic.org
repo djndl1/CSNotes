@@ -1,0 +1,30 @@
+#+title: Libreoffice BASIC
+
+Not much different from VBA.
+
+the difference between =Public= and =Global=
+
+#+begin_quote
+In LibreOffice Basic, the expression Option Base 1 does not affect the number of elements in an array as it does in VBA.
+It is, rather, the start index which moves in LibreOffice Basic.
+While the declaration MyInteger(3) creates three integer values in VBA with the indexes 1 to 3,
+the same declaration in LibreOffice Basic creates four integer values with the indexes 1 to 4.
+By using Option Compatible, LibreOffice Basic behaves like VBA.
+#+end_quote
+
+#+begin_quote
+VBA : Unlike VBA, where only the upper limit of the last dimension of a data field can be changed through Preserve,
+LibreOffice Basic lets you change other dimensions as well.
+#+end_quote
+
+#+begin_quote
+The ParamArray keyword present in VBA is not supported in LibreOffice Basic.
+#+end_quote
+
+#+begin_quote
+Whereas VBA summarizes the error messages in a statistical object called Err,
+LibreOffice Basic provides the Err, Error$, and Erl variables.
+...
+In VBA, the Err.Clear method of the Err object resets the error status after an error occurs.
+In LibreOffice Basic, this is accomplished with the On Error or Resume commands.
+#+end_quote

@@ -768,7 +768,7 @@ check. The default policy is to pass the =Err= object and control to the parent 
 
 - =On Error Goto 0=: disable any previous =On Error=
 
-- (Obscure) =On Error Goto -1=: clears the error that just occurred in praperation
+- (Obscure) =On Error Goto -1=: clears the error that just occurred in preparation
   for a new one to occur. Useful in a error handler to handler error.
 
   #+begin_src vba
