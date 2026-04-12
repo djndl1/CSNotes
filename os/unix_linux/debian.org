@@ -1,0 +1,7 @@
+* User Management
+
+- =adduser=
+  + =useradd=: low-level
+
+- =deluser=
+  + =userdel=: low-level
