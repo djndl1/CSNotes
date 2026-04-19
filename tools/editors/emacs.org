@@ -138,6 +138,8 @@ TODO
 
 - =C-a= =move-beginning-of-line=; =C-e= =move-end-of-line=
 
+- =M-a=: =backward-sentence=; =M-e=: =forward-sentence=
+
 - =M-f= =forward-word=; =M-b= =backward-word=
 
 - =M-r= =move-to-window-line-top-bottom=: reposition the point (cursor)
@@ -157,15 +159,20 @@ TODO
 
 - =<BACKSPACE>= =delete-backward-char=,
   =C-d= =delete-char= (at point, the semantics stays the same when operating on a marked region),
-   =<Delete>= =delete-forward-char=
+  =<Delete>= =delete-forward-char=
 
 - =C-k= =kill-line=
+
+- =C-S-<BACKSAPCE>=: =kill-whole-line=
+  + doesn't work in terminal
+  + needs =set-window-option -g xterm-keys on= in the tmux settings.
 
 - =M-d= =kill-word=; =M-<BACKSPACE>= =backward-kill-word=
 
 ** Move Screen
 
 - =C-v=, =scroll-up-command=; =M-v=, =scroll-down-command=
+  + they are kind of different in that given an numeric argument they scroll by line but by page.
 
 ** Status Awareness
 
@@ -464,6 +471,9 @@ Any shell command is allowed when grepping.
 - =C-x 4=-family commands display buffers in another window
 
 - =C-x 0=: =delete-window=; =C-x 1=: =delete-other-window=;
+
+- =C-M-v=: =scroll-other-window= scroll the next window
+  + to scroll the page upward, use a prefix.
 
 - =C-x ~=; =C-x }=; =C-x {=; =C-x -=; =C-x +=
 
