@@ -60,7 +60,7 @@ can bind rvalue expressions.
 
 - =Destructible=: all scalar types meet the requirement of Destructible,
   while array types and reference types do not. Note that
-  std::is\_destructible allows arrays and reference types.
+  =std::is_destructible= allows arrays and reference types.
 
 * Library-wide
   :PROPERTIES:

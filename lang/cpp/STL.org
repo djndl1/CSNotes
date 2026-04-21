@@ -410,7 +410,7 @@ create elements in the destination container.
 - =back_inserter=: calls the container's =push_back= member to add new
   elements at the end of the container.
 
-- =front_inserter= calls the container's push\_front member, adding new
+- =front_inserter= calls the container's =push_front= member, adding new
   elements at the beginning of the container.
 
 - =inserter= calls the container's =insert= member adding new elements
@@ -456,7 +456,7 @@ which they point.
 
 - when assigning a =unique_ptr= to another move semantics is used.
 
-- multiple unique\_ptr objects should not be allowed to point to the
+- multiple =unique_ptr= objects should not be allowed to point to the
   same block of dynamically allocated memory.
 
 - If =T= is a derived class of some base =B=, then =std::unique_ptr<T>=
@@ -505,7 +505,7 @@ deleted correctly even if the destructor of =B= is not virtual.
 Polymorphism isn't required.
 
 Different from the =unique_ptr= class no specialization exists for the
-shared\_ptr class to handle dynamically allocated arrays of objects.
+=shared_ptr= class to handle dynamically allocated arrays of objects.
 
 To avoid double free error, pointer cast operations are provided so that
 after casting, the resulting pointer still share the ownership of the
@@ -530,8 +530,8 @@ same object
    :CUSTOM_ID: weak_ptr-in-memory
    :END:
 
-`=std::weak_ptr is a smart pointer that holds a non-owning ("weak") reference to an object that is managed by=std::shared\_ptr=. It must be converted to=std::shared\_ptr`
-in order to access the referenced object.
+=std::weak_ptr= is a smart pointer that holds a non-owning ("weak") reference to an object that is managed by=std::shared_ptr=. 
+It must be converted to =std::shared_ptr= in order to access the referenced object.
 
 =std::weak_ptr= models temporary ownership: when an object needs to be
 accessed only if it exists, and it may be deleted at any time by someone

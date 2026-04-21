@@ -126,7 +126,7 @@ be stored in an unordered map. It does not support =operator[]= and
   :END:
 
 Elements stored in the =unordered_set= are immutable but they can be
-inserted or removed. The unordered\_multiset allows multiple objects
+inserted or removed. The =unordered_multiset= allows multiple objects
 using the same keys to be stored in an unordered set.
 
 * (C++14) Heteregenenous Lookup

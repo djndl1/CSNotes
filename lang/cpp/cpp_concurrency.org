@@ -353,7 +353,7 @@ the same =shared_mutex= object and vice versa.
 Locks are used to simplify the use of mutexes. To simplify locking and
 unlocking, a few mutex wrappers are available:
 
-- =std::lock_guard=: basic unlock\_guarantee, a basic wrapper. This
+- =std::lock_guard=: basic =unlock_guarantee=, a basic wrapper. This
   wrapper can accept a mutex that the thread has already acquired.
 
 #+BEGIN_SRC C++
@@ -573,7 +573,7 @@ First read [[https://en.wikipedia.org/wiki/Compare-and-swap][CAS]],
 
 Integral atomic types =Integral= also offers:
 
-- =fetch_add=; =fetch_sub=; =fetch_and=; =fetch_!=``;=fetch\_\^|`,
+- =fetch_add=; =fetch_sub=; =fetch_and=; =operator+==, =operator-==,
   increments, decrements, assignments.
 
 =std::atomic_compare_exchange_strong=;

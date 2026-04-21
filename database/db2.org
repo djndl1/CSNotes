@@ -9,7 +9,7 @@ access to one or more databases.
 - /instance directory/: where instance-level information are stored
   + configuration file
   + system database directory
-  + node directory and node configuration file =db2nodes.cfg=\
+  + node directory and node configuration file =db2nodes.cfg=
   + and others.
   + typically under =/sqllib= where the product is installed
 

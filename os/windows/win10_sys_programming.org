@@ -182,7 +182,7 @@ https://docs.microsoft.com/en-us/windows/win32/apiindex/windows-apisets
 
 Windows has four entry point function: =(w)main=, =(w)WinMain=. For the latter the command line is a single string to be parsed by =CommandLineToArgvW()=. A process can get its command line at any time by calling =GetCommandLine()=.
 
-The environment variables can be a third argument for =(w)main=, or call =GetEnvironmentStrings()=, which is a single memory block separated by '\0'. 
+The environment variables can be a third argument for =(w)main=, or call =GetEnvironmentStrings()=, which is a single memory block separated by =\0=. 
 
 #+BEGIN_SRC C
  SetEnvironmentVariable(); 

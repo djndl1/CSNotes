@@ -16,7 +16,7 @@ for multiprocessors.
 
 TODO
 
-\## SISD, MIMD, SIMD, SPMD and Vector
+ SISD, MIMD, SIMD, SPMD and Vector
 
 -   SPMD: Single Program Multiple Data, writing a single program that
     runs on all processors of a MIMD computer, relying on conditional
@@ -27,14 +27,14 @@ TODO
     series of computation on a single data stream in a pipelined
     fashion.
 
--   SIMD: From a programmer\'s perspective, this is close to SISD. So it
+-   SIMD: From a programmer's perspective, this is close to SISD. So it
     would be easy to compile sequential code for SISD into a program
     running on SIMD. This reduces the cost of the control unit over
     dozens of execution units and instruct bandwidth and space. SIMD
-    works best when dealing with arrays in \`for\` loops, in the case of
+    works best when dealing with arrays in =for= loops, in the case of
     [data-level parallelism]{.underline}.
 
-\### Examples
+*** Examples
 
 -   x86: MMX, SSE, AVX
 
@@ -44,7 +44,7 @@ TODO
 
 TODO
 
-\## Hardware Multithreading
+** Hardware Multithreading
 
 Hardware multithreading allows multiple threads to share the functional
 units of a single processors in an overlapping fashion to try to utilize
@@ -59,7 +59,7 @@ to change to a different thread relatively quickly.
 
 TODO
 
-\## Graphics Processing Units
+** Graphics Processing Units
 
 Graphics processing evolved its own style of processing and terminology.
 GPUs are accelerators that supplement a CPU. GPUs does not rely on

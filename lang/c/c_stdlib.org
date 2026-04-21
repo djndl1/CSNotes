@@ -302,7 +302,7 @@ handles memory allocation automatically.
 
 - =strcmp=, =strncmp=
 
-- =strcpy=, =strncpy= (it may add additional '\0's )
+- =strcpy=, =strncpy= (it may add additional =\0=)
 
 #+BEGIN_SRC C
   char *strcat(char *dest, const char  *src)

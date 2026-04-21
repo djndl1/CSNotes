@@ -15,7 +15,7 @@ html: $(HTML_FILES)
 # Pattern rule: generate .html from corresponding .org
 %.html: %.org
 	@mkdir -p $(dir $@)
-	@pandoc -s --toc -f org -t html -o "$@" "$<" || (echo "Warning: Failed to generate $@ (non-fatal)" && true)
+	@pandoc --mathjax -s --toc -f org -t html -o "$@" "$<" || (echo "Warning: Failed to generate $@ (non-fatal)" && true)
 	@echo "Generated $@"
 
 # Remove generated HTML files under DIR

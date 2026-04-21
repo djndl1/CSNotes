@@ -305,9 +305,9 @@ In POSIX systems the errno variable may be associated with many, often
 rather cryptic, symbols. The predefined =enum class errc= is an attempt
 to use intuitively more appealing symbols instead. Since its symbols are
 defined in a strongly typed enumeration, they cannot directly be used
-when defining a matching error\_code. Instead, a function
+when defining a matching =error_code=. Instead, a function
 =make_error_code= is available, converting =enum class errc= values to
-error\_code objects.
+=error_code= objects.
 
 More at
 [[https://akrzemi1.wordpress.com/2017/07/12/your-own-error-code/][Your

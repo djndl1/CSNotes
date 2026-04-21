@@ -60,7 +60,8 @@ The idea of these definitions is to establish a relative order among functions.
 
 *** Formulation
 
-Given integers $a_{1}, a_{2}, a_{3}, ..., a_{n}$, find the maximum value of $\sum_{k = i}^{j}a_{k}$. Negative sum not considered zero.
+Given integers $a_{1}, a_{2}, a_{3}, ..., a_{n}$, find the maximum value of 
+$\sum_{k=i}^{j}a_{k}$. Negative sum not considered zero.
 
 ** Check the Analysis
 
@@ -321,9 +322,9 @@ left and right subtrees can differ by at most 1 (The heigth of an empty
 is defined to be $-1$). Height information is kept for each node in the
 node structure. The height of an AVL tree is at most roughly
 $1.44\log\left(N+2\right)$, but in practice only slightly more than
-$O\left(\log N\right)$. The minimum number of nodes
+$O \left( \log N \right)$. The minimum number of nodes
 
-$S \left(h\right)=S\left(h-1\right)+S\left(h-2\right)+1 $$
+$$ \left(h\right)=S\left(h-1\right)+S\left(h-2\right)+1 $$
 
 where $S\left(0\right)=1,S\left(h\right)=2$. All the tree operations can
 be performed in $O\left(\log N\right)$, except possibly insertion, which
@@ -590,7 +591,7 @@ This function doesn't give indices large enough.
 Another fairly good hash function is
 
 $$
-\sum_{i=0}^{\text{size}-1}\text{Key}\text{{[size-i-1]}}\cdot32^{i}
+\sum_{i=0}^{ \text{size} - 1 } \text{Key} \text{[size-i-1]} \cdot32^{i}
 $$
 
 #+BEGIN_SRC C
@@ -818,7 +819,7 @@ with an average running time $O(N)$ and a worst-case time $O(N \log N)$.
 - The selection problem: the input is a list of $N$ elements, which can
   be totally ordered. The problem is to find the $k$th largest element.
   The first way is to make the input a heap and perform $k$ =DeleteMin=
-  operations. The total running time is $O(N + \logN)$. Another way is
+  operations. The total running time is $O(N + \log N)$. Another way is
   to build a set (which is implemented as a heap) of $k$ elements. The
   first $k$ elements are placed in the set and remaining elements are
   compared with the $k$th largest one by one. If one of the remaining
@@ -899,13 +900,13 @@ The average running time $\Theta(N^{2})$.
    :CUSTOM_ID: shellsort
    :END:
 
-The general strategy to $h_k$ sort is for each position $i$, in
-$h_k, h_k+1, \dots, N-1$ place the element in the correct spot among
+The general strategy to $h_k$ sort is for each position $i$, in$h_k, h_k+1, \dots, N-1$ 
+place the element in the correct spot among
 $i, i-h_k, i-2h_k, \dots$. The action of an $h_k$-sort is to perform an
 insertion on $h_k$ independent subarrays. The /increment sequence/
-$h_1, h_2, dots, h_t$ requires $h_1 = 1$. A popular but poor choice for
-increment sequence is to use the sequence $h\_{t} = \lfloor N/2
-\rfloor and $h\_k = \lfloor h\_{k=1} / 2\rfloor.
+$h_1, h_2, \dots, h_t$ requires $h_1 = 1$. A popular but poor choice for
+increment sequence is to use the sequence
+ $h_{t} = \lfloor N/2 \rfloor$ and $h_k = \lfloor h_{k=1} / 2\rfloor$.
 
 #+BEGIN_SRC C
     void shellSort(element_t elms[], size_t n)

@@ -592,7 +592,7 @@ a pointer to a derived class to a pointer to its base class. Also, use
    :CUSTOM_ID: const_cast
    :END:
 
-A const\_cast(expression) expression is used to undo the const attribute
+A =const_cast(expression)= expression is used to undo the const attribute
 of a (pointer) type.
 
 The need for a =const_cast= may occur in combination with functions from

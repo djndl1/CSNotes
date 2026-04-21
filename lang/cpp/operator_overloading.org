@@ -277,7 +277,7 @@ whatever it wants to do with the memory pointed to.
 Although the addresses returned by =new= and =new[]= point to the
 allocated object(s), there is an additional =size_t= value available
 immediately before the address returned by =new= and =new[]=. This
-size\_t value is part of the allocated block and contains the actual
+=size_t= value is part of the allocated block and contains the actual
 size of the block. =operator new[]= does not receive the address
 returned by =new[]= but rather the address of the initial =size_t=
 value.

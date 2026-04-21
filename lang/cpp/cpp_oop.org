@@ -1722,7 +1722,7 @@ A dynamic cast is a cast, and casts should be avoided whenever possible.
 When using dynamic casts in your own code always properly document why
 the dynamic cast was appropriately used and was not avoided.
 
-As with the dynamic\_cast operator, typeid is usually applied to
+As with the =dynamic_cast= operator, typeid is usually applied to
 references to base class objects that refer to derived class objects.
 Typeid should only be used with base classes offering virtual members.
 The typeid operator returns an object of type =type_info=. The typeid
