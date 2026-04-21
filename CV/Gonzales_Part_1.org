@@ -602,7 +602,7 @@ f(t)=\sum\limits^{\infin}_{n=-\infin}c_ne^{j\frac{2\pi n}{T}t}
 $$
 
 where
-$c_n=\dfrac{1}{T}\int\limits^{T/2}_{-T/2}f(t)e^{-j\frac{2\pi n}{T}t}dt\qquad for\ n=0,\pm1,\pm2,...$
+$c_n=\dfrac{1}{T}\int\limits^{T/2}_{-T/2}f(t)e^{-j\frac{2\pi n}{T}t}dt\qquad for\qquad n=0,\pm1,\pm2,...$
 
 $\quad\quad$ *Impulse* $$
 \delta(0)=
@@ -913,7 +913,7 @@ $$
 
 where $H(u,v)$ is a filter transfer function.
 
-e.g. $H(u,v)=0\ for\ u=v=0\$otherwise $1$ reduces the average intensity
+e.g. $H(u,v)=0\qquad for\qquad u=v=0\$ otherwise $1$ reduces the average intensity
 Lowpass filter blurs an image while a highpass filter enhance sharp
 detail.
 
@@ -1085,7 +1085,7 @@ $$
 *High-frequency-emphasis filter*:
 $g(x,y)=\mathcal{F}^{-1}\Bigg(\Big[k_1+k_2*H_{HP}(u,v)\Big]F(u,v)\Bigg)$
 
-where $k\_1\geq 0 $ gives controls of the offset from the origin and
+where $k_1\geq 0 $ gives controls of the offset from the origin and
 $k_2$ controls the contribution of high frequencies.
 
 ****** Homomorphic Filtering

@@ -2,7 +2,7 @@
 - ML/idioms.org: Python NumPy code snippet demonstrating element-wise conditional value assignment using array indexing or np.where function as Theano switch operation equivalent 
 - ML/links_notes.md: machine learning tutorial links computer vision convolution layers 
 - ML/ncnn.org: ncnn neural network inference library internal structure source code organization layer net mat blob allocator gpu vulkan 
-- ML/PRML\ Part\ 1.md: Pattern Recognition Machine Learning probability distributions linear models regression basis functions 
+- ML/PRML Part 1.md: Pattern Recognition Machine Learning probability distributions linear models regression basis functions 
 - ML/tf/tensorflow.org: TensorFlow core fundamentals overview tensors rank shape definition operations placeholders versus variables computation graphs session execution device placement memory management TensorBoard visualization high-level APIs Keras Estimators Slim implementation 
 - ML/papers/AlexNet.md: landmark 2012 ImageNet paper introducing eight-layer convolutional neural network architecture with ReLU nonlinearities overlapping pooling dropout regularization local response normalization dual-GPU training achieving breakthrough deep learning performance results 
 - ML/papers/Inception.md: brief Inception network documentation covering inception module architectures Google Brain research contributing to modern deep learning frameworks 
