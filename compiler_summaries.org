@@ -1,4 +1,2 @@
-| filepath | summary |
-|----------|---------|
-| compiler/optimization.org | explains constant folding and propagation as compile-time expression evaluation using __builtin_constant_p() to identify expressions subject to optimization |
-| compiler/relocation.org | describes relocation as assigning new memory addresses to code and data during linking using relocation tables to resolve labels undefined symbols and adjust instructions across object modules |
+- compiler/optimization.org: explains constant folding and propagation as compile-time expression evaluation using __builtin_constant_p() to identify expressions subject to optimization 
+- compiler/relocation.org: describes relocation as assigning new memory addresses to code and data during linking using relocation tables to resolve labels undefined symbols and adjust instructions across object modules 

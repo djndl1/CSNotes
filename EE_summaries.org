@@ -1,7 +1,5 @@
-| filepath | summary |
-|----------|---------|
-| EE/PCL.org | PLC programming and industrial control systems content covering programmable logic controllers automated manufacturing automation protocols and control system implementation |
-| EE/basic_components.org | electrical engineering basic components tutorial covering fundamental circuit elements resistors capacitors inductors transistors diodes integrated circuits and component characteristics specifications |
-| EE/circuits.org | concise notes on electrical circuits theory analysis techniques nodal mesh analysis power calculations impedance network theorems transient steady-state response and circuit behavior principles |
-| EE/digital_design.org | digital design course material explaining discrete binary signal advantages reproducibility cost flexibility speed economy abstraction levels HDL hardware description language practical considerations debugging business requirements task scheduling and real-world product development factors influencing successful electronic system creation |
-| EE/qemu.org | QEMU CPU emulator virtualization tools documentation covering instruction set emulation system simulation kernel testing performance profiling cross-compilation environments and virtual machine management utilities |
+- EE/PCL.org: PLC programming and industrial control systems content covering programmable logic controllers automated manufacturing automation protocols and control system implementation 
+- EE/basic_components.org: electrical engineering basic components tutorial covering fundamental circuit elements resistors capacitors inductors transistors diodes integrated circuits and component characteristics specifications 
+- EE/circuits.org: concise notes on electrical circuits theory analysis techniques nodal mesh analysis power calculations impedance network theorems transient steady-state response and circuit behavior principles 
+- EE/digital_design.org: digital design course material explaining discrete binary signal advantages reproducibility cost flexibility speed economy abstraction levels HDL hardware description language practical considerations debugging business requirements task scheduling and real-world product development factors influencing successful electronic system creation 
+- EE/qemu.org: QEMU CPU emulator virtualization tools documentation covering instruction set emulation system simulation kernel testing performance profiling cross-compilation environments and virtual machine management utilities 

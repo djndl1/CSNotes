@@ -1,8 +1,6 @@
-| filepath | summary |
-|----------|---------|
-| cloud/docker.org | covers Docker development best practices, Dockerfile instructions including FROM and RUN, multistage builds for slimming images, persistence strategies using volumes and secrets, and CI/CD integration for deployment |
-| cloud/distributed.org | introduces distributed systems as collections of autonomous collaborating nodes with overlay networks, explains middleware as a resource manager providing communication security transactions and reliability services |
-| cloud/middleware/MiddlewareTutorials/README.md | contains no content |
-| cloud/middleware/SOAP.org | describes Simple Object Access Protocol as an XML-based platform-independent encoding scheme for RPC messages that can use various transport protocols like HTTP or SMTP |
-| cloud/middleware/WebSocket.org | documents RFC 6455 WebSocket as a full-duplex Layer 7 communication protocol over TCP with HTTP handshake initiation used by all mainstream browsers and web servers but lacks implementation details |
-| cloud/middleware/zeromq.org | presents ZeroMQ as high-performance asynchronous messaging for concurrent applications without dedicated brokers featuring publish-subscribe and request-reply patterns across TCP UDP WebSocket transports |
+- cloud/docker.org: covers Docker development best practices, Dockerfile instructions including FROM and RUN, multistage builds for slimming images, persistence strategies using volumes and secrets, and CI/CD integration for deployment 
+- cloud/distributed.org: introduces distributed systems as collections of autonomous collaborating nodes with overlay networks, explains middleware as a resource manager providing communication security transactions and reliability services 
+- cloud/middleware/MiddlewareTutorials/README.md: contains no content 
+- cloud/middleware/SOAP.org: describes Simple Object Access Protocol as an XML-based platform-independent encoding scheme for RPC messages that can use various transport protocols like HTTP or SMTP 
+- cloud/middleware/WebSocket.org: documents RFC 6455 WebSocket as a full-duplex Layer 7 communication protocol over TCP with HTTP handshake initiation used by all mainstream browsers and web servers but lacks implementation details 
+- cloud/middleware/zeromq.org: presents ZeroMQ as high-performance asynchronous messaging for concurrent applications without dedicated brokers featuring publish-subscribe and request-reply patterns across TCP UDP WebSocket transports 

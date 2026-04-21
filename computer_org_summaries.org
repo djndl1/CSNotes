@@ -1,22 +1,20 @@
-| filepath | summary |
-|----------|---------|
-| arithmetics.org | covers binary arithmetic including two's complement representation and signed addition/subtraction overflow conditions |
-| ARM/ARM32_Architecture.org | details ARM32 processor architecture including register banks, execution modes, data types, instruction sets, and floating-point programming model |
-| ARM/Arm_Architecture_Overview.org | provides overview documentation for ARM processor family architectures and features |
-| computer_organization.org | explores multiprocessor systems task-level parallelism SIMD/MIMD/VLIW architectures GPU hardware design and multithreading strategies |
-| intro.org | introduces computer organization fundamentals including Von Neumann/Harvard architectures five classic components performance metrics Amdahl's Law memory hierarchy and modern design trends like multicore processors and domain-specific architectures |
-| ISA.org | explains instruction set architecture design principles including operand types addressing modes branching mechanisms procedure calling conventions synchronization primitives and program translation from assembler through linker to executable loader |
-| mips/arch.org | documents MIPS architecture history from MIPS I through MIPS V covering register sets instruction formats exception handling extensions and 64-bit enhancements |
-| riscv/riscv_architecture.org | comprehensively covers RISC-V ISA family including base integer ISAs optional extensions M/F/D/Q/A/P/C/V encoding schemes memory models exceptions/traps/interrupts register naming conventions and system call mechanisms |
-| riscv/riscv_virtualized.org | describes libvirt virtualization setup for RISC-V using Debian images with static network configuration and SSH access |
-| riscv/run_qemu.org | provides QEMU system emulation guide for RISC-V including device frontend/backend configuration networking backends SLIRP user networking mode and boot process setup |
-| x86/amd_timeline.org | traces AMD CPU evolution from AM9080 clone through K5-K10 microarchitectures to Bulldozer Jaguar Excavator and Zen generations with core specifications and instruction set improvements |
-| x86/ibm_pc.org | documents IBM PC architecture including 5150 configuration ISA expansion bus PCI/PCI Express standards Front Side Bus topology northbridge/southbridge chipset design and modern point-to-point interconnects replacing FSB |
-| x86/intel_core_march.org | minimal entry documenting Intel Core microarchitecture timeline |
-| x86/intel_core.org | covers Core microarchitecture series including Nehalem/Sandy Bridge/Haswell/Broadwell/Skylake/Kaby Lake/Coffee Lake with pipeline stages cache configurations AVX instructions Turbo Boost power management and Windows compatibility |
-| x86/intel_early_history.org | comprehensive history of Intel x86 processors from 4004 through 8086 detailing specifications registers segmentation interrupts multiprocessing support bus organization memory addressing and early development tools |
-| x86/intel_pentium_era_before_core.org | details Pentium through Pentium M era including P5 superscalar design P6 out-of-order execution NetBurst hyper-threading performance features pipeline stages caches MMX/SSE/AVX extensions and product revisions |
-| x86/intel_soft_dev_manual_notes.org | extracts key conventions from Intel Software Development Manual covering reserved bits and CPU exception concepts |
-| x86/inter_atom.org | brief notes on Intel Atom processor featuring two in-order execution pipelines |
-| x86/x86_instructions.org | documents x86 instruction encoding including prefixes opcode formats ModR/M and SIB bytes displacement/immediate fields lock/repeat prefixes segment overrides and operand/address size overrides |
-| x86/x86_internals.org | explains x86 CPU internal pipeline stages from branch prediction through fetch decode rename reorder buffer reservation stations execution to retire with discussion of micro-op fusion and branch target buffers |
+- arithmetics.org: covers binary arithmetic including two's complement representation and signed addition/subtraction overflow conditions 
+- ARM/ARM32_Architecture.org: details ARM32 processor architecture including register banks, execution modes, data types, instruction sets, and floating-point programming model 
+- ARM/Arm_Architecture_Overview.org: provides overview documentation for ARM processor family architectures and features 
+- computer_organization.org: explores multiprocessor systems task-level parallelism SIMD/MIMD/VLIW architectures GPU hardware design and multithreading strategies 
+- intro.org: introduces computer organization fundamentals including Von Neumann/Harvard architectures five classic components performance metrics Amdahl's Law memory hierarchy and modern design trends like multicore processors and domain-specific architectures 
+- ISA.org: explains instruction set architecture design principles including operand types addressing modes branching mechanisms procedure calling conventions synchronization primitives and program translation from assembler through linker to executable loader 
+- mips/arch.org: documents MIPS architecture history from MIPS I through MIPS V covering register sets instruction formats exception handling extensions and 64-bit enhancements 
+- riscv/riscv_architecture.org: comprehensively covers RISC-V ISA family including base integer ISAs optional extensions M/F/D/Q/A/P/C/V encoding schemes memory models exceptions/traps/interrupts register naming conventions and system call mechanisms 
+- riscv/riscv_virtualized.org: describes libvirt virtualization setup for RISC-V using Debian images with static network configuration and SSH access 
+- riscv/run_qemu.org: provides QEMU system emulation guide for RISC-V including device frontend/backend configuration networking backends SLIRP user networking mode and boot process setup 
+- x86/amd_timeline.org: traces AMD CPU evolution from AM9080 clone through K5-K10 microarchitectures to Bulldozer Jaguar Excavator and Zen generations with core specifications and instruction set improvements 
+- x86/ibm_pc.org: documents IBM PC architecture including 5150 configuration ISA expansion bus PCI/PCI Express standards Front Side Bus topology northbridge/southbridge chipset design and modern point-to-point interconnects replacing FSB 
+- x86/intel_core_march.org: minimal entry documenting Intel Core microarchitecture timeline 
+- x86/intel_core.org: covers Core microarchitecture series including Nehalem/Sandy Bridge/Haswell/Broadwell/Skylake/Kaby Lake/Coffee Lake with pipeline stages cache configurations AVX instructions Turbo Boost power management and Windows compatibility 
+- x86/intel_early_history.org: comprehensive history of Intel x86 processors from 4004 through 8086 detailing specifications registers segmentation interrupts multiprocessing support bus organization memory addressing and early development tools 
+- x86/intel_pentium_era_before_core.org: details Pentium through Pentium M era including P5 superscalar design P6 out-of-order execution NetBurst hyper-threading performance features pipeline stages caches MMX/SSE/AVX extensions and product revisions 
+- x86/intel_soft_dev_manual_notes.org: extracts key conventions from Intel Software Development Manual covering reserved bits and CPU exception concepts 
+- x86/inter_atom.org: brief notes on Intel Atom processor featuring two in-order execution pipelines 
+- x86/x86_instructions.org: documents x86 instruction encoding including prefixes opcode formats ModR/M and SIB bytes displacement/immediate fields lock/repeat prefixes segment overrides and operand/address size overrides 
+- x86/x86_internals.org: explains x86 CPU internal pipeline stages from branch prediction through fetch decode rename reorder buffer reservation stations execution to retire with discussion of micro-op fusion and branch target buffers 

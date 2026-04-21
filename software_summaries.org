@@ -1,9 +1,7 @@
-| filepath | summary |
-|----------|---------|
-| software/CleanArchitecture.org | Clean Architecture principles dependency inversion core domain project structure infrastructure separation Domain-Driven Design entities aggregates |
-| software/design.org | Inversion of Control design patterns Mediator Specification C# code examples |
-| software/design_flow.org | software development lifecycle specification design implementation testing documentation maintenance |
-| software/MVC.org | MVVM architecture View UI code ViewModel domain logic Model data transport layers separation |
-| software/performance_tuning.org | .NET 6 performance improvement delegates file I/O blog posts links |
-| software/SOLID.org | SOLID principles Single Responsibility Open Closed Liskov Substitution Interface Segregation Dependency Inversion object-oriented design |
+- software/CleanArchitecture.org: Clean Architecture principles dependency inversion core domain project structure infrastructure separation Domain-Driven Design entities aggregates 
+- software/design.org: Inversion of Control design patterns Mediator Specification C# code examples 
+- software/design_flow.org: software development lifecycle specification design implementation testing documentation maintenance 
+- software/MVC.org: MVVM architecture View UI code ViewModel domain logic Model data transport layers separation 
+- software/performance_tuning.org: .NET 6 performance improvement delegates file I/O blog posts links 
+- software/SOLID.org: SOLID principles Single Responsibility Open Closed Liskov Substitution Interface Segregation Dependency Inversion object-oriented design 
 

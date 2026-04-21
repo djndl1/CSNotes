@@ -1,31 +1,29 @@
-| filepath | summary |
-|----------|---------|
-| tools/editors/ctags.org | source code indexing tag generation navigation symbols definitions |
-| tools/editors/editorconfig.org | coding style consistency configuration file format editor support |
-| tools/editors/ed.org | Unix ed line editor basic commands text manipulation |
-| tools/editors/emacs.magit.org | Magit Git integration Emacs interface version control operations |
-| tools/editors/emacs.org | Emacs comprehensive UI frames windows buffers editing commands search modes packages version control LSP support |
-| tools/editors/emacs-tricks.org | Emacs tips tricks productivity enhancements configurations |
-| tools/editors/neovim.org | Neovim runtime provider architecture Vim 8 compile-time feature approach comparison |
-| tools/editors/org-mode.org | Org-mode rich text headlines folding tables calculations links tags properties TODO source code blocks Babel |
-| tools/editors/vim.org | Vim modes navigation multiwindow folding autocompletion syntax highlighting plugins IDE configurations |
-| tools/editors/vimium_vim_in_browser.org | Vimium browser extension Vim-style keyboard navigation web browsing |
-| tools/editors/vimscript.org | Vimscript scripting language plugin development automation |
-| tools/editors/vim_tips.org | Vim tips tricks efficient editing techniques |
-| tools/editors/vi.org | vi classic Unix text editor basic operations modes |
-| tools/latex/latex_basic.org | LaTeX TeX implementations pdfTeX XeTeX LuaTeX distributions document structure sectioning lists math notation |
-| tools/latex/PlainTex.org | Plain TeX base format fundamental typesetting commands |
-| tools/learning_methods/bibtex.org | BibTeX bibliography management citation references LaTeX documents |
-| tools/learning_methods/org-citation-ref.org | Org-mode citation references academic writing integration |
-| tools/learning_methods/org-roam.org | Org-roam networked note-taking Zettelkasten methodology personal knowledge management |
-| tools/learning_methods/Zettelkasten.basics.org | Zettelkasten note-taking method atomic notes linking slip-box organization knowledge building |
-| tools/programming_without_ide.org | IDE-free programming development workflows text editors command-line tools |
-| tools/terminals/truecolors.org | terminal true color 24-bit RGB support capabilities |
-| tools/tmux.org | tmux terminal multiplexer server session window pane hierarchy commands clipboard layouts |
-| tools/utils/coreutils.org | GNU coreutils essential Unix commands file text shell operations |
-| tools/utils/curl.org | empty file title only |
-| tools/utils/diffutils.org | diff comparison utilities file differences patch generation |
-| tools/utils/findutils.org | find utilities file search locate xargs command execution |
-| tools/utils/grep_ripgrep.org | grep ripgrep text search options patterns performance PowerShell Select-String comparison |
-| tools/vcs/git.org | Git version control three states commit history branching merging rebasing remotes tagging worktree |
+- tools/editors/ctags.org: source code indexing tag generation navigation symbols definitions 
+- tools/editors/editorconfig.org: coding style consistency configuration file format editor support 
+- tools/editors/ed.org: Unix ed line editor basic commands text manipulation 
+- tools/editors/emacs.magit.org: Magit Git integration Emacs interface version control operations 
+- tools/editors/emacs.org: Emacs comprehensive UI frames windows buffers editing commands search modes packages version control LSP support 
+- tools/editors/emacs-tricks.org: Emacs tips tricks productivity enhancements configurations 
+- tools/editors/neovim.org: Neovim runtime provider architecture Vim 8 compile-time feature approach comparison 
+- tools/editors/org-mode.org: Org-mode rich text headlines folding tables calculations links tags properties TODO source code blocks Babel 
+- tools/editors/vim.org: Vim modes navigation multiwindow folding autocompletion syntax highlighting plugins IDE configurations 
+- tools/editors/vimium_vim_in_browser.org: Vimium browser extension Vim-style keyboard navigation web browsing 
+- tools/editors/vimscript.org: Vimscript scripting language plugin development automation 
+- tools/editors/vim_tips.org: Vim tips tricks efficient editing techniques 
+- tools/editors/vi.org: vi classic Unix text editor basic operations modes 
+- tools/latex/latex_basic.org: LaTeX TeX implementations pdfTeX XeTeX LuaTeX distributions document structure sectioning lists math notation 
+- tools/latex/PlainTex.org: Plain TeX base format fundamental typesetting commands 
+- tools/learning_methods/bibtex.org: BibTeX bibliography management citation references LaTeX documents 
+- tools/learning_methods/org-citation-ref.org: Org-mode citation references academic writing integration 
+- tools/learning_methods/org-roam.org: Org-roam networked note-taking Zettelkasten methodology personal knowledge management 
+- tools/learning_methods/Zettelkasten.basics.org: Zettelkasten note-taking method atomic notes linking slip-box organization knowledge building 
+- tools/programming_without_ide.org: IDE-free programming development workflows text editors command-line tools 
+- tools/terminals/truecolors.org: terminal true color 24-bit RGB support capabilities 
+- tools/tmux.org: tmux terminal multiplexer server session window pane hierarchy commands clipboard layouts 
+- tools/utils/coreutils.org: GNU coreutils essential Unix commands file text shell operations 
+- tools/utils/curl.org: empty file title only 
+- tools/utils/diffutils.org: diff comparison utilities file differences patch generation 
+- tools/utils/findutils.org: find utilities file search locate xargs command execution 
+- tools/utils/grep_ripgrep.org: grep ripgrep text search options patterns performance PowerShell Select-String comparison 
+- tools/vcs/git.org: Git version control three states commit history branching merging rebasing remotes tagging worktree 
 
