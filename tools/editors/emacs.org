@@ -2,7 +2,7 @@
 
 * Help
 
-- =C-h= to invoke help
+- =C-h= to invoke =help=. =C-h= can be bound to =^?= (=DEL=), then bind =C-x h=.
 
 * UI Concept
 
@@ -19,6 +19,7 @@
   + each buffer has its own /point/.
 
 - /Echo area/ :: the bottom of the frame, where various small text or messages are displayed.
+  + Multi-character commands are echoed if paused for more than one second to give user feedback.
   + Informative echo messages are saved in =*Message*=.
   + also for displaying the "minibuffer".
 
@@ -44,6 +45,20 @@
 
 Emacs does not assign meanings to keys directly: keys are bound to commands (functions).
 Customization depends on various /variables/.
+
+** Additionl Modifiers
+
+#+begin_quote
+Even if your keyboard lacks these additional modifier keys, you can
+enter them using ‘C-x @’: ‘C-x @ h’ adds the Hyper flag to the next
+character, ‘C-x @ s’ adds the Super flag, and ‘C-x @ a’ adds the Alt
+flag.  For instance, ‘C-x @ h C-a’ is a way to enter ‘Hyper-Control-a’.
+(Unfortunately, there is no way to add two modifiers by using ‘C-x @’
+twice for the same character, because the first one goes to work on the
+‘C-x’.)  You can similarly enter the Shift, Control, and Meta modifiers
+by using ‘C-x @ S’, ‘C-x @ c’, and ‘C-x @ m’, respectively, although
+this is rarely needed.
+#+end_quote
 
 * Enter and Exiting
 
@@ -422,6 +437,9 @@ before any searching and matching takes place.
   + =RET= with no search strings starts */nonincremental search/* (not of much
     use and inconvenient to use), or with
     =(re-)search-forward= and =(re-)search-backward=.
+
+- =isearch-forward/backward-regexp= :: normally bound to =C-M-s=, use =Esc C-s= 
+  when in terminal.
 
 - =isearch-query-replace= :: search and replace with a yes/no query
 
