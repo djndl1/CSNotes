@@ -4,6 +4,11 @@
 
 - =C-h= to invoke =help=. =C-h= can be bound to =^?= (=DEL=), then bind =C-x h=.
 
+** Info
+
+By default Emacs reuses a single Info buffer, =M-n= (=clone-buffer=) the first Info buffer
+and use this new one.
+
 * UI Concept
 
 - /Frame/ :: normal MS Windows term would be /windows/. Under a terminal, it is the entire terminal screen.
