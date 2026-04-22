@@ -2,10 +2,13 @@
 
 DIR ?= .
 
-# Find all .org files under DIR
-ORG_FILES := $(shell find $(DIR) -name "*.org" -type f 2>/dev/null)
+# Find all .org files under DIR using wildcard (handles spaces in filenames)
+ORG_FILES := $(wildcard $(DIR)/*.org)
+ORG_FILES += $(wildcard $(DIR)/*/*.org)
+ORG_FILES += $(wildcard $(DIR)/*/*/*.org)
+ORG_FILES += $(wildcard $(DIR)/*/*/*/*.org)
 
-# Convert .org paths to .html paths (using subst to preserve spaces in filenames)
+# Convert .org paths to .html paths
 HTML_FILES := $(foreach f,$(ORG_FILES),$(subst .org,.html,$(f)))
 
 # Default target - generate all HTML files
@@ -13,9 +16,9 @@ html: $(HTML_FILES)
 	@echo "HTML generation complete"
 
 # Pattern rule: generate .html from corresponding .org
-%.html: %.org
+%.html: %.org 
 	@mkdir -p $(dir $@)
-	@pandoc --mathjax -s --toc -f org -t html -o "$@" "$<" || (echo "Warning: Failed to generate $@ (non-fatal)" && true)
+	@pandoc --css /Notes/CSNotes/sidebar.css --mathjax -s --toc -f org -t html -o "$@" "$<" || (echo "Warning: Failed to generate $@ (non-fatal)" && true)
 	@echo "Generated $@"
 
 # Remove generated HTML files under DIR
