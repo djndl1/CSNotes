@@ -137,7 +137,7 @@ TODO
   + =read-quoted-char-radix= sets the input format used by  =quoted-insert=
 
 - =C-x 8 RET= (=insert-char=): inserts unicode characters
-  using a code point value, a character name, an abbrevation.
+  using a code point value (followed by a =RET=), a character name, an abbrevation.
   + without the =RET=, =C-x 8= may be with =[=, =]=, ={=, =}=
     to type some special characters.
 
@@ -172,6 +172,7 @@ TODO
 - =M-g <TAB>=: =move-to-column=
 
 - =M-g c=, =goto-char=: to the nth char in the buffer
+  + not of much use (probably only in diagostics)
 
 - To navigate a line visually, set =line-move-visual= to =t=
 
@@ -184,6 +185,7 @@ TODO
 - =C-k= =kill-line=
 
 - =C-S-<BACKSAPCE>=: =kill-whole-line=
+  + not very ergonomic
   + doesn't work in terminal
   + needs =set-window-option -g xterm-keys on= in the tmux settings.
 
