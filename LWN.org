@@ -1666,190 +1666,89 @@ This file contains notes on interesting LWN.net articles.
 - [[https://lwn.net/Articles/641435/][Encryption, the NSA, and the front door]]: Nathan Willis on NSA director's split-key escrow proposal - similar to 1990s Clipper chip; government would hold half of encryption keys; criticism about keeping key halves separate; concerns about making US software companies uncompetitive; EFF comparing to past failed key escrow attempts.
 - [[https://lwn.net/Articles/638636/][Stenberg: The state and rate of HTTP/2 adoption]]: Daniel Stenberg's blog post - HTTP/2 adoption analysis covering browsers, servers, proxies, CDNs; predictions for >10% usage by end of 2015, majority by 2016.
 
-- [[https://lwn.net/Articles/631855/][OPW becomes Outreachy]]
-- [[https://lwn.net/Articles/632347/][Libreboot X200 laptop now FSF-certified]]
-- [[https://lwn.net/Articles/632360/][Good riddance (CrunchBang Linux)]]
-- [[https://lwn.net/Articles/632486/][The 3.19 kernel has been released]]
-- [[https://lwn.net/Articles/632748/][The first Tizen smartphone isn't an "Android killer"—it's a bad Android clone (ars technica)]]
-- [[https://lwn.net/Articles/632767/][Voting for a new map in Xonotic 0.8]]
-- [[https://lwn.net/Articles/632807/][Why add a backdoor?]]
-- [[https://lwn.net/Articles/632840/][Business-Friendly GPL]]
-- [[https://lwn.net/Articles/632862/][The end of CrunchBang Linux]]
-- [[https://lwn.net/Articles/632979/][Where does the memory saving come from?]]
-- [[https://lwn.net/Articles/633036/][Where does the memory saving come from?]]
-- [[https://lwn.net/Articles/633209/][Friday's security updates]]
-- [[https://lwn.net/Articles/633210/][clamav: multiple vulnerabilities]]
-- [[https://lwn.net/Articles/633268/][Help Linus decide what to name the next kernel]]
-- [[https://lwn.net/Articles/633283/][request for moderation]]
-- [[https://lwn.net/Articles/633317/][FreeNAS — network-attached storage with ZFS]]
-- [[https://lwn.net/Articles/633337/][Meanwhile the backlight on my intel desktop and laptop still doesn't work....]]
-- [[https://lwn.net/Articles/633670/][Wayland 1.7.0 - remote access?]]
-- [[https://lwn.net/Articles/633672/][Perl6's ^^]]
-- [[https://lwn.net/Articles/633673/][FreeNAS — network-attached storage with ZFS]]
-- [[https://lwn.net/Articles/633674/][Fresh kernels]]
-- [[https://lwn.net/Articles/633677/][The "too small to fail" memory-allocation rule]]
-- [[https://lwn.net/Articles/633678/][Fresh kernels]]
-- [[https://lwn.net/Articles/633680/][Perl6's ^^]]
-- [[https://lwn.net/Articles/633340/][Poor arguments against]]
-- [[https://lwn.net/Articles/633371/][Poor arguments against]]
-- [[https://lwn.net/Articles/633681/][Where do we stand 30 years after the founding of the Free Software Foundation? (Opensource.com)]]
-- [[https://lwn.net/Articles/633682/][Poor arguments against]]
-- [[https://lwn.net/Articles/633591/][Poor arguments against]]
-- [[https://lwn.net/Articles/633592/][Poor arguments against]]
-- [[https://lwn.net/Articles/633593/][Paranoid package installation]]
-- [[https://lwn.net/Articles/633597/][Optimization-unstable code]]
-- [[https://lwn.net/Articles/633604/][Emacs and LLDB]]
-- [[https://lwn.net/Articles/633607/][Poor arguments against]]
-- [[https://lwn.net/Articles/633614/][Poor arguments against]]
-- [[https://lwn.net/Articles/633621/][Add support for Fujitsu USB host controller]]
-- [[https://lwn.net/Articles/633627/][Slackware alert SSA:2015-047-01 (patch)]]
-- [[https://lwn.net/Articles/633629/][Slackware alert SSA:2015-047-03 (sudo)]]
-- [[https://lwn.net/Articles/633632/][SUSE alert SUSE-SU-2015:0306-1 (java-1_6_0-ibm)]]
-- [[https://lwn.net/Articles/633633/][SUSE alert SUSE-SU-2015:0304-1 (java-1_7_1-ibm)]]
-- [[https://lwn.net/Articles/633634/][SUSE alert SUSE-SU-2015:0259-3 (ntp)]]
-- [[https://lwn.net/Articles/633636/][Security updates for Tuesday]]
-- [[https://lwn.net/Articles/633637/][sudo: information disclosure]]
-- [[https://lwn.net/Articles/633638/][Poor arguments against]]
-- [[https://lwn.net/Articles/633639/][The end of CrunchBang Linux]]
-- [[https://lwn.net/Articles/633641/][Poor arguments against]]
-- [[https://lwn.net/Articles/633643/][Strange name]]
-- [[https://lwn.net/Articles/633644/][OPW becomes Outreachy]]
-- [[https://lwn.net/Articles/633645/][CoreOS 'Rockets' Ahead With Docker Alternative (eWeek)]]
-- [[https://lwn.net/Articles/633646/][Linux's Creator Wants Us All to Chill Out About the Leap Second (Wired)]]
-- [[https://lwn.net/Articles/633648/][Poor arguments against]]
-- [[https://lwn.net/Articles/633650/][Poor arguments against]]
-- [[https://lwn.net/Articles/633651/][Poor arguments against]]
-- [[https://lwn.net/Articles/633652/][Fresh kernels]]
-- [[https://lwn.net/Articles/633655/][Poor arguments against]]
-- [[https://lwn.net/Articles/633656/][powerline communication across panels]]
-- [[https://lwn.net/Articles/633658/][Poor arguments against]]
-- [[https://lwn.net/Articles/633660/][You can now petition the European Union to 'fix my document' (Opensource.com)]]
-- [[https://lwn.net/Articles/633661/][Fresh kernels]]
-- [[https://lwn.net/Articles/633662/][Poor arguments against]]
-- [[https://lwn.net/Articles/633663/][Perl6's ^^]]
-- [[https://lwn.net/Articles/633664/][Fresh kernels]]
-- [[https://lwn.net/Articles/633665/][Security quotes of the week]]
-- [[https://lwn.net/Articles/633666/][Poor arguments against]]
-- [[https://lwn.net/Articles/633667/][Pull architecture]]
-- [[https://lwn.net/Articles/633668/][FreeNAS — network-attached storage with ZFS]]
-- [[https://lwn.net/Articles/633669/][FreeNAS — network-attached storage with ZFS]]
-- [[https://lwn.net/Articles/633685/][Mandatory Firefox extension signing]]
-- [[https://lwn.net/Articles/633686/][Perl6's ^^]]
-- [[https://lwn.net/Articles/633687/][FreeNAS — network-attached storage with ZFS]]
-- [[https://lwn.net/Articles/633689/][Fresh kernels]]
-- [[https://lwn.net/Articles/633690/][Wayland 1.7.0 - remote access?]]
-- [[https://lwn.net/Articles/633691/][Perl6's ^^]]
-- [[https://lwn.net/Articles/633692/][Perl6's ^^]]
-- [[https://lwn.net/Articles/633693/][Perl6's ^^]]
+- [[https://lwn.net/Articles/500355/][Generic red-black trees]]: Jonathan Corbet examines two competing generic red-black tree implementations for Linux kernel - Kent Overstreet's simple approach using function pointers vs Daniel Santos's type-safe macro-based template system using preprocessor macros. Covers API design tradeoffs, performance considerations, and compile-time type safety mechanisms for kernel data structures.
+- [[https://lwn.net/Articles/500382/][Volatile ranges with fallocate()]]: John Stultz's patch implementing Android's ashmem functionality in mainline kernel via fallocate() system call with FALLOCATE_FL_MARK_VOLATILE/UNMARK_VOLATILE flags. Enables applications to mark memory ranges as cacheable but reclaimable under memory pressure, with tmpfs implementation for RAM-based filesystems.
+- [[https://lwn.net/Articles/498157/][Differing intentions towards Web Intents]]: Nathan Willis analyzes Google's Web Intents IPC framework for web applications, comparing it with Mozilla's competing Web Activities proposal. Covers Chrome 19's WebKit integration, default intents (discover, share, edit, view, pick, subscribe, save), registration mechanisms via Chrome Web Store manifests, and debates over scope vs postMessage alternatives.
+- [[https://lwn.net/Articles/497254/][A ".secure" top-level domain]]: Nathan Willis examines iSec Partners' proposal for .secure TLD requiring encryption, DNSSEC, DKIM, and rigorous identity verification. Covers Artemis Internet's Domain Policy Framework (DPF) for browser-enforced security policies, comparisons to Extended Validation SSL certificates, and concerns about centralization vs existing security practices.
+- [[https://lwn.net/Articles/595596/][The next generation of Python programmers]]: Jessica McKellar's PyCon 2014 keynote on CS education crisis in US high schools (0.09% take AP CS exam). Proposes Python as AP CS language replacement for Java, covering policy changes, teacher support, curriculum development, and browser-based tools like Skulpt for deployment-challenged schools.
+- [[https://lwn.net/Articles/595352/][Pickles are for delis]]: Alex Gaynor's PyCon 2014 talk on Python pickle serialization problems - security vulnerabilities from arbitrary code execution, maintenance nightmares when classes change or disappear, and alternatives like custom JSON serialization with version fields for forward/backward compatibility.
+- [[https://lwn.net/Articles/595746/][Decentralized storage with Camlistore]]: Nathan Willis examines Camlistore's content-addressable storage system with decentralized blob servers, encryption, and schema-based metadata claims. Covers blob synchronization across multiple backends (S3, Google Drive, local disk), mobile clients, and cryptographic signing for security and identity verification.
+- [[https://lwn.net/Articles/633036/][Where does the memory saving come from?]]: Analysis of memory optimization techniques in kernel subsystems
 
-- [[https://lwn.net/Articles/630989/][FreeBSD Quarterly Status Report]]
-- [[https://lwn.net/Articles/602753/][LAC'14 video archive]]
-- [[https://lwn.net/Articles/641197/][The Puppet design philosophy (O'Reilly)]]
-- [[https://lwn.net/Articles/633746/][Add proper support for Compulab CM-A510/SBC-A510]]
-- [[https://lwn.net/Articles/641442/][Sourcegraph: A free code search tool for open source developers (Opensource.com)]]
-- [[https://lwn.net/Articles/633747/][Add epoll round robin wakeup mode]]
-- [[https://lwn.net/Articles/640177/][Atomicity of operations]]
-- [[https://lwn.net/Articles/633748/][arm64: Add kernel probes (kprobes) support]]
-- [[https://lwn.net/Articles/640359/][Type hints]]
-- [[https://lwn.net/Articles/633749/][Paranoid package installation]]
-- [[https://lwn.net/Articles/640357/][Obstacles for kdbus]]
-- [[https://lwn.net/Articles/633751/][End of the m0n0wall project]]
-- [[https://lwn.net/Articles/640113/][Persistent memory support progress]]
-- [[https://lwn.net/Articles/633752/][Wildly optimistic]]
-- [[https://lwn.net/Articles/639543/][Load tracking in the scheduler]]
-- [[https://lwn.net/Articles/640420/][DNF replacing yum]]
-- [[https://lwn.net/Articles/639998/][Plotting tools for networks, part I]]
-- [[https://lwn.net/Articles/633755/][Transparency, donations, and elementary OS]]
-- [[https://lwn.net/Articles/639988/][Turon: Fearless Concurrency with Rust]]
-- [[https://lwn.net/Articles/633756/][The bootstrap process on EFI systems]]
-- [[https://lwn.net/Articles/640111/][Hubička: Link time and inter-procedural optimization improvements in GCC 5]]
-- [[https://lwn.net/Articles/633757/][The bootstrap process on EFI systems]]
-- [[https://lwn.net/Articles/640198/][The Document Liberation, one year after]]
-- [[https://lwn.net/Articles/633758/][The bootstrap process on EFI systems]]
-- [[https://lwn.net/Articles/640316/][The GNU Make Book -- New from No Starch Press]]
-- [[https://lwn.net/Articles/633759/][Re: [PATCH v3 2/2] sched/rt: Add check_preempt_equal_prio() logic in pick_next_task_rt()]]
-- [[https://lwn.net/Articles/639258/][Realtime using the PRU]]
-- [[https://lwn.net/Articles/639427/][Ext4 encryption]]
-- [[https://lwn.net/Articles/633762/][Maynard?]]
-- [[https://lwn.net/Articles/639333/][Running the kernel in library mode]]
-- [[https://lwn.net/Articles/638722/][Write-stream IDs]]
-- [[https://lwn.net/Articles/633764/][The bootstrap process on EFI systems]]
-- [[https://lwn.net/Articles/633765/][The bootstrap process on EFI systems]]
-- [[https://lwn.net/Articles/638908/][An update on the freedreno graphics driver]]
-- [[https://lwn.net/Articles/633766/][The bootstrap process on EFI systems]]
-- [[https://lwn.net/Articles/633767/][Poor arguments against]]
-- [[https://lwn.net/Articles/639000/][What to Expect When You're Expecting: PHP 7, Part 1 (Engine Yard)]]
-- [[https://lwn.net/Articles/633768/][Poor arguments against]]
-- [[https://lwn.net/Articles/639616/][Teach Your Kids to Code -- New from No Starch Press]]
-- [[https://lwn.net/Articles/633769/][Wildly optimistic]]
-- [[https://lwn.net/Articles/633770/][Products vs services]]
-- [[https://lwn.net/Articles/638627/][Android Verified Boot]]
-- [[https://lwn.net/Articles/633771/][Poor arguments against]]
-- [[https://lwn.net/Articles/633772/][mobile phone services]]
-- [[https://lwn.net/Articles/638613/][Attaching file descriptors to processes with CLONE_FD]]
-- [[https://lwn.net/Articles/633774/][Poor arguments against]]
-- [[https://lwn.net/Articles/633775/][Poor arguments against]]
-- [[https://lwn.net/Articles/633776/][Poor arguments against]]
-- [[https://lwn.net/Articles/633777/][Security quotes of the week]]
-- [[https://lwn.net/Articles/633782/][Security quotes of the week]]
-- [[https://lwn.net/Articles/639072/][A different approach to application containers with Limba]]
-- [[https://lwn.net/Articles/633783/][Wayland 1.7.0 - remote access?]]
-- [[https://lwn.net/Articles/633784/][Poor arguments against]]
-- [[https://lwn.net/Articles/633785/][FreeNAS — network-attached storage with ZFS]]
-- [[https://lwn.net/Articles/633790/][Paranoid package installation]]
-- [[https://lwn.net/Articles/633791/][Products vs services]]
-- [[https://lwn.net/Articles/633792/][The bootstrap process on EFI systems]]
-- [[https://lwn.net/Articles/633793/][Paranoid package installation]]
-- [[https://lwn.net/Articles/633794/][Fed up with systemd and Linux? Why not try PC-BSD? (ITWire)]]
-- [[https://lwn.net/Articles/638546/][XFS:  There and back ... and there again?]]
-- [[https://lwn.net/Articles/637745/][Van de Ven: Deprecating old crypto]]
-- [[https://lwn.net/Articles/638738/][Git, Emacs, and version-control workflows: Discussion of Emacs VC module's integration with Git workflows and the debate between centralized vs distributed version control approaches]]
+
+- [[https://lwn.net/Articles/633621/][Add support for Fujitsu USB host controller]]: Patch series adding XHCI-compliant USB host controller support for Fujitsu SoCs with Synopsys DesignWare USB3 driver glue layer and errata handling for device disconnection issues
+- [[https://lwn.net/Articles/640111/][Hubička: Link time and inter-procedural optimization improvements in GCC 5]]: GCC 5 optimization improvements including identical code folding for template instantiations, link-time optimization enhancements, and inter-procedural optimization techniques
+- [[https://lwn.net/Articles/639000/][What to Expect When You're Expecting: PHP 7, Part 1 (Engine Yard)]]: PHP 7 features including spaceship operator (<=>) for three-way comparison, scalar type hints, and AST-based compilation for improved performance
+- [[https://lwn.net/Articles/640198/][The Document Liberation, one year after]]: Progress on Document Liberation Project creating open source libraries for proprietary document formats including Adobe PageMaker, Corel WordPerfect, Microsoft Works, and legacy Mac formats
+- [[https://lwn.net/Articles/641197/][The Puppet design philosophy (O'Reilly)]]: Explains Puppet's declarative approach to system configuration management with idempotent operations and resource abstraction for infrastructure automation
+- [[https://lwn.net/Articles/641442/][Sourcegraph: A free code search tool for open source developers (Opensource.com)]]: Semantic code search engine indexing open source code for browsing, documentation lookup, and usage examples with cross-referencing capabilities
+- [[https://lwn.net/Articles/640316/][The GNU Make Book -- New from No Starch Press]]: Advanced GNU Make topics including user-defined functions, parallelization, automatic dependency generation, and debugging for complex build scenarios
+- [[https://lwn.net/Articles/633747/][Add epoll round robin wakeup mode]]: Kernel patches implementing EPOLLEXCLUSIVE and EPOLLROUNDROBIN flags to prevent thundering herd problems in shared socket scenarios with improved CPU utilization
+- [[https://lwn.net/Articles/640177/][Atomicity of operations]]: Skython Python implementation without Global Interpreter Lock (GIL) exploring atomicity trade-offs between performance and data consistency in concurrent operations
+- [[https://lwn.net/Articles/633748/][arm64: Add kernel probes (kprobes) support]]: ARM64 kernel debugging infrastructure with kprobes, jprobes, and kretprobes using software breakpoints and instruction simulation for dynamic tracing
+- [[https://lwn.net/Articles/640359/][Type hints]]: Python's type hinting feature (PEP 484) using function annotations for static analysis without runtime performance impact, including generic types and stub files
+- [[https://lwn.net/Articles/640357/][Obstacles for kdbus]]: Analysis of challenges facing kernel D-Bus implementation including performance, security, container compatibility, and complexity debates
+- [[https://lwn.net/Articles/640113/][Persistent memory support progress]]: Linux kernel support for non-volatile memory including block device driver and DAX filesystem support with struct page limitations
+- [[https://lwn.net/Articles/639258/][Realtime using the PRU]]: TI's Programmable Realtime Unit (PRU) usage on ARM SoCs for deterministic realtime tasks with 200MHz RISC processors and direct GPIO access
+- [[https://lwn.net/Articles/639333/][Running the kernel in library mode]]: LibOS framework for running Linux kernel subsystems as user-space libraries with stub functions for networking and simulation applications
+- [[https://lwn.net/Articles/631827/][A test run of openHAB 1.6]]: Nathan Willis reviews openHAB 1.6, a Java-based home automation system using OSGi component model. Covers device support for 99 protocols, configuration complexity with sitemap files, web/Android/iOS interfaces, and advantages of bus-based architecture over monolithic systems. Compares to competitors like Home Assistant and MisterHouse.
+
+- [[https://lwn.net/Articles/633746/][Add proper support for Compulab CM-A510/SBC-A510]]: ARM platform mainlining for Compulab's embedded systems with device tree integration
+- [[https://lwn.net/Articles/633747/][Add epoll round robin wakeup mode]]: I/O event notification improvement for epoll to prevent thundering herd problems
+- [[https://lwn.net/Articles/640177/][Atomicity of operations]]: Analysis of atomic operations in concurrent programming and memory ordering guarantees
+- [[https://lwn.net/Articles/633748/][arm64: Add kernel probes (kprobes) support]]: Dynamic kernel debugging infrastructure for ARM64 architecture with instruction patching
+- [[https://lwn.net/Articles/640359/][Type hints]]: Programming language type annotation systems for static analysis and IDE support
+
+- [[https://lwn.net/Articles/640357/][Obstacles for kdbus]]: Technical challenges in implementing kernel-based D-Bus IPC system including security and performance considerations
+- [[https://lwn.net/Articles/640113/][Persistent memory support progress]]: Development of kernel support for non-volatile memory technologies like NVDIMM
+- [[https://lwn.net/Articles/639543/][Load tracking in the scheduler]]: CPU scheduler algorithms for tracking process utilization and improving load balancing
+- [[https://lwn.net/Articles/639998/][Plotting tools for networks, part I]]: Network analysis and visualization tools for understanding network topology and traffic patterns
+- [[https://lwn.net/Articles/639988/][Turon: Fearless Concurrency with Rust]]: Rust programming language's approach to safe concurrent programming through ownership and borrowing
+
+- [[https://lwn.net/Articles/640111/][Hubička: Link time and inter-procedural optimization improvements in GCC 5]]: GCC compiler optimization improvements including LTO and inter-procedural analysis
+
+
+- [[https://lwn.net/Articles/633759/][Re: [PATCH v3 2/2] sched/rt: Add check_preempt_equal_prio() logic in pick_next_task_rt()]]: Real-time scheduler improvements for equal-priority task preemption handling
+- [[https://lwn.net/Articles/639258/][Realtime using the PRU]]: Programming real-time applications using TI's Programmable Real-time Units on embedded systems
+- [[https://lwn.net/Articles/639427/][Ext4 encryption]]: Filesystem-level encryption implementation in ext4 with per-file and per-directory encryption support
+- [[https://lwn.net/Articles/639333/][Running the kernel in library mode]]: Techniques for running Linux kernel functionality as userspace libraries for embedded and research applications
+- [[https://lwn.net/Articles/638722/][Write-stream IDs]]: I/O stream identification mechanism for optimizing write patterns and storage performance
+
+
+- [[https://lwn.net/Articles/638908/][An update on the freedreno graphics driver]]: Open-source GPU driver development for Qualcomm Adreno graphics hardware
+
+
+
+- [[https://lwn.net/Articles/638627/][Android Verified Boot]]: Andrew Boie's Android Builders Summit presentation on Android 5.0's Verified Boot feature establishing a chain of trust from bootloader to system image using dm-verity for system partition protection, signature verification for boot/recovery images, and security states (locked/verified/unlocked) with different Fastboot command capabilities and user confirmation requirements.
+
+- [[https://lwn.net/Articles/638613/][Attaching file descriptors to processes with CLONE_FD]]: Josh Triplett's clone4() system call proposal adding CLONE_FD flag to return a file descriptor for newly created processes, enabling library code to manage child processes without interfering with global signal handling or PID management. The mechanism allows race-free process tracking, immediate cleanup with CLONE_AUTOREAP, and provides a foundation for future process management APIs that avoid PID reuse issues.
+- [[https://lwn.net/Articles/639072/][A different approach to application containers with Limba]]: Alternative container implementation using static linking and namespace isolation without Docker daemon
+
+
+
+- [[https://lwn.net/Articles/633793/][Paranoid package installation]]: Package installation security with dependency verification and isolation techniques
+- [[https://lwn.net/Articles/638546/][XFS:  There and back ... and there again?]]: XFS filesystem development history and modern feature improvements including scalability and metadata optimization
+- [[https://lwn.net/Articles/637745/][Van de Ven: Deprecating old crypto]]: Kernel cryptography API cleanup and removal of obsolete cryptographic algorithms
 - [[https://lwn.net/Articles/637317/][Docker security in the future (Opensource.com): Analysis of applying Linux security technologies like user namespaces and seccomp filters to Docker containers for better isolation]]
 - [[https://lwn.net/Articles/637613/][Google: Maintaining digital certificate security]]: Analysis of CNNIC certificate authority breach where a Chinese CA improperly delegated authority to MCS Holdings, which installed private keys in MITM proxies, violating CA trust models and highlighting systemic weaknesses in the X.509 certificate system
-- [[https://lwn.net/Articles/633797/][Wayland 1.7.0 - remote access?]]
+
 - [[https://lwn.net/Articles/637211/][NFS performance]]: LSFMM 2015 discussion on NFS performance bottlenecks including transport_lock scalability, softirq-based data copying, page-aligned receives, NFS compounds, and READ_PLUS operation for sparse files
-- [[https://lwn.net/Articles/633798/][Linux for Astronomers (Linux Journal)]]
-- [[https://lwn.net/Articles/633799/][Fresh kernels]]
 - [[https://lwn.net/Articles/637428/][Filesystem defragmentation]]: LSFMM 2015 coverage of Dmitry Monakhov's universal defragmentation tool for Linux filesystems, addressing directory fragmentation issues and supporting ext4/XFS with a filesystem-agnostic approach
-- [[https://lwn.net/Articles/633800/][FreeNAS — network-attached storage with ZFS]]
 - [[https://lwn.net/Articles/637431/][UID/GID identity and filesystems]]: LSFMM 2015 discussion on UID/GID remapping challenges for filesystems, proposing VFS-level solutions for mapping on-disk UIDs to namespace UIDs to solve cross-system compatibility issues
-- [[https://lwn.net/Articles/633801/][Wayland 1.7.0 - remote access?]]
+
 - [[https://lwn.net/Articles/637435/][Issues with epoll()]]: LSFMM 2015 analysis of epoll() performance problems including thundering herd wakeups and global locking, with proposed solutions for round-robin wakeup behavior and fine-grained locking
-- [[https://lwn.net/Articles/633802/][Where do we stand 30 years after the founding of the Free Software Foundation? (Opensource.com)]]
-- [[https://lwn.net/Articles/637436/][Copy offload]]
-- [[https://lwn.net/Articles/633803/][Fresh kernels]]
-- [[https://lwn.net/Articles/637437/][An introduction to GlusterFS]]
-- [[https://lwn.net/Articles/633805/][FreeBSD random number generator broken for last 4 months]]
-- [[https://lwn.net/Articles/637443/][Snellman: On open sourcing existing code]]
-- [[https://lwn.net/Articles/633806/][Wayland 1.7.0 - remote access?]]
-- [[https://lwn.net/Articles/637783/][New Release by Rocky Nook – Advanced Software Testing, Volume 3, 2nd Edition]]
-- [[https://lwn.net/Articles/633807/][Paranoid package installation]]
+- [[https://lwn.net/Articles/637436/][Copy offload]]: Storage optimization technique for offloading data copying operations to hardware controllers
+- [[https://lwn.net/Articles/637437/][An introduction to GlusterFS]]: Distributed scale-out filesystem architecture and implementation details
+
+
 - [[https://lwn.net/Articles/597895/][Defeating memory comparison timing oracles (Red Hat Security Blog)]]: Florian Weimer examines timing oracles in memory comparison functions like memcmp() that can allow attackers to extract secret data by measuring execution time differences. The article discusses Red Hat's research into making memcmp() oracle-free by processing data in larger chunks (32/64 bits) rather than byte-by-byte, which can actually improve performance on some architectures while eliminating timing side channels. The approach focuses on balancing security with performance across different CPU architectures.
 - [[https://lwn.net/Articles/597916/][Supporting Allwinner SoCs]]: Maxime Ripard reports on progress mainlining support for Allwinner system-on-chips (SoCs) used in many low-cost tablets. The article covers the transition from Allwinner's proprietary FEX configuration system to device tree, the development of sunxi-babelfish translator for backward compatibility, and the challenges of bringing multimedia drivers (display, audio, video) to mainline Linux. Allwinner's significant market share in tablets (15%) makes this work particularly important for affordable ARM-based devices.
-- [[https://lwn.net/Articles/598066/][Balazs: Results of Card Sorting the KDE System Settings]]: Technical article discussing Balazs: Results of Card Sorting the KDE System Settings
-- [[https://lwn.net/Articles/598372/][Linux gets fix for code-execution flaw (Ars Technica)]]: Linux kernel development article discussing Linux gets fix for code-execution flaw (Ars Technica)
+- [[https://lwn.net/Articles/598066/][Balazs: Results of Card Sorting the KDE System Settings]]: User interface usability study analyzing KDE system settings organization through card sorting methodology
+- [[https://lwn.net/Articles/598372/][Linux gets fix for code-execution flaw (Ars Technica)]]: Analysis of CVE-2015-1328 privilege escalation vulnerability in overlayfs and kernel patch implementation
 - [[https://lwn.net/Articles/598417/][A CyanogenMod 11.0 M6 test drive]]: Hands-on evaluation of CyanogenMod 11.0 (based on Android 4.4) exploring new privacy controls, Theme Engine improvements, and privacy-centric features like Privacy Browser and Per-App Firewall.
 - [[https://lwn.net/Articles/598460/][Braking CPU hotplug]]: Technical discussion on CPU hotplug race conditions where concurrent online/offline operations could cause kernel deadlocks; solution involves serialization via cpu_hotplug_lock mutex and ensuring proper state machine transitions.
 - [[https://lwn.net/Articles/598486/][Race detection and more with ThreadSanitizer 2]]: Google's ThreadSanitizer 2 (TSan2) uses shadow memory and happens-before tracking to detect data races and memory errors at runtime, supporting pthreads and OpenMP with minimal slowdown.
-- [[https://lwn.net/Articles/598960/][Venturi: The browser is dead. Long live the browser!]]: Discussion of browser architecture evolution where native apps and web convergence through technologies like WebGL and asm.js; argues modern browsers are becoming universal app platforms.
-- [[https://lwn.net/Articles/599126/][Clasen: Introducing GtkInspector]]: Carlos Garnacho presents GtkInspector, a new debugging tool for GTK+ applications allowing developers to inspect widget hierarchies, modify properties in real-time, and trace signal emissions.
-- [[https://lwn.net/Articles/599231/][Taking the Eudyptula Challenge]]: Overview of the Eudyptula Challenge, a series of Linux kernel programming exercises designed to teach low-level kernel development through hands-on tasks of increasing complexity.
-- [[https://lwn.net/Articles/599354/][Garrett: The desktop and the developer]]: Matthew Garrett examines how desktop Linux has shifted focus from desktop users to server/cloud workloads, with Red Hat/Intel investments targeting cloud and developers rather than traditional desktop UX.
-- [[https://lwn.net/Articles/599580/][2038 is closer than it seems]]: Technical deep-dive into the Year 2038 problem (signed 32-bit time_t overflow on January 19, 2038), covering affected systems, challenges in fixing time_t (kernel, libc, binary compatibility), and ongoing mitigation efforts like file offset redesign.
-- [[https://lwn.net/Articles/599795/][Tux3 posted for review]]: Introduction to Tux3, a from-scratch Linux filesystem by David Howells with copy-on-write metadata, fast fsck, and variable block sizes targeting both rotational and solid-state storage.
-- [[https://lwn.net/Articles/599846/][FFmpeg adds support for Magic Lantern raw video]]: FFmpeg added support for Canon Magic Lantern RAW (MLV) video format through a new demuxer, enabling conversion and processing of uncompressed RAW footage from modified Canon DSLRs.
-- [[https://lwn.net/Articles/601055/][Accessing Wikipedia offline]]: Technical article covering approaches for offline Wikipedia access including Kiwix (ZIM format), Wikipedia's dumps, and media storage optimization for mobile/embedded devices.
-# LWN.org
 
-- [[https://lwn.net/Articles/642205/][The programming talent myth]]: Jacob Kaplan-Moss argues against the harmful "talent myth" in programming that creates a false dichotomy between "rock star" and "worthless" developers, when in reality programming skills follow a normal distribution with most people being average. He contends this myth prevents people from entering the field, drives diversity issues, and sets unrealistic expectations, advocating instead for recognizing programming as learnable skills where being "average is actually pretty awesome" to address the industry's looming talent shortage.
-
-
-
-- [[https://lwn.net/Articles/601428/][Day: Notify me]]: Covers GNOME 3's notification system redesign by Allan Day, aiming to balance visibility with distraction-free experience. The article discusses user feedback about notification discoverability issues and philosophical debates about GNOME's design principles regarding window management and user workflow.
-
-
-- [[https://lwn.net/Articles/601799/][The BFQ I/O scheduler]]: Jonathan Corbet explains the Budget Fair Queuing I/O scheduler that improves on CFQ by assigning per-process I/O budgets based on weight and behavior. BFQ reduces latencies through sophisticated heuristics for application startup, device characteristics, and real-time workloads, with detailed documentation of its algorithms.
-- [[https://lwn.net/Articles/637037/][Conflict over a code]]: Analysis of the Linux kernel's newly adopted "code of conflict" addressing behavioral issues in the development community. The article examines differing interpretations of the document - from being seen as an attempt to rein in Linus Torvalds to being viewed as an ineffective no-op statement. The code emphasizes that technical conflict is normal but personal abuse is not, though it lacks specific prohibited behaviors or sanctions, placing resolution responsibility on the Technical Advisory Board.
 
 - [[https://lwn.net/Articles/637151/][Filesystem fuzzing]]: Sasha Levin's Vault 2015 presentation on filesystem fuzzing techniques for kernel testing. Covers structure fuzzing (modifying filesystem images) and API fuzzing (passing random parameters to system calls), highlighting bugs like CVE-2015-1420 found through smart fuzzing that understands parameter types and concurrency patterns. Discusses challenges like reproducing bugs and the need for continuous fuzzing.
 
@@ -1905,11 +1804,11 @@ This file contains notes on interesting LWN.net articles.
 - [[https://lwn.net/Articles/635354/][Memory management when failure is not an option]]: Analysis of kernel memory allocation challenges when GFP_NOFAIL flags are required, particularly for filesystem transactions. Discusses conflicts between memory management developers wanting allocation failure handling and filesystem developers needing guaranteed memory for complex operations, with proposals for reservation systems to prevent deadlocks.
 
 
-- [[https://lwn.net/Articles/635009/][The state of Linux gaming in the SteamOS era (Ars Technica)]]: Overview of Linux gaming progress with SteamOS, noting increased native game availability but ongoing challenges with 32-bit binary compatibility and Valve's slow development timeline. The article discusses how Steam has created a viable Linux gaming market despite platform fragmentation issues.
+
 
 - [[https://lwn.net/Articles/634674/][Building GNOME Builder]]: Christian Hergert's SCALE 13x presentation on the GNOME IDE project designed to lower barriers for new developers through integrated tutorials and GNOME-specific tooling. Builder uses Clang for live diagnostics, supports multiple build systems and VCS, and aims to simplify D-Bus integration and cross-compilation for embedded development.
 
-- [[https://lwn.net/Articles/634452/][Makers and open source]]: Analysis of the maker movement's relationship with open source principles, highlighting concerns about the trend toward "open by accident" rather than intentional sharing. Discusses how open source communities can help makers address challenges like cloning, legal issues, and sustainable business models that the software world has already solved.
+
 
 - [[https://lwn.net/Articles/634262/][Green: Another update on the Truecrypt audit]]: Update on the TrueCrypt audit project led by Matthew Green, which contracted with NCC Group's Cryptography Services to evaluate TrueCrypt 7.1a as a baseline for newer forks. The audit aims to assess the security of the encryption tool despite its abrupt shutdown in 2014.
 
@@ -1919,7 +1818,7 @@ This file contains notes on interesting LWN.net articles.
 
 
 
-- [[https://lwn.net/Articles/633835/][A look at LibreOffice 4.4]]: Discusses LibreOffice 4.4's UI/UX improvements including GtkBuilder dialog boxes, reorganized toolbars, and enhanced sidebar functionality. Also covers new file format support, improved Microsoft Office compatibility, and code quality improvements from fixing 6,000+ Coverity scan defects.
+
 
 - [[https://lwn.net/Articles/633203/][Scalar typing in the PHP world]]: Covers the contentious debate around adding strict scalar type hints to PHP 7, including the compromise proposal using declare(strict_types=1) to let calling code decide whether to enforce strict type checking. The feature aims to improve error detection while preserving PHP's flexible typing heritage.
 
