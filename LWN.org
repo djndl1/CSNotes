@@ -2958,4 +2958,80 @@ This file contains notes on interesting LWN.net articles.
 - [[https://lwn.net/Articles/643269/][Opposition to Python type hints]]: Technical debate around Python's type hinting system implementation, covering performance implications, runtime behavior changes, and alternative approaches to static type checking in dynamic languages.
 - [[https://lwn.net/Articles/643476/][Qt4's status and Qt4's webkit removal in Stretch]]: Technical analysis of Qt4 maintenance status and the removal of QtWebKit component from Debian Stretch, covering migration paths to QtWebEngine and compatibility implications for legacy applications.
 - [[https://lwn.net/Articles/643238/][App Container spec gains new support as a community-led effort]]: Technical overview of the App Container (appc) specification development as a community standard for container formats, including image layout, runtime requirements, and interoperability with Docker and other container systems.
+- [[https://lwn.net/Articles/643253/][Git code hosting beta (launchpadblog)]]: Technical discussion of Launchpad's Git repository hosting implementation, including comparisons between Git and Bazaar workflows, repository management features, and the technical challenges of integrating Git support into existing code hosting infrastructure.
 - [[https://lwn.net/Articles/642683/][Unboxing Linux/Mumblehard: Muttering spam from your servers]]: Technical analysis of the Mumblehard Linux malware that infects servers to send spam, examining the malware's propagation mechanisms, persistence techniques, and Linux-specific attack vectors for server security hardening. Stashed changes
+
+- [[https://lwn.net/Articles/684830/][fallocate() and the block layer]]: Discussion at LSFMM 2016 about moving block-layer functionality from ioctl() to fallocate() flags. Darrick Wong proposed using FALLOC_FL_PUNCH_HOLE and FALLOC_FL_ZERO_RANGE flags for block layer operations, addressing alignment requirements and thin provisioning concerns. The session debated whether fallocate() should handle expensive operations like unsharing blocks in copy-on-write filesystems.
+
+- [[https://lwn.net/Articles/684831/][Using the multiqueue block subsystem by default]]: Bart Van Assche's LSFMM 2016 session on making multiqueue block layer the default for SCSI devices. The multiqueue subsystem improves performance but requires maintenance of both single and multiqueue paths. Discussion covered I/O scheduling needs, legacy device compatibility, and the challenge of converting remaining 38 drivers to multiqueue support.
+
+- [[https://lwn.net/Articles/684611/][CMA and compaction]]: LSFMM 2016 discussions on contiguous memory allocation and compaction challenges. Aneesh Kumar highlighted problems with CMA fragmentation and ZONE_CMA approach, while Mel Gorman advocated for page migration and sticky MIGRATE_MOVABLE bits. The compaction session addressed issues with THP allocations, skip bits optimization, and the need for flexible compaction priorities.
+
+- [[https://lwn.net/Articles/684614/][Virtual machines as containers]]: Rik van Riel's LSFMM 2016 session on using VMs as containers with shared memory management. Discussed balloon drivers for memory reclamation, paravirtualization approaches for memory balancing, and sharing page cache between host and guests. The session explored mechanisms for quantifying memory pressure across virtualized environments.
+
+- [[https://lwn.net/Articles/684926/][Memory control group fairness]]: Vladimir Davydov's LSFMM 2016 session on fairness issues in memory control groups. Addressed problems with streaming processes claiming memory from other groups, and proposed solutions including dynamic limit adjustment, age-based LRU balancing, and using refault distance metrics. The discussion covered vmpressure mechanisms and wait-time metrics for memory health.
+
+- [[https://lwn.net/Articles/684288/][Persistent-memory error handling]]: Jeff Moyer's LSFMM 2016 plenary session on error handling for persistent memory. Differentiated between load/store (CPU instructions) and read/write (system calls) errors, discussing machine check recovery, ACPI scrubbing mechanisms, and granular error reporting. The session explored interfaces for bad-block lists, SIGBUS delivery, and remapping strategies for persistent memory failures.
+
+- [[https://lwn.net/Articles/684300/][Two transparent huge page cache implementations]]: Compares Kirill Shutemov's compound pages approach with Hugh Dickins' team pages for transparent huge pages in page cache. Discusses trade-offs including subpage access, memory usage for small files, recovery mechanisms, and the goal of unifying anonymous and page-cache THP implementations.
+
+- [[https://lwn.net/Articles/684366/][Persistent memory as remote storage]]: Explores using RDMA for remote persistent memory access, comparing pull mode (current approach with extra round-trip for writes) vs push mode (initiator registers interest, target exposes memory regions). Discusses durability guarantees across different systems and the need for a unified API similar to DAX.
+
+- [[https://lwn.net/Articles/684009/][Costa: Designing a Userspace Disk I/O Scheduler for Modern Datastores]]: Examines why high-performance datastores like Scylla need custom userspace I/O scheduling, particularly for thread-per-core architectures where kernel schedulers lack fine-grained priority control and async I/O requires O_DIRECT bypassing page cache.
+
+- [[https://lwn.net/Articles/676806/][A BoF on kernel network performance]]: Covers kernel networking optimizations including DDoS mitigation using BPF early packet filtering, transmit performance with xmit_more API, cache optimization through packet bundling, and instruction cache improvements by delaying eth_type_trans() calls.
+
+- [[https://lwn.net/Articles/674725/][The rkt container manager reaches 1.0]]: Details rkt's security-focused container architecture including KVM-based isolation, SELinux support, TPM integration, image signature validation, and its approach as a lightweight toolset vs Docker's monolithic daemon model.
+
+- [[https://lwn.net/Articles/670209/][How 4.4's patches got to the mainline]]: Analysis of Linux kernel development workflow showing that most maintainers push patches directly to Linus Torvalds rather than through intermediate layers, with networking developers using the deepest hierarchy. The study used git repository analysis to trace patch flow paths through merge commits.
+
+- [[https://lwn.net/Articles/663361/][Kernel Self Protection Project]]: Announcement of community effort to port PaX and Grsecurity kernel hardening features upstream, including PAX_SIZE_OVERFLOW GCC plugin, PAX_REFCOUNT for reference counter overflows, and PAX_USERCOPY for memory protection. Focuses on proactive defenses beyond just bug fixes.
+
+- [[https://lwn.net/Articles/662839/][Developer workflow security]]: Technical discussion of secure development practices including GPG key management with subkeys and short expiration times, containerized builds for isolation, full-disk encryption, and avoiding SSH daemons on developer workstations to protect against key theft and code injection attacks.
+
+- [[https://lwn.net/Articles/662907/][Security part 2]]: Discussion of kernel security enhancements including potential adoption of PaX/grsecurity patches, GCC plugins for integer overflow protection, and trade-offs between security features and debugging capabilities. Focuses on kernel-mode execution prevention and secure debugging information extraction mechanisms.
+
+- [[https://lwn.net/Articles/662930/][Kernel documentation]]: Technical overview of Linux kernel documentation toolchain using DocBook templates, docproc utility, and kernel-doc Perl parser for extracting documentation from source code. Discusses challenges with dependency-heavy tools like pandoc for Markdown conversion and alternatives like asciidoc.
+
+- [[https://lwn.net/Articles/662966/][The stable kernel process]]: Analysis of stable kernel maintenance workflow including patch selection criteria, regression testing challenges, and the announcement process for long-term support kernels. Covers the decision-making process for designating 4.4 as the next LTS kernel and coordination with distributors.
+
+- [[https://lwn.net/Articles/656683/][Mozilla: Improving Security for Bugzilla]]: Mozilla implemented two-factor authentication using TOTP (Time-based One-Time Password) apps like Google Authenticator after a Bugzilla compromise revealed security vulnerabilities. The security improvements included reducing privileged user access, implementing MFA with Perl modules like Auth::GoogleAuth and GD::Barcode::QRcode, and enhancing access controls for sensitive security bug information.
+
+- [[https://lwn.net/Articles/655721/][Grsecurity stable patches to be limited to sponsors]]: The Grsecurity kernel-hardening project announced it would restrict stable patch distribution to sponsors due to GPL and trademark violations by embedded industry companies. This affects Linux kernel security hardening features, with only the test series remaining publicly available for Gentoo Hardened and Arch Linux communities.
+
+- [[https://lwn.net/Articles/655366/][The bcachefs filesystem]]: Bcachefs is a copy-on-write filesystem derived from bcache that provides multi-tier hybrid caching, device integration, and data checksumming, with planned features including snapshots and erasure coding, though it currently lacks an fsck utility and stable on-disk format.
+
+- [[https://lwn.net/Articles/651818/][Gorman: Continual testing of mainline kernels]]: SUSE's Marvin system provides automated kernel performance testing infrastructure that continuously runs benchmarks against mainline Linux kernel releases and generates comparative performance reports, helping detect performance regressions through systematic testing of kernel patches and versions.
+
+- [[https://lwn.net/Articles/649764/][Amazon's new TLS implementation]]: Amazon's s2n TLS library is designed as a minimal, security-focused TLS 1.2 implementation with only 6,000 lines of code, prioritizing simplicity and auditability while avoiding rarely used protocol options and extensions to reduce attack surface and improve security verification.
+
+- [[https://lwn.net/Articles/648977/][The Open Container Project]]: Announcement of Docker and CoreOS collaboration under Linux Foundation to standardize container formats and runtimes, addressing industry fragmentation concerns while maintaining innovation in container-based solutions through donated code and specifications.
+
+- [[https://lwn.net/Articles/647979/][The hidden costs of embargoes (Red Hat Security Blog)]]: Analysis of security embargo impacts on patch quality, citing examples like Shellshock where limited participation during embargo periods led to incomplete fixes requiring multiple CVEs, highlighting the trade-offs between coordinated disclosure and development quality assurance.
+
+- [[https://lwn.net/Articles/683551/][Live Kernel Patching Microconference Accepted into LPC 2016]]: Discusses technical challenges in live kernel patching including stacktrace reliability, kernel thread safety, thread consistency models, porting to non-x86 architectures, handling loadable modules, compiler optimizations, and patch-creation guidelines for the Linux kernel's live patching infrastructure.
+
+- [[https://lwn.net/Articles/680232/][Apple, iPhones, and encryption]]: Analyzes iOS encryption mechanisms including the 4-digit PIN protection, auto-erase feature after failed attempts, firmware signing requirements, and technical implications of government-mandated backdoors on device security and free software ecosystems.
+
+- [[https://lwn.net/Articles/679366/][Subgraph OS, a new security-centric desktop distribution]]: Subgraph OS implements multiple security hardening layers including grsecurity/PaX kernel patches for memory protection, mandatory LUKS disk encryption, Tor-based network isolation with application whitelisting, and Oz sandboxing system using namespaces, seccomp filters, and Xpra X11 forwarding for application containment.
+
+- [[https://lwn.net/Articles/677751/][SFLC: The Linux Kernel, CDDL and Related Issues]]: Analyzes the legal technicalities of CDDL-licensed ZFS integration with GPLv2 Linux kernel, discussing whether kernel modules constitute derivative works under copyright law and the distinction between literal vs equitable license interpretation for system call interfaces versus internal kernel APIs.
+
+- [[https://lwn.net/Articles/673693/][Automotive security and safety]]: Examines automotive software security challenges including legacy CAN bus vulnerabilities, transition to Ethernet AVB networks, hypervisor-based isolation for safety-critical systems, and V2V communication using public-key encryption with short-lived keys to prevent tracking.
+
+- [[https://lwn.net/Articles/671873/][De Raadt: Important SSH patch coming soon]]: Details CVE-2016-0777/0778 vulnerabilities in OpenSSH's experimental roaming feature, where memory safety issues in the client-side implementation could leak private keys through buffer management flaws in the unfinished roaming protocol support.
+
+- [[https://lwn.net/Articles/672515/][Linux Kernel ROP - Ropping your way to #]]: Explains return-oriented programming (ROP) techniques for exploiting Linux kernel vulnerabilities, focusing on how x86 instruction set density allows attackers to find "gadgets" through code misalignment to bypass security controls.
+
+- [[https://lwn.net/Articles/668177/][An authentication bypass issue in GRUB]]: Details an integer underflow vulnerability in GRUB bootloader versions 1.98-2.02 that enables local attackers to bypass authentication on systems with boot passwords, affecting numerous Linux systems and embedded devices.
+
+- [[https://lwn.net/Articles/665537/][Gräßlin: Looking at the security of Plasma/Wayland]]: Technical analysis of Plasma/Wayland security vulnerabilities demonstrating how a key logger could be implemented in under 10 minutes, highlighting security gaps in the desktop environment's input handling and privilege separation mechanisms.
+
+- [[https://lwn.net/Articles/664403/][The "Clair" security scanner]]: CoreOS's container security tool that scans container layers against CVE databases to identify vulnerabilities, using layer introspection to build package inventories and match against known security issues across Red Hat, Ubuntu, and Debian databases.
+- [[https://lwn.net/Articles/643141/][FontForge and moving forward]]: Analysis of FontForge's technical debt and the emergence of web-based font editors like Typism and Glyphr Studio, discussing the trade-offs between desktop C/C++ applications versus JavaScript/CSS web applications for complex graphics software development.
+
+- [[https://lwn.net/Articles/643345/][A Libre Graphics Meeting showcase summary]]: Covers three technical projects: The List (crowdsourced image collection using Android app), html2print (HTML/CSS-based print layout with CMYK support and CSS Regions), and 3D-to-2D data embedding techniques for encoding 3D models in PNG images.
+
+- [[https://lwn.net/Articles/643241/][Video editing and free software]]: Technical comparison of Natron (OpenFX-based VFX compositor with Python scripting and Blender integration) and Pitivi (GTK+/GStreamer-based non-linear editor), examining architectural approaches, industry standards adoption, and the technical challenges of maintaining complex multimedia software with small developer teams.
+
+- [[https://lwn.net/Articles/642745/][Mozilla: Deprecating Non-Secure HTTP]]: Mozilla's technical proposal to phase out non-TLS HTTP, addressing security vulnerabilities in unencrypted web traffic, the need for industry coordination through W3C WebAppSec Working Group, and the implications for web application security and privacy protection.
