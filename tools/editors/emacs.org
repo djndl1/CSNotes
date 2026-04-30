@@ -272,12 +272,28 @@ Completion styles are loaded using =completion-styles=
 
 - =C-h d=: search in documentation for keywords =apropos-documentation=
 
-- =C-h i=: the GNU Info manual
+- =C-h i=: the GNU Info manual. To create a new info buffer, add an argument. 
   + =C-h r i=: search info by topic
   + =C-h r s=: search info by text
 
 - =C-h p=: search Emacs packages =finder-by-keyword=
   and =list-packages=
+  + =C-h P=: =describe-package= shows package documentation
+
+- =C-h m=: =describe-mode=
+
+- =C-h o=: =describe-symbol=
+  + =C-h S=: =info-lookup-symbol=
+
+- =C-h C=: =describe-coding-system= (encoding schemes)
+
+- =C-h F=: =Info-goto-emacs-command-node= (go to the node that documents the Emacs command)
+
+- =C-h I=: =describe-input-method=
+
+- =shortdoc=: Pop to a buffer with short documentation summary for functions in GROUP.
+
+- =help-follow-symbol= go to the help of the symbol at cursor.
 
 * Region, Mark
 
