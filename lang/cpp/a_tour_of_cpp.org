@@ -1,14 +1,27 @@
+* C++17
+
 An overview of C++17
 
 Advice about what constitutes good modern C++ can be found in the C++
 Core Guidelines.
 
-* Basics
+** Basics
   :PROPERTIES:
   :CUSTOM_ID: basics
   :END:
 
-- A declaration is a statement that introduces an entity into the
+#+begin_quote
+The number of errors in code correlates strongly with the amount of code and the
+complexity of the code. Both problems can be addressed by using more and shorter
+functions. Using a function to do a specific task often saves us from writing a
+specific piece of code in the middle of other code; making it a function forces
+us to name the activity and document its dependencies.
+#+end_quote
+
+- The semantics of argument passing are identical to the semantics of
+  initialization.
+
+- A declaration is a statement that introduces an entity into the
   program. It specifies a type for the entity.
 
 - A type defines a set of possible values and a set of operations.
@@ -21,22 +34,22 @@ Core Guidelines.
 
 ='= can be used to make long literals more readable to humans.
 
-** Initialization
+*** Initialization
    :PROPERTIES:
    :CUSTOM_ID: initialization
    :END:
 
-#+BEGIN_EXAMPLE C++
+#+BEGIN_SRC C++
     double d1 = 2.3;
     double d2 = {2.3};
     double d3 {2.3}
-#+END_EXAMPLE
+#+END_SRC
 
 If in doubt, use the general ={}= form. It prevents conversions that
 lose information. /Narrowing conversions/ are allowed and implicitly
 applied. Use =auto= when there is no need to state its type explicitly
-or to avoid redundancy and writing long type names, which is especially
-important in generic programming.
+or to avoid redundancy and writing long type names, (especially in generic
+programming).
 
 Two notions of immutability:
 
@@ -82,35 +95,7 @@ have been had the symbolic and enumerator names not been used.
 
 At the language level, C++ represents interfaces by declarations.
 
-* Modules (C++20)
-  :PROPERTIES:
-  :CUSTOM_ID: modules-c20
-  :END:
-
-=export= ing and =import= ing certain part of a source file as part of the
-interaface finally become possible.
-
-#+BEGIN_SRC C++
-    //file Vector.cpp
-
-    module;
-    export module Vector;
-    export class Vector {
-    // definitions and declarations go here
-    };
-
-    //file user.cpp
-    import Vector;
-    #include <cmath>
-
-    //...
-#+END_SRC
-
-A module is compiled only once; two modules can be imported in either
-order without chaning their meaning; =import= is not transitive: a
-module is not imported automatically in a chain of =import= s.
-
-* Error handling
+** Error handling
   :PROPERTIES:
   :CUSTOM_ID: error-handling
   :END:
@@ -130,7 +115,7 @@ A function can indicate that it cannot perform its alloted task by
 Exception handling is slow; it is often faster than correct handling of
 complex or rare error conditions and of repeated tests of error codes.
 
-** Exceptions
+*** Exceptions
    :PROPERTIES:
    :CUSTOM_ID: exceptions
    :END:
@@ -154,7 +139,7 @@ Often, a function has no way of completing its assigned task after an
 exception is thrown. Then, "handling" an exception means doing some
 minimal local cleanup and rethrowing the exception.
 
-** Resource Acquisition is Initialization
+*** Resource Acquisition is Initialization
    :PROPERTIES:
    :CUSTOM_ID: resource-acquisition-is-initialization
    :END:
@@ -163,7 +148,7 @@ The basic idea behind RAII is for a constructor to acquire all resources
 necessary for a class to operate and have the destructor release all
 resources, thus making resource release guaranteed and implicit.
 
-** Static Assertions
+*** Static Assertions
    :PROPERTIES:
    :CUSTOM_ID: static-assertions
    :END:
@@ -180,7 +165,7 @@ The most important uses of =static_assert= come when making assertions
 about types used as parameters in generic programming. # Function
 arguments and Return Values
 
-** Argument Passing
+*** Argument Passing
    :PROPERTIES:
    :CUSTOM_ID: argument-passing
    :END:
@@ -204,7 +189,7 @@ but don't need to modify the argument, we pass-by-const-reference.
 
 Using a default argument is sometimes easier than overloading.
 
-** Value return
+*** Value return
    :PROPERTIES:
    :CUSTOM_ID: value-return
    :END:
@@ -217,7 +202,7 @@ semantics, i.e. a move constructor or move assignment. Returning large
 objects by returning a pointer to it is common in older code and a major
 source of hard-to-find errors.
 
-** Structured binding (C++17)
+*** Structured binding (C++17)
    :PROPERTIES:
    :CUSTOM_ID: structured-binding-c17
    :END:
@@ -271,7 +256,7 @@ functions.
     auto [re, im] = z + 2;
 #+END_SRC
 
-* Classes
+** Classes
   :PROPERTIES:
   :CUSTOM_ID: classes
   :END:
@@ -280,7 +265,7 @@ The central language feature of C++ is the class. A class in a
 user-defined type provided to represent a concept in the code of a
 program.
 
-** Types
+*** Types
    :PROPERTIES:
    :CUSTOM_ID: types
    :END:
@@ -515,7 +500,7 @@ This way, we no longer need a desctructor for =Smiley= since the
 destructor of =unique_ptr= takes responsiblity. The code using
 =unique_ptr= will be as efficient as code using raw pointers.
 
-** Essential operations
+*** Essential operations
    :PROPERTIES:
    :CUSTOM_ID: essential-operations
    :END:
@@ -562,7 +547,7 @@ object used to initialize right in the target object.
 Default implementation of special member functions can be explicitly
 specified, that is, generated by the compiler if needed:
 
-#+BEGIN_EXAMPLE C++
+#+BEGIN_SRC C++
     class Y {
     public:
          Y(Sometype);
@@ -570,7 +555,7 @@ specified, that is, generated by the compiler if needed:
          Y(Y&&) = default;        // and the default move constructor
          // ...
     };
-#+END_EXAMPLE
+#+END_SRC
 
 If an operation is not needed, == delete= can be used.
 
@@ -668,7 +653,7 @@ collection is fundamentally a global memory management scheme. As
 systems are getting more distributed, locality is more important than
 ever.
 
-** Conventional Operations
+*** Conventional Operations
    :PROPERTIES:
    :CUSTOM_ID: conventional-operations
    :END:
@@ -676,7 +661,7 @@ ever.
 Some operations have conventional meaings when defined for a type, often
 assumed by programmers and libraries.
 
-** Container Operations
+*** Container Operations
    :PROPERTIES:
    :CUSTOM_ID: container-operations
    :END:
@@ -691,7 +676,7 @@ together. Note =a>b= can be implemented as =b<a=.
 
 =.size()=, =.begin()=, =end()=.
 
-*** User-Defined Literals
+**** User-Defined Literals
     :PROPERTIES:
     :CUSTOM_ID: user-defined-literals
     :END:
@@ -710,7 +695,7 @@ suitable suffix to a literal, /literal operators/, in the form
     }
 #+END_SRC
 
-*** =swap()=
+**** =swap()=
     :PROPERTIES:
     :CUSTOM_ID: swap
     :END:
@@ -722,7 +707,7 @@ that =swap()= is very fast and doesn't throw an exception.
 The standard library =std::swap()= is implemented as three move
 operations.
 
-*** =hash<>=
+**** =hash<>=
     :PROPERTIES:
     :CUSTOM_ID: hash
     :END:
@@ -758,25 +743,7 @@ conceivable need and technique; in that direction lies inelegance and
 code bloat. Instead, start with one -- and preferably more -- concrete
 examples from real use and try to eliminate inessential details.
 
-** (C++20) Constrained Template Arguments, concepts
-   :PROPERTIES:
-   :CUSTOM_ID: c20-constrained-template-arguments-concepts
-   :END:
-
-=template <Element T>= prefix is C++ version of mathematical "for all T
-such that Element(T)", where =Element=, called a /concept/, is a
-predicate that checks whether =T= has all the properties required. A
-concept is about semantics.
-
-#+BEGIN_SRC C++
-    template<Sequence Seq, Number Num>
-        requires Arithmetic<Value_type<Seq>,Num>
-    Num sum(Seq s, Num n);
-#+END_SRC
-
-TODO (not yet fully supported by GCC)
-
-** Value Template Arguments
+*** Value Template Arguments
    :PROPERTIES:
    :CUSTOM_ID: value-template-arguments
    :END:
@@ -797,7 +764,7 @@ TODO (not yet fully supported by GCC)
     buffer<char, 1024> glob;
 #+END_SRC
 
-** (C++17) template parameter deduction from constructors arguments.
+*** (C++17) template parameter deduction from constructors arguments.
    :PROPERTIES:
    :CUSTOM_ID: c17-template-parameter-deduction-from-constructors-arguments.
    :END:
@@ -831,12 +798,12 @@ A deduction guide can be added after declaration.
 The effects of deduction guides are often subtle, so it is best to
 design class templates so that deduction guides are not needed.
 
-** Parameterized Operations
+*** Parameterized Operations
    :PROPERTIES:
    :CUSTOM_ID: parameterized-operations
    :END:
 
-*** Function Templates
+**** Function Templates
     :PROPERTIES:
     :CUSTOM_ID: function-templates
     :END:
@@ -863,7 +830,7 @@ design class templates so that deduction guides are not needed.
 
 A function template can be a member function, but not a virtual member.
 
-*** Function Objects (functor)
+**** Function Objects (functor)
     :PROPERTIES:
     :CUSTOM_ID: function-objects-functor
     :END:
@@ -891,7 +858,7 @@ A function template can be a member function, but not a virtual member.
     }
 #+END_SRC
 
-*** Lambda Expressions
+**** Lambda Expressions
     :PROPERTIES:
     :CUSTOM_ID: lambda-expressions
     :END:
@@ -958,12 +925,12 @@ Using a lambda, we can turn any statement into an expression.
     };
 #+END_SRC
 
-** Template Mechanisms
+*** Template Mechanisms
    :PROPERTIES:
    :CUSTOM_ID: template-mechanisms
    :END:
 
-*** Variable Templates: values dependent on a type
+**** Variable Templates: values dependent on a type
     :PROPERTIES:
     :CUSTOM_ID: variable-templates-values-dependent-on-a-type
     :END:
@@ -981,7 +948,7 @@ We can use arbitrary expressions of suitable type as initializers.
     auto acc = external_acceleration<float>;
 #+END_SRC
 
-*** Type aliasing
+**** Type aliasing
     :PROPERTIES:
     :CUSTOM_ID: type-aliasing
     :END:
@@ -1001,7 +968,7 @@ some or all template arguments.
     String_map<int> m;     // m is a Map<string,int>
 #+END_SRC
 
-*** (C++17) Compile-time =if=
+**** (C++17) Compile-time =if=
     :PROPERTIES:
     :CUSTOM_ID: c17-compile-time-if
     :END:
@@ -1021,7 +988,7 @@ some or all template arguments.
 
 Only the selected branc hof an =if constexpr= is instantiated.
 
-*** Variadic Templates
+**** Variadic Templates
     :PROPERTIES:
     :CUSTOM_ID: variadic-templates
     :END:
@@ -1054,7 +1021,7 @@ Here =Tail= is a parameter pack.
 The recursive implementation can be surprisingly expensive in compile
 time.
 
-*** (C++17) Fold Expressions
+**** (C++17) Fold Expressions
     :PROPERTIES:
     :CUSTOM_ID: c17-fold-expressions
     :END:
@@ -1105,14 +1072,14 @@ Convert a sequence of values of different types into a vector.
     aut x = to_vector<double>(1, 2.0, 3, 'a');
 #+END_SRC
 
-*** Forwarding Arguments
+**** Forwarding Arguments
     :PROPERTIES:
     :CUSTOM_ID: forwarding-arguments
     :END:
 
 Perfect forwarding
 
-** Template Compilation Model
+*** Template Compilation Model
    :PROPERTIES:
    :CUSTOM_ID: template-compilation-model
    :END:
@@ -1131,3 +1098,53 @@ instantiation-time type checking provided for templates checks the use
 of arguments in the template definition. This provides a compile-time
 variant of what is often called duck typing. What is done at compile
 time using templates mostly does not involve objects, only values.
+
+
+* C++20/23
+
+** Modules (C++20)
+  :PROPERTIES:
+  :CUSTOM_ID: modules-c20
+  :END:
+
+=export= ing and =import= ing certain part of a source file as part of the
+interaface finally become possible.
+
+#+BEGIN_SRC C++
+    //file Vector.cpp
+
+    module;
+    export module Vector;
+    export class Vector {
+    // definitions and declarations go here
+    };
+
+    //file user.cpp
+    import Vector;
+    #include <cmath>
+
+    //...
+#+END_SRC
+
+A module is compiled only once; two modules can be imported in either
+order without chaning their meaning; =import= is not transitive: a
+module is not imported automatically in a chain of =import= s.
+
+
+** Constrained Template Arguments, concepts
+   :PROPERTIES:
+   :CUSTOM_ID: c20-constrained-template-arguments-concepts
+   :END:
+
+=template <Element T>= prefix is C++ version of mathematical "for all T
+such that Element(T)", where =Element=, called a /concept/, is a
+predicate that checks whether =T= has all the properties required. A
+concept is about semantics.
+
+#+BEGIN_SRC C++
+    template<Sequence Seq, Number Num>
+        requires Arithmetic<Value_type<Seq>,Num>
+    Num sum(Seq s, Num n);
+#+END_SRC
+
+TODO (not yet fully supported by GCC)
