@@ -1340,6 +1340,7 @@ but they may be overridden by applications in raw mode (Bash).
 - =^Z=: the terminal =susp= setting (sending =SIGTSTP=)
 - =^\=: the terminal =quit= setting (sending =SIGQUIT=)
 
+To use Readline functions without binding: =M-x= works outside Emacs.
 
 *** Edit
 
@@ -1375,6 +1376,11 @@ Supposedly, one should set a mark and use some other region-related commands to 
 
 - =C-X C-E=: invoke the =edit-and-execute-command= function using editors
   in =$VISUAL=, =$EDITOR= or =emacs=
+
+*** Completions
+
+- =possible-completions= (=M-?=) and =insert-completions= (=M-*=)
+  + not something defined in Emacs
 
 * Developing Good Scripts
 
