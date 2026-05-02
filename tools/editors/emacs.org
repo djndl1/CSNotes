@@ -301,6 +301,8 @@ Completion styles are loaded using =completion-styles=
   + a region may be deactivated. To deactivate a region, use =C-g=;
     to activate a region, use =C-x C-x= (=exchange-point-and-mark=),
     it also switches between the cursor and the mark.
+  + by default (=transient-mark-mode=) this region is highlighted and some commands
+    begin to operate on the region.
 
 - *Mark*: the initially starting end of the selected region.
 
@@ -318,10 +320,12 @@ Completion styles are loaded using =completion-styles=
 - =C-SPC=: set the mark at point, enter the mark mode. Hit twice to simply set a mark
   without marking a region.
 
-- =SHIFT=-selection together with certain cursor motion commands: =S-M-f=
+- Other region selection:  =SHIFT=-selection together with certain cursor motion commands
+  + e.g.  =S-M-f=
 
-- =M-@=: move mark to the end of the next word;
+- =M-@=: move mark to the end of the next word; 
   =C-M-@=: mark to the end of following balanced expression.
+  + not compatible with =M-SPC=, under =M-@= other movements cannot be used.
 
   Many commands that insert text set the mark at the other end of the inserted text
   without activating it.
@@ -338,7 +342,7 @@ saving to a register, saving to a buffer or a file.
 
 - =M-%=: =query-replace=, query whether to replace and replace if yes.
 
-- =C-x TAB=: indent
+- =C-x TAB=: indent regions
 
 * Killing And Moving Text
 
@@ -350,7 +354,14 @@ Killing also copies text to the system's clipboard.
 
 ** Deletion
 
-- Delete blanks: =M-\= (delete whitespaces around point), =M-SPC= (delete all but =just-one-space=), =M-^=: move the current line up by deleting the previous newline, while =C-x C-o=: deletes the next newline of the current line.
+- Delete blanks: =M-\= (delete whitespaces around point), 
+  =M-SPC= (delete all but =just-one-space=), 
+  =M-^=: move the current line up by deleting the previous newline, 
+  while =C-x C-o=: =delete-blank-lines= deletes all the blank lines after the current line,
+  and preceding blank lines if the current one is blank, leaving only one blank line.
+
+Real deletion commands, which does not save the text in the kill ring does exist in Emacs, 
+typially starting with =delete-=.
 
 ** Killing
 
@@ -358,31 +369,79 @@ Killing also copies text to the system's clipboard.
 
 - =C-S-backspace=: =kill-whole-line=, works with arguments.
 
-- =C-w=: =kill-region=; =M-w=; =M-d=: =kill-word=; =M-BACKSPACE=: =backward-kill-word=;
+- =C-w=: =kill-region=; 
 
-- =C-M-k=: =kill-sexp=
+- =M-d=: =kill-word=; =M-BACKSPACE=: =backward-kill-word=;
+
+- =C-x <DEL>=: =backward-kill-sentence=
+
+- =M-k=: =kill-sentence=
+
+- =C-M-k=: =kill-sexp=, Kill the following balanced expression
 
 - =M-z char=: =zap-to-char= (kill to the next occurrence of the character).
+
+- =zap-up-to-char= does not include the target char.
+
+- Two or more kill commands in a row combine their text into a
+  single entry, so that a single =C-y= yanks all the text as a unit, just
+  as it was before it was killed. 
+  +  A kill command following ‘M-w’ (‘kill-ring-save’) does not append to
+  the text that ‘M-w’ copied into the kill ring.
+  + Commands that kill forward from point add onto the end of the
+    previous killed text.  Commands that kill backward from point add text
+    onto the beginning. This means one need not to be at beginning or end of 
+    a region to kill text in the original order: simply alternate between a pair
+    of commands that kill forwards and backwards.
+  + to force kill-append, use =C-M-w= (=append-next-kill=)
+
 
 ** Yanking
 
 Emacs respects the system's clipboard.
 
-- =C-y= (with arguments earlier kills are inserted), =M-y= (=yank-pop=, choose from the kill ring).
+- =C-y= (with arguments earlier kills are inserted)
+  + =C-u C-y=: after yanking the cursor is at the start of the inserted text.
+
+- =M-y=: =yank-pop=
+  + if the previous command is yanking, the yanked text is replaced by a previous entry in
+    in the kill ring each time =yank-pop= called.
+    In short =yank-pop= changes the just-yank pointer permanently for
+    the remainder of that editing experience.
+  + otherwise, =yank-from-kill-ring= (shows a menu)
 
 - =C-M-w= + kill command: kill the text and append/prepend it to the previous kill entry.
 
 - =mouse-yank-primary=: yanks the primary selection under X. The secondary selection of X is rarely used.
 
-- =append-to-buffer=, =prepend-to-buffer=, =copy-to-buffer= (destroy and copy), =insert-buffer=, =append-to-file=
+** Transfer between Buffers
+
+- =append-to-buffer=, =prepend-to-buffer=: relative the target buffer's cursor (not the buffer's
+  beginning/end).
+  + the text is put before the cursor for appending and after the cursor for prepending 
+    so that the cursor is always at the same relative position (precondition maintained).
+
+- =copy-to-buffer=: destroy the target buffer's text and copy the source region
+
+- =insert-buffer= (=C-x x i=): insert the source buffer after the cursor
+
+- =append-to-file=: append the region to a file
 
 ** Rectangles
 
-There are two ways to do rectangle operations.
+Rectangle commands are what Vim's visual-block mode does. There are two ways to do rectangle
+operations:
 
-- The Rectangle commands, starting with =C-x r=: =C-x r k=, =C-x r M-w=, etc.
+- The user sets the mark at one corner and then move the cursor to the opposite corner
+  and then use the Rectangle commands (the region is not highlighted), starting with 
+  =C-x r=: kill, copy, delete, yank, push to the right, insert line numbers, clear with whitespaces, delete whitespace
+  rectangle, replace, delete whitespaces
+  + use =C-x r t= on a zero-column region to enter text.
+  + the kill ring is specific to rectangle commands
 
-- Enter the rectangle mark mode with =C-x SPC= and use normal commands.
+- (more intuitive and more comparable to Vi's visual block mode) Enter the rectangle mark mode with
+  =C-x SPC= and use normal commands.
+  + the kill ring is the same as in normal mode
 
 * Register
 
