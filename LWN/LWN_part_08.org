@@ -1,0 +1,23 @@
+# format: <line>#<hash>#<anchor>|<content>
+# use refs exactly as shown in hashline edit/patch tools
+#HL REV:NEWFILE08V2
+* LWN Articles
+#+OPTIONS: ^:{}
+
+This file contains notes on interesting LWN.net articles.
+
+**Format:**
+- [[article_link][article_title]]: article_summary
+
+**Contents:**
+
+** Part 08 (Technical Articles - Filtered)
+
+- [[https://lwn.net/Articles/787636/][get_user_pages(), pinned pages, and DAX]]: LSFMM 2019 discussion on problems with get_user_pages() and DAX persistent memory, focusing on handling pinned pages during truncate/hole-punch operations; options discussed include SIGBUS, failing operations, or implementing lease mechanisms for page revocation.
+- [[https://lwn.net/Articles/787629/][How to get rid of mmap_sem]]: LSFMM 2019 session on replacing the mmap_sem lock with maple trees, range locks, and per-VMA locking to improve scalability; multiple approaches discussed but no consensus on the best path forward.
+- [[https://lwn.net/Articles/787705/][The memory-management subsystem development process]]: LSFMM 2019 session with Andrew Morton on patch review processes, the role of -mm tree, and calls for better topic branches and more standardized development workflow for memory management patches.
+- [[https://lwn.net/Articles/787740/][Alignment guarantees for kmalloc()]]: LSFMM 2019 discussion on tightening kmalloc() alignment guarantees for power-of-two sizes, ensuring natural alignment even with SLUB debugging enabled, to prevent surprising behavior for developers who come to depend on implicit alignment.
+- [[https://lwn.net/Articles/787748/][Improving access to physically contiguous memory]]: LSFMM 2019 session on methods to improve allocation of large physically contiguous memory chunks for huge/gigantic pages and high-bandwidth devices, discussing khugepaged, CMA, and page-exchange defragmentation approaches.
+- [[https://lwn.net/Articles/787754/][Memory management for 400Gb/s interfaces]]: LSFMM 2019 discussion on challenges of keeping the kernel page cache and memory management subsystem ahead of 400Gb/s network interfaces; CPU/memory bandwidth gaps, XDP, DAX, and future terabit-stream requirements.
+- [[https://lwn.net/Articles/787454/][Firefox bug disables all extensions]]: Brief note on the May 2019 incident where an expired extension signing certificate caused all Firefox add-ons to be disabled, with hotfix being rolled out via Studies mechanism.
+- [[https://lwn.net/Articles/787315/][Netdev 0x13 slides and papers]]: Announcement that slides and papers from Netdev 0x13 (March 20-22, 2019) are now available online, with videos to follow.
