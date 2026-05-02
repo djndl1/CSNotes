@@ -512,29 +512,40 @@ TODO
 
 By /incremental/, it means the user do no have to type the entire search string
 before any searching and matching takes place.
+- /Search ring/: previously searched strings are saved in the /search ring/, which can be
+    retrieved with =isearch-ring-retreat= and =isearch-ring-advance= (=M-p= and =M-n=).
 
-- =isearchx-forward=, =isearch-backward= :: the search ends with a =RET= (=isearch-exit=) when the
+- =isearch-forward=, =isearch-backward= :: the search ends with a =RET= (=isearch-exit=) when the
   user decides that the target item is found. =isearch-cancel= or
   =isearch-abort= abandon the search and returns to the original point.
   + the original point is marked after exiting the search. =C-u C-SPC= goes back
     to the previous mark.
-  + double type searches the previous item.
+  + double type restarts the previous search.
   + forward and backward search can switch to each other without changing the
     keyword.
-  + Previously searched strings are saved in the /search ring/, which can be
-    retrieved with =isearch-ring-retreat= and =isearch-ring-advance=.
-  + =isearch-yank-word-or-char=, =isearch-yank-symbol-or-char=, =isearch-yank-line= appends the next
-    word/rest of the line at point to the current search string.
+  + to search the text at point: =isearch-yank-word-or-char= (=C-w=), =isearch-yank-symbol-or-char=
+    (=C-M-w=), =isearch-yank-line= (=M-s C-e=) appends the next word/rest of the line at point to
+    the current search string. Or use =M-s M-.= (=isearch-forward-thing-at-point=) to search the
+    text at point.
+  + to search the text just copied/killed: =isearch-yank-kill= (=C-y=) and =isearch-yank-pop= (=M-y=)
   + =isearch-forward-thing-at-poinit= searches the thing found near point.
   + =M-e= edit the search string during searching, =C-M-d= deletes the current
     search string.
   + =M-c= changes case sensitivity.
   + =M-r= toggles regex search, or with =isearch-forward/backword-regexp=. Regex
     search has independent defaults, search rings.
+  + =M-s _= to toggle symbol mode
   + =C-h C-h= for help during searching.
+  + =M-s o= to invoke =isearch-occur= which runs =occur= with the current search string.
+  + =M-s h r= (=highlight-regexp=) leaves the search while leaving the matches highlighted.  
+    =M-s h u= (=unhighlight-regexp=) remoes the highlight. These two can be used independent of
+    isearch. 
   + =RET= with no search strings starts */nonincremental search/* (not of much
     use and inconvenient to use), or with
     =(re-)search-forward= and =(re-)search-backward=.
+  + =M-s M->= and =M-s M-<= goes to the last/first occurence.
+  + any command not specially meaningful in searches stops the searching and is then executed. 
+  + searching with a minibuffer is supported, but through the history (rather than a buffer).
 
 - =isearch-forward/backward-regexp= :: normally bound to =C-M-s=, use =Esc C-s= 
   when in terminal.
@@ -551,7 +562,6 @@ before any searching and matching takes place.
 - =isearch-forward/backward-symbol= :: the boundaries of the search must match
   the boundaries of a symbol. The meaning of symbol in this context depends on
   the major mode, and usually refers to a source code token.
-
 
 ** Grepping
 
