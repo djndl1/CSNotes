@@ -1357,6 +1357,11 @@ Company also supports searching candidates with =company-search/filter-candidate
 
 - =company-yasnippet= (buitin): based on YASnippet
 
+- =company-shell= (3rd party, code): providing completions for binaries that are found on
+  your =$PATH=
+  + candidates are cached in =company-shell--cache=. =company-shell-rebuild-cache= rebuilds the
+    cache.
+
 *** Troubleshooting
 
 - =company-diag=
@@ -1464,6 +1469,84 @@ A portable project interaction library for easy project management and navigatio
 - =dap-debug=: use a debug template to start the debugging
 
 - =dap-debug-edit-template=: prepare a template declaration inside a temporary buffer.
+
+** Eglot
+
+The built-in LSP client (since Emacs 29), with pre-configured for many popular language servers
+(=eglot-server-programs=).
+Most Eglot facilities are integrated into Emacs features, such as
+ElDoc, Flymake, Xref, and Imenu.
+The notion of a “project” used by Eglot is the same Emacs uses.
+
+*** Features
+
+- at-point documentation
+
+- flymake diagnostic annotations
+
+- find definitions vai Xref
+
+- buffer outline via Imenu
+
+- provide completion via CAPF
+
+- Automatic reformatting
+
+- Project management via Emacs built-in project management infrastructure to figure out which files
+  and buffers belong to what project. When Eglot starts a server program, it does so in the project’s root
+  directory, which is usually the top-level directory of the project’s directory hierarchy.
+  + All of the project’s file-visiting buffers under the same major-mode are served by a single
+    language-server connection. 
+
+*** Usage
+
+- To run LSP with eglot, run the =eglot= command. This adds the buffer to eglot's management 
+  based on its major mode and starts a language server if required.
+  + =eglot-reconnect= restats the server (not just the connection, tested).
+
+- stop LSP: =eglot-shutdown= 
+  + by default =eglot-autoshutdown= is =nil=: the server will not shutdown when the last buffer
+    served by that language server is killed.
+
+- configure workspaces: via the  =eglot-workspace-configuration= variable. It specifies the parameters and their values
+  to communicate to each language server which needs that.
+
+- Symbol Renaming =eglot-rename=
+
+- Symbol Definition and References: integrates with Xref
+  + =xref-find-definitions= (=M-.=)
+  + =xref-find-references= (=M-?=)
+
+- Navigation =imenu=
+
+- Format 
+  + =eglot-format=: reformats the active region
+  + =eglot-format-buffer=
+
+- Code Actions
+  + =eglot-code-actions=
+  + =eglot-code-action-*= family commands
+
+- Inlay hints (small text annotations to specific parts of the whole buffer)
+  =eglot-inlay-hints-mode=, enabled by default.
+
+- Documentation 
+  + =eldoc=
+
+- LSP-local keybindings: =eglot-mode-map=
+
+*** Troubleshooting
+
+- =eglot-events-buffer=: communication events with the language server
+
+- =eglot-stderr-buffer=: debug info printed by the language server to its standard error stream.
+
+- =eglot-forget-pending-continuations=: Forget pending requests for the server of the current buffer.
+
+- =eglot-signal-didChangeConfiguration=: updates the language server configuration according to
+  the current value of the variable =eglot-workspace-configuration=
+     
+- =eglot-clear-status=: Clear the last JSONRPC error for the server of the current buffer.
 
 ** Useful Language Servers
 
