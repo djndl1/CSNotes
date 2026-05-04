@@ -1287,6 +1287,50 @@ A minubuffer completion framework.
   + =counsel-find-library=
   + =counsel-git=, =counsel-git-grep=, =counsel-ag=, =counsel-locate=
 
+** Company
+
+A modular text completion framework. 
+
+- /Completion/: an act of intelligently guessing possible variants of words based on already typed
+  characters.
+
+- /Backend/: a function responsible for retrieving completion candidates
+  + =company-backends=
+  + Backends are tried one by one and the first applicable one is used for completion.
+    To the use the backends after the current one, call =company-other-backend= or just
+    call that backend's function (e.g =company-yasnippet=).
+
+- /Frontend/: a function that receives a command and acts accordingly to it: outputs candidates,
+  hides its output, refreshes displayed data, and so on.
+  + builtin: tooltip (popup), inline preview, echo in the echo area (documentation string or candidates),
+  + =company-frontends=
+
+*** Usage
+
+- =company-complete= the core function that triggers completion.
+
+- =company-indent-or-complete-common= should be bound to =<tab>=
+
+While the candidate is displayed:
+
+- In additional to traditional navigation, =M-Number= selects the Number-th candidate.
+
+- =<F1>= (=copany-show-doc-buffer=): candidate documentation in a temporary buffer
+
+- =C-w= (=company-show-location=): candidate definition in a temporary buffer
+
+Company also supports searching candidates with =company-search/filter-candidates=
+
+*** Common Backends
+
+- =company-capf= (builtin): integrates with the logic provided by =completion-at-point-functions=
+  (Emacs builtin)
+  + Probably the most of often used and recommended backend nowadays. Also relied on by LSP.
+
+*** Troubleshooting
+
+- =company-diag=
+
 ** Treemacs
 
 Managing directories as workspaces
