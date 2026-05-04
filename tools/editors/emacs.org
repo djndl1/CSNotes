@@ -29,7 +29,7 @@ and use this new one.
   + also for displaying the "minibuffer".
 
 - /Mode line/ :: the status line at the bottom.
-  + =**= modified modifiable buffer, =%*= modified readonly buffer, =%%= otherwise
+  + =**= modified modifiable buffer, =%*= modified read-only buffer, =%%= otherwise
   + =FN= the Nth 
 
 - /Menu Bar/ :: mouse-clickable or =F10=
@@ -51,7 +51,7 @@ and use this new one.
 Emacs does not assign meanings to keys directly: keys are bound to commands (functions).
 Customization depends on various /variables/.
 
-** Additionl Modifiers
+** Additional Modifiers
 
 #+begin_quote
 Even if your keyboard lacks these additional modifier keys, you can
@@ -172,7 +172,7 @@ TODO
 - =M-g <TAB>=: =move-to-column=
 
 - =M-g c=, =goto-char=: to the nth char in the buffer
-  + not of much use (probably only in diagostics)
+  + not of much use (probably only in diagnostics)
 
 - To navigate a line visually, set =line-move-visual= to =t=
 
@@ -262,11 +262,11 @@ Completion styles are loaded using =completion-styles=
 
 - =previous-history-element=, =next-history-element=, =list-command-history=
 
-- =C-x ESC ESC=: reexecute a recent minibuffer command
+- =C-x ESC ESC=: re-execute a recent minibuffer command
 
 * Help
 
-- =C-h a=: searches for commands =aprops-command=
+- =C-h a=: searches for commands =apropos-command=
 
 - =C-h b=: describe bindings =describe-bindings=
 
@@ -330,7 +330,7 @@ Completion styles are loaded using =completion-styles=
   Many commands that insert text set the mark at the other end of the inserted text
   without activating it.
 
-  There are also commands that [[info:emacs#Marking Objects][mark textual objects]]. Unlike norma CUA editors, activating a region and
+  There are also commands that [[info:emacs#Marking Objects][mark textual objects]]. Unlike Normal CUA editors, activating a region and
   inserting some text does not delete the region unless delete selection mode is enabled.
 
 ** Operating on the Region
@@ -361,7 +361,7 @@ Killing also copies text to the system's clipboard.
   and preceding blank lines if the current one is blank, leaving only one blank line.
 
 Real deletion commands, which does not save the text in the kill ring does exist in Emacs, 
-typially starting with =delete-=.
+typically starting with =delete-=.
 
 ** Killing
 
@@ -508,7 +508,7 @@ TODO
 :ID:       5d1a488b-cc8f-4c26-9de8-3b6daabcc142
 :END:
 
-** Incremental and Nonincremental Search
+** Incremental and Non-incremental Search
 
 By /incremental/, it means the user do no have to type the entire search string
 before any searching and matching takes place.
@@ -519,7 +519,8 @@ before any searching and matching takes place.
   user decides that the target item is found. =isearch-cancel= or
   =isearch-abort= abandon the search and returns to the original point.
   + the original point is marked after exiting the search. =C-u C-SPC= goes back
-    to the previous mark.
+    to the previous mark. Combined with search and match, this offers the same
+    functionality as Vim's =f=, =t= and =/= command.
   + double type restarts the previous search.
   + forward and backward search can switch to each other without changing the
     keyword.
@@ -538,12 +539,12 @@ before any searching and matching takes place.
   + =C-h C-h= for help during searching.
   + =M-s o= to invoke =isearch-occur= which runs =occur= with the current search string.
   + =M-s h r= (=highlight-regexp=) leaves the search while leaving the matches highlighted.  
-    =M-s h u= (=unhighlight-regexp=) remoes the highlight. These two can be used independent of
+    =M-s h u= (=unhighlight-regexp=) removes the highlight. These two can be used independent of
     isearch. 
-  + =RET= with no search strings starts */nonincremental search/* (not of much
+  + =RET= with no search strings starts */non-incremental search/* (not of much
     use and inconvenient to use), or with
     =(re-)search-forward= and =(re-)search-backward=.
-  + =M-s M->= and =M-s M-<= goes to the last/first occurence.
+  + =M-s M->= and =M-s M-<= goes to the last/first occurrence.
   + any command not specially meaningful in searches stops the searching and is then executed. 
   + searching with a minibuffer is supported, but through the history (rather than a buffer).
   + =nonincremental-search-forward/backward= with =C-r RET= =C-s RET=
@@ -617,7 +618,7 @@ Any shell command is allowed when grepping.
 
 ** Input
 
-- =insert-char=: insert unicode characters.
+- =insert-char=: insert Unicode characters.
 
 - various input methods.
   + =describe-input-method=
@@ -651,7 +652,7 @@ most of the time).
 
 =unix=, =dos= and =mac= indicates EOL marker schemes.
 
-=raw-text= show charaters as ASCII characters and byte values.
+=raw-text= show characters as ASCII characters and byte values.
 =no-conversion= does nothing to convert bytes to characters. Both set
 =enable-multibyte-characters= to =nil=.
 
@@ -886,7 +887,7 @@ Flycheck can have =lsp-mode= support and uses lsp as a backend.
 ** Compilation
 
 - =compile=, =recompile= :: basically starts a noninteractive subshell and run some custom
-  command and show the output in a special =*compilation*= buffer which cna
+  command and show the output in a special =*compilation*= buffer which can
   direct the user to where the error takes place.
 
 ** Debugging
@@ -1299,6 +1300,13 @@ A modular text completion framework.
   + Backends are tried one by one and the first applicable one is used for completion.
     To the use the backends after the current one, call =company-other-backend= or just
     call that backend's function (e.g =company-yasnippet=).
+  + A sublist inside =company-backends= groups backends together to provide completion candidates.
+    - =:separate=: separates the results from different backends in the group
+    - =:with=: the backend(s) after =:with= is auxilliary and tried only if the primary succeeds.
+      #+begin_quote
+If the group contains keyword ‘:with’, the backends listed after this keyword are ignored for the
+purpose of the ‘prefix’ command
+      #+end_quote
 
 - /Frontend/: a function that receives a command and acts accordingly to it: outputs candidates,
   hides its output, refreshes displayed data, and so on.
@@ -1327,9 +1335,49 @@ Company also supports searching candidates with =company-search/filter-candidate
   (Emacs builtin)
   + Probably the most of often used and recommended backend nowadays. Also relied on by LSP.
 
+- =company-dabbrev-code= (builtin, code): similar to the Emacs builtin package =dabbrev=.
+
+- =company-keywords= (builtin, code): completions for language keywords
+
+- =company-clang=: (builtin, code) the clang CLI driver without any advanced caching across calls or project
+  structure detection, not suitable for large projects.
+
+- =company-etags= (builtin, code)
+
+- =company-cmake= (buitin, coed): for CMake
+
+- =company-dabrrev= (builtin, text): searching for completion candidates inside the contents of the open
+  buffers.
+  
+- =company-ispell= (builtin, text): based on an ispell dictionary
+
+- =company-files= (buitin): based on the directory structure and paths.
+
+- =company-abbrev= (buitin): word abbreviation
+
+- =company-yasnippet= (buitin): based on YASnippet
+
 *** Troubleshooting
 
 - =company-diag=
+
+** Yasnippet
+
+A template system.
+
+Snippets are stored as text files in the directories named after Emacs major mode under
+=yas-snippet-dirs= (by default =$HOME/.emacs.d/snippets/=)
+
+Some modes may share snippets with each other (C with C++), use a =.yas-parents= file to
+specify peer modes.
+
+*** Usage
+
+Enable =yas-minor-mode= or =(yas-global-mode 1)=
+
+- =yas-insert-snippet=
+
+- =yas-expand=
 
 ** Treemacs
 
