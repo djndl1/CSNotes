@@ -843,23 +843,31 @@ Emacs at any time uses only one /selected/ tags table.
 
 ** Linting
 
-*** =flymake-mode= On-The-Fly Syntax Checking (Make On-The-Fly to Check)
+*** =flymake-mode= (Builtin-in) On-The-Fly Syntax Checking (Make On-The-Fly to Check)
 
 #+begin_quote
 Flymake collects diagnostic information from multiple sources,
 called backends, and visually annotates the buffer with the
 results.
 
-It periodically compiles an active buffer when the minor mode is enabled, and then flags or highlights lines that cause errors or warnings during the compile as you edit.
+It periodically compiles an active buffer when the minor mode is enabled, and then flags or
+highlights lines that cause errors or warnings during the compile as you edit.
 #+end_quote
 
-The overall approach is primitive, compared to integration with a language parser
-or a linter.
+Aside from various primitive backends, it now integrates with eglot to provide LSP diagnostics.
 
-Only a few languages are supported with builtin checkers (mostly compilers). A few third-party
-checkers are available.
+*** Usage
 
-The buffer-checking service is done via the hook =flymake-diagnostic-functions=.
+- =flymake-show-buffer-diagnostics=, =flyamek-show-project-diagnostics= or click the left fringe or
+  the mode line.
+
+*** Troubleshooting
+
+- The commands =flymake-reporting-backends=, =flymake-running-backends=
+  and =flymake-disabled-backends= show the backends currently used and
+  those which are disabled.
+
+- =*Flymake log*=
 
 *** [[https://www.flycheck.org/en/latest/index.html][Flycheck]] Syntax Checker
 
