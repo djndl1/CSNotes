@@ -1227,7 +1227,16 @@ TODO
 
 ** TRAMP: Transparent Remote Access Multiple Protocol
 
-=/method:user@host:/path/to/file=
+#+begin_quote
+The commands ‘flymake-reporting-backends’, ‘flymake-running-backends’
+and ‘flymake-disabled-backends’ show the backends currently used and
+those which are disabled.
+...
+TRAMP temporarily transfers a remote file’s contents to the local
+host editing and related operations.
+#+end_quote
+
+Initiate =find-file= and enter =/method:user@host:/path/to/file=.
 
 #+begin_src
 /smb:user%domain@host:/path/to/file # windows SAMBA
@@ -1238,17 +1247,32 @@ TODO
 
 Supports ssh, telnet, samba, GVFS, FUSE, Android adb
 
-- *inline methods*: use the same login connection to transfer file contents
-  + ssh, telnet, su, sudo, plink
+- *inline methods*: use the same login connection to transfer file contents (dependening on some
+  external encoding programs =tramp-remote-coding-commands=).
+  + quick and easy for small files
+  + ssh, telnet, su, sudo, plink, sshx (ssh with special commands to force a pseudoterminal),
+    docker, podman, kubernetes
 
 - *external methods*: operate over multiple channels
-  + rcp, scp, rsync, fcp, ftp, smb
-  + GVFS: atp, dav(s), gdrive, mtp, nextcloud, sftp
-  + FUSE: sshfs
-  + docker, kubernetes, magit, hdfs,vagrant
+  + rcp, scp, rsync, fcp, ftp, smb (=$$= for =$= in paths, =user%domain@host=), nc (telnet + nc, for routers or NAS hosts)
+  + GVFS (=tramp-gvfs-enabled=, =tramp-gvfs-methods=): atp, dav(s), gdrive, mtp, nextcloud, sftp
+  + FUSE: sshfs, rclone
+  + dockercp, podmancp, kubernetes, magit, hdfs, vagrant
 
-- Some useful options
-  + =tramp-remote-path=
+*** =su=, =sudo= and Others
+
+TRAMP is not only used for remote connections.
+
+*** Remote Processes (e.g. Language Server)
+
+TRAMP supports starting new running processes on the remote host for discovering remote file
+names (not for every connection method: GVFS, ftp).
+Emacs packages on the remote host need no specific modifications for TRAMP’s use.
+
+- =tramp-remote-path=: remote executable paths for TRAMP (not the real =PATH= environment variable)
+  
+- =winexe= (part of Samba) is used to run remote Windows processes. The remote host needs to have
+  PowerShell 2.0.
 
 ** CC Mode
 
