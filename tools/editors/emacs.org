@@ -445,36 +445,59 @@ operations:
 
 * Register
 
-- *Register*: positions, text, rectangles, numbers, windows configurations,
-  a file name are saved for later use.
+- *Register*: where positions, text, rectangles, numbers, windows configurations,
+  file names are saved for later use.
+  + named after a alphanumberic character (case-sensitive).
+  + Unlike Vim, Emacs has both registers and kill rings.
 
 - *Bookmark*: records files and positions.
 
+** View Registers
+
+- =view-register=
+
 ** Saving Positions
 
-- =C-x r SPC a=: =point-to-register= record the position of point and the current buffer in register =a=
+Saving position for a later jump. Like Vim's marks, not the Emacs' mark ring.
 
-- =C-x r j a=: =jump-to-register= =a=
+- =C-x r SPC RegisterName=: =point-to-register= record the position of point and the current buffer in register =RegisterName=
+
+- =C-x r j RegisterName=: =jump-to-register= =RegisterName=
 
 ** Saving Text
 
-- =C-x r s r=: =copy-to-register=; =append-to-register=, =prepend-to-register=
+- =C-x r s RegisterName=: =copy-to-register=, copies the text of the region into the register.
 
-- =C-x r i r=: =insert-register=
+- =append-to-register=
+
+- =prepend-to-register=
+
+- =C-x r i RegisterName=: =insert-register=: insert the content of =RegisterName= at point
 
 ** Saving Rectangles
 
-- =C-x r r r=: =copy-rectangle-to-register=
+- =C-x r r RegisterName=: =copy-rectangle-to-register=
 
-- =C-x r i r=: =insert-register=
+- =C-x r i RegisterName=: =insert-register=
+
+** Saving File/Buffer Names
+
+- =(set-register R '(file . Name))=
+
+- then run =C-x r j R= to jump to the file.
+
+** Saving Keyboard Macros
+
+- =kmacro-to-register= (=C-x C-k x=) saves the current keyboard macro for later use.
 
 ** Bookmarks
 
-- =C-x r m RET=:set the bookmark for the visited file at point.
+Persisted position records for later restoration. There is a default bookmark file
+(=bookmar-default-file=) that various bookmark commands use to save bookmarks to.
 
-- =C-x r m bookmark RET=: =bookmark-set=
+- =C-x r m RET= (=bookmark=set=): set the bookmark for the visited file at point.
 
-- =C-x r b bookmark RET=: =bookmark-jump=
+- =C-x r b bookmark RET=: =bookmark-jump= jump to the bookmark
 
 - =C-x r l=: =list-bookmarks=
 
