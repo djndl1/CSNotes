@@ -1200,30 +1200,43 @@ A project is a collection of files used for producing one or more programs.
 Two backends [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Version-Control.html][VC]] and [[https://www.gnu.org/software/emacs/manual/html_node/emacs/EDE.html][Emacs Development Environment]] determine whether a directory
 is a /project root/.
 
-
 ** Commands
 
-- =project-find-file=, =project-find-regexp=, =project-search= ::
+- =project-find-file= (=C-x p f=)
 
-- =project-dired= ::
+- =project-find-dir= (=C-x p d=): it really just finds a directory
 
-- =project-vc-dir= ::
+- =project-find-regexp= (=C-x p g=): search for a pattern in all files in the project
 
-- =project-eshell=, =project-shell= ::
+- =project-query-replace-regexp= (=C-x p r=)
 
-- =project-compile= ::
+- =project-search=:
 
--  =project-shell-command=, =project-async-shell-command= ::
+- =project-dired= (=C-x p D=): open dired in the current project
 
-- =project-switch-to-buffer= ::
+- =project-vc-dir=:
 
-- =project-kill-buffers= ::
+- =project-eshell=, =project-shell=:
 
-- =project-switch-project=, =project-forget-project= ::
+- =project-compile= (=C-x p c=): run a compilation commands
+
+- =project-shell-command=, =project-async-shell-command=:
+
+- =project-switch-to-buffer= (=C-x p b=): switch an open buffer in the project
+
+- =project-list-buffers= (=C-x p C-b=): list buffers that belong to the project
+
+- =project-kill-buffers=: kill all live buffers that belong to the current project
+
+- =project-switch-project= (=C-x p p=)
+
+- =project-forget-project=: remove a project from =project-list-file=
+
+- =project-any-command= any Emacs command in the current project  
 
 ** Emacs Development Environment
 
-Not used much, not recommended.
+Not used anymore with LSP, mostly used for C/C++, not recommended.
 
 #+begin_quote
 A package that simplifies the task of creating, building and debugging large
