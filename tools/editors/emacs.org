@@ -1115,17 +1115,18 @@ common operations in many version control operations.
 
 ** Emacs VC Concepts
 
-- /Registration/, /register/: the state of a file  under version control
+- /Registration/, /register/: the state of a file under version control.
+  In Git parlance, "track".
 
 - /Repository/: where the present state and the change history of the files are
-  stored
+  stored, not just the files stored there.
 
 - /log entries/: change description
 
 - /work file/: the current version of the file being worked on; a directory of
   work files is a /working tree/.
 
-- /commit/ , /check in/: a change is recorded in the repository.
+- /commit/, /check in/: a change is recorded in the repository.
 
 - /revision/: a commit/check-in creates a revision.
 
@@ -1138,10 +1139,12 @@ common operations in many version control operations.
   + Experience has shown that merging is superior to locking, both in
     convenience to developers and in minimizing the number and severity of
     conflicts that actually occur.
-  + Older lock-based systems use the terms "check in" and "check out".
+  + Older lock-based systems use the terms "check in" (commit) and "check out" (update).
 
 - /Changeset-based/ and /file-based/: how changes are organized as a unit. Newer
   systems are changeset-based and allow for more flexible control.
+  + SCCS, RCS, CVS and other early VCS handles changes per file.
+  + Changeset-based version control is more flexible and powerful than file-based version control.
 
 - /Decentralized/ and /Centralized/: in a decentralized VCS, a project may have
   several different repositories. Different repositories can be merged to
@@ -1150,35 +1153,43 @@ common operations in many version control operations.
 
 ** Basic Operations
 
-- =vc-next-action= :: confusing command but unavoidable.
+- =vc-next-action= (=C-x v v=): confusing command but unavoidable.
+  + a multi-purpose command, the most appropriate action on the current VC fileset:
+    registering, committing (=*vc-log*=)
+  + in a file-visiting buffer, in a Dired buffer or in a VC directory buffer.
 
-- =vc-register= :: register the file in the repository
+- =vc-register= (=C-x v i= =git add=): register the file in the repository
 
-- =vc-diff=, =vc-ediff=, =vc-root-diff= :: compare two revisions. Without a prefix argument, it defaults to
-  the work files and the last revision.
+- =vc-diff= =C-x v ==, =vc-ediff=, =vc-root-diff= (=C-x v D= compare the entire working tree): 
+  compare two revisions. Without a prefix argument, it defaults to the work files and the last
+  revision.
 
-- =vc-revision-other-window= :: show a revision of the current file in another
+- =vc-revision-other-window=: show a revision (commit) of the current file in another
   window
 
-- =vc-annotate= :: for each line, show the latest revision in which it was
+- =vc-annotate= (=C-x v g= =git annotate/blame=): for each line, show the latest revision in which it was
   modified.
 
-- =vc-print-log=, =vc-print-root-log=, =vc-log-incoming=, =vc-log-outgoing=, =vc-region-history= ::
+- =vc-print-log= (=C-x v l= the current fileset), =vc-print-root-log= (=C-x v L= the current
+  repository), =vc-print-branch-log= (=C-x v b l= a certain branch),
+  =vc-log-incoming= (compared with new changes made by a pull operation),
+  =vc-log-outgoing= (changes that will be sent by a push operation),
+  =vc-region-history= (with the history of changes made in the region)
+  
+- =vc-revert=: revert the work file to its last revision.
 
-- =vc-revert= :: revert the work file to its last revision.
+- =vc-ignore=: ignore a file under the current VCS.
 
-- =vc-ignore= :: ignore a file under the current VCS.
+- =vc-retrieve-tag=: check out a branch or a tagged revision
 
-- =vc-retrieve-tag= :: check out a branch or a tagged revision
+- =vc-create-tag=: create a tagged revision. With a prefix argument, creates a branch.
 
-- =vc-create-tag= :: create a tagged revision. With a prefix argument, creates a branch.
+- =vc-delete-file=, =vc-rename-file=:
 
-- =vc-delete-file=, =vc-rename-file= ::
-
-- =vc-push=, =vc-update= :: push/pull; =vc-push= does not exist in a centralized
+- =vc-push=, =vc-update=: push/pull; =vc-push= does not exist in a centralized
   VCS, where a changeset commit includes a push.
 
-- =vc-merge= :: merge changes from another branch into the current one.
+- =vc-merge=: merge changes from another branch into the current one.
 
 ** VC Directory Mode
 
