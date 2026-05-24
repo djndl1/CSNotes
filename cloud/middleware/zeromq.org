@@ -2,7 +2,7 @@
 
 High-performance asynchronous messaging library used in distributed or
 concurrent applications that provides a message queue without having to run a
-dedicated message broker.
+dedicated message broker by extending the standard socket interfaces.
 
 - common messaging patterns
   + publish-subscribe:
@@ -12,10 +12,220 @@ dedicated message broker.
       on the transport.
   + request-reply: the classic client/server RPC model
 
-- transports:
-  + TCP
-  + UDP
-  + In-processs
-  + Inter-process
-  + multicast: PGM, EPGM
-  + WebSocket
+* Concepts
+
+- /messages/: discrete unit of datas passed between applications 
+  or components of the same application.
+  + opaque binary data from the POV of ZMQ.
+
+- /socket/: ZMQ sockets present an abstraction of an asynchronous message queue, with the exact
+  queueing semantics depending on the socket type in use.
+  #+begin_quote
+       0MQ sockets being asynchronous means that the timings of the physical
+       connection setup and tear down, reconnect and effective delivery are
+       transparent to the user and organized by 0MQ itself. Further, messages
+       may be queued in the event that a peer is unavailable to receive them.
+  #+end_quote
+  + not TCP/UDP sockets but message queues.
+  + ZMQ sockets may be connected to multiple endpoints using
+    =zmq_connect()=, while simultaneously accepting incoming connections from
+    multiple endpoints bound to the socket using =zmq_bind()=, thus allowing
+    many-to-many relationships.
+  + /mute state/: a state where a socket can no loger process outgoing messages.
+    - high-water mark reached, no connection is established or no available peers.
+    - messages may be dropped or operations will block dependening on the socket's type.
+    
+- /context/: list of sockets, the async I/O thread and internal queries.
+  + thread-safe. Individual ZMQ sockets are not thread safe
+
+- /transport/: underlying transport mechanisms
+  + TCP: first choice. The user can specify a source socket before the destination socket
+    =tcp://source;destination=.
+  + UDP: used with only =ZMQ_RADIO= and =ZMQ_DISH= socket types.
+    The radio connects to the dishes and distributes the data.
+  + In-processs: messaging via memory directly between threads. No I/O threads are involved and
+    not allowed. =inproc://arbitrary_custom_endpoint_name=
+  + Inter-process: based on Unix domain sockets.
+  + multicast: PGM, EPGM (experimental transport protocols over IP networks)
+  + WebSocket (ZWS) maps ZeroMQ to websocket.
+  + even VMCI (Virtual Machine Communication Interface)
+
+- /Proxies/: a tunnel that connects ZMQ sockets. 
+  + used to create fanout and fan-in topologies
+
+- /Security/
+  + null
+  + plain text with username and password
+  + elliptic curve authentication and encryption (?)
+  + CURVE keypair in armored text format (?)
+  + Derive a CURVE public key from a secret key (?)
+  + Converting keys to/from armoured text strings.
+
+** High-Water Mark Mechanism & Mute State
+
+TODO
+
+** Messaging Patterns and Socket Types
+
+*** Client-Server (=ZMQ_CLIENT= and =ZMQ_SERVER=, In Draft)
+
+A single =ZMQ_SERVER= talk to one or more =ZMQ_CLIENT= clients bidirectionally.
+The client always starts the session, after which either peer can send messages asynchronously,
+ to the other.
+
+- =ZMQ_CLIENT=
+  + bidirectional
+  + If the buffer is full or the transport protocol is set to =ZMQ_IMMEDIATE=, 
+    =send= will block.
+  + it can connects to multiple =ZMQ_SERVER= sockets and send messages on a round-robin basis.
+  + thread-safe
+
+- =ZMQ_SERVER=: a server can only reply to an incoming message.
+
+*** Radio-dish (In Draft)
+
+#+begin_quote
+       The radio-dish pattern is used for one-to-many distribution of data
+       from a single publisher to multiple subscribers in a fan out fashion.
+       Radio-dish is using groups (vs Pub-sub topics), Dish sockets can join a
+       group and each message sent by Radio sockets belong to a group.
+#+end_quote
+
+- =ZMQ_RADIO=: used by a publisher to distribute data in a group.
+
+- =ZMQ_DISH=: the subscriber
+
+*** Publish-Subscribe 
+
+#+begin_quote
+       The publish-subscribe pattern is used for one-to-many distribution of
+       data from a single publisher to multiple subscribers in a fan out
+       fashion.
+       Messages sent are distributed in a fan out fashion to all connected
+       peers. The zmq_recv(3) function is not implemented for this socket
+#+end_quote
+
+- =ZMQ_PUB=
+  #+begin_quote
+When a ZMQ_PUB socket enters the mute state due to having reached
+ the high water mark for a subscriber, then any messages that would
+be sent to the subscriber in question shall instead be dropped
+ until the mute state ends. 
+  #+end_quote
+  + unidirectional, send only
+  + drops messages in mute state
+
+- =ZMQ_SUB=: subscriber socket via =zqm_setsockopt= with =ZMQ_SUBSCRIBE=
+  + receive only
+
+- =ZMQ_XPUB=, =ZMQ_XSUB= (extended): subscriptions via messages. XSUB and XPUB are exactly like SUB
+  and PUB except they expose subscriptions as special messages.
+  + as proxies (TODO)
+
+*** Pipeline
+
+#+begin_quote
+for distributing data to nodes arranged in
+ a pipeline. Data always flows down the pipeline, and each stage of the
+ pipeline is connected to at least one node. When a pipeline stage is
+connected to multiple nodes data is round-robined among all connected
+ nodes.
+#+end_quote
+
+- =ZMQ_PUSH= sends messages to downstream pipeline nodes.
+  + Messages are round-robined to all connected downstream nodes.
+  + unidirectional, send only
+
+- =ZMQ_PULL=: used by a pipeline node to receive
+  messages from upstream pipeline nodes. Messages are fair-queued
+  from among all connected upstream nodes. 
+  + unidirectional, receive only
+
+**** Scatter-Gather
+
+thread-safe version of push-pull
+
+- =ZMQ_SCATTER= used for distributing data to nodes arranged in a pipeline. 
+  
+- =ZMQ_GATHER= receive messages from upstream scatter-gather nodes.
+
+**** Exclusive Pair
+
+Connects a pair to precisely one other peer. Used for inter-thread communication 
+across the inproc transport.
+
+- =ZMQ_PAIR=: can only be connected to a single peer at any one time.
+  + unable to auto-reconnect and new incoming connections being terminated by old connections, not
+    suitable for cross-process communication.
+  + bidirectional    
+
+*** P2P (In Draft)
+
+TODO
+
+*** Request-Reply
+
+#+begin_quote
+sending requests from a ZMQ_REQ
+ to one or more ZMQ_REP services, and receiving subsequent
+ to each request sent.
+#+end_quote
+
+- =ZMQ_REQ=: request client
+  + =zmq_send= and =zmq_recv= calls alternate. Each request sent is round-robined among all
+    services, and each reply received is matched with the last issued request.
+  + bidirectional
+
+- =ZMQ_REP=: response server.
+  + =zmq_recv= and =zmq_send= calls alternate.
+  #+begin_quote
+Each request received is fair-queued from
+among all clients, and each reply sent is routed to the client that
+issued the last request. If the original requester does not exist
+any more the reply is silently discarded.
+  #+end_quote
+
+- =ZMQ_DEALER=: Each message sent is round-robined
+  among all connected peers, and each message received is fair-queued
+  from all connected peers.
+  + no alternating send and receive to guarantee the order.
+
+- =ZMQ_ROUTER=: Routing messages based on routing ids. the received messages are prefixed with its
+  peer's /routing id/ and then use this routing id to determine which destination to send to.
+
+
+* ZMTP
+
+** Multi-part Messages
+
+Each part (frame) is a =zmq_msg_t= but the entire message is delivered atomically.
+
+** Implementations
+
+*** libzmq (C++ with C API)
+
+The standard implementation.
+
+A weird design choice is "send" and "receive" functions are associated
+with messages, not just the sockets (which are deprecated). 
+
+A message is nullified (disposed, no need to call =zmq_msg_close()=) after a successful send. Subsequent 
+calls on the same message require calling =zmq_msg_copy= to create new copies.
+
+Multipart messages are sent with the =ZMQ_SNDMORE= flag except for the last one.
+
+**** Atomic Counter API
+
+=zmq_atomic_counter_*= Simple wrappers around native atomic operations.
+
+**** [[http://czmq.zeromq.org/][CZMQ]] (High-Level C API)
+
+
+
+*** .NET (NetMQ)
+
+Pure C# implementation
+
+*** Java (JZMQ)
+
+Pure Java implementation
