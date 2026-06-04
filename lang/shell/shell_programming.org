@@ -17,6 +17,7 @@
   + *Bourne-Again Shell*: the GNU shell as a superset, the default shell on most Linux distros.
     - Only some Debian-related distros use Dash, some smaller distros may use =BusyBox=, 
       most others (including Redhat family, OpenSUSE, Arch, Gentoo) use Bash.
+    - [[https://github.com/reubeno/brush][Bourne Rusty Shell]]: a modern bash- and POSIX- compatible shell writting in Rust.
   + *KornShell* (ksh): the POSIX shell is a subset of Korn shell, an enhanced
     version the Bourne shell.
     - ksh93 is the one commonly used.
