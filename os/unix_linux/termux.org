@@ -77,7 +77,11 @@ There is a =qb64= termux package.
 
 ** Dotnet
 
-dotnet 8.0 and 9.0 and mono are in the repository.
+dotnet 8.0, 9.0 and 10.0, mono are in the repository.
+
+** Java
+
+OpenJDK, Kotlin, Scala.
 
 ** FreePascal
 
@@ -96,3 +100,10 @@ style code that needs patching.
 
 Easy to build but JWLink requires [[https://github.com/JWasm/JWlink][this old version]]. The version from the
 original author does not build under Linux.
+
+** AI
+
+*** OpenCode
+
+There is no official support due to Bun not being available on Bionic Termux.
+This is [[https://github.com/Hope2333/opencode-termux][some work]] that runs OpenCode in the glibc environment on Termux.
