@@ -42,17 +42,21 @@ Class attributes are optional and assumed to be their default values if missing
 - =VB_PredeclaredId=: if =True=,  the default instance
   variable is given the name of the class as its name
   + not a singleton, as the user may still =New= another instance.
+  + without =VB_GlobalNameSpace=, the default instance is not exposed globally.
 
-- =VB_GlobalNameSpace=: if =True=, as a global class module, it has a default
-  instance and all its members may be accessed via simple name expressions, i.e.
+- =VB_GlobalNameSpace=: if =True=, as a global class module, its default
+  instance (if any) and all its members may be accessed via simple name expressions, i.e.
   as if imported into the global namespace.
 
 The default instance is created by default with module extent and automatically instantiated.
 
 - =VB_Exposed=: class module accessibility of the type
+  + =public class= or =internal class=
 
 - =VB_Creatable=: whether external projects can create instances of the class,
-  i.e. the accessibility of the constructor
+  i.e. the accessibility of the default constructor
+  + combined with =VB_Exposed= to control the creation.
+  + =public= constructor or =internal= constructor
 
 - =VB_Description=: =ComponentModel.DescriptionAttribute= in C#, used by COM to show documentation.
 
