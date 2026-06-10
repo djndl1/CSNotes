@@ -150,6 +150,7 @@ Type value may be surrounded by =[TypeName]=.
 - =Currency= (=CURRENCY=, 8-byte number in an integer format scaled down by
   10000, i.e. =2^63 / 10000=)
   + literal suffix =@=
+  + this can replace =int64= in some occasions but we don't know the exact semantics of its operations.
 
 ** =Variant=
 
@@ -365,7 +366,7 @@ execution when the variable is live and available for use.
 
 - Procedure declaration without accessbility modifier is =Public=
 
-- /Global/ :: BAS module =Public= variables. application long lifetime; application-wide scope
+- /Global/ :: BAS module =Public= variables. application long lifetime; project-wide scope
   + best practice: define all variables in a UDT and declare such a UDT in one
     place. =Public MyPublicVar As Long= in BAS modules.
 
@@ -373,7 +374,7 @@ execution when the variable is live and available for use.
   section of a module. Module-long lifetime
 
 - /Public/ module-level :: except in BAS modules where /Public/ variables are
-  global or called /property/; module-long lifetime.
+  global or called /property/; module-long (class, form) lifetime.
 
 - /Dynamic Local/ :: =Dim= defined within a procedure; procedure-wide scope/lifetime.
 
