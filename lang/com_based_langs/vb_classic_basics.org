@@ -207,6 +207,8 @@ basically a structure or record type.
   declared in a public object module, that is, a DLL or ActiveX EXE (standard EXE is not a COM server) 
   class module so that they may be marshaled by COM.
 
++ Array assignment follows value semantics.
+
 #+begin_src vba
 Private Type EmployeeUDT
     Name As String
@@ -224,6 +226,8 @@ hence =Dim= and =ReDim=, declared and accessed through =ElementType()= and =Arra
 
 + The number in =Dim arr(num) As TypeName= is the upper bound, the actual length is =num - 1=.
 
++ max size in a =Long= variable
+
 + Up to 60 dimensions. Initially no dimension as a declared variable.
 
 + can be static or dynamic. Dynamic arrays can be first declared =Dim arr() As
@@ -240,11 +244,12 @@ hence =Dim= and =ReDim=, declared and accessed through =ElementType()= and =Arra
     - =ReDim Preserve= tries to preserve the original values.
       Only the last dimension can resized with =Preserve=
 
-+ Array can be assigned to a =Variant= with ~var = arr()~ by physically copying.
++ Array can be assigned to a =Variant= with ~var = arr()~ with value semantics.
     - an array and an =Variant= can be assigned to each other.
     - an array in =Variant= has its =VarType(v) = vbArray + vbElementType=.
     - an array passed into a procedure as an =Variant= by ref while assignment
       makes an array copy itself.
+    - Array assignment uses value semantics even if the destination is a =Variant= variable.
 
 + Array assignment only works if the target is a dynamic array and both syntax (w/o =()=)
   forms are copy assignment.
@@ -688,7 +693,7 @@ ProcedureName(positional-param, Optional [ByVal/ByRef] paramName [ = constant-ex
   + =ByVal= performs possible type conversion for values passed in
   + =ByVal= may not be used with an array type.
   + A =ByRef Variant= accepts arguments of any types and always forms a reference
-    parameter binding.
+    parameter binding (intuitive).
     #+begin_src vba
     ' Swap values of any type.
     Sub Swap(first As Variant, second As Variant)
