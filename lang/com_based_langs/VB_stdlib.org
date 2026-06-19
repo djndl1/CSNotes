@@ -46,14 +46,14 @@ The project name is =VBA=, present in every VBA environment.
 
 - =/= always converts its operands into =Double=; Use =\= for pure integer
   division.
-  - VBA uses round-to-zero division
+  - VBA uses round-to-zero integer division.
   - =MOD= works only for integers.
 
 - =^=: exponentiation.
 
 - Common math functions are available: =Abs=, =Sgn=, =Sqr=, =Exp=, =Log=
 
-- =Int=: round to the lower integer, a ceiling function; =Fix=: truncates the
+- =Int=: round to the lower integer, a floor function; =Fix=: truncates the
   fractional part; =Round=
   to the specified number of digits and uses banker's rounding.
 
