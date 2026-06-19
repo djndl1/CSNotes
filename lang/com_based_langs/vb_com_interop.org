@@ -37,6 +37,15 @@ Function WaitForProcess(taskId As Long, Optional msecs As Long = -1) _
 End Function
 #+end_src
 
+* Dynamic Invocation with =DispCallFunc=
+
+=DispCallFunc= takes all arguments in an array of pointers to variants,
+that is an array of long integers, which are pointers to variants, which themselves
+store the actual argument values. These values, if they are pointers, should also be referenced
+(with =VarPtr=) before assigning to a variant. That is, for a pointer argument, two =VarPtr= is
+required to set the argument pointer array. Also, the called-on object variable must be of the correct
+interface type before =ObjPtr= to actually obtains its pointer value.
+
 * Exposing VB API
 
 VB API=s are exposed as COM servers and thus only public class modules are exposed.
