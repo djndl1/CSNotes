@@ -17,3 +17,9 @@ To see the output, you must run the DLL project within the VB6 IDE and configure
     Open the Immediate Window by pressing Ctrl + G or going to View -> Immediate Window.
     Step through your code using F8 (Step Into) or Shift + F8 (Step Over) and observe the output from your Debug.Print statements in the Immediate Window. 
 #+end_quote
+
+** Private Classes
+
+When debugging as above, the DLL actually runs in another COM Server, and thus, any objects passed
+to this DLL have to be publicly exposed. If the client tries to use a private class while debugging, 
+error 98 is raised.
