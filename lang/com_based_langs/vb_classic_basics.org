@@ -164,12 +164,13 @@ the default data type in VBA if no type is not specified.
 - Special values
   + =Empty= (the uninitialized =Variant= variable value), =IsEmpty()=;
   + =Null= (no valid data), =IsNull=
-  + =Error= (an error code): from 0 to 65535 Windows =HRESULT=
+  + =Error= (an error code): from 0 to 65535 Windows =HRESULT=, custom errors are defined by adding
+    =vbObjectError= to custom error numbers to avoid conflicts.
   + =Missing=: no value is passed to the declared optional parameter.
 
 - =Variant= can be useful when returning a result of different types on some
   condition, especially as a =Result<T, E>= type since it can contains a
-  =vbError= type, checked using =IsError=.
+  =vbError= type, created with =CVErr=. checked using =IsError=.
 
 - Use =IsObject= instead of =VarType= to test for an object within a  =Variant=.
   The latter may evaluates to its default property before passed to =VarType=.
