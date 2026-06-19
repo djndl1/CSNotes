@@ -76,8 +76,8 @@ Use the =$= version, they return a string instead of =Variant=.
 
 - =&=: concatenation
 
-- =Left$=, =Right$=, =Mid$=: substring; =Mid$= also returns a string slice,
-  which can be assigned. =Mid$(Text, 3, 4) = "abcd";
+- =Left$=, =Right$=, =Mid$=: substring; =Mid$= also returns a string slice (Mid statement),
+  which can be assigned. ~Mid$(Text, 3, 4) = "abcd"~;
 
 - =Len=: string length;
 
