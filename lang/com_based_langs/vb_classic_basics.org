@@ -342,6 +342,9 @@ Global  ' also public but no WithEvent is allowed
 Private/Dim [Shared] # module-level
 
 Dim varname As varType, [varname2 As varType2]
+
+' : is the statement separator
+Dim a As Long: a = 10 ' Now we can declare and initialize on the same line
 #+end_src
 
 When a variable is created, it is initialized to a default value.
@@ -364,6 +367,9 @@ UDT type or a private enum type.
 
 - Setting an =Object= variable requires a =Set=. Value assignment might
   causes the right-side to use its default property and thus unexpected behavior.
+  + As long as either side is an object variable =Set= is required, otherwise the object variable
+    evaluates to its default property. However a variable containing an object reference assigned to 
+    another variable does not require =Set=.
 
 ** Scopes and Lifetimes
 
