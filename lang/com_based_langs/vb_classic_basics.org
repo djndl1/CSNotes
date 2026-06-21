@@ -368,9 +368,11 @@ UDT type or a private enum type.
 
 - Setting an =Object= variable requires a =Set=. Value assignment might
   causes the right-side to use its default property and thus unexpected behavior.
-  + As long as either side is an object variable =Set= is required, otherwise the object variable
-    evaluates to its default property. However a variable containing an object reference assigned to 
-    another variable does not require =Set=.
+  + As long as reference assignment is
+    involved, =Set= is required (because otherwise it's =Let=-assignment), even if the both sides
+    are variants. Also, COM is refcounted,
+    with a =Set= the compiler can't insert a =AddRef= call. One has to check using =IsObject= before
+    assignment if the source can be an object.
 
 ** Scopes and Lifetimes
 
@@ -710,6 +712,14 @@ ProcedureName(positional-param, Optional [ByVal/ByRef] paramName [ = constant-ex
     End Sub
     #+end_src
   + Use =ByVal= whenever possible.
+  + A =ByRef= parameter name stores the temporary value of a rvalue, the same as =ByVal= in this
+    case.
+  + For a =Variant= return value or similar =Variant=-to-=Variant= assignment where the source may
+    be an object, use a =Sub LetSet(ByRef dst As Variant, ByRef src As Variant)= to handle it.
+    Otherwise, we would need to evaluate our source expressions twice (erroneous) or get stuck in a
+    catch-22 situation.
+  + For =IUnknown= (=vbDataObject=) =Let= and =Set= yield  the same valid result. Prefer =Set=
+    due to its reference nature (=AddRef=) maybe.
 
 - Passing User Defined Types is restricted
   + a =Public= UDT defined in a =BAS= module can only be passed into
