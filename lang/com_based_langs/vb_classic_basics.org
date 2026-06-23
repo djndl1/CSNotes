@@ -736,8 +736,6 @@ ProcedureName(positional-param, Optional [ByVal/ByRef] paramName [ = constant-ex
   + If the type is =Variant=  and the value is missing,
     a =Missing= value (an =Err= value 448 "Named argument not found") is pushed
     onto the stack for an optional argument, which can checked by =IsMissing()=.
-    =IsMissing= only works with an optional parameter once, the second time it
-    would return =False=.
   + A non-Variant optional parameter receives its default value if no default value
     is assigned (not =Missing=).
   + May be used with a default value. ~Optional color As Long = vbWhite~;
