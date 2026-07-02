@@ -1,3 +1,116 @@
+* Before Anything
+
+In various programming languages, there is a constant use of the word "reference"
+to actually denote different concepts: 
+
+- /object handle/: a reference value to an object, a value that identifies a thing.
+  a memory pointer or an index.
+  + a runtime object identifier, as in Java and C#. A object variable simply holds 
+    a handle value.
+
+- /alia or name binding/: a reference to a variable or more precisely a bound name to a value,
+  maybe a memory pointer or just a language syntax feature. Only in some
+  extreme cases, it acts like an object handle =int &r = *p=.
+  + a language syntactic construct, a language-level name game. May or may not be a pointer. But the 
+    aliasing semantics holds.
+
+#+begin_quote
+1. Two fundamentally different meanings of "reference"
+Reference to an object is a runtime value—a handle, pointer, or index that identifies an object. It
+has its own existence, can be stored, compared, passed around, and may be null. It answers the
+question "which object?"
+
+Reference to a variable is a compile-time alias—another name for a storage location. It may have no
+runtime representation at all. It answers the question "where is the value stored?" and assignment
+through it overwrites that storage directly.
+
+Confusion arises because both are often called "references" and both may be implemented with
+pointers under the hood, but they are semantically distinct concepts.
+
+
+2. Languages differ in which kind of reference they provide
+
+C has only explicit object references (pointers passed by value). No variable aliasing exists—*p = x
+is always a manual dereference.
+Java has only object references (managed handles). Variables hold handle values; parameter passing
+copies the handle. No variable aliasing exists.
+C++ has variable aliasing via & references. Object identity is handled separately through explicit
+pointers (raw or smart). A C++ reference is always an alias to a variable (or dereferenced pointer,
+or materialized temporary), never a standalone managed handle.
+C# has both: variable aliasing (ref, out) and managed object handles (reference types). It also has
+true value types (struct) that lack identity entirely.
+
+3. Aliases are syntactic; handles are real
+
+A variable alias is a language construct that can vanish completely during compilation. If you write
+int& r = x in the same scope, the compiler may simply treat r as x with no runtime artifact. An
+object handle must be a runtime value because it carries identity that persists across function
+boundaries, threads, and rebindings—it distinguishes one object from another, and that identity is
+observable.
+
+4. Pass-by-value vs. pass-by-alias is about the variable, not the thing it holds
+
+In C and Java, all parameter passing is by value: you copy the contents of the variable (which may
+be an object handle). In C++ and C#, you can additionally pass by alias (&, ref), where the
+parameter is the caller's variable. Whether the underlying thing is a value type or a reference type
+is orthogonal. You can pass a value type by alias (ref int in C#) or a reference type by alias (ref
+SomeClass in C#), just as you can pass both by value.
+
+5. Value semantics vs. reference semantics is about identity, not memory location
+
+A type has value semantics if its identity is invisible or irrelevant—only its content
+matters. Equality means "same content," assignment means "copy the content," and sharing is
+impossible or accidental. Reference semantics means identity is observable and matters—equality
+means "same object," and sharing is explicit.
+
+This is independent of heap vs. stack. A C# struct can be boxed onto the heap and unboxed back; its
+value semantics survive the round-trip. A Java String is always on the heap, but immutability plus
+equals() give it a value-like discipline—though identity remains observable via ==, so it's not true
+value semantics.
+
+6. Immutability creates "value-like" behavior but isn't the same as value semantics
+
+Python's int and Java's String are immutable objects accessed through handles. Because they can't be
+mutated, the handle's identity becomes practically irrelevant for correctness, and they feel like
+values. But the identity still exists and is reachable (is in Python, == in Java). True value types
+(C# structs, future Java value classes) have no identity at all—the language prevents you from even
+asking the question.
+
+7. Orthogonal dimensions of the taxonomy
+
+These three axes are independent:
+Axis	                      Options
+Variable binding	Pass-by-value (copy) vs. pass-by-alias (ref, &)
+Data semantics	        Value semantics (identity-free) vs. reference semantics (identity-bearing)
+Runtime implementation	Stack, register, or heap—irrelevant to the semantics
+
+A language design can choose any combination, and much of the confusion around "references" comes
+from conflating these axes.
+
+8. Null references make sense only for handles, not aliases
+
+A handle is a value that can take a special "points to nothing" value (null). An alias must bind to
+an existing object at creation—there is no "null binding" because the alias is the name of
+something, not a value holding an identity. C++ references cannot be null because they are aliases;
+Java references can be null because they are handles.
+
+9. Aliases can also be the first name for a temporary object
+
+A const T& (or rvalue reference) can bind to a literal or temporary prvalue. The compiler
+materializes a temporary object, and the reference becomes its name—either an alias for that
+now-existing storage or the very first name by which it's known. This is still aliasing, not a
+handle: the reference is directly bound to the temporary's storage, cannot be reseated, and has no
+portable identity token. The temporary's lifetime is tied to the reference's scope (lifetime
+extension), and the compiler may optimize both away. No matter whether the reference renames an
+existing variable or christens a nameless temporary, the fundamental relationship is a compile-time
+binding to an object—not an independent, storable runtime value.
+
+That completes the picture. The alias/handle distinction holds elegantly even when the alias gives a
+name to something that previously had none.
+#+end_quote
+
+Here we are discussing the latter.
+
 * Behavior
   :PROPERTIES:
   :CUSTOM_ID: behavior
