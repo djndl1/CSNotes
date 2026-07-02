@@ -37,6 +37,15 @@ Function WaitForProcess(taskId As Long, Optional msecs As Long = -1) _
 End Function
 #+end_src
 
+** StrPtr, ObjPtr & VarPtr
+
+- =StrPtr=: because in VBA, a string has no indexer, one has to use a dedicated function =StrPtr= to
+  obtain the address of the first element, instead of =VarPtr(str(0))=, which only works for an
+  array.
+
+- =ObjPtr=: =VarPtr= takes the address of a variable, =ObjPtr= takes the address of the object
+  referenced by the variable.
+
 * Dynamic Invocation with =DispCallFunc=
 
 =DispCallFunc= takes all arguments in an array of pointers to variants,
