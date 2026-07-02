@@ -19,6 +19,7 @@ html: $(HTML_FILES)
 %.html: %.org 
 	@mkdir -p $(dir $@)
 	@pandoc --css /Notes/CSNotes/sidebar.css --mathjax -s --toc -f org -t html -o "$@" "$<" || (echo "Warning: Failed to generate $@ (non-fatal)" && true)
+	@sed -i -e '/polyfill\.io/d' $@
 	@echo "Generated $@"
 
 # Remove generated HTML files under DIR
