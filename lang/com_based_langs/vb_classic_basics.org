@@ -338,7 +338,7 @@ End Sub
 
 #+begin_src basic
 ' module-level variables, Shared has no meaning
-Public [Shared]
+Public [Shared] ' Shared is not Public, it means shared among module procedures, which is already the case for VBA
 Global  ' also public but no WithEvent is allowed
 Private/Dim [Shared] # module-level
 
@@ -397,7 +397,8 @@ execution when the variable is live and available for use.
   =Static InProgress As Boolean=; useful for preventing procedure reentry. VB6
   apps are single-threaded, no need to worry about thread safety.
   + =Static= may precede or follow a procedure declaration to indicate all
-    variables declared within the procedure have module extent.
+    variables declared within the procedure have module extent. THIS IS NOT the =static= in common
+    OOP languages.
 
 - /Project/ :: =Friend= inside an object (class or form) module. Project-wide
   scope.
@@ -671,7 +672,7 @@ End Function
 There are some weird rules about parentheses with subroutine call.
 
 If a function is used in an expression, parameters must be enclosed within
-parentheses. Otherwise, =Call= must be used with parentheses. To avoid all these
+parentheses. Otherwise, =Call= must be used to include arguments in parentheses. To avoid all these
 rules, one may use =Call= if possible.
 
 - =Call expr=: invokes a subroutine or function discarding any return value
