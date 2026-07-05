@@ -1,0 +1,47 @@
+* Minimal and Standard BASIC
+
+An early standardization effort (ECMA-55). There was a Standard/Full BASIC standard (ECMA-116)
+that never caught up after Microsoft BASIC took over the market.
+
+** Implementations
+
+- [[https://buraphakit.sourceforge.io/BASIC.shtml][John's ECMA-55 Minimal BASIC Compiler]]
+
+- [[https://sourceforge.net/projects/bwbasic/][bwBASIC]]:  implements a large superset of the ANSI Standard for Minimal BASIC (X3.60-1978)
+  and a significant subset of the ANSI Standard for Full BASIC (X3.113-1987) in C. Recent versions
+  (since 2.20) aim to emulate various BASIC dialects.
+
+* Microsoft BASIC
+
+** Implementations
+
+- [[https://github.com/microsoft/BASIC-M6502][Original From Microsoft]]
+
+- [[https://github.com/mist64/msbasic][The Reversed-engineered one]]
+
+* GW-BASIC (the PC-Compatible Version of IBM BASICA)
+
+Ultimately dervied from Microsoft BASIC. Applesoft BASIC is the version for Apple Ⅱ
+
+** Implementations
+
+- [[https://github.com/microsoft/GW-BASIC][Original from Microsoft]] 
+
+- [[https://robhagemans.github.io/pcbasic/index.html][PC-BASIC]]: bug-for-bug compatibility
+  + Various code pages and Unicode support
+
+* QuickBASIC and QBASIC
+
+** Implementations
+
+- [[https://qb64phoenix.com/][qb64phoenix]]: do not use the "official" unmaintained one.
+
+- [[https://www.freebasic.net/wiki/LangQB][FreeBASIC]]: some compatiblity with QBasic
+
+** Documentation
+
+- [[https://qbasic.net/en/qb-manual/qb45/overview.htm][QBasic and QuickBASIC manuals]]
+
+* References
+
+- [[https://everybasic.info/doku.php/start][everyBASIC]]
