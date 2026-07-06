@@ -1,0 +1,143 @@
+Don't use VB.NET in favor of C#.
+
+- NO LSP outside of Visual Studio
+
+- All boolean operators are bitwise operators.
+
+- =AndAlso=, =OrElse= short circuit operators.
+
+- =<>= and === for equality check. For reference equality, use =Is= and =IsNot=
+  + in C# =Is= is used for type check and pattern matching.
+
+- pointer operations are not supported.
+
+- =+= as concatenation still converts strings to numbers.
+
+- =AddHandler=, =RemoveHandler= with =AddressOf= for event subscription.
+  + =WithEvents= is still supported but with a =Handles variable.EventName= suffix
+
+- =AddHandler= =RemoveHandler= are also used for the  =add= and =remove= blocks.
+   + =RaiseEvent= a default handler block not in C#.
+
+- =/= is always floating-point division while =\= is integer division, even for floating points.
+
+- =Inherits= and =Implements=
+  + Method implementation is explicit: =Public ... Implements IInterface.Method=
+  + interface inheritance uses =Implements=
+
+- Python-like statement termination with additional =:= as a terminator.
+
+- Case-insensitive except for real strings
+
+- =(Of Type)= instead of =<>= for generic types.
+
+- no lambda but real anonymous functions/subroutines (simply without a name)
+
+- =If(condition, A[, B])= for ternary conditional and coalesce operator.
+
+- =[Identifier]=, similar to =@=. VB.NET Strings are always verbatim, no escape sequence but
+  constants or function calls.
+
+- =ReDim [Preserve]= still exists.
+
+- =Dim a(0 To 4) As Integer= still has 4 as the upper bound.
+
+- =<>= surrounds attributes
+
+- No dedicated code blocks
+
+- =MustInherit= for =abstract= class and =MustOverride= for =abstract= members.
+
+- =Friend= for =internal=
+
+- =New With { .PropertyName = ...  }= anonymous type
+   + =With= is required for initializers
+
+- =ByRef= for =ref=, there is no equivalent for =out=
+
+- Read-write propety synctax =Public Property PropName As PropType [ = "Valu"]= and =ReadOnly= property
+
+- =New= as constructor names
+
+- =MyBase=
+
+- =CInt(False)= and implicit cast to =Integer= is =-1= for backward compatiblity
+
+- =Exit Do/For/While/Select= for =break=; =Continue For/Do/While=
+
+- =Shadows= for =new=, =NonINheritable= for =sealed=. =static classs= is replaced by =Module=
+
+- =Shared= for =static= members
+
+- =CType=-family functions similar to the =cast= operators in C#.
+
+- =DirectCast= for object cast; =TryCast= for =as= cast
+
+- =Date= is =DateTime=, no longer =double=
+
+- =Nothing= is both =null= and =default=
+
+- =Finalize= is the finalizer.
+
+- =Try= =Finally= =End Try=
+
+- Late bound instances are created as =Object= under =Option Strict Off= , not =dynamic=
+
+- =Imports= for =using=
+
+- =Narrowing= for =implicit= operator cast; =Widening= for =explicit=
+
+- =<Extension>= methods in modules
+
+- =Shared= for =extern= =Dllimport=. The legacy API declaration is still there.
+
+- No unsafe blocks. Use =System.Runtime.InteropServices.Marshal= and
+  =System.Runtime.InteropServices.Unsafe=
+
+- LINQ expressions are supported.
+
+- =As= for =where= to constrain generic types.
+
+- Visual Basic automatically initializes all fields and local variables to their default values
+  (typically Nothing or some variation eof zero) when no other initialization is used.
+  
+- C#'s type =is= in VB.NET is =TypeOf .. Is(Not) ...= as in VBA.
+
+- =Yield= instead of =yield return=.
+
+- In Visual Basic, all local non-static variables, whether declared inside or outside of a given
+  block, have procedure-lifetime. If you declare a variable within an If statement block, its value
+  will remain throughout the entire procedure, although scoping rules limit access to the variable
+  to just that block.
+  
+- =SyncLock lockName End SyncLock= for =lock=
+
+- VBA-style Date literal (US format and ISO format) is supported.
+
+- =<STAThread>= is attached to the main thread automatically in WinForms.
+
+- A parameterless constructor can be called without the parentheses.
+
+- =^= used for the exponentiation operator
+
+- =Overloads= can be used to explicitly indicate overloading function groups.
+
+- A property can have parameters (not supported in C#). A property can be passed to a method by
+  reference.
+
+- =return= is supported in functions while the old implicit variable and =exit function= are still
+  supported.
+
+- no =stackalloc=
+
+- constructor delegation is not supported. Use =Me.New=.
+
+- =Default= property for indexers.
+
+- =Overridable= for =virtual=
+
+- =MyClass= for this class
+
+- =GetType= for =typeof=
+
+- =Dim= without =As TypeName=  is =var= (requires =Option Infer On=).
