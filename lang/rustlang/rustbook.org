@@ -194,6 +194,12 @@ whenever building. =cargo update= bypasses this.
   :CUSTOM_ID: basic-concepts
   :END:
 
+** Variable Shaodwing
+
+A new variable with the same name as a previous variable shadows the
+previous one, or an inner variable shadows the outer one.
+This is not possible in C#.
+
 ** Mutability
    :PROPERTIES:
    :CUSTOM_ID: mutability
@@ -207,12 +213,43 @@ immutable. =mut= makes a variable mutable. Constants are declared using
   const MAX_POINTS: u32 = 100_000;
 #+END_SRC
 
-A new variable with the same name as a previous variable shadows the
-previous one.
 
 The compiler can usually infer what type we want to use based on the
 value and how we use it. In cases when many types are possible, we must
 add a type annotation:
+
+There is the distinction between
+
+- /variable (binding) mutability/: Whether a variable cannot be associated with another value
+  (binding mutability, Java =final=).
+  
+- /value mutablity/: whether the object's internal state allow change.
+
+In Rust, mutability is a property of the access path, not an intrinsic property of the type.
+
+- An imumutable binding means the value cannot be modified through this variable; nor can one create
+  a mutable reference to it. Nor this variable can rebound: a binding immutability that prevents
+  value mutablity.
+
+- Reference mutability also limits the mutability of the access path. A binding can be mutable,
+  but if it refer to an immutable reference, it can be rebound but the value is still immutable.
+  Mutability is part of reference type, not of the variables or the object.
+
+Rust's default and primary mechanism is binding mutability. But this binding mutability gatekeeps 
+whether value mutability is allowed. Unlike Java, a =final= variable holding an object cannot
+prevent the user from calling a mutating method on the object. In Rust, a mutable binding (=let mut=
+or =&mut=) is required to mutate the value itself. =let mut= and =let= are about binding mutability,
+but a immutable variable can contain a mutable reference to a value. Exclusive access rule in Rust
+aside, it is like:
+
+#+begin_src c
+const object *mutable_ptr_to_immutable;   // a mutable pointer variable pointing to an immutable object
+object *immutatable_ptr_to_mutable const;                // an immutable poiner variable pointing to a mutable object
+#+end_src
+
+Furthermore, =Cell=, =RefCel=, =Rc=, =Arc= etc form /interior mutability/ (object mutability made
+safe). TODO
+
 
 ** Data Types
    :PROPERTIES:
