@@ -236,7 +236,7 @@ In Rust, mutability is a property of the access path, not an intrinsic property 
   Mutability is part of reference type, not of the variables or the object.
 
 Rust's default and primary mechanism is binding mutability. But this binding mutability gatekeeps 
-whether value mutability is allowed. Unlike Java, a =final= variable holding an object cannot
+whether value mutability is allowed (/inherited mutability/). Unlike Java, a =final= variable holding an object cannot
 prevent the user from calling a mutating method on the object. In Rust, a mutable binding (=let mut=
 or =&mut=) is required to mutate the value itself. =let mut= and =let= are about binding mutability,
 but a immutable variable can contain a mutable reference to a value. Exclusive access rule in Rust
@@ -248,7 +248,9 @@ object *immutatable_ptr_to_mutable const;                // an immutable poiner 
 #+end_src
 
 Furthermore, =Cell=, =RefCel=, =Rc=, =Arc= etc form /interior mutability/ (object mutability made
-safe). TODO
+safe). These types are provided to overcome the limitations of the compiler in a controller manner
+(mutable via =&T=, when commonly inhertied mutability is used via =&mut T=). Brorows for
+=RefCell= are tracked at runtime, unlike typical staticallyed traced refrence types.
 
 
 ** Data Types
