@@ -1,4 +1,5 @@
-Don't use VB.NET in favor of C#.
+Don't use VB.NET in favor of C#. BASIC was never intended for serious programming, just the
+beginning to the destination. Visual Fred was a mistake.
 
 - NO LSP outside of Visual Studio
 
@@ -141,3 +142,5 @@ Don't use VB.NET in favor of C#.
 - =GetType= for =typeof=
 
 - =Dim= without =As TypeName=  is =var= (requires =Option Infer On=).
+
+- =CreateObject= returns a COM instance from an external source. =Activator.CreateInstance= + =Type.GetTypeFromProgID=
