@@ -1,0 +1,25 @@
+
+- =value struct= for CLI =struct=
+
+- =ref class/struct= for CLI =class=: CLI reference objects are allocated in the managed heap, not
+  the native heap by =gcnew= (the C# =new=).
+
+- A CLI object reference is called /handle/ in C++/CLI.
+  
+- CLI Reference type declarations are suffixed with a =^=. The member access syntax is similar to
+  that of a pointer.
+
+- =~ClassName= in a CLI class definition is the dispose logic, cleaning up all resources.
+  =!ClassName= does what =Dispose(false)= does, cleans up only unmanaged resources.
+  #+begin_src cpp
+void Dispose(bool disposing) {
+   if (disposing) {
+      ~T();
+   } else {
+      !T();    // 
+   }
+}
+  #+end_src
+  + To enforce =using=-style disposal, create the CLI object with =TypeName obj= and when =obj= goes
+    out of scope, =Dispose= is called on it, similar to  standard C++ RAII. Also, now it uses =.=
+    for member access.
