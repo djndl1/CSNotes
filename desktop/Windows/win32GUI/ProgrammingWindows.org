@@ -1,15 +1,95 @@
 #+title: Programming Windows
 
-* Windows and Messages
+* Background Concepts
+
+** Windows
 
 - /window/: a rectangular area on the screen that receives user input and
   displays output in the form of text and graphics.
-  + /application window/: contains a title bar that shows the program's name, a menu and perhaps a toolbar and a scroll bar.
+  + the /desktop/ IS a window defined by the system =GetDesktopWindow=.
+  + /application window/: contains a /title bar/ that shows the /program's name/, a /menu bar/ and perhaps a
+    /toolbar/ and a /scroll bar/.
   + /dialog window/: may or may not have a title bar.
   + various windows controls
 
-- /messages/: the window receives the user input in the form of messages to the window. A window also uses messages to communicate with other windows, that is, the OS calls into a function (the window procedure) in the program with proper arguments. The window procedure does some processing based on the
-  message and then returns control to Windows.
+- /Main Window/: every GUI Windows application creates at least one window as the primary
+  interactive interface.
+
+- /Client Area/: part of a window where the pplication displays output.
+
+- /NonClient Area/: title bar, menu bar, window menu, minimize/maximize buttons, sizing borde and
+  scroll bars.
+  + /title bar/: icon, title text
+  + /menu bar/: lists the commands supported by the application.
+  + /window menu/: created/managed by the system with a standard set of menu items (click the upper left corner)
+  + /maximize, minimize and restore buttons/
+  + /sizing border/
+  + /scroll bars/
+
+- /Window Attributes/: 
+  + /Window Handle/: uniquely identifies the window. =FindWindow=, =FindWindowEx=, =IsWindow=
+  + /Class Name/: every window belongs to a window class, specified by its name.
+  + /Window Name/ or /Window Text/: a text string that identifies a window for the user, typically in the title bar.
+    =SetWindowText=, =GetWindowText=, =GetWindowTextLength=
+  + /Window Style/: a named constant =WS_*= that defines an aspect of the window's appearance and behavior
+    not specified by the window class. =SetWindowLong=.
+  + /Extended Window Style/: optinally one or more window style.
+  + /Position/: the coordinates of its upper left corner, relative to the upper left corner of the
+    screen or the parent window's client area. =WindowFromPoint=, =ChildWindowFromPoint=,
+    =ChildWindowFromPointEx=
+  + /Size/: width and height. =AdjustWindowRect=, =AdjustWindowRectEx= for calculating the required
+    size of a window based on the desired size of the client area.
+  + /Parent/: The parent window provides the coordinate system used for positioning a
+    child window. Having a parent window affects aspects of a window's appearance. =EnumWindows=,
+    =EnumWindowsProc= to enumerate windows and window procedures to obtain top-level windows'
+    handles.
+  + /Owner/: An owned window always appear in front of its owner windows (e.g. a message box) and is
+    hidden when its owner  is minimized, destroyed when its owner is destroyed.
+  + /Application Instance Handle/: an instance handle associated with an application that identifies
+    the app.
+  + /Creation Data/: application-defined creation data.
+  + /Child-Window Identifier/: a unique application-defined (specified by the app) value associated with
+    the child window.
+  + /Menu handle/: each window can have a menu except a child window.
+
+- /window class/: a template from which windows may be created by specifying a window's icon, menu,
+  background color and a few other features and its /window procedure/. Conceptually simlar to OOP
+  classes.
+  + A process must register a window class before it can create a window of that class. Registering
+    a window class associates a window procedure, class styles, and other class attributes with a
+    class name.
+
+- /brush/: a colored pattern of pixels used to fill an area.
+
+A window is always created based on a /window class/, which identifies its
+window procedure.
+
+=CreateWindow= and =CreateWindowEx= for creating application windows.
+
+The basic structure of a Win32 GUI app is pretty much the same for all apps and
+there's no need to write them every time, just copy and paste. One can have windows on different
+threads but that's not recommended if cross-threads access is required.
+
+** Event Loop/Message Loop/Message Dispatcher/Message Pump
+
+A fundamental mechanism that enables asynchronous execution by continuously monitoring and
+dispatching events or messages from a queue when the main program thread is idle.
+
+#+begin_src 
+  loop
+    message := get_next_message()
+    process_message(message)
+  while message != quit
+#+end_src
+
+- /messages/: the window receives the user input in the form of messages to the window. A window
+  also uses messages to communicate with other windows. The OS calls into a function (the
+  window procedure /WindowProc/) in the program with proper arguments to handle received messages. 
+  The window procedure does some processing based on the message and then returns control to
+  Windows.
+  + /Window procedure/: a user-defined callback function (=DefWindowProc= the default one provided
+    by Windows, called at the end of user-defined WindowProc) that processes messsages sent to a window,
+    specified when an application registers its window class.
   + a message queue is created for the program per thread, which stores all the messages
     to windows a program might create.
   + A windows app includes a message loop to
@@ -26,13 +106,7 @@
     function that results in calling the window procedure. This requires the
     window procedure be reentrant.
 
-- /brush/: a colored pattern of pixels used to fill an area.
 
-A window is always created based on a /window class/, which identifies its
-window procedure.
-
-The basic structure of a Win32 GUI app is pretty much the same for all apps and
-there's no need to write them every time, just copy and paste.
 
 * Painting the Client Area
 
