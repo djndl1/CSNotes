@@ -23,3 +23,58 @@ void Dispose(bool disposing) {
   + To enforce =using=-style disposal, create the CLI object with =TypeName obj= and when =obj= goes
     out of scope, =Dispose= is called on it, similar to  standard C++ RAII. Also, now it uses =.=
     for member access.
+
+- An unmanaged class cannot hold a reference or pointer to a managed one, but
+  =gcroot<ManagedClass^>=.
+
+- =abstract= after  CLI class names and method names and the methods have to be marked as =virtual=.
+
+- =nullptr= is =null= reference but can be assigned to a managed reference, interior pointer or a
+  native pointer. The compiler determines what =nullptr= actually is (null reference or null
+  pointer). =__nullptr= is the unambiguous C++ =nullptr=. =nullptr= is only zero in native code.
+  + one can cast the =nullptr= for clearer semantics.
+
+- Property syntax is simlar to that of VB.NET
+#+begin_src cpp
+  Access property Type PropName
+  {
+    Type get() { ... }
+    protected/private: void set(Type valu) { ... }
+  }  
+#+end_src
+  + indexers are named =default=
+
+- managed types are given higher precedence when it comes to type resolving in function overloading.
+  A string literal is treated as =System::String= whenver possible. =std::string= is lowest, after
+  =const char*=.
+
+- Managed arrays are =cli:array= which extends =System::Array=
+
+- =pin_ptr<T>= pins the instance from being moved during GC. An object is pinned as long as a
+  =pin_ptr= points to it.
+  + the =pin_ptr= itself only exists as a varible on the stack to reduce the pinning scoope.
+  + the target is a vlaue type, a member of a managed object but not the  object itself.
+
+- =interior_ptr=
+  + able to reference .NET  types, an element of a managed array or any native object compatiable
+    with a native pointer.
+  + only as a variable on the stack
+
+- Both templates and CLI generics are supported. A template can even make use of a generic type but
+  not the inverse.
+
+* Compilation Model
+
+Unmanaged code and managed code can be linked together statically or dynamically. The transition 
+between managed code and unmanaged code is seamless but in reawl world, it is important to avoid
+transitions to avoid performance problem.
+
+- Existing C++ source code can be compiled to managed code (source code compatibility).
+  + With =/clr=, functions are compiled for execution in the CLR unless specified otherwise with
+    =__cdecl= or =__stdcall=. The compiler generates thunks for the transitions without resorting to
+    PInvoke C-style function calls.
+
+- Native code and managed code can be linked into a mixed-code assembly (object file compatibility).
+
+C++/CLI code can be pure CLI or mixed. Pure CLI object files cannot be linked with native code
+object files.
