@@ -1,16 +1,19 @@
+#+title: C++ CLI
 
-- =value struct= for CLI =struct=
+* Key Difference
 
-- =ref class/struct= for CLI =class=: CLI reference objects are allocated in the managed heap, not
-  the native heap by =gcnew= (the C# =new=).
+- =value struct= for C# =struct=, =ref class/struct= for C# =class=
+  + CLI reference objects are allocated in the managed heap by =gcnew= (the C# =new=)., not
+    the native heap.
 
-- A CLI object reference is called /handle/ in C++/CLI.
+- A CLI object reference is called /(tracking) handle/ in C++/CLI.
   
-- CLI Reference type declarations are suffixed with a =^=. The member access syntax is similar to
+- CLI Reference type declarations are suffixed with a caret =^=. The member access syntax is similar to
   that of a pointer.
 
-- =~ClassName= in a CLI class definition is the dispose logic, cleaning up all resources.
-  =!ClassName= does what =Dispose(false)= does, cleans up only unmanaged resources.
+- =~ClassName= in a CLI class definition is the dispose logic, cleaning up all resources =Dispose(true)=.
+  =!ClassName= does what =Dispose(false)= does, cleans up only unmanaged resources (to avoid
+  referencing managed objets during GC).
   #+begin_src cpp
 void Dispose(bool disposing) {
    if (disposing) {
@@ -21,10 +24,10 @@ void Dispose(bool disposing) {
 }
   #+end_src
   + To enforce =using=-style disposal, create the CLI object with =TypeName obj= and when =obj= goes
-    out of scope, =Dispose= is called on it, similar to  standard C++ RAII. Also, now it uses =.=
+    out of scope, =Dispose= is called on it, similar to  standard C++ RAII. Also, now it uses a dot =.=
     for member access.
 
-- An unmanaged class cannot hold a reference or pointer to a managed one, but
+- An unmanaged class cannot hold a reference or pointer to a managed one, but a GC-aware
   =gcroot<ManagedClass^>=.
 
 - =abstract= after  CLI class names and method names and the methods have to be marked as =virtual=.
@@ -35,13 +38,13 @@ void Dispose(bool disposing) {
   + one can cast the =nullptr= for clearer semantics.
 
 - Property syntax is simlar to that of VB.NET
-#+begin_src cpp
+  #+begin_src cpp
   Access property Type PropName
   {
     Type get() { ... }
     protected/private: void set(Type valu) { ... }
   }  
-#+end_src
+  #+end_src
   + indexers are named =default=
 
 - managed types are given higher precedence when it comes to type resolving in function overloading.
@@ -50,31 +53,84 @@ void Dispose(bool disposing) {
 
 - Managed arrays are =cli:array= which extends =System::Array=
 
+- =for each (... in ...)=
+
 - =pin_ptr<T>= pins the instance from being moved during GC. An object is pinned as long as a
   =pin_ptr= points to it.
   + the =pin_ptr= itself only exists as a varible on the stack to reduce the pinning scoope.
-  + the target is a vlaue type, a member of a managed object but not the  object itself.
+  + the target is a value type, a member of a managed object but not the  object itself.
 
-- =interior_ptr=
-  + able to reference .NET  types, an element of a managed array or any native object compatiable
+- =interior_ptr=: GC-aware non-pinning pointer type, 
+  + a tracking handle with pointer semantics
+  + able to reference .NET types, an element of a managed array or any native object compatiable
     with a native pointer.
   + only as a variable on the stack
 
 - Both templates and CLI generics are supported. A template can even make use of a generic type but
-  not the inverse.
+  not the reverse.
 
 * Compilation Model
 
-Unmanaged code and managed code can be linked together statically or dynamically. The transition 
-between managed code and unmanaged code is seamless but in reawl world, it is important to avoid
-transitions to avoid performance problem.
-
 - Existing C++ source code can be compiled to managed code (source code compatibility).
-  + With =/clr=, functions are compiled for execution in the CLR unless specified otherwise with
-    =__cdecl= or =__stdcall=. The compiler generates thunks for the transitions without resorting to
-    PInvoke C-style function calls.
+  + With =/clr=, functions are compiled for execution in the CLR (even C++ native types, just not
+    managed by the GC) unless specified otherwise with
+    =__cdecl= or =__stdcall= or with =#pragman unmanaged=. The compiler generates thunks for the
+    seamless transitions without resorting to Pinvoke C-style function calls.
 
-- Native code and managed code can be linked into a mixed-code assembly (object file compatibility).
+- Unmanaged code and managed code can be linked together statically or dynamically. Native code and
+  managed code can be linked into a mixed-code assembly (object file compatibility).
 
 C++/CLI code can be pure CLI or mixed. Pure CLI object files cannot be linked with native code
 object files.
+
+* Memory Model
+
+** GC (Managed) Heap
+
+Only instances of managed types can be allocated on the GC heap (via =gcnew=)
+
+In C++/CLI, even managed primitive types can be =gcnew=. The type can be either a pointer or a /tracking handle/
+(.NET CLI reference, a virtual memory address pointing to the middle of an object's 8-byte header, before
+the type identifier). Object handles to value types in declarations are allowed.
+
+#+begin_src cpp
+int^ i = gcnew int(0);  // no System::Object^  requried
+f(DateTime^ dt); // impossible in C#
+#+end_src
+
+GC must be aware of all references (including pointers to managed objects) for memory safety.
+
+Still a reminder: reference types and value types differ in semantics, not in memory management.
+
+Every conversion between value and reference types may result in a boxing/unboxing operation.
+
+- Unboxing can be a cast or a dereference operation =*=. 
+
+- Unboxing differs from a type cast even if the syntax is the same
+
+  #+begin_src cpp
+  int i = 5;
+  Object::ReferenceEquals(i ,i); // different boxed objects, false
+
+  int^ oi = gcnew int(10);
+  int si = *oi;  // an unboxing
+
+  System::Object^ o = 5;
+  short s = (short)o; // exception  because it's an unboxing, use (int)o.
+  #+end_src
+
+- =System::String=: different strings are of different lengths. The string object holds the
+  characters inside itself, instead of holding a reference to a character array. That's why string
+  operations are immutable: a .NET object cannot dynamically shrink or expand after construction.
+  + also, strings are pooled if the same string literal is used several times.
+
+- =cli::array<T>=
+  + =array<typeName[, Rank]>=
+  + one can use =interior_ptr= to access the array.
+  + tracking handle arrays are covariant: =Array<T^>= is =Array<Object^>=. Value arrays are not due
+    to boxing and unboxing.
+
+** Managed Stack
+
+- Managed stack: 
+  + implemented in terms of native stack.
