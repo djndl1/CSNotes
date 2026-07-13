@@ -134,3 +134,22 @@ Every conversion between value and reference types may result in a boxing/unboxi
 
 - Managed stack: 
   + implemented in terms of native stack.
+
+* Types
+
+#+begin_quote
+ If you include a header file with managed type declarations in your project, the compiler expects
+ these types to be defined in your project, not in the library you would like to
+ reference. Including header files with declarations of managed types only makes sense if a managed
+ type is used by source files from the same project that implements the managed type.
+#+end_quote
+
+.NET types have metadata and do not need header files to expose themselves.
+
+* Type Cast
+
+- =dynamic_cast= is basically =as= in C#
+
+- =safe_cast=: normal C# object type cast that throws for incompatible types.
+
+- =static_cast=: compile-time cast, undefined  behavior for incompatible types.
