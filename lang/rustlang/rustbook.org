@@ -194,7 +194,7 @@ whenever building. =cargo update= bypasses this.
   :CUSTOM_ID: basic-concepts
   :END:
 
-** Variable Shaodwing
+** Variable Shadowing
 
 A new variable with the same name as a previous variable shadows the
 previous one, or an inner variable shadows the outer one.
@@ -606,7 +606,7 @@ parameter.
 It's possible for structs to store references to data owned by something
 else, but to do so requires the use of /lifetimes/.
 
-- =Debug= trait output:
+- =Debug= pretty-print trait output:
 
 #+BEGIN_SRC rust
   #[derive(Debug)]
