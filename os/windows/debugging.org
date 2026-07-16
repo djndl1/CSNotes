@@ -1,0 +1,7 @@
+* Winedbg
+
+Breakpoints work fine on linux. =c= =u= stop at breakpoints. 
+=n=, =s= or =si= do not stop at the next line on ARM64 (work on x86).
+ARM wine doesn't seem to be very stable, at least in terms of debugging.
+
+To see wide strings, paste the octal representation into python.
