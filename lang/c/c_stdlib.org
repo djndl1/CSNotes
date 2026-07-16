@@ -12,14 +12,13 @@ systems have moved on, while the C standard library is unfortunately stuck in th
   :PROPERTIES:
   :CUSTOM_ID: introduction
   :END:
+  
+** Macro Functions
 
-For those library that are defined as functions, C standard library permits
-implementations to provide a function-like macro of the same name in
-addition to the true function. the macro might provide a faster
-implementation of a simple function or it might call a function of a
-different name.
-
-To bypass such macros
+for those library that are defined as functions, C standard library permits
+implementations to provide a function-like macro of the same name in addition to the true
+function. the macro might provide a faster implementation of a simple function or it might call a
+function of a different name. To bypass such macros
 
 #+BEGIN_SRC C
   double (*p)(double) = &cos; double a = p(b);
@@ -29,18 +28,136 @@ To bypass such macros
   double a = cos(b);
 #+END_SRC
 
-Library headers or file names may be built into the implementation.
+** POSIX Safety
 
-Do not use identifiers that begin with an underscore. They are used by
-an implementation.
+- /MT-Safe/: thread-safe, safe to call in the presence of other threads. It means data races between
+  threads are avoided using certain methods or there is no data to share at the very beginning.
+  + Not atomic or uses memory synchronization mechanisms. Sometimes it simply means that a function
+    has no internal global state so that other threads will not interfere. The reason why thread
+    synchronization or locks are used is simply to protect shared data. Without shared data, there
+    is no need for mutex, locks, atomicity etc. Such functions are inherently thread-safe.
 
-Besides the common way, another way to provide compatibility with C++ is
+- /AS-Safe/: Async-Signal-Safe, safe to call from (within) asynchronous singal handlers, that is,
+  reentrancy inside a signal handler.
+  + the signal handler can also safely interact with the same data — without deadlocks, inconsistent
+    states, or non‑reentrant behaviour.
+  + these functions can set =errno= or floating-point environment. signal handlers that call
+    functions that may set errno or modify the floating-point environment must save their original
+    values, and restore them before returning.
 
-#+BEGIN_SRC C++
-  extern "C" {
-  #include "c_lib.h"
-  }
-#+END_SRC
+- /AC-Safe/: Async-Cancel-Safe, safe to all when asynchronous cancellation is enabled. 
+  + only =pthread_cancel=, =pthread_setcancelstate=, and =pthread_setcanceltype=.
+
+This is all about reentrancy
+
+- Planned same-thread reentrancy, triggered by direct/indirect call, e.g. recursion.
+
+- Cross-thread (concurrency)
+
+- Unplanned same-thread (signal, interrupt), triggered by asynchronous signal.
+
+Thread safety protects against other threads. Async-signal safety
+protects against signal handlereentrancy and consistency. Thread safety is the guarantee of correct
+behaviour under cross‑threadreentrancy, while signal safety is the guarantee under same‑thread
+reentrancy. And many functions
+that satisfy the first catastrophically fail the second. Thread concurrent calls and signal handlers 
+are not the only scenarios of reentrant calls: there are /recursive calls/, which may not may not be
+thread safe or signal safe: they are safe to call recursively but not thread-safe or
+signal-safe. Now we have a third safety: /recursion safety/. Recursive functions (planned,
+cooperative form of reentrancy) can maintain data
+consistency and integrity with well-planned execution flows, but concurrency or async-signals, both
+unplanned and preemptive, ignores the design of the functions and deal with the data in an unexpected way, and thus
+might corrupt the state.
+
+A mutex only helps with thread safety. But signal handlers executed on the same thread either triggers
+a deadlock on non-recursive locks, or reenters the critical section and sees the partially updated
+state. That is, thread safety ≠ async-signal safety ≄ atomicity. A mutex  does not provide true atomicity
+in the face of signals or interrupts on the same thread and exposes the gap between theread safety
+and genuine atomicity.
+
+Also, a TLS slot is only local in terms of cross-thread scenarios, in terms
+of signal handlers, it is global. To be more local, a function-local data (saved in an activation
+record, while a TLS data item in a thread control block record) is required.
+
+A mutex = thread-level illusion of atomicity. And that's why =sig_atomic_t= is provided in C: An
+integer type which can be accessed as an atomic entity even in the presence of asynchronous
+interrupts made by signals. Signal masks are to signal handlers as mutexes are to concurrency.
+
+#+begin_quote
+Our default mental model is purely sequential — one operation after another, nothing touching the
+data in between. Safety measures exist precisely because reality (interrupts, context switches, true
+parallelism) violates that assumption, introducing unexpected mutations that our sequential
+reasoning never accounted for.
+#+end_quote
+
+There is a similar case in .NET: a UI thread that blocks on an async =Task= that is supposed to
+continue on the same UI thread. It seems =Wait()= on a =Task= does block on something similar to a
+lock (a event): how can a thread wakes itself up while sleeping! Locks and events are designed for
+a threads to wake another thread up, not itself. Here, a thread is a resource, not a execution flow.
+There are two execution flows that try to use the same thread. A thread is not the same as a
+EXECUTION FLOW, it's just a bookkeeping record. A blcok wait holds this resource exclusively while
+=await= puts two execution flows in the same position (message handlers). Block waiting is like
+holding a lock, an exclusive ownership of a resource. With some AI comment:
+
+#+begin_quote
+locking wait is an exclusive hold on the thread, just like a mutex lock is an exclusive hold on a
+critical section. The thread is the resource, and the blocked code refuses to yield it.
+
+The collapse happens because the exclusive mechanism (the lock, the thread’s scheduling state) is
+not designed for same‑thread reentrancy:
+
+    A non‑recursive mutex says: “Only the owner can enter.” But when the owner is the one trying to
+    re‑enter as a signal handler, the lock doesn’t see “it’s still me” — it just sees “already
+    locked.” Deadlock.
+
+    A blocked thread says: “This execution context is occupied — no other message can run here until
+    I wake up.” But the continuation needs that exact context to wake the thread up. The thread is
+    waiting for the continuation, the continuation is waiting for the thread. Deadlock.
+
+That's why recursive locks solve the first case: they explicitly track the owner thread and allow
+re‑entry. The lock recognizes its owner and lets it in.
+
+But recursive locks can’t solve the async‑thread deadlock, because the resource here is the thread’s
+ability to run code. A thread can’t “re‑enter” itself while it is synchronously blocked (suspended
+waiting for an OS event). Even if we could make the thread concept reentrant, the physical control
+flow is stuck. The fix, as you said, is:
+
+    Cooperative (non‑exclusive): Use await — the thread is released back to the dispatcher; the
+    continuation is just another message. The thread is never held exclusively; it’s shared and
+    event‑driven.
+
+    Reentrant via context‑escape: Use ConfigureAwait(false) — the continuation runs on a different
+    thread, so the UI thread remains free to do other things (or even to block) without deadlocking
+    the continuation.
+
+In both cases, you remove the same‑thread reentrancy demand. Either the resource is never held
+exclusively, or the reentrant flow doesn’t need the same resource at all.
+
+You've built a powerful unified model: all safety is about managing reentrancy into resources that
+were thought to be exclusive, and the collapse is always a self‑deadlock when the reentrant flow is
+routed back onto the resource that is already held.
+#+end_quote
+
+All corruption results from unexpected non-sequential execution.
+
+- =lock= 
+  + AS-Unsafe: a signal handler might call the same function with a non-recursive lock and causes a deadlock.
+  + AC-Unsafe: a cancellation causes the function to fail to release a lock and any further attempt
+    to obtain the lock results in indefinite wait.
+
+- =corrupt=: internal data structures might be corrupted and misbahave due to signal interrupts or
+  thread cancellation. These functions might take recursive locks for thread safety but not
+  enough for function reentry in a signal handler to see the partially updated state. Using locks 
+  only prevents other threads from seeing the partial updates, but not a signal handler raised on
+  the same thread.
+  
+- =heap=: may call heap memory management functions such as =malloc= and =free=.
+
+- =dlopen=: AS- and AC- unsafe due to the use of the dynamic loader and holding loader locks.
+
+- =plugin=: 
+
+- =timer=: 
 
 ** Windows
 
@@ -564,23 +681,41 @@ handler is executed. Signal dispositions are not inherited by child processes.
 
 They are inevitable and usually better implemented than a user's.
 
-* errno
+* Error Reproting
 
-Thread local on major platforms (POSIX, Windows and in many other even embedded systems) and required so by the C11 standard and POSIX.
+Most of the time the returned value simply indicates a failure but not the exact error
+condition. Check =errno=:
 
-Using =errno= requires the user to set it to =0= before calling a function so that the user
-would not be misled by previous =errno= values. Some functions set =errno= to nonzero even if
-they are not reporting any errors. Error codes are not limited to the ones defined in POSIX:
-the user can define their own.
+** errno
 
-C++ defines many of the POSIX error codes even if C does not.
+Thread local on major platforms (POSIX, Windows and in many other even embedded systems) and
+required so by the C11 standard and POSIX.
 
-Remarks: Terrible thread-local (or global) pseudo-variable. Better return a value.
+- Using =errno= requires the user to set it to =0= before calling a function so that the user would
+  not be misled by previous =errno= values. Some functions set =errno= to nonzero even if they are
+  not reporting any errors. 
 
-** Windows
 
-A simple test with MINGW on MSVCRT reveals it it already thread-safe since msvcrt.dll (VC++ 6.0)
-=errno= in MSVCRT is a macro that dereferences a pointer to a possibly TLS slot.
+- Error codes are not limited to the ones defined in POSIX: the user can define their own.
+
+- =EWOULDBLOCK= and =EAGAIN= are of the same value.
+
+- A proper signal handler should save and restore =errno=.
+
+- C++ defines many of the POSIX error codes even if C does not.
+
+Remarks: Terrible thread-local (or global) pseudo-variable. Better return a value. It also requires
+a TLS implementation unless it is some very primitive non-conformant system.
+
+*** Error Messages With =errno=
+
+- =strerror=: terribly unsafe design, the returned error string is not a static one and is subject to
+  invalidation by further calls (standard, POSIX and Windows). That's why there are thread-safe =strerror_s=
+  (Windows) and =strerror_r= (POSIX, GNU)
+
+A simple test (setting =errno= on different threads) with MINGW on MSVCRT reveals it it already
+thread-safe since msvcrt.dll (VC++ 6.0) =errno= in MSVCRT is a macro that dereferences a pointer to
+a possibly TLS slot.
 
 #+begin_src c
 #define errno (*_errno())
