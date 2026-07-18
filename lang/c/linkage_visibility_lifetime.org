@@ -32,3 +32,11 @@ can be made to refer to the same object or function by a process called linkage.
     - C99 =inline= has external linkage but an undefined symbol and another
       definition is expected to be supplied in case inlining does not occur.
   + *no linkage*: no other way to reference the entity except through a certain identifier.
+
+* Visibility
+
+In typical C and C++ practice, internal types, functions, variables are hidden by excluding the
+declarations/definitions from   the public headers, anonymous namespace, =static= keyword,
+=internal=/=detail= namespace, pimpl, interface-based API. However, real encapsulation come from
+symbol visibility configuration, this is what .NET =public=/=internal= does (reflection aside) at
+the assembly level.
