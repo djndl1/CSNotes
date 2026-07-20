@@ -30,9 +30,10 @@ Hardware  |  |     Microarchitecture     |
 
 Operating systems perform essentially unrelated functions:
 
-- an interface to the user
-
 - extended machine/control program (top-down): providing application programmers a clean abstract set of resources instead of the messy hardware ones; OS works as an extended machine. The abstract is the key to managing all the complexity.
+  - abstraction in two aspects: for normal users (interactive interface) and programmers (better API)
+  - abstraction is an understanding in system function. API design is grounded in system design.
+>Abstraction is often taught as ""hiding unnecessary details." That's true, but incomplete. The harder part is deciding which details are essential for the system’s function and meaning. When you design an abstraction, you’re defining a new layer of reality—a model that must faithfully represent the capabilities below while shaping how those capabilities can be used. the interface is the visible boundary, but the function is what the system actually accomplishes through that boundary. 
 
 - resource manager/resource allocator (bottom-up): managing hardware resources. OS works as a resource manager. Resource management includes multiplexing resources in time (CPU multiprocessing) and in space (virtual memory).
 
@@ -51,11 +52,19 @@ A program first writes the program on paper and then punch it on cards. It was t
 
 ## The Third Generation
 
-OS/360, IC, compatible across different computer systems, multiprogramming (CPU multiplexing and memory partitioning), spooling (Simulatenous Peripheral Operation On Line, that is, read next job into memory while processing the previous job), timesharing. MULTICS (MULTiplexed Information and Computing Service), primitive cloud computing concept. UNIX, POSIX, MINIX, Linux.
+- OS/360, IC, compatible across different computer systems, multiprogramming (multiple programs in the memory, CPU multiplexing and memory partitioning), spooling (Simulatenous Peripheral Operation On Line, that is, read next job into memory while processing the previous job), timesharing.
+
+- MULTICS (MULTiplexed Information and Computing Service), primitive cloud computing concept.
+
+- MInicomputers: UNIX, POSIX, MINIX, Linux.
 
 ## The Fourth Generation
 
-Personal computers, CP/M, DOS, MS-DOS, Mac OS, Windows 95/98/ME, Windows NT, Linux, FreeBSD, distributed operating systems, network operating systems.
+- Personal computers, 8080 and Z-80, CP/M, DOS, MS-DOS,
+
+- Mac OS, Windows 95/98/ME, Windows NT, Linux, FreeBSD,
+
+- distributed operating systems, network operating systems.
 
 ## The Fifth Generation: Mobile Computers
 
@@ -97,23 +106,25 @@ Hard deadlines, soft deadlines,  sometimes the operating system is simply a libr
 
 ## Smart Card Operating Systems
 
-JVM
+limited power (computing and eletrical), sinples functions, sometimes JVM-based.
 
 # Hardware basics
 
 ## CPU
 
-- fetch-decode-execute model
+- ISA and registers
 
-- Program counter; stack pointer; program status word;
+- microarchitecture 
+  + simple fetch-decode-execute model
+  + modern pipelined, superscalar CPU (multiple execution units carrying out instructions from a buffer pool)
 
-- pipeline; superscalar (multiple execute units carrying out instructions from a buffer pool)
+- Privileges: generally, all instructions involving I/O and memory protection are disallowed in user mode. Setting the PSW mode bit to enter kernel mode is also forbidden.
+  + kernel mode access is restricted from users. Users can only enter kernel mode by certain instructions and pass through certain routes under kernel mode.
 
-Generally, all instructions involving I/O and memory protection are disallowed in user mode. Setting the PSW mode bit to enter kernel mode is also forbidden.
+- Hyperthreading/hardware multithreading: allows the CPU to hold the state of multiple different threads and then switch back and forth on a nanosecond time scale.
+  This does not offer true parallelism, but thread-switching time is reduced to the order of a nanosecond. Each thread appears to the OS as a separate CPU. This reduces  the time wasted on  memory access because the CPU can execute the other thread.
 
-Hyperthreading/hardware multithreading: allows the CPU to hold the state of multiple different threads and then switch back and forth on a nanosecond time scale. This does not offer true parallelism, but thread-switching time is reduced to the order of a nanosecond. Each thread appears to the OS as a separate CPU.
-
-Many CPUs have multiple cores. GPUs have thousands of tiny cores, good for many small computations done in parallel.
+- Multicore: Many CPUs have multiple cores. GPUs have thousands of tiny cores, good for many small computations done in parallel.
 
 ## Memory
 
@@ -171,32 +182,6 @@ A program in execution, with its address space, registers, a list of open files,
 ## Protection
 
 access control, privilege
-
-## Ontogeny Recapitulates Phylogeny
-
-## Syscalls
-
-A procedure library makes syscalls written in assembly easier to use in C.
-
-- Pushing parameters onto the stack;
-
-- the library procedure puts the syscall number in a place where the OS expects it;
-
-- executes a trap instruction and switches into kernel mode;
-
-- the kernel examines the syscall number and then dispatches to the correct syscall handler;
-
-- after handling the syscall, control returns to the user-space procedure;
-
-- the procedure returns to the user program.
-
-### Win32 API
-
-A Windows program is normally event driven.
-
-On Windows, the library calls and the actual syscalls are highly decoupled. Win32 API are used to get OS services. By decoupling the API interface from the actual syscalls, Microsoft retains the ability to change the actual syscalls in time. Win32 provides compatibility among versions of Windows.
-
-The Win32 API has a huge number of calls for managing windows, geometric figures, text, fonts, scrollbars, dialog boxes, menus, and other features of the GUI.
 
 ## OS Structures
 
@@ -283,6 +268,8 @@ Exokernels partition resources and allocate them to user-level virtual machines 
 
 ## System Calls: Interface to the OS Services
 
+### Services
+
 - Process Control: create process; terminate process; load, execute; get/set process attributes; wait event, signal event; allocate/free memory
 
 - File Management: create/delete/open/close/read/write/ file; retrieve/set file attributes
@@ -294,3 +281,32 @@ Exokernels partition resources and allocate them to user-level virtual machines 
 - commnications: create/close communication; send/receive messages; transfer status information; attach/detach remote devices
 
 - protection
+
+### The Flow
+
+A syscall is structurally similar to an RPC call: contract mandated by the server (kernel), 
+different execution contexts (context switch), untrusted input validation. Upon a syscall, the execution is taken over
+and the user program is suspended, what is executed is the restricted execution route defined by the kernel. 
+The major difference is the transport layer (hardware registers and CPU interrupt/except routing vectors)
+
+A procedure library makes syscalls written in assembly easier to use in C.
+
+- Pushing parameters onto the stack;
+
+- the library procedure puts the syscall number in a place where the OS expects it;
+
+- executes a trap instruction and switches into kernel mode;
+
+- the kernel examines the syscall number and then dispatches to the correct syscall handler;
+
+- after handling the syscall, control returns to the user-space procedure;
+
+- the procedure returns to the user program.
+
+### Win32 API
+
+A Windows program is normally event driven.
+
+On Windows, the library calls and the actual syscalls are highly decoupled. Win32 API are used to get OS services. By decoupling the API interface from the actual syscalls, Microsoft retains the ability to change the actual syscalls in time. Win32 provides compatibility among versions of Windows.
+
+The Win32 API has a huge number of calls for managing windows, geometric figures, text, fonts, scrollbars, dialog boxes, menus, and other features of the GUI.
