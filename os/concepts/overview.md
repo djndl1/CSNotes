@@ -233,14 +233,20 @@ Practical hypervisors use a hybrid strategy. They add a kernel module to do the 
 
 - The Java virtual machine
 
-- Containers, provided by the hosst OS. Each container shares the host OS kernel 
+- Containers, provided by the host OS. Each container shares the host OS kernel 
 and typically the binaries and libraries in a read-only fashion.
 
 ### Exokernels and Unikernel
 
-Exokernels partition resources and allocate them to user-level virtual machines and do not hide the fact that the underlying resources might be shared. This saves a layer of resource remapping. The functionality of exokernels is limited to ensuring protection and multiplexing of resources. The user application is free to build any custom abstraction on limited hardware resources (not real bare metal), or even runs in full kernel mode.
+Exokernels partition resources and allocate them to user-level virtual machines and do not hide the fact that the underlying resources might be shared. 
+This saves a layer of resource remapping. 
+The functionality of exokernels is limited to ensuring protection and multiplexing of resources. The user application is free to build any custom abstraction on limited hardware resources (not real bare metal), or even runs in full kernel mode.
 
 > The exokernel concept is a compromise: let the kernel allocate the basic physical resources of the machine (e.g. disk blocks, memory pages, and processor time) to multiple application programs, and let each program decide what to do with these resources. The program can then link to a support library that implements the abstractions it needs (or it can implement its own).
+
+Library OSes, which provide OS services to user programs in the form of a linked library, instead of an independent OS. A program linked with a library OS runs on bare metal, a hypervisor or another OS in user mode. 
+
+Wine on Linux can be seen somewhat as a library OS. And also [the abstraction layer SQLPAL](https://www.microsoft.com/en-us/sql-server/blog/2016/12/16/sql-server-on-linux-how-introduction/) used by SQL Server Linux: the Drawbridge project is even called a library OS and SQL Server itself had been already designed to be quite self contained, only uses a few low-level features from Windows and then the two are merged together to provide Windows NT services to SQL Server. 
 
 # Services
 
