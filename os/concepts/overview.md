@@ -128,18 +128,21 @@ limited power (computing and eletrical), sinples functions, sometimes JVM-based.
 
 ## Memory
 
-- Hierarchical architecture; 
+- Hierarchical architecture: registers, cache, main memory, nonvolatile storage.
 
-Certain correspondence is established between cache lines and memory addresses.
+- Cached data are transferred in cache lines. 
+  - L1 cache in CPUs (dozens of KB) and L2 cache (several MBs)
+  - when and which item to cache, which cache line to use: a new item will generally be entered on every cache miss.
+  - when and which item to evict
 
-L1 cache: inside the CPU and usually feeds decoded instructions into the CPU's execution engine; L2: several megabytes of recently used memory words.
+- Main memory: volatile RAM, non-volatile RAM (ROM, EEPROM, Flash memory, CMOS)
+  - MMU for virtual memory management
 
-## Disks
-
-- Surface, cylinder, track, sector
-  - tracks through several surfaces forms a cylinder
-
-SSDs are not disks at all, they are flash memory.
+- Non-volatile storage
+  - hard disks: Surface (disk surface), cylinder, track (an annular region), sector (segments of a track, typically 512 bytes). 
+    tracks through several surfaces forms a cylinder. Moving the arm of read/write heads is slow, taking 5-10 msec to a random cylinder and another 5-10 msec for the neeeded sector to rotate.
+  - SSDs: not dissk at all but flash memory.
+  - Persistent memory: Intel Optane
 
 ## I/O Devices
 
