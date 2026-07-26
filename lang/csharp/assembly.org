@@ -1,0 +1,51 @@
+* Identity
+
+-  If and only if an assembly has a unique name, all types defined in the assembly have a unique
+  name.
+
+- Assemblies without a strong name cannot be referenced by strongly named assemblies.
+
+- Assemblies with a weak name can only be installed in the directory where the referencing
+  application is stored or in special subdirectories.
+
+- When the runtime searches an assembly, the version number is only relevant for assemblies with a strong name.
+
+#+begin_quote
+There is no version checking for assemblies without strong names, nor does the runtime check in the
+global assembly cache for assemblies without strong names.
+#+end_quote
+
+* Resolution
+
+- The GAC is searched first for Strong named assemblies 
+
+- the base directory (where the executable resides)
+
+- it is possible to add more search paths by changing the application configuration file
+  + =probing= under =assemblyBinding= 
+  
+** GAC
+
+Side-by-side installation of assemblies with more one than versions of an assembly.
+under =%systemroot%\assembly\GAC_MSIL/32/64\=
+
+Assemblies installed by =gacutil.exe -i/-u=
+
+** Version Redirections 
+
+Not just to resolve diamond issues but also for bug fixes without recompilation.
+
+Configurations that cause a different version to be loaded
+
+- application level: =assemblyBinding= =bindingRedirect= in the configuration file redirects
+  versions of a range to another version.
+
+- machine level: =machine.config= under =%frameworkdir%\%frameworkversion%\config=
+
+- assembly level: via publisher policy assembly, which explicitly specifies that the version is
+  backward compatible with =al.exe= and a DLL configuration file.
+
+* Mnaual Dynamic Assembly Loading
+
+=Assembly.Load=, =Assembly.LoadFrom= (does not load the file directly but an assembly with the same
+identity using the resolution algorithm).
