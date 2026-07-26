@@ -1,4 +1,6 @@
-The most central concept in any operating system is the _process_: an abstract of a running program that turns a physical CPU into multiple virtual CPU. Processes are one of the oldest and most important abstractions that operating systems provide.
+The most central concept in any operating system is the _process_: an abstract of a running program that turns a physical CPU into multiple virtual CPU (only orignally without multithreading). Processes are one of the oldest and most important abstractions that operating systems provide.
+
+A process is no longer a *sequential process* in the literal sense, rather, it represents the entire execution state of a program, an activity with a program, input, output and a state, including the execution flows, the data, security context etc.
 
 # Process
 
@@ -27,9 +29,9 @@ A process terminates usually due to:
 
 1. normal exit (voluntary); error exit (voluntary): A syscall is executed to tell the OS that it is finished.
 
-3. fatal error (involuntary): an error is caused by the process, often due to a program bug.
+2. fatal error (involuntary): an error is caused by the process, often due to a program bug. e.g. Illegal instruction, terminating signals
 
-4. killed by another process (involuntary)
+3. killed by another process (involuntary), on Unix that is also caused by a signal but on Windows this is not the case for the unconditional `TerminateProcess`.
 
 A process may be in
 
@@ -47,14 +49,6 @@ A process may be in
      │       └─────────────┘     │
      │                           │
      │                           │
-     │                           │
-     │                           │
-     │                           │
-     │                           │
-     │                           │
-     │                           │
-     │                           │
-     │                           │
 ┌────▼───────┐              ┌────▼──────┐
 │            │              │           │
 │   Blocked  ├─────────────►│   Ready   │
@@ -66,7 +60,7 @@ The process scheduler handles all these process state changes.
 
 The OS maintains a _process table_ (_process control block_), with one entry per process. Each entry contains important information about the process' state, including its program counter, stack pointer, memory allocation, the status of its open files, its accounting and scheduling information and everything about the process that must be saved when context switch occurs.
 
-Suppose a disk interrupt occurs. (By hardware) The current program counter, program status word, and sometimes a few registers are pushed onto the current stack by the interrupt hardware. The computer jumps to the address specified in the interrupt vector. (By software) More registers are saved; new stack is setup; C interrupt service runs (to handle the disk); Scheduler decides which process to run next; a process is run.
+context switch: Suppose a disk interrupt occurs. (By hardware) The current program counter, program status word, and sometimes a few registers are pushed onto the current stack by the interrupt hardware. The computer jumps to the address specified in the interrupt vector. (By software) More registers are saved; new stack is setup; C interrupt service runs (to handle the disk); Scheduler decides which process to run next; a process is run.
 
 Suppose there are $n$ processes, each spending $p$ fraction of its time waiting for I/O, then the probability of all processes are waiting for I/O is $p^{n}$, the CPU must have at least one process running on it otherwise, then the CPU utilization is 
 
@@ -80,38 +74,36 @@ A better modeling should be constructed using _queuing theory_.
 
 # Threads
 
-The main reason for having threads is that in many applications, multiple activities are going on at once. Threads are lighter weight than processes, easier/faster to create and destroy than processes. Threads are useful especially on systems with multiple CPUs for performance reason.
+The main reason for having threads is that in many applications:
+-  multiple activities are going on at once and threading makes them easier to manage
+-  Threads are lighter weight than processes, easier/faster to create and destroy than processes
+- Threads are useful especially on systems with multiple CPUs for performance reason
+-  with I/O to release execution from waiting on I/O
 
-- **thread**: The abstraction of execution of a process is a _thread of execution_. The thread has a program counter, registers that hold its current working variables, a stack which contains the execution history with one frame for each procedure. Threads are the entities scheduled for execution on the CPU.
+**thread**: The abstraction of execution of a process is a _thread of execution_. The thread has a program counter, registers that hold its current working variables, a stack which contains the execution history with one frame for each procedure. Threads are the entities scheduled for execution on the CPU.
+
+Today a thread may not be a single execution flow, but a bookkeeping record, a container for many execution flows to make use of, not just in a userspace thread pool, sometimes even in the kernel.
 
 What threads add to the process model is to allow multiple executions to take place in the same process environment, to a large degree independent of one another. 
-Threading separates the concepts of /resource grouping/ and /execution/. Processes share physical hardware resources while threads shared an address space and other resources.
+Threading separates the concepts of _resource grouping_ and _execution_. Processes share physical hardware resources while threads shared an address space and other resources.
 
 - **multithreading**: used to describe the situation of allowing multiple threads in the same process. Some CPUs have direct hardware support for multithreading and allow thread switches to happen on a nanosecond time scale.
 
 Multithreading adds complications into the programming model: the behavior and semantics of Unix `fork` when the parent process is multithreaded; thread synchronization;
 
-A thread may be in:
-
-- running
-
-- blocked
-
-- ready
-
-- terminated
+A thread may be in: running, blocked, ready, terminated.
 
 There are two main places to implement threads:
 
-- *Userspace*: can be implemented /on an OS that does not support threads/. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Making a local call into the runtime is /much more efficient/ than calling a kernel call. User-level threads allow each process to /have its own scheduling algorithm/. Some major problems with user-level threads are: 
-  - blocking syscalls blocks the whole process, which defeats one of the major goals of having multiple threads.Either the system calls have to be nonblocking or it is possible to determine in advance whether it will block. 
+- *Userspace*: can be implemented _on an OS that does not support threads_. Each process needs its own private thread table to keep track of the threads in the process. A user space runtime is responsible for thread management. Making a local call into the runtime is _much more efficient_ than calling a kernel call. User-level threads allow each process to _have its own scheduling algorithm_. Some major problems with user-level threads are: 
+  - blocking syscalls blocks the whole process, which defeats one of the major goals of having multiple threads. Either the system calls have to be nonblocking or it is possible to determine in advance whether it will block. 
   - The whole process is blocked when a page fault occurs. 
-  - Cooperative scheduling: within a single process, there are no clock interrupts, making it impossible to schedule processes preemptively. The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
+  - Cooperative scheduling: within a single process, there are no clock interrupts, making it impossible to schedule threads  preemptively. The scheduler might request a clock signal once a second to give it control, however, this is crude and messy to program.
   - threads are often used in situations where they are frequently blocked, to overcome the negative effects of blocking calls to provide responsive results and high throughput. Kernel threads may immediately switch on blocking calls without much cost since the kernel has already taken control. For CPU-bound tasks, userspace threads are not of much value.
 
-- *Kernel**: the kernel handles all the threads in the system. In some systems, thread structures in the kernel are recycled and reused. The main disadvantage is that the cost of a syscall is substantial.
+- *Kernel*: the kernel handles all the threads in the system. In some systems, thread structures in the kernel are recycled and reused. The main disadvantage is that the cost of a syscall is substantial.
 
-- hybrid: use kernel-level threads and then multiplex user-level onto some or all of them.
+- *hybrid*: use kernel-level threads and then multiplex user-level onto some or all of them.
 
 - [Scheduler activations](http://polaris.imag.fr/vincent.danjean/papers/anderson.pdf): 
 
@@ -119,14 +111,18 @@ There are two main places to implement threads:
 
 ## Multithreading Versus Event-Driven
 
-I/O operations are mostly handled by peripheral devices rather than the CPU and thus inherently asynchronous and concurrent.
-In a multi-threaded program, each run of a thread is a task. The runtime switches between threads to run each task. In an event-driven program,
-A single thread always uses async I/O and saves each task's I/O state before moving on to another task. The thread runs in an event loop, keeps checking all the saved states and picks completed ones to carry out related tasks further. It only returns to a previous task when the related async I/O operation returns.
-A multi-threaded program switches tasks through the runtime and tasks' states are managed and maintained by the runtime. An event-driven program maintains the states
-of tasks by itself and cooperatively yields and switches to another task. A thread is a vessel of a task, which records its execution state. The threading runtime takes this state and lets the CPU to continue at the saved state and to yield when appropriate. The main thread in an event-driven program may as well simulate this mechanism with cooperative multitasking: saving the execution state of a task when it simply cannot continue due to logic requirement, and continuing with the task only when the task's required condition is met. There is no rule saying that multitasking requires multi-threading.
-A typical event driven program runs like the following psuedocode that simulates a web server:
+I/O operations are inherently asynchronous and concurrent, as they are primarily handled by peripheral devices rather than the CPU. There is no need to force a CPU execution flow concept (thread) on I/O operations.
+
+In a multi-threaded program, each run of a thread constitutes a task. The threading runtime manages the switching between these tasks, taking responsibility for maintaining and managing their states. A thread acts as a vessel that records a task’s execution state; the runtime uses this saved state to let the CPU resume execution at the correct point and yield when appropriate.
+
+In contrast, an event-driven program uses a single thread with asynchronous or non-blocking I/O. Here, the program maintains its own task states, saving a task's I/O state before moving on to another operation. The thread runs an event loop that continually checks all saved states; when an async I/O operation completes, the loop picks up that specific task and resumes its execution. This process is cooperative—tasks explicitly yield and switch when they cannot proceed due to logic requirements.
+
+Notably, the main thread in an event-driven program effectively simulates the threading runtime's mechanism through this cooperative approach: it saves a task’s execution state whenever it is blocked, and only resumes the task when its required condition is met.
+
+Ultimately, this demonstrates that multitasking does not necessarily require multi-threading.
 
 ```c
+// event-driven web server 
 inputHandles = { }
 outputHandles = {  }
 
@@ -168,6 +164,11 @@ while (true) {
 }
 ```
 
+In this phased execution model, request handling is divided into three or more sequential stages. The thread processes pending tasks by iterating through these stages from first to last, checking at each one which requests are ready to proceed and handling them accordingly.
+
+At the end of every stage, the request handling flow cooperatively yields. For a task to advance to the next stage, its associated I/O handles must be actively monitored so that the runtime can determine when it is ready to continue. As a result, pending tasks are distributed across all stages, and the program must systematically inspect and process them in order, always starting from the first stage.
+
+This design naturally frames each stage as beginning with I/O calls that may be ready and ending with calls that may potentially block, thereby establishing clear and consistent boundaries for yielding and resuming execution.
 
 ## Issues When Making Existing Code Multithreaded
 
