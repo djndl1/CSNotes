@@ -184,9 +184,9 @@ Many library procedures are not reentrant: they are not designed to have a secon
 
 Signals are hard to handle in multithreading as they are not designed for this. Some signals are logically thread-specific while others have semantics unrelated to threading.
 
-# IPC
+# IPC & Synchronization
 
-Two main issues:
+Main issues:
 
 1. how to pass information to another process/thread
 
@@ -194,11 +194,15 @@ Two main issues:
 
 3. Proper sequencing when dependencies are present among processes/threads.
 
-To overcome race conditions, mutual exclusion is needed. The choice of appropriate primitive operations for achieving mutual exclusion is a major design issue in any operating system. 
+For inter-process communication (IPC) and synchronization, certain data must be shared among processes or threads. However, operations performed within the sections of code that access this shared data can lead to race conditions.
 
-- race conditions: When two or more processes are reading or writing some shared data and the final result depends on who runs precisely when.
+- _critical region/section_: the part of the program where the shared resource is accessed. 
 
-- _critical region/section_: the part of the program where the shared resource is accessed. No two processes may be simultaneously inside their critical regions.
+- _race conditions_: the system's substantive behavior is dependent on the sequence or timing of uncontrollable events, leading to unexpected or inconsistent results. For a software system A computer program has multiple code paths that are executing at the same time. If the multiple code paths take a different amount of time than expected, they can finish in a different order than expected, which can cause software bugs due to unanticipated behavior.
+
+Race conditions arise because the sequence of execution—including context switches—is not controlled by the processes or threads themselves. However, what can be controlled is the access to the shared resource. By forcing a specific ordering of that access, we can avoid race conditions. The core challenge is that processes or threads interfere with one another when they are inside a critical section.
+
+To eliminate this conflict, we can enforce exclusive ownership of the shared resource for a short period—a mechanism known as _mutual exclusion_. The choice of appropriate primitive operations for achieving mutual exclusion remains a major design issue in any operating system.
 
 A good solution to mutual exclusion should meet the following criteria:
 
@@ -212,11 +216,38 @@ A good solution to mutual exclusion should meet the following criteria:
 
 To achieve mutual exclusion
 
-### Busy Waiting
+### Mutual Exclusin with Busy Waiting
 
-- disabling interrupts: have each process disable all interrupts just after entering its critical region and reenable them just before leaving it. Disabling interupts is undesired and does not work for multiprocessor systems. Disabling interrupts is often a useful technique within the operating system itself but is not appropriate as a general mutual exclusion mechanism for user processes.
+- _disabling interrupts_ to achive mutual exclusion: Context switch relies on clock interrupts. Have each process disable all interrupts just after entering its critical region and reenable them just before leaving it so that no context switch can take place. Disabling interupts is undesirable and does not work for multiprocessor systems. 
+Disabling interrupts is often a useful technique within the operating system itself but is not appropriate as a general mutual exclusion mechanism for user processes.
 
-- strict alternation: not suitable for two processes at different execution rate. A process may be blocked by the other process even if the other is not in its critical region (it is one process' turn to enter its critical region while it is still in its non-critical region). There is no read-test-write race condition since the acquire-release mechanism is done by the other process/thread.
+- _atomic instructions_: A pure software solution using a "locked" variable is not enough due to the operation of test and enter not being atomic and thus suffers from the same race condition. With a little help (atomic instructions) from the hardware, this can be done:
+
+```asm
+enter_region:
+	tsl register, lock   // read lock and set lock in a single instruction by locking the memory bus
+	cmp register, #0     // the second one that executes tsl always sees 1
+	jne enter_region     // spin and test
+    ret
+
+leave_region:
+	move lock, #0
+	ret
+
+// or
+enter_region:
+	move register, #1
+	xchg register, lock  // exchange = read lock into register and set lock to 1, the same as tsl
+	cmp register, #0
+	jne enter_region
+	ret
+
+leave_region:
+	move lock, #0
+	ret
+```
+
+- _strict alternation_: not suitable for two processes at different execution rate. A process may be blocked by the other process even if the other is not in its critical region (it is one process' turn to enter its critical region while it is still in its non-critical region). There is no read-test-write race condition since the acquire-release mechanism is done by the other process/thread.
 
 ```c
 int turn;
