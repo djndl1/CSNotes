@@ -247,7 +247,7 @@ leave_region:
 	ret
 ```
 
-- _strict alternation_: not suitable for two processes at different execution rate. A process may be blocked by the other process even if the other is not in its critical region (it is one process' turn to enter its critical region while it is still in its non-critical region). There is no read-test-write race condition since the acquire-release mechanism is done by the other process/thread.
+- _strict alternation_: not suitable for two processes at different execution rate. There is no read-test-write race condition because there is no test-and-set operation, one process tests to enter the critical region and the other decides whether it can enter. This works only if the two processes work in strict alteration: if one process is too fast, enters and leaves the critical region and then the noncritical region while the other is still in the noncritical region, the first one will be blocked at the while loop because the latest `turn` value is set by itself and the only value set by the other process can make it proceed. In this solution, a process cannot enter the critical section in succession.
 
 ```c
 int turn;
@@ -264,8 +264,7 @@ void process_0(void)
 
 void process_1(void)
 {
-        while (turn != 0)
-                ;
+        while (turn != 1);
         critical_region();
         turn = 0;
         non_critical_region();
@@ -273,6 +272,8 @@ void process_1(void)
 ```
 
 - Peterson's solution: lock variables and warning variables; A software solution. `enter_region` will ensure a process enters the region safely. If both processes try to enter the region, the last one that sets `turn` will enter region while the second one busily waits. No read-test-write here. A simple assignment is atomic.
+`interested` indicates contention. A process can only enter the critical region when there is no contention and it's fast enough to enter without losing its `turn`.
+There is no test-and-set, it's set-and-acquire-or-fail. The problem with nonatomic test-and-set is setting based on stale value while with  this solution, we enter by testing.
 
 ```c
 #include <stdbool.h>
@@ -298,45 +299,14 @@ void leave_region(int process)
 }
 ```
 
-- `tsl`, a hardware solution. `tsl` reads the contents of the memory word `lock` into register `rx` and then stores a nonzero value at the memory address `lock`. The memory bus is locked so that a second processor cannot acess the work in `lock`. An alternative solution is to use `xchg`: exchanges the contents of two locations atomically.
-
-```asm
-; a spin lock, fast if the wait is short
-; if lock is 1, any process is guaranteed to wait since tsl is tsl read-write is indivisible
-; and the process will definitely read the current value of lock into rx.
-enter_region:
-    tsl rx, lock
-    cmp rx, #0
-    jne enter_region
-    ret
-    
-leave_region:
-    mov lock, #0
-    ret
-```
-
-```asm
-enter_region:
-    mov, rx, #1
-    xchg rx, lock ; the set-one operation replaced by exchanging but the mechanism is the same.
-    cmp rx, #0
-    jne enter_region
-    ret
-    
-leave_region:
-    mov lock, #0
-    ret
-```
-
 In essence, what these solutions do is this: when a process wants to enter its
 critical region, it checks to see if the entry is allowed. If it is not, the
 process just sits in a tight loop waiting until it is.
 
-
 Busy waiting may encounter the _priority inversion problem_ (the lower-priority
 process in its critical section may not be scheduled to run while the higher-priority process is busy waiting).
 
-### IPC that blocks
+### Mutual Exclusion that blocks
 
 - /The Producer-Consumer Problem/: Two processes share a common, fixed-size
   buffer. One of them, the producer, puts information into the buffer, and the
