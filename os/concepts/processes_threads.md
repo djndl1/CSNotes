@@ -306,20 +306,31 @@ process just sits in a tight loop waiting until it is.
 Busy waiting may encounter the _priority inversion problem_ (the lower-priority
 process in its critical section may not be scheduled to run while the higher-priority process is busy waiting).
 
-### Mutual Exclusion that blocks
+### Blocking Operations
 
-- /The Producer-Consumer Problem/: Two processes share a common, fixed-size
+/The Producer-Consumer Problem/ (Bounded Buffer Problem): Two processes share a common, fixed-size
   buffer. One of them, the producer, puts information into the buffer, and the
   other one, the consumer, takes it out. The Producer process must not produce
   an item if the shared buffer is full. The Producer process must not produce an
   item if the shared buffer is full. At any given instance, only one process
   should be able to access the shared buffer and make changes to it.
 
+A naive solution to the producer-consumer problem uses sleep and wakeup calls: the producer goes to sleep when the buffer is full, and the consumer goes to sleep when the buffer is empty. Likewise, the producer is woken up when the buffer is no longer full, and the consumer when it is no longer empty.
+
+However, this approach suffers from a critical race condition. The operations of checking the item count and then deciding to sleep (or wake) are not atomic—they can be interrupted by a context switch.
+
+Consider this classic deadlock scenario: the consumer checks the buffer, finds it empty, and decides to sleep. But just before it actually executes the sleep operation, a context switch occurs. The producer runs, fills the buffer, and sends a wakeup signal to the consumer. At that moment, however, the consumer is still awake (since it hasn't gone to sleep yet), so the wakeup is effectively lost. The producer, now seeing the buffer is full, goes to sleep. Finally, the consumer resumes and completes its sleep operation. The result is that both processes remain asleep forever—the producer waits for space, and the consumer waits for data.
+
+The underlying problem is that this test-and-act sequence can be interrupted, causing a process to take action based on stale or incorrect information, thereby breaking the intended state transition. A simple fix is to notify the consumer that it should stay awake using a wakeup waiting bit, The more consumers, the more bits to use.
+
 #### Semaphore
+
+A mechanism designed proposed to solve the producer-consumer problem by making 
+the operations indivisible (atomic).
 
 - **semaphore**: using an integer variable to count the number of wakeups saved
   for future use. Two atomic actions that check the value, change it and
-  possibly go to sleep/wake up are P (down, wait) and V (up, signal). This
+  possibly go to sleep/wake up are P (proberen, down, wait) and V (verhogen, up, signal). This
   atomicity is essential to solving synchronization problems and avoiding race
   conditions.
   
@@ -327,11 +338,17 @@ process in its critical section may not be scheduled to run while the higher-pri
   If the new value of the semaphore variable is negative, the process executing
   wait is blocked. Otherwise, the process continues execution,
   having used a unit of the resource.
+  ```c
+  if (--semaphore < 0) sleep();
+  ```
   
 - /V/, /up/, /signal/: Increments the value of semaphore variable by 1. After
   the increment, if the pre-increment value was negative (meaning there are
   processes waiting for  a resource), it transfers a blocked process from the
   semaphore's waiting queue to the ready queue.
+  ```c
+  if (semaphore++ < 0) wake_up();
+  ```
 
 ```c
 #include <stdbool.h>
@@ -380,19 +397,27 @@ void consumer(void)
 }
 ```
 
+A single semaphore is not enough: `empty` and `full` semaphores are required for the producer/consumers to sleep and wake up (/synchronization/)
+so that certain event sequences do or do not occur (proper state transition).
+A dedicated binary semaphore `mutex` here ensures /mutual exclusion/ and prevents chaos. 
+Mutual exclusion and synchronization are unrelated and the `mutex` is not supposed to protect the two synchronization semaphores (no `down(&full)` after `down(&mutex)` ), otherwise a producer cannot fill the buffer if the `mutex` is held by a sleeping consumer. `up(&empty/full)` can be put inside the critical region however but it 
+causes extra delay if the notified consumer runs immediately and gets blocked by the mutex.
+
+The exact implementation may use a few atomic instructions and possibly locks the memory bus. 
+
  e.g. semaphore used on I/O devices and interrupt: a process waiting on an empty
  semaphore after starting an I/O operation until the interrupt comes in and
  signals that semaphore to allow the process to handle the interrupt.
 
-- **mutex**: a special version of binary semaphore, in two states: locked, or unlocked. This may not need a kernel call. Also, a mutex has a owner, a specific thread/process.
+- **mutex**: a special version of binary semaphore, in two states: locked, or unlocked. This may not need a kernel call. Also, a mutex has a owner, a specific thread/process. A mutex may be implemented by a binary semaphore but not required.
 
 ```asm
 mutex_lock:
   tsl rx, mutex
   cmp rx, #0
   jze ok
-  call thread_yield
-  jmp mutex_lock
+  call thread_yield    // yield instead of testing in a loop and no more dead locks if there is no context switch (user threads, priority inversion)
+  jmp mutex_lock       // if a lock is held, it means someone else needs the CPU to finish its job in the critical section.
 ok: ret
 
 mutex_unlock:
