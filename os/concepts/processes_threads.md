@@ -323,6 +323,9 @@ Consider this classic deadlock scenario: the consumer checks the buffer, finds i
 
 The underlying problem is that this test-and-act sequence can be interrupted, causing a process to take action based on stale or incorrect information, thereby breaking the intended state transition. A simple fix is to notify the consumer that it should stay awake using a wakeup waiting bit, The more consumers, the more bits to use.
 
+/The Readers and Writers Problem/: It is acceptable to have multiple processes reading the database at the same time, but if one process is updating (writing)
+the database, no other processes may have access to the database, not even readers.
+
 #### Semaphore
 
 A mechanism designed proposed to solve the producer-consumer problem by making 
@@ -408,6 +411,45 @@ The exact implementation may use a few atomic instructions and possibly locks th
  e.g. semaphore used on I/O devices and interrupt: a process waiting on an empty
  semaphore after starting an I/O operation until the interrupt comes in and
  signals that semaphore to allow the process to handle the interrupt.
+
+For the reader/writer problem:
+
+```c
+typedef int semaphore;
+semaphore mutex = 1;
+semaphore db = 1;
+int rc = 0;    // reader count
+
+void reader(void)
+{
+	while (TRUE) {
+		// mutex protects rc
+		down(&mutex);
+		rc = rc + 1;
+		if (rc == 1) down(&db); // first reader enters, acquires the db
+		up(&mutex);
+		// db protects the database
+	   read_database();
+	   
+	   down(&mutex);
+	   rc = rc - 1;
+	   if (rc == 0) up(&db); // last reader leaves, releases the db
+	   up(&mutex);
+
+	   use_data_read();
+   }
+}
+// the potential problem is that too many readers may hog the database and no writers can enter
+void writer(void)
+{
+	while (TRUE) {
+		prepare_data( );
+   		down(&db);
+		write_database( );
+		up(&db);
+	}
+}
+```
 
 - **mutex**: a special version of binary semaphore, in two states: locked, or unlocked. This may not need a kernel call. Also, a mutex has a owner, a specific thread/process. A mutex may be implemented by a binary semaphore but not required.
 
