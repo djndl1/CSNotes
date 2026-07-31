@@ -499,9 +499,16 @@ The linux futex is a 32-bit integer with atomic operations and associated with a
 #### Monitor
 
 - **monitor**: a higher-level synchronization primitive rather than the hard-to-use-and-easy-to-make-a-mistake mutexes and semaphores. A monitor is a colletion of procedure, variables and data structures that are all grouped together in a special kind of module or package. Only one task can be active in a monitor at any instant. 
+Monitors are a programming-language construct. It is up to the compiler to implement mutual exclusion on monitor entries. 
 
-Monitors are a programming-language construct. It is up to the compiler to implement mutual exclusion on monitor entries. The automatic mutual exclusion on monitor procedures guarantees that if the producer inside a monitor procedure discovers that the buffer is full, it will be able to complete the `wait` operation without having to worry about the possibility that the scheduler may switch to the consumer just before the `wait` completes, that is, a signal is never lost (in case where a consumer is about to wait after knowing the condition is not met).
+1. Only one proess can be in the monitor at a time. A process acquires the mutex upon enter. The acquisition and release of the mutex is automatic on enter and exit.
 
+2. Mutual exclusion is not enough. A monitor adds `signal` and `wait` condvar procedures for synchronization.
+  - `wait` causes the calling process to block and allows another process blocking at the entry to enter now, typical condvar behavior.
+  - `signal`: wakes up a `wait`ing process before exiting the monitor.
+  - the key is the automatic mutual exclusion conbined with `wait`: as long as a process is running inside a monitor, it has the mutex. `wait ` and `signal` 
+    are not simple `sleep` and `wakeup`: they have implicit acquire-release operations on the mutex and no activity from the producer before a consumer calling `wait`
+    actually goes to sleep because there IS a mutex held by the consumer.
 
 ```basic
 monitor ProducerConsumer
@@ -510,12 +517,12 @@ monitor ProducerConsumer
 
   procedure insert(item: integer);
   begin
-        if count = N then wait(full);
-        insert_item(item);
-        count := count + 1;
-        if count = 1 then signal(empty);
-  end;
-
+        if count = N then wait(full);        # if there is only one producer and one consumer and both are well-behaved, if is fine
+        insert_item(item);                   # use while otherwise
+		count := count + 1;                  # being woken up does not mean the condition is met: conditional variable is not the condition itself, just a channel to communicate the condition
+        if count = 1 then signal(empty);     # 1. another thread might come in and steal the condition
+  end;                                       # 2. for multiple waiting threads, only first one actually has the condition
+                                             # 3. spurious wakeup: the waiting thread just wakes up for no reason even if the condition is not met due to OS problems or                                             # some badly-behaved signaling thread that has not fulfill the condition.
   function remove: integer;
   begin
         if count = 0 then wait(empty);
