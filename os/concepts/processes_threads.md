@@ -559,18 +559,33 @@ end;
 
 #### Message Passing
 
-- **message passing**: low-level synchronization primitives don't work on distributed systems. Message passing is commonly used in parallel programming systems. Message loss, duplicates, authentication and performance are issues with message passing.  Two primitives are available: `send(destination, message)` and `receive(source, message)`. 
+**message passing**: low-level synchronization primitives based on `TSL` or `XCHG` don't work on distributed systems. Message passing is commonly used in parallel programming systems. 
+
+Main issues with message passing:
+
+- Message loss: acknowledge
+
+- duplicates: lost acknowledge causes retransmission and duplicates, solved with sequence numbers.
+
+- authentication
+
+- performance are issues with message passing
 
 Consider the producer-consumer problem without using shared memory. _If no message is available, the receiver can block until one arrives._ The producer also blocks on full. 
 There is no race condition since they don't manipulate shared resource. Both the producer and the consumer operate on messages that they have received and suspend when there's no more messages to handle.
 
 - **mailbox**: a place to buffer a certain number of messages. Both `send` and `receive` uses a mailbox as its address. A producere process blocks on a full mailbox and a consumer blocks on an empty mailbox.
+ - a mailbox is similar to a MQ but not required to be FIFO, typically for a single receiver
 
-- **rendezvous**: no buffer is required: both `send` and `receive` block waiting and run in locksteps.
+- **rendezvous**: no buffer is required: both `send` and `receive` block waiting and run in strict lockstep.
 
 ```c
 /*
  * tow mailboxes are used, one for producer and another for consumer, with a size of N.
+ * this is not a simple push-pull: the producer only sends a message if it receives an empty-slot message.
+ *                                 the consumer sends back an empty reply to notify the producer it has received one and the producer can send another.
+ *                                 This is more like a request-response: the consumer request by sending an empty message, the producer responds by sending a full message
+ *  There will be no message flooding or starvation: both parties work in a loose lockstep.
  */
 #include <stdio.h>
 
