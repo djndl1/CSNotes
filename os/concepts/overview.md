@@ -52,11 +52,24 @@ A program first writes the program on paper and then punch it on cards. It was t
 
 ## The Third Generation
 
-- OS/360, IC, compatible across different computer systems, multiprogramming (multiple programs in the memory, CPU multiplexing and memory partitioning), spooling (Simulatenous Peripheral Operation On Line, that is, read next job into memory while processing the previous job), timesharing.
+- OS/360, IC, compatible across different computer systems, multiprogramming (multiple programs in the memory, CPU multiplexing and memory partitioning), spooling (Simulatenous *Peripheral Operation* On Line, that is, a combination of buffering and queuing), timesharing.
 
 - MULTICS (MULTiplexed Information and Computing Service), primitive cloud computing concept.
 
 - MInicomputers: UNIX, POSIX, MINIX, Linux.
+
+### Spooling
+
+Peripheral devices have been slower than the processing units and the PUs cannot simply wait for efficiency reason.
+A dedicated queued buffer mechanism to free the PUs (becasuse the main system was not capable of multitasking 
+ ).
+
+- spooler: the spooling manager program
+
+- spool (a spool of thread, like a tape): the jobs in queue
+
+Historically used for task reading in batch processing, Nowadays mainly for sending printing jobs to printers 
+to free the printing software (e.g. Office suites)
 
 ## The Fourth Generation
 
