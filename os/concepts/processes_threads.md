@@ -1,6 +1,8 @@
 The most central concept in any operating system is the _process_: an abstract of a running program that turns a physical CPU into multiple virtual CPU (only orignally without multithreading). Processes are one of the oldest and most important abstractions that operating systems provide.
 
-A process is no longer a *sequential process* in the literal sense, rather, it represents the entire execution state of a program, an activity with a program, input, output and a state, including the execution flows, the data, security context etc.
+A process is no longer a *sequential process* in the literal sense, rather, it represents the entire execution state of a program, an activity with a program, input, output and a state, including the execution flows, the data, security context etc. A process is the unit of modern *multiprogramming* (multipe programs，多道程序设计).
+
+> all activities are divided over a number of sequential processes. These sequential processes are placed at various hierarchical levels, in each of which one or more independent abstractions have been implemented. 
 
 # Process
 
@@ -627,13 +629,45 @@ e.g. the **Message Passing Interface** standard protocol.
 
 #### Barrier
 
-- **barrier**: When a thread reaches the barrier, it is blocked until all processes have reached the barrier. This allows groups of threads to synchronize. 
+- **barrier**: When a process reaches the barrier, it is blocked until all processes have reached the barrier. This allows groups of threads to synchronize. 
 e.g. multiple threads computing a matrix transformation *iteratively*, that is, no thread should proceed to the next iteration before others.
+
+- **memory barrier/fence**:  enforce an order to guarantee that all memory operations (to read or write memory) started before the barrier instruction will also finish before the memory operations issued after the barrier. An enforced sequence point.
+
+```c
+// THREAD 1:
+while (turn != 1) { } /* loop */
+printf ("%d\n", x);
+
+
+// THREAD 2:, turn = 1 might be executed before x = 100, thread 1 might not print x = 100
+x = 100;
+turn = 1;
+```
+
+#### Priority Inversion
+
+A lower-priority thread holds a mutex while a preempting higher-priority thread needs the mutex to move on, causing a deadlock.
+Solution: if the priority is not high enough, make it higher
+
+- (naive) disabling all interrupts
+
+- /priority ceiling/: a priority is assigned to the mutex and the holding thread has this priority. As long as contending threads 
+  have no higher priority, no priority inversion occurs.
+  
+- /priority inheritance/: the holding thread temporarily inherit the priority of the contending higher-priority threads
+
+- /random boosting/: give random holding threads a high priority
 
 #### Lock-free
 
 - **read-copy-update**: properly design an algorithm to ensure that each reader either reads the old version of the data or the new one entirely. 
-  **RCU** decouples the removal and reclamation phases of the update.
+  **RCU** decouples the removal and reclamation phases of the update.  Of course atomic operations are still required.
+  RCU needs to carefully determines the maximum time (grace period, read-side critical section) a reader may hold a reference to the old version and then reclaim the memory: a simple 
+  criterion is to wait until all the threads have executed a context switch.
+  - used commonly in OS kernels
+
+
 
 # Scheduling
 
