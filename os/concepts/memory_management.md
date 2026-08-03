@@ -49,14 +49,15 @@ The OS must manage memory allocation of processes (note this is not about implem
   - simple but inefficient both in memory and during searching: a large region of free memory requires a large number of bits; 
     searching for a free region of certain size requires iterating over many consecutive bits. One has to measure/represent a hole by many bits.
 
-- _linked list_: a sorted linked list of allocated and free memory segments, where a segment either contains a process or is an empty hole between two processes.  The node would look like `(State, StartAddress, SegmentLength, PointerToNextNode)`. There are several algorithms to allocate memory for a created process.
+- _linked list_: a sorted linked list of allocated and free memory segments, where a segment either contains a process or is an empty hole between two processes.  The node looks like `(State, StartAddress, SegmentLength, PointerToNextNode[, PointerToLastNode])`. Freed segments can be easily merged with free neighbors. There are several algorithms to allocate memory for a created process.
    - First fit: use the first hole that is big enough
-   - Next fit: search the list from the place where it left off last time instead of always at the beginning; worse than first fit
-   - Best fit: take the smallest appropriate hole among the entire list; resulting in more wasted memory than first/next fit
+   - Next fit: search the list from the place where the last search ended instead of always at the beginning; worse than first fit
+   - Best fit: take the smallest appropriate hole among the entire list; resulting in more wasted memory than first/next fit due to very small useless holes
    - Worst fit: take the largest available hole so that the new hole will be big enough to be useful; not very good either
-   - Quick fit: maintains separate lists for some of the more common sizes requested. The downside is expensive merge during deallocation due to segment nodes not being sorted.
+   - Quick fit: a more refined best fit with partial sorting. It maintains separate lists for some of the more common sizes requested. The downside is expensive merge during deallocation due to segment node neighbors not being linked as neighbors.
    - Allocated segments and unallocated holes can be maintained in separate lists. The hole list may be sorted to allow best-fit to quickly find the first as the best-fit hole. The downside is inefficient deallocation where a freed segment has to be removed from 
    the process list and inserted into the hole list, with possible merging.
+   - the hole list nodes can be stored at the beginning of a hole instead of being stored in a dedicated memory region.
 
 # Virtual Memory
 
