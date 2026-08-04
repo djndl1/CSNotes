@@ -61,9 +61,23 @@ The OS must manage memory allocation of processes (note this is not about implem
 
 # Virtual Memory
 
-The problem of programs larger than memory has been around since the beginning of computing. A solution in the '60s was to split programs into little pieces (overlays). The overlay manager loaded each overlay when it was needed. The overlays were kept on the disk and swapped in and out of memory by the overlay manager. The work of splitting the program had to be done manually by the programmer. The automatic version of this splitting method is known as _virtual memory_. The basic idea is that each program has its own address space, which is broken up into chunks called _pages_ and swapped by pages. An alternative, called _segmentation_ is to use variable-sized segment as units, which is not really used much nowadays.
+- virtual private address space with *address mapping*
 
-Virtual memory creates a new abstraction - the address space which is an abstraction of physical memory, just as a process is an abstraction of the physical processor.
+- partial *swapping* techniques
+
+## From Overlay To Paging Virtual Memory 
+
+A solution in the '60s was to split programs into little pieces (overlays). The overlay manager loaded each overlay when it was needed. The overlays were kept on the disk and swapped in and out of memory by the overlay manager. The work of splitting the program had to be done manually by the programmer. 
+
+The automatic version of this splitting method is known as _virtual memory_. The basic idea is that the address space of each program is broken up into chunks called _pages_:
+
+- mapped from virtual addresses to physical addresses on fly by the hardware when a part of the address space is referenced
+
+- swapped by pages if the page is not in the physical memory.
+
+A generializatin of the base-and-limit-register idea. Paging maps memory in small  chunks (pages) of equal size while the base-and-limit scheme maps memory in large blocks of variable length.
+
+An alternative, called _segmentation_ is to use variable-sized segment as units, which is not really used much nowadays.
 
 ## Paging Overview
 
@@ -73,17 +87,25 @@ Virtual memory creates a new abstraction - the address space which is an abstrac
 
 - _virtual address_: program-generated address.
 
-When virtual memory is used, the virtual addresses do not go directly to the memory bus. Instead, they go to an MMU that maps the virtual addresses onto the physical memory addresses. The MMU holds the current set of page mappings. A present/absent bit keeps track of which pages are physically present in memory. A page fault causes the OS to bring the unmapped page into physical memory and occupy a page frame if that page is not mapped. The original page that uses this frame, if any, is set to absent and the faulting page is set to present.
+*mapping*: When virtual memory is used, the virtual addresses do not go directly to the memory bus. Instead, they go to an MMU that maps the virtual addresses onto the physical memory addresses. The MMU holds the current set of page mappings. All memory access made by software use virtual addresses including the kernel, which has its own set of mappings. Sometimes the OS maps the kernel memory into the user process' virtual space but protected to avoid switching page mappings.
 
-Using a page size of a power of 2 simplifies the mapping from virtual addresses to physical addresses as the lower offset part may be retained while the higher page number is mapped and replaced. All memory access made by software use virtual addresses including the kernel, which has its own set of mappings. Sometimes the OS maps the kernel memory into the user process' virtual space but protected to avoid switching page mappings.
+*swapping*: A present/absent bit keeps track of which pages are physically present in memory. A page fault causes the OS to bring the unmapped page into physical memory and occupy a page frame if that page is not mapped. The original page that uses this frame, if any, is set to absent and the faulting page is set to present.
+
+Using a page size of a power of 2 simplifies the mapping from virtual addresses to physical addresses as the lower offset part may be retained while the higher page number is mapped and replaced with bit operations only without subtraction and addition: The upper part of an address is the page number. With this page number as an index into the page table, if the corresponding page is absent, a page fault is generated to load the page frame. With the page loaded, the page number part of the address is replaced by the page frame number and the result is placed on the memory bus.
 
 ## Page Table
 
+The virtual address is split into a virtual page number and an offset. The purpose of the page table is to map virtual pages onto page frames,
+not from virtual pages to swap pages on the disk, which is handled purely by the OS, not the MMU.
+
+A simple mapping table from page number to frame number is only practical for small virtual memory space. 
+
 ### Table Entry
 
-The virtual address is split into a virtual page number and an offset. The purpose of the page table is to map virtual pages onto page frames.
+
 
 ```
+the exact structure is highly machine dependent
             Caching
             disabled    Modified          Present/Absent
 +-----------|-----|-----|-----|----------|-----|-----------------------------+
@@ -94,13 +116,14 @@ The virtual address is split into a virtual page number and an offset. The purpo
                   Referenced
 ```
 
-- page frame number: the output
-
 - present/absent bit: whether this page/entry is mapped and can be used
+
+- page frame number: the output
 
 - protection bits: what kinds of access are permitted
 
-- supervisor bit: whether the page is accessible only to privileged code.
+- supervisor bit: whether the page is accessible only to privileged code, 
+  e.g. the kernel memory can be mapped into user processes to avoid swapping the page table to speed up the syscalls.
 
 - modified bit/dirty bit: must be written back to nonvolatile storage when the OS decides to reclaim a frame
 
