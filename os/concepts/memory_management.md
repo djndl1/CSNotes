@@ -131,7 +131,7 @@ the exact structure is highly machine dependent
 
 - caching bit: whether caching is disabled for this page. Important for pages that map onto device registers rather than memory.
 
-The major issue in any paging system is
+The major issues in any paging system are
 
 1. the mapping must be fast;
 
@@ -143,9 +143,12 @@ A _soft miss_ occurs when the page referenced is not in the TLB. A _hard miss_ o
 
 2. if the virtual address space is large, the page table will be large. And EACH process needs its own page table.
 
-_multilevel page table_: avoid keeping all the page tables in memory all the time. The unused entries of the top level  or intermediate levels can be marked as absent, saving a lot of space for low-level page tables. Not each process need to have a full multi-level page table. Intel 386 uses a two-level page table (10-10-12). Pentium Pro extended each entry in each level of the page table from 32 bits to 64 bits. AMD64 uses a four-level page table (9-9-9-9-12).
+- _multilevel page table_: avoid keeping all the page tables in memory all the time. The unused entries of the top level or intermediate levels can be marked as absent, saving a lot of space for low-level page tables. Not each process need to have a full multi-level page table. 
+  - Grouping: Only the group needs an entry, its members don't. Unmapped pages are left out in the page table by burying them under the table entries of high-level tables. If a group of pages are not used, the entire group is represented by a single entry, not entries of all the pages.
+  - An address number is split into several parts dependent on the number of levels, each of which except the last offset represents an index into the page table at the corresponding level. Intel 386 uses a two-level page table (10-10-12). Pentium Pro added another level and extended each entry in each level of the page table from 32 bits to 64 bits. AMD64 uses a four-level page table (9-9-9-9-12).
 
-_inverted page tables_ (Itanium): one entry per page frame in real memory. The entry keeps track of which (process, virutal page) is located in the page frame. It's hard to perform virtual-to-physical translation. TLB and hashing are used.
+
+_inverted page tables_ (Itanium): one entry per page frame in real memory. The entry keeps track of which (process, virutal page) is located in the page frame. It's hard to perform virtual-to-physical translation. TLB first and then hashing are used.
 
 # Page Replacement Algorithms
 
