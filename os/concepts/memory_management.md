@@ -133,15 +133,26 @@ the exact structure is highly machine dependent
 
 The major issues in any paging system are
 
-1. the mapping must be fast;
+1. the mapping must be fast: caching in the MMU to avoid memory access based on locality of reference.
 
-In widely implemented schemes for speeding up paging and handling large virtual address spaces, the page table is in memory. Most programs tend to make a large number of references to a small number of pages. Computers are equipped with a small hardware device for mapping virtual address to physical addresses without going through the page table - _translation lookaside buffer_, also called an _associative memory_, which is usually inside the MMU and consists of a small number of entries, rarely more than 256. When the virtual page number is not in the TLB. The MMU detects the miss and does an ordinary page table lookup. It then evicts one of the entries from the TLB and replaces it with the page table just looked up.
+In widely implemented schemes for speeding up paging and handling large virtual address spaces, the page table is in memory. Most programs tend to make a large number of references to a small number of pages. Computers are equipped with a small hardware device for mapping virtual address to physical addresses without going through the page table - _translation lookaside buffer_, also called an _associative memory_ (organized like a hash map combined with possible hardwre parallel search), which is usually inside the MMU and consists of a small number of entries, rarely more than 256 (32 on 80386; 64 to 128 entries in L1 cache, a few thousands in L2 cache on modern x86). When the virtual page number is not in the TLB. The MMU detects the miss,  does an ordinary page table lookup and then evicts one of the entries from the TLB and replaces it with the page table just looked up. For the OS to modify a page table entry, it must modify the one in the main memory and flush the entry in the TLB. 
+
+Also, to solve the chicken-and-egg problem of the page table address, the physical address of the level-1 table is stored in a register and each entry of a table contains physical addresses (the frame number).
 
 Many RISC machines do nearly all of page management in software. The TLB entries are explicitly loaded by the OS. When a TLB miss occurs, a TLB fault causes the OS to buffer the page entry in the TLB. If the TLB is moderately large to reduce the miss rate, software management of the TLB turns out to be acceptably efficient. The OS can use some prediction methods to cache related pages. However, the page that holding the page table may not be in the TLB, causing additional TLB faults. The OS can maintain a large software cache of TLB entries in a fixed location whose page is always kept in the TLB (multi-level?). 
 
-A _soft miss_ occurs when the page referenced is not in the TLB. A _hard miss_ occurs when the page itself is not in memory. Looking up the mapping in the page table hierarchy is known as a _page table walk_. Some misses are slightly softer than other misses. _Minor page fault_ is that the page is not in the page table the current process, but brought into memory by another process. A major page fault occurs if the page needs to be brought in from disk. The virtual address may not map to any storage, resulting in segmentation fault.
+- _TLB miss_: the referenced page entry is not in the TLB. 
 
-2. if the virtual address space is large, the page table will be large. And EACH process needs its own page table.
+- _page table walk_: Looking up the mapping in the page table hierarchy
+
+- _Minor/soft page fault_: the page is not in the page table the current process, but brought into memory by another process. 
+  - this page is mapped but not for this process.
+
+- _major/hard page fault_: the page needs to be brought in from disk. The virtual address may not map to any storage, resulting in segmentation fault.
+
+- a more severe fault is _segfault_: this page does not map to any frame at all but thus illegal. For page faults, the physical frame exists, just not in the memory or not mapped for this process but still available elsewhere.
+
+2. if the virtual address space is large, the page table will be large. And EACH process needs its own page table: compress unmapped pages into one entry
 
 - _multilevel page table_: avoid keeping all the page tables in memory all the time. The unused entries of the top level or intermediate levels can be marked as absent, saving a lot of space for low-level page tables. Not each process need to have a full multi-level page table. 
   - Grouping: Only the group needs an entry, its members don't. Unmapped pages are left out in the page table by burying them under the table entries of high-level tables. If a group of pages are not used, the entire group is represented by a single entry, not entries of all the pages.
