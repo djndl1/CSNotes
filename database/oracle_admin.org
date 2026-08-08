@@ -571,6 +571,31 @@ Logical storage units of a database that group related logical structures
 ** Transporting Data
 
 
+** Defragmentation
+
+- look at =dba_segments= and =dba_extents= to find the high watermark of each object.
+
+- enable row movement =alter table <table> enable row movement=
+
+- shrink tables and rebuild indexes.
+  #+begin_src sql
+  alter table <table> shrink space cascade;
+  alter index <index> rebuild online;
+
+  alter index <index> rebuild partition <partition> online;
+  #+end_src
+
+- move/compact tables
+  #+begin_src sql
+    alter table <table> move online;
+    alter table <table> move partition <partition_name>;
+    -- lob data
+    alter table <table> move partition <partition> lob (lob_column) store as (tablespace <tablespace_name>);
+  #+end_src
+
+- purge the recycle bin =purge tablespace <tablespace>=
+
+- resize the data file =alter database datafile '<filepath>' resize <filesize>;=
 
 * Users and Security
 
