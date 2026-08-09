@@ -211,21 +211,50 @@ TODO
 
 # Segmentation
 
-For many problems, having two or more separate virtual address spaces may be much better than having only one. e.g. compilation, when code source text, parse tree, symbol tables and call stack all take part of the address space and may collide. A segment is a logical entity, which the programmer is aware of and uses as a logical entity.
+A segment is an indenpendnet address space of a linear sequence of addresses starting at 0, a logical entity taht the programmer is aware of and uses as a logical entity. For example, each section of a process can have its own segment (text, stacks, heap, data) to avoid collision. 
 
-To specify an address in this segmented or two-dimensional memory, the program must supply a two-part address, a segment number and number within the segment. 
+## Use
 
-Segments can facilitate linking, in which case, each procedure occupies a segment, and one recompiled procedure does not affect the others. Some shared code can occupy a segment. Different segments can have different kinds of protection.
+- (dedicated space) A dedicated segment provides a large contiguous address space for data structures that require contiguous storage.
 
-# Implementation and Examples
+- different segments for different procedures to facilitate linking and avoid relocating other existing procedures.
+
+- (shareing) segments for shared data
+
+- (protection) Different kinds of protectin for different segments.
+
+## Implementation and Examples
 
 One essential difference between paging and segments is that pages are of fixed size and segments are not.
 
-## MULTICS 
+## MULTICS (Paged Segments)
 
-TODO
+With pure segmentation, keeping segments in main memory in their entirely is inconvenient or straight impossible, which leads to the idea of paging.
 
-## Intel x86
+- 24-bit physical address: 18 for segment number since pages are aligned at 64 byte boundaries
+
+- 34-bit memory address: segment number (18) + page number (typically 6) + offset (10).
+
+- $2^18$ segments of 65536 36-bit words for a program.
+
+- the segment table itself is a segment, with each descriptor one word long
+  ```
+  | 18-bit page table address | 9-bit segment page count | 0/1 page size 1024/64 | 0/1 paged | reserved | 3-bit misc | 3-bit protection bits |
+  ```
+  - a segment is present if some of the pages are in memory and its page table is in main memory
+
+- address resolution:
+  - segment used to find the segment descriptor: if the segment's page table is in memory, use it, if not, a segment fault occurrs and the page table is loaded. 
+  - then the page table is accessed and the page entry is found with the page number. 
+  - If the page is present, access the memory with the offset, otherwise a page fault is triggered.
+  - the descriptor base register is used to locate the page table of the segment table, which itself is in a paged segment, no chicken-and-egg problem.
+    The resolution is carried by the OS on every instruction. A 16-word TLB was used for speed, which keeps the 16 most recently referneced pages.
+
+TODO more details on MULTICS address resolution
+
+## Intel x86 (32-bit)
+
+Fewer segments, larger segments
 
 x86 has 16K independent segments. The heart of the x86 virtual memory consists of two tables:
 
@@ -244,7 +273,7 @@ To access a segment, a 16-bit selector (number) for that segment is loaded into 
 +---------------------------------------------------+
 ```
 
-(selector, offset) is converted to a physical address, selector selects the segment, offset denotes the address in the segment.
+(selector, offset) is converted to a physical address, selector selects the segment, offset is the address in the segment.
 
 After loading the selector, the corresponding descriptor (64-bit) is fetched from the LDT or GDT and stored in microprogram registers. If the segment does not exist, or is currently paged out, a trap occurs. The hardware then uses `Limit` field to check if the offset is beyond the end of the segment. The x86 adds the 32-bit Base field in the descriptor to the offset to form _linear address_. If paging is disabled, the linear address is interpreted as the physical address and sent to the memory for read/write. With paging disabled, it's a pure segmentation scheme. If paging is enabled, the linear address is interpreted as a virtual address and mapped onto the physical address using page tables. The page tables are three-level hierarchy.
 
