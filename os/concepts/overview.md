@@ -159,7 +159,7 @@ limited power (computing and eletrical), sinples functions, sometimes JVM-based.
 
 ## I/O Devices
 
-I/O devices generally consist of two parts: a _controller_ and the device itself. The controller presents a simpler interface to the OS. Each controller has a _device driver_. Each controller manufacturer has to supply a driver for each OS it supports. It may be relinked to the kernel, registered to the system or installed on the fly without rebooting. Controller is operated through the device register, which forms the _I/O port space_.
+I/O devices generally consist of two parts: a _controller_ and the device itself (between them e.g. SATA). The controller presents a simpler interface to the OS (e.g. AHCI, xHCI, EHCI, OHCI). Each controller has a _device driver_. Each controller manufacturer has to supply a driver for each OS it supports. It may be relinked to the kernel, registered to the system or installed on the fly without rebooting. Controller is operated through the device register, which forms the _I/O port space_.
 
 I/O operatins may be carried out through busy waiting, interrupt mechanism, or DMA (which controls the flow of bits between memory and some controller without constant CPU intervention).
 

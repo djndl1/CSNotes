@@ -2,21 +2,36 @@
 
 ## Hardware
 
-I/O devices can be roughly divided into two categories
+## Categories
+I/O devices can be roughly divided into two categories:
+- Block devices
+- Character devices
 
-- block devices:
-
-- character devices: 
-
+## Components of I/O Units
 I/O units often consist of a mechanical component and an electronic component:
+- **Device controller/adapter**:  
+  - Form factor: chip on the motherboard (often part of the chipset) or a printed circuit card inserted into an expansion slot.  
+  - Registers: each controller has a few registers for communicating with the CPU; the OS writes to them to command the device (deliver data, accept data, switch on/off).
+  - Data buffer: many devices include a buffer that the OS can read and write.
+- **The device itself**
 
-- device controller/adapter: often takes the form of a chip on the parentboard or a printed circuit card that can be inserted into an extension slot. Each controller has a few registers that are used for communicating with the CPU. By writing into these registers, the OS can command the device to deliver data, accept data, switch itself on or off. Many devices have a data buffer that the OS can read and write.
+**Example**: 
+-  The disk controller has a buffer (for error checking and transfer between devices of different rates) that contains a stream of bits from the disk; the controller checks if this block of bits, lumped together out of the stream, contains any errors. If none, the block is sent to main memory. 
+- An LCD controller manipulates the polarization of the backlight so that the OS programmer can focus on higher-level tasks like displaying a line of pixels on the screen.
 
-- the device itself
+## Where to Access Controller Registers
 
-e.g. The disk controller has a buffer (for error checking and transfer between devices of different rates) that contains a stream of bits from the disk and the controller checks if this block of bits, lumped together out of the stream, contain any errors. If none, this block will be sent to the main memory. An LCD controller manipulates the polarization of the backlight so that the OS programmer can focus higher-level stuff like displaying a line of pixels on the screen.
+- **Mapping**: control registers may or may not appear in the same address space as *main memory* (since PDP-11) or in a dedicated *I/O port space*
+- x86 uses a hybrid approach: data buffers in memory space; control registers in separate I/O ports.
+- **If mapped**:
+  - **Access**: directly usable from C/C++ – no need for assembly routines with specialised instructions.
+  - **Protection**: normal virtual memory mechanisms keep user processes from performing I/O – no extra protection hardware needed.
+  - **Caching**: memory-mapped I/O **must not be cached**.
+    - Hardware must be able to selectively disable caching for those addresses.
+  - **Bus monitoring**: all memory modules and all I/O devices must examine every memory reference (the address on the bus) and their memory ranges to determine which ones to respond to as they share the same address space and thus the same address bus.
+    - modern PCs have a dedicated memory bus for high-speed access, making the unified address space more complicated under the hood: failover to I/O, snooping device on the memory bus, dedicated address range for I/O.
 
-- memory-mapped I/O: The control registers may or may not be mapped into the same address space as the main memory. They are directly accessible using C/C++ instead of assembly procedure. No special protection mechanism is needed to keep user processes from performing I/O. Normal virtual memory will do. However, memory-mapped I/O shouldn't be cached by memory caching. The hardware has to be able to selectively disable caching. All memory modules and all I/O devices must examine all memory references to see which ones to respond to.
+## DMA
 
 To save CPU time, _Direct Memory Access (DMA)_ is used to access I/O instead of CPU. The OS can use only DMA if the hardware has a DMA controller, which most systems do. The DMA contains several registers that can be written and read by the CPU, including a memory address register, a byte count register, and a few control registers that specify the I/O port to use, the direction of transfer, the transfer unit and the number of bytes to transfer in one burst. 
 
