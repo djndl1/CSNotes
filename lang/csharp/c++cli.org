@@ -2,7 +2,10 @@
 
 * Key Difference
 
-- =value struct= for C# =struct=, =ref class/struct= for C# =class=
+- =value struct= for C# =struct=, =ref class/struct= for C# =class=; =interface class= for C#
+  =interface=, =enum class= for C# enum (=public=/=private= is used to differentiate from C++11
+  =enum class=)
+  + =interface=, =ref=, =value= and =enum= (=private= and =public=) are what make the difference, not =class= or =struct=
   + CLI reference objects are allocated in the managed heap by =gcnew= (the C# =new=)., not
     the native heap.
 
@@ -153,3 +156,4 @@ Every conversion between value and reference types may result in a boxing/unboxi
 - =safe_cast=: normal C# object type cast that throws for incompatible types.
 
 - =static_cast=: compile-time cast, undefined  behavior for incompatible types.
+
