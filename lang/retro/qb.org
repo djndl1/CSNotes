@@ -38,6 +38,24 @@ Ultimately dervied from Microsoft BASIC. Applesoft BASIC is the version for Appl
 
 - [[https://www.freebasic.net/wiki/LangQB][FreeBASIC]]: some compatiblity with QBasic
 
+** Basic
+
+- 40-character limit for identifiers
+
+- =String= =$= (up to 32767 characters length (2 bytes) + (near pointer to data 2 bytes) + character
+  bytes (not null terminated)), =Integer= (i16) =%=, =Long= (i32) =&=,
+  =Single= (f32, default) =!= and =Double= (f64) =#=
+
+- Line numbers are not required. Alphanumeric labels 
+
+- =GOTO= discouraged
+
+- Functions:
+  #+begin_src basic
+  DE FNfuncname (args list) = ... ' single line function
+  #+end_src
+
+
 ** Documentation
 
 - [[https://qbasic.net/en/qb-manual/qb45/overview.htm][QBasic and QuickBASIC manuals]]
