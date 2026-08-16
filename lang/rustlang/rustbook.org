@@ -397,11 +397,8 @@ compile time.
 
 ** Basic Rules
 
-- Each value has a variable called its /owner/;
-
-- There can only be one owner at a time;
-
-- When the owner goes out of scope, the value will be /dropped/.
+- Each value has a variable called its /owner/, but only one at a time
+  and the value is /dropped/ (=Drop= is called) as soon as the owner goes out of scope.
 
 - Assignment by default moves a value
   - Stack-only data are copied. =Copy= trait indicates that a type is placed on
@@ -490,7 +487,10 @@ compile time.
   + String slice range indices must occur at valid UTF-8 character boundaries.
     Creating a string slice in the middle of a multibyte character causes the
     program to exit with an error.
-  + string literals are referred to as string slices.
+  + string literals are referred to as string slices. Using string slices as parameter types is
+    better than a =String&= type.
+  + string slicing is a reference to a string and remains valid, subject to borrow rules and compiler check and is why 
+    it is better than a pair of indices.
 
 #+BEGIN_SRC rust
   let mut s = String::from("hello world");
@@ -508,6 +508,8 @@ compile time.
 #+END_SRC
 
 #+BEGIN_SRC rust
+// implicit relation here has s bound to the returned slice without lifetime annotation
+// fn fist_word(s: &'a String) -> &'a str by default
   fn first_word(s: &String) -> &str{
       let bytes = s.as_bytes();
 
