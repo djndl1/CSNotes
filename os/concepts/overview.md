@@ -215,13 +215,27 @@ The OS has a basic structure:
 
 ### Layered Systems
 
-A more generalized approach is to organize the OS as a hierarchy of layers, each one constructed upon the one below it.
+A more generalized approach is to organize the OS as a hierarchy of layers, each one constructed upon the one below it. e.g. THE:
+
+- layer 0: CPU management, processes, multiprogramming. Everything running on atop of this layer sees sequential processes only.
+
+- layer 1: memory management. Upper layers care only about abstract memory instead of physical memory or paging.
+
+- layer 2: Inter-Process Communication
+
+- layer 3: I/O. Abstract I/O now above this layer
+
+- layer 4: user programs
+
+- layer 5: system operator process
+
+MULTICS had a series of rings/layers, with each outer ring calling inner ring services via trap instructions.
 
 ### Microkernels
 
-Puts as little as possible in kernel mode. The basic idea behind the microkernel design is to achieve high reliability by splitting the operating system up into small, well-defined modules, only one of which—the microkernel—runs in kernel mode and the rest run as relatively powerless ordinary user processes, in particular, running each device driver and file system as a separate user process.
+Puts as little as possible in kernel mode (/Principle of Least Authority/). The basic idea behind the microkernel design is to achieve high reliability by splitting the operating system up into small, well-defined modules, only one of which—the microkernel—runs in kernel mode and the rest run as relatively powerless ordinary user processes, in particular, running each device driver and file system as a separate user process.
 
-Common desktop operating systems do not use microkernels. However, they are dominant in real-time, industrial, avionics, and military applications that are mission critical and have very high reliability requirements.
+Common desktop operating systems do not use microkernels (except MacOS). However, they are dominant in real-time, industrial, avionics, and military applications that are mission critical and have very high reliability requirements.
 
 The MINIX3 OS has a microkernel that handles interrupts, processes, scheduling, interprocess communication, with a set of kernel calls and the clock driver. Outside the kernel, the system is structured as three layers of processes all running in user mode:
 
@@ -236,12 +250,13 @@ This puts the mechanism for doing something in the kernel and let user-mode proc
 ### Virtual Machines
 
 IBM provided virtual machine systems in the 1970s with VM/370, which provided full OS and hardware virtualization or a CPM single-user interactive systems.
+A VM monitor system separates multiprogramming (hypervisor) from an extended machine (guest OS).
 
-In order to run virtual machine software on a computer, its CPU must be virtualizable. Privileged instructions executed under user mode are ignored by CPUs without virtualization support unless some interpreter are used. It is essential that the hardware trap to the virtual machine monitor so that instruction can be emulated in software.
+In order to run virtual machine software on a computer, its CPU must be virtualizable (purposely designed for virtualization). Privileged instructions executed under user mode are ignored by CPUs without virtualization support unless some interpreter are used. It is essential that the hardware trap to the virtual machine monitor so that instruction can be emulated in software.
 
 - type 1 hypervisor: virtual machine monitor
 
-- type 2 hypervisor: running on top of a host OS, possibly with some kernel modules.
+- type 2 hypervisor: running on top of a host OS, possibly with some kernel modules. Early efforts on PCs required an interpreter, later machine simulatorws with binary translation were introduced and finally a kernel module was added.
 
 Practical hypervisors use a hybrid strategy. They add a kernel module to do the heavy lifting.
 
@@ -256,13 +271,59 @@ and typically the binaries and libraries in a read-only fashion.
 
 Exokernels partition resources and allocate them to user-level virtual machines and do not hide the fact that the underlying resources might be shared. 
 This saves a layer of resource remapping. 
-The functionality of exokernels is limited to ensuring protection and multiplexing of resources. The user application is free to build any custom abstraction on limited hardware resources (not real bare metal), or even runs in full kernel mode.
+The functionality of exokernels is limited to ensuring protection and multiplexing of resources. The user application is free to build any custom abstraction on limited hardware resources (not real bare metal), or even runs in full kernel mode. Abstractions are moved into untrusted user-space libraries (libOS) and security is controlled by the exokernel, which also exposes the underlying hardware to its guests directly instead of providing abstraction to its guests. Abstraction (LibOS) is separated from security (exokernel).
 
 > The exokernel concept is a compromise: let the kernel allocate the basic physical resources of the machine (e.g. disk blocks, memory pages, and processor time) to multiple application programs, and let each program decide what to do with these resources. The program can then link to a support library that implements the abstractions it needs (or it can implement its own).
 
 Library OSes, which provide OS services to user programs in the form of a linked library, instead of an independent OS. A program linked with a library OS runs on bare metal, a hypervisor or another OS in user mode. 
 
 Wine on Linux can be seen somewhat as a library OS. And also [the abstraction layer SQLPAL](https://www.microsoft.com/en-us/sql-server/blog/2016/12/16/sql-server-on-linux-how-introduction/) used by SQL Server Linux: the Drawbridge project is even called a library OS and SQL Server itself had been already designed to be quite self contained, only uses a few low-level features from Windows and then the two are merged together to provide Windows NT services to SQL Server. 
+
+A unikernel is a computer program statistically linked with one or more library OSes that provide OS services and can run as a guest of a hypervisor.
+
+#### Case Study: [DrawBridge](https://www.microsoft.com/en-us/research/project/drawbridge/publications/) and [SQLPAL](https://www.microsoft.com/en-us/sql-server/blog/2016/12/16/sql-server-on-linux-how-introduction/)
+
+##### SQLOS
+
+- Background: the hardware trend of SMT and NUMA requires software developers to take advantage of parallelism with optimized concurrent solutions.
+
+A new platform layer to enable ful support for the current and the future hardware features: a user-level operating system, with support for parallelism
+and locality and dynamic configuration, but not platform independence. It should be configurable so that the SQL Server could run on low-end as well as high-end 
+hardware platforms while hiding complexity from the high level developers but give broad range of flexibility to the low level developers and expand the OS' services
+over the new hardware.
+
+- Non-preemptive scheduling
+
+- memory management
+
+- deadlock detection
+
+- exception handling
+
+- external components hosting
+
+>The major objects in SQLOS design are nodes, schedulers, and tasks. Each object at its level exposes functionality maximizing local state and minimizing global state.  SQLOS attempts to minimize global state as much as possible. 
+
+Abstractions:
+
+- memory nodes: memory attached to a CPU or a set of CPUs.
+  - different hardware configurations have different relationships between CPU and  memory.
+
+- CPU node: a logical grouping of CPUs. Locality of reference, scheduling affinity
+
+TODO
+
+##### DrawBridge
+
+##### SQLPAL
+
+SQL Server needed to be ported to Linux, however, its library dependencies heavily rely on Windows API and SQL Server could not simply discard
+them nor implement them nor port them without sacrificing features, performance or  semantics. SQL Server already had a heavy abstraction layer ([SQLOS](https://learn.microsoft.com/en-us/archive/blogs/slavao/platform-layer-for-sql-server)), which did not rely much on Windows but unfornately still carried Windows API semantics and SQLOS could not help solve the problem of other dependencies.
+
+Drawbridge existed as a library OS, a research project originally intended to reduce virtualization overhead by providing a cut-down Windows environment 
+within a single process on atop of a small interface (PAL or hoste extension) to the host environment.
+
+By merging the two, SQL Server either calls into SQLOS APIs, a library or the hosted user-mode Windows OS APIs and all these APIs are built on atop of the new abstraction layer. Only very few I/O calls are directly built on Linux APIs with a small amount of conversion code. When the host extension starts as a native Linux executable, it loads and initializes SQLPAL and then SQLPAL brings up SQL Server. The whole application runs in a single Linux process but SQLPAL creates software-isolated process (a collection of threads) for various components of SQL Servers (Think about how Oracle DBMS manages processes). The ultimate goal is to remove SQLOS from SQLPAL.
 
 # Services
 
