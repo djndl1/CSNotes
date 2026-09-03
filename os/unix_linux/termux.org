@@ -107,3 +107,17 @@ original author does not build under Linux.
 
 There is no official support due to Bun not being available on Bionic Termux.
 This is [[https://github.com/Hope2333/opencode-termux][some work]] that runs OpenCode in the glibc environment on Termux.
+
+*** Pi
+
+TODO
+
+** Database
+
+*** MariaDB
+
+use =mariadb -u root= to enter root mode.
+
+If case sensitivity is required, configure it in =$PREFIX/etc/my.cnf.d/termux.cnf=. The main
+configuration file =my.cnf= is overwritten when installing but other files are not. This ensures
+the lower-case table name setting can be read.
