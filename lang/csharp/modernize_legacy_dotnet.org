@@ -30,6 +30,25 @@ to access the modern ecosystem.
   + The original author hasn't been active for a few years and the support is only up to .NET 5/6.
   + Relatively comprehensive and includes plenty of API support.
 
+- Those libraries ported by [[https://www.nuget.org/profiles/piero.viano][piero.viano]]
+  + C# 14 extension features used
+  + [[https://www.nuget.org/packages/Net4x.ValueTuple/#readme-body-tab][ValueTuple]]
+  + [[https://www.nuget.org/packages/Net4x.AsyncBridge][Net4x.AsyncBridge]], [[https://www.nuget.org/packages/Net4x.AsyncBridgeExtensions][Net4x.AsyncBridgeExtensions]]
+    for =Task= and =ValueTask=
+  + [[https://www.nuget.org/packages/Net4x.Runtime.Caching][System.Runtime.Caching]], [[https://www.nuget.org/packages/Net35.CollectionsBridge][Net35.CollectionBridge]],
+    [[https://www.nuget.org/packages/Net4x.Collections.Immutable][System.Collections.Immutable]],
+    [[https://www.nuget.org/packages/Net4x.Extensions.Caching.Memory][Microsoft.Extensions.Caching.Memory]],
+    [[https://www.nuget.org/packages/Net20.DynamicBridge][System.Dynamic]]
+    [[https://www.nuget.org/packages/Net4x.Net.Http][System.Net.HttpClient]]
+    [[https://www.nuget.org/packages/Net4x.Text.Json][System.Text.Json]]
+  + the Microsoft.Extension family: 
+    - [[https://www.nuget.org/packages/Net4x.Extensions.Logging.Abstractions][Logging.Abstractions]]
+    - [[https://www.nuget.org/packages/Net4x.Extensions.DependencyInjection.Library][DependencyInjection]]
+    - [[https://www.nuget.org/packages/Net4x.SerilogLibrary][Serilog.Extensions.Logging]]
+  + A drop-in [[https://www.nuget.org/packages/Net4x.Runtime.Remoting][replacement]] for .NET Remoting
+
+    
+
 - Various other NuGet packages listed or referenced in the projects above called =*Bridge=,  =Net40*=, =Net35*=, =Polyfill.*=
   and there are even [[https://www.nuget.org/profiles/cuteant][packages]] that port Microsoft extension libraries 
   (presumably from .NET Core 2.1) to .NETFX 4.0.
