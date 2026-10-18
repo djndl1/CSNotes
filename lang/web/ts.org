@@ -1,0 +1,39 @@
+* tuple
+
+Fundamentally a JS array with additional compile-time information, a reference type.
+
+Only =string=, =number=, =boolean=, =bigint=, =symbol=, =null= and =undefine= behave like immutable
+value types. Tuples are objects and thus reference types. The tuple syntax uses =[]= instead of
+=()=, which is comma operator in typescript.
+
+
+* =?=
+
+Rationale: indicator of missing members.
+
+- By default =var?: vartype= is =var: vartype | undefined=, which mixes explicit =undefined= value
+  and missing members.
+
+- With =exactOptionalPropertyTypes=, =var?: vartype= is a member of =vartype= or missing. It cannot
+  be assigned =undefined=.
+
+- when used for a function parameter to indicate optional parameters, the resulting argument value is =undefined=
+  and thus required by the compiler to be handled (a value has to be provided). Unlike default
+  parameters that have a value if unspecified, optional parameters are always =undefined= unless
+  provided.
+
+- =?= is not allowed on a return type or on a variable declaration. The semantics of "Missing" does
+  not make sense here.
+
+* =!=
+
+the opposite of =?=, null-forgiving operator (equivalent to that in C#). 
+It asserts the presence of a value so the compiler can let go.
+
+Most relevant when =strictNullChecks= is enabled.
+
+* =??=
+
+- covers both =null= and =undefined=
+
+- use =??= instead of =||= for more predictable result type.
