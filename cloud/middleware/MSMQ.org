@@ -123,6 +123,15 @@ Queues can be
 
 - ADs path
 
+*** Navigation
+
+- Lookup Identifiers: a locator of a message in a queue, like an index, used to read a specific message in the queue.
+  + with this ID, an app can go directly to the message and navigate from that point.
+  + there is another message ID, unique to that message, generated when the message is sent to
+    identify the message itself, not to locate it in a queue.
+
+- cursor:
+
 ** Messaging
 
 *** Multiple Destinations
