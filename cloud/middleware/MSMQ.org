@@ -48,7 +48,7 @@ and security descriptors can be set and retrieved.
 Queues can be 
 
 - *application queues*: created by an application or an MQ administrator
-  - destination queues: store messages sent from an application
+  - *destination queues*: store messages sent from an application
     + *public*: registered permanently in the directory service to located by other applications.
     + *private*: registered on the local computer (=%windir/system32/MSMQ/Storage/Lqs=) and their properties cannot be obtained by remote
     applications. Still integrated into the AD to deal with security and name resolution.
@@ -125,7 +125,7 @@ Queues can be
 
 *** Navigation
 
-- Lookup Identifiers: a locator of a message in a queue, like an index, used to read a specific message in the queue.
+- Lookup Identifiers: a locator ID of a message in a queue, like an index, used to read a specific message in the queue.
   + with this ID, an app can go directly to the message and navigate from that point.
   + there is another message ID, unique to that message, generated when the message is sent to
     identify the message itself, not to locate it in a queue.
@@ -133,6 +133,15 @@ Queues can be
 - cursor:
 
 ** Messaging
+
+- maximum size of 4MB
+
+- unique identifier
+
+*** Recoverability
+
+Recoverable messages are persisted on the disk in memory-mapped files.
+Express messages are stored in the memory.
 
 *** Multiple Destinations
 
@@ -147,3 +156,45 @@ Queues can be
     multicast address format names, and distribution list format names.
 
 - *Multicast addresses*: a queue associated with a multicast address
+
+*** Transactions
+
+
+*** Direct Messaging
+
+Used with direct format name to locate and open the queue with any directory service.
+
+*** Message Body
+
+The message body type is not restricted to an array of bytes. One of the property
+=PROPID_M_BODY_TYPE= includes all the common COM types.
+
+*** Acknowledgment
+
+Information about the ultimate outcome of message sending operations is provided by acknowledgment messages 
+(system-generated non-transactional messages), sent back to the user-specified administration queue. 
+Reliable messaging can be implemented only when acknowledgment messages are requested.
+
+When a message is lost, an acknowledgment message can indicate the reason for its loss.
+There are a few acknowledgment classess under the following two categories.
+
+- *positive Acknowledgment* ACK: reached/retrieved
+
+- *negative Acknowledgment* NACK: failed delivery or retrieval. 
+  + For negative acknowledgment messages (with the exception of private, encrypted messages) 
+    the body of the acknowledgment message contains the message body of the original message.
+  + access denied
+  + queue not available to the sender
+  + bad encryption
+  + bad signature
+  + timeout, purged, deleted, etc.
+
+
+The message ID and format name of the original message are returned in correlation ID and response
+queue info of the acknowledgment message.
+
+*** Response
+
+Response messages are application-defined response to a message, in compassion to the
+system-generated acknowledgment. The sender provides a *response queue* for the receiver to send
+back the response to.
