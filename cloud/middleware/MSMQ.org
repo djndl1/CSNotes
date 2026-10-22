@@ -51,14 +51,13 @@ Queues can be
   - *destination queues*: store messages sent from an application
     + *public*: registered permanently in the directory service to located by other applications.
     + *private*: registered on the local computer (=%windir/system32/MSMQ/Storage/Lqs=) and their properties cannot be obtained by remote
-    applications. Still integrated into the AD to deal with security and name resolution.
-      + operable even if the directory service is offline
+    applications. Still integrated into the AD to deal with security and name resolution. Operable even if the directory service is offline
     + *transaction*: only transactional queues can accept messages sent in the context of a transaction
       - When receiving messages, only local transactional queues can be accessed within the context of a transaction.
         The transactional queue must be local to the receiving application.
         On the other hand, non-transactional queues can be accessed within or outside of a transaction.
         Also, transactional queues, local or remote, can be accessed outside of a transaction.
-  - *administration queues*: used to store system-generated negative and positive acknowledgement
+  - *administration queues*: used to store system-generated negative and positive /acknowledgment/
     messages to indicate whether these messages arrived at the destination or retrieved. The sender
     can specify a queue as an administration queue for acknowledgement.
     + any non-transactional queue is eligible.
@@ -198,3 +197,39 @@ queue info of the acknowledgment message.
 Response messages are application-defined response to a message, in compassion to the
 system-generated acknowledgment. The sender provides a *response queue* for the receiver to send
 back the response to.
+
+*** Network Sessions
+
+Network connections are maintained by the local queue manager. 
+The manager attempts to connect to the remote computer with increasing delays until *time-to-reach-queue timer* of the
+message expires using the interval in =HKLM\SOFTWARE\Microsoft\MSMQ\Parameters\WaitTime=.
+
+Once a session is created, it is reused by bidirectional messaging, for outgoing messages, acknowledgment and responses.
+Any queue info is cached internally for some time
+=HKLM\SOFTWARE\Microsoft\MSMQ\Parameters\CleanupInterval= until the session is closed.
+
+*** Journaling
+
+**** Positive Source Journaling
+
+If enabled, a copy of the message is placed in the source /computer's journal/ if the message is
+delivered successfully to the next computer.
+
+**** Negative Source Journaling
+
+For non-transactional messages, the message is placed in the dead-letter queue of any computer 
+that cannot deliver the message to the next computer.
+
+For transactional messages, a copy of the message is placed in the transactional dead-letter queue 
+of the source computer only if the source queue manager receives a negative acknowledgment message 
+or does not receive a confirmation from the target queue manager 
+indicating that the message was retrieved from its destination queue.
+No notification is returned within the transaction confirmation process if the message is not delivered,
+is not received, or the receiving transaction is aborted.
+Messages found in the transactional dead-letter queue may be used as a guaranteed negative acknowledgment.
+
+**** Target Journaling
+
+If enabled, a copy of any message retrieved from the queue is placed in the queue's /queue
+journal/. This journal needs to be cleared periodically, otherwise no new messages will be placed
+there.
