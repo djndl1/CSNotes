@@ -233,3 +233,12 @@ Messages found in the transactional dead-letter queue may be used as a guarantee
 If enabled, a copy of any message retrieved from the queue is placed in the queue's /queue
 journal/. This journal needs to be cleared periodically, otherwise no new messages will be placed
 there.
+
+*** Reading/Retrieving/Peeking Messages
+
+Message Queuing provides a way to always retrieve/peek the first message in a queue, or retrieve/peek a message 
+at a specific cursor location.
+
+Although remote read operations are not part of the optimal messaging model,
+reading messages from remote non-transactional queues is fully supported (not for transactional
+queues).
