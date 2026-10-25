@@ -1,3 +1,50 @@
+* Queued Messaging
+
+- asynchronous
+
+- not real-time but real-enough time
+
+- priories can be assigned to messages
+
+- reliability: messages can be saved and offline
+
+- scalability: processing can be carried out depending on the workload
+
+- decoupled in time (either can be offline) and identity (the receiver is not forced as long as the
+  receiver is permitted)
+
+** Roles in a distributed system
+
+Any application or system can be decomposed into three general elements: *presentation*,
+*processing*, and *data management*.
+
+- two-tier (processing and presentation on one machine and data management on the
+  servers, insufficient scalability); 
+  + an intermediary agent between the client and the server in a two-tier system or integrating with
+    other systems
+
+- three-tier: scalability, availability
+  + the presentation layer can be customized for departments' needs. 
+  + In three-tier systems an attempt is made to define data entities and relationships to
+    support larger enterprise requirements instead of narrower departmental needs. The ability to
+    create new applications from a substrate of basic services is often one of the prime
+    motivating factors for going to a three-tier architecture.
+  + The business-processing tier reflects a company’s structure, its important business
+    functions, and the information flows between business units. Business processes apply business rules. 
+  + Physically separating three tiers does not automatically create decoupled structures. 
+    Capturing all data and processing rules can be a difficult and time-consuming. 
+    Many companies don’t go through the formal process of developing a business case for an application,
+    deriving all requirements, and creating a well-specified and documented design before
+    development begins. Requirements may change continually.
+
+**  Scenarios
+
+- event notification; pub-sub model.
+
+- workflow: part of the data pipeline
+
+- integrating existing systems
+
 * Versions
 
 Legacy component
@@ -137,6 +184,24 @@ Queues can be
 
 - unique identifier
 
+** Life Timers
+
+- time-to-reach-queue timer: how long a message has to reach the queue manager of the target computer
+  + set to a value less than the time-to-be-received setting
+
+- time-to-be-received timer: how long a message remains in the system,
+  starting from the time the message is sent to the time it is removed from the destination queue.
+  + time-to-to-received timer covers the time to reach the destination queue.
+
+In each hop, Message Queuing subtracts the time elapsed on the applicable computer 
+from the time-to-reach-queue and time-to-be-received properties of the message 
+when it dispatches the message to the next computer, where a new timer is set.
+
+
+If a timer expires, the message is discarded.
+If configured, the discarded message is placed in the DLQ (dead-letter queue).
+If configured, a NACK message may be sent to the administration queue;
+
 *** Recoverability
 
 Recoverable messages are persisted on the disk in memory-mapped files.
@@ -158,6 +223,7 @@ Express messages are stored in the memory.
 
 *** Transactions
 
+TODO
 
 *** Direct Messaging
 
@@ -242,3 +308,44 @@ at a specific cursor location.
 Although remote read operations are not part of the optimal messaging model,
 reading messages from remote non-transactional queues is fully supported (not for transactional
 queues).
+
+*** Poison Messages
+
+A message in a queue that has exceeded the maximum number of delivery attempts to the receiving application.
+If an application keeps processing a poison message in an infinite loop,
+a poison message can obstruct the processing of other valid messages in the queue.
+
+- *abort count*: how many times transactional processing has been aborted on a message since it was
+  placed in the current queue.
+  + reset when moved to/from a subqueue
+
+- *move count*: how many times transactional processing has been aborted on a message during its lifetime.
+
+- an application can move or mark as rejected a poison message (remove the message and send a
+  NACK message).
+
+*** Tracing: track how messages reach their destination queues.
+
+When message tracking is enabled for the source computer and tracing is requested for a message,
+Message Queuing generates a report message each time the message is *sent from* or *arrives at a computer*.
+
+A report queue needs to be set so that report messages can have a destination.
+
+With each hop, more report queues will be added to the message's report queue list and each of these
+so-called conflict report queues will receive a report message.
+
+Each report message has its own message identifier, a specific message class, which indicates that it is a report message,
+and a label and body that provide details about the original message that was sent.
+
+*** Offline 
+
+Support for computers that are temporarily not connected to all or part of the network 
+and have no access to the directory service
+
+#+begin_quote
+Once the application computer is connected to the network,
+the messages that could not be delivered to remote queues are sent on to their destination.
+Similarly, with this support, an application can read messages from local public 
+and private queues in calls using any type of format name 
+and from remote public and private queues in calls using a direct format name during offline operation.
+#+end_quote+
