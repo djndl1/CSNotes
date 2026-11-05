@@ -1,0 +1,45 @@
+* History
+
+- Core component of Oracle database since 8i.
+
+- AQ Sharded Queues (12.2), rebranded as TxEventQ in 21c
+
+* Patterns
+
+- point-to-point
+
+- pub-sub supported via multi-consumer dequeuing.
+  All messages enqueued in the queue are made available to be consumed by each of the queue subscribers.
+  + each subscriber can specify a rule which represents  a specification for he messages that
+    the subscriber wishes to receive.
+
+- multicast: A message producer can submit a list of recipients (only by name) at the time a message is enqueued
+  into a non-sharded queue. This allows for a unique set of recipients for each message
+  in the queue. The recipient list associated with the message overrides the subscriber
+  list associated with the queue, if there is one. The recipients need not be in the
+  subscriber list.
+
+Messages can be buffered (in-memory only) or persistent. In legacy AQ
+buffered messages cannot be published without static registration. 
+Buffered messages can not have actual LOB data (the field can be there but null). 
+Buffered messages do not participate in external transaction (immediate visibility).
+Also, array dequeue is not supported for buffered messaging for non-sharded queues. 
+Buffered messages are gated to prevent the memory (streams pool) from message flooding: the sender
+blocks on enqueuing and timeout with an error. Older messages are spilled to disk to free up memory
+to prevent faster subscribers from getting bogged down by slower subscribers.
+
+Array enqueue/dequeue and PL/SQL notification are only supported for sharded queues for buffered
+messaging. Message retention (message kept in the queue table for some time) transaction grouping, message export/import are not supported for
+buffered messaging.
+
+* API
+
+** PL/SQL
+
+- =DBMS_AQ= 
+
+- =DBMS_AQADM=
+
+- =DBMS_AQELM=
+
+** JMS Message Service using =oracle.jms=
