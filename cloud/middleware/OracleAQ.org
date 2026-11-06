@@ -32,6 +32,65 @@ Array enqueue/dequeue and PL/SQL notification are only supported for sharded que
 messaging. Message retention (message kept in the queue table for some time) transaction grouping, message export/import are not supported for
 buffered messaging.
 
+- Asynchronous notification: the server calls back to the client by creating a new connection to a
+ (specified or random) port of the client. A client may even register for the first notification
+only or a time interval.
+
+* Enqueue and Dequeue
+
+- Array (batched) enqueuing and dequeuing are supported
+
+- *correlation identifiers*: assigned to specific messages to retrieve at a later time
+
+- priority can be assigned to messages but it is not the only sorting criteria. 
+  A sort order is specified at table creation time: priority, enqueue time or commit time.
+  A queue may not be a strict FIFO due to flexible ordering.
+
+- *message grouping*: group messages in a transaction so that they are consumed by the same user.
+  + useful for segmentation.
+  + not supported by buffered messaging
+
+- The sender can mark the messages with a custom identification.
+
+- An expiration time may be assigned to a message.
+
+- dequeuing is concurrency-safe: no messages are consumed by two receivers.
+
+- dequeuing can be out-of-order
+  + by correlation identifier (user defined)
+  + by message identifier (system assigned)
+  + specified by other conditions
+  + default (in order): the first available message
+  + navigating through the queue: =FIRST_MESSAGE=, =NEXT_MESSAGE=, =NEXT_TRANSACTION= (grouping).
+    Non-zero wait time at the end of a queue moves the cursor back to the beginning. Using zero wait time 
+    throws an exception.
+
+- dequeuing modes:
+  + browse (peek)
+  + remove (receive)
+  + remove with no data (deleted without retrieval)
+
+- =DEQUEUE= a single queue or =LISTEN= (select) on multiple
+
+- Dequeuing may fail and application is allowed to retry for a few times (specified at the queue level)
+
+- Message states:
+  + READY: dequeueable
+  + PROECSSED: all intended consumer have dequeued the message
+  + EXPIRED: expired messages will be moved an exception queue.
+
+
+** Propagation
+
+Messages being passed form one queue to another.
+
+*** Use Cases
+
+- Messages can be fanned out to a large number of recipients without requiring them all to dequeue
+  messages from a single queue. 
+
+- Combining multiple queues into a single queue.
+
 * API
 
 ** PL/SQL
