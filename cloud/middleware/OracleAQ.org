@@ -4,6 +4,15 @@
 
 - AQ Sharded Queues (12.2), rebranded as TxEventQ in 21c
 
+* Concepts
+
+- *agent* =AQA$_AGENT=: producer or consumer of a message
+g + name, protocol, address
+
+- *recipient*: an agent that receive a message
+
+- *subscriber*
+
 * Patterns
 
 - point-to-point
@@ -75,14 +84,18 @@ only or a time interval.
 - Dequeuing may fail and application is allowed to retry for a few times (specified at the queue level)
 
 - Message states:
-  + READY: dequeueable
+  + WAITING
+  + READY: dequeuable
   + PROECSSED: all intended consumer have dequeued the message
   + EXPIRED: expired messages will be moved an exception queue.
 
-
 ** Propagation
 
-Messages being passed form one queue to another.
+Messages being passed form one queue to another (local or remote).
+
+Propagation can be *dedicated* (immediate), *event-based* (delayed but at a certain time later) or *periodic*.
+A schedule indicates the time frame during which messages can be propagated from
+the source queue.
 
 *** Use Cases
 
@@ -91,14 +104,57 @@ Messages being passed form one queue to another.
 
 - Combining multiple queues into a single queue.
 
+- integrating messages across database servers.
+
+- remote subscription (federated)
+
+*** Two Modes
+
+- Queue-to-dblink: propagation from a source queue to subscribers via a dblink
+
+- Queue-to-queue: point-to-point
+
+* Background Processes & Maintenance
+
+** Queue Monitor Processes
+
+- message state transition
+
+- spilling and recovering of buffered messages
+
+- moving messages to exception queues
+
+** Job Queue Processes
+
+Handle propagation and PL/SQL notifications.
+
 * API
 
 ** PL/SQL
 
-- =DBMS_AQ= 
+Full AQ administration capability.
 
-- =DBMS_AQADM=
+Administrative and operational
 
-- =DBMS_AQELM=
+- =DBMS_AQ=: operational interface 
+
+- =DBMS_AQADM=: administrative interface
+
+- RAW payload limited to 32K
 
 ** JMS Message Service using =oracle.jms=
+
+Administrative and operational. Standard JMS interface support.
+
+- Creating RAW message is not supported.
+
+** C/OCI
+
+Operational only. 4G Raw payload limit. Unsuitable for sharded queues.
+
+** AQ XML Servlet — SOAP / IDAP
+
+ accesses AQ over HTTP using SOAP and the AQ XML message format IDAP (Internet Data Access
+ Presentation). A Web browser or any HTTP client can act as an AQ client, sending IDAP-conformant
+ XML to the servlet, which interprets it, connects to the database and operates on user queues.
+
