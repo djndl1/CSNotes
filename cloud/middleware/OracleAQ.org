@@ -58,6 +58,8 @@ only or a time interval.
 - *message grouping*: group messages in a transaction so that they are consumed by the same user.
   + useful for segmentation.
   + not supported by buffered messaging
+  + if a queue is set to have transactional message grouping, all messages enqueued in one
+    transaction are considered part of the same group.
 
 - The sender can mark the messages with a custom identification.
 
@@ -144,7 +146,7 @@ Administrative and operational
 
 ** JMS Message Service using =oracle.jms=
 
-Administrative and operational. Standard JMS interface support.
+Administrative and operational. Standard JMS interface support. Mostly on par with the PL/SQL API.
 
 - Creating RAW message is not supported.
 
@@ -158,3 +160,61 @@ Operational only. 4G Raw payload limit. Unsuitable for sharded queues.
  Presentation). A Web browser or any HTTP client can act as an AQ client, sending IDAP-conformant
  XML to the servlet, which interprets it, connects to the database and operates on user queues.
 
+* Security
+
+- =AQ_ADMINISTRATOR_ROLE=
+
+- =AQ_USER_ROLE=: insufficient provileges for enqueuing or dequeuing
+  + =EXECUTE= on =DBMS_AQ= for OCI or PL/SQL; on =DBMS_ADIN= for JDBC or JMS to enqueue or dequeue
+    in one's onw schema.
+  + Privileges can be managed at the queue level
+
+* Administration
+
+** Table Management
+
+Before creating a queue, its queue table must be created beforehand.
+
+=DBMS_AQADM.CREATE_QUEUE_TABLE=, =DBMS_AQADM.ALTER_QUEUE_TABLE=, =DBMS_AQADM.DROP_QUEUE=,
+=DBMS_AQADM.PURGE_QUEUE_TABLE=
+
+#+begin_quote
+The following objects are created at table creation time:
+- AQ$_queue_table_name, a read-only view which is used by Oracle Database
+Advanced Queuing applications for querying queue data
+- AQ$_queue_table_name_E, the default exception queue associated with the queue
+table
+- AQ$_queue_table_name_I, an index or an index-organized table (IOT) in the case
+of multiple consumer queues for dequeue operations
+- AQ$_queue_table_name_T, an index for the queue monitor operations
+- AQ$_queue_table_name_L, dequeue log table, used for storing message identifiers
+of committed dequeue operations on the queue
+#+end_quote
+
+- The payload can be either =RAW= or any object type. 
+
+- multiple consumers or a single consumer
+
+- messages in a transaction are grouped or not
+
+** Queue Management
+
+=DBMS_AQADM.CREATE_QUEUE=, =DBMS_AQADM.ALTER_QUEUE=, =DBMS_AQADM.STOP_QUEUE=,
+=DBMS_AQADM.START_QUEUE= (ENABLE), =DBMS_AQADM.DROP_QUEUE=
+
+- normal queue or exceptio nqueue
+
+- max retry count for dequeuing
+
+- time to retain a message in the queue table after dequeuing
+
+** Privilege Management
+
+=DBMS_AQADM.GRANT_QUEUE_PRIVILEGE=, =DBMS_AQADM.REVOKE_QUEUE_PRIVILGE=
+
+** Subscription
+
+=DBMS_AQADM.ADD_SUBSCRIBER=, =ALTER_SUBSCRIBER=, =REMOVE_SUBSCRIBER=
+
+Before adding a subscriber, one must create an agent object as the subscriber's identity.
+On dequeuing, the agent uses the agent's name to specify the subscription.
