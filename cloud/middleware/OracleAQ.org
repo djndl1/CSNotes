@@ -169,7 +169,7 @@ Operational only. 4G Raw payload limit. Unsuitable for sharded queues.
     in one's onw schema.
   + Privileges can be managed at the queue level
 
-* Administration
+* Administration & Operations
 
 ** Table Management
 
@@ -218,3 +218,27 @@ of committed dequeue operations on the queue
 
 Before adding a subscriber, one must create an agent object as the subscriber's identity.
 On dequeuing, the agent uses the agent's name to specify the subscription.
+
+** Enqueuing
+
+=DBMS_AQ.ENQUEUE=.
+
+For a multi-consumer queue with no matching subscribers, enqueuing will throw ORA-24033 indicating
+the message will be discarded.
+
+A message can be transformed on enqueuing. A message can be delivered buffered or persistent.
+Its priority can be specified as a number. Its waiting time (delay) can be specified so that 
+it's not subject to immediate dequeuing (not supported by buffered messaging). It can be removed
+from the queue table only after the specified expiration time. An additional custom identifier
+(correlation) carries app-specific identification info. The recipients of a message are also
+specified on enqueuing.
+
+For Oracle AQ LOB payloads, both =BLOB= and =CLOB= use the same two-phase locator pattern: enqueue the
+message with an empty LOB placeholder (=EMPTY_BLOB()= or =EMPTY_CLOB()=), then select the newly created
+locator from the queue table and populate it with =DBMS_LOB.WRITE/WRITEAPPEND= before committing; on
+dequeue, read the =LOB= via its locator with =DBMS_LOB.READ= before committing, because the locator is
+valid only within that transaction. The only differences are type-specific: =BLOB= uses =RAW= buffers
+and byte-based offsets/amounts, while CLOB uses VARCHAR2 buffers and character-based semantics;
+payload size limits depend on the client interface (32 KB for PL/SQL/Java/precompilers, up to 4 GB
+for OCI), and enqueued payloads cannot be updated directly.
+
