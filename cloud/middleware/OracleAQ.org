@@ -217,7 +217,8 @@ of committed dequeue operations on the queue
 =DBMS_AQADM.ADD_SUBSCRIBER=, =ALTER_SUBSCRIBER=, =REMOVE_SUBSCRIBER=
 
 Before adding a subscriber, one must create an agent object as the subscriber's identity.
-On dequeuing, the agent uses the agent's name to specify the subscription.
+On dequeuing, the agent uses the agent's name to specify the subscription. A rule (filter) can be
+specified upon subscription to receive only the messages matching the condition.
 
 ** Enqueuing
 
@@ -241,4 +242,15 @@ valid only within that transaction. The only differences are type-specific: =BLO
 and byte-based offsets/amounts, while CLOB uses VARCHAR2 buffers and character-based semantics;
 payload size limits depend on the client interface (32 KB for PL/SQL/Java/precompilers, up to 4 GB
 for OCI), and enqueued payloads cannot be updated directly.
+
+** Listening & Dequeuing
+
+=DBMS_AQ.LISTEN= listens on agents, which themselves contain queue names.
+
+=DBMS_AQ.DEQUEUE= can take a consumer agent name (=NULL= for single consumer queue or the
+subscriber's name for multi-consumer queues). Dequeuing can be peeking, removing, dropping, locked.
+Navigation is also done by =DBMS_AQ.DEQUEUE=. Dequeuing can be blocking or limited timeout or
+immediate.
+Correlation identifiers (pattern supported) specified during enqueuing now can be used to retrieve certain messages.
+
 
