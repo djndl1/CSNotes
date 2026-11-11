@@ -253,4 +253,21 @@ Navigation is also done by =DBMS_AQ.DEQUEUE=. Dequeuing can be blocking or limit
 immediate.
 Correlation identifiers (pattern supported) specified during enqueuing now can be used to retrieve certain messages.
 
+* DBMS_PIPE
 
+This is not part of AQ but definitely worth attention. Even if it is often compared with Unix pipes,
+it is not byte-oriented but message-oriented, with system-supplied boundaries. It is still
+unidirectional but the user is not limited to just sending or receiving messages.
+
+There are public
+pipes (explictly created with =DBMS_PIPE.CREAT_PIPE= or implicitly on referencing), private pipes
+(explictly created and used only by =SYSDBA= or the owner).
+
+The user composes the message in an implicit buffer
+(of a limited length of 4096 bytes) by calling =DBMS_PIPE.PACK_MESSAGE= and then
+=DBMS_PIPE.SEND_MESSAGE= to a pipe. The receiver calls =DBMS_PIPE.RECEIVE_MESSAGE= to copy the
+message to the local buffer and calls =DBMS_PIPE.UNPACK_MESSAGE= to retrieve each field of the
+message.
+The type of the next item in the buffer can be obtained by =DBMS_PIPE.NEXT_ITEM_TYPE=.
+
+A pipe can be cleared by =DBMS_PIPE.PURGE=. The buffer cursors are reset with =DBMS_PIPE.RESET_BUFFER=.
