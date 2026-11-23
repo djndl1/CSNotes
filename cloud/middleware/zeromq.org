@@ -26,19 +26,21 @@ dedicated message broker by extending the standard socket interfaces.
        transparent to the user and organized by 0MQ itself. Further, messages
        may be queued in the event that a peer is unavailable to receive them.
   #+end_quote
-  + not TCP/UDP sockets but message queues.
+  + not TCP/UDP sockets but message queues. But still, most communiation APIs have buffers/queues
+    behind them.
   + ZMQ sockets may be connected to multiple endpoints using
     =zmq_connect()=, while simultaneously accepting incoming connections from
     multiple endpoints bound to the socket using =zmq_bind()=, thus allowing
     many-to-many relationships.
   + /mute state/: a state where a socket can no loger process outgoing messages.
     - high-water mark reached, no connection is established or no available peers.
-    - messages may be dropped or operations will block dependening on the socket's type.
+    - messages may be dropped or operations will block depending on the socket's type.
     
 - /context/: list of sockets, the async I/O thread and internal queries.
   + thread-safe. Individual ZMQ sockets are not thread safe
 
 - /transport/: underlying transport mechanisms
+  + transport mechanisms are not orthogonal to socket types.
   + TCP: first choice. The user can specify a source socket before the destination socket
     =tcp://source;destination=.
   + UDP: used with only =ZMQ_RADIO= and =ZMQ_DISH= socket types.
@@ -207,12 +209,51 @@ Each part (frame) is a =zmq_msg_t= but the entire message is delivered atomicall
 The standard implementation.
 
 A weird design choice is "send" and "receive" functions are associated
-with messages, not just the sockets (which are deprecated). 
+with messages, not just the sockets (which are deprecated).
 
-A message is nullified (disposed, no need to call =zmq_msg_close()=) after a successful send. Subsequent 
-calls on the same message require calling =zmq_msg_copy= to create new copies.
+*** Bind and Listen
 
-Multipart messages are sent with the =ZMQ_SNDMORE= flag except for the last one.
+No more gymnastics of binding, listening and then accepting, a simple call =zmq_bind= covers all
+transports.
+
+#+begin_quote
+The zmq_bind() function binds the 'socket' to a local 'endpoint' and then accepts incoming
+connections on that endpoint.
+...
+Every 0MQ socket type except 'ZMQ_PAIR' and 'ZMQ_CHANNEL' supports one-to-many and many-to-one semantics.
+#+end_quote
+
+*** Message Lifetime
+
+A message is nullified (ownership transferred to the sockets , no need to call =zmq_msg_close()=) after a successful send. Subsequent 
+calls on the same message require calling =zmq_msg_copy= to create new copies and possibly share the
+buffed (=ZMQ_SHARED= property of a message shows this behavior) or =zmq_msg_move= to
+steal the buffer. 
+
+#+begin_quote
+Actual release of resources associated with the message object shall be postponed by 0MQ
+until all users of the message or underlying data buffer have indicated it is no longer required.
+...
+Avoid modifying message content after a message has been copied with zmq_msg_copy(), 
+doing so can result in undefined behaviour. If what you need is an actual hard copy, 
+initialize a new message using zmq_msg_init_buffer() with the message content.
+#+end_quotex1
+
+That is, even if =zmq_msg_close= is called on a successfully sent messages, that message is not
+disposed until it's actually transmitted over the wire.
+Whether the buffer is copied or shared, whether immediately released or not is dependent on the runtime itself,
+which suggests a possible reference count mechanism.
+
+*** Multipart Messaging
+
+Multipart messages are sent with the =ZMQ_SNDMORE= flag except for the last one. The receiver shall
+query with =zmq_geetsockopt(socket, ZMQ_RCVMORE, ...)= or =zmq_msg_more()= or
+=zmq_msg_get(ZMQ_MORE)=  for subsequent messages.
+
+*** Message Metaproperty
+
+Defined on a per-connection basis with some predefined property (="Socket-Type"= , ="Routing-Id"=
+and optional ="Peer-Address"=), retrievable by =zmq_msg_gets= and set by =zmq_setsockopt= with =ZMQ_METADATA=.
 
 **** Atomic Counter API
 
