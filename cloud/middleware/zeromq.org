@@ -116,9 +116,19 @@ be sent to the subscriber in question shall instead be dropped
   #+end_quote
   + unidirectional, send only
   + drops messages in mute state
+  + bind the PUB and connect the SUB, unless your network design makes that impossible. In theory
+    with ZeroMQ sockets, it does not matter which end connects and which end binds. However, in
+    practice there are undocumented differences
+  + From ZeroMQ v3.x, filtering happens at the publisher side when using a connected protocol
+    (tcp or ipc). Using the epgm protocol, filtering happens at the subscriber
+    side. In ZeroMQ v2.x, all filtering happened at the subscriber side.
 
 - =ZMQ_SUB=: subscriber socket via =zqm_setsockopt= with =ZMQ_SUBSCRIBE=
   + receive only
+  + precisely when a subscriber starts to get messages cannot be determined.
+  + A subscriber can connect to more than one publisher, using one connect call each time. Data will
+    then arrive and be interleaved (“fair-queued”) so that no single publisher drowns out the
+    others.
 
 - =ZMQ_XPUB=, =ZMQ_XSUB= (extended): subscriptions via messages. XSUB and XPUB are exactly like SUB
   and PUB except they expose subscriptions as special messages.
@@ -255,7 +265,12 @@ query with =zmq_geetsockopt(socket, ZMQ_RCVMORE, ...)= or =zmq_msg_more()= or
 Defined on a per-connection basis with some predefined property (="Socket-Type"= , ="Routing-Id"=
 and optional ="Peer-Address"=), retrievable by =zmq_msg_gets= and set by =zmq_setsockopt= with =ZMQ_METADATA=.
 
-**** Atomic Counter API
+*** =zmq_setsockopt=
+
+This function seems to be just setting some options/properties. Some of the important actions
+(subscribing, unsubscribing etc) are actually performed by this function.
+
+*** Atomic Counter API
 
 =zmq_atomic_counter_*= Simple wrappers around native atomic operations.
 
